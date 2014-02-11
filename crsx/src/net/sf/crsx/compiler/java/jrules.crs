@@ -1,0 +1,872 @@
+// Copyright © 2012 IBM Corporation
+// $Id: jrules.crs,v 3.10 2013/07/31 16:45:42 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE JAVA RULES FILE TEXT FROM REIFIED CRSX.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+JRULES[(
+
+$Use["compiler/java/jdefs.crs"];
+$Use["compiler/java/jterm.crs"] ; 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// JAVA RULES TEMPLATE.
+//
+// Create text of nameModule.java file.
+// Environment:
+// - PACKAGE: package name 
+// - CLASSNAME: class name 
+// - MODULE : module name
+//
+
+CRSX[#name, #Declarations]
+→
+F-Declarations[#name, #Declarations, $[Get, "MODULE", ""]]
+;
+
+-[Copy[#name],Copy[#module]]
+:
+F-Declarations[#name, #Declarations, #module]
+→
+%n⟪/* JAVA RULES FOR CRSX « TOKEN[#name] » MODULE « TOKEN[#module] ». */
+package †« $[Get, PACKAGE, ""] »;
+
+import net.sf.crsx.compiler.java.*;
+import static net.sf.crsx.compiler.java.Term.*;
+import static net.sf.crsx.compiler.java.Sink.*;
+import static net.sf.crsx.compiler.java.Variable.*;
+import static net.sf.crsx.compiler.java.Crsx.*;
+import static net.sf.crsx.compiler.java.VariableSet.*;
+import static †« $[Get, PACKAGE, ""] ».†« #name »_data_fun.*;
+import static †« $[Get, PACKAGE, ""] ».†« #name »_†« $[Get, CLASSNAME, ""] ».*;
+import static †« $[Get, PACKAGE, ""] ».†« #name ».*;
+
+import java.util.ArrayList;
+
+public class †« #name »_†« $[Get, CLASSNAME, ""] »  {
+	« MapText[d.F-Declaration[d, #module], #Declarations] »
+}
+/* END OF JAVA RULES FOR CRSX « TOKEN[#name] » MODULE « TOKEN[#module] ». */
+⟫
+;
+
+Empty[Discard[#module]]             : F-Declaration[(), #module] → %n⟪⟫ ;
+Polymorphic[Fresh[argument]]        : F-Declaration[POLYMORPHIC[a.#Declaration[a]], #module] → F-Declaration[#Declaration[argument], #module] ;
+Data[Discard[#Sort,#Forms,#module]] : F-Declaration[DATA[#Sort, #Forms]           , #module] → %n⟪⟫ ;
+
+Function
+:
+F-Declaration[FUNCTION[#prefix, #kind, #path, #function, #Forms, #Sort, #Rules], #module]
+→
+$[If, $[StartsWith,#prefix, #module], F-Function[#kind, #path, #function, #Forms, #Sort, #Rules], %n⟪⟫]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// RULE FUNCTIONS.
+
+-[Discard[#Sort1,#Sort2]]
+:
+F-Function[#kind, #path, #function, (SORT-SET[#Sort1, #Sort2, #Form]; #Forms), #Sort, #Rules]
+→
+F-Function[#kind, #path, #function, (#Form; #Forms), #Sort, #Rules]
+;
+
+-[Copy[#function],Discard[#name,#Forms],Fresh[sink,term]]
+:
+F-Function[#kind, #path, #function, (FORM[#name, #FormArguments]; #Forms),SORT[#SortName,#SortArgs], #Rules]
+→
+%n⟪
+/* FUNCTION « MANGLE[#function] ». */
+final public static boolean « MANGLE[#function] »_step(final Sink «sink», final Term «term», final ArrayList<Crsx.ContextEntry> ancestors) {⟦
+boolean r = false;
+« F-Body[#kind, #path, sink, term, #function, #FormArguments, SORT[#SortName,#SortArgs], #Rules] »return r;⟧}
+⟫
+;
+
+-[Copy[#function],Discard[#name,#Forms],Fresh[sink,term]]
+:
+F-Function[#kind, #path, #function, (FORM[#name, #FormArguments]; #Forms), SORT-VARIABLE[#SortVariable], #Rules]
+→
+%n⟪
+/* FUNCTION « MANGLE[#function] ». */
+final public static boolean « MANGLE[#function] »_step(final Sink «sink», final Term «term», final ArrayList<Crsx.ContextEntry> ancestors) {⟦
+boolean r = false;
+« F-Body[#kind, #path, sink, term, #function, #FormArguments, SORT-VARIABLE[#SortVariable], #Rules] »return r;⟧}
+⟫
+;
+//TODO: check #Forms empty and #function = #name.
+
+-[Discard[#kind,#path,#function,#Sort,#Rules]]
+:
+F-Function[#kind, #path, #function, (), #Sort, #Rules]
+→
+%n⟪⟫
+;
+
+-[Copy[#kind],Share[#sink,#term,#function,#FormArguments,#Sort,#Rules]]
+:
+F-Body[#kind, #path, #sink, #term, #function, #FormArguments, #Sort, #Rules]
+→ 
+$[If, $[Equal, #kind, "Contract"], F-Contract[#sink, #term, #function, #Rules],
+$[If, $[Equal, #kind, "BinderDispatch"], F-Contract[#sink, #term, #function, #Rules], //TODO: only works for single rule...
+$[If, $[Equal, #kind, "Dispatch"], F-Dispatch[#sink, #term, #path, #function, #FormArguments, #Sort, #Rules],
+$[If, $[Equal, #kind, "Shuffle" ], F-Contract [#sink, #term, #function, #Rules],
+%n⟪⟫]]]]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Contraction rule function: rule that merely destructs according to a pattern and generates a result term.
+
+// Generate function body for complete contraction rule: 
+// 1. process options (record in environment), 
+// 2. then pattern:
+// 2.1. Extract metavar terms. Call normalize/force if needed.
+// 2.2. Match  properties
+// 3. Unlink top term (function)
+// 4. contraction.
+// 5. Unlink environment
+ 
+-[Free[sink,term], Copy[#Options]]
+:
+F-Contract[sink, term, #function, (RULE[#name, #Options, #Pattern, #Contractum];#Rules)]
+→
+%n⟪do {⟦
+/* Contraction rule « MANGLE[#name] ». */
+« {"$Binders":();"$Subs": (); "$Refs":(); "$Copies":()} F-Options[#Options, o3.F-then-Fresh[o3, sink, #Options, ok.F-then-Pattern[ok, FIRST, MATCH, #Pattern, sink, %n⟨⟩, $False, $False, term, o2.F-then-Send[o2, term, #Contractum, sink]]]] »r = true; break;⟧
+} while (false);
+if (!r) {⟦
+« F-Contract[sink, term, #function, #Rules] »⟧}⟫
+;
+
+// Generate function body for complete contraction rule: process options, then pattern, finally contraction. 
+-[Free[sink,term],Discard[#function]]
+:
+F-Contract[sink, term, #function, ()]
+→
+%n⟪⟫
+;
+
+// Initialize fresh variable.
+
+-[Free[sink]]
+:
+{#env}F-then-Fresh[OK, sink, #Options, ok.#[ok]] → 
+%n⟪«F-Freshes[sink, #Options]»«{#env}#[OK]»⟫
+;
+
+-[Free[sink]]:	F-Freshes[sink, (OPTION[#name, #value]; #options)] 	→ %n⟪«F-Fresh[sink, #name, #value]»«F-Freshes[sink, #options]»⟫;
+-[Free[sink]]:	F-Freshes[sink, ()]									→ %n⟪⟫;
+
+-[Free[sink]]: F-Fresh [sink, #name, #value]  → $[If, $[Equal, #name, "Fresh"], F-Fresh2[sink, #value],  %n⟪⟫]; 
+
+-[Free[sink],Discard[#sort]] : F-Fresh2[sink, ARGUMENT[#sort,#term]] → F-Fresh2[sink, #term];
+-[Free[sink,key]] 	         : F-Fresh2[sink, VARIABLE-USE[key]]	 → %n⟪final Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«STRING[$[Show,key]]»);
+⟫;
+
+-[Free[sink],Discard[#symbol]]	: F-Fresh2[sink, CONSTRUCTION[#symbol, #binders]] → F-Fresh3[sink, #binders];
+
+-[Free[sink]]	  : F-Fresh3[sink, (#binder; #binders)] → %n⟪«F-Fresh2[sink, #binder]»«F-Fresh3[sink, #binders]»⟫;
+-[Free[sink]]	  : F-Fresh3[sink, ()                 ] → %n⟪⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Dispatch rule function: single rule that switches on an initial value before contracting the remainder.
+
+// Generate function body for complete contraction rule set.
+-[Free[sink,term],Discard[#FormArguments,#ResultSort]]
+:
+F-Dispatch[sink, term, #path, #function, (#FormArgument1;#FormArguments), #ResultSort, #Rules]
+→
+F-Dispatch-choice[#function, #FormArgument1, sink, term, #path, #Rules]
+;
+
+// Generate choice.
+
+// TODO: TEMPORARY RULE UNTIL FOUND OUT WHY BinderSort is missing
+-[Fresh[dummy]]
+:
+F-Dispatch-choice[#function, FORM-BINDER[v.#Form[v]], #sink, #term, #path, #Rules]
+→
+F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #path, #Rules]
+;
+
+-[Discard[#BinderSort],Fresh[dummy]]
+:
+F-Dispatch-choice[#function, FORM-BINDER[#BinderSort, v.#Form[v]], #sink, #term, #path, #Rules]
+→
+F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #path, #Rules]
+;
+
+-[Free[sink,term],Fresh[sub,choice],Copy[#SortName],Discard[#SortParams, #path]]
+:
+F-Dispatch-choice[#function, FORM-ARGUMENT[SORT[#SortName, #SortParams]], sink, term, #path, #Rules]  
+→ // No need to link the SUB term as it is immediately replaced. 
+%n⟪Term «sub» = SETSUB(«term», 0, FORCE(SUB(«term», 0), ancestors));
+int «choice» = (IS_VARIABLE_USE(«sub») ? « Enum[#SortName] »« EnumVar[#SortName] » : TAG(«sub»));
+switch («choice»)
+{⟦
+« F-Dispatch-cases[FIRST, #function, #Rules, sink, term, #SortName] »default: break;⟧
+}
+⟫
+;
+
+-[Free[sink,term,alpha],Fresh[sub,choice],Discard[#path]]
+:
+F-Dispatch-choice[#function, FORM-ARGUMENT[SORT-VARIABLE[alpha]], sink, term, #path, #Rules] // TODO: #path
+→
+F-Contract[sink, term, #function, #Rules] // dispatch on single polymorphic variable - just contract.
+;
+
+// Generate switch body for each dispatch rule: case+options+matching, then contraction, finally report success.
+-[Free[sink,termp],Copy[#SortName]]
+:
+F-Dispatch-cases[#pass, #function, (RULE[#name, #Options, #Pattern, #Contractum];#Rules), sink, termp, #SortName]
+→
+%n⟪« {"$Binders":();"$Subs":();"$Refs":();"$Copies":()}F-Pattern[#pass, DISPATCH[#name,#Options,#SortName], #Pattern, sink, %n⟨⟩, $False, $False, termp, ok.F-then-Send[ok, termp, #Contractum, sink]] »« F-Dispatch-cases[SECOND, #function, #Rules, sink, termp, #SortName] »⟫
+;
+
+-[Discard[#function,#sink,#termp,#SortName]]
+:
+F-Dispatch-cases[FIRST, #function, (), #sink, #termp, #SortName]
+→
+%n⟪⟫
+;
+-[Discard[#function,#sink,#termp,#SortName]]
+:
+F-Dispatch-cases[SECOND, #function, (), #sink, #termp, #SortName]
+→
+%n⟪}
+⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Options.
+//
+// Options are recorded in the environment thus collected in a chained manner, where the final
+// invocation has mappings  variable : Free|Fresh  and  Discard$metavar | Copy$metavar |... : () .
+
+{#env} F-then-Options[OK, #Options, ok.#[ok]] → {#env} F-Options[#Options, ok.#[ok]] ;
+
+{#env} F-Options[(OPTION[#option, #value] ; #Options), ok.#[ok]] → {#env} F-Option[#option, #value, o2.F-then-Options[o2, #Options, ok.#[ok]]] ;
+{#env} F-Options[()                                  , ok.#[ok]] → {#env} #[OK] ;
+
+-[Copy[#option],Share[#value, #env, #]]
+:
+{#env}
+F-Option[#option, #value, ok.#[ok]]
+→
+$[If, $[Equal, #option, "Free"            ], {#env} F-variableOption[#option, #value, ok.#[ok]],
+$[If, $[Equal, #option, "Fresh"           ], {#env} F-variableOption[#option, #value, ok.#[ok]],
+$[If, $[Equal, #option, "FreshReuse"      ], {#env} F-variableOption[#option, #value, ok.#[ok]],
+$[If, $[Equal, #option, "FreshReuseOrigin"], {#env} F-variableFreshReuseOriginOption[#option, #value, ok.#[ok]],
+  {#env} F-metaOption[#option, #value, ok.#[ok]]]]]]
+;
+
+-[Free[key]]
+:
+{#env}
+F-variableOption[#option, VARIABLE-USE[key], ok.#[ok]]
+→ 
+{#env; key : #option}
+#[OK]
+;
+
+{#env}
+F-variableOption[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]]
+→
+{#env} F-variableOption2[#option, #symbol, #binders, ok.#[ok]]
+;
+
+-[Copy[#option]]
+:
+{#env}
+F-variableOption2[#option, #symbol, (#binder;#binders), ok.#[ok]]
+→
+{#env} F-variableOption3[#option, #binder, ok.F-then-VariableOption2[ok, #option, #symbol, #binders, o2.#[o2]]]
+;
+
+-[Discard[#option,#symbol]]
+:
+{#env}
+F-variableOption2[#option, #symbol, (), ok.#[ok]]
+→
+{#env}#[OK]
+;
+
+{#env}
+F-then-VariableOption2[OK, #option, #symbol, #binders, ok.#[ok]]
+→
+{#env}
+F-variableOption2[#option, #symbol, #binders, ok.#[ok]]
+;
+
+-[Discard[#sort]]
+:
+{#env}
+F-variableOption3[#option, ARGUMENT[#sort,#term], ok.#[ok]]
+→
+{#env}
+F-variableOption4[#option, #term, ok.#[ok]]
+;
+
+-[Free[key]]
+:
+{#env}
+F-variableOption4[#option, VARIABLE-USE[key], ok.#[ok]]
+→
+{#env; key : #option}
+#[OK]
+;
+
+-[Discard[#option, #symbol, #binders]]
+:
+{#env}
+F-variableOption4[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]]
+→
+{#env}#[OK]
+;
+
+{#env}
+F-variableFreshReuseOriginOption[#option, FreshReuseOrigin[#var, #metavar, #index], ok.#[ok]] // HACK---TODO: clean up here and in reify().
+→
+{#env}
+F-variableFreshReuseOriginOption2[#option, $[:,"Reuse$",#metavar,"$",#index], #var, ok.#[ok]]
+;
+
+-[Discard[#option]]
+:
+{#env}
+F-variableFreshReuseOriginOption2[#option, #key, #var, ok.#[ok]]
+→
+{#env; #key : #var} #[OK]
+;
+
+-[Discard[#sort]]
+:
+{#env}
+F-metaOption[#option, LITERAL[#key, #sort], ok.#[ok]]
+→
+{#env}
+F-metaOption2[$[:,#option,"$",#key], ok.#[ok]]
+;
+
+-[Discard[#binders]]
+:
+{#env}
+F-metaOption[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]]
+→
+{#env}
+F-metaOption2[$[:,#option,"$",#symbol], ok.#[ok]]
+;
+
+-[Discard[#arguments]]
+:
+{#env}
+F-metaOption[#option, META-APPLICATION[#symbol, #arguments], ok.#[ok]]
+→
+{#env}
+F-metaOption2[$[:,#option,"$",#symbol], ok.#[ok]]
+;
+
+{#env}
+F-metaOption2[#key, ok.#[ok]]
+→
+{#env; #key : ()}
+#[OK]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Match term against pattern.
+//
+// Goes to some trouble to match the body of a pattern before the properties.
+
+// Sort for stages of pattern matching generation:
+#Pattern-Stage ::=(
+  DISPATCH[$String,$List[#Option],$String]; // processing common part of dispatch function
+  CASE[$String,$List[#Option],$String];     // processing one pattern case of dispatch function
+  MATCH;                                    // processing top pattern for simple contraction rule
+  SUBMATCH;                                 // processing sub-component of pattern of either kind of function
+);
+
+// Delayed variant.
+{#env} 
+F-then-Pattern[OK, #pass, #stage, #Pattern, #sink, #setup, #needed, #unique, #termp, ok.#[ok]] 
+→ 
+{#env}  
+F-Pattern[#pass, #stage, #Pattern, #sink, #setup, #needed, #unique, #termp, ok.#[ok]] ;
+
+// Pattern {#REF} prefix: create reference variable (if used).
+// #REF is used when not discarded or compare.
+Pattern-PropertyRef[Free[sink,termp],Copy[#Ref],Share[#pass,#stage,#Pattern,#setup,#unique,#]]
+:
+{#env}
+F-Pattern[#pass, #stage, PROPERTY-REF[#Ref, #Pattern], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+$[{#env}IfDef, $[:,"Discard$",#Ref],
+ $[{#env}IfDef, $[:,"Comparable$",#Ref],
+  {#env} F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, termp, ok.F-then-Pattern-Ref[ok, $[:,"MetaVar$",#Ref],termp, o2.#[o2]]],
+  {#env} F-Pattern[#pass, #stage, #Pattern, sink, #setup, #needed, #unique, termp, ok.#[ok]]],
+ {#env} F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, termp, ok.F-then-Pattern-Ref[ok, $[:,"MetaVar$",#Ref], termp, o2.#[o2]]]]
+;
+// Helper for generating environment reference meta-variable.
+-[Fresh[namedP, varP],Free[termp],Copy[#RefCookie]]
+:
+{#env; "$Refs": #refs}
+F-then-Pattern-Ref[OK, #RefCookie, termp,ok.#[ok]]
+→
+%n⟪final NamedPropertyLink «namedP» = LINK_LINK(NAMED_PROPERTIES(«termp»));
+final VariablePropertyLink «varP» = LINK_LINK(VARIABLE_PROPERTIES(«termp»));
+« {#env; #RefCookie : PP[namedP, varP];"$Refs":(#RefCookie;#refs)} #[OK] »⟫
+;
+
+// Pattern {KEY:VALUE} prefix: extract property and match pattern.
+Pattern-Property[Free[sink,termp],Fresh[value],Copy[#pass],Discard[#Sort,#needed]]
+:
+{#env}
+F-Pattern[#pass, #stage, PROPERTY[#Key, #Value, #Pattern], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+{#env}
+F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, termp, ok.F-then-Pattern-Property[ok, #pass, sink, termp, #Key, #Value, o2.#[o2]]]
+;
+-[Free[sink,termp],Fresh[key,valuep]]
+:
+{#env}
+F-then-Pattern-Property[OK, #pass, sink, termp, #Key, #Value, ok.#[ok]] 
+→
+%n⟪« {#env} F-set-value[#Key, termp, valuep] »if («valuep» == null) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;} 
+« {#env} F-Pattern[#pass, SUBMATCH, #Value, sink, %n⟨⟩, $False, $True, valuep, ok.#[ok]] »⟫
+;
+
+-[Free[termp,valuep],Discard[#Args]]    : {#env} F-set-value[META-APPLICATION[#MetaVar, #Args], termp, valuep] → %n⟪Term «valuep» = LINK(PROPERTY(«termp», « {#env}MetaVar[#MetaVar] »));
+⟫ ;
+-[Free[termp,valuep],Discard[#Sort]]    : {#env} F-set-value[LITERAL[#Literal, #Sort],          termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«termp», «STRING[#Literal]»));
+⟫ ;
+-[Free[termp,valuep],Discard[#Binders]] : {#env} F-set-value[CONSTRUCTION[#Symbol, #Binders],   termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«termp», «STRING[#Symbol]»)); 
+⟫ ;
+-[Free[variable,termp,valuep]]          : {#env} F-set-value[VARIABLE-USE[variable],            termp, valuep] → %n⟪Term «valuep» = LINK(VARIABLE_PROPERTY(«termp», «variable»)); 
+⟫ ;
+
+// Pattern {¬ KEY} prefix: extract property and check for absence.
+Pattern-NotProperty[Free[sink,termp],Discard[#needed],Fresh[key,value]]
+:
+{#env}
+F-Pattern[#pass, #stage, PROPERTY-NOT[#Key, #Pattern], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+{#env}
+F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, termp, ok.F-then-Pattern-Not-Property[ok, sink, termp, #Key, o2.#[o2]]]
+;
+-[Free[sink,termp],Fresh[key,valuep]]
+:
+{#env}
+F-then-Pattern-Not-Property[OK, sink, termp, #Key, ok.#[ok]]
+→
+%n⟪« {#env} F-set-value[#Key, termp, valuep] »if («valuep» != null) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;}
+« {#env} #[OK] »⟫
+;
+
+// Pattern Symbol[Binders...]: advances the stage.
+//
+// - DISPATCH stage: ignore function application itself and advance to case generation.
+Pattern-Construction-Dispatch[Free[sink,termp],Discard[#needed],Copy[#pass,#unique]]
+:
+{#env}
+F-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, (#Binder1;#Binders)], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+{#env}
+F-PatternBinder[#pass, CASE[#Name,#Options,#SortName], #Binder1, sink, %n⟪« #setup »assert SYMBOL(«termp»).equals(«STRING[#Symbol]»);
+⟫, #unique, termp, 0, 0, o2.F-then-PatternBinders[o2, #pass, #Binders, sink, #unique, termp, 1, ok.#[ok]]]
+;
+
+Pattern-Construction-NoBinders-Dispatch[Free[sink,termp],Copy[#Symbol],Discard[#needed]]
+:
+{#env}
+F-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, ()], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+{#env}
+F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, ()], sink, %n⟪« #setup »assert SYMBOL(«termp»).equals(«STRING[#Symbol]»);
+⟫, $False, #unique, termp, ok.#[ok]]
+;
+
+// - CASE stage: emit case check and proceed normally.
+Pattern-Construction-Case[Free[sink,termp],Copy[#pass,#Symbol],Discard[#needed]]
+:
+{#env}
+F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+%n⟪« F-Pattern-Open[#pass] »case « Enum[#SortName] »« EnumTag[#Symbol] »: {⟦ /* Function «MANGLE[#Name]» case «MANGLE[#Symbol]» */
+« #setup »assert SYMBOL(«termp»).equals(«STRING[#Symbol]»);
+« {#env} F-Options[#Options, ok.F-then-PatternBinders[ok, #pass, #Binders, sink, #unique, termp, 0, ok.#[ok]]] »r = true; ⟧
+⟫
+;
+F-Pattern-Open[FIRST] → %n⟪⟫; 
+F-Pattern-Open[SECOND] → %n⟪
+}
+break;
+⟫
+;
+
+// - MATCH stage: check symbol and then process Binders.
+Pattern-Construction-Match[Free[sink,termp],Discard[#needed],Fresh[symbol]]
+:
+{#env}
+F-Pattern[#pass, MATCH, CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+%n⟪« #setup »assert SYMBOL(«termp»).equals(«STRING[#Symbol]»);
+« {#env} F-then-PatternBinders[OK, #pass, #Binders, sink, #unique, termp, 0, ok.#[ok]] »⟫
+;
+
+// - SUBMATCH stage: force, check, and process argument Binders.
+Pattern-Construction-SubMatch[Free[sink,termp],Fresh[ntermp],Discard[#needed],Fresh[symbol]]
+:
+{#env}
+F-Pattern[#pass, SUBMATCH, CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+%n⟪« #setup »final Term «ntermp» = FORCE(«termp», ancestors);
+if (!SYMBOL(«ntermp»).equals(«STRING[#Symbol]»)) break;
+« {#env} F-then-PatternBinders[OK, #pass, #Binders, sink, #unique, ntermp, 0, ok.#[ok]] »⟫
+;
+
+// Helper for processing construction subterms.
+{#env} F-then-PatternBinders[OK, #pass, #Binders, #sink, #unique, #termp, #index, ok.#[ok]] → {#env} F-PatternBinders[#pass, #Binders, #sink, #unique, #termp, #index, ok.#[ok]] ;
+
+// Pattern arguments [Binder,Binders...]
+-[Free[sink,termp],Copy[#pass,#index,#unique]]
+:
+{#env}
+F-PatternBinders[#pass, (#Binder;#Binders), sink, #unique, termp, #index, ok.#[ok]]
+→
+{#env}
+F-PatternBinder[#pass, SUBMATCH, #Binder, sink, %n⟨⟩, #unique, termp, #index, 0, ok.F-then-PatternBinders[ok, #pass, #Binders, sink, #unique, termp, $[Plus,#index,1], o2.#[o2]]]
+;
+
+// Pattern arguments []
+-[Free[sink,termp],Discard[#pass,#sink,#unique,#termp,#index]]
+:
+{#env}
+F-PatternBinders[#pass, (), sink, #unique, termp, #index, ok.#[ok]]
+→
+{#env}
+#[OK]
+;
+
+// Pattern argument b . Binder:
+-[Discard[#sort]]
+:
+{#env}
+F-PatternBinder[#pass, #stage, BINDER[#promisc, #sort, #occs, b . #Binder[b]], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+→
+{#env}
+F-PatternBinder1[#occs, NOTHING, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+;
+
+// - if binder occurs in exactly one meta-application then record a BinderUnique$mv$k$promisc cookie for that meta-application position -
+-[Copy[#promisc]]:
+{#env}
+F-PatternBinder1[(META-USE[#mv,#k];#occs), NOTHING, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+→
+{#env}
+F-PatternBinder1[#occs, UNIQUE[$[:,"BinderUnique$",#mv,"$",#k,"$",#promisc]], #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+;
+-[Discard[#occs,#state,#promisc]]:
+{#env}
+F-PatternBinder1[(OTHER;#occs), #state, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+→
+{#env}
+F-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+;
+-[Discard[#occ,#occs,#cookie,#promisc]]:
+{#env}
+F-PatternBinder1[(#occ;#occs), UNIQUE[#cookie], #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+→
+{#env}
+F-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+;
+-[Discard[#promisc]]:
+{#env}
+F-PatternBinder1[(), #cookie, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+→
+{#env}
+F-PatternBinder2[#cookie, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #termp, #i, #j, ok.#[ok]]
+;
+
+// - then generate and record cookie, binder name, and promiscuity (and recurse).
+-[Free[termp],Fresh[v],Copy[#cookie,#i,#j]]
+:
+{#env}
+F-PatternBinder2[UNIQUE[#cookie], #pass, #stage, b . #Binder[b], #sink, #code, #unique, termp, #i, #j, ok.#[ok]]
+→
+{#env; v : "Bound"; #cookie : v}
+F-PatternBinder[#pass, #stage, #Binder[v], #sink, %n⟪« #code »final Variable «v» = BINDER(«termp»,«INTEGER[#i]»,«INTEGER[#j]»); UNBIND(«v»);
+⟫, #unique, termp, #i, $[Plus,#j,1], ok.#[ok]]
+;
+-[Free[termp],Fresh[v],Copy[#i,#j]]
+:
+{#env}
+F-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, termp, #i, #j, ok.#[ok]]
+→
+{#env; v : "Bound"}
+F-PatternBinder[#pass, #stage, #Binder[v], #sink, %n⟪« #code »final Variable «v» = BINDER(«termp»,«INTEGER[#i]»,«INTEGER[#j]»); UNBIND(«v»);
+⟫, #unique, termp, #i, $[Plus,#j,1], ok.#[ok]]
+;
+
+// Pattern argument subterm: process as regular pattern.
+-[Free[sink,termp],Fresh[subp],Discard[#j],Copy[#i]]
+:
+{#env; "$Subs":#subs}
+F-PatternBinder[#pass, #stage, ARGUMENT[#sort,#Pattern], sink, #code, #unique, termp, #i, #j, ok.#[ok]]
+→
+{#env; subp: SUB[termp, #i]; "$Subs":(subp;#subs)}
+F-Pattern[#pass, #stage, #Pattern, sink, %n⟪« #code »final Term «subp» = LINK(SUB(«termp», «INTEGER[#i]»));  « D-check-sort[sink, subp, #sort] »
+⟫, $True, #unique, subp, ok.#[ok]]
+;
+
+// Pattern "Literal": assume that the literal is there...
+Pattern-Literal[Free[sink],Discard[#pass,#stage,#Type,#unique,#termp]]
+:
+{#env}
+F-Pattern[#pass, #stage, LITERAL[#Literal, #Type], sink, #setup, #needed, #unique, #termp, ok.#[ok]]
+→
+%n⟪/* Ignoring literal «STRING[#Literal]» */
+« If[#needed,#setup,%n⟨⟩] »« {#env} #[OK] »⟫
+;
+
+// SUBMATCH stage, pattern is free variable (outside meta-application): record the variable.  
+Pattern-Variable-Free[Free[variable,sink,termp],Fresh[ntermp], Discard[#pass,#needed,#unique]]
+:
+{#env; variable : "Free"}
+F-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+%n⟪« #setup »final Term «ntermp» = FORCE(«termp», ancestors); final Variable «variable» = VARIABLE(«ntermp»); 
+« {#env} #[OK] »⟫
+;
+
+// SUBMATCH stage, Pattern is bound variable (outside meta-application).
+Pattern-Variable-Bound[Free[variable,sink,termp],Fresh[ntermp],Discard[#pass,#kind,#needed,#unique]]
+:
+{#env; variable : $[NotMatch, "Free", #kind]}
+F-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+%n⟪« #setup »final «ntermp» = FORCE(«termp», ancestors); if («variable» != VARIABLE(«ntermp»)) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;}
+« {#env} #[OK] »⟫
+;
+
+// Pattern is variable but before options have been processed.
+
+// - first variable.
+Pattern-Variable-Case1[Discard[#needed,#unique],Copy[#SortName]]
+:
+{#env}
+F-Pattern[FIRST, CASE[#Name,#Options,#SortName], VARIABLE-USE[#variable], #sink, #setup, #needed, #unique, #termp, ok.#[ok]]
+→
+%n⟪case « Enum[#SortName] »« EnumVar[#SortName] »: {⟦
+« {#env} F-Pattern-Variable-Case[#Name, #Options, #variable, #sink, #setup, #termp, ok.#[ok]] »⟧⟫
+;
+// - subsequent variable (always follows another variable).
+Pattern-Variable-Case2[Discard[#SortName,#needed,#unique]]
+:
+{#env}
+F-Pattern[SECOND, CASE[#Name,#Options,#SortName], VARIABLE-USE[#variable], #sink, #setup, #needed, #unique, #termp, ok.#[ok]]
+→
+{#env}
+F-Pattern-Variable-Case[#Name, #Options, #variable, #sink, #setup, #termp, ok.#[ok]]
+;
+// - use a do block so failed test can break out.
+-[Free[sink,termp]]:
+{#env}
+F-Pattern-Variable-Case[#Name, #Options, #variable, sink, #setup, termp, ok.#[ok]]
+→
+%n⟪if (!r) {⟦do {⟦
+« #setup »« {#env} F-Options[#Options, ok.F-then-Pattern-Variable-Use[ok, #Name, sink, #variable, termp, o2.#[o2]]] »
+r = true; break;⟧
+} while (false);⟧}
+⟫
+;
+// - bound variable
+-[Free[sink, variable, termp], Discard[#kind]]
+:
+{#env; variable : "Bound"}
+F-then-Pattern-Variable-Use[OK, #Name, sink, variable, termp, ok.#[ok]]
+→
+%n⟪/* Function «MANGLE[#Name]» case for pattern bound variable. */
+if («variable» != VARIABLE(«termp»)) { «F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;}
+«{#env}#[OK]»⟫
+;
+// - free variable case is always last
+-[Free[sink, variable, termp]]
+:
+{#env; variable : "Free"}
+F-then-Pattern-Variable-Use[OK, #Name, sink, variable, termp, ok.#[ok]]
+→
+%n⟪/* Function «MANGLE[#Name]» case for free variable */
+final Variable «variable» = VARIABLE(«termp»);
+«{#env}#[OK]»⟫
+;
+-[Free[sink, variable, termp]]
+:
+{#env; ¬variable}
+F-then-Pattern-Variable-Use[OK, #Name, sink, variable, termp, ok.#[ok]]
+→
+%n⟪/* Function «MANGLE[#Name]» fall-back case for free variable */
+final Variable «variable» = VARIABLE(«termp»);
+«{#env}#[OK]»⟫
+;
+
+// Pattern $[...]: 
+Pattern-Evaluator[Free[sink,termp],Discard[#needed,#unique]]
+:
+{#env}
+F-Pattern[#pass, #stage, EVALUATOR[#Primitive, #Patterns], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→
+%n⟪« #setup »« {#env} E-Pattern[#Primitive, #Patterns, #pass, #stage, sink, termp, ok.#[ok]] »⟫
+;
+
+// Pattern #MetaVar[MetaArg...]: store in meta-variable and record argument variables.
+Pattern-MetaApplication[Free[sink,termp],Copy[#MetaVar],Share[#],Discard[#unique,#pass,#stage]]
+:
+{#env}
+F-Pattern[#pass, #stage, META-APPLICATION[#MetaVar, #MetaArgs], sink, #setup, #needed, #unique, termp, ok.#[ok]]
+→ // No need to LINK termp because it's just an alias.
+$[If, $[{#env}IfDef, $[:,"Discard$",#MetaVar], #needed, $True],
+  {#env}F-Pattern-MetaArgs-Norm[{#env}F-Pattern-NeedNorm[#MetaVar], #MetaVar, #MetaArgs, sink, #setup, termp, ok.#[ok]],
+  // Not needed: skip.
+  %n⟪
+« {#env} #[OK] »⟫]
+;
+
+-[Copy[#MetaVar]]
+:
+{#env}F-Pattern-NeedNorm[#MetaVar]
+→ 
+$[{#env}IfDef, $[:,"Copy$",#MetaVar], $True, $[{#env}IfDef, $[:,"Data$",#MetaVar], $True, $False]]
+;
+
+-[Free[sink, termp, parentp], Fresh[ntermp], Copy[#MetaVar, #i]]
+:
+{#env; termp:SUB[parentp, #i]}
+F-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, sink, #setup, termp, ok.#[ok]]
+→ 
+%n⟪« #setup »UNLINK_SUB(«parentp»,  «INTEGER[#i]»); final Term «ntermp» = NORMALIZE(«termp», ancestors); SETSUB(«parentp», «INTEGER[#i]», LINK(«ntermp»));
+«{#env}F-Pattern-MetaArgs-Copy[$[{#env}IfDef, $[:,"Copy$",#MetaVar], $True, $False], #MetaVar, #MetaArgs, sink, ntermp, ok.#[ok]]»⟫
+;
+
+-[Free[sink, termp], Copy[#MetaVar]]
+:
+{#env}
+F-Pattern-MetaArgs-Norm[$False, #MetaVar, #MetaArgs, sink, #setup, termp, ok.#[ok]]
+→
+%n⟪« #setup »«{#env}F-Pattern-MetaArgs-bind[$[:,"MetaVar$",#MetaVar], #MetaVar, #MetaArgs, sink, termp, ok.#[ok]] »⟫
+;
+
+-[Free[sink, termp], Copy[#MetaVar]]
+:
+{#env;"$Copies":#Copies}
+F-Pattern-MetaArgs-Copy[$True, #MetaVar, #MetaArgs, sink, termp, ok.#[ok]]
+→ 
+{#env;"$Copies":(termp;#Copies)}F-Pattern-MetaArgs-bind[$[:,"MetaVar$",#MetaVar], #MetaVar, #MetaArgs, sink, termp, ok.#[ok]];
+
+-[Free[sink, termp], Copy[#MetaVar, #i]]
+:
+{#env}
+F-Pattern-MetaArgs-Copy[$False, #MetaVar, #MetaArgs, sink, termp, ok.#[ok]]
+→ 
+{#env}F-Pattern-MetaArgs-bind[$[:,"MetaVar$",#MetaVar], #MetaVar, #MetaArgs, sink, termp, ok.#[ok]];
+
+-[Free[termp],Copy[#MetaVar]]
+:
+{#env}
+F-Pattern-MetaArgs-bind[#MetaVarCookie, #MetaVar, #MetaArgs, #sink, termp, ok.#[ok]]
+→
+%n⟪/* «termp» = « TOKEN[#MetaVar] » */
+« {#env; #MetaVarCookie : termp} F-Pattern-MetaArgs[#MetaVar, #MetaArgs, 0, #sink, termp, ok.#[ok]] »⟫
+;
+
+// Helper for meta-application variable .
+-[Discard[#sink,#termp]]
+:
+{#env}
+F-Pattern-MetaArgs[#MetaVar, (), #index, #sink, #termp, ok.#[ok]]
+→
+{#env}
+F-Pattern-MetaArgs-arity[$[:,#MetaVar,"$arity"], #index, ok.#[ok]]
+;
+{#env}
+F-Pattern-MetaArgs-arity[#MetaVarArity, #arity, ok.#[ok]]
+→
+{#env; #MetaVarArity : #arity}
+#[OK]
+;
+
+-[Free[sink,termp,variable],Copy[#i,#j,#MetaVar,#index],Discard[#sort]]
+:
+{#env}
+F-Pattern-MetaArgs[#MetaVar, (ARGUMENT[#sort, VARIABLE-USE[variable]]; #MetaArgs), #index, sink, termp, ok.#[ok]]
+→
+{#env}
+F-Pattern-MetaArgs-variable[$[:,#MetaVar,"$",#index], $[:,"Reuse$",#MetaVar,"$",#index], variable, #MetaVar, #MetaArgs, #index, sink, termp, ok.#[ok]]
+;
+
+-[Free[sink,termp,variable],Copy[#i,#j,#MetaVar,#index],Discard[#sort]]
+:
+{#env}
+F-Pattern-MetaArgs[#MetaVar, (ARGUMENT[#sort, META-REQUIRED-VARIABLE[variable]]; #MetaArgs), #index, sink, termp, ok.#[ok]]
+→
+{#env}
+F-Pattern-MetaArgs-variable[$[:,#MetaVar,"$",#index], $[:,"Reuse$",#MetaVar,"$",#index], variable, #MetaVar, #MetaArgs, #index, sink, termp, ok.#[ok]]
+;
+
+-[Free[sink,termp,variable]]
+:
+{#env}
+F-Pattern-MetaArgs-variable[#MetaVarIndex, #ReuseVar, variable, #MetaVar, #MetaArgs, #index, sink, termp, ok.#[ok]]
+→
+{#env; #MetaVarIndex : variable}
+F-Pattern-MetaArgs-variable2[$[{#env}Get, #ReuseVar, NO], variable, #MetaVar, #MetaArgs, #index, sink, termp, ok.#[ok]]
+;
+
+-[Free[sink,termp,variable]]
+:
+{#env}
+F-Pattern-MetaArgs-variable2[NO, variable, #MetaVar, #MetaArgs, #index, sink, termp, ok.#[ok]]
+→
+{#env}
+F-Pattern-MetaArgs[#MetaVar, #MetaArgs, $[Plus,#index,1], sink, termp, ok.#[ok]]
+;
+
+-[Free[reuse,sink,termp,variable]]
+:
+{#env}
+F-Pattern-MetaArgs-variable2[reuse, variable, #MetaVar, #MetaArgs, #index, sink, termp, ok.#[ok]]
+→
+%n⟪final Variable «reuse» = «variable»; 
+« {#env} F-Pattern-MetaArgs[#MetaVar, #MetaArgs, $[Plus,#index,1], sink, termp, ok.#[ok]] »⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Match term against pattern.
+//
+
+-[Free[termp,sink]]
+:
+{#env}
+F-then-Send[OK, termp, #Contractum, sink]
+→
+%n⟪WEAKENINGS_OF(«sink», «termp»); UNLINK(«termp»);
+« {#env; "!propcount":0} T-send[#Contractum, sink] »«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]»«{#env}F-unlink[$[{#env}Get, "$Copies"]]»
+⟫
+;
+
+
+-           : {#env}F-unlink-refs[()] → %n⟪⟫;
+
+-[Comparable[#RefCookie], Discard[#RefCookie], Free[namedP, varP]]
+: 
+{#env; #RefCookie:PP[namedP, varP]}
+F-unlink-refs[(#RefCookie;#refs)] → %n⟪UNLINK(«namedP»);UNLINK(«varP»);«{#env}F-unlink-refs[#refs]»⟫;
+
+
+-         : F-unlink[()] → %n⟪⟫;
+-[Free[v]]: F-unlink[(v;#vs)] → %n⟪UNLINK(«v»);«F-unlink[#vs]»⟫;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //F

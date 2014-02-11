@@ -1,0 +1,107 @@
+// Copyright © 2012 IBM Corporation
+// $Id: jsorts.crs,v 3.4 2013/06/25 13:27:21 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE JAVA SORT DESCRIPTORS FILE TEXT FROM REIFIED CRSX.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SORTS[(
+
+$Use["compiler/defs.crs"];
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// JAVA SORT FILE TEMPLATE.
+//
+// Create text of nameSorts.java file.
+//
+// Environment:
+// - PACKAGE: package name
+// - CLASSNAME : class name
+
+Crsx[Copy[#name, #Declarations]]
+:
+CRSX[#name, #Declarations]
+→
+%n⟪
+package †« $[Get, PACKAGE, ""] »;
+
+import net.sf.crsx.compiler.java.*;
+import static †« $[Get, PACKAGE, ""] ».†« #name ».*;
+
+public class †« #name »_†« $[Get, CLASSNAME, ""] » implements « SplitMapText[d.S-Empty[d], #Declarations, 0, 0, 1000, p.S-Classname[#name, p], p.S-EmptyEnd[p]] » {
+} 
+
+« SplitMapText[d.S-Declaration[d], #Declarations, 0, 0, 1000, p.S-BeginDeclaration[#name, p], p.S-EndDeclaration[p]] »
+⟫
+;
+
+-[Discard[#decl]]      : S-Empty[#decl]    → %n⟪⟫;
+-[Discard[#partCount]] : S-EmptyEnd[#partCount]    → %n⟪⟫;
+-[Copy[#partCount]]    : S-Classname[#name, #partCount] → %n⟪«$[If, $[Equal, #partCount, 0], %n⟨⟩, %n⟨, ⟩]»†« #name »_†«$[Get, CLASSNAME, ""]»«INTEGER[#partCount]»⟫;
+   
+                        S-BeginDeclaration[#name, #partCount] → %n⟪interface †« #name »_†«$[Get, CLASSNAME, ""]»«INTEGER[#partCount]»{⟫;
+-[Discard[#partCount]]: S-EndDeclaration[#partCount]   → %n⟪}⟫;
+
+Polymorphic[Fresh[arg]] : S-Declaration[POLYMORPHIC[a.#Declaration[a]]] → S-Declaration[#Declaration[arg]] ;
+Data                    : S-Declaration[DATA[#Sort, #Forms]           ] → S-Data[#Sort, #Forms] ;
+
+Function[Discard[#name,#kind,#path,#function,#Forms,#Sort,#Rules]]
+:
+S-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]]
+→
+%n⟪⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// SORT CONSTANTS.
+
+-[Copy[#name,#Forms],Discard[#args]]
+:
+S-Data[SORT[#name, #args], #Forms]
+→
+%n⟪
+/* SORT « TOKEN[#name] » CONSTANTS. */
+final public static SortDescriptor « Sort[#name] » = new SortDescriptor(« STRING[#name] », « INTEGER[Length[#Forms, 0]] », null);
+« MapIndexText[f i.S-Data-Form[#name, f, i], #Forms, 0] »
+⟫
+;
+
+-[Discard[#Sort1, #Sort2]]
+:
+S-Data[SORT-PROPERTY[#Sort1, #Sort2, #Sort3], #Forms]
+→
+S-Data[#Sort3, #Forms]
+;
+
+-[Discard[#Sort1,#Sort2]]
+:
+S-Data-Form[#sortname, SORT-SET[#Sort1, #Sort2, #Form], #n] // Added #n (constructor index in SortDescriptor)
+→
+S-Data-Form[#sortname, #Form, #n]
+;
+ 
+-[Discard[#sortname, #n]]
+:
+S-Data-Form[#sortname, SORT-ALLOWS-VARIABLES, #n] // Added #n
+→
+%n⟪⟫
+;
+  
+-[Copy[#name,#sortname,#FormArguments]]
+:
+S-Data-Form[#sortname, FORM[#name, ()], #n] // Added #n
+→
+%n⟪
+final static public ConstructionDescriptor « Descriptor[#name] »  = new DataConstructionDescriptor(« STRING[#name] »,« Sort[#sortname] », « Enum[#sortname] »« EnumTag[#name] », 0, 0, null, «INTEGER[#n]»);
+⟫
+;
+
+-[Copy[#name,#sortname,#FormArgument1,#FormArguments]]
+:
+S-Data-Form[#sortname, FORM[#name, (#FormArgument1;#FormArguments)], #n]
+→
+%n⟪
+final static public ConstructionDescriptor « Descriptor[#name] »  = new DataConstructionDescriptor(« STRING[#name] »,« Sort[#sortname] », « Enum[#sortname] »« EnumTag[#name] », « INTEGER[Length[#FormArguments,1]] », « INTEGER[FormArguments-binder-count[(#FormArgument1;#FormArguments), 0]] », new int[] {0« MapText[o.%n⟨ , ‹ INTEGER[o] ›⟩, FormArguments-binder-offsets[(#FormArgument1;#FormArguments), 0]] »}, «INTEGER[#n]»);
+⟫;
+ 
+)]

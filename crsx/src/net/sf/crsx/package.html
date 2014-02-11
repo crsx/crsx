@@ -1,0 +1,23 @@
+<body>
+	Combinatory Reduction Systems framework.
+	<p>
+	Implementation of higher order rewriting based on
+	Klop's Combinatory Reduction System (CRS) formalism.
+	<p>
+	Terms are one of the following:
+	<ul>
+	<li>A <em>construction</em> with a constructor symbol wrapping zero or more subterms with optional binding of variables for each subterm.
+	<li>A <em>variable</em> which can be "bound" or "free".
+	<li>A <em>meta-application</em> which applies a "meta-variable" to zero or more subterms;
+		meta-applications also serve to write match patterns. 
+	</ul>
+	Each implementation defines the internal representation of terms and the precise nature of matching.
+	<p>
+	The package is structured as follows:
+	<ul>
+	<li>The top-level package has the public interfaces.
+	<li>The {@link generic} subpackage contains a complete interpretive implementation of {@link CRS}.
+	<li>The {@link jjcrs} subpackage contains a parser generator (built on the JavaCC parser generator) suitable for parsing CRS terms.
+	<li>The {@link util} subpackage contains various utility classes.
+	</ul>
+</body>

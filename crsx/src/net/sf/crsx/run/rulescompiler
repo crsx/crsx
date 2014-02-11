@@ -1,0 +1,3006 @@
+// Copyright © 2010, 2011 IBM Corporation
+// $Id: rulescompiler,v 3.0 2012/12/17 18:04:57 krisrose Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// CRSX RULES TO C COMPILER
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+RulesCompiler[(
+
+$CheckGrammar['net.sf.crsx.text.Text'] ;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// TOP LEVEL
+//
+// All top level command take their input from a URL and prints the result to the standard output.
+//
+// * $Dispatch[URL] - reads a CRS system from the URL and generates the sorts and rules of a
+//   single master "dispatchified" CRS system with fully explicit sort declarations.
+//
+// * $CHeader[URL, "crsx.h"] - reads a dispatchified CRS from URL and generates the text of a C
+//   header (.h) file, which will load the CRS runtime setup from "crsx.h" and declares all global
+//   types and macros defining the sorts and signatures of invoking rules from the system.
+//
+// * $CSymbols[URL] - reads a dispatchified CRS from URL and generates list of all constructor symbols.
+//
+// * $CData[URL, "CHeader.h"] - reads a dispatchified CRS from URL and generates the text of a C
+//   module (.c) file, which includes the corresponding "CHeader.h" file and contains the C
+//   data structure constants.
+//
+// * $CRules[URL, "CHeader.h"] - reads a dispatchified CRS from URL and generates the text
+//   of a C module (.c) file, which includes the corresponding "CHeader.h" file and contains the C
+//   function definitions corresponding to all rules in the URL CRS.
+//
+// * $CMain[URL, "CHeader.h", Term] - reads a dispatchified CRS from URL and generates the text
+//   of a C main program (.c) file, which includes the corresponding "CHeader.h" file and contains
+//   a main() function that normalizes and prints the passed Term.
+//
+// * $CMainRaw[URL, "CHeader.h", URL, Category] - reads a dispatchified CRS from URL and generates
+//   the text of a C main program (.c) file, which includes the corresponding "CHeader.h" file and
+//   contains a main() function that just prints the term in the passed URL2 parsed as Category.
+
+-[Copy[###url]]
+:
+$Dispatch[###url]
+→
+$[Script, (
+  $[Load, ###url];
+  $Dispatchify;
+  $Sortify;
+  $DumpRules;
+)]
+;
+
+-[Copy[###url]]
+:
+$CHeader[###url, ###header]
+→
+$C-Header[###url, ###header, $[Load, ###url]]
+;
+
+$CSymbols[###url]
+→
+$C-Symbols[$[Load, ###url]]
+;
+
+-[Copy[###url]]
+:
+$CData[###url, ###header]
+→
+$C-Data[###url, ###header, $[Load, ###url]]
+;
+
+-[Copy[###url]]
+:
+$CRules[###url, ###header]
+→
+$C-Rules[###url, ###header, $[Load, ###url]]
+;
+
+$CMain[###url, ###header, ###term]
+→
+$C-Main[###header, ###term, $[Load, ###url], 'printTerm']
+;
+
+$CMainRaw[###url, ###header, ###url2, ###category2]
+→
+$C-Main[###header, $[Load, ###url2, ###category2], $[Load, ###url], 'printTerm']
+;
+
+$CMainC[###url, ###header, ###term]
+→
+$C-Main[###header, ###term, $[Load, ###url], 'printCTerm']
+;
+
+$CMainCRaw[###url, ###header, ###url2, ###category2]
+→
+$C-Main[###header, $[Load, ###url2, ###category2], $[Load, ###url], 'printCTerm']
+;
+
+$C[###url, ###term]
+→
+$C-Single[###url, ###term]
+;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// C FILE TEMPLATES.
+
+// $C-Single: build stand alone program!
+//
+-[Copy[###url]]
+:
+$C-Single[###url, ###term]
+→
+$C-Single2[###url, $[Load, ###url], ###term]
+;
+
+-[Copy[###url,###crs]]
+:
+$C-Single2[###url, ###crs, ###term]
+→
+%n⟪// C STAND ALONE PROGRAM FOR CRSX SYSTEM OF †«###url» ON TERM.
+« $C-Header[###url, 'crsx.h', ###crs] »
+« $C-Data[###url, (), ###crs] »
+« $C-Rules[###url, (), ###crs] »
+« $C-Main[(), ###term, ###crs, 'printTerm'] »
+⟫
+;
+
+// $C-Header: Convert entire (dispatchified) CRS to C header file.
+//
+$C-Header[###url, ###header, (###directives;)]
+→
+$C-Header[###url, ###header, ###directives]
+;
+
+$C-Include[$[NotMatch,(),###header]] → %n⟪↲#include "†«###header»"⟫ ;
+$C-Include[()] → %n⟪⟫ ;
+
+-[Copy[###url,###name]]
+:
+$C-Header[###url, ###header, $[C,###name,(###directives;)]]
+→
+%n⟪// C HEADER FOR †«###name» CRSX SYSTEM OF †«###url».
+#ifndef CRSX_†«$[Mangle,###url]»_H
+#define CRSX_†«$[Mangle,###url]»_H
+«$C-Include[###header]»
+#ifdef __cplusplus
+extern "C" {
+#endif
+«$C-Passes[H, ###directives]»
+#ifdef __cplusplus
+}
+#endif
+#endif
+// END OF C HEADER FOR †«###name» CRSX SYSTEM OF †«###url».
+⟫
+;
+
+// $C-Data: Convert entire (dispatchified) CRS to C term data structures.
+//
+$C-Data[###url, ###header, (###directives;)]
+→
+$C-Data[###url, ###header, ###directives]
+;
+
+-[Copy[###url,###name]]
+:
+$C-Data[###url, ###header, $[C,###name,(###directives;)]]
+→
+%n⟪// C DATA DESCRIPTORS FOR †«###name» CRSX SYSTEM OF †«###url».
+«$C-Include[###header]»
+#ifdef __cplusplus
+extern "C" {
+#endif
+«$C-Passes[D, ###directives]»
+#ifdef __cplusplus
+}
+#endif
+// END OF DATA DESCRIPTORS †«###name» CRSX SYSTEM OF †«###url».
+⟫
+;
+
+// $C-Rules: Convert entire (dispatchified) CRS to C rewrite function source.
+//
+$C-Rules[###url, ###header, (###directives;)]
+→
+$C-Rules[###url, ###header, ###directives]
+;
+
+-[Copy[###url,###name]]
+:
+$C-Rules[###url, ###header, $[C,###name,(###directives;)]]
+→
+%n⟪// C RUNTIME FOR RULES OF †«###name» CRSX SYSTEM OF †«###url».
+«$C-Include[###header]»
+#ifdef __cplusplus
+extern "C" {
+#endif
+«$C-Passes[C, ###directives]»
+#ifdef __cplusplus
+}
+#endif
+// END OF RUNTIME FOR RULES OF †«###name» CRSX SYSTEM OF †«###url».
+⟫
+;
+
+// $C-Main: Convert entire (dispatchified) CRS to C rewrite function source.
+//
+$C-Main[###header, ###term, (###directives;), ###printer]
+→
+$C-Main[###header, ###term, ###directives, ###printer]
+;
+
+-[Copy[###name],Fresh[sink]]
+:
+$C-Main[###header, ###term, $[C,###name,(###directives;)], ###printer]
+→
+%n⟪// GENERATED C MAIN PROGRAM FOR NORMALIZING †«###name» CRSX SYSTEM TERM.
+#include <stdlib.h>
+«$C-Include[###header]»
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Function generating term.
+void sendTerm(Sink «sink»)
+{⟦«
+  $C-Pass1[N, ###directives, ok¹.Cok-T[ok¹, "MAIN", ###term, (), sink]]
+»⟧
+}
+
+// Test program.
+int main(int argc, char *argv[])
+{
+  int i; char key[20];
+  for (i = 0; i <= argc; ++i)
+  {
+    snprintf(key, 20, "ARG%d", i);
+    setenv(key, argv[i], 1);
+  }
+  struct _Context _context = {};
+  
+  Sink sink = MAKE_BUFFER(&_context);
+  sendTerm(sink);
+  Term term = BUFFER_TERM(sink);
+  FREE_BUFFER(sink);
+  normalize(&_context, &term);
+  †«###printer»(&_context, term);
+  return 0;
+}
+
+#ifdef __cplusplus
+}
+#endif
+// END OF GENERATED C MAIN PROGRAM FOR NORMALIZING †«###name» CRSX SYSTEM TERM.
+⟫
+;
+
+// $C-Symbols: Convert entire (dispatchified) CRS to list of symbols...
+//
+$C-Symbols[(###directives;)]
+→
+$C-Symbols[###directives]
+;
+-[Discard[###name]]
+:
+$C-Symbols[$[C,###name,(###directives;)]]
+→
+$C-Passes[S, ###directives]
+;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// MODES AND PASSES.
+//
+// There are three modes:
+// - 'H' for generating a header file (.h) with (non-allocating) declarations of all sort tags, constructors, and available step functions.
+// - 'D' for generating an implementation file (.c) with the sort and constructor descriptors
+// - 'C[Pre]' for generating an implementation file (.c) with the step function implementations for all functions that start with Pre
+// - 'L' for generating a lexer file (.l) that defines a simple parse function for terms.
+// - 'N' for not generating anything but still process all declarations (for testing).
+//
+// The 'C' mode uses two passes where the ###Env environment is built by the first pass and used by the second with entries of the forms
+// - C : Sort - the Sort of each constructor C
+// - Sort : (C1;...Cn;) - the data constructors Ci of a Sort
+//
+-                      : $C-Passes[H, ###directives] → $C-Pass1[H, ###directives, ok¹.%n⟪⟫] ;
+-                      : $C-Passes[S, ###directives] → $C-Pass1[S, ###directives, ok¹.%n⟪⟫] ;
+-                      : $C-Passes[D, ###directives] → $C-Pass1[D, ###directives, ok¹.$C-LastSortDescriptor[ok¹]] ;
+-[Copy[###directives]] : $C-Passes[C, ###directives] → $[Echo, "// Pass 1.\n", $C-Pass1[C, ###directives, ok¹.$C-Pass2[ok¹, ###directives]]] ;
+
+{###Env} $C-Pass1[H, (), ok¹.###continue[ok¹]] → $[Echo, "// Done.\n", {###Env} ###continue[OK]] ;
+{###Env} $C-Pass1[S, (), ok¹.###continue[ok¹]] → $[Echo, "// Done.\n", {###Env} ###continue[OK]] ;
+{###Env} $C-Pass1[D, (), ok¹.###continue[ok¹]] → $[Echo, "// Done.\n", {###Env} ###continue[OK]] ;
+{###Env} $C-Pass1[C, (), ok¹.###continue[ok¹]] → $[Echo, "// Pass 2.\n", {###Env} ###continue[OK]] ;
+{###Env} $C-Pass1[N, (), ok¹.###continue[ok¹]] → {###Env} ###continue[OK] ;
+
+Pass2-Done : $C-Pass2[OK, ()] → $[Echo, "\n// Done.\n", %n⟪⟫] ;
+
+{###Env}
+$C-LastSortDescriptor[OK]
+→
+%n⟪
+SortDescriptor lastSortDescriptor = « $[{###Env}Get, '$$_LAST_SORT_$$', %n⟨NULL⟩] »;
+⟫
+;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// DATA SORTS
+//
+// s[ps] ::=( [v ;] c1[ b.s11,..., b.s1n1 ] ;...; cm[ b.sm1,...,b.smnm ] ;);
+//
+// Compiled to structure declarations compatible with crsx/c/crsx.h.
+
+-[Copy[###sort,###forms]]
+:
+{###Env}
+$C-Pass1[H, ($[C,$Sort,(###sort;###forms;)] ; ###rest), ok¹.###pass2[ok¹]]
+→
+%n⟪
+
+// DATA SORT: †«$[Squash,$[Show,$[C,$Sort,(###sort;###forms;)]]]»«{###Env} $C-DataSort[H, ###sort, ###forms, ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+
+{###Env}
+$C-Pass1[S, ($[C,$Sort,(###sort;###forms;)] ; ###rest), ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DataSort[S, ###sort, ###forms, ###rest, ok¹.###pass2[ok¹]]
+;
+
+-[Copy[###sort,###forms]]
+:
+{###Env}
+$C-Pass1[D, ($[C,$Sort,(###sort;###forms;)] ; ###rest), ok¹.###pass2[ok¹]]
+→
+%n⟪
+
+// DATA SORT: †«$[Squash,$[Show,$[C,$Sort,(###sort;###forms;)]]]»«{###Env} $C-DataSort[D, ###sort, ###forms, ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+
+{###Env}
+$C-Pass1[C, ($[C,$Sort,(###sort;###forms;)] ; ###rest), ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DeclareThenProcess[C, ###forms, ###sort, (), 'C$', ###rest, ok¹.###pass2[ok¹]]
+;
+
+{###Env}
+$C-Pass1[N, ($[C,$Sort,(###sort;###forms;)] ; ###rest), ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DeclareThenProcess[N, ###forms, ###sort, (), 'C$', ###rest, ok¹.###pass2[ok¹]]
+;
+
+Pass2-Sort[Discard[###sort,###forms]] : {###Env} $C-Pass2[OK, ($Sort[###sort, ###forms] ; ###rest)] → {###Env} $C-Pass2[OK, ###rest] ;
+
+// Type parameters are ignored.
+-[Fresh[p]]
+:
+{###Env}
+$C-DataSort[###HD, ###sort, $B param . ###forms[param], ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DataSort[###HD, ###sort, ###forms[p], ###rest, ok¹.###pass2[ok¹]]
+;
+-[Fresh[p¹]]
+:
+{###Env}
+$C-DataSort[###HD, ###sort, $BL param . ###forms[param], ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DataSort[###HD, ###sort, ###forms[p¹], ###rest, ok¹.###pass2[ok¹]]
+;
+
+// Proper sort with at least one form.
+-[Copy[###sort,###form,###forms]]
+:
+{###Env}
+$C-DataSort[H, ###sort,(###form;###forms), ###rest, ok¹.###pass2[ok¹]]
+→
+%n⟪«$C-Enumerate[(###form;###forms), ###sort]»«{###Env} $C-DataDescriptors[H, (###form;###forms), ###sort, ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+
+{###Env}
+$C-DataSort[S, ###sort,(###form;###forms), ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DataDescriptors[S, (###form;###forms), ###sort, ###rest, ok¹.###pass2[ok¹]]
+;
+
+{###Env}
+$C-DataSort[D, ###sort,(###form;###forms), ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DataDescriptors[D, (###form;###forms), ###sort, ###rest, ok¹.###pass2[ok¹]]
+;
+
+// Dummy sort with no forms.
+-[Copy[###sort,###form,###forms]]
+:
+{###Env}
+$C-DataSort[###HD, ###sort,(), ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DataDescriptors[###HD, (), ###sort, ###rest, ok¹.###pass2[ok¹]]
+;
+
+// $C-Enumerate:
+// * $C-Xf[s]: identifies function construction of sort s.
+// * $C-Xv[s]: identifies variable of sort s.
+// * $C-Xe[s]: type name for enumeration of data tags for sort s.
+// * $C-X[c]: name of constant index for constructor c (with value >0).
+$C-Xf[###sort] → $[:,'FunctionOf',$[Mangle,###sort]] ;
+$C-Xv[###sort] → $[:,'VariableOf',$[Mangle,###sort]] ;
+$C-Xe[###sort] → $[:,'EnumOf',$[Mangle,###sort]] ;
+$C-X[###c] → $[:,'Data',$[Mangle,###c]] ;
+//
+-[Copy[###sort]]
+:
+$C-Enumerate[###forms, ###sort]
+→
+%n⟪
+typedef enum {†«$C-Xf[###sort]» = 0, †«$C-Xv[###sort]» = 1«$C-EnumerateChoices[###forms]»} †«$C-Xe[###sort]»;⟫
+;
+-                   : $C-EnumerateChoices[()                            ] → %n⟪⟫ ;
+-[Discard[###args]] : $C-EnumerateChoices[($[C,###c,###args] ; ###forms)] → %n⟪, †«$C-X[###c]»«$C-EnumerateChoices[###forms]»⟫ ;
+-[Free[v]]          : $C-EnumerateChoices[(v                 ; ###forms)] → $C-EnumerateChoices[###forms] ;
+
+// $C-DataDescriptors:
+//
+// * struct _SortDescriptor $C-s[s]: descriptor structure for sort s.
+// * struct _ConstructionDescriptor $C-c[c]: descriptor structure for construction with c.
+// * $C-n[c]: function returning the name of the constructor.
+//
+$C-s[###sort] → $[:,'sort',$[Mangle,###sort]] ;
+-[Copy[###sort]] : $C-sp[###sort] → $[If, $[Equal,'$ANY',###sort], NULL, $[:,'&sort',$[Mangle,###sort]]] ;
+$C-sc[###sort] → $[:,'sortConstructors',$[Mangle,###sort]] ;
+$C-sn[###sort] → $[:,'sortConstructorNames',$[Mangle,###sort]] ;
+$C-si[###sort] → $[:,'sortConstructorInternalNames',$[Mangle,###sort]] ;
+$C-c[###c] → $[:,'descriptor',$[Mangle,###c]] ;
+$C-cb[###c] → $[:,'constructorBinderOffsets',$[Mangle,###c]] ;
+$C-n[###c] → $[:,'name',$[Mangle,###c]] ;
+
+-[Copy[###forms,###sort]]
+:
+{###Env}
+$C-DataDescriptors[H, ###forms, ###sort, ###rest, ok¹.###pass2[ok¹]]
+→
+%n⟪
+extern struct _SortDescriptor †«$C-s[###sort]»;«$C-DataConstructionDescriptors[H, ###forms, ###sort]» «$C-Forms[###sort, ###forms]»
+«{###Env} $C-Pass1[H, ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+
+{###Env}
+$C-DataDescriptors[S, ###forms, ###sort, ###rest, ok¹.###pass2[ok¹]]
+→
+%n⟪«$C-ConstructorDescriptors[###sort, ###forms]»«{###Env} $C-Pass1[S, ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+//
+-[Copy[###sort,###c],Discard[###args]]
+:
+$C-ConstructorDescriptors[###sort, ($[C,###c,###args] ; ###forms)]
+→
+%n⟪{†«$[Escape,###c]», &†«$C-c[###c]»},
+«$C-ConstructorDescriptors[###sort, ###forms]»⟫
+;
+-[Free[variable]]   : $C-ConstructorDescriptors[###sort, (variable          ; ###forms)] → $C-ConstructorDescriptors[###sort, ###forms] ;
+-[Discard[###sort]] : $C-ConstructorDescriptors[###sort, ()                            ] → %n⟪⟫ ;
+
+-[Copy[###forms,###sort]]
+:
+{###Env}
+$C-DataDescriptors[D, ###forms, ###sort, ###rest, ok¹.###pass2[ok¹]]
+→
+%n⟪«$C-DataConstructionDescriptors[D, ###forms, ###sort]»
+ConstructionDescriptor †«$C-sc[###sort]»[] = {NULL, NULL, «$C-ConstructorRefs[###forms]»};
+char *†«$C-sn[###sort]»[] = {NULL, NULL, «$C-ConstructorNames[###forms]»};
+char *†«$C-si[###sort]»[] = {NULL, NULL, «$C-ConstructorInternalNames[###forms]»};
+struct _SortDescriptor †«$C-s[###sort]» = {†«$[Escape,###sort]», †«$C-sc[###sort]», †«$C-sn[###sort]», †«$C-si[###sort]», «$[{###Env}Get, '$$_LAST_SORT_$$', %n⟨NULL⟩]»};«{###Env; '$$_LAST_SORT_$$' : %n⟨&†‹$C-s[###sort]›⟩} $C-DeclareThenProcess[D, ###forms, ###sort, (), 'C$', ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+
+-[Free[variable]]
+:
+$C-DataConstructionDescriptors[###HD, (variable; ###forms), ###sort]
+→
+$C-DataConstructionDescriptors[###HD, ###forms, ###sort]
+;
+
+-[Discard[###HD,###sort]] : $C-DataConstructionDescriptors[###HD, (), ###sort] → %n⟪⟫ ;
+
+-[Discard[###args]]
+:
+$C-DataConstructionDescriptors[H, ($[C,###c,###args] ; ###forms), ###sort]
+→
+%n⟪
+extern struct _ConstructionDescriptor †«$C-c[###c]»;«$C-DataConstructionDescriptors[H, ###forms, ###sort]»⟫
+;
+
+-[Discard[###c,###args]]
+:
+$C-DataConstructionDescriptors[S, ($[C,###c,###args] ; ###forms), ###sort]
+→
+$C-DataConstructionDescriptors[S, ###forms, ###sort]
+;
+
+-[Copy[###args]]
+:
+$C-DataConstructionDescriptors[D, ($[C,###c,###args] ; ###forms), ###sort]
+→
+$C-DataConstructionDescriptorsD1[###c, ###args, ###forms, ###sort, ###args, 0]
+;
+
+-[Discard[###arg9]]
+:
+$C-DataConstructionDescriptorsD1[###c, ###args, ###forms, ###sort, (###arg9 ; ###args9), ###arity]
+→
+$C-DataConstructionDescriptorsD1[###c, ###args, ###forms, ###sort, ###args9, $[Plus,###arity,1]]
+;
+
+-[Copy[###sort,###c,###args,###arity]]
+:
+$C-DataConstructionDescriptorsD1[###c, ###args, ###forms, ###sort, (), ###arity]
+→
+%n⟪«$C-DataConstructionDescriptorsD1Offset[###c, ###args, ###arity]»
+struct _ConstructionDescriptor †«$C-c[###c]» = {⟦¶&†«$C-s[###sort]», ¶†«$C-X[###c]», ¶†«###arity», ¶sizeof(†«$C-Cstruct[###c]»), ¶«$C-DataConstructionDescriptorsD1OffsetReference[###c, ###args]», ¶&dataName, ¶&dataStep⟧ ¶};«$C-DataConstructionDescriptors[D, ###forms, ###sort]»⟫
+;
+
+$C-DataConstructionDescriptorsD1Offset[###c, ###args, ###arity]
+→
+$[IfZero, ###arity, %n⟪⟫, %n⟪
+int †«$C-cb[###c]»[] = {0«$C-DataDescriptorOffsets[###args,0]»};⟫]
+;
+
+-[Discard[###arg,###args]] : $C-DataConstructionDescriptorsD1OffsetReference[###c, (###arg ; ###args)] → %n⟪†«$C-cb[###c]»⟫ ;
+-[Discard[###c]]           : $C-DataConstructionDescriptorsD1OffsetReference[###c, ()                ] → %n⟪noBinderOffsets⟫ ;
+//
+-[Fresh[f]]                      : $C-DataDescriptorOffsets[($B a . ###arg[a] ; ###args), ###offset] → $C-DataDescriptorOffsets[(###arg[f] ; ###args), $[Plus,1,###offset]] ;
+-[Fresh[f¹]]                     : $C-DataDescriptorOffsets[($BL a . ###arg[a] ; ###args), ###offset] → $C-DataDescriptorOffsets[(###arg[f¹] ; ###args), $[Plus,1,###offset]] ;
+-[Free[param]]                   : $C-DataDescriptorOffsets[(param            ; ###args), ###offset] → $C-DataDescriptorOffsets[###args, ###offset] ;
+-[Discard[###s],Copy[###offset]] : $C-DataDescriptorOffsets[($[C,###s]        ; ###args), ###offset] → %n⟪, †«###offset»«$C-DataDescriptorOffsets[###args, ###offset]»⟫ ;
+-[Discard[###offset]]            : $C-DataDescriptorOffsets[(),                           ###offset] → %n⟪⟫ ;
+//
+-[Discard[###args]] : $C-ConstructorRefs[($[C,###c,###args] ; ###forms)] → %n⟪&†«$C-c[###c]», «$C-ConstructorRefs[###forms]»⟫ ;
+-[Free[variable]]   : $C-ConstructorRefs[(variable          ; ###forms)] → $C-ConstructorRefs[###forms] ;
+-                   : $C-ConstructorRefs[()                            ] → %n⟪NULL⟫ ;
+//
+-[Discard[###args]] : $C-ConstructorNames[($[C,###c,###args] ; ###forms)] → %n⟪†«$[Escape,###c]», «$C-ConstructorNames[###forms]»⟫ ;
+-[Free[variable]]   : $C-ConstructorNames[(variable          ; ###forms)] → $C-ConstructorNames[###forms] ;
+-                   : $C-ConstructorNames[()                            ] → %n⟪NULL⟫ ;
+//
+-[Discard[###args]] : $C-ConstructorInternalNames[($[C,###c,###args] ; ###forms)] → %n⟪"†«$[Mangle,###c]»", «$C-ConstructorInternalNames[###forms]»⟫ ;
+-[Free[variable]]   : $C-ConstructorInternalNames[(variable          ; ###forms)] → $C-ConstructorInternalNames[###forms] ;
+-                   : $C-ConstructorInternalNames[()                            ] → %n⟪NULL⟫ ;
+
+// $C-Forms: Handle each form.
+// * $C-C[c]: type of Term data structure containing a construction with c.
+// * $C-Cstruct[c]: macro defined as structure of term
+// * $C-Cvar[sort]: macro defined when sort has variable case
+//
+$C-C[###c] → $[:,'Construction',$[Mangle,###c]] ;
+$C-Cstruct[###c] → $[:,'STRUCT_Construction',$[Mangle,###c]] ;
+$C-Cvars[###s] → $[:,'HasVariables_',$[Mangle,###s]] ;
+
+-[Copy[###sort,###form]]
+:
+$C-Forms[###sort, (###form ; ###forms)]
+→
+%n⟪«$C-Form[###sort, ###form]»«$C-Forms[###sort, ###forms]»⟫
+;
+
+-[Discard[###sort]]
+:
+$C-Forms[###sort, ()]
+→
+%n⟪⟫
+;
+
+-[Free[v]]
+:
+$C-Form[###sort, v]
+→
+%n⟪↲#define †«$C-Cvars[###sort]»⟫
+;
+
+-[Discard[###sort]]
+:
+$C-Form[###sort, $[C,###c,()]]
+→
+%n⟪↲#define †«$C-Cstruct[###c]» struct _ConstantConstruction⟫
+;
+
+-[Copy[###c,###args],Free[v],Discard[###sort]]
+:
+$C-Form[###sort, $[NotMatch, v, $[C,###c,$[NotMatch,(),###args]]]]
+→
+%n⟪↲#define †«$C-Cstruct[###c]» struct _†«$C-C[###c]»
+struct _†«$C-C[###c]» {struct _Construction construction; Term sub[†«$C-Arity[###args,0]»]; Variable binder[†«$C-ConstructionVariableCount[###args,0]»];};⟫
+;
+//
+-[Fresh[f]]       : $C-ConstructionVariableCount[($B a . ###arg[a] ; ###args), ###count] → $C-ConstructionVariableCount[(###arg[f] ; ###args), $[Plus,1,###count]];
+-[Fresh[f¹]]      : $C-ConstructionVariableCount[($BL a . ###arg[a] ; ###args), ###count] → $C-ConstructionVariableCount[(###arg[f¹] ; ###args), $[Plus,1,###count]];
+-[Free[p]]        : $C-ConstructionVariableCount[(p                ; ###args), ###count] → $C-ConstructionVariableCount[###args, ###count];
+-[Copy[###index]] : $C-ConstructionVariableCount[($[C]             ; ###args), ###count] → $C-ConstructionVariableCount[###args, ###count] ;
+-                 : $C-ConstructionVariableCount[(),                           ###count] → ###count ;
+
+-[Discard[###arg],Copy[###index]] : $C-Arity[(###arg ; ###args), ###index] → $C-Arity[###args, $[Plus,1,###index]] ;
+-                                 : $C-Arity[(),                 ###index] → ###index ;
+
+// Finally the helper to collect the list of symbols per sort.
+//
+-[Free[variable]]
+:
+{###Env}
+$C-DeclareThenProcess[###HD, (variable ; ###forms), ###sort, ###list, ###prefix, ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DeclareThenProcess[###HD, ###forms, ###sort, ###list, ###prefix, ###rest, ok¹.###pass2[ok¹]]
+;
+
+-[Discard[###args],Copy[###prefix,###c]]
+:
+{###Env}
+$C-DeclareThenProcess[###HD, ($[C,###c,###args] ; ###forms), ###sort, ###list, ###prefix, ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DeclareThenProcess2[###HD, $[:,###prefix,###c], ###forms, ###sort, ###c, ###list, ###prefix, ###rest, ok¹.###pass2[ok¹]]
+;
+
+-[Copy[###sort]]
+:
+{###Env}
+$C-DeclareThenProcess2[###HD, ###key, ###forms, ###sort, ###c, ###list, 'C$', ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env; ###key : ###sort}
+$C-DeclareThenProcess[###HD, ###forms, ###sort, (###c;###list), 'C$', ###rest, ok¹.###pass2[ok¹]]
+;
+
+-[Discard[###prefix]]
+:
+{###Env}
+$C-DeclareThenProcess[###HD, (), ###sort, ###list, 'C$', ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env; ###sort : ###list}
+$C-Pass1[###HD, ###rest, ok¹.###pass2[ok¹]]
+;
+
+// Variant for function constructors (invoked from below).
+//
+-[Discard[###c],Share[###HD,###key,###forms,###sort,###list,###rest],Copy[###Env,###pass2]]
+:
+{###Env}
+$C-DeclareThenProcess2[###HD, ###key, ###forms, ###sort, ###c, ###list, 'F$', ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env; ###key : ()}
+$C-DeclareThenProcess[###HD, ###forms, ###sort, ###list, 'F$', ###rest, ok¹.###pass2[ok¹]]
+;
+
+-[Discard[###sort,###list]]
+:
+{###Env}
+$C-DeclareThenProcess[###HD, (), ###sort, ###list, 'F$', ###rest, ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-Pass1[###HD, ###rest, ok¹.###pass2[ok¹]]
+;
+
+// Accumulate $SortAliases...
+//
+{###Env}
+$C-Pass1[###HCN, ($SortAlias[###sort1, ###sort2]; ###rest), ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-Pass1-SortAlias[###HCN, ###sort1, $[:,'A$',###sort2], ###rest, ok¹.###continue[ok¹]]
+;
+
+{###Env}
+$C-Pass1-SortAlias[###HCN, ###sort1, ###sort2key, ###rest, ok¹.###continue[ok¹]]
+→
+{###Env; ###sort2key : ###sort1} $C-Pass1[###HCN, ###rest, ok¹.###continue[ok¹]]
+;
+
+Pass2-SortAlias[Discard[###sort1,###sort2]] : {###Env} $C-Pass2[OK, ($SortAlias[###sort1, ###sort2]; ###rest)] → {###Env} $C-Pass2[OK, ###rest] ;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// FUNCTION SORTS
+//
+// c[ b.s1,..., b.sn ] :: s
+//
+// Compile to callable-only structure declarations compatible with crsx/c/crsx.h.
+// * $C-step[###c] function name (in C) for computing ###c constructions
+// * $C-stepv[###c] helper function name (in C) for handling variable case for ###c
+// * $C-name[###c] constant name (in C) with function's name
+// * $C-namef[###c] function name (in C) for returning the function's name [sic]
+$C-step[###c] → $[:,'stepFunction',$[Mangle,###c]] ;
+$C-stepv[###c] → $[:,'stepFunctionVariable',$[Mangle,###c]] ;
+$C-name[###c] → $[:,'name',$[Mangle,###c]] ;
+$C-namef[###c] → $[:,'nameFunction',$[Mangle,###c]] ;
+
+-[Copy[###function,###args,###sort]]
+:
+{###Env}
+$C-Pass1[H, ($[C,###function,###args] :: ###sort ; ###rest), ok¹.###pass2[ok¹]]
+→
+%n⟪
+
+// FUNCTION SORT: †«$[Squash,$[Show,$[C,###function,###args]]]» :: †«$[Squash,$[Show,###sort]]»
+extern int †«$C-cb[###function]»[];
+extern int †«$C-step[###function]»(Sink sink, Term term);
+extern struct _ConstructionDescriptor †«$C-c[###function]»;«$C-Form[###sort, $[C,###function,###args]]»«{###Env} $C-Pass1[H, ###rest, ok¹.###pass2[ok¹]]»⟫
+;
+
+-[Copy[###function],Discard[###args,###sort]]
+:
+{###Env}
+$C-Pass1[S, ($[C,###function,###args] :: ###sort ; ###rest), ok¹.###pass2[ok¹]]
+→
+%n⟪{†«$[Escape,###function]», &†«$C-c[###function]»},
+« {###Env} $C-Pass1[S, ###rest, ok¹.###pass2[ok¹]] »⟫
+;
+
+-[Copy[###function,###args,###sort]]
+:
+{###Env}
+$C-Pass1[D, ($FunctionSort[$[C,###function,###args], ###sort] ; ###rest), ok¹.###pass2[ok¹]]
+→
+%n⟪
+
+// FUNCTION SORT: †«$[Squash,$[Show,$[C,###function,###args]]]» :: †«$[Squash,$[Show,###sort]]»
+int †«$C-cb[###function]»[] = {0«$C-DataDescriptorOffsets[###args,0]»};
+char *†«$C-name[###function]» = "†«###function»";
+char *†«$C-namef[###function]»(Term term) { return †«$C-name[###function]»; }
+struct _ConstructionDescriptor †«$C-c[###function]» = {⟦¶†«$C-sp[###sort]», ¶0, ¶†«$C-Arity[###args,0]», ¶sizeof(†«$C-Cstruct[###function]»), ¶†«$C-cb[###function]», ¶&†«$C-namef[###function]», ¶&†«$C-step[###function]»⟧ ¶};
+« {###Env} $C-Pass1[D, ###rest, ok¹.###pass2[ok¹]] »⟫
+;
+
+{###Env}
+$C-Pass1[C, ($[C,###function,###args] :: ###sort ; ###rest), ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DeclareThenProcess[C, ($[C,###function,###args];), ###sort, (), 'F$', ###rest, ok¹.###pass2[ok¹]]
+;
+
+{###Env}
+$C-Pass1[N, ($[C,###function,###args] :: ###sort ; ###rest), ok¹.###pass2[ok¹]]
+→
+{###Env}
+$C-DeclareThenProcess[N, ($[C,###function,###args];), ###sort, (), 'F$', ###rest, ok¹.###pass2[ok¹]]
+;
+
+Pass2-FunctionSort[Discard[###form,###sort]] : {###Env} $C-Pass2[OK, (###form :: ###sort ; ###rest)] → {###Env} $C-Pass2[OK, ###rest] ;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// RULES
+//
+// name[options] : pattern → contractum
+//
+// Generates a function declaration for the rule.
+// * {###Env}$C-m[###m] text for meta-variable named ###m
+// * $C-mcount[###m] copy counter for term associated with explicit (shareable) meta-variable named ###m
+// * $C-mbind[###m,###k] variable used to store ###k'th argument of matching redex
+// * {###Env}$C-mprops[###m] text used for properties meta-variable ###m
+
+-[Copy[###m]]
+:
+{###Env}
+$C-m[###m]
+→
+$[{###Env}Get, $[:,Meta$,###m], $[:,'m_MISSING',$[Mangle,###m]]]
+;
+
+-[Copy[###m]]
+:
+{###Env}
+$C-mprops[###m]
+→
+$[{###Env}Get, $[:,MetaProps$,###m], $[:,'m_MISSING',$[Mangle,###m]]]
+;
+
+$C-mbind[###m,###k] → $[:,'mbind',###k,$[Mangle,###m]] ;
+$C-mcount[###m] → $[:,'mcount',$[Mangle,###m]] ;
+
+// RULES PASS ONE: C generation classifies the rule (to capture variable case of dispatch rules).
+//
+-[Discard[###rule,###pattern,###contractum]] : {###Env} $C-Pass1[H, (###rule : ###pattern → ###contractum ; ###rest), ok¹.###pass2[ok¹]] → {###Env} $C-Pass1[H, ###rest, ok¹.###pass2[ok¹]] ;
+-[Discard[###rule,###pattern,###contractum]] : {###Env} $C-Pass1[S, (###rule : ###pattern → ###contractum ; ###rest), ok¹.###pass2[ok¹]] → {###Env} $C-Pass1[S, ###rest, ok¹.###pass2[ok¹]] ;
+-[Discard[###rule,###pattern,###contractum]] : {###Env} $C-Pass1[D, (###rule : ###pattern → ###contractum ; ###rest), ok¹.###pass2[ok¹]] → {###Env} $C-Pass1[D, ###rest, ok¹.###pass2[ok¹]] ;
+-[Discard[###rule,###pattern,###contractum]] : {###Env} $C-Pass1[N, (###rule : ###pattern → ###contractum ; ###rest), ok¹.###pass2[ok¹]] → {###Env} $C-Pass1[N, ###rest, ok¹.###pass2[ok¹]] ;
+//
+// Only the C generation takes action: it updates the environment with the dispatch index for dispatch functions.
+// (This is done in pass 1 to make sure that all rules have this information in pass 2, especially variable dispatch
+// rules that are otherwise categorised as non-dispatching.)
+//
+-[Discard[###contractum,###rule],Share[###rest,###pass2]]
+:
+{###Env}
+$C-Pass1[C, (###rule : $[C,###function,###args] → ###contractum ; ###rest), ok2¹.###pass2[ok2¹]]
+→
+{###Env} $C-RuleType[###args, ok¹ type . $C-Pass1C-StoreRuleType[ok¹, type, $[:,'D$',###function], ###rest, ok2¹.###pass2[ok2¹]]]
+;
+
+// Analyse rule: if it contains a $[C[###sort],...] pattern argument then function symbol is a (primary) dispatch rule.
+//
+-[Fresh[dummy]]         : {###Env} $C-RuleType[($B x . ###a[x]                  ; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[(###a[dummy];###as), ok¹ t.###ok[ok¹,t]] ;
+-[Fresh[dummy¹]]        : {###Env} $C-RuleType[($BL x . ###a[x]                 ; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[(###a[dummy¹];###as), ok¹ t.###ok[ok¹,t]] ;
+-                       : {###Env} $C-RuleType[($[V]                            ; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###as, ok¹ t.###ok[ok¹,t]] ;
+-                       : {###Env} $C-RuleType[($[M]                            ; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###as, ok¹ t.###ok[ok¹,t]] ;
+-                       : {###Env} $C-RuleType[($[C,'$',()]                     ; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###as, ok¹ t.###ok[ok¹,t]] ;
+-                       : {###Env} $C-RuleType[($[C,'$',(###ca1;###cas)]        ; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleTypeDollar[(###ca1;###cas), ###as, ok¹ t.###ok[ok¹,t]] ;
+-[Discard[###c]]        : {###Env} $C-RuleType[($[C,$[NotMatch,'$',###c],###cas]; ###as), ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###cas, ok¹ t.$C-then-RuleType[t, ###as, ok2¹ t2.###ok[ok2¹,t2]]] ;
+-                       : {###Env} $C-RuleType[$[M]                                     , ok¹ t.###ok[ok¹,t]] → {###Env} ###ok[OK, NO_DISPATCH] ;
+-[Discard[###n]]        : {###Env} $C-RuleType[(),                                        ok¹ t.###ok[ok¹,t]] → {###Env} ###ok[OK, NO_DISPATCH] ;
+
+-[Discard[###cas,###as],Copy[###sort,###m]] : {###Env} $C-RuleTypeDollar[(C[###sort]                 ; ###cas), ###as, ok¹ t.###ok[ok¹,t]] → {###Env} ###ok[OK, DISPATCH[###sort]] ;
+-[Discard[###sort,###c]]                    : {###Env} $C-RuleTypeDollar[($[NotMatch,C[###sort],###c]; ###cas), ###as, ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###cas, ok¹ t.$C-then-RuleType[t, ###as, ok2¹ t2.###ok[ok2¹,t2]]] ;
+-                                           : {###Env} $C-RuleTypeDollar[(),                                    ###as, ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###as, ok¹ t.###ok[ok¹,t]] ;
+
+-                               : {###Env} $C-then-RuleType[NO_DISPATCH      , ###as, ok¹ t.###ok[ok¹,t]] → {###Env} $C-RuleType[###as, ok¹ t.###ok[ok¹,t]] ;
+-[Discard[###as],Copy[###sort]] : {###Env} $C-then-RuleType[DISPATCH[###sort], ###as, ok¹ t.###ok[ok¹,t]] → {###Env} ###ok[OK, DISPATCH[###sort]] ;
+
+-[Discard[###key]]
+:
+{###Env}
+$C-Pass1C-StoreRuleType[OK, NO_DISPATCH, ###key, ###rest, ok2¹.###pass2[ok2¹]]
+→
+{###Env}
+$C-Pass1[C, ###rest, ok2¹.###pass2[ok2¹]]
+;
+
+{###Env}
+$C-Pass1C-StoreRuleType[OK, DISPATCH[###sort], ###key, ###rest, ok2¹.###pass2[ok2¹]]
+→
+{###Env; ###key : DISPATCH[###sort]}
+$C-Pass1[C, ###rest, ok2¹.###pass2[ok2¹]]
+;
+
+// RULES PASS TWO: Generate step function code.
+//
+Pass2-Rule[Copy[###rule,###options,###pattern,###contractum],Share[###rest]]
+:
+{###Env}
+$C-Pass2[OK, ($[C,###rule,###options] : ###pattern → ###contractum; ###rest)]
+→
+%n⟪†«$[Echo,'.','']»
+
+// RULE: †«$[Squash,$[Show,$[C,###rule,###options]]]» : †«$[Squash,$[Show,###pattern]]» → †«$[Squash,$[Show,###contractum]]»
+« {###Env} $C-Rule[###pattern, ###rule, ###options, ###pattern, ###contractum] »« {###Env} $C-Pass2[OK, ###rest] »⟫
+;
+
+-[Discard[###functionprops]]
+:
+{###Env}
+$C-Rule[$[P, ###functionprops, $[C,###function,###arguments]], ###rule, ###options, ###pattern, ###contractum]
+→
+{###Env}
+$C-Rule0[$[:,'D$',###function], ###arguments, ###rule, ###options, ###pattern, ###contractum]
+;
+
+-[Copy[###key,###Env]]
+:
+{###Env}
+$C-Rule0[###key, ###arguments, ###rule, ###options, ###pattern, ###contractum]
+→
+{###Env}
+$C-Rule1[###key, $[{###Env}Get, ###key, NO_DISPATCH], ###arguments, ###rule, ###options, ###pattern, ###contractum]
+;
+
+-[Copy[###ruletype],Discard[###key]]
+:
+{###Env}
+$C-Rule1[###key, ###ruletype, ###arguments, ###rule, ###options, ###pattern, ###contractum]
+→
+{###Env}
+$C-RuleType[###arguments, ok¹ type . $C-Rule2[###ruletype, type, ###rule, ###options, ###pattern, ###contractum]]
+;
+
+// (1) GENERAL CONTRACTION
+//
+// Send events for the contracted term.
+//
+// The generation is split in two parts:
+// (i) Traverse the pattern to extract
+//   - root properties
+//   - meta-application redex subterm variables
+//   - meta-application positional argument to binder correspondence
+// (ii) Traverse the contractum to build event sequence
+//   - meta-applications become copies or, if they have arguments, substitutions
+
+-[Fresh[sink,term,choice],Copy[###rule,###contractum]]
+:
+{###Env}
+$C-Rule2[NO_DISPATCH, NO_DISPATCH, ###rule, ###options, $[P,###functionprops,$[C,###function,###args]], ###contractum]
+→
+%n⟪int †«$C-step[###function]»(Sink «sink», Term «term»)
+{⟦
+DEBUGT(«sink»->context, "\n==========\nMATCH †« ###rule » \n==========\n", «term»);« {###Env; "Post$Pattern$Code" : %n⟨⟩; "Post$Contract$Code" : %n⟨⟩} $C-PatternOptions[###rule, ###options, ###contractum, sink, ok¹.$C-Pattern[ok¹, ###rule, ###args, 0, term, choice, sink, ###functionprops, ok1¹.$C-PostPattern[ok2¹.Cok-T[ok2¹, ###rule, ###contractum, (), sink]]]] »
+DEBUGF(«sink»->context, "%s","\n==========\nEND †« ###rule »\n==========\n");
+return 1;⟧
+}⟫
+;
+
+// (2) DISPATCH[dispatch-sort]
+//
+// Compute the single critical subterm and then generate the combined frame.
+
+-[Copy[###function,###rule,###contractum],Fresh[sink,term,choice],Discard[###ignored]]
+:
+{###Env}
+$C-Rule2[###ignored, DISPATCH[###sort], ###rule, ###options, $[P,###functionprops,$[C,###function,###args]], ###contractum]
+→
+%n⟪int †«$C-step[###function]»(Sink «sink», Term «term»)
+{⟦
+DEBUGT(«sink»->context, "\n==========\nMATCH †« ###rule » \n==========\n", «term»);«{###Env; "Post$Pattern$Code" : %n⟨⟩; "Post$Contract$Code" : %n⟨⟩} $C-PatternOptions[###rule, ###options, ###contractum, sink, ok¹.$C-Pattern[ok¹, ###rule, ###args, 0, term, choice, sink, ###functionprops, ok1¹.$C-PostPattern[ok2¹.Cok-Dispatch[ok2¹, ###function, term, ###rule, ###contractum, ###sort, choice, sink]]]]»
+DEBUGF(«sink»->context, "%s","\n==========\nEND †« ###rule »\n==========\n");
+return 1;⟧
+}⟫
+;
+
+// (3) VARIABLE CONTRACTION[dispatch-sort]
+//
+// Special case for variable rule (analyses as non-dispatch) for a dispatch constructor.
+
+-[Fresh[sink,term,choice],Copy[###rule,###contractum],Discard[###functionsort]]
+:
+{###Env}
+$C-Rule2[DISPATCH[###functionsort], NO_DISPATCH, ###rule, ###options, $[P,###functionprops,$[C,###function,###args]], ###contractum]
+→
+%n⟪int †«$C-stepv[###function]»(Sink «sink», Term «term»)
+{⟦
+DEBUGT(«sink»->context, "\n==========\nMATCH †« ###rule » \n==========\n", «term»);«{###Env; "Post$Pattern$Code" : %n⟨⟩; "Post$Contract$Code" : %n⟨⟩} $C-PatternOptions[###rule, ###options, ###contractum, sink, ok¹.$C-Pattern[ok¹, ###rule, ###args, 0, term, choice, sink, ###functionprops, ok1¹.$C-PostPattern[ok2¹.Cok-T[ok2¹, ###rule, ###contractum, (), sink]]]]»
+DEBUGF(«sink»->context, "%s","\n==========\nEND †« ###rule »\n==========\n");
+return 1;⟧
+}⟫
+;
+
+{###Env; "Post$Contract$Code" : ###code}
+$C-PostPattern[ok¹.###[ok¹]]
+→
+%n⟪«###code»« {###Env} ###[OK] »⟫
+;
+
+// Helper to initiate contract or dispatch.
+//
+-[Free[sink],Copy[###rule]]
+:
+{###Env}
+Cok-T[OK, ###rule, ###contractum, ###bvs, sink]
+→
+%n⟪
+DEBUGRULE(«sink»->context, "†« ###rule »");
+DEBUGF(«sink»->context, "%s","\n==========\nCONTRACT †« ###rule »\n==========\n");
+PROPERTIES_RESET(«sink»);« {###Env} T[###rule, ###contractum, ###bvs, sink] »⟫
+;
+//
+-[Free[term,choice,sink],Copy[###rule]]
+:
+{###Env}
+Cok-Dispatch[OK, ###function, term, ###rule, ###contractum, ###sort, choice, sink]
+→
+%n⟪
+DEBUGRULE(«sink»->context, "†« ###rule »");
+DEBUGF(«sink»->context, "%s","\n==========\nDISPATCH †« ###rule »\n==========\n");« {###Env} $C-Dispatch[###function, term, ###rule, ###contractum, ###sort, choice, sink] »⟫
+;
+
+// (1+2+3) PATTERN EXTRACTION
+
+// Options.
+//
+// {Env} $C-PatternOptions[RuleName, OptionList, Conractum, sink, ok¹.Continuation[ok¹]] - invoke {Env'} Continuation[OK] where Env' has been extended with declarations for all options:
+// * Free[v,....]
+// * Fresh[v,...]
+// * FreshReuse[v,...]
+// * Discard[#,...]
+// * Copy[#,...]
+// * Share[#,...]
+// * Comparable[#,...]
+// * Lax
+// * Data[#,...]
+// * Weak[#,...]
+//
+-[Free[sink],Discard[###rule,###contractum]] : {###Env} $C-PatternOptions[###rule, ()                , ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} ###continue[OK] ;
+-[Free[sink],Discard[###vs]]   : {###Env} $C-PatternOptions[###rule, ($[C,Free      ,###vs]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // allocated by pattern
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,Fresh     ,###vs]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternFresh[###rule, ###vs, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,FreshReuse,###vs]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternFreshReuse[###rule, ###vs, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,Discard   ,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternDiscard[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // whether to discard
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,Copy      ,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternCopy[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // whether to count
+-[Free[sink],Discard[###ms]]   : {###Env} $C-PatternOptions[###rule, ($[C,Share     ,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // share means use sharing, the default
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,Comparable,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternComparable[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // whether to allow equality tests
+-[Free[sink],Discard[###ms]]   : {###Env} $C-PatternOptions[###rule, ($[C,Lax       ,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternLax[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // whether to allow everything...
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,Data      ,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternData[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // whether to normalize...
+-[Free[sink]]                  : {###Env} $C-PatternOptions[###rule, ($[C,Weak      ,###ms]; ###rest), ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternWeak[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ; // whether to normalize...
+
+// Allocate fresh variables.
+-[Free[sink]]   : {###Env} $C-PatternFresh[###rule, ()       , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink,v]] : {###Env} $C-PatternFresh[###rule, (v;###vs), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → %n⟪¶Variable «v» = MAKE_FRESH_†«$[IfLinear, v, LINEAR, PROMISCUOUS]»_VARIABLE(«sink»->context, "«v»"); permitUnusedVariable(«v»);«{###Env} $C-PatternFresh[###rule, ###vs, ###rest, ###contractum, sink, ok¹.###continue[ok¹]]»⟫ ;
+
+// Reused bound variables as fresh.
+-[Free[sink]]                               : {###Env} $C-PatternFreshReuse[###rule, ()       , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink,v],Copy[###rule,###contractum]] : {###Env} $C-PatternFreshReuse[###rule, (v;###vs), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; v:REUSE} Targs-analyze-reuse[v, (###contractum;), ###rule, ok¹.$C-then-PatternFreshReuse[ok¹, ###rule, ###vs, ###rest, ###contractum, sink, ok2¹.###continue[ok2¹]]] ;
+{###Env} $C-then-PatternFreshReuse[OK, ###rule, ###vs, ###rest, ###contractum, ###sink, ok2¹.###continue[ok2¹]] → {###Env} $C-PatternFreshReuse[###rule, ###vs, ###rest, ###contractum, ###sink, ok2¹.###continue[ok2¹]] ;
+
+// Record meta-variables to discard.
+-[Free[sink]]               : {###Env} $C-PatternDiscard[###rule, ()                  , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink],Copy[###rule]] : {###Env} $C-PatternDiscard[###rule, ($[M,###m,()];###ms), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternDiscard2[###rule, $[:,'Discard$',###rule,'$',###m], ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]] : {###Env} $C-PatternDiscard2[###rule, ###key, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; ###key:()} $C-PatternDiscard[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+
+// Record meta-variables to copy.
+-[Free[sink]]               : {###Env} $C-PatternCopy[###rule, ()                  , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink],Copy[###rule]] : {###Env} $C-PatternCopy[###rule, ($[M,###m,()];###ms), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternCopy2[###rule, $[:,'Copy$',###rule,'$',###m], ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]] : {###Env} $C-PatternCopy2[###rule, ###key, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; ###key:()} $C-PatternCopy[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+
+// Record meta-variables to permit comparison of.
+-[Free[sink]]               : {###Env} $C-PatternComparable[###rule, ()                  , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink],Copy[###rule]] : {###Env} $C-PatternComparable[###rule, ($[M,###m,()];###ms), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternComparable2[###rule, $[:,'Comparable$',###rule,'$',###m], ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]] : {###Env} $C-PatternComparable2[###rule, ###key, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; ###key:()} $C-PatternComparable[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+
+// Record laxity...
+-[Free[sink],Copy[###rule]] : {###Env} $C-PatternLax[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternLax2[###rule, $[:,'Lax$',###rule], ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]] : {###Env} $C-PatternLax2[###rule, ###key, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; ###key:COPY} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+
+// Record whether to normalize...
+-[Free[sink]]               : {###Env} $C-PatternData[###rule, ()                  , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink],Copy[###rule]] : {###Env} $C-PatternData[###rule, ($[M,###m,()];###ms), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternData2[###rule, $[:,'Data$',###rule,'$',###m], ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]] : {###Env} $C-PatternData2[###rule, ###key, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; ###key:()} $C-PatternData[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+
+// Record whether meta-applications may be weak.
+-[Free[sink]]               : {###Env} $C-PatternWeak[###rule, ()                  , ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternOptions[###rule, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink],Copy[###rule]] : {###Env} $C-PatternWeak[###rule, ($[M,###m,()];###ms), ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env} $C-PatternWeak2[###rule, $[:,'Weak$',###rule,'$',###m], ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+-[Free[sink]] : {###Env} $C-PatternWeak2[###rule, ###key, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] → {###Env; ###key:()} $C-PatternWeak[###rule, ###ms, ###rest, ###contractum, sink, ok¹.###continue[ok¹]] ;
+
+// Traverse pattern arguments and then the properties to name all matched subterms from redex.
+//
+-[Free[sink,term,choice],Copy[###rule,###i,###functionprops,###arg,###args]]
+:
+{###Env}
+$C-Pattern[OK, ###rule, (###arg;###args), ###i, term, choice, sink, ###functionprops, ok¹.###continue[ok¹]]
+→
+{###Env} $C-PatternArg[OK, ###rule, ###arg, ###i, 0, term, choice, sink, ok¹.$C-Pattern[ok¹, ###rule, ###args, $[Plus,###i,1], term, choice, sink, ###functionprops, ok2¹.###continue[ok2¹]]]
+;
+
+-[Free[sink,term,choice],Discard[###i]]
+:
+{###Env}
+$C-Pattern[OK, ###rule, (), ###i, term, choice, sink, ###functionprops, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-PatternProps[OK, ###rule, sink, ###functionprops, term, ok¹.###continue[ok¹]]
+;
+
+// Handle properties of a pattern argument (inserted after the argument has been processed so the argument references are in place).
+//
+-[Free[sink,term]]
+:
+{###Env}
+$C-PatternProps[OK, ###rule, sink, ($RP[$[M,###m]];###rest), term, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-KeyValue[$[:,"MetaProps$",###m], %n⟪«term»⟫, ok¹.$C-PatternProps[ok¹, ###rule, sink, ###rest, term, ok2¹.###continue[ok2¹]]]
+;
+
+{###Env}
+$C-KeyValue[###key, ###value, ok¹.###continue[ok¹]]
+→
+{###Env; ###key : ###value}
+###continue[OK]
+;
+
+-[Free[sink,term],Fresh[key,value],Copy[###rule]]
+:
+{###Env}
+$C-PatternProps[OK, ###rule, sink, ($NP[###key,###value];###more), term, ok¹.###continue[ok¹]]
+→
+%n⟪
+char *«key»;«{###Env} Tstring[###rule, (), sink, ###key, key]»
+Term «value» = NAMED_PROPERTY(«term», «key»);
+ASSERT(«sink»->context, «value»);«{###Env} $C-PatternPropValue[OK, ###rule, ###value, value, sink, ok¹.$C-PatternProps[ok¹, ###rule, sink, ###more, term, ok2¹.###continue[ok2¹]]]»⟫
+;
+
+-[Free[sink,term,key],Fresh[value],Copy[###rule]]
+:
+{###Env}
+$C-PatternProps[OK, ###rule, sink, ($VP[key,###value];###more), term, ok¹.###continue[ok¹]]
+→
+%n⟪
+Term «value» = VARIABLE_PROPERTY(«term», « {###Env} Tvariable[key] »);
+ASSERT(«sink»->context, «value»);«{###Env} $C-PatternPropValue[OK, ###rule, ###value, value, sink, ok¹.$C-PatternProps[ok¹, ###rule, sink, ###more, term, ok2¹.###continue[ok2¹]]]»⟫
+;
+
+-[Free[sink,term],Fresh[key,value],Copy[###key,###value,###rule]]
+:
+{###Env}
+$C-PatternProps[OK, ###rule, sink, ($MP[###key,###value];###more), term, ok¹.###continue[ok¹]]
+→
+%n⟪
+FORCE(«sink»->context, «{###Env}$C-m[$[Show,###key]]»);
+Term «value»;
+if (IS_VARIABLE_USE(«{###Env}$C-m[$[Show,###key]]»)) ¶{⟦¶Variable «key» = VARIABLE(«{###Env}$C-m[$[Show,###key]]»);¶«value» = VARIABLE_PROPERTY(«term», «key»);⟧¶}
+else ¶{⟦¶char *«key»;«{###Env} Tstring[###rule, (), sink, ###key, key]»¶«value» = NAMED_PROPERTY(«term», «key»);⟧¶}
+ASSERT(«sink»->context, «value»);«{###Env} $C-PatternPropValue[OK, ###rule, ###value, value, sink, ok¹.$C-PatternProps[ok¹, ###rule, sink, ###more, term, ok2¹.###continue[ok2¹]]]»⟫
+;
+
+-[Free[sink,term],Discard[###rule]]
+:
+{###Env}
+$C-PatternProps[OK, ###rule, sink, (), term, ok¹.###continue[ok¹]]
+→
+{###Env}
+###continue[OK]
+;
+
+// Generate code to record matching of a pattern property value...
+// {###Env} $C-PatternPropValue[OK, ###rule, VALUEPATTERN, value, choice, sink, ok¹.###continue[ok¹]]
+
+-[Free[v,value,sink],Discard[###rule]]
+:
+{###Env}
+$C-PatternPropValue[OK, ###rule, v, value, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+if (!IS_VARIABLE_USE(«value»)) return 0;
+Variable «v» = VARIABLE(«value»); permitUnusedVariable(«v»);«{###Env} ###continue[OK]»⟫
+;
+
+-[Free[value,sink],Fresh[nochoice],Discard[###c]]
+:
+{###Env}
+$C-PatternPropValue[OK, ###rule, $[P,###props,$[C,###c,###cas]], value, sink, ok¹.###continue[ok¹]]
+→
+%n⟪¶if (!IS_DATA(«value»)) return 0;« {###Env} $C-Pattern[OK, ###rule, ###cas, 0, value, nochoice, sink, ###props, ok¹.###continue[ok¹]] »⟫
+;
+
+-[Free[value,sink],Fresh[nochoice],Discard[###c,###sort]]
+:
+{###Env}
+$C-PatternPropValue[OK, ###rule, $[P,###props,$[C[###sort],###c,###cas]], value, sink, ok¹.###continue[ok¹]]
+→
+%n⟪¶if (!IS_DATA(«value»)) return 0;« {###Env} $C-Pattern[OK, ###rule, ###cas, 0, value, nochoice, sink, ###props, ok¹.###continue[ok¹]] »⟫
+;
+
+-[Free[value,sink],Copy[###m]]
+:
+{###Env}
+$C-PatternPropValue[OK, ###rule, $[M,###m,###mas], value, sink, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-PatternPropValue-m[$[:,Meta$,###m], ###rule, ###m, ###mas, value, sink, ok¹.###continue[ok¹]]
+;
+-[Free[value,sink],Copy[###m,###mas],Share[###continue],Copy[###rule]]
+:
+{###Env}
+$C-PatternPropValue-m[###key, ###rule, ###m, ###mas, value, sink, ok¹.###continue[ok¹]]
+→
+$[{###Env}IfDef, $[:,'Discard$',###rule,'$',###m],
+ {###Env} ###continue[OK],
+ %n⟪« {###Env} $C-PatternMetaCount[###rule, ###m, value] »« {###Env; ###key : value} $C-PatternMetaArg[###rule, ###mas, ###m, 0, ok¹.###continue[OK]] »⟫
+]
+;
+
+// Matching translate on-dispatch pattern argument.
+// {###Env} $C-PatternArg[OK, ###rule, TERM, INDEX, SUBINDEX, term, choice, sink, ok¹.###continue[ok¹]]
+
+// * Binder in pattern.
+
+-[Free[term,choice,sink],Fresh[v],Copy[###i,###j]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $B b . ###a[b], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+UNBIND(BINDER(«term»,†«###i»,†«###j»));«
+ {###Env; v : Binder[term, ###i, ###j]}
+ $C-PatternArg[OK, ###rule, ###a[v], ###i, $[Plus,###j,1], term, choice, sink, ok¹.###continue[ok¹]]
+»⟫
+;
+
+-[Free[term,choice,sink],Fresh[v¹],Copy[###i,###j]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $BL b . ###a[b], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+UNBIND(BINDER(«term»,†«###i»,†«###j»));«
+ {###Env; v¹ : Binder[term, ###i, ###j]}
+ $C-PatternArg[OK, ###rule, ###a[v¹], ###i, $[Plus,###j,1], term, choice, sink, ok¹.###continue[ok¹]]
+»⟫
+;
+
+// * Variable in pattern...TODO: dispatch separately on bound/free variables?
+
+-[Free[v,term,choice,sink],Fresh[sub],Discard[###j]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, v, ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪¶Term «sub» = FORCE(«sink»->context, SUB(«term»,†«###i»));« {###Env} $C-PatternArg1[###rule, v, sub, choice, sink, ok¹.###continue[ok¹]] »⟫
+;
+
+-[Free[term,choice,sink],Fresh[sub],Discard[###j,###c,###cas],Copy[###i]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $[Match,###arg,$[C,$[NotMatch,'$',###c],###cas]], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+// Pattern argument is unique construction, which should not be a variable, and have the subarguments extracted.
+%n⟪¶Term «sub» = FORCE(«sink»->context, SUB(«term»,†«###i»));« {###Env} $C-PatternArg1[###rule, ###arg, sub, choice, sink, ok¹.###continue[ok¹]] »⟫
+;
+
+-[Free[term,choice,sink],Fresh[sub],Discard[###j]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $[Match,###arg,$[C,'$',()]], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+// Pattern argument is $ constant.
+%n⟪¶Term «sub» = FORCE(«sink»->context, SUB(«term»,†«###i»));« {###Env} $C-PatternArg1[###rule, ###arg, sub, choice, sink, ok¹.###continue[ok¹]] »⟫
+;
+
+// * Meta-application in pattern.
+//
+// Encodes the following evaluation strategy components:
+// - if meta-variable is copied by rule then compute it first.
+// - if meta-variable marked Data then compute it first.
+//
+// TODO: Weak patterns
+
+-[Free[term,choice,sink],Copy[###m,###mas,###i,###rule],Share[###continue],Discard[###j]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $[M,###m,###mas], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+$[{###Env}IfDef, $[:,'Already$',###rule,'$',###m], %n⟪¶if (!deepEqual(«{###Env}$C-m[###m]», SUB(«term»,†«###i»))) return 0;« {###Env} ###continue[OK] »⟫,
+ %n⟪«
+  $[{###Env}IfDef, $[:,'Copy$',###rule,'$',###m], %n⟨¶COMPUTE(‹sink›->context, SUB(‹term›,†‹###i›));⟩,
+   $[{###Env}IfDef, $[:,'Data$',###rule,'$',###m], %n⟨¶COMPUTE(‹sink›->context, SUB(‹term›,†‹###i›));⟩,
+    %n⟨⟩]]
+ »«
+  $[{###Env}IfDef, $[:,'Discard$',###rule,'$',###m],
+   %n⟨¶FREE_TERM(‹sink›->context, SUB(‹term›,†‹###i›)); ‹ {###Env} ###continue[OK] ›⟩,
+   {###Env} $C-PatternArg-meta-normal[###rule, ###m, term, %n⟨SUB(‹term›,†‹###i›)⟩, ###mas, ok¹.###continue[ok¹]]]
+ »⟫]
+;
+
+-[Copy[###m],Free[term]]
+:
+{###Env}
+$C-PatternArg-meta-normal[###rule, ###m, term, ###ref, ###mas, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-PatternArg-meta-normal-m[$[:,Meta$,###m], ###rule, ###m, term, ###ref, ###mas, ok¹.###continue[ok¹]]
+;
+
+-[Copy[###rule,###m],Free[term]]
+:
+{###Env}
+$C-PatternArg-meta-normal-m[###key, ###rule, ###m, term, ###ref, ###mas, ok¹.###continue[ok¹]]
+→
+%n⟪«{###Env} $C-PatternMetaCount[###rule, ###m, term]» «{###Env; ###key : ###ref} $C-PatternMetaArg[###rule, ###mas, ###m, 0, ok¹.###continue[ok¹]]»⟫
+;
+
+-[Free[term],Copy[###m,###rule]]
+:
+{###Env} $C-PatternMetaCount[###rule, ###m, term]
+→
+$[{###Env}IfDef, $[:,'Copy$',###rule,'$',###m], %n⟪¶int †«$C-mcount[###m]» = 0; permitUnusedInt(†«$C-mcount[###m]»);⟫, $[{###Env}IfDef, $[:,'Lax$',###rule], %n⟪¶int †«$C-mcount[###m]» = 0; permitUnusedInt(†«$C-mcount[###m]»);⟫, %n⟪⟫]]
+;
+
+-[Free[v,term],Copy[###rule,###m,###k]]
+:
+{###Env; v : Binder[term, ###vi, ###vj]}
+$C-PatternMetaArg[###rule, (v;###mas), ###m, ###k, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-PatternMetaArg-variable[###rule, v, term, ###vi, ###vj, $[:,"Meta$",###rule,"$",###m,"$ArgLinear$",###k], $[IfLinear, v, LINEAR, PROMISCUOUS], $[{###Env}Get,v,UNASSIGNED], ###mas, ###m, ###k, ok¹.###continue[ok¹]]
+;
+
+-[Free[v,term],Copy[###m,###k],Discard[###flag]]
+:
+{###Env}
+$C-PatternMetaArg-variable[###rule, v, term, ###vi, ###vj, ###argkey, ###linearity, ###flag, ###mas, ###m, ###k, ok¹.###continue[ok¹]]
+→
+%n⟪
+Variable †«$C-mbind[###m,###k]» = BINDER(«term»,†«###vi»,†«###vj»); permitUnusedVariable(†«$C-mbind[###m,###k]»);«
+  {###Env; ###argkey : ###linearity} $C-PatternMetaArg[###rule, ###mas, ###m, $[Plus,###k,1], ok¹.###continue[ok¹]]
+»⟫
+;
+
+-[Discard[###k]]
+:
+{###Env}
+$C-PatternMetaArg[###rule, (), ###m, ###k, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-PatternArg-AddMeta[$[:,'Already$',###rule,'$',###m], ok¹.###continue[ok¹]]
+;
+
+{###Env} $C-PatternArg-AddMeta[###dm, ok¹.###continue[ok¹]] → {###Env; ###dm : ALREADY} ###continue[OK] ;
+
+// Special data pattern...$[Data, PATTERN] normalizes before matching against PATTERN.
+//
+-[Free[term,choice,sink],Copy[###i]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $[C,'$',(Data; ###pattern;)], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪¶COMPUTE(«sink»->context, SUB(«term»,†«###i»));« {###Env} $C-PatternArg[OK, ###rule, ###pattern, ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]] »⟫
+;
+
+// Special non-match pattern...$[NotMatch, #BAD, PATTERN] where #BAD must be ground and have been seen already.
+//
+-[Free[term,choice,sink],Copy[###m,###i]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $[C,'$',(NotMatch; $[M,###m,()]; ###pattern;)], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪¶if (deepEqual(«{###Env}$C-m[###m]», FORCE(«sink»->context, SUB(«term»,†«###i»)))) return 0;« {###Env} $C-PatternArg[OK, ###rule, ###pattern, ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]] »⟫
+;
+
+// Special dispatch pattern where ###arg has shape $[Match, ###i, {###$props}$[C[SORT], ###$c, ###$as]] for some SORT (except {###$props} may be omitted).
+//
+// This means that the generated code should...
+// (1) compute the argument to data form,
+// (2) remember ###i, ###$props, and ###$as as associated with the term, and that ###$c is the construction descriptor.
+//
+-[Free[term,choice,sink],Fresh[data],Copy[###i],Discard[###j,###dasas]]
+:
+{###Env}
+$C-PatternArg[OK, ###rule, $[C,'$',(Match; ###template; $[P,###props,$[C,'$',(C[###sort]; $[M,###dc,()]; $[M,###das,###dasas];)]];)], ###i, ###j, term, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+Term «data» = FORCE(«sink»->context, SUB(«term»,†«###i»));«
+  {###Env} $C-PatternArg1[###rule, ###template, data, choice, sink,
+    ok¹.$C-PatternArg-dispatch[ok¹, ###props, ###sort, ###dc, ###das, data, choice, sink, ok2¹.###continue[ok2¹]]]
+»⟫
+;
+-[Free[data,choice,sink],Copy[###dc]]
+:
+{###Env}
+$C-PatternArg-dispatch[OK, ###props, ###sort, ###dc, ###das, data, choice, sink, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-PatternArg-dispatch-m[$[:,Meta$,###dc], ###props, ###sort, ###das, data, choice, sink, ok¹.###continue[ok¹]]
+;
+-[Free[data,choice,sink],Copy[###sort,###das]]
+:
+{###Env}
+$C-PatternArg-dispatch-m[###key, ###props, ###sort, ###das, data, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+†«$C-Xe[###sort]» «choice» = (IS_VARIABLE_USE(«data») ? †«$C-Xv[###sort]» : (†«$C-Xe[###sort]») TAG(«data»));
+if (!«choice») return 0;
+ASSERT(«sink»->context, IS_VARIABLE_USE(«data») || (SORT(«data») == &†«$C-s[###sort]» && †«$C-s[###sort]».constructorNames[«choice»]));«{###Env; ###key : data; ###das : ###sort}$C-PatternDispatchProps[OK, ###props, data, choice, sink, ok¹.###continue[ok¹]]»⟫
+;
+
+// Helper for Data: $C-PatternArg1[#rulename, #pattern-argument, pattern-variable, choice, sink, ok¹.###continue[ok¹]]
+
+-[Free[v,sub,choice,sink],Discard[###j,###rule]]
+:
+{###Env}
+$C-PatternArg1[###rule, v, sub, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+if (!IS_VARIABLE_USE(«sub»)) return 0;
+Variable «v» = VARIABLE(«sub»); permitUnusedVariable(«v»);« {###Env} ###continue[OK] »⟫
+;
+
+-[Free[sub,choice,sink],Discard[###c,###j],Copy[###i]]
+:
+{###Env}
+$C-PatternArg1[###rule, $[P,###props,$[C,$[NotMatch,'$',###c],###cas]], sub, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+if (!IS_DATA(«sub»)) return 0;«{###Env} $C-Pattern[OK, ###rule, ###cas, 0, sub, choice, sink, ###props, ok¹.###continue[ok¹]]»⟫
+;
+
+-[Free[sub,choice,sink],Discard[###c,###j]]
+:
+{###Env}
+$C-PatternArg1[###rule, $[P,###props,$[C,'$',()]], sub, choice, sink, ok¹.###continue[ok¹]]
+→
+%n⟪
+if (!IS_DATA(«sub»)) return 0;«{###Env} $C-Pattern[OK, ###rule, (), 0, sub, choice, sink, ###props, ok¹.###continue[ok¹]]»⟫
+;
+
+-[Free[sub,choice,sink],Copy[###m,###rule],Share[###continue]]
+:
+{###Env}
+$C-PatternArg1[###rule, $[M,###m,###mas], sub, choice, sink, ok¹.###continue[ok¹]]
+→
+$[{###Env}IfDef, $[:,'Already$',###rule,'$',###m], %n⟪¶if (!deepEqual(«{###Env}$C-m[###m]», «sub»)) return 0;« {###Env} ###continue[OK] »⟫,
+ $[{###Env}IfDef, $[:,'Discard$',###rule,'$',###m], {###Env} ###continue[OK],
+  {###Env} $C-PatternArg-meta-normal[###rule, ###m, sub, %n⟪«sub»⟫, ###mas, ok¹.###continue[ok¹]]]]
+;
+
+// Helper to extract properties reference from dispatch argument, if any.
+//
+-[Free[data,choice,sink]]
+:
+{###Env}
+$C-PatternDispatchProps[OK, ($RP[$[M,###r]];###rest), data, choice, sink, ok¹.###continue[ok¹]]
+→
+{###Env}
+$C-KeyValue[$[:,"MetaProps$",###r], %n⟪«data»⟫, ok¹.$C-PatternDispatchProps[ok¹, ###rest, data, choice, sink, ok¹.###continue[ok¹]]]
+;
+//
+-[Free[data,choice,sink]]
+:
+{###Env}
+$C-PatternDispatchProps[OK, (), data, choice, sink, ok¹.###continue[ok¹]]
+→
+{###Env} ###continue[OK]
+;
+
+// Special handling of dispatch root contractum.
+//
+-[Free[term,choice,sink]]
+:
+{###Env}
+$C-Dispatch[###function, term, ###rule, $[P,###cprops,$[C,'$',(C[###csort]; $[C,'$',(':'; ###cprefix; $[M,###cm];)]; ###cargs;)]], ###psort, choice, sink]
+→
+{###Env}
+$C-DispatchProps[###cprops, ###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, ###psort, choice, sink]
+;
+
+-[Free[term,choice,sink]]
+:
+{###Env}
+$C-DispatchProps[($RP[$[M,###r]];###rest), ###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, ###psort, choice, sink]
+→
+%n⟪¶ADD_PROPERTY_REF(«sink», «{###Env}$C-mprops[###r]»);«{###Env} $C-DispatchProps[###rest, ###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, ###psort, choice, sink]»⟫
+;
+
+-[Free[term,choice,sink],Share[###function,###rule,###csort,###cprefix,###cm,###cargs,###psort]]
+:
+{###Env}
+$C-DispatchProps[(), ###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, ###psort, choice, sink]
+→
+$[{###Env} IfDef, $[:,'A$',###psort],
+ {###Env} $C-DispatchProps[(), ###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, $[{###Env}Get,$[:,'A$',###psort]], choice, sink],
+ {###Env} $C-DispatchProps-switch[###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, ###psort, $[{###Env}Get,###psort], choice, sink]
+]
+;
+-[Free[term,choice,sink],Copy[###rule,###psort]]
+:
+{###Env}
+$C-DispatchProps-switch[###function, term, ###rule, ###csort, ###cprefix, ###cm, ###cargs, ###psort, ###cases, choice, sink]
+→
+%n⟪
+switch («choice»)
+{ «{###Env} $C-DispatchVariableCase[###function, term, ###psort, sink]» «{###Env} $C-DispatchCases[###cases, ###rule, ###cargs, ###csort, ###cprefix, ###cm, ###psort, choice, sink]»
+default : ⟦¶ERRORF(«sink»->context, "PANIC in rule †«###rule»: Unhandled case for †«###psort» dispatch argument: %s\n", †«$C-s[###psort]».constructorNames[«choice»]);⟧
+}⟫
+;
+
+-[Free[term,sink],Copy[###psort]]
+:
+{###Env}
+$C-DispatchVariableCase[###function, term, ###psort, sink]
+→
+%n⟪↲#ifdef †«$C-Cvars[###psort]»
+case †«$C-Xv[###psort]» : return †«$C-stepv[###function]»(«sink», «term»);↲#else
+case †«$C-Xv[###psort]» : return 0;↲#endif⟫
+;
+
+-[Free[choice,sink],Discard[###rule,###cargs,###csort,###cprefix,###cm,###psort]]
+:
+{###Env}
+$C-DispatchCases[(), ###rule, ###cargs, ###csort, ###cprefix, ###cm, ###psort, choice, sink]
+→
+%n⟪⟫
+;
+
+-[Free[choice,sink],Copy[###cm,###case,###rule,###cprefix,###cargs,###psort]]
+:
+{###Env}
+$C-DispatchCases[(###case; ###cases), ###rule, ###cargs, ###csort, ###cprefix, ###cm, ###psort, choice, sink]
+→
+%n⟪«{###Env} $C-DispatchCase[###cm, ###cprefix, ###case, ###rule, ###cargs, ###psort, sink]» «{###Env} $C-DispatchCases[###cases, ###rule, ###cargs, ###csort, ###cprefix, ###cm, ###psort, choice, sink]»⟫
+;
+
+-[Free[sink],Copy[###cprefix,###case],Discard[###psort]]
+:
+{###Env}
+$C-DispatchCase[###cm, ###cprefix, ###case, ###rule, ###cargs, ###psort, sink]
+→
+%n⟪↲#ifdef †«$C-Cstruct[$[:,###cprefix,###case]]»
+case †«$C-X[###case]» : {⟦
+START(«sink», †«$[Mangle,$[:,###cprefix,###case]]»);«{###Env; ###cm : ###case} Targs[###rule, ###cargs, (), sink]»
+END(«sink», †«$[Mangle,$[:,###cprefix,###case]]»);
+break;⟧¶};↲#endif⟫
+;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// TERM CONSTRUCTION
+
+// PROPERTIES.
+
+// Process term.
+//
+-[Free[sink],Copy[###props,###term]]
+:
+{###Env}
+T[###rule, $[P,###props,###term], ###bvs, sink]
+→
+{###Env}
+Tprops[###rule, ###props, ###term, ###bvs, sink]
+;
+
+// Process properties.
+
+// Reference property.
+-[Fresh[name,value],Free[sink],Copy[###m,###bvs]]
+:
+{###Env}
+Tprops[###rule, ($RP[$[M,###m,###margs]] ; ###rest), ###term, ###bvs, sink]
+→
+%n⟪¶ADD_PROPERTY_REF(«sink», «{###Env}$C-mprops[###m]»);« {###Env} Tpropsweakenings[Texcept[###bvs,Tfv[###margs]], sink] »« {###Env} Tprops[###rule, ###rest, ###term, ###bvs, sink] »⟫
+;
+
+// Named property.
+-[Fresh[name,value],Free[sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Tprops[###rule, ($NP[###key,###value] ; ###rest), ###term, ###bvs, sink]
+→
+%n⟪¶{⟦¶char *«name»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, name]»¶Term «value»;«{###Env} Tcompute[###rule, ###value, value, ###bvs, sink]»¶ADD_PROPERTY_NAMED(«sink», «name», «value»);⟧¶}«{###Env} Tprops[###rule, ###rest, ###term, ###bvs, sink]»⟫
+;
+
+// Variable property.
+-[Fresh[value],Free[key,sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Tprops[###rule, ($VP[key,###value] ; ###rest), ###term, ###bvs, sink]
+→
+%n⟪¶{⟦¶Term «value»;«{###Env} Tcompute[###rule, ###value, value, ###bvs, sink]»¶ADD_PROPERTY_VARIABLE(«sink», « {###Env} Tvariable[key] », «value»);⟧¶}«{###Env} Tprops[###rule, ###rest, ###term, ###bvs, sink]»⟫
+;
+
+// Meta-property.
+-[Fresh[key,value],Free[sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Tprops[###rule, ($MP[$[M,###m,###margs],###value] ; ###rest), ###term, ###bvs, sink]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, $[M,###m,###margs], key, ###bvs, sink]»¶Term «value»;«{###Env} Tcompute[###rule, ###value, value, ###bvs, sink]»¶ADD_PROPERTY(«sink», «key», «value»);⟧¶}«{###Env} Tprops[###rule, ###rest, ###term, ###bvs, sink]»⟫
+;
+
+// No more properties.
+-[Copy[###term],Free[sink]]
+:
+{###Env}
+Tprops[###rule, (), ###term, ###bvs, sink]
+→
+{###Env}
+T2[###rule, ###term, ###bvs, sink]
+;
+
+-[Free[sink]]   : {###Env} Tpropsweakenings[(), sink] → %n⟪⟫ ;
+-[Free[v,sink]] : {###Env} Tpropsweakenings[(v; ###bvs), sink] → %n⟪¶ADD_PROPERTY_WEAKEN(«sink», « {###Env} Tvariable[v] »);« {###Env} Tpropsweakenings[###bvs, sink] »⟫ ;
+
+// VARIABLE.
+
+-[Free[variable,sink],Discard[###rule,###bvs]]
+:
+{###Env}
+T2[###rule, variable, ###bvs, sink]
+→
+%n⟪¶USE(«sink», « {###Env} Tvariable[variable] »);⟫
+;
+
+-[Free[v]] : {###Env} Tvariable[v] → Tvariable2[v, $[{###Env}Get, v, UNASSIGNED]] ;
+
+-[Free[v],Discard[###f]]                   : Tvariable2[v,            ALIAS[###m,###n,###f]         ] → %n⟪†«$C-mbind[###m,###n]»/*«v»*/⟫ ;
+-[Free[v],Discard[###m,###n,###f,###flag]] : Tvariable2[v, $[NotMatch,ALIAS[###m,###n,###f],###flag]] → %n⟪«v»⟫ ;
+
+-[Discard[###pre,###in]]   :          Tvariables[###pre, ###in, ()              ] → %n⟪⟫ ;
+-[Free[first],Copy[###in]] : {###Env} Tvariables[###pre, ###in, (first; ###rest)] → %n⟪†«###pre»« {###Env} Tvariable[first] »« {###Env} Tvariables[###in, ###in, ###rest] »⟫ ;
+
+// CONSTRUCTION.
+//
+// Emits start/end events around the argument scopes.
+
+// Regular constructors.
+-[Copy[###c,###args,###rule,###bvs],Free[sink]]
+:
+{###Env}
+T2[###rule, $[C,$[NotMatch,'$',$[NotMatch,'',###c]],###args], ###bvs, sink]
+→
+$[{###Env}IfDef, $[:,'C$',###c],
+ %n⟪¶START(«sink», †«$[Mangle,###c]»);«{###Env} Targs[###rule, ###args, ###bvs, sink]»¶END(«sink», †«$[Mangle,###c]»);⟫,
+ $[{###Env}IfDef, $[:,'F$',###c],
+  %n⟪¶START(«sink», †«$[Mangle,###c]»);«{###Env} Targs[###rule, ###args, ###bvs, sink]»¶END(«sink», †«$[Mangle,###c]»);⟫,
+  %n⟪¶LITERALU(«sink», †«$[Escape,###c]»);⟫]]
+;
+
+// Naked '$' construction.
+-[Free[sink],Discard[###rule,###bvs]]
+:
+{###Env}
+T2[###rule, $[C,'$',()], ###bvs, sink]
+→
+%n⟪¶LITERALU(«sink», "$");⟫
+;
+
+// Naked '' construction.
+-[Free[sink],Discard[###rule,###bvs]]
+:
+{###Env}
+T2[###rule, $[C,'',()], ###bvs, sink]
+→
+%n⟪¶LITERALU(«sink», "");⟫
+;
+
+// Evaluators (other $ constructions).
+-[Free[sink]]
+:
+{###Env}
+T2[###rule, $[C,'$',($[P,###props,###arg1];###args)], ###bvs, sink]
+→
+{###Env}
+Tdollar[###rule, ###props, ###arg1, ###args, ###bvs, sink]
+;
+
+// META-APPLICATION.
+//
+// A meta-application compiles to a copy of the referenced match term.
+
+-[Free[sink],Copy[###margs,###bvs]]
+:
+{###Env}
+T2[###rule, $[M,###m,###margs], ###bvs, sink]
+→
+%n⟪« {###Env} Tweakenings[Texcept[###bvs, Tfv[###margs]], sink] »« {###Env} Tmeta[###rule, ###m, ###margs, ###bvs, 0, 0, %n⟨⟩, %n⟨⟩, %n⟨⟩, %n⟨⟩, COPY, sink] »⟫
+;
+
+-[Free[v,sink]]
+:
+{###Env}
+Tmeta[###rule, ###m, (v;###args), ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+{###Env}
+Tmeta1[$[{###Env}Get, v, UNASSIGNED], v, ###rule, ###m, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+;
+
+-[Free[sink],Discard[###status]]
+:
+{###Env}
+Tmeta[###rule, ###m, ($[NotMatch,$[V],###arg1];###args), ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+{###Env}
+Tmeta2[###rule, ###m, ###arg1, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]
+;
+
+-[Free[sink],Copy[###rule,###m,###bvs],Discard[###bvs,###arity,###count,###vars,###code,###subs,###ccounts]]
+:
+{###Env}
+Tmeta[###rule, ###m, (), ###bvs, ###arity, ###count, ###vars, ###code, ###subs, ###ccounts, COPY, sink]
+→
+$[{###Env}IfDef, $[:,'Copy$',###rule,'$',###m],
+ %n⟪¶COPY(«sink», «{###Env}$C-m[###m]», †«$C-mcount[###m]»++);⟫,
+ $[{###Env}IfDef, $[:,'Lax$',###rule],
+  %n⟪¶COPY(«sink», «{###Env}$C-m[###m]», †«$C-mcount[###m]»++);⟫,
+  %n⟪¶COPY(«sink», «{###Env}$C-m[###m]», 0);⟫]]
+;
+
+-[Free[sink],Copy[###rule,###m,###count,###margs],Fresh[vars,subs,ccounts,substitution],Discard[###bvs,###arity]]
+:
+{###Env}
+Tmeta[###rule, ###m, (), ###bvs, ###arity, ###count, ###vars, ###code, ###subs, ###ccounts, SUBSTITUTE, sink]
+→
+%n⟪
+{⟦
+Variable «vars»[†«###count»] = {«###vars»};«###code»
+Term «subs»[†«###count»] = {«###subs»};
+int *«ccounts»[†«###count»] = {«###ccounts»};
+struct _SubstitutionFrame «substitution» = {NULL, 0, †«###count», «vars», «subs», «ccounts»};«
+ $[{###Env}IfDef, $[:,'Copy$',###rule,'$',###m],
+  %n⟨¶SUBSTITUTE(‹sink›, ‹{###Env}$C-m[###m]›, †‹$C-mcount[###m]›++, &‹substitution›);⟩,
+  $[{###Env}IfDef, $[:,'Lax$',###rule],
+   %n⟨¶SUBSTITUTE(‹sink›, ‹{###Env}$C-m[###m]›, †‹$C-mcount[###m]›++, &‹substitution›);⟩,
+   %n⟨¶SUBSTITUTE(‹sink›, ‹{###Env}$C-m[###m]›, 0, &‹substitution›);⟩]]
+»⟧
+}⟫
+;
+
+// Tmeta1 handles the cases for variables.
+
+-[Free[v,sink],Discard[###status]]
+:
+{###Env}
+Tmeta1[UNASSIGNED, v, ###rule, ###m, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+{###Env}
+Tmeta2[###rule, ###m, v, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]
+;
+
+-[Free[v,sink],Discard[###,###status]]
+:
+{###Env}
+Tmeta1[CREATE[###], v, ###rule, ###m, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+{###Env}
+Tmeta2[###rule, ###m, v, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]
+;
+
+// When a variable alias occurs as a meta-application argument then either it is in the right place for trivial
+// substitution, in which case it is neither forces nor included in substitutions, or it is not special and forces substitution:
+//
+-[Free[v,sink],Copy[###m,###index],Share[###rule,###bvs,###count,###vars,###code,###subs,###ccounts,###args]]
+:
+{###Env}
+Tmeta1[ALIAS[###am,###an,CREATE], v, ###rule, ###m, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+$[If, $[Equal, $[:,###am,'$',###an], $[:,###m,'$',###index]],
+ {###Env} Tmeta[###rule, ###m, ###args, ###bvs, $[Plus,###index,1], ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink],
+ {###Env} Tmeta2[###rule, ###m, v, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]]
+;
+
+// When a variable alias occurs as a meta-application argument then either it is in the right place for trivial
+// substitution, in which case it is neither forces nor included in substitutions, or it is not special and forces substitution:
+//
+-[Free[v,sink],Copy[###m,###index],Share[###rule,###bvs,###count,###vars,###code,###subs,###ccounts,###args]]
+:
+{###Env}
+Tmeta1[ALIAS[###am,###an,REUSE], v, ###rule, ###m, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+$[If, $[Equal, $[:,###am,'$',###an], $[:,###m,'$',###index]],
+ %n⟪¶/*FreshReuse[«v»]*/« {###Env} Tmeta[###rule, ###m, ###args, ###bvs, $[Plus,###index,1], ###count, ###vars, ###code, ###subs, ###ccounts, ###status, sink] »⟫,
+ {###Env} Tmeta2[###rule, ###m, v, ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]]
+;
+
+-[Free[v,sink],Discard[###m,###args,###bvs,###index,###vars,###code,###subs, ###ccounts,###status]]
+:
+{###Env}
+Tmeta1[REUSE, v, ###rule, ###m, ###args, ###bvs, ###index, ###vars, ###code, ###subs, ###ccounts, ###status, sink]
+→
+$[Error, $[:,'UNHANDLED REUSE ',$[Show,v],' IN ',###rule]]
+;
+
+// Tmeta2 is the helper that adds actual substitution arguments.
+
+// Tmeta2: if substitution argument is an existing meta-application then pass copy counter from it.
+
+-[Free[sink],Fresh[sub],Copy[###rule,###m,###m1,###index,###count,###bvs]]
+:
+{###Env}
+Tmeta2[###rule, ###m, $[M,###m1,()], ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]
+→
+{###Env}
+Tmeta[###rule, ###m, ###args, ###bvs, $[Plus,###index,1], $[Plus,###count,1],
+  %n⟪«###vars»†«$[IfZero,###count,"",", "]»†«$C-mbind[###m,###index]»⟫,
+  %n⟪«###code»¶Term «sub» = « {###Env} $C-m[###m1] »;⟫,
+  %n⟪«###subs»†«$[IfZero,###count,"",", "]»«sub»⟫,
+  %n⟪«###ccounts»†«$[IfZero,###count,"",", "]»« {###Env} Tmcount[###rule, ###m1, "&(", ")", "NULL"] »⟫,
+  SUBSTITUTE, sink]
+;
+
+-[Copy[###rule,###m],Share[###pre,###post]]
+:
+{###Env}
+Tmcount[###rule, ###m, ###pre, ###post, ###default]
+→
+$[{###Env}IfDef, $[:,'Copy$',###rule,'$',###m],
+ %n⟪†«###pre»†«$C-mcount[###m]»†«###post»⟫,
+ $[{###Env}IfDef, $[:,'Lax$',###rule],
+  %n⟪†«###pre»†«$C-mcount[###m]»†«###post»⟫,
+  %n⟪†«###default»⟫]]
+;
+
+// Tmeta2: if substitution argument is a proper term construction then create term with counter.
+
+-[Free[sink],Fresh[sub,ccount],Discard[###m1],Copy[###rule,###m,###index,###count,###bvs]]
+:
+{###Env}
+Tmeta2[###rule, ###m, $[NotMatch,$[M,###m1,()],###arg1], ###args, ###bvs, ###index, ###count, ###vars, ###code, ###subs, ###ccounts, sink]
+→
+{###Env}
+Tmeta[###rule, ###m, ###args, ###bvs, $[Plus,###index,1], $[Plus,###count,1],
+  %n⟪«###vars»†«$[IfZero,###count,"",", "]»†«$C-mbind[###m,###index]»⟫,
+  %n⟪«###code»¶Term «sub»;«{###Env} Tload[###rule, ###arg1, sub, ###bvs, sink]»¶int «ccount» = 0;⟫,
+  %n⟪«###subs»†«$[IfZero,###count,"",", "]»«sub»⟫,
+  %n⟪«###ccounts»†«$[IfZero,###count,"",", "]»&«ccount»⟫,
+  SUBSTITUTE, sink]
+;
+// TODO: the above will generate a (0-valued) ccount even for linear variable substitutions, which is not really needed.
+
+-[Free[sink]]   : {###Env} Tweakenings[()         , sink] → %n⟪⟫ ;
+-[Free[v,sink]] : {###Env} Tweakenings[(v; ###bvs), sink] → %n⟪¶WEAKEN(«sink», « {###Env} Tvariable[v] »);« {###Env} Tweakenings[###bvs, sink] »⟫ ;
+
+// ARGUMENT LISTS.
+
+-[Free[sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Targs[###rule, ($B binder . ###arg[binder]; ###args), ###bvs, sink]
+→
+%n⟪« {###Env} Targs-binders[###rule, $B binder . ###arg[binder], ###bvs, sink] »« {###Env} Targs[###rule, ###args, ###bvs, sink] »⟫
+;
+
+-[Free[sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Targs[###rule, ($BL binder . ###arg[binder]; ###args), ###bvs, sink]
+→
+%n⟪« {###Env} Targs-binders[###rule, $BL binder . ###arg[binder], ###bvs, sink] »« {###Env} Targs[###rule, ###args, ###bvs, sink] »⟫
+;
+
+// Simple variable argument.
+-[Free[variable,sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Targs[###rule, (variable ; ###args), ###bvs, sink]
+→
+%n⟪« {###Env} T[###rule, variable, ###bvs, sink] »« {###Env} Targs[###rule, ###args, ###bvs, sink] »⟫
+;
+
+// Construction arguments.
+-[Free[sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Targs[###rule, ($[Match,$[C],###arg] ; ###args), ###bvs, sink]
+→
+%n⟪« {###Env} T[###rule, ###arg, ###bvs, sink] »« {###Env} Targs[###rule, ###args, ###bvs, sink] »⟫
+;
+
+// Meta-application argument.
+-[Free[sink],Copy[###rule,###bvs]]
+:
+{###Env}
+Targs[###rule, ($[Match,$[M],###arg] ; ###args), ###bvs, sink]
+→
+%n⟪« {###Env} T[###rule, ###arg, ###bvs, sink] »« {###Env} Targs[###rule, ###args, ###bvs, sink] »⟫
+;
+
+// No more arguments.
+-[Free[sink],Discard[###rule,###bvs]]
+:
+Targs[###rule, (), ###bvs, sink]
+→
+%n⟪⟫
+;
+
+// Collect and generate code for set of binders
+//
+// One of the key sources of making the generated CRSX C code running fast is to AVOID SUBSTITUTION.
+// A major technique for avoiding sustitution is to REUSE VARIABLES such that 'renaming' substitutions
+// are avoided when possible.  Specifically, we avoid renaming in two cases:
+//
+// (A) If the rule has the 'FreshReuse[v]' option then v is not created but instead the variable corresponding
+//     to the first meta-application argument use of v is reused, and the substitution is avoided.
+//     (We observe this by looking for v:REUSE in the environment.)
+//
+// (B) If an introduced binder occurs in a (non-copied) meta-application argument then the variable originally
+//     used for that argument is reused for the binder.
+//     (Introduced binders that may reuse previous binders have b:CREATE[FALSE] in the environment,
+//     introduced binders that do reuse pattern binders have b:ALIAS[M,N,F], and 
+//     introduced binders that must be allocated have b:CREATE[TRUE].) 
+//
+// The outcome of the analysis of a variable is that the variable is mapped in the environment to either...
+// * CREATE[X] - the variable should be allocated normally using the variable name itself.
+// * ALIAS[M,N,F] - the variable reuses the pattern binder for metavariable M's N'th argument with F=REUSE or F=CREATE.
+
+-[Free[sink]]
+:
+{###Env}
+Targs-binders[###rule, ###arg1, ###bvs, sink]
+→
+{###Env}
+Targs-binders1[###rule, (), ###arg1, ###bvs, sink]
+;
+
+// Targs-binders1 collects fresh equivalents for binders.
+
+-[Free[sink],Fresh[binder]]
+:
+{###Env}
+Targs-binders1[###rule, ###rbinders, $B b . ###arg1[b], ###bvs, sink]
+→
+{###Env}
+Targs-binders1[###rule, (binder; ###rbinders), ###arg1[binder], (binder; ###bvs), sink]
+;
+
+-[Free[sink],Fresh[binder¹]]
+:
+{###Env}
+Targs-binders1[###rule, ###rbinders, $BL b¹ . ###arg1[b¹], ###bvs, sink]
+→
+{###Env}
+Targs-binders1[###rule, (binder¹; ###rbinders), ###arg1[binder¹], (binder¹; ###bvs), sink]
+;
+
+-[Free[sink],Discard[###1,###2]]
+:
+{###Env}
+Targs-binders1[###rule, ###rbinders, $[NotMatch, $B b.###1[b], $[NotMatch, $BL b¹.###2[b¹], ###arg1]], ###bvs, sink]
+→
+{###Env}
+Targs-binders2[###rule, ###rbinders, 0, (), ###arg1, ###bvs, sink]
+;
+
+// Targs-binders2 analyses each binder.
+
+-[Free[binder,sink],Copy[###rule,###arg1]]
+:
+{###Env}
+Targs-binders2[###rule, (binder; ###rbinders), ###n, ###binders, ###arg1, ###bvs, sink]
+→
+{###Env; binder:CREATE[FALSE]}
+Targs-analyze-reuse[binder, (###arg1;), ###rule, ok¹.Targs-then-binders3[ok¹, binder, ###rule, ###rbinders, ###n, ###binders, ###arg1, ###bvs, sink]]
+;
+
+-[Free[sink],Fresh[binds],Copy[###n,###binders]]
+:
+{###Env}
+Targs-binders2[###rule, (), ###n, ###binders, ###arg1, ###bvs, sink]
+→
+%n⟪
+{⟦
+Variable «binds»[†«###n»] = {« {###Env} Tvariables["", ", ", ###binders] »};« {###Env} Trebinds[###binders] »
+BINDS(«sink», †«###n», &«binds»[0]);⟧
+}« {###Env} T[###rule, ###arg1, ###bvs, sink] »⟫
+;
+
+-          :          Trebinds[()          ] → %n⟪⟫ ;
+-[Free[v]] : {###Env} Trebinds[(v; ###rest)] → {###Env} Trebinds2[v, $[{###Env}Get, v, UNASSIGNED], ###rest] ;
+
+-[Free[v]]                                 : {###Env} Trebinds2[v,            ALIAS[###m,###n,CREATE]       , ###rest] → %n⟪¶REBIND(†«$C-mbind[###m,###n]»);« {###Env} Trebinds[###rest] »⟫ ;
+-[Free[v],Discard[###m,###n]]              : {###Env} Trebinds2[v,            ALIAS[###m,###n,REUSE]        , ###rest] → {###Env} Trebinds[###rest] ;
+-[Free[v],Discard[###m,###n,###f,###flag]] : {###Env} Trebinds2[v, $[NotMatch,ALIAS[###m,###n,###f],###flag], ###rest] → {###Env} Trebinds[###rest] ;
+
+// Targs-binders3 generates declarations of the variables that need to be created.
+
+-[Free[binder,sink]]
+:
+{###Env}
+Targs-then-binders3[OK, binder, ###rule, ###rbinders, ###n, ###binders, ###arg1, ###bvs, sink]
+→
+{###Env}
+Targs-binders3[binder, ###rule, ###rbinders, ###n, ###binders, ###arg1, ###bvs, sink]
+;
+
+-[Free[binder,sink],Discard[###am,###an,###af]]
+:
+{###Env; binder : ALIAS[###am,###an,###af]}
+Targs-binders3[binder, ###rule, ###rbinders, ###n, ###binders, ###arg1, ###bvs, sink]
+→
+{###Env} Targs-binders2[###rule, ###rbinders, $[Plus,###n,1], (binder; ###binders), ###arg1, ###bvs, sink]
+;
+
+-[Free[binder,sink],Discard[###am,###an,###af,###]]
+:
+{###Env; binder : $[NotMatch,ALIAS[###am,###an,###af],###]}
+Targs-binders3[binder, ###rule, ###rbinders, ###n, ###binders, ###arg1, ###bvs, sink]
+→
+%n⟪¶Variable «binder» = MAKE_BOUND_†«$[IfLinear, binder, LINEAR, PROMISCUOUS]»_VARIABLE(«sink»->context, "«binder»");« {###Env} Targs-binders2[###rule, ###rbinders, $[Plus,###n,1], (binder; ###binders), ###arg1, ###bvs, sink] »⟫
+;
+
+// Targs-analyze-reuse passes through entire subterm looking for first occurrence of variable as meta-application argument.
+
+-[Free[b],Discard[###rule]]            : {###Env} Targs-analyze-reuse[b, ()                                            , ###rule, ok¹.###continue[ok¹]] → {###Env} ###continue[OK] ;
+-[Free[b],Fresh[b2]]                   : {###Env} Targs-analyze-reuse[b, ($B binder . ###term[binder]        ; ###rest), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, (###term[b2]; ###rest), ###rule, ok¹.###continue[ok¹]] ;
+-[Free[b],Fresh[b2¹]]                  : {###Env} Targs-analyze-reuse[b, ($BL binder¹ . ###term[binder¹]     ; ###rest), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, (###term[b2¹]; ###rest), ###rule, ok¹.###continue[ok¹]] ;
+-[Free[b],Discard[###c],Copy[###rule]] : {###Env} Targs-analyze-reuse[b, ($[P, ###props, $[C, ###c, ###args]]; ###rest), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse2[b, ###props, ###rule, ok¹.Targs-then-analyze-reuse[ok¹, b, ###args, ###rule, ok2¹.Targs-then-analyze-reuse[ok2¹, b, ###rest, ###rule, ok3¹.###continue[ok3¹]]]] ;
+-[Free[b],Copy[###rule]]               : {###Env} Targs-analyze-reuse[b, ($[P, ###props, $[M, ###m, ###args]]; ###rest), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse2[b, ###props, ###rule, ok¹.Targs-then-analyze-reuse3[ok¹, b, ###m, 0, ###args, ###rule, ok2¹.Targs-then-analyze-reuse[ok2¹, b, ###rest, ###rule, ok3¹.###continue[ok3¹]]]] ;
+-[Free[b,v]]                           : {###Env} Targs-analyze-reuse[b, (v                                  ; ###rest), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, ###rest, ###rule, ok¹.###continue[ok¹]] ; // plain occurrence not significant!
+
+-[Free[b],Discard[###rule]]              : {###Env} Targs-analyze-reuse2[b, ()                              , ###rule, ok¹.###continue[ok¹]] → {###Env} ###continue[OK] ;
+-[Free[b],Discard[###m]]                 : {###Env} Targs-analyze-reuse2[b, ($RP[$[M,###m]]      ; ###props), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, ###props, ###rule, ok¹.###continue[ok¹]] ;
+-[Free[b],Discard[###key],Copy[###rule]] : {###Env} Targs-analyze-reuse2[b, ($NP[###key,###value]; ###props), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, (###value;), ###rule, ok¹.Targs-then-analyze-reuse2[ok¹, b, ###props, ###rule, ok2¹.###continue[ok2¹]]] ;
+-[Free[b,key],Copy[###rule]]             : {###Env} Targs-analyze-reuse2[b, ($VP[key,###value]   ; ###props), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, (###value;), ###rule, ok¹.Targs-then-analyze-reuse2[ok¹, b, ###props, ###rule, ok2¹.###continue[ok2¹]]] ;
+-[Free[b],Discard[###key],Copy[###rule]] : {###Env} Targs-analyze-reuse2[b, ($MP[###key,###value]; ###props), ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, (###value;), ###rule, ok¹.Targs-then-analyze-reuse2[ok¹, b, ###props, ###rule, ok2¹.###continue[ok2¹]]] ;
+
+// For each meta-application argument we check whether it is the analyzed variable...
+
+// The next meta-application argument is the variable!
+-[Free[b],Copy[###m,###n],Copy[###rule]]
+:
+{###Env}
+Targs-analyze-reuse3[b, ###m, ###n, (b; ###args), ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+Targs-analyze-reuse4[$[{###Env}Get,b,UNASSIGNED], b, ###m, ###n, ###rule, ok¹.Targs-then-analyze-reuse3[ok¹, b, ###m, $[Plus,###n,1], ###args, ###rule, ok2¹.###continue[ok2¹]]]
+;
+
+// The next meta-application argument is not the bound variable.
+-[Free[b],Copy[###rule]]
+:
+{###Env}
+Targs-analyze-reuse3[b, ###m, ###n, ($[NotMatch, b, ###arg]; ###args), ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+Targs-analyze-reuse[b, (###arg;), ###rule, ok¹.Targs-then-analyze-reuse3[ok¹, b, ###m, $[Plus,###n,1], ###args, ###rule, ok2¹.###continue[ok2¹]]]
+;
+
+// There are no more meta-application arguments.
+-[Free[b],Discard[###m,###n,###rule]]
+:
+{###Env}
+Targs-analyze-reuse3[b, ###m, ###n, (), ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+###continue[OK]
+;
+
+// Interesting cases for occurrences of the actual variable.
+
+// Previously unreused bound variable...try alias unless meta-variable copied.
+Targs-analyze-reuse-create[Free[b],Copy[###m],Share[###continue]]
+:
+{###Env}
+Targs-analyze-reuse4[CREATE[FALSE], b, ###m, ###n, ###rule, ok¹.###continue[ok¹]]
+→
+$[{###Env}IfDef, $[:,'Copy$',###rule,'$',###m],
+ {###Env; b : CREATE[TRUE]} ###continue[OK],
+ {###Env; b : ALIAS[###m,###n,CREATE]} ###continue[OK]]
+;
+
+// Previously aliased bound variable...no change.
+Targs-analyze-reuse-alias-create[Free[b],Discard[###am,###an,###m,###n,###rule]]
+:
+{###Env}
+Targs-analyze-reuse4[ALIAS[###am,###an,CREATE], b, ###m, ###n, ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+###continue[OK]
+;
+
+// Previously unused reusable fresh variable...use alias.
+Targs-analyze-reuse-reused[Free[b],Discard[###rule]]
+:
+{###Env}
+Targs-analyze-reuse4[REUSE, b, ###m, ###n, ###rule, ok¹.###continue[ok¹]]
+→
+{###Env; b : ALIAS[###m,###n,REUSE]}
+###continue[OK]
+;
+
+// Previously aliased fresh variable...no change.
+Targs-analyze-reuse-alias-reuse[Free[v],Discard[###am,###an,###m,###n,###rule]]
+:
+{###Env}
+Targs-analyze-reuse4[ALIAS[###am,###an,REUSE], v, ###m, ###n, ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+###continue[OK]
+;
+
+// Already determined unaliasable.
+Targs-analyze-reuse-recreate[Free[b],Discard[###m,###n,###rule]]
+:
+{###Env}
+Targs-analyze-reuse4[CREATE[TRUE], b, ###m, ###n, ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+###continue[OK]
+;
+
+// TODO: Why should this ever happen?
+Targs-analyze-reuse-unassigned[Free[b],Discard[###m,###n,###rule]]
+:
+{###Env}
+Targs-analyze-reuse4[UNASSIGNED, b, ###m, ###n, ###rule, ok¹.###continue[ok¹]]
+→
+{###Env}
+###continue[OK]
+;
+
+-[Free[b]] : {###Env} Targs-then-analyze-reuse[OK, b, ###terms, ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse[b, ###terms, ###rule, ok¹.###continue[ok¹]] ;
+-[Free[b]] : {###Env} Targs-then-analyze-reuse3[OK, b, ###m, ###n, ###terms, ###rule, ok¹.###continue[ok¹]] → {###Env} Targs-analyze-reuse3[b, ###m, ###n, ###terms, ###rule, ok¹.###continue[ok¹]] ;
+
+//////////////////////////////
+// Generic evaluator primitives
+//
+// Tdollar[RULENAME, Q_PROPERTIES, PRIMITIVE, Q_ARGUMENTS, sink]
+
+// $[If, TEST, YES, NO]
+-[Free[sink],Fresh[test],Copy[###count],Copy[###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, (), If, (###test; ###success; ###failure;), ###bvs, sink]
+→
+%n⟪¶{⟦¶long long «test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if («test») ¶{⟦«{###Env} T[###rule, ###success, ###bvs, sink]»⟧¶} ¶else ¶{⟦«{###Env} T[###rule, ###failure, ###bvs, sink]»⟧¶}⟧¶}⟫
+;
+
+// $[IfZero, TESTNUMBER, YES, NO]
+-[Free[sink],Fresh[test],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, (), IfZero, (###test; ###success; ###failure;), ###bvs, sink]
+→
+%n⟪¶{⟦¶long long «test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if («test») ¶{⟦«{###Env} T[###rule, ###failure, ###bvs, sink]»⟧¶} ¶else ¶{⟦«{###Env} T[###rule, ###success, ###bvs, sink]»⟧¶}⟧¶}⟫
+;
+
+// $[IfEmpty, SEQUENCE, YES, NO] 
+-[Free[sink],Fresh[string],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, (), IfEmpty, (###string; ###success; ###failure;), ###bvs, sink]
+→
+%n⟪¶{⟦¶char *«string»;«{###Env} Tstring[###rule, ###bvs, sink, ###string, string]»¶if («string»[0]) ¶{⟦«{###Env} T[###rule, ###failure, ###bvs, sink]»⟧¶} ¶else ¶{⟦«{###Env} T[###rule, ###success, ###bvs, sink]»⟧¶}⟧¶}⟫
+;
+
+// $[Pick, INDEX, SEQUENCE]
+-[Free[sink],Fresh[index],Copy[###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, (), Pick, (###index; ###list;), ###bvs, sink]
+→
+%n⟪¶{⟦¶long long «index»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###index, index]»¶switch («index») ¶{ «{###Env} TdollarPicks[###rule, ###list, 0, index, ###bvs, sink]»¶}⟧¶}⟫
+;
+-[Free[index,sink],Copy[###index,###rule,###bvs]]    : {###Env} TdollarPicks[###rule, (###pick; ###rest), ###index, index, ###bvs, sink] → %n⟪¶case †«###index» : ⟦«{###Env} T[###rule, ###pick, ###bvs, sink]»¶break;⟧ «{###Env} TdollarPicks[###rule, ###rest, $[Plus,###index,1], index, ###bvs, sink]»⟫ ;
+-[Free[index,sink],Discard[###index,###rule,###bvs]] : {###Env} TdollarPicks[###rule, ()                , ###index, index, ###bvs, sink] → %n⟪¶default : ⟦¶ERRORF(«sink»->context, "Impossible Pick choice (%lld)\n", «index»);⟧⟫ ;
+
+// $[LoadTerm, URL]
+-[Free[sink],Fresh[url]]
+:
+{###Env}
+Tdollar[###rule, (), LoadTerm, (###url;), ###bvs, sink]
+→
+%n⟪¶{⟦¶char *«url»;« {###Env} Tstring[###rule, ###bvs, sink, ###url, url] »¶LOAD_TERM(«sink», «url»);⟧¶}⟫
+;
+
+// $[SaveTerm, URL, TERM, RESULT]
+-[Free[sink],Fresh[url,term],Copy[###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, (), SaveTerm, (###url; ###term; ###result;), ###bvs, sink]
+→
+%n⟪¶{⟦
+char *«url»;« {###Env} Tstring[###rule, ###bvs, sink, ###url, url] »
+Term «term»;« {###Env} Tload[###rule, ###term, term, ###bvs, sink] »
+SAVE_TERM(«sink»->context, «url», «term»);« {###Env} T[###rule, ###result, ###bvs, sink]  »⟧ }⟫
+;
+// TODO: make and use variant that saves without requiring Tload buffering.
+
+// $[ {ENVIRONMENT}IfDef, KEY, YES, NO]
+-[Free[sink],Fresh[key],Copy[###m,###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, ($RP[$[M,###m]];), IfDef, (###key; ###success; ###failure;), ###bvs, sink]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶if (PROPERTY(«{###Env}$C-mprops[###m]», «key»))¶{⟦«{###Env} T[###rule, ###success, ###bvs, sink]»⟧¶} ¶else ¶{⟦«{###Env} T[###rule, ###failure, ###bvs, sink]»⟧¶}⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY]
+-[Free[sink],Fresh[key,value],Copy[###m,###success,###failure]]
+:
+{###Env}
+Tdollar[###rule, ($RP[$[M,###m]];), Get, (###key;), ###bvs, sink]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶Term «value» = PROPERTY(«{###Env}$C-mprops[###m]», «key»);¶COPY(«sink», «value», 1);⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY, FALLBACK]
+-[Free[sink],Fresh[key,value],Copy[###rule,###bvs,###m,###success,###failure]]
+:
+{###Env}
+Tdollar[###rule, ($RP[$[M,###m]];), Get, (###key; ###default;), ###bvs, sink]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶Term «value» = PROPERTY(«{###Env}$C-mprops[###m]», «key»);
+if («value») ⟦¶COPY(«sink», «value», 1);⟧ ¶else ¶{⟦«{###Env} T[###rule, ###default, ###bvs, sink]»⟧¶} ⟧¶}⟫
+;
+
+// $[Get, KEY]
+-[Free[sink],Fresh[key,value],Copy[###rule,###bvs,###success,###failure],Discard[###m]]
+:
+{###Env}
+Tdollar[###rule, (), Get, (###key;), ###bvs, sink]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, key]»¶char *«value» = getenv(«key»);
+if («value») ⟦¶LITERAL(«sink», «value»);⟧ ¶else ¶{⟦«{###Env} T[###rule, (), ###bvs, sink]»⟧¶} ⟧¶}⟫
+;
+
+// $[Get, KEY, FALLBACK]
+-[Free[sink],Fresh[key,value],Copy[###rule,###bvs,###success,###failure],Discard[###m]]
+:
+{###Env}
+Tdollar[###rule, (), Get, (###key; ###default;), ###bvs, sink]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, key]»¶char *«value» = getenv(«key»);
+if («value») ⟦¶LITERAL(«sink», «value»);⟧ ¶else ¶{⟦«{###Env} T[###rule, ###default, ###bvs, sink]»⟧¶} ⟧¶}⟫
+;
+
+// String-valued functions.
+//
+-[Free[sink],Fresh[string]] : {###Env} Tdollar[###rule, ###props, ":"        , ###args, ###bvs, sink] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, ":"        , ###args, ###bvs, sink, string] »¶LITERALU(«sink», «string»);⟧¶}⟫ ;
+-[Free[sink],Fresh[string]] : {###Env} Tdollar[###rule, ###props, AfterFirst , ###args, ###bvs, sink] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, AfterFirst , ###args, ###bvs, sink, string] »¶LITERALU(«sink», «string»);⟧¶}⟫ ;
+-[Free[sink],Fresh[string]] : {###Env} Tdollar[###rule, ###props, BeforeFirst, ###args, ###bvs, sink] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, BeforeFirst, ###args, ###bvs, sink, string] »¶LITERALU(«sink», «string»);⟧¶}⟫ ;
+-[Free[sink],Fresh[string]] : {###Env} Tdollar[###rule, ###props, Substring  , ###args, ###bvs, sink] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, Substring  , ###args, ###bvs, sink, string] »¶LITERALU(«sink», «string»);⟧¶}⟫ ;
+
+// Tests.
+//
+-[Free[sink],Fresh[test]] : {###Env} Tdollar[###rule, ###props, Equal      , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, Equal      , ###args, ###bvs, sink, test] »¶LITERALU(«sink», («test» ? True : Nil));⟧¶}⟫ ;
+-[Free[sink],Fresh[test]] : {###Env} Tdollar[###rule, ###props, NotEqual   , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, NotEqual   , ###args, ###bvs, sink, test] »¶LITERALU(«sink», («test» ? True : Nil));⟧¶}⟫ ;
+-[Free[sink],Fresh[test]] : {###Env} Tdollar[###rule, ###props, Contains   , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, Contains   , ###args, ###bvs, sink, test] »¶LITERALU(«sink», («test» ? True : Nil));⟧¶}⟫ ;
+-[Free[sink],Fresh[test]] : {###Env} Tdollar[###rule, ###props, BitSubSetEq, ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, BitSubSetEq, ###args, ###bvs, sink, test] »¶LITERALU(«sink», («test» ? True : Nil));⟧¶}⟫ ;
+
+// Bitset-valued (long long) functions.
+//
+-[Free[sink],Fresh[bitset]] : {###Env} Tdollar[###rule, ###props, BitNot   , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitNot  , ###args, ###bvs, sink, bitset] »¶LITERALNF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink],Fresh[bitset]] : {###Env} Tdollar[###rule, ###props, BitAnd   , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitAnd  , ###args, ###bvs, sink, bitset] »¶LITERALNF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink],Fresh[bitset]] : {###Env} Tdollar[###rule, ###props, BitOr    , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitOr   , ###args, ###bvs, sink, bitset] »¶LITERALNF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink],Fresh[bitset]] : {###Env} Tdollar[###rule, ###props, BitXor   , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitXor  , ###args, ###bvs, sink, bitset] »¶LITERALNF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink],Fresh[bitset]] : {###Env} Tdollar[###rule, ###props, BitMinus , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitMinus, ###args, ###bvs, sink, bitset] »¶LITERALNF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink],Fresh[bitset]] : {###Env} Tdollar[###rule, ###props, Hex      , ###args, ###bvs, sink] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, Hex     , ###args, ###bvs, sink, bitset] »¶LITERALNF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+
+// Numeric-valued (double) functions.
+//
+-[Free[sink],Fresh[number]] : {###Env} Tdollar[###rule, ###props, Plus  , ###args, ###bvs, sink] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Plus  , ###args, ###bvs, sink, number] »¶LITERALNF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink],Fresh[number]] : {###Env} Tdollar[###rule, ###props, Minus , ###args, ###bvs, sink] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Minus , ###args, ###bvs, sink, number] »¶LITERALNF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink],Fresh[number]] : {###Env} Tdollar[###rule, ###props, Times , ###args, ###bvs, sink] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Times , ###args, ###bvs, sink, number] »¶LITERALNF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink],Fresh[number]] : {###Env} Tdollar[###rule, ###props, Divide, ###args, ###bvs, sink] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Divide, ###args, ###bvs, sink, number] »¶LITERALNF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink],Fresh[number]] : {###Env} Tdollar[###rule, ###props, Modulo, ###args, ###bvs, sink] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Modulo, ###args, ###bvs, sink, number] »¶LITERALNF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+
+// Normalization hint...
+//
+// $[Data, #]
+-[Free[sink],Fresh[term]]
+:
+{###Env}
+Tdollar[###rule, (), Data, (###term;), ###bvs, sink]
+→
+%n⟪¶{⟦¶Term «term»;«{###Env} Tcompute[###rule, ###term, term, ###bvs, sink]»¶COPY(«sink», «term», 0);⟧¶}⟫
+;
+
+// Error...
+//
+-[Free[sink],Fresh[message]]
+:
+{###Env}
+Tdollar[###rule, (), Error, (###message;), ###bvs, sink]
+→
+%n⟪¶{⟦¶char *«message»;«{###Env} Tstring[###rule, ###bvs, sink, ###message, message]»¶ERRORF(«sink»->context, "%s\n", «message»);⟧¶}⟫
+;
+
+// Special case to capture repeat of dispatch term.
+// Exploits two specific properties:
+// (1) Contraction of the form $[C[<SORT>],#c,#as] always reconstruct term matched with the same pattern form.
+// (2) Variables for a term and it's constructor are aliases.
+//
+-[Free[sink],Discard[###sort,###mas,###rule,###bvs]]
+:
+{###Env}
+Tdollar[###rule, (), C[###sort], ($[M,###mc,()]; $[M,###mas,()];), ###bvs, sink]
+→
+%n⟪¶COPY(«sink», «{###Env}$C-m[###mc]», 0);⟫
+;
+
+// Special case to capture nested $[C, $[:,Prefix,#$c], #$as] inside $#c-case generated by dispatcher (OLD STYLE)...
+//
+-[Free[sink],Fresh[symbol],Copy[###prefix,###case],Discard[###casem]]
+:
+{###Env; ###casem : ###case}
+Tdollar[###rule, (), C, ($[C,'$',(':'; ###prefix; $[M,###casem];)]; ###args;), ###bvs, sink]
+→
+$[Trace, DEPRECATED,
+%n⟪
+START(«sink», †«$[Mangle,$[:,###prefix,###case]]»);«{###Env} Targs[###rule, ###args, ###bvs, sink]»
+END(«sink», †«$[Mangle,$[:,###prefix,###case]]»);⟫
+]
+;
+
+////////////////////////////////////////////////
+// Tstring[RULENAME, bvs, sink, TERM, stringvariable]
+//
+// Compute stringvariable = "the (constructor) string value of TERM".
+//
+-[Free[sink,string],Discard[###rule,###bvs]]
+:
+Tstring[###rule, ###bvs, sink, $[C,###c,()], string]
+→
+%n⟪¶«string» = †«$[Escape,###c]»;⟫
+;
+
+-[Free[sink,string]]
+:
+{###Env}
+Tstring[###rule, ###bvs, sink, $[C,'$',($[P,###props,###arg1];###args)], string]
+→
+{###Env}
+Tstringdollar[###rule, ###props, ###arg1, ###args, ###bvs, sink, string]
+;
+
+-[Free[sink,string],Fresh[buf,data],Discard[###c,###m]]
+:
+{###Env}
+Tstring[###rule, ###bvs, sink, $[NotMatch,$[C,###c,()],$[NotMatch,$[C,'$'],###term]], string]
+→
+%n⟪¶{⟦¶Term «data»;« {###Env} Tforce[###rule, ###term, data, ###bvs, sink] »¶«string» = SYMBOL(«data»);⟧¶}⟫
+;
+
+// Implement all $[...] special cases for strings.
+
+// $[If, TEST, YES, NO]
+-[Free[sink,string],Fresh[test],Copy[###count],Copy[###rule,###bvs]]
+:
+{###Env}
+Tstringdollar[###rule, (), If, (###test; ###success; ###failure;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶long long «test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if («test») ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###success, string]»⟧¶} ¶else ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###failure, string]»⟧¶}⟧¶}⟫
+;
+
+// $[IfZero, TESTNUMBER, YES, NO]
+-[Free[sink,string],Fresh[test],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tstringdollar[###rule, (), IfZero, (###test; ###success; ###failure;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶long long «test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if (!«test») ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###success, string]»⟧¶} ¶else ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###failure, string]»⟧¶}⟧¶}⟫
+;
+
+// $[IfEmpty, SEQUENCE, YES, NO] 
+-[Free[sink,string],Fresh[sequence],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tstringdollar[###rule, (), IfEmpty, (###sequence; ###success; ###failure;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«sequence»;«{###Env} Tstring[###rule, ###bvs, sink, ###sequence, sequence]»¶if (!«sequence»[0] || !strcmp(«sequence», "$Nil")) ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###success, string]»⟧¶} ¶else ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###failure, string]»⟧¶}⟧¶}⟫
+;
+
+// $[Pick, INDEX, SEQUENCE]
+-[Free[sink,string],Fresh[index],Copy[###rule,###bvs]]
+:
+{###Env}
+Tstringdollar[###rule, (), Pick, (###index; ###list;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶long long «index»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###index, index]»¶switch («index») ¶{ «{###Env} TstringdollarPicks[###rule, ###list, 0, index, ###bvs, sink, string]»¶}⟧¶}⟫
+;
+-[Free[index,sink,string],Copy[###index,###rule,###bvs]]    : {###Env} TstringdollarPicks[###rule, (###pick; ###rest), ###index, index, ###bvs, sink, string] → %n⟪¶case †«###index» : ⟦«{###Env} Tstring[###rule, ###bvs, sink, ###pick, string]»¶break;⟧ «{###Env} TstringdollarPicks[###rule, ###rest, $[Plus,###index,1], index, ###bvs, sink, string]»⟫ ;
+-[Free[index,sink,string],Discard[###index,###rule,###bvs]] : {###Env} TstringdollarPicks[###rule, ()                , ###index, index, ###bvs, sink, string] → %n⟪¶default : ⟦¶ERRORF(«sink»->context, "Impossible Pick choice (%lld)\n", «index»);⟧⟫ ;
+
+// $[ {ENVIRONMENT}IfDef, KEY, YES, NO]
+-[Free[sink,string],Fresh[key],Copy[###m,###rule,###bvs]]
+:
+{###Env}
+Tstringdollar[###rule, ($RP[$[M,###m]];), IfDef, (###key; ###success; ###failure;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶if (PROPERTY(«{###Env}$C-mprops[###m]», «key»)) ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###success, string]»⟧¶} ¶else ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###failure, string]»⟧¶}⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY]
+-[Free[sink,string],Fresh[key,value],Copy[###m,###success,###failure]]
+:
+{###Env}
+Tstringdollar[###rule, ($RP[$[M,###m]];), Get, (###key;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶«string» = SYMBOL(PROPERTY(«{###Env}$C-mprops[###m]», «key»));⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY, FALLBACK]
+-[Free[sink,string],Fresh[key,value],Copy[###rule,###bvs,###m,###success,###failure]]
+:
+{###Env}
+Tstringdollar[###rule, ($RP[$[M,###m]];), Get, (###key; ###default;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶Term «value» = PROPERTY(«{###Env}$C-mprops[###m]», «key»);
+if («value») ⟦¶«string» = SYMBOL(«value»);⟧ ¶else ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###default, string]»⟧¶} ⟧¶}⟫
+;
+
+// $[Get, KEY]
+-[Free[sink,string],Fresh[key,value],Copy[###success,###failure],Discard[###m]]
+:
+{###Env}
+Tstringdollar[###rule, (), Get, (###key;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, key]»¶«string» = GLOBAL(«sink»->context, getenv(«key»)));⟧¶}⟫
+;
+
+// $[Get, KEY, FALLBACK]
+-[Free[sink,string],Fresh[key,value],Copy[###rule,###bvs,###success,###failure],Discard[###m]]
+:
+{###Env}
+Tstringdollar[###rule, (), Get, (###key; ###default;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, key]»¶char *«value» = getenv(«key»);
+if («value») ⟦¶«string» = GLOBAL(«sink»->context, «value»);⟧ ¶else ¶{⟦«{###Env} Tstring[###rule, ###bvs, sink, ###default, string]»⟧¶} ⟧¶}⟫
+;
+
+// STRING-VALUED FUNCTIONS.
+//
+// $[:, ...]
+//
+-[Free[sink,concat],Share[###rest],Fresh[length,sub,sublength,p]]
+:
+{###Env}
+Tstringdollar[###rule, (), ":", (###rest), ###bvs, sink, concat]
+→
+%n⟪
+{⟦
+char *«sub»[†«Tlength[###rest,0]»];
+size_t «sublength»[†«Tlength[###rest,0]»];
+size_t «length» = 0;«{###Env} Tconcat1[###rule, ###bvs, sink, ###rest, length, sub, sublength, 0]»
+«concat» = ALLOCATE(«sink»->context, «length»+1);
+char *«p» = «concat»;
+int i;
+for (i = 0; i < †«Tlength[###rest,0]»; ++i)
+{⟦
+memcpy(«p», «sub»[i], «sublength»[i]);
+«p» += «sublength»[i];⟧
+}
+*«p» = '\0';
+ASSERT(«sink»->context, strlen(«concat») == «length»);⟧
+}⟫
+;
+
+-[Free[sink,sub,sublength,length],Discard[###rule,###bvs,###index]]
+:
+{###Env}
+Tconcat1[###rule, ###bvs, sink, (), length, sub, sublength, ###index]
+→
+%n⟪⟫
+;
+
+-[Free[sink,sub,sublength,length],Fresh[s],Copy[###index]] :
+{###Env}
+Tconcat1[###rule, ###bvs, sink, ($[C,###c,()];###rest), length, sub, sublength, ###index]
+→
+%n⟪¶«length» += («sublength»[†«###index»] = strlen(«sub»[†«###index»] = †«$[Escape,###c]»));«{###Env} Tconcat1[###rule, ###bvs, sink, ###rest, length, sub, sublength, $[Plus,###index,1]]»⟫
+;
+
+-[Free[sink,sub,sublength,length],Fresh[s],Copy[###index,###rule,###bvs],Discard[###c]]
+:
+{###Env}
+Tconcat1[###rule, ###bvs, sink, ($[NotMatch,$[C,###c,()],###1];###rest), length, sub, sublength, ###index]
+→
+%n⟪¶{⟦¶char *«s»;«{###Env} Tstring[###rule, ###bvs, sink, ###1, s]»¶«length» += («sublength»[†«###index»] = strlen(«sub»[†«###index»] = «s»));⟧¶} «{###Env} Tconcat1[###rule, ###bvs, sink, ###rest, length, sub, sublength, $[Plus,###index,1]]»⟫
+;
+
+// $[AfterFirst,SUPER,SUBSTRING], $[BeforeFirst,SUPER,SUBSTRING]
+//
+-[Free[sink,string],Fresh[super,sub,p],Copy[###rule,###bvs]]
+:
+{###Env} Tstringdollar[###rule, (), AfterFirst, (###super; ###sub;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«super», *«sub»;«{###Env} Tstring[###rule, ###bvs, sink, ###super, super]» «{###Env} Tstring[###rule, ###bvs, sink, ###sub, sub]»¶char *«p» = strstr(«super»,«sub»);¶«string» = («p» ? makeSubstring(«sink»->context, «super», («p»-«super»)+strlen(«sub»), strlen(«super»)-((«p»-«super»)+strlen(«sub»))) : "");⟧¶}⟫
+;
+-[Free[sink,string],Fresh[super,sub,p],Copy[###rule,###bvs]]
+:
+{###Env} Tstringdollar[###rule, (), BeforeFirst, (###super; ###sub;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«super», *«sub»;«{###Env} Tstring[###rule, ###bvs, sink, ###super, super]» «{###Env} Tstring[###rule, ###bvs, sink, ###sub, sub]»¶char *«p» = strstr(«super»,«sub»);¶«string» = («p» ? makeSubstring(«sink»->context, «super», 0, «p»-«super») : "");⟧¶}⟫
+;
+
+// $[Substring,SUPER,FROM], $[Substring,SUPER,FROM,UPTO]
+//
+-[Free[sink,string],Fresh[super,first],Copy[###rule,###bvs]] : {###Env} Tstringdollar[###rule, (), Substring, (###super; ###first;), ###bvs, sink, string] → %n⟪¶{⟦¶char *«super»;«{###Env} Tstring[###rule, ###bvs, sink, ###super, super]»¶long long «first»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###first, first]»¶«string» = makeSubstring(«sink»->context, «super», «first», strlen(«super»)-«first»);⟧¶}⟫ ;
+
+-[Free[sink,string],Fresh[super,first,after],Copy[###rule,###bvs]]
+:
+{###Env} Tstringdollar[###rule, (), Substring, (###super; ###first; ###after;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«super»;«{###Env} Tstring[###rule, ###bvs, sink, ###super, super]»¶long long «first», «after»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###first, first]» «{###Env} Tlonglong[###rule, ###bvs, sink, ###after, after]»¶«string» = makeSubstring(«sink»->context, «super», «first», «after»-«first»);⟧¶}⟫
+;
+
+// Tests.
+//
+-[Free[sink,string],Fresh[test]] : {###Env} Tstringdollar[###rule, ###props, Equal      , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, Equal      , ###args, ###bvs, sink, test] »¶«string» = («test» ? True : Nil);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[test]] : {###Env} Tstringdollar[###rule, ###props, NotEqual   , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, NotEqual   , ###args, ###bvs, sink, test] »¶«string» = («test» ? True : Nil);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[test]] : {###Env} Tstringdollar[###rule, ###props, Contains   , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, Contains   , ###args, ###bvs, sink, test] »¶«string» = («test» ? True : Nil);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[test]] : {###Env} Tstringdollar[###rule, ###props, BitSubSetEq, ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, BitSubSetEq, ###args, ###bvs, sink, test] »¶«string» = («test» ? True : Nil);⟧¶}⟫ ;
+
+// Bitset-valued (long long) functions.
+//
+-[Free[sink,string],Fresh[bitset]] : {###Env} Tstringdollar[###rule, ###props, BitNot  , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitNot  , ###args, ###bvs, sink, bitset] »¶«string» = ALLOCATENF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[bitset]] : {###Env} Tstringdollar[###rule, ###props, BitAnd  , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitAnd  , ###args, ###bvs, sink, bitset] »¶«string» = ALLOCATENF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[bitset]] : {###Env} Tstringdollar[###rule, ###props, BitOr   , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitOr   , ###args, ###bvs, sink, bitset] »¶«string» = ALLOCATENF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[bitset]] : {###Env} Tstringdollar[###rule, ###props, BitXor  , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitXor  , ###args, ###bvs, sink, bitset] »¶«string» = ALLOCATENF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[bitset]] : {###Env} Tstringdollar[###rule, ###props, BitMinus, ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitMinus, ###args, ###bvs, sink, bitset] »¶«string» = ALLOCATENF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[bitset]] : {###Env} Tstringdollar[###rule, ###props, Hex     , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, Hex     , ###args, ###bvs, sink, bitset] »¶«string» = ALLOCATENF(«sink», 100, "%lld", «bitset»);⟧¶}⟫ ;
+
+// Numeric-valued (double) functions.
+//
+-[Free[sink,string],Fresh[number]] : {###Env} Tstringdollar[###rule, ###props, Plus    , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Plus  , ###args, ###bvs, sink, number] »¶«string» = ALLOCATENF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[number]] : {###Env} Tstringdollar[###rule, ###props, Minus   , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Minus , ###args, ###bvs, sink, number] »¶«string» = ALLOCATENF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[number]] : {###Env} Tstringdollar[###rule, ###props, Times   , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Times , ###args, ###bvs, sink, number] »¶«string» = ALLOCATENF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[number]] : {###Env} Tstringdollar[###rule, ###props, Divide  , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Divide, ###args, ###bvs, sink, number] »¶«string» = ALLOCATENF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+-[Free[sink,string],Fresh[number]] : {###Env} Tstringdollar[###rule, ###props, Modulo  , ###args, ###bvs, sink, string] → %n⟪¶{⟦¶double «number»;« {###Env} Tdoubledollar[###rule, ###props, Modulo, ###args, ###bvs, sink, number] »¶«string» = ALLOCATENF(«sink», 100, "%g", «number»);⟧¶}⟫ ;
+
+// Normalization hint...
+//
+// $[Data, #]
+-[Free[sink,string],Fresh[term]]
+:
+{###Env}
+Tstringdollar[###rule, (), Data, (###term;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶Term «term»;«{###Env} Tcompute[###rule, ###term, term, ###bvs, sink]»¶«string» = SYMBOL(«term»);⟧¶}⟫
+;
+
+// Error...
+//
+-[Free[sink,string],Fresh[message]]
+:
+{###Env}
+Tstringdollar[###rule, (), Error, (###message;), ###bvs, sink, string]
+→
+%n⟪¶{⟦¶char *«message»;«{###Env} Tstring[###rule, ###bvs, sink, ###message, message]»¶ERRORF(«sink»->context, "%s\n", «message»);⟧¶}⟫
+;
+
+// Special case to capture repeat of dispatch term.
+// Exploits two specific properties:
+// (1) Contraction of the form $[C[<SORT>],#c,#as] always reconstruct term matched with the same pattern form.
+// (2) Variables for a term and it's constructor are aliases.
+//
+-[Free[sink,string],Discard[###sort,###mas,###rule,###bvs]]
+:
+{###Env}
+Tstringdollar[###rule, (), C[###sort], ($[M,###mc,()]; $[M,###mas,()];), ###bvs, sink, string]
+→
+%n⟪¶«string» = SYMBOL(«{###Env}$C-m[###mc]»);⟫
+;
+
+////////////////////////////////////////////////////
+// Tlonglong[RULENAME, BVS, sink, TERM, longlongvariable] 
+//
+// Compute longlongvariable = "the (constructor) longlong value of TERM".
+//
+-[Free[sink,number],Discard[###rule,###bvs]]
+:
+Tlonglong[###rule, ###bvs, sink, $[C,###c,()], number]
+→
+%n⟪¶«number» = †«###c»ll;⟫
+;
+
+-[Free[sink,number]]
+:
+{###Env}
+Tlonglong[###rule, ###bvs, sink, $[C,'$',($[P,###props,###arg1];###args)], number]
+→
+{###Env}
+Tlonglongdollar[###rule, ###props, ###arg1, ###args, ###bvs, sink, number]
+;
+
+-[Free[sink,number],Fresh[buf,data],Discard[###c,###m]]
+:
+{###Env}
+Tlonglong[###rule, ###bvs, sink, $[NotMatch,$[C,###c,()],$[NotMatch,$[C,'$'],###term]], number]
+→
+%n⟪¶{⟦¶Term «data»;« {###Env} Tforce[###rule, ###term, data, ###bvs, sink] »¶«number» = LONGLONG(«data»);⟧¶}⟫
+;
+
+// Implement all $[...] special cases for longlongs.
+
+// $[If, TEST, YES, NO]
+-[Free[sink,number],Fresh[test],Copy[###count],Copy[###rule,###bvs]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), If, (###test; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶long long *«test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if («test») ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[IfZero, TEST, YES, NO]
+-[Free[sink,number],Fresh[test],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), IfZero, (###test; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶long long «test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if (!«test») ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[IfEmpty, SEQUENCE, YES, NO] 
+-[Free[sink,number],Fresh[string],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), IfEmpty, (###string; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«string»;«{###Env} Tstring[###rule, ###bvs, sink, ###string, string]»¶if (!«string»[0] || !strcmp(«string», "$Nil")) ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[Pick, INDEX, SEQUENCE]
+-[Free[sink,number],Fresh[index],Copy[###rule,###bvs]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), Pick, (###index; ###list;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶long long «index»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###index, index]»¶switch («index») ¶{ «{###Env} TlonglongdollarPicks[###rule, ###list, 0, index, ###bvs, sink, number]»¶}⟧¶}⟫
+;
+-[Free[index,sink,number],Copy[###index,###rule,###bvs]]    : {###Env} TlonglongdollarPicks[###rule, (###pick; ###rest), ###index, index, ###bvs, sink, number] → %n⟪¶case †«###index» : ⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###pick, number]»¶break;⟧ «{###Env} TlonglongdollarPicks[###rule, ###rest, $[Plus,###index,1], index, ###bvs, sink, number]»⟫ ;
+-[Free[index,sink,number],Discard[###index,###rule,###bvs]] : {###Env} TlonglongdollarPicks[###rule, ()                , ###index, index, ###bvs, sink, number] → %n⟪¶default : ⟦¶ERRORF(«sink»->context, "Impossible Pick choice (%lld)\n", «index»);⟧⟫ ;
+
+// $[ {ENVIRONMENT}IfDef, KEY, YES, NO]
+-[Free[sink,number],Fresh[key],Copy[###m,###rule,###bvs]]
+:
+{###Env}
+Tlonglongdollar[###rule, ($RP[$[M,###m]];), IfDef, (###key; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶if (PROPERTY(«{###Env}$C-mprops[###m]», «key»)) ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY]
+-[Free[sink,number],Fresh[key,value],Copy[###m,###success,###failure]]
+:
+{###Env}
+Tlonglongdollar[###rule, ($RP[$[M,###m]];), Get, (###key;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶«number» = LONGLONG(PROPERTY(«{###Env}$C-mprops[###m]», «key»));⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY, FALLBACK]
+-[Free[sink,number],Fresh[key,value],Copy[###rule,###bvs,###m,###success,###failure]]
+:
+{###Env}
+Tlonglongdollar[###rule, ($RP[$[M,###m]];), Get, (###key; ###default;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶Term «value» = PROPERTY(«{###Env}$C-mprops[###m]», «key»);
+if («value») ⟦¶«number» = LONGLONG(«value»);⟧ ¶else ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###default, number]»⟧¶} ⟧¶}⟫
+;
+
+// $[Get, KEY]
+-[Free[sink,number],Fresh[key,value],Copy[###success,###failure],Discard[###m]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), Get, (###key;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, key]»¶«number» = atoll(getenv(«key»));⟧¶}⟫
+;
+
+// $[Get, KEY, FALLBACK]
+-[Free[sink,number],Fresh[key,value],Copy[###rule,###bvs,###success,###failure],Discard[###m]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), Get, (###key; ###default;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, ###bvs, sink, ###key, key]»¶char *«value» = getenv(«key»);
+if («value») ⟦¶«number» = atoll(«value»);⟧ ¶else ¶{⟦«{###Env} Tlonglong[###rule, ###bvs, sink, ###default, number]»⟧¶} ⟧¶}⟫
+;
+
+// String-valued-functions.
+//
+-[Free[sink,number],Fresh[string]] : {###Env} Tlonglongdollar[###rule, ###props, ":"        , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, ":"        , ###args, ###bvs, sink, string] »¶«number» = atoll(«string»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string]] : {###Env} Tlonglongdollar[###rule, ###props, AfterFirst , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, AfterFirst , ###args, ###bvs, sink, string] »¶«number» = atoll(«string»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string]] : {###Env} Tlonglongdollar[###rule, ###props, BeforeFirst, ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, BeforeFirst, ###args, ###bvs, sink, string] »¶«number» = atoll(«string»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string]] : {###Env} Tlonglongdollar[###rule, ###props, Substring  , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, Substring  , ###args, ###bvs, sink, string] »¶«number» = atoll(«string»);⟧¶}⟫ ;
+
+// TESTS.
+//
+// $[Equal,STRING1,STRING2], $[NotEqual,STRING1,STRING2]
+//
+-[Free[sink,number],Fresh[string1,string2],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), Equal   , (###string1; ###string2;), ###bvs, sink, number] → %n⟪¶{⟦¶char *«string1», *«string2»;«{###Env} Tstring[###rule, ###bvs, sink, ###string1, string1]» «{###Env} Tstring[###rule, ###bvs, sink, ###string2, string2]»¶«number» = (long long) !strcmp(«string1»,«string2»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string1,string2],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), NotEqual, (###string1; ###string2;), ###bvs, sink, number] → %n⟪¶{⟦¶char *«string1», *«string2»;«{###Env} Tstring[###rule, ###bvs, sink, ###string1, string1]» «{###Env} Tstring[###rule, ###bvs, sink, ###string2, string2]»¶«number» = (long long) strcmp(«string1»,«string2»);⟧¶}⟫ ;
+
+// $[Contains,STRING,SUBSTRING],  $[StartsWith,STRING,SUBSTRING], $[EndsWith,STRING,SUBSTRING]
+//
+-[Free[sink,number],Fresh[string,substring],Copy[###rule,###bvs]]        : {###Env} Tlonglongdollar[###rule, (), Contains  , (###string; ###substring;), ###bvs, sink, number] → %n⟪¶{⟦¶char *«string», *«substring»;«{###Env} Tstring[###rule, ###bvs, sink, ###string, string]» «{###Env} Tstring[###rule, ###bvs, sink, ###substring, substring]»¶«number» = (long long) (strstr(«string»,«substring») != NULL);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string,substring],Copy[###rule,###bvs]]        : {###Env} Tlonglongdollar[###rule, (), StartsWith, (###string; ###substring;), ###bvs, sink, number] → %n⟪¶{⟦¶char *«string», *«substring»;«{###Env} Tstring[###rule, ###bvs, sink, ###string, string]» «{###Env} Tstring[###rule, ###bvs, sink, ###substring, substring]»¶«number» = (long long) !strncmp(«string»,«substring»,strlen(«substring»));⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string,substring,offset],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), EndsWith  , (###string; ###substring;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«string», *«substring»;«{###Env} Tstring[###rule, ###bvs, sink, ###string, string]» «{###Env} Tstring[###rule, ###bvs, sink, ###substring, substring]»¶size_t «offset» = strlen(«string»)-strlen(«substring»);¶«number» = (long long) !(«offset»>=0 && strcmp(«string»+«offset»,«substring»));⟧¶}⟫
+;
+
+// $[BitSubSetEq, LEFT, RIGHT]
+//
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), BitSubSetEq, (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶long long «left», «right»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###left, left]» «{###Env} Tlonglong[###rule, ###bvs, sink, ###right, right]»¶«number» = (long long) !(«left»&(~«right»));⟧¶}⟫ ;
+
+// BITWISE-VALUED (long long) OPERATIONS
+//
+-[Free[sink,number],Fresh[arg],Copy[###rule]]               : {###Env} Tlonglongdollar[###rule, (), BitNot  , (###arg;           ), ###bvs, sink, number] → %n⟪¶{⟦¶long long «arg»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###arg, arg]»¶«number» = ~«arg»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), BitAnd  , (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶long long «left», «right»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###left, left]» «{###Env} Tlonglong[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»&«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), BitOr   , (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶long long «left», «right»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###left, left]» «{###Env} Tlonglong[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»|«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), BitXor  , (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶long long «left», «right»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###left, left]» «{###Env} Tlonglong[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»^«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tlonglongdollar[###rule, (), BitMinus, (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶long long «left», «right»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###left, left]» «{###Env} Tlonglong[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»&(~«right»);⟧¶}⟫ ;
+
+// Hex number literal used when possible...
+-[Free[sink,number],Fresh[hex],Discard[###rule,###bvs]]
+:
+{###Env} Tlonglongdollar[###rule, (), Hex, ($[C,###hex];), ###bvs, sink, number]
+→
+%n⟪¶«hex» = 0x†«###hex»ll;⟫
+;
+-[Free[sink,number],Fresh[hex],Copy[###rule]]
+:
+{###Env} Tlonglongdollar[###rule, (), Hex, ($[NotMatch,$[C],###hex];), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«hex»;«{###Env} Tstring[###rule, ###bvs, sink, ###hex, hex]»¶if (sscanf(«hex», "%llx", &«number») <= 0) ⟦¶ERRORF(«sink»->context, "Illegally formatted $[Hex,'%s']\n", «hex»);⟧⟧¶}⟫
+;
+
+// Numeric-valued (double) functions.
+//
+-[Free[sink,number],Fresh[d]] : {###Env} Tlonglongdollar[###rule, ###props, Plus  , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶double «d»;« {###Env} Tdoubledollar[###rule, ###props, Plus  , ###args, ###bvs, sink, d] »¶«number» = (long long) «d»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[d]] : {###Env} Tlonglongdollar[###rule, ###props, Minus , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶double «d»;« {###Env} Tdoubledollar[###rule, ###props, Minus , ###args, ###bvs, sink, d] »¶«number» = (long long) «d»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[d]] : {###Env} Tlonglongdollar[###rule, ###props, Times , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶double «d»;« {###Env} Tdoubledollar[###rule, ###props, Times , ###args, ###bvs, sink, d] »¶«number» = (long long) «d»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[d]] : {###Env} Tlonglongdollar[###rule, ###props, Divide, ###args, ###bvs, sink, number] → %n⟪¶{⟦¶double «d»;« {###Env} Tdoubledollar[###rule, ###props, Divide, ###args, ###bvs, sink, d] »¶«number» = (long long) «d»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[d]] : {###Env} Tlonglongdollar[###rule, ###props, Modulo, ###args, ###bvs, sink, number] → %n⟪¶{⟦¶double «d»;« {###Env} Tdoubledollar[###rule, ###props, Modulo, ###args, ###bvs, sink, d] »¶«number» = (long long) «d»;⟧¶}⟫ ;
+
+// $[Data,TERM]
+//
+-[Free[sink,number],Fresh[term]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), Data, (###term;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «term»;«{###Env} Tcompute[###rule, ###term, term, ###bvs, sink]»¶«number» = LONGLONG(«term»);⟧¶}⟫
+;
+
+// $[Error,MESSAGE]
+//
+-[Free[sink,number],Fresh[message]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), Error, (###message;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«message»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###message, message]»¶ERRORF(«sink»->context, "%s\n", «message»);⟧¶}⟫
+;
+
+// Special case to capture repeat of dispatch term.
+// Exploits two specific properties:
+// (1) Contraction of the form $[C[<SORT>],#c,#as] always reconstruct term matched with the same pattern form.
+// (2) Variables for a term and it's constructor are aliases.
+//
+-[Free[sink,number],Discard[###sort,###mas,###rule,###bvs]]
+:
+{###Env}
+Tlonglongdollar[###rule, (), C[###sort], ($[M,###mc,()]; $[M,###mas,()];), ###bvs, sink, number]
+→
+%n⟪¶«number» = LONGLONG(«{###Env}$C-m[###mc]»);⟫
+;
+
+//////////////////////////////////////////////////
+// Tdouble[RULENAME, BVS, sink, TERM, longlongvariable] 
+//
+// Compute doublevariable = "the (constructor) double value of TERM".
+//
+-[Free[sink,number],Discard[###rule,###bvs]]
+:
+Tdouble[###rule, ###bvs, sink, $[C,###c,()], number]
+→
+%n⟪¶«number» = (double) †«###c»;⟫
+;
+
+-[Free[sink,number]]
+:
+{###Env}
+Tdouble[###rule, ###bvs, sink, $[C,'$',($[P,###props,###arg1];###args)], number]
+→
+{###Env}
+Tdoubledollar[###rule, ###props, ###arg1, ###args, ###bvs, sink, number]
+;
+
+-[Free[sink,number],Fresh[buf,data],Discard[###c,###m]]
+:
+{###Env}
+Tdouble[###rule, ###bvs, sink, $[NotMatch,$[C,###c,()],$[NotMatch,$[C,'$'],###term]], number]
+→
+%n⟪¶{⟦¶Term «data»;« {###Env} Tforce[###rule, ###term, data, ###bvs, sink] »¶«number» = DOUBLE(«data»);⟧¶}⟫
+;
+
+// Implement all $[...] special cases for doubles.
+
+// $[If, TEST, YES, NO]
+-[Free[sink,number],Fresh[test],Copy[###count],Copy[###rule,###bvs]]
+:
+{###Env}
+Tdoubledollar[###rule, (), If, (###test; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶long long *«test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if («test») ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[IfZero, TESTNUMBER, YES, NO]
+-[Free[sink,number],Fresh[test],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tdoubledollar[###rule, (), IfZero, (###test; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶long long «test»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###test, test]»¶if (!«test») ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[IfEmpty, SEQUENCE, YES, NO] 
+-[Free[sink,number],Fresh[string],Copy[###count,###rule,###bvs]]
+:
+{###Env}
+Tdoubledollar[###rule, (), IfEmpty, (###string; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«string»;«{###Env} Tstring[###rule, ###bvs, sink, ###string, string]»¶if (!«string»[0] || !strcmp(«string», "$Nil")) ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[Pick, INDEX, SEQUENCE]
+-[Free[sink,number],Fresh[index],Copy[###rule,###bvs]]
+:
+{###Env}
+Tdoubledollar[###rule, (), Pick, (###index; ###list;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶long long «index»;«{###Env} Tlonglong[###rule, ###bvs, sink, ###index, index]»¶switch («index») ¶{ «{###Env} TdoubledollarPicks[###rule, ###list, 0, index, ###bvs, sink, number]»¶}⟧¶}⟫
+;
+-[Free[index,sink,number],Copy[###index,###rule,###bvs]]    : {###Env} TdoubledollarPicks[###rule, (###pick; ###rest), ###index, index, ###bvs, sink, number] → %n⟪¶case †«###index» : ⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###pick, number]»¶break;⟧ «{###Env} TdoubledollarPicks[###rule, ###rest, $[Plus,###index,1], index, ###bvs, sink, number]»⟫ ;
+-[Free[index,sink,number],Discard[###index,###rule,###bvs]] : {###Env} TdoubledollarPicks[###rule, ()                , ###index, index, ###bvs, sink, number] → %n⟪¶default : ⟦¶ERRORF(«sink»->context, "Impossible Pick choice (%lld)\n", «index»);⟧⟫ ;
+
+// $[ {ENVIRONMENT}IfDef, KEY, YES, NO]
+-[Free[sink,number],Fresh[key],Copy[###rule,###bvs]]
+:
+{###Env}
+Tdoubledollar[###rule, ($RP[$[M,###m]];), IfDef, (###key; ###success; ###failure;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶if (PROPERTY(«{###Env}$C-mprops[###m]», «key»)) ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###success, number]»⟧¶} ¶else ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###failure, number]»⟧¶}⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY]
+-[Free[sink,number],Fresh[key,value],Copy[###success,###failure]]
+:
+{###Env}
+Tdoubledollar[###rule, ($RP[$[M,###m]];), Get, (###key;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶«number» = DOUBLE(PROPERTY(«{###Env}$C-mprops[###m]», «key»));⟧¶}⟫
+;
+
+// $[ {ENVIRONMENT}Get, KEY, FALLBACK]
+-[Free[sink,number],Fresh[key,value],Copy[###rule,###bvs,###success,###failure]]
+:
+{###Env}
+Tdoubledollar[###rule, ($RP[$[M,###m]];), Get, (###key; ###default;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «key»;«{###Env} Tforce[###rule, ###key, key, ###bvs, sink]»¶Term «value» = PROPERTY(«{###Env}$C-mprops[###m]», «key»);
+if («value») ⟦¶«number» = DOUBLE(«value»);⟧ ¶else ¶{⟦«{###Env} Tdouble[###rule, ###bvs, sink, ###default, number]»⟧¶} ⟧¶}⟫
+;
+
+// $[Get, KEY]
+-[Free[sink,number],Fresh[key,value],Copy[###success,###failure]]
+:
+{###Env}
+Tdoubledollar[###rule, (), Get, (###key;), sink, number]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, sink, ###key, key]»¶«number» = strtod(getenv(«key»), NULL));⟧¶}⟫
+;
+
+// $[Get, KEY, FALLBACK]
+-[Free[sink,number],Fresh[key,value],Copy[###rule,###bvs,###success,###failure]]
+:
+{###Env}
+Tdoubledollar[###rule, (), Get, (###key; ###default;), sink, number]
+→
+%n⟪¶{⟦¶char *«key»;«{###Env} Tstring[###rule, sink, ###key, key]»¶char *«value» = getenv(«key»);
+if («value») ⟦¶«number» = strtod(«value», NULL);⟧ ¶else ¶{⟦«{###Env} Tdouble[###rule, sink, ###default, number]»⟧¶} ⟧¶}⟫
+;
+
+// String-valued functions.
+//
+-[Free[sink,number],Fresh[string]] : {###Env} Tdoubledollar[###rule, ###props, ":"        , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, ":"        , ###args, ###bvs, sink, string] »¶«number» = atof(«string»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string]] : {###Env} Tdoubledollar[###rule, ###props, AfterFirst , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, AfterFirst , ###args, ###bvs, sink, string] »¶«number» = atof(«string»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string]] : {###Env} Tdoubledollar[###rule, ###props, BeforeFirst, ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, BeforeFirst, ###args, ###bvs, sink, string] »¶«number» = atof(«string»);⟧¶}⟫ ;
+-[Free[sink,number],Fresh[string]] : {###Env} Tdoubledollar[###rule, ###props, Substring  , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶char *«string»;« {###Env} Tstringdollar[###rule, ###props, Substring  , ###args, ###bvs, sink, string] »¶«number» = atof(«string»);⟧¶}⟫ ;
+
+// Tests.
+//
+-[Free[sink,number],Fresh[test]] : {###Env} Tdoubledollar[###rule, ###props, Equal      , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, Equal      , ###args, ###bvs, sink, test] »¶«number» = (double) «test»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[test]] : {###Env} Tdoubledollar[###rule, ###props, NotEqual   , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, NotEqual   , ###args, ###bvs, sink, test] »¶«number» = (double) «test»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[test]] : {###Env} Tdoubledollar[###rule, ###props, Contains   , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, Contains   , ###args, ###bvs, sink, test] »¶«number» = (double) «test»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[test]] : {###Env} Tdoubledollar[###rule, ###props, BitSubSetEq, ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «test»;« {###Env} Tlonglongdollar[###rule, ###props, BitSubSetEq, ###args, ###bvs, sink, test] »¶«number» = (double) «test»;⟧¶}⟫ ;
+
+// Bitset-valued (long long) functions.
+//
+-[Free[sink,number],Fresh[bitset]] : {###Env} Tdoubledollar[###rule, ###props, BitNot  , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitNot  , ###args, ###bvs, sink, bitset] »¶«number» = (double) «bitset»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[bitset]] : {###Env} Tdoubledollar[###rule, ###props, BitAnd  , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitAnd  , ###args, ###bvs, sink, bitset] »¶«number» = (double) «bitset»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[bitset]] : {###Env} Tdoubledollar[###rule, ###props, BitOr   , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitOr   , ###args, ###bvs, sink, bitset] »¶«number» = (double) «bitset»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[bitset]] : {###Env} Tdoubledollar[###rule, ###props, BitXor  , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitXor  , ###args, ###bvs, sink, bitset] »¶«number» = (double) «bitset»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[bitset]] : {###Env} Tdoubledollar[###rule, ###props, BitMinus, ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, BitMinus, ###args, ###bvs, sink, bitset] »¶«number» = (double) «bitset»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[bitset]] : {###Env} Tdoubledollar[###rule, ###props, Hex     , ###args, ###bvs, sink, number] → %n⟪¶{⟦¶long long «bitset»;« {###Env} Tlonglongdollar[###rule, ###props, Hex     , ###args, ###bvs, sink, bitset] »¶«number» = (double) «bitset»;⟧¶}⟫ ;
+
+// NUMERIC-VALUED (double) OPERATIONS
+//
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tdoubledollar[###rule, (), Plus  , (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶double «left», «right»;«{###Env} Tdouble[###rule, ###bvs, sink, ###left, left]» «{###Env} Tdouble[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»+«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tdoubledollar[###rule, (), Minus , (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶double «left», «right»;«{###Env} Tdouble[###rule, ###bvs, sink, ###left, left]» «{###Env} Tdouble[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»-«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tdoubledollar[###rule, (), Times , (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶double «left», «right»;«{###Env} Tdouble[###rule, ###bvs, sink, ###left, left]» «{###Env} Tdouble[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»*«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tdoubledollar[###rule, (), Divide, (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶double «left», «right»;«{###Env} Tdouble[###rule, ###bvs, sink, ###left, left]» «{###Env} Tdouble[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»/«right»;⟧¶}⟫ ;
+-[Free[sink,number],Fresh[left,right],Copy[###rule,###bvs]] : {###Env} Tdoubledollar[###rule, (), Modulo, (###left; ###right;), ###bvs, sink, number] → %n⟪¶{⟦¶double «left», «right»;«{###Env} Tdouble[###rule, ###bvs, sink, ###left, left]» «{###Env} Tdouble[###rule, ###bvs, sink, ###right, right]»¶«number» = «left»%«right»;⟧¶}⟫ ;
+
+// $[Data,TERM]
+//
+-[Free[sink,number],Fresh[term]]
+:
+{###Env}
+Tdoubledollar[###rule, (), Data, (###term;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶Term «term»;«{###Env} Tcompute[###rule, ###term, term, ###bvs, sink]»¶«number» = DOUBLE(«term»);⟧¶}⟫
+;
+
+// $[Error,MESSAGE]
+//
+-[Free[sink,number],Fresh[message]]
+:
+{###Env}
+Tdoubledollar[###rule, (), Error, (###message;), ###bvs, sink, number]
+→
+%n⟪¶{⟦¶char *«message»;«{###Env} Tstring[###rule, ###bvs, sink, ###message, message]»¶ERRORF(«sink»->context, "%s\n", «message»);⟧¶}⟫
+;
+
+// Special case to capture repeat of dispatch term.
+// Exploits two specific properties:
+// (1) Contraction of the form $[C[<SORT>],#c,#as] always reconstruct term matched with the same pattern form.
+// (2) Variables for a term and it's constructor are aliases.
+//
+-[Free[sink,number],Discard[###sort,###mas,###rule,###bvs]]
+:
+{###Env}
+Tdoubledollar[###rule, (), C[###sort], ($[M,###mc,()]; $[M,###mas,()];), ###bvs, sink, number]
+→
+%n⟪¶«number» = DOUBLE(«{###Env}$C-m[###mc]»);⟫
+;
+
+///////////////////////////////////////
+// Load and possibly evaluate values...
+//
+-[Free[sink,term],Discard[###rule,###bvs]]
+:
+{###Env}
+Tload[###rule, $[M,###m,()], term, ###bvs, sink]
+→
+%n⟪¶«term» = «{###Env}$C-m[###m]»;⟫
+;
+
+-[Free[sink,term],Fresh[buf],Discard[###m]]
+:
+{###Env}
+Tload[###rule, $[NotMatch,$[M,###m,()],###term], term, ###bvs, sink]
+→
+%n⟪¶{⟦¶Sink «buf» = MAKE_BUFFER(«sink»->context);«{###Env} T[###rule, ###term, ###bvs, buf]»¶«term» = BUFFER_TERM(«buf»);¶FREE_BUFFER(«buf»);⟧¶}⟫
+;
+
+-[Free[sink,data],Discard[###rule,###bvs]]
+:
+{###Env}
+Tforce[###rule, $[M,###m,()], data, ###bvs, sink]
+→
+%n⟪¶«data» = FORCE(«sink»->context, «{###Env}$C-m[###m]»);⟫
+;
+
+-[Free[sink,data],Fresh[buf],Discard[###m]]
+:
+{###Env}
+Tforce[###rule, $[NotMatch,$[M,###m,()],###term], data, ###bvs, sink]
+→
+%n⟪« {###Env} Tload[###rule, ###term, data, ###bvs, sink] »¶FORCE(«sink»->context, «data»);⟫
+;
+
+-[Free[sink,data],Discard[###rule,###bvs]]
+:
+{###Env}
+Tcompute[###rule, $[M,###m,()], data, ###bvs, sink]
+→
+%n⟪¶«data» = COMPUTE(«sink»->context, «{###Env}$C-m[###m]»);⟫
+;
+
+-[Free[sink,data],Fresh[buf],Discard[###m]]
+:
+{###Env}
+Tcompute[###rule, $[NotMatch,$[M,###m,()],###term], data, ###bvs, sink]
+→
+%n⟪« {###Env} Tload[###rule, ###term, data, ###bvs, sink] »¶COMPUTE(«sink»->context, «data»);⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// List operations: length, append, except.
+//
+-                : Tlength[()         , ###arity] → ###arity ;
+-[Discard[###1]] : Tlength[(###1;###s), ###arity] → Tlength[###s,$[Plus,###arity,1]] ;
+//
+Tappend[()          , ###ys] → ###ys ;
+Tappend[(###x;###xs), ###ys] → (###x; Tappend[###xs, ###ys]) ;
+//
+-[Discard[###xs]]       : Texcept[()       , ###xs] → () ;
+-[Free[v],Share[###xs]] : Texcept[(v;###vs), ###xs] → Texcept1[v, ###xs, Texcept[###vs, ###xs]] ; //Note: Share is safe!
+//
+-[Free[v]]                : Texcept1[v, ()                     , ###rest] → (v; ###rest) ;
+-[Free[v],Discard[###xs]] : Texcept1[v, (v;###xs)              , ###rest] → ###rest ;
+-[Free[v,x]]              : Texcept1[v, ($[NotMatch,v,x];###xs), ###rest] → Texcept1[v, ###xs, ###rest] ;
+
+// Free variables in term.
+//
+-[Free[v]]       : Tfv[v] → (v;) ;
+-[Discard[###c]] : Tfv[$[P, ###props, $[C,###c,###args]]] → Tpfv[###props, ###args] ;
+-[Fresh[v]]      : Tfv[$B b . ###[b]] → Texcept[Tfv[###[v]], (v;)] ;
+-[Fresh[v¹]]     : Tfv[$BL b . ###[b]] → Texcept[Tfv[###[v¹]], (v¹;)] ;
+//
+-[Discard[###m]] : Tfv[$[P, ###props, $[M,###m,###args]]] → Tpfv[###props, ###args] ;
+//
+                     Tpfv[()                            , ###args] → Tsfv[###args] ;
+-[Discard[###m]]   : Tpfv[($RP[$[M,###m]]      ;###more), ###args] → Tpfv[###more, ###args] ;
+-[Discard[###key]] : Tpfv[($NP[###key,###value];###more), ###args] → Tsfv[(###value; Tpfv[###more, ###args])] ;
+-[Free[key]]       : Tpfv[($VP[key,###value]   ;###more), ###args] → Tsfv[(###value; Tpfv[###more, ###args])] ;
+-[Discard[###key]] : Tpfv[($MP[###key,###value];###more), ###args] → Tsfv[(###value; Tpfv[###more, ###args])] ;
+//
+Tsfv[()          ] → () ;
+Tsfv[(###x;###xs)] → Tappend[Tfv[###x], Tsfv[###xs]] ;
+
+// Meta-variables in a term.
+//
+-[Free[v]]       : Tmv[v] → () ;
+-[Discard[###c]] : Tmv[$[P, ###props, $[C,###c,###args]]] → Tpmv[###props, ###args] ;
+-[Fresh[v]]      : Tmv[$B b . ###[b]] → Tmv[###[v]] ;
+-[Fresh[v¹]]     : Tmv[$BL b . ###[b]] → Tmv[###[v¹]] ;
+//
+Tmv[$[P, ###props, $[M,###m,###args]]] → (###m; Tpmv[###props, ###args]) ;
+//
+                     Tpmv[()                            , ###args] → Tsmv[###args] ;
+                     Tpmv[($RP[$[M,###m]]      ;###more), ###args] → (###m; Tpmv[###more, ###args]) ;
+-[Discard[###key]] : Tpmv[($NP[###key,###value];###more), ###args] → Tsmv[(###value; Tpmv[###more, ###args])] ;
+-[Free[key]]       : Tpmv[($VP[key,###value]   ;###more), ###args] → Tsmv[(###value; Tpmv[###more, ###args])] ;
+                     Tpmv[($MP[###key,###value];###more), ###args] → (###key; Tsmv[(###value; Tpmv[###more, ###args])]) ;
+//
+Tsmv[()          ] → () ;
+Tsmv[(###x;###xs)] → Tappend[Tmv[###x], Tsmv[###xs]] ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] // RulesCompiler

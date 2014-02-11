@@ -1,0 +1,68 @@
+// Copyright (c) 2012 IBM Corporation.
+// $Id: loader.crs,v 3.3 2013/08/01 13:12:18 krisrose Exp $
+
+LOADER[(
+
+$Use["compiler/defs.crs"];
+
+$Lax;
+
+-[Discard[#name]]:
+LOADER[#term, #name] → %n⟪
+« MapText[x.%n⟨#include "‹ TOKEN[x] ›"↲⟩, $[Split, $[Get, "HEADERS", ""], ";"]] »
+
+// Function generating term.
+void sendTerm(Sink sink)
+{
+  PROPERTIES_RESET(sink);
+«LOADER-TERM[#term]»}
+
+// Test program.
+int main(int argc, char *argv[])
+{
+  int i; char key[20];
+  for (i = 0; i < argc; ++i)
+  {
+    snprintf(key, 20, "ARG%d", i);
+    setenv(key, argv[i], 1);
+  }
+  struct _Context _context = {};
+  
+  Sink sink = MAKE_BUFFER(&_context);
+  sendTerm(sink);
+  Term term = BUFFER_TERM(sink);
+  FREE_BUFFER(sink);
+  normalize(&_context, &term);
+  printTerm(&_context, term);
+  return 0;
+}
+⟫;
+
+LOADER-TERM[$[C[$String], #name]] → 
+%n⟪⟦
+LITERAL(sink, «STRING[#name]»);⟧⟫;
+
+LOADER-TERM[LOADER-VAR[#name]] → 
+%n⟪⟦
+USE(sink, «#name»);⟧⟫;
+
+-[Fresh[x]]:
+LOADER-TERM[$B[var . #Term[var]]] → 
+%n⟪⟦
+Variable «x» = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink->context, "«x»");
+{⟦
+  Variable *binder = ALLOCATE(sink->context, 1*sizeof(Variable));
+  binder[0] = «x»;
+  BINDS(sink, 1, binder);
+⟧}⟧«LOADER-TERM[#Term[LOADER-VAR[x]]]»⟫;
+
+-[Copy[#name], Discard[#name2]]:
+LOADER-TERM[$[NotMatch, $[C[$String], #name2], $[C, #name, #args]]] → 
+%n⟪⟦
+START(sink, «EventConstructor[#name]»);«LOADER-ARGS[#args]»
+END(sink, «EventConstructor[#name]»);⟧⟫;
+ 
+LOADER-ARGS[()] 		→ %n⟪⟫;
+LOADER-ARGS[(#arg;#args)] 	→ %n⟪«LOADER-TERM[#arg]»«LOADER-ARGS[#args]»⟫;
+
+)]

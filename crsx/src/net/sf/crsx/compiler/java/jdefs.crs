@@ -1,0 +1,88 @@
+// Copyright © 2012 IBM Corporation
+// $Id: jdefs.crs,v 3.2 2013/06/19 19:46:46 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPER FUNCTIONS TO ANALYZE REIFIED CRSX RULES AND WRITE JAVA TEXT
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+D[(
+
+$Use["compiler/reify.crs"];
+$Use["compiler/defs.crs"];
+
+-[Discard[#1,#2]]                              : D-check-sort[#sink, #termp, SORT-PROPERTY[#1,#2,#sort]] → F-check-sort[#sink, #termp, #sort] ;
+-[Discard[#sink,#termp,#var]]                  : D-check-sort[#sink, #termp, SORT-VARIABLE[#var]] → %n⟪⟫ ;
+-[Free[sink,termp],Discard[#args],Copy[#sort]] : D-check-sort[sink, termp, SORT[#sort, #args]] → $[If, $[Contains, #sort, "$"], %n⟪⟫, %n⟪CRSX_CHECK_SORT(«termp», « Sort[#sort] »); ⟫] ;
+
+
+D-split[()]                 → $False;
+D-split[(#Binder;#Binders)] → D-split2[#Binder, #Binders];
+
+-[Discard[#Binder]]: D-split2[#Binder, ()]                   → $False;
+                     D-split2[#Binder, (#Binder2; #Binders)] → D-split3[D-size-binders[(#Binder;#Binder2;#Binders), 0, 100]];
+
+-[Data[#size]]: D-split3[#size] → $[GreaterThan, #size, 100];
+
+-[Data[#size, #max], Discard[#max]]  
+: 
+D-size-terms[(), #size, #max] → #size;  
+
+-[Data[#size, #max], Copy[#size, #max]]  
+: 
+D-size-terms[(#Term;#Terms), #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-terms[#Terms, D-size-term[#Term, #size, #max], #max]];
+
+-[Data[#size, #max], Copy[#size, #max], Discard[#Reference]]
+: 
+D-size-term[PROPERTY-REF[#Reference, #Term], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-term[#Term, $[Plus, #size, 1], #max]];
+
+-[Data[#size, #max], Copy[#size, #max]]
+:
+D-size-term[PROPERTY[#Key, #Value, #Scope], #size, #max] →  $[If, $[GreaterThan, #size, #max], #size, D-size-term[#Key, D-size-term[#Value, D-size-term[#Scope, $[Plus, #size, 1], #max], #max], #max]]; 
+
+-[Data[#size, #max], Copy[#size, #max]]
+:
+D-size-term[PROPERTY-NOT[#Key, #Scope], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-term[#Key,D-size-term[#Scope,$[Plus, #size, 1], #max], #max]];
+
+-[Data[#size, #max], Copy[#size, #max], Discard[#Constructor]]
+:
+D-size-term[CONSTRUCTION[#Constructor, #Binders], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-binders[#Binders,$[Plus, #size, 1],#max]];
+
+-[Data[#size, #max], Discard[#Value, #Sort, #max]]
+: 
+D-size-term[LITERAL[#Value, #Sort], #size, #max] → $[Plus, #size, 1];
+
+-[Data[#size, #max], Discard[#Variable, #max]]
+: 
+D-size-term[VARIABLE-USE[#Variable] , #size, #max] → $[Plus, #size, 1];
+
+-[Data[#size, #max], Copy[#size, #max], Discard[#MetaVar]]
+: 
+D-size-term[META-APPLICATION[#MetaVar, #Binders], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-binders[#Binders,$[Plus, #size, 1], #max]];
+
+-[Data[#size, #max], Copy[#size, #max], Discard[#String]] // Approximation
+: 
+D-size-term[EVALUATOR[#String, #Terms], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-terms[#Terms,$[Plus, #size, 1], #max]];
+
+-[Data[#size, #max], Discard[#max]]  
+: 
+D-size-binders[(), #size, #max] → #size;  
+
+-[Data[#size, #max], Copy[#size, #max]]  
+: 
+D-size-binders[(#Binder;#Binders), #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-binders[#Binders, D-size-binder[#Binder, #size, #max], #max]];
+
+-[Fresh[b], Data[#size, #max], Copy[#size, #max], Discard[#Promiscuity, #Sort, #Occurrences]]  
+: 
+D-size-binder[BINDER[#Promiscuity, #Sort, #Occurrences, binder.#Binder[binder]], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-binder[#Binder[b],$[Plus, #size, 1], #max]];
+
+-[Data[#size, #max], Copy[#size, #max], Discard[#Sort]]  
+: 
+D-size-binder[ARGUMENT[ #Sort, #Term ], #size, #max] → $[If, $[GreaterThan, #size, #max], #size, D-size-term[#Term, $[Plus, #size, 1], #max]];  
+
+-[Data[#size, #max], Discard[#Variable, #max]]  
+: 
+D-size-binder[META-REQUIRED-VARIABLE[ #Variable ], #size, #max] → $[Plus, #size, 1];
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //D

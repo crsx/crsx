@@ -1,0 +1,35 @@
+/* Copyright (c) 2010 IBM Corporation. */
+
+/**
+ * Grammar for simple structured text with embedded terms.
+ *
+ * @author <a href="http://www.research.ibm.com/people/k/krisrose">Kristoffer Rose</a>.
+ * @version $Id: Text.pg,v 3.6 2013/12/05 03:28:30 krisrose Exp $
+ */
+
+class net.sf.crsx.text.Text : <Text>
+prefix n
+declarations
+%{
+	String unembed(String s) {return s.charAt(0) <= '~' ? s.substring(2, s.length()-2) : s.substring(1, s.length()-1);}
+%}
+
+<Text> ::= {$TextCons} <Part> <Text>
+         | {$TextNil}
+         .
+
+<Part> ::= {$TextChars} CHARS$
+         | {$TextBreak} BREAK$
+         | '¶' {{ $TextBreak["\n"] }}
+         | '⟦' {$TextIndent} <Text> '⟧'
+         | '“' {$TextString} <Text> '”'
+         | {$TextEmbed} {AsText} EMBEDDED$$:unembed
+		 | '†' {$TextChars} EMBEDDED$$:unembed
+		 | '‡' {$TextBreak} EMBEDDED$$:unembed
+		 | '∧' {$TextTerm} {'$'} {{Cast[Text]}} EMBEDDED$$:unembed
+         .
+
+CHARS ::= ~[\n\r\f,'¶','⟦','⟧','†','‡','∧','«','»','‹','›','“','”','‘','’','⟨','⟩']+ .
+BREAK ::= [\n\r\f]+ .
+
+EMBEDDED ::= ( '«' ~['«','»']* '»' | '‹' ~['‹','›']* '›' | '‘' ~['‘','’']* '’' | '⟨' ~['⟨','⟩']* '⟩' ).

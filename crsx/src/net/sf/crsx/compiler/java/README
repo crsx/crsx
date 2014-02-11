@@ -1,0 +1,13 @@
+This directory contains a straight port of the C rule compiler to Java.
+
+A great care is to keep the Java rule compiler as close as possible to the C rule compiler. 
+In particular, naming conventions follow the C naming convention.
+
+Here a list of notable differences between the 2 rule compilers:
+- There is no Sink.context as Java has a GC. So for instance makeStringLiteral takes only 1 argument, instead of 2.
+- In the Construction Java class, Binders are stored in their own field (See Construction.binders). In C, binders are stored in the sub array, at the last position
+- In C, subbinders are passed around as (array) pointer. In Java, subbinders are *logically* represented by as the triplet (binders[], startOffset, length). 
+- In C, data sorts (see header.crs) are represented using C enum. In Java, they are represented as global int constants 
+
+
+Most macros can be used as such. Except:

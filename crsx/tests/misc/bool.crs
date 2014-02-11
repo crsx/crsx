@@ -1,0 +1,43 @@
+Bool[(
+   {$String : $StringEntrySort}E ::=( True; False; );
+
+   {$String : $StringEntrySort}Check[E] :: E;
+	{#E}Check[True] → {#E}Check[False];   
+    
+
+
+
+	Not[$True] → $False;
+	Not[$False] → $True;
+
+  	-[Discard[#]] : And[$False,#] → $False ;
+  	And[$True,#] → # ;
+
+  	-[Discard[#]] : Or[#,$True] → $True ;
+  	Or[#,$False] → # ;
+
+  	∀ a . If[$Boolean, a, a] :: a;
+  	-[Discard[#success]] : If[$False, #success, #failure] → #failure ;
+  	-[Discard[#failure]] : If[$True, #success, #failure] → #success ;
+
+	Report ::=( YES; NO; );
+	Start → If[And[$True,Not[Or[$True,$False]]], YES, NO];
+
+	ForAll[x:a.$Boolean, $List[a]] :: $Boolean ;
+	
+	-[Discard[#]]:
+	ForAll[x.#[x], ()] → $True ;
+	
+	-[Copy[#,#1]]:
+	ForAll[x.#[x], (#1;#s)] → And[#[#1], ForAll[x.#[x], #s]] ;
+	
+	Peano ::=( Z; S[Peano]; );
+	
+	Dummy ::=( Hello; Catch[x::Dummy.Dummy]; var; );
+	
+	Depth[Dummy] :: Peano ;
+	Depth[Hello] → Z ;
+	-[Free[v]] : Depth[v] → Z ;
+	
+	Variable ::=( v; );
+)]

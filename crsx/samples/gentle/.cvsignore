@@ -1,0 +1,16 @@
+src
+build
+tmp
+*.tmp
+*.pg
+*.crs
+*.run
+test*
+*.crsE
+*.hxt
+hacs.zip
+*.crs-ref
+*.crs-refE
+*.crs-installed
+*.pg-installed
+*.pg-ref

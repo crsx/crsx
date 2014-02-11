@@ -1,0 +1,17 @@
+VariableNameIs[(
+$Lax;
+
+Test → $[Trace, Rename1[a.Inner[a], $[Get, "name", "foo"]]] ;
+
+Rename1[b.$[VariableNameIs,b,#b,#[b]], #name]
+→
+$[Trace, $[:,"Variable Name Before is ",#b],
+  Rename2[c.#[c], #name]]
+;
+
+Rename2[d.#[d], #name]
+→
+Done[e.$[VariableNameIs,e,#name,#[e]]]
+;
+
+)]

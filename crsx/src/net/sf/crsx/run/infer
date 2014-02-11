@@ -1,0 +1,124 @@
+// Copyright © 2007,2011 IBM Corporation
+// $Id: infer,v 3.0 2012/12/17 18:04:57 krisrose Exp $
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// TRANSLATION OF INFERENCE RULES TO CRSX RULES
+//
+// The rules below rewrite inference rules of the form
+//
+// (
+//  (∀ x-1 ... x-m . ( #Question-1 ⇒ #Conclusion-1 ; ... ; #Question-n ⇒ #Conclusion-n ; ))
+//  -----[#Name]
+//  #Question ⇒ #Conclusion
+// )
+//
+// with m,n≥0 (terms with n=0 are called "axioms") into sequences of rewrite rules.
+//
+// An inference rule is subject to the following restrictions:
+//
+// 1. Name should be a legal CRSX rule name, optionally including rule options as required by the
+//    following points.
+//
+// 2. Question and Conclusioni (1≤i≤n) must each be a permissible rule pattern. The meta-variables
+//    used across all these patterns must be distinct.
+//
+// 3. Each Questioni (1≤i≤n) must be a permissible rule contractum where meta-variables from the
+//    Question and Conclusionj (1≤j<i) patterns are permitted.
+//
+// 4. Conclusion must be a permissible rule contractum, where meta-variables from all the patterns
+//    are permitted.
+//
+// 5. Free variables x can be used with the same occurrence restrictions as meta-variables, however,
+//    in that case the name of the rule must declare it with Name[Free[x]] just as it would have to
+//    be in rules.
+//
+// 6. Fresh free variables x may be introduced in a contractum without having occurred in a pattern,
+//    in that case they must instead be declared with Name[Fresh[x]] just as in normal rules. 
+//
+// The generated rules implement rewrites such that the "query" term ?-[Question] rewrites to the
+// term Conclusion if and only if a proof tree can be constructed deterministically with the
+// involved rule(s) for the judgment Question ⇒ Conclusion. (Some cases of non-determinism are
+// handled by transforming the generated rules but that is not discussed here.)
+//
+// Finally, each double arrow can be given a name as an argument, like ⇒[Sort], which makes the
+// query term take the form ?-Sort[Question], effectively creating families of rules.
+//
+// Usage
+//   $Meta[ $Load['run/infer'] ] ;
+//
+Infer2Rules[(
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Anonymous arrows are just in the empty sort.
+//
+AnonymousArrow : (⇒) → (⇒[""]) ;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// The use of an inference rule corresponds to a rewrite from ?-Rule[Question] to a series of
+// special terms !-Rule-Name-i[Question, ?-Rulei[Questioni], Conclusioni-1,...,Conclusion1] (1≤i≤n)
+// where each then permits recursive evaluation of the i'th premise.
+//
+Rule[Copy[#Name,#Free,#Rule,#Question]]
+:
+( #Premises -----[$[C,#Name,#Options]] #Question ⇒[#Sort] #Conclusion )
+→
+(
+  $[C,$[:,#Name,-,0],#Options] : $[C,$[:,?,-,#Sort],(#Question;)] → $[C,$[:,!,-,#Sort,-,#Name,-,1],(#Question;)]
+  ;
+  $InferencePremises[#Premises, #Name,#Options,#Sort,1, #Question, (), #Conclusion]
+)
+;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// 
+//
+Inference-Premise-Abstractions[Copy[#N,#F,#R,#Q,#Cs]]
+:
+$InferencePremises[∀ v . #Ps[v], #N,#F,#R,#i, #Q, #Cs, #C]
+→
+(
+  $[C,$[:,#N,-,#i],(Lax;#F)] :
+   $[C,$[:,!,-,#R,-,#N,-,#i], (#Q; #Cs)]
+   → $[C,$[:,!,-,#R,-,#N,-,$[Plus,#i,1]], (#Q; $[C,$[:,?,-,#Ri],(#Qi;)]; #Cs)]
+  ;
+  $InferencePremises[#Ps, #N,#F,#R,$[Plus,#i,1], #Q, (#Ci ; #Cs), #C]
+)
+;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Advance to the i'th premise: the pattern !-R-N-i[(Q; (Ci-1;...;C1;)] matches after we
+// successfully proved the (i-1)'th premise. We use !-R-N-i+1[(Q; ?-Ri[Qi]; Ci-1;...;C1;)] to
+// initiate building the proof for the i'th premise and continue.
+//
+Inference-Premise-Next[Copy[#N,#F,#R,#Q,#Cs]]
+:
+$InferencePremises[(#Qi ⇒[#Ri] #Ci ; #Ps), #N,#F,#R,#i, #Q, #Cs, #C]
+→
+(
+  $[C,$[:,#N,-,#i],(Lax;#F)] :
+   $[C,$[:,!,-,#R,-,#N,-,#i], (#Q; #Cs)]
+   → $[C,$[:,!,-,#R,-,#N,-,$[Plus,#i,1]], (#Q; $[C,$[:,?,-,#Ri],(#Qi;)]; #Cs)]
+  ;
+  $InferencePremises[#Ps, #N,#F,#R,$[Plus,#i,1], #Q, (#Ci ; #Cs), #C]
+)
+;
+
+Inference-Premise-Done [Share[N,i]] :
+
+        Wrap it up: the pattern !-R-N-n+1[(Q; Cn;...;C1;)] matches after we successfully proved all n premises and thus the entire proof step. 
+
+    $InferencePremises[(), N,F,R,i, Q, Cs, C]
+    → ( $[C,$[:,N,-,i],(Lax;F)] : $[C,$[:,!,-,R,-,N,-,i],(Q; Cs)] → C ) ;
+
+Inference-Premise-Last :
+
+        Handle last premise gracefully. 
+
+    $InferencePremises[(Qi ⇒[Ri] Ci), N,F,R,i, Q, Cs, C]
+    → $InferencePremises[(Qi ⇒[Ri] Ci ;), N,F,R,i, Q, Cs, C] ;
+
+Inference-Anonymous :
+
+        Names the anonymous judgment arrow. 
+
+)]

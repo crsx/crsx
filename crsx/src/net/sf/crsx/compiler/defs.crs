@@ -1,0 +1,375 @@
+// Copyright © 2012 IBM Corporation
+// $Id: defs.crs,v 3.20 2014/02/05 23:01:59 krisrose Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// COMMON HELPER FUNCTIONS TO ANALYZE REIFIED CRSX RULES 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+DEFS[(
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// New text mode...
+//
+// Text is entered as %n⟪TEXT⟫ where TEXT is a sequence of characters where fragments of the form
+// «t», with t of sort Text, represent computed text fragments.
+//
+// - TOKEN[s] represents the text %n⟪S⟫ where S has the same characters as the $String s.
+//
+// - INTEGER[i] represents the integer text %n⟪I⟫ where I has the same digits as the $Numeric i.
+//
+// - STRING[s] represents the text %n⟪Q⟫ where Q is a text that would be read as the $String s by C (and CRSX).
+//
+// - MANGLE[s] represents the test %n⟪M⟫ where M is a text that is an acceptable C identifier uniquely
+//   constructed from the $String s.
+
+// Currently based on old text mode.
+$CheckGrammar["net.sf.crsx.text.Text"];
+$Use["text/Text.crs"];
+$Use["compiler/reify.crs"];
+
+$SortAlias[Reified_Variable, Text];
+
+$Lax;
+
+// Add new constructors to Text sort:
+//Text ::=( TOKEN[$String]; INTEGER[$Numeric]; STRING[$String]; MANGLE[$String]; );
+
+TOKEN[$String] :: Text;
+COMMENT_TOKEN[$String] :: Text;
+STRING[$String] :: Text;
+INTEGER[$Numeric] :: Text;
+MANGLE[$String] :: Text;
+
+-[Data[#t]] : TOKEN[#t] → %n⟪†« #t »⟫ ; 
+-[Data[#t]] : COMMENT_TOKEN[#t] → %n⟪†« $[Replace,#t,"*/","*_/"] »⟫ ; 
+-[Data[#t]] : INTEGER[#t] → %n⟪†« $[FormatNumber, #t] »⟫ ;
+-[Data[#t]] : STRING[#t] → %n⟪ “†« $[Escape,#t] »” ⟫ ;
+-[Data[#t]] : MANGLE[#t] → %n⟪†« $[Mangle,#t] »⟫ ;
+
+DTOKEN[OK_SORT, $String] :: Text;
+DCOMMENT_TOKEN[OK_SORT, $String] :: Text;
+DSTRING[OK_SORT, $String] :: Text;
+DINTEGER[OK_SORT, $Numeric] :: Text;
+DMANGLE[OK_SORT, $String] :: Text;
+
+-[Data[#t]] : DTOKEN[OK, #t] → %n⟪†« #t »⟫ ; 
+-[Data[#t]] : DCOMMENT_TOKEN[OK, #t] → %n⟪†« $[Replace,#t,"*/","*_/"] »⟫ ; 
+-[Data[#t]] : DINTEGER[OK, #t] → %n⟪†« $[FormatNumber, #t] »⟫ ;
+-[Data[#t]] : DSTRING[OK, #t] → %n⟪ “†« $[Escape,#t] »” ⟫ ;
+-[Data[#t]] : DMANGLE[OK, #t] → %n⟪†« $[Mangle,#t] »⟫ ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Common sorts
+
+OK_SORT ::=( OK ;) ;
+
+STRING_ENTRY ::= 
+(
+	STRING_VALUE[$String];
+	LIST_STRING[$List[$String]];
+
+	NUM_VALUE[$Numeric];
+
+	VARIABLE[Reified_Variable];
+	LIST_VARIABLE[$List[Reified_Variable]];
+
+	PROPERTY_VARIABLE[Reified_Variable, Reified_Variable];	
+
+	NO;
+);
+
+PASS ::= ( FIRST; SECOND; );
+
+VARIABLE_ENTRY ::= 
+( 
+	SUB[Text<!-- Parent Variable -->, $Numeric<!-- Index in parent -->, $Boolean<!-- Linked? -->];
+
+	BOUND; 
+	FREE;
+	BOUNDREUSE;
+	FRESH;	
+	FRESHREUSE;
+);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generic utilities.
+
+
+∀ a . Length[$List[a], $Numeric] :: $Numeric ;
+-             : Length[()    , #n] → #n ;
+-[Discard[#]] : Length[(#;##), #n] → Length[##, $[Plus,1,#n]] ;
+
+∀ a . MapText[x:a.Text, $List[a]] :: Text ;
+-[Share[#x],Copy[#]] : MapText[t.#[t], (#x; #xs)] → %n⟪« #[#x] »« MapText[t.#[t], #xs] »⟫ ;
+-[Discard[#]]        : MapText[t.#[t], ()       ] → %n⟪⟫ ;
+
+∀ a . MapIndexText[x:a i:$Numeric.Text, $List[a], $Numeric] :: Text ;
+-[Share[#x],Copy[#, #n]] : MapIndexText[t i.#[t, i], (#x; #xs), #n] → %n⟪« #[#x, #n] »« MapIndexText[t i.#[t, i], #xs, $[Plus,1,#n]] »⟫ ;
+-[Discard[#, #n]]        : MapIndexText[t i.#[t, i], ()       , #n] → %n⟪⟫ ;
+
+∀ a . MapText1[x:a.Text, x:a.Text, $List[a]] :: Text ;
+-[Share[#x]]      : MapText1[t.#1[t], t.#2[t], (#x; #xs)] → %n⟪« #1[#x] »« MapText[t.#2[t], #xs] »⟫ ;
+-[Discard[#1,#2]] : MapText1[t.#1[t], t.#2[t], ()       ] → %n⟪⟫ ;
+
+∀ a . IfZero[$Numeric, a, a] :: a ;
+-[Data[#n]] : IfZero[#n, #true, #false] → $[IfZero, #n, #true, #false] ;
+
+∀ a . If[$Boolean, a, a] :: a ;
+-[Discard[#2]] : If[$True, #1, #2] → #1 ;
+-[Discard[#1]] : If[$False, #1, #2] → #2 ;
+
+// Map splitting input in partition
+// x: current input
+// p: partition number 
+∀ a . SplitMapText[x:a.Text, $List[a], $Numeric, $Numeric, $Numeric, p:$Numeric.Text, p:$Numeric.Text] :: Text ;
+
+-[Data[ #Count, #PartCount], Share[#x, #xs],Copy[#, #Count, #PartCount, #PartSize, #BeginPartition, #EndPartition]] 
+: 
+SplitMapText[t.#[t], (#x; #xs), #Count, #PartCount, #PartSize, p.#BeginPartition[p], p.#EndPartition[p]] 
+→
+$[If, $[Equal, #Count, 0],
+	%n⟪«#BeginPartition[#PartCount]»« #[#x] »« SplitMapText[t.#[t], #xs, 1, #PartCount, #PartSize, p.#BeginPartition[p],  p.#EndPartition[p]] »⟫,
+    $[If, $[Equal, #Count, #PartSize],
+		%n⟪«#EndPartition[#PartCount]»«SplitMapText[t.#[t], (#x; #xs), 0, $[Plus, #PartCount, 1], #PartSize, p.#BeginPartition[p], p.#EndPartition[p]]»⟫,
+		%n⟪« #[#x] »« SplitMapText[t.#[t], #xs, $[Plus, #Count, 1], #PartCount, #PartSize, p.#BeginPartition[p], p.#EndPartition[p]] »⟫
+]];
+
+-[Copy[#PartCount], Discard[#, #Count, #PartSize, #BeginPartition]]        
+: 
+SplitMapText[t.#[t], (), #Count, #PartCount, #PartSize, p.#BeginPartition[p], p.#EndPartition[p]] → #EndPartition[#PartCount] ;
+
+
+UnString[STRING_ENTRY] :: $String;
+UnString[STRING_VALUE[#Str]] → #Str;
+
+UnVariable[STRING_ENTRY] :: Reified_Variable;
+UnVariable[VARIABLE[#Var]] → #Var;
+
+PromiscuityString[Reified_Promiscuity] :: $String;
+PromiscuityString[LINEAR]      → "LINEAR";
+PromiscuityString[PROMISCUOUS] → "PROMISCUOUS";
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Information extraction
+
+Sort-name[Reified_Sort] :: Text;
+
+-[Discard[#args]] : Sort-name[SORT[#name, #args]] → TOKEN[#name] ;
+
+Forms-Constructors[$List[Reified_Form]] :: $List[$String];
+
+-                   : Forms-Constructors[(SORT-ALLOWS-VARIABLES ; #rest)] → Forms-Constructors[#rest] ; 
+-[Discard[#s1,#s2]] : Forms-Constructors[(SORT-SET[#s1, #s2, #f]; #rest)] → Forms-Constructors[(#f; #rest)] ;
+-[Discard[#args]]   : Forms-Constructors[(FORM[#c, #args]       ; #rest)] → (#c; Forms-Constructors[#rest]) ; 
+-[Discard[#args]]   : Forms-Constructors[(                             )] → () ;
+
+FormArguments-binder-count[$List[Reified_FormArgument], $Numeric] :: $Numeric;
+
+-[Fresh[dummy::Reified_Variable]] : FormArguments-binder-count[(FORM-BINDER[#Sort, b.#[b]]; #rest), #n] → FormArguments-binder-count[(#[dummy]; #rest), $[Plus,1,#n]] ;
+-              			   : FormArguments-binder-count[(FORM-ARGUMENT[#Sort]          ; #rest), #n] → FormArguments-binder-count[#rest, #n] ;
+-                          : FormArguments-binder-count[(                                     ), #n] → #n ;
+
+FormArguments-binder-offsets[$List[Reified_FormArgument], $Numeric] :: $List[$Numeric];
+
+-[Fresh[dummy::Reified_Variable]] 
+: 
+FormArguments-binder-offsets[(FORM-BINDER[#Sort, b.#Form[b]]; #rest), #n] → FormArguments-binder-offsets[(#Form[dummy]; #rest), $[Plus,1,#n]] ;
+
+FormArguments-binder-offsets[(FORM-ARGUMENT[#Sort]          ; #rest), #n] → (#n; FormArguments-binder-offsets[#rest, #n]) ;
+FormArguments-binder-offsets[(                                     ), #n] → () ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Identifiers.
+
+EnumFun[$String] :: Text;
+EnumFun[#name] → %n⟪FunOf« MANGLE[#name] »⟫ ;
+
+EnumVar[$String] :: Text;
+EnumVar[#name] → %n⟪VarOf« MANGLE[#name] »⟫ ;
+
+EnumTag[$String] :: Text;
+EnumTag[#name] → %n⟪Data« MANGLE[#name] »⟫ ;
+
+DEnumTag[OK_SORT, $String] :: Text;
+DEnumTag[OK, #name] → %n⟪Data« MANGLE[#name] »⟫ ;
+
+Enum[$String] :: Text;
+Enum[#name] → %n⟪EnumOf« MANGLE[#name] »⟫ ;
+
+Sort[$String] :: Text;
+Sort[#name] → %n⟪sort« MANGLE[#name] »⟫ ;
+
+Descriptor[$String] :: Text;
+Descriptor[#name] → %n⟪descriptor« MANGLE[#name] »⟫ ;
+
+DDescriptor[OK_SORT, $String] :: Text;
+DDescriptor[OK, #name] → %n⟪descriptor« MANGLE[#name] »⟫ ;
+
+SortCons[$String] :: Text;
+SortCons[#name] → %n⟪sortCon« MANGLE[#name] »⟫ ;
+
+SortNames[$String] :: Text;
+SortNames[#name] → %n⟪sortNam« MANGLE[#name] »⟫ ;
+
+SortInternals[$String] :: Text;
+SortInternals[#name] → %n⟪sortInt« MANGLE[#name] »⟫ ;
+
+Struct[$String] :: Text;
+Struct[#name] → %n⟪_Con« MANGLE[#name] »⟫ ;
+
+BinderOffsets[$String] :: Text;
+BinderOffsets[#name] → %n⟪conBindOffs« MANGLE[#name] »⟫ ;
+
+Name[$String] :: Text;
+Name[#name] → %n⟪name« MANGLE[#name] »⟫ ;
+
+NameFun[$String] :: Text;
+NameFun[#name] → %n⟪nameFun« MANGLE[#name] »⟫ ;
+
+Step[$String] :: Text;
+Step[#name] → %n⟪step« MANGLE[#name] »⟫ ;
+
+Var[$String] :: Text;
+Var[#name] → %n⟪v« MANGLE[#name] »⟫ ;
+
+{$String:String}MetaVar[$String] :: Text;
+
+-[Data[#name]]
+:
+{#env}MetaVar[#name] → {#env}MetaVar2[$[{#env}Get[STRING_ENTRY], $[:,"MetaVar$", #name], STRING_VALUE[$[:, "m", $[Mangle, #name]]]]] ;
+
+MetaVar2[STRING_ENTRY] :: Text;
+
+-[Free[var::Reified_Variable]]: MetaVar2[VARIABLE[var]] → %n⟪«var»⟫;
+MetaVar2[STRING_VALUE[#Str]] → TOKEN[#Str];
+
+
+{$String:String}EventConstructor[$String] :: Text;
+
+EventConstructor[#name] → MANGLE[#name] ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Primitives
+
+SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; E_LessThanOrEqual; E_SameVariable; E_LesserVariable;
+				 E_GreaterThanOrEqual; E_If; E_IfZero; E_IfEmpty; E_Squash; E_Contains; E_StartsWith; E_EndsWith; E_MatchRegex; E_Length;
+				 E_Substring; E_Escape; E_Mangle; E_BeforeFirst; E_AfterFirst; E_Plus; E_Minus; E_Times; E_Absolute; E_Decimal;
+				 E_Div; E_Mod; E_Hex; E_BitAnd; E_BitOr; E_BitXOr; E_BitNot; E_BitMinus; E_BitSubSetEq;
+				 E_LoadTerm; E_SaveTerm; E_IsZero; E_IsEmpty; E_NumericEqual; E_Error; E_Trace; E_FormatNumber; E_PassLocationProperties; E_Get; E_GetRef;
+				 E_IfDef; E_Show; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
+				 E_Match; E_Call; E_TryCall; E_Cast; E_Null; E_Nil; E_ForgivableError; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
+                 E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_Echo; E_DeepEqual; E_HashCode;
+				);
+
+Primitive[$String] :: SPrimitive;
+
+-[Share[#Primitive]]:
+Primitive[#Primitive] →
+	$[If, $[Equal, #Primitive, "C"], 					E_C,
+	
+	$[If, $[Equal, #Primitive, "NumericEqual"], 		E_NumericEqual,
+	$[If, $[Equal, #Primitive, "StringLessThan"], 		E_StringLessThan,
+	$[If, $[Equal, #Primitive, "LessThan"], 			E_LessThan,
+	$[If, $[Equal, #Primitive, "GreaterThan"], 			E_GreaterThan,  
+	$[If, $[Equal, #Primitive, "LessThanOrEqual"], 		E_LessThanOrEqual,
+	$[If, $[Equal, #Primitive, "GreaterThanOrEqual"], 	E_GreaterThanOrEqual,  
+	$[If, $[Equal, #Primitive, "NotEqual"], 			E_NotEqual,  
+	$[If, $[Equal, #Primitive, ":"], 					E_Concat,	
+
+	$[If, $[Equal, #Primitive, "SameVariable"], 		E_SameVariable,  
+	$[If, $[Equal, #Primitive, "LesserVariable"], 		E_LesserVariable,  
+	$[If, $[Equal, #Primitive, "Equal"], 				E_Equal,  
+	$[If, $[Equal, #Primitive, "Contains"], 			E_Contains,  
+	$[If, $[Equal, #Primitive, "StartsWith"], 			E_StartsWith,  
+	$[If, $[Equal, #Primitive, "EndsWith"], 			E_EndsWith,  
+	$[If, $[Equal, #Primitive, "Split"], 				E_Split, 
+	$[If, $[Equal, #Primitive, "MatchRegex"], 			E_MatchRegex, 
+	$[If, $[Equal, #Primitive, "Length"], 				E_Length, 
+	$[If, $[Equal, #Primitive, "Substring"], 			E_Substring,  
+	$[If, $[Equal, #Primitive, "Escape"], 				E_Escape, 
+	$[If, $[Equal, #Primitive, "Mangle"], 				E_Mangle, 
+	$[If, $[Equal, #Primitive, "BeforeFirst"], 			E_BeforeFirst, 
+	$[If, $[Equal, #Primitive, "AfterFirst"], 			E_AfterFirst,  
+	$[If, $[Equal, #Primitive, "FromFirst"], 			E_FromFirst,  
+	$[If, $[Equal, #Primitive, "ToFirst"], 				E_ToFirst,  
+	$[If, $[Equal, #Primitive, "FormatNumber"],			E_FormatNumber,
+	$[If, $[Equal, #Primitive, "Format"],				E_Format,
+	$[If, $[Equal, #Primitive, "Show"],					E_Show,
+	$[If, $[Equal, #Primitive, "PassLocationProperties"], E_PassLocationProperties,
+
+	$[If, $[Equal, #Primitive, "Plus"], 				E_Plus,  
+	$[If, $[Equal, #Primitive, "Minus"], 				E_Minus,  
+	$[If, $[Equal, #Primitive, "Times"], 				E_Times,  
+	$[If, $[Equal, #Primitive, "Divide"], 				E_Div,  
+	$[If, $[Equal, #Primitive, "Modulo"], 				E_Mod,  
+	$[If, $[Equal, #Primitive, "Absolute"],				E_Absolute, 
+	$[If, $[Equal, #Primitive, "Decimal"], 				E_Decimal, 
+	$[If, $[Equal, #Primitive, "Hex"], 					E_Hex, 
+	
+	$[If, $[Equal, #Primitive, "BitAnd"], 				E_BitAnd, 
+	$[If, $[Equal, #Primitive, "BitOr"], 				E_BitOr,  
+	$[If, $[Equal, #Primitive, "BitXor"], 				E_BitXOr, 
+	$[If, $[Equal, #Primitive, "BitNot"], 				E_BitNot,  
+	$[If, $[Equal, #Primitive, "BitMinus"], 			E_BitMinus,  
+	$[If, $[Equal, #Primitive, "BitSubSetEq"], 			E_BitSubSetEq, 
+
+	$[If, $[Equal, #Primitive, "Get"], 					E_Get,
+	$[If, $[Equal, #Primitive, "GetRef"], 				E_GetRef,
+	$[If, $[Equal, #Primitive, "IfDef"], 				E_IfDef,
+  
+	$[If, $[Equal, #Primitive, "Error"], 				E_Error,  
+	$[If, $[Equal, #Primitive, "ForgivableError"], 		E_ForgivableError,  
+	$[If, $[Equal, #Primitive, "Trace"], 				E_Trace,  
+	
+	$[If, $[Equal, #Primitive, "LoadTerm"], 			E_LoadTerm, 
+	$[If, $[Equal, #Primitive, "SaveTerm"], 			E_SaveTerm,  
+	$[If, $[Equal, #Primitive, "If"], 					E_If,  
+	$[If, $[Equal, #Primitive, "IfZero"], 				E_IfZero,  
+	$[If, $[Equal, #Primitive, "IfEmpty"], 				E_IfEmpty,
+
+	$[If, $[Equal, #Primitive, "FreeVariables"], 		E_FreeVariables,
+	$[If, $[Equal, #Primitive, "IntersectVariables"], 	E_IntersectVariables,
+	$[If, $[Equal, #Primitive, "UnionVariables"], 		E_UnionVariables,
+	$[If, $[Equal, #Primitive, "ExceptVariables"], 		E_ExceptVariables,
+	$[If, $[Equal, #Primitive, "VariableNameIs"], 		E_VariableNameIs,
+
+	$[If, $[Equal, #Primitive, "Match"], 				E_Match,
+
+	$[If, $[Equal, #Primitive, "TryCall"], 				E_TryCall,
+	$[If, $[Equal, #Primitive, "Call"], 				E_Call,
+
+	$[If, $[Equal, #Primitive, "Cast"], 				E_Cast,
+	$[If, $[Equal, #Primitive, "Null"], 				E_Null,
+	$[If, $[Equal, #Primitive, "Nil"], 					E_Nil,
+
+    // NEW PRIMITIVES ADDED BY Kris FOR HACS
+	$[If, $[Equal, #Primitive, "UpCase"],				E_UpCase,
+	$[If, $[Equal, #Primitive, "DownCase"],				E_DownCase,
+	$[If, $[Equal, #Primitive, "Replace"],				E_Replace,
+	$[If, $[Equal, #Primitive, "Trim"],					E_Trim,
+	$[If, $[Equal, #Primitive, "Split"],				E_Split,
+	$[If, $[Equal, #Primitive, "Rescape"],				E_Rescape,
+	$[If, $[Equal, #Primitive, "Keys"],					E_Keys,
+	$[If, $[Equal, #Primitive, "ParseURL"],				E_ParseURL,
+	$[If, $[Equal, #Primitive, "Echo"],					E_Echo,
+	$[If, $[Equal, #Primitive, "DeepEqual"],				E_DeepEqual,
+	$[If, $[Equal, #Primitive, "HashCode"],				E_HashCode,
+	
+	MissingPrimitive[#Primitive] 
+	
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+
+MissingPrimitive[$String] :: SPrimitive;
+
+MissingPrimitive[#Primitive] → $[Error, $[:, "$[",#Primitive,"] not supported"]] ;
+
+
+// TODO: this rule is OK. The editor does not support this construct yet.
+∀ a . DelayMapText[k:OK_SORT x:a.Text , $List[a]] :: Text ;
+
+-[Share[#x],Copy[#]] : DelayMapText[k t.#[k, t], (#x; #xs)] → %n⟪« #[OK, #x] »« DelayMapText[k t.#[k, t], #xs] »⟫ ;
+-[Discard[#]]        : DelayMapText[k t.#[k, t], ()       ] → %n⟪⟫ ;
+
+
+
+)] // CD

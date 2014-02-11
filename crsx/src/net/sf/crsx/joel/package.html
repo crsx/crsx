@@ -1,0 +1,109 @@
+<body>
+Joel stands for Java Object Expression Language.
+
+<h3>Syntax</h3>
+
+<PRE>
+<em>E</em> ::= () | ( <em>E</em><sub>1</sub> ;...; <em>E</em><sub>last</sub> )
+    | New[<em>class</em>, <em>E</em><sub>1</sub>,...] | Invoke[<em>E</em><sub>object</sub>, <em>method</em>, <em>E</em><sub>1</sub>,...] | Static[<em>class</em>, <em>method</em>, <em>argument</em>,...]
+    | NewArray[<em>class</em>, <em>E</em><sub>length</sub>] | ArraySet[<em>E</em><sub>array</sub>, <em>E</em><sub>index</sub>, <em>E</em><sub>value</sub>] | ArrayGet[<em>E</em>, <em>index</em>]
+    | Null | False | True | Integer[<em>term</em>] | String[<em>term</em>] | Character[<em>term</em>]
+    | Let[<em>type</em>, <em>E</em><sub>value</sub>, <em>variable</em> . <em>E</em><sub>body</sub>] | GenerateSymbol[<em>prefix</em>]
+    | EnvironmentSet[<em>name</em>, <em>E</em><sub>value</sub>, <em>E</em><sub>body</sub>] | EnvironmentGet[<em>name</em>] .
+</PRE>
+</BODY>
+
+<h3>Semantics</h3>
+
+Expressions correspond to Java object operations in a fairly one to one way:
+
+<DL>
+
+<DT>()
+<DD>Do nothing; return <b>void</b>.
+<P>
+
+<DT>( <em>E</em><sub>1</sub> ;...; <em>E</em><sub>last</sub> )
+<DD>Evaluate the expressions in sequence and return the result of
+  evaluating the last.  The expression stack from one <em>E</em> is
+  passed to the next.
+<P>
+
+<DT>New[<em>class</em>, <em>E</em><sub>1</sub>,...]
+<DD>Return new instance of <em>class</em> using constructor taking
+  (result of evaluating) the arguments <em>E</em><sub>1</sub>,...
+<P>
+
+<DT>Invoke[<em>E</em><sub>object</sub>, <em>method</em>, <em>E</em><sub>1</sub>,...]
+<DD>Return result of invoking the <em>method</em> of (evaluated)
+ <em>E</em><sub>object</sub> on (result of evaluating) the
+ arguments <em>E</em><sub>1</sub>,...
+<P>
+
+<DT>Static[<em>class</em>, <em>method</em>, <em>argument</em>,...]
+<DD>Return result of invoking the static <em>method</em> of
+  <em>class</em> on (result of evaluating) the
+  arguments <em>E</em><sub>1</sub>,...
+<P>
+   
+<DT>NewArray[<em>class</em>, <em>E</em><sub>length</sub>]
+<DD>Return new array instance with (result of
+  evaluating) <em>E</em><sub>length</sub> members of <em>class</em>
+  (initialized to <b>null</b>).
+<P>
+
+<DT>ArraySet[<em>E</em><sub>array</sub>, <em>E</em><sub>index</sub>, <em>E</em><sub>value</sub>]
+<DD>Evaluate <em>E</em><sub>array</sub> and then set
+  the <em>E</em><sub>index</sub>'th member
+  to <em>E</em><sub>value</sub>; return <b>void</b>.
+<P>
+
+<DT>ArrayGet[<em>E</em><sub>array</sub>, <em>E</em><sub>index</sub>]
+<DD>Return result of evaluating <em>E</em><sub>array</sub> and then
+  getting the <em>E</em><sub>index</sub>'th member.
+<P>
+   
+<DT>Null
+<DD>Java <b>null</b> constant.
+<P>
+
+<DT>False
+<DD>Java <b>false</b> constant.
+<P>
+
+<DT>True
+<DD>Java <b>true</b> constant.
+<P>
+
+<DT>Integer[<em>integer</em>]
+<DD>Java <em>integer</em> constant.
+<P>
+
+<DT>String[<em>string</em>]
+<DD>Java <em>string</em> constant.
+<P>
+
+<DT>Character[<em>character</em>]
+<DD>Java <em>character</em> constant.
+<P>
+   
+<DT>Let[<em>type</em>, <em>E</em><sub>value</sub>, <em>variable</em> . <em>E</em><sub>body</sub>]
+<DD>Evaluate <em>E</em><sub>value</sub> and bind it to <em>variable</em> of <em>type</em> before evaluating <em>E</em><sub>body</sub>.
+<P>
+
+<DT>GenerateSymbol[<em>prefix</em>]
+<DD>Return string that starts with <em>prefix</em> and is different
+  from all other such generated symbols.
+<P>
+   
+<DT>EnvironmentSet[<em>name</em>, <em>E</em><sub>value</sub>]
+<DD>Set the environment variable <em>name</em> to the (result of evaluating) <em>E</em><sub>value</sub>; return <b>void</b>.
+<P>
+
+<DT>EnvironmentGet[<em>name</em>, <em>E</em><sub>default</sub>]
+<DD>Return value of <em>name</em> environment variable
+  or <em>E</em><sub>default</sub> value if unset.
+<P>
+
+</DL>
+</body>

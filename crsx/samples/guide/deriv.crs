@@ -1,0 +1,151 @@
+<!-- CRS Rules for HOACS module "net.sf.crsx.samples.guide.Deriv".
+@version $Id: deriv.crs,v 1.8 2013/09/19 16:08:23 krisrose Exp $
+-->
+Deriv[(
+
+<!-- Our syntax. -->
+$CheckGrammar["net.sf.crsx.samples.guide.DerivParser"];
+
+<!-- Syntax and sorts of text. -->
+$CheckGrammar["net.sf.crsx.text.Text"];
+$Use["net/sf/crsx/text/Text.crs"];
+
+<!-- Allow inference of options. -->
+$Lax;
+
+<!-- Rules per sort. -->
+
+<!-- All rules for B sort. -->
+$PrecedenceWrap-B[$Numeric, $Numeric, Text] :: Text ;
+-[Data[#Prec,#InnerPrec]]: $PrecedenceWrap-B[#Prec, #InnerPrec, #] → $[If, $[LessThanOrEqual, #Prec, #InnerPrec], #, %n⟪ ( ⟨#⟩ ) ⟫] ;
+
+$Print-B[B, $Numeric] :: Text ;
+$Print-B[v, #Prec] → $TextCons[$TextEmbed[v], $TextNil] ;
+ %derivB⟪ ⟨B⟩ ∨ ⟨B⟩ ⟫ :: B ;  %derivB⟪ ⟨B⟩ ∧ ⟨B⟩ ⟫ :: B ;  %derivB⟪ ¬ ⟨B⟩ ⟫ :: B ; 
+%derivB⟪ ( ⟨B⟩ ) ⟫ :: B ;
+<!--#L file:bool.hx;6:10-->%derivB⟪ ( ⟨B#⟩ ) ⟫ → %derivB⟪⟨B#⟩⟫ ;
+$Meta[(%derivB⟪ ( ⟨B#⟩ ) ⟫ → %derivB⟪⟨B#⟩⟫ ;)];
+
+B ::=( %derivB⟪ f ⟫; );
+$Print-B[%derivB⟪ f ⟫, #Prec] → $PrecedenceWrap-B[#Prec, 4, %n⟪ f ⟫];
+
+B ::=( %derivB⟪ t ⟫; );
+$Print-B[%derivB⟪ t ⟫, #Prec] → $PrecedenceWrap-B[#Prec, 4, %n⟪ t ⟫];
+<!--#L ;:-->- : %derivB⟪t∨ ⟨B#⟩⟫ → %derivB⟪t ⟫ ; <!--#L ;:-->- : %derivB⟪f∨ ⟨B#⟩⟫ → # ; <!--#L ;:-->- : %derivB⟪t∧ ⟨B#⟩⟫ → # ; <!--#L ;:-->- : %derivB⟪f∧ ⟨B#⟩⟫ → %derivB⟪f ⟫ ; <!--#L ;:-->- : %derivB⟪¬t ⟫ → %derivB⟪f ⟫ ; <!--#L ;:-->- : %derivB⟪¬f ⟫ → %derivB⟪t ⟫ ; 
+
+
+<!-- All rules for Exp sort. -->
+$PrecedenceWrap-Exp[$Numeric, $Numeric, Text] :: Text ;
+-[Data[#Prec,#InnerPrec]]: $PrecedenceWrap-Exp[#Prec, #InnerPrec, #] → $[If, $[LessThanOrEqual, #Prec, #InnerPrec], #, %n⟪ ( ⟨#⟩ ) ⟫] ;
+
+$Print-Exp[Exp, $Numeric] :: Text ;
+$Print-Exp[v, #Prec] → $TextCons[$TextEmbed[v], $TextNil] ;
+
+%derivExp⟪ + ⟨Exp⟩ ⟫ :: Exp ;
+<!--#L deriv.hx;17:12-->%derivExp⟪ + ⟨Exp#1⟩ ⟫ → %derivExp⟪0 + ⟨Exp#1⟩⟫ ;
+$Meta[(%derivExp⟪ + ⟨Exp#1⟩ ⟫ → %derivExp⟪0 + ⟨Exp#1⟩⟫ ;)];
+
+%derivExp⟪ - ⟨Exp⟩ ⟫ :: Exp ;
+<!--#L deriv.hx;18:12-->%derivExp⟪ - ⟨Exp#1⟩ ⟫ → %derivExp⟪0 - ⟨Exp#1⟩⟫ ;
+$Meta[(%derivExp⟪ - ⟨Exp#1⟩ ⟫ → %derivExp⟪0 - ⟨Exp#1⟩⟫ ;)];
+
+Exp ::=( %derivExp⟪ ⟨Exp⟩ + ⟨Exp⟩ ⟫; );
+$Print-Exp[%derivExp⟪ ⟨Exp#1⟩ + ⟨Exp#2⟩ ⟫, #Prec] → $PrecedenceWrap-Exp[#Prec, 1, %n⟪ ⟨ $Print-Exp[#1,1] ⟩ + ⟨ $Print-Exp[#2,2] ⟩ ⟫];
+
+Exp ::=( %derivExp⟪ ⟨Exp⟩ - ⟨Exp⟩ ⟫; );
+$Print-Exp[%derivExp⟪ ⟨Exp#1⟩ - ⟨Exp#2⟩ ⟫, #Prec] → $PrecedenceWrap-Exp[#Prec, 1, %n⟪ ⟨ $Print-Exp[#1,1] ⟩ - ⟨ $Print-Exp[#2,2] ⟩ ⟫];
+
+Exp ::=( %derivExp⟪ ⟨Exp⟩ * ⟨Exp⟩ ⟫; );
+$Print-Exp[%derivExp⟪ ⟨Exp#1⟩ * ⟨Exp#2⟩ ⟫, #Prec] → $PrecedenceWrap-Exp[#Prec, 2, %n⟪ ⟨ $Print-Exp[#1,2] ⟩ * ⟨ $Print-Exp[#2,3] ⟩ ⟫];
+
+Exp ::=( %derivExp⟪ ⟨Exp⟩ / ⟨Exp⟩ ⟫; );
+$Print-Exp[%derivExp⟪ ⟨Exp#1⟩ / ⟨Exp#2⟩ ⟫, #Prec] → $PrecedenceWrap-Exp[#Prec, 2, %n⟪ ⟨ $Print-Exp[#1,2] ⟩ / ⟨ $Print-Exp[#2,3] ⟩ ⟫];
+
+%derivExp⟪ D ⟨Exp⟩ [ ⟨Var "vVar1"⟩ ↦ ⟨Exp{vVar1 : Exp}Exp⟩ ] ⟫ :: Exp ;
+
+Exp ::=( %derivExp⟪ ⟨Fun⟩ ⟨Exp⟩ ⟫; );
+$Print-Exp[%derivExp⟪ ⟨Fun#1⟩ ⟨Exp#2⟩ ⟫, #Prec] → $PrecedenceWrap-Exp[#Prec, 3, %n⟪ ⟨ $Print-Fun[#1,0] ⟩ ⟨ $Print-Exp[#2,4] ⟩ ⟫];
+
+%derivExp⟪ ( ⟨Exp⟩ ) ⟫ :: Exp ;
+<!--#L deriv.hx;16:12-->%derivExp⟪ ( ⟨Exp#⟩ ) ⟫ → # ;
+$Meta[(%derivExp⟪ ( ⟨Exp#⟩ ) ⟫ → # ;)];
+
+Exp ::=( %derivExp⟪ ⟨Int⟩ ⟫; );
+$Print-Exp[%derivExp⟪ ⟨Int#1⟩ ⟫, #Prec] → $PrecedenceWrap-Exp[#Prec, 4, %n⟪ ⟨ $Print-Int[#1,0] ⟩ ⟫];
+<!--#L ;:-->- : %derivExp⟪D ⟨Exp#1⟩[x↦ ⟨Int#2⟩] ⟫ → %derivExp⟪0 ⟫ ; <!--#L deriv.hx;46:1-->Bound :
+  %derivExp⟪D ⟨Exp#1⟩[x↦x] ⟫
+  →
+  %derivExp⟪1 ⟫
+  ;
+<!--#L deriv.hx;47:1-->Indep[Free[y]] :
+  %derivExp⟪D ⟨Exp#1⟩[x↦y] ⟫
+  →
+  %derivExp⟪0 ⟫
+  ;
+<!--#L ;:-->- :
+  %derivExp⟪D ⟨Exp#0⟩[x↦ ⟨Exp#1[x]⟩+ ⟨Exp#2[x]⟩] ⟫
+  →
+  %derivExp⟪D ⟨Exp#0⟩[y↦ ⟨Exp#1[y]⟩] + D ⟨Exp#0⟩[z↦ ⟨Exp#2[z]⟩] ⟫
+  ;
+<!--#L ;:-->- :
+  %derivExp⟪D ⟨Exp#0⟩[x↦ ⟨Exp#1[x]⟩- ⟨Exp#2[x]⟩] ⟫
+  →
+  %derivExp⟪D ⟨Exp#0⟩[y↦ ⟨Exp#1[y]⟩] - D ⟨Exp#0⟩[z↦ ⟨Exp#2[z]⟩] ⟫
+  ;
+<!--#L ;:-->- :
+  %derivExp⟪D ⟨Exp#⟩[x↦ ⟨Exp#1[x]⟩* ⟨Exp#2[x]⟩] ⟫
+  →
+  %derivExp⟪D ⟨Exp#⟩[x↦ ⟨Exp#1[x]⟩] * ⟨Exp#2[#]⟩+ ⟨Exp#1[#]⟩* D ⟨Exp#⟩[x↦ ⟨Exp#2[x]⟩] ⟫
+  ;
+<!--#L ;:-->- :
+  %derivExp⟪D ⟨Exp#⟩[x↦ ⟨Exp#1[x]⟩/ ⟨Exp#2[x]⟩] ⟫
+  →
+  %derivExp⟪( D ⟨Exp#⟩[x↦ ⟨Exp#1[x]⟩] * ⟨Exp#2[#]⟩- ⟨Exp#1[#]⟩* D ⟨Exp#⟩[x↦ ⟨Exp#2[x]⟩] ) / ( ⟨Exp#2[#]⟩* ⟨Exp#2[#]⟩) ⟫
+  ;
+<!--#L ;:-->- :
+  %derivExp⟪D ⟨Exp#⟩[x↦ ⟨Fun#f⟩⟨Exp#2[x]⟩] ⟫
+  →
+  %derivExp⟪⟨Fun#f⟩' ⟨Exp#2[#]⟩* D ⟨Exp#⟩[x↦ ⟨Exp#2[x]⟩] ⟫
+  ;
+<!--#L ;:-->- : %derivExp⟪0 + ⟨Exp#⟩⟫ → # ; <!--#L ;:-->- : %derivExp⟪⟨Exp#⟩+ 0 ⟫ → # ; <!--#L ;:-->- : %derivExp⟪⟨Exp#⟩- 0 ⟫ → # ; <!--#L ;:-->- : %derivExp⟪1 * ⟨Exp#⟩⟫ → # ; <!--#L ;:-->- : %derivExp⟪⟨Exp#⟩* 1 ⟫ → # ; <!--#L ;:-->- : %derivExp⟪0 * ⟨Exp#⟩⟫ → %derivExp⟪0 ⟫ ; <!--#L ;:-->- : %derivExp⟪⟨Exp#⟩* 0 ⟫ → %derivExp⟪0 ⟫ ; <!--#L ;:-->- : %derivExp⟪[x ↦ ⟨Exp#[x]⟩] ⟨Exp#2⟩⟫ → #[#2] ; 
+
+
+<!-- All rules for Fun sort. -->
+$Meta[( $PrecedenceWrap-Fun[#Prec, #InnerPrec, #] → # ; )]; 
+$Print-Fun[Fun, $Numeric] :: Text ;
+$Print-Fun[v, #Prec] → $TextCons[$TextEmbed[v], $TextNil] ;
+ %derivFun⟪ ⟨Fun⟩ ' ⟫ :: Fun ; 
+Fun ::=( %derivFun⟪ [ ⟨Var "vVar1"⟩ ↦ ⟨Exp{vVar1 : Exp}Exp⟩ ] ⟫; );
+$Print-Fun[%derivFun⟪ [ ⟨Var "vVar1"⟩ ↦ ⟨Exp#1[vVar1]⟩ ] ⟫, #Prec] → $PrecedenceWrap-Fun[#Prec, 2, %n⟪ [ ⟨vVar1⟩ ↦ ⟨ $Print-Exp[#1[vVar1],0] ⟩ ] ⟫];
+
+Fun ::=( %derivFun⟪ cos ⟫; );
+$Print-Fun[%derivFun⟪ cos ⟫, #Prec] → $PrecedenceWrap-Fun[#Prec, 2, %n⟪ cos ⟫];
+
+Fun ::=( %derivFun⟪ exp ⟫; );
+$Print-Fun[%derivFun⟪ exp ⟫, #Prec] → $PrecedenceWrap-Fun[#Prec, 2, %n⟪ exp ⟫];
+
+Fun ::=( %derivFun⟪ ln ⟫; );
+$Print-Fun[%derivFun⟪ ln ⟫, #Prec] → $PrecedenceWrap-Fun[#Prec, 2, %n⟪ ln ⟫];
+
+Fun ::=( %derivFun⟪ sin ⟫; );
+$Print-Fun[%derivFun⟪ sin ⟫, #Prec] → $PrecedenceWrap-Fun[#Prec, 2, %n⟪ sin ⟫];
+<!--#L ;:-->- : %derivFun⟪sin' ⟫ → %derivFun⟪cos ⟫ ; <!--#L ;:-->- : %derivFun⟪cos' ⟫ → %derivFun⟪[a ↦ - sin a] ⟫ ; <!--#L ;:-->- : %derivFun⟪ln' ⟫ → %derivFun⟪[z ↦ 1/z] ⟫ ; <!--#L ;:-->- : %derivFun⟪exp' ⟫ → %derivFun⟪exp ⟫ ; <!--#L ;:-->- :
+  %derivFun⟪[x ↦ ⟨Exp#1[x]⟩]' ⟫
+  →
+  %derivFun⟪[y ↦ D(y)[z↦ ⟨Exp#1[z]⟩]] ⟫
+  ;
+
+
+
+<!-- All rules for Int token sort. -->
+$Print-Int[Int, $Numeric] :: Text ;
+$Print-Int[#, #Prec] → $TextCons[$TextChars[#], $TextNil] ;
+
+
+<!-- All rules for Var token sort. -->
+$Print-Var[Var, $Numeric] :: Text ;
+$Print-Var[#, #Prec] → $TextCons[$TextChars[#], $TextNil] ;
+
+
+
+)]

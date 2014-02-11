@@ -1,0 +1,117 @@
+// Copyright © 2012 IBM Corporation
+// $Id: sorts.crs,v 3.3 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C SORT DESCRIPTORS FILE TEXT FROM REIFIED CRSX.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SORTS[(
+
+$Use["compiler/c/cdefs.crs"];
+
+$Lax;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// C SORT FILE TEMPLATE.
+//
+// Create text of name-sorts.c file.
+//
+// Environment:
+// - HEADERS: ;-separated list of header file base names.
+
+ComputeSorts[Reify_CRSX] :: Text;
+
+Crsx[Copy[#name]]
+:
+ComputeSorts[CRSX[#name, #Declarations]]
+→
+%n⟪/* C SORT DESCRIPTORS FOR CRSX « TOKEN[#name] ». */
+« DelayMapText[k x.%n⟨#include "‹ DTOKEN[k, x] ›"
+⟩, $[Split, $[Get[$String], "HEADERS", ""], ";"]] »
+#ifdef __cplusplus
+extern "C" {
+#endif
+« MapText[d.S-Declaration[d], #Declarations] »
+#ifdef __cplusplus
+}
+#endif
+/* END OF C SORT DESCRIPTORS FOR CRSX « TOKEN[#name] ». */
+⟫
+;
+
+S-Declaration[Reified_Declaration] :: Text;
+
+Polymorphic[Fresh[arg::Reified_Variable]] : S-Declaration[POLYMORPHIC[a.#Declaration[a]]] → S-Declaration[#Declaration[arg]] ;
+Data                    : S-Declaration[DATA[#Sort, #Forms]           ] → S-Data[#Sort, #Forms] ;
+
+Function[Discard[#name,#kind,#path,#function,#Forms,#Sort,#Rules]]
+:
+S-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]]
+→
+%n⟪⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// SORT CONSTANTS.
+
+S-Data[Reified_Sort, $List[Reified_Form]] :: Text;
+
+-[Copy[#name,#Forms],Discard[#args]]
+:
+S-Data[SORT[#name, #args], #Forms]
+→
+%n⟪
+/* SORT « TOKEN[#name] » CONSTANTS. */
+« MapText[f.S-Data-Form[#name, f], #Forms] »ConstructionDescriptor « SortCons[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨&‹ DDescriptor[k, c] ›, ⟩, Forms-Constructors[#Forms]] » NULL};
+char *« SortNames[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨‹ DSTRING[k, c] ›, ⟩, Forms-Constructors[#Forms]] » NULL};
+char *« SortInternals[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨"‹ DMANGLE[k, c] ›", ⟩, Forms-Constructors[#Forms]] » NULL};
+struct _SortDescriptor « Sort[#name] » = {« STRING[#name] », « SortCons[#name] », « SortNames[#name] », « SortInternals[#name] », NULL};
+⟫
+;
+
+-[Discard[#Sort1, #Sort2]]
+:
+S-Data[SORT-PROPERTY[#Sort1, #Sort2, #Sort3], #Forms]
+→
+S-Data[#Sort3, #Forms]
+;
+
+S-Data-Form[$String, Reified_Form] :: Text;
+
+-[Discard[#Sort1,#Sort2]]
+:
+S-Data-Form[#sortname, SORT-SET[#Sort1, #Sort2, #Form]]
+→
+S-Data-Form[#sortname, #Form]
+;
+
+-[Discard[#sortname]]
+:
+S-Data-Form[#sortname, SORT-ALLOWS-VARIABLES]
+→
+%n⟪⟫
+;
+
+-[Copy[#name,#FormArguments]]
+:
+S-Data-Form[#sortname, FORM[#name, ()]]
+→
+%n⟪char *« Name[#name] » = « STRING[#name] »;
+char *« NameFun[#name] »(Term term) { return « Name[#name] »; }
+struct _ConstructionDescriptor « Descriptor[#name] » = {&« Sort[#sortname] », « EnumTag[#name] », 0, sizeof(STRUCT« Struct[#name] »), noBinderOffsets, &« NameFun[#name] », &dataStep};
+⟫
+;
+
+-[Copy[#name,#FormArgument1,#FormArguments]]
+:
+S-Data-Form[#sortname, FORM[#name, (#FormArgument1;#FormArguments)]]
+→
+%n⟪int « BinderOffsets[#name] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets[(#FormArgument1;#FormArguments), 0]] »};
+char *« Name[#name] » = « STRING[#name] »;
+char *« NameFun[#name] »(Term term) { return « Name[#name] »; }
+struct _ConstructionDescriptor « Descriptor[#name] » = {&« Sort[#sortname] », « EnumTag[#name] », « INTEGER[Length[#FormArguments,1]] », sizeof(STRUCT« Struct[#name] »), « BinderOffsets[#name] », &« NameFun[#name] », &dataStep};
+⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //SORTS

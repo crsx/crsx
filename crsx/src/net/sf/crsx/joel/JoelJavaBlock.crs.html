@@ -1,0 +1,56 @@
+<h2>Translate Joel script to Java</h2>
+
+<div>
+This rewrite system translates Joel expressions to Java source (in the
+form of a Block expressions).
+<p>
+The top-level expression is
+<pre>
+  Joel[<em>fil-ename</em>, <em>joel-expression</em>]
+</pre>
+
+
+</div>
+
+<PRE>
+Joel[(
+
+  Joel[#name, #j] &rarr; Block[#name, _J[#j]] ;
+
+  _J[$[C, New, (#class; #args)]] &rarr; ( "new" ; #class ; Join ; "(" ; 
+
+
+
+
+
+  Invoke[<em>E</em><sub>object</sub>, <em>method</em>, <em>E</em><sub>1</sub>,...] 
+
+  Static[<em>class</em>, <em>method</em>, <em>argument</em>,...]
+    
+  NewArray[<em>class</em>, <em>E</em><sub>length</sub>] 
+
+  ArraySet[<em>E</em><sub>array</sub>, <em>E</em><sub>index</sub>, <em>E</em><sub>value</sub>] 
+
+  ArrayGet[<em>E</em>, <em>index</em>]
+    
+  Null &rarr; 
+
+  False 
+
+  True 
+
+  Integer[<em>term</em>] 
+
+  String[<em>term</em>] 
+
+  Character[<em>term</em>]
+    
+  Let[<em>type</em>, <em>E</em><sub>value</sub>, <em>variable</em> . <em>E</em><sub>body</sub>] 
+  GenerateSymbol[<em>prefix</em>]
+    
+  EnvironmentSet[<em>name</em>, <em>E</em><sub>value</sub>, <em>E</em><sub>body</sub>] 
+
+  EnvironmentGet[<em>name</em>]
+
+)]
+</PRE>

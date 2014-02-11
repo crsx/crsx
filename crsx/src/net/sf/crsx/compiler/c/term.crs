@@ -1,0 +1,904 @@
+// Copyright © 2012,2013 IBM Corporation
+// $Id: term.crs,v 3.28 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C FUNCTION BODY FRAGMENT FOR CONTRACTION OF TERM.
+//
+// Implements the following term functions:
+//
+// * {#env} T-send[TERM, sink] - send term to sink
+// * {#env} T-set[TERM, sink, variable] - set Term variable (and register > to term)
+// * {#env} T-set-ref[TERM, sink, variable] - set Term reference variable
+// * {#env} T-set-bool[TERM, sink, variable] - set boolean (int) variable
+// * {#env} T-set-int[TERM, sink, variable] - set integer (long long) variable
+// * {#env} T-set-num[TERM, sink, variable] - set generic numeric (double) variable
+// * {#env} T-set-string[TERM, sink, variable] - set allocated string (char*) variable
+// * {#env} T-local-string[TERM, sink, s p.#[s,p]] - invoke # with either local (volatile!) variable name
+//				or literal argument string, with post-processing p
+//
+// * {#env} T-then-*[OK, ...] - delayed variant of each of the above.
+//
+// * {#env} T-substitute[METAVAR, ARGUMENT_TERMS, sink] - send substitution result to sink
+//
+// Meta-variables expand.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+TERM[(
+
+$Use["compiler/c/cdefs.crs"];
+$Use["compiler/c/evaluators.crs"];
+
+$Lax;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to send term to sink.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-send[OK_SORT, Reified_Term, Text] :: Text;
+
+{#env}
+T-then-send[OK, #term, #sink] 
+→ 
+{#env}
+T-send[#term, #sink]
+; 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send[Reified_Term, Text] :: Text;
+
+Send-PropertyRef[Free[sink::Text]]
+:
+{#env}
+T-send[PROPERTY-REF[#Ref, #term], sink]
+→
+%n⟪«{#env}T-send-property-ref[$[:,"MetaVar$",#Ref], sink]»« {#env} T-send-property-ref2[$[{#env}Get[STRING_ENTRY], "$Binders", LIST_VARIABLE[()]], #term, sink] »⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-property-ref[$String, Text] :: Text;
+
+-[Free[sink::Text, namedP::Text, varP::Text], Comparable[#RefCookie]]
+:
+{#env}
+T-send-property-ref[#RefCookie, #sink]
+→  
+T-send-property-ref-helper[$[{#env}Get[STRING_ENTRY], #RefCookie], #sink]
+;
+
+T-send-property-ref-helper[STRING_ENTRY, Text] :: Text;
+
+T-send-property-ref-helper[PROPERTY_VARIABLE[#namedP, #varP], #sink]
+→  // namedP and varP references are NOT transferred.
+%n⟪ADD_PROPERTIES(«#sink», LINK_NamedPropertyLink(«#sink»->context, « #namedP »), LINK_VariablePropertyLink(«#sink»->context, « #varP»));
+⟫
+;
+
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-property-ref2[STRING_ENTRY, Reified_Term, Text] :: Text;
+
+{#env}
+T-send-property-ref2[LIST_VARIABLE[#Vars], #Term, #sink]
+→
+{#env}
+T-send-property-ref3[#Vars, #Term, #sink]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-property-ref3[$List[Reified_Variable], Reified_Term, Text] :: Text;
+
+-[Free[v::Reified_Variable, sink::Text]]
+:
+{#env}
+T-send-property-ref3[(v;#rest), #Term, sink]
+→
+%n⟪ADD_PROPERTY_WEAKEN(«sink», «v»);
+« {#env} T-send-property-ref3[#rest, #Term, sink] »⟫
+;
+
+{#env}
+T-send-property-ref3[(), #Term, #sink]
+→
+{#env}
+T-send[#Term, #sink]
+;
+
+Send-Property-Variable-Key[Free[sink::Text, key::Text], Fresh[value::Text]]
+:
+{#env}
+T-send[PROPERTY[VARIABLE-USE[key], #Value, #Term], sink]
+→
+%n⟪{⟦ Term «value»;
+« {#env} T-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
+ADD_PROPERTY_VARIABLE(«sink», «key», «value»); ⟧}
+« {#env} T-send[#Term, sink] »⟫
+;
+
+Send-Property-Literal-Key[Free[sink::Text], Fresh[value::Text]]
+:
+{#env}
+T-send[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], sink]
+→
+%n⟪{⟦ Term «value»;
+« {#env} T-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
+ADD_PROPERTY_NAMED(«sink», « STRING[#Literal] », «value»); ⟧}
+« {#env} T-send[#Term, sink] »⟫
+;
+
+Send-Property-other[Free[sink::Text], Fresh[key::Text, value::Text]]
+:
+{#env}
+T-send[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#Key]], #Value, #Term], sink]
+→
+%n⟪{⟦ Term «key», «value»;
+« {#env} T-set-ref[#Key, sink, key] »« {#env} T-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
+ADD_PROPERTY(«sink», «key», «value»);«T-unlink-ref[sink, key] »
+« {#env} T-send[#Term, sink] »⟧}
+⟫
+;
+
+Send-Construction[Free[sink::Text]]
+:
+{#env}
+T-send[CONSTRUCTION[#Symbol, #Binders], sink]
+→
+%n⟪{⟦ START(«sink», «EventConstructor[#Symbol]»);
+« {#env} T-send-Binders[#Binders, sink] »END(«sink», «EventConstructor[#Symbol]»); ⟧}
+⟫
+;
+
+Send-Literal[Free[sink::Text]]
+:
+{#env}
+T-send[LITERAL[#Literal, #Sort], sink]
+→
+%n⟪LITERAL(«sink», «STRING[#Literal]»);
+⟫
+;
+
+Send-Variable[Free[sink::Text, variable::Reified_Variable]]
+:
+{#env}
+T-send[VARIABLE-USE[variable], sink]
+→
+%n⟪USE(«sink», «variable»);
+⟫
+;
+
+Send-MetaApplication
+:
+{#env}
+T-send[META-APPLICATION[#MetaVar, #Arguments, #Occ], #sink]
+→
+{#env}
+T-send-meta-aplication0[$[{#env}Get[STRING_ENTRY], "$Binders", LIST_VARIABLE[()]], $[FreeVariables, #Arguments], #MetaVar, #Arguments, #Occ, #sink]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication0[STRING_ENTRY, $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+{#env}
+T-send-meta-aplication0[LIST_VARIABLE[#ContextVariables], #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
+→
+{#env}
+T-send-meta-aplication1[#ContextVariables, #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication1[$List[Reified_Variable], $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+{#env}
+T-send-meta-aplication1[#ContextVariables, #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
+→
+{#env}
+T-send-meta-aplication2[$[ExceptVariables, #ContextVariables, #UsedVariables], #MetaVar, #Arguments, #Occ, #sink]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication2[$List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+-[Free[v::Reified_Variable, sink::Text]]
+:
+{#env}
+T-send-meta-aplication2[(v;#rest), #MetaVar, #Arguments, #Occ, sink]
+→
+%n⟪WEAKEN(«sink», «v»);
+« {#env} T-send-meta-aplication2[#rest, #MetaVar, #Arguments, #Occ, sink] »⟫
+;
+
+{#env}
+T-send-meta-aplication2[(), #MetaVar, #Arguments, #Occ, #sink]
+→
+{#env}
+T-substitute[#MetaVar, #Arguments, #Occ, #sink]
+;
+
+Send-Evaluator
+:
+{#env}
+T-send[EVALUATOR[#Primitive, #Terms, #Options], #sink]
+→
+{#env}
+E-send[Primitive[#Primitive], #Terms, #Options, #sink]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code for construction subterms, with binders.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binders[$List[Reified_Binder], Text] :: Text;
+
+-[Free[sink::Text]]
+:
+{#env}
+T-send-Binders[(), sink]
+→
+%n⟪⟫
+;
+
+-[Free[sink::Text]]
+:
+{#env}
+T-send-Binders[(#Binder; #Binders), sink]
+→
+%n⟪« {#env}T-send-Binder[#Binder, sink] »« {#env}T-send-Binders[#Binders, sink] »⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder[Reified_Binder, Text] :: Text;
+
+// Subterm without binders.
+{#env}
+T-send-Binder[ARGUMENT[#sort, #Term], #sink]
+→
+{#env}
+T-send[#Term, #sink]
+;
+
+// Subterm with binders:
+Binder-State ::= ( OUTER; REUSING; COPYING; NO_REUSE; );
+
+// TODO: review NO_REUSE as it does not seem to be used.
+
+{#env}
+T-send-Binder[BINDER[#promisc, #sort, #occs, b.#Binder[b]], #sink]
+→
+%n⟪{⟦ « {#env}T-send-Binder1[BINDER[#promisc, #sort, #occs, b.#Binder[b]], #sink, 0, %n⟨⟩, %n⟨⟩, OUTER] » ⟧}
+⟫
+;
+
+// - Analyze each binder and either allocate it or reuse the unique variable it replaces.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder1[Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+
+{#env}
+T-send-Binder1[BINDER[#promisc, #sort, #occs, b.#Binder[b]], #sink, #index, #bs, #sep, #state]
+→
+{#env}
+T-send-Binder2[#occs, NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+;
+
+// -- if binder occurs in exactly one meta-application then record a cookie for that meta-application position and promiscuity -
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder2[$List[Reified_Occurrence], Meta-Occurrence, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+
+{#env}
+T-send-Binder2[(META-USE[#mv,#k];#occs), NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+→
+$[{#env}IfDef, $[:,"Copy$",#mv],
+  {#env}T-send-Binder3[NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state],
+  $[If, $[Equal, #state, NO_REUSE],
+    {#env}T-send-Binder3[NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state],
+    {#env}T-send-Binder2[#occs, UNIQUE[$[:,"BinderUnique$",#mv,"$",$[FormatNumber, #k],"$",PromiscuityString[#promisc]]], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]]
+]
+;
+
+{#env}
+T-send-Binder2[(META-USE[#mv,#k];#occs), UNIQUE[#cookie], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+→
+{#env}
+T-send-Binder3[NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+;
+
+{#env}
+T-send-Binder2[(OTHER;#occs), #cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+→
+{#env}
+T-send-Binder2[#occs, #cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+;
+
+{#env}
+T-send-Binder2[(), #cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+→
+{#env}
+T-send-Binder3[#cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+;
+
+// -- test whether uniquely used local binder was also unique in pattern?
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder3[Meta-Occurrence, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+
+{#env}
+T-send-Binder3[UNIQUE[#cookie], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+→
+$[{#env}IfDef, #cookie,
+  {#env}T-send-Binder4[$[{#env}Get[STRING_ENTRY], #cookie], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state],
+  {#env}T-send-Binder3[NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+];
+
+// -- binder that can neither be reused nor generate a fresh binder.
+-[Free[sink::Text]]
+:
+{#env}
+T-send-Binder3[NOTHING, #promisc, b.#Binder[b], sink, #index, #bs, #sep, #state]
+→
+{#env}
+T-send-Binder6[#promisc, b.#Binder[b], sink, #index, #bs, #sep, #state]
+;
+
+// -- outermost reused binder.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder4[STRING_ENTRY, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+
+{#env}
+T-send-Binder4[VARIABLE[#reused], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, OUTER]
+→
+%n⟪if (!IS_BOUND(«#reused»)) {⟦ « {#env}T-send-Binder5[#reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, REUSING] » ⟧}
+else {⟦ « {#env}T-send-Binder6[#promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING] » ⟧   }
+⟫
+;
+
+// -- following reused binder.
+{#env}
+T-send-Binder4[VARIABLE[#reused], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, REUSING]
+→
+{#env}
+T-send-Binder5[#reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, REUSING]
+;
+
+// -- binder that should not be reused because we are copying.
+{#env}
+T-send-Binder4[#reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
+→
+{#env}
+T-send-Binder6[#promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder5[Text, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+
+-[Free[reused::Text]]
+:
+{#env; "$Binders":LIST_VARIABLE[#binders]}
+T-send-Binder5[reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+→
+%n⟪REBIND(«reused»);
+« {#env; reused : BOUNDREUSE; "$Binders":LIST_VARIABLE[(reused;#binders)]}T-send-Binder1[#Binder[reused], #sink, $[Plus,#index,1], %n⟨‹#bs›‹#sep›‹reused›⟩, %n⟨,⟩, #state] »⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder6[Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+
+-[Fresh[new::Text]]
+:
+{#env; "$Binders":LIST_VARIABLE[#binders]}
+T-send-Binder6[#promisc, b.#Binder[b], sink, #index, #bs, #sep, #state]
+→
+%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«sink»->context,"«new»");
+« {#env; new : BOUND; "$Binders":LIST_VARIABLE[(new;#binders)]}T-send-Binder1[#Binder[new], sink, $[Plus,#index,1], %n⟨‹#bs›‹#sep›‹new›⟩, %n⟨,⟩, #state] »⟫
+;
+
+// - Once all binders are collected they issue as BINDS event.
+-[Free[sink::Text], Fresh[binds::Reified_Variable]]
+:
+{#env}
+T-send-Binder1[ARGUMENT[#sort, #Term], sink, #rank, #bs, #sep, #state]
+→
+%n⟪Variable «binds»[«INTEGER[#rank]»] = {«#bs»}; BINDS(«sink», «INTEGER[#rank]», «binds»);
+« {#env}T-send[#Term, sink] »⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to substitute what was matched by meta-application, with substitutions. 
+
+// T-substitute builds information for either copying or substituting.
+//
+// Do a plain copy if all variables have been previously marked for *Reuse, otherwise a full substitution is necessary.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-substitute[$String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+-[Free[sink::Text]]
+:
+{#env}
+T-substitute[#MetaVar, (), USE[#Count], sink]
+→
+$[If, $[Equal, #Count, 1],
+	%n⟪COPY(«sink», « {#env}MetaVar[#MetaVar] »);⟫, // Give up the reference own by the step function 
+	%n⟪COPY(«sink», LINK(«sink»->context, « {#env}MetaVar[#MetaVar] »));⟫
+]
+;
+
+{#env}
+T-substitute[#MetaVar, (#Argument1;#Arguments), #Occ, #sink]
+→
+{#env}
+T-substitute2[#MetaVar, (#Argument1;#Arguments), #Occ, #sink, 0, %n⟪⟫, %n⟪⟫, %n⟪⟫, %n⟪⟫, $True, 0]
+;
+
+// Process substitution argument.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-substitute2[$String, $List[Reified_Binder], Reified_Use, Text, $Numeric, Text, Text, Text, Text, $Boolean, $Numeric] :: Text;
+
+{#env}
+T-substitute2[#MetaVar, (ARGUMENT[#sort, #Term]; #Arguments), #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+→
+{#env}
+T-substitute3[{#env} T-CheckReuse[#Term], #MetaVar, #Term, $[:,#MetaVar,"$",$[FormatNumber, #index]], #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+;
+
+// Generate COPY instruction for explicit substitution.
+-[Free[sink::Text]]
+:
+{#env}
+T-substitute2[#MetaVar, (), USE[#Count], sink, #arity, #prefix, #vars, #args, #sep, $True, #used]
+→
+$[If, $[Equal, #Count, 1],
+  %n⟪COPY(«sink», « {#env}MetaVar[#MetaVar] »); /* REUSED SUBSTITUTION */ ⟫,
+  %n⟪COPY(«sink», LINK(«sink»->context, « {#env}MetaVar[#MetaVar] »)); /* REUSED SUBSTITUTION */ ⟫
+]
+;
+
+// Generate full SUBSTITUTE instruction for non-explicit substitution.
+-[Free[sink],Discard[#sep,#arity],Copy[#MetaVar,#used], Fresh[substitution::Text, vars::Text, args::Text]]
+:
+{#env}
+T-substitute2[#MetaVar, (), USE[#Count], sink, #arity, #prefix, #vars, #args, #sep, $False, #used]
+→
+%n⟪{⟦
+« #prefix »Variable «vars»[«INTEGER[#used]»] = {«#vars»};
+Term «args»[«INTEGER[#used]»] = {«#args»};
+struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args», NULL};
+SUBSTITUTE(«sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, T-link-prefix[sink]]»«{#env}MetaVar[#MetaVar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», &«substitution»); ⟧}
+⟫
+;
+
+// Skip reusable substitution component.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-substitute3[T_REUSE_SORT, $String, Reified_Term, $String, $List[Reified_Binder], Reified_Use, Text, $Numeric, Text, Text, Text, Text, $Boolean, $Numeric] :: Text;
+
+{#env}
+T-substitute3[T_REUSE, #MetaVar, #Term, #MetaVarIndex, #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+→
+{#env}
+T-substitute2[#MetaVar, #Arguments, #Occ, #sink, $[Plus,#index,1], #prefix, #vars, #args, #sep, #explicit, #used]
+;
+
+// Generate non-explicit substitution setup for argument.
+-[Free[sink::Text]]
+:
+{#env}
+T-substitute3[T_NO_REUSE, #MetaVar, #Term, #MetaVarIndex, #Arguments, #Occ, sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+→
+{#env}
+T-substitute4[$[{#env}Get[STRING_ENTRY], #MetaVarIndex],#MetaVar, #Term, #MetaVarIndex, #Arguments, #Occ, sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+;
+ 
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-substitute4[STRING_ENTRY, $String, Reified_Term, $String, $List[Reified_Binder], Reified_Use, Text, $Numeric, Text, Text, Text, Text, $Boolean, $Numeric] :: Text;
+
+-[Fresh[arg::Text]]
+:
+{#env}
+T-substitute4[VARIABLE[#var], #MetaVar, #Term, #MetaVarIndex, #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+→
+{#env}
+T-substitute2[#MetaVar, #Arguments, #Occ, #sink, $[Plus,#index,1],
+  // prefix extended with reference to argument term.  TODO: linear arguments.
+  %n⟪« #prefix »Term «arg»;
+« {#env} T-set[#Term, #sink, arg] »⟫,
+  // vars and args recorded; separator now known to be comma.
+  %n⟪«#vars»«#sep»«#var»⟫, %n⟪«#args»«#sep»«arg»⟫, %n⟪,⟫,
+  // explicitness property now lost.
+  $False, $[Plus,#used,1]]
+;
+
+T-link-prefix[Text] :: Text;
+
+T-link-prefix[#sink]
+→
+%n⟪LINK(«#sink»->context,⟫;
+
+// Helper to test variable reuse for (non-copied) meta-application argument in contraction.
+T_REUSE_SORT ::= ( T_REUSE; T_NO_REUSE; );
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-CheckReuse[Reified_Term] :: T_REUSE_SORT;
+
+-[Free[y::Reified_Variable]]
+:
+{#env}
+T-CheckReuse[VARIABLE-USE[y]]
+→
+T-CheckReuse-Variable[$[{#env}Get[VARIABLE_ENTRY], y, FREE]] // FREE = T_NO_REUSE
+;
+
+-[#Fallback]
+:
+{#env}
+T-CheckReuse[#]
+→
+T_NO_REUSE
+;
+
+
+T-CheckReuse-Variable[VARIABLE_ENTRY] :: T_REUSE_SORT;
+
+T-CheckReuse-Variable[FRESHREUSE] → T_REUSE;
+T-CheckReuse-Variable[BOUNDREUSE] → T_REUSE;
+T-CheckReuse-Variable[BOUND]      → T_NO_REUSE;
+T-CheckReuse-Variable[FREE]       → T_NO_REUSE;
+T-CheckReuse-Variable[FRESH]      → T_NO_REUSE;
+
+//
+//-[Free[y::Reified_Variable]]:
+//{y : FRESHREUSE}
+//T-CheckReuse[VARIABLE-USE[y]]
+//→
+//T_REUSE
+//;
+//
+//-[Free[y::Reified_Variable]]:
+//{y : BOUND}
+//T-CheckReuse[VARIABLE-USE[y]]
+//→
+//T_NO_REUSE
+//;
+//
+//-[Free[y::Reified_Variable]]:
+//{y : BOUNDREUSE}
+//T-CheckReuse[VARIABLE-USE[y]]
+//→
+//T_REUSE
+//;
+//
+//-[Free[y::Reified_Variable]]:
+//{y : FREE}
+//T-CheckReuse[VARIABLE-USE[y]]
+//→
+//T_NO_REUSE
+//;
+//
+//-[Free[y::Reified_Variable]]:
+//{¬y}
+//T-CheckReuse[VARIABLE-USE[y]]
+//→
+//T_NO_REUSE
+//;
+
+//-[Free[y::Reified_Variable]]:
+//{}
+//T-CheckReuse[$[NotMatch,VARIABLE-USE[y],#]]
+//→
+//T_NO_REUSE
+//;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-UnlinkLastMetaUse[$String, Reified_Use, Text] :: Text;
+
+{#env}
+T-UnlinkLastMetaUse[#MetaVar, USE[#Use], #sink]
+→
+$[If, $[Equal, #Use, 1], %n⟪
+UNLINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»);⟫, %n⟪⟫]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to capture reference to term to an existing variable.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-set-ref[OK_SORT, Reified_Term, Text, Text] :: Text;
+
+{#env}
+T-then-set-ref[OK, #Term, #sink, #variable] 
+→ 
+{#env}
+T-set-ref[#Term, #sink, #variable]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-ref[Reified_Term, Text, Text] :: Text;
+
+// Literals can be created directly.
+{#env}
+T-set-ref[LITERAL[#Literal, #Sort], #sink, #variable]
+→
+%n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
+⟫
+;
+
+// Most term cases require buffering (like T-set).
+{#env} T-set-ref[PROPERTY-REF[#Ref, #Term],         #sink, #variable] → {#env} T-set-buffer[PROPERTY-REF[#Ref, #Term],         #sink, #variable] ;
+{#env} T-set-ref[PROPERTY[#Key, #Value, #Term],     #sink, #variable] → {#env} T-set-buffer[PROPERTY[#Key, #Value, #Term],     #sink, #variable] ;
+{#env} T-set-ref[PROPERTY-NOT[#Key, #Term],         #sink, #variable] → {#env} T-set-buffer[PROPERTY-NOT[#Key, #Term],         #sink, #variable] ;
+{#env} T-set-ref[CONSTRUCTION[#Symbol, #Binders],   #sink, #variable] → {#env} T-set-buffer[CONSTRUCTION[#Symbol, #Binders],   #sink, #variable] ;
+{#env} T-set-ref[VARIABLE-USE[#Variable],           #sink, #variable] → {#env} T-set-buffer[VARIABLE-USE[#Variable],           #sink, #variable] ;
+
+// Existing reference used directly.
+{#env}
+T-set-ref[META-APPLICATION[#MetaVar, #Args, USE[#Count]], #sink, #variable] 
+→
+$[If, $[Equal, #Count, 1], 
+	%n⟪«#variable» = « {#env}MetaVar[#MetaVar] »;
+⟫,
+	%n⟪«#variable» = LINK(«#sink»->context, « {#env}MetaVar[#MetaVar] »);
+⟫];
+
+// Evaluators are handled separately...
+{#env}
+T-set-ref[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable]
+→
+{#env}
+E-set-ref[Primitive[#Primitive], #Args, #Options, #sink, #variable]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to release reference to term to an existing variable.
+
+T-unlink-ref[Text, Text] :: Text;
+
+T-unlink-ref[#sink, #variable] → %n⟪UNLINK(«#sink»->context, «#variable»);
+⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to capture copy of term to an existing variable.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-set[OK_SORT, Reified_Term, Text, Text] :: Text;
+
+{#env}
+T-then-set[OK, #Term, #sink, #variable] 
+→ 
+{#env} 
+T-set[#Term, #sink, #variable]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set[Reified_Term, Text, Text] :: Text;
+
+// Literals can be created directly.
+{#env}
+T-set[LITERAL[#Literal, #Sort], #sink, #variable]
+→
+%n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
+⟫
+;
+
+// Evaluators are handled separately...
+{#env}
+T-set[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable]
+→
+{#env}
+E-set[Primitive[#Primitive], #Args, #Options, #sink, #variable]
+;
+
+// Proper term cases require buffering.
+{#env} T-set[PROPERTY-REF[#Ref, #Term],             #sink, #variable] → {#env} T-set-buffer[PROPERTY-REF[#Ref, #Term],         #sink, #variable] ;
+{#env} T-set[PROPERTY[#Key, #Value, #Term],         #sink, #variable] → {#env} T-set-buffer[PROPERTY[#Key, #Value, #Term],     #sink, #variable] ;
+{#env} T-set[PROPERTY-NOT[#Key, #Term],             #sink, #variable] → {#env} T-set-buffer[PROPERTY-NOT[#Key, #Term],         #sink, #variable] ;
+{#env} T-set[CONSTRUCTION[#Symbol, #Binders],       #sink, #variable] → {#env} T-set-buffer[CONSTRUCTION[#Symbol, #Binders],   #sink, #variable] ;
+{#env} T-set[VARIABLE-USE[#Variable],               #sink, #variable] → {#env} T-set-buffer[VARIABLE-USE[#Variable],           #sink, #variable] ;
+{#env} T-set[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] → {#env} T-set-buffer[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] ;
+
+// Helper to set term variable using temporary buffer.  TODO: alloca-buffer?
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-buffer[Reified_Term, Text, Text] :: Text;
+
+-[Fresh[buf::Text]]
+:
+{#env}
+T-set-buffer[#Term, #sink, #variable]
+→
+%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
+« {#env} T-send[#Term, buf] »«#variable» = BUFFER_TERM(«buf»); FREE_BUFFER(«buf»); ⟧}
+⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to capture term to an existing variable of type $Boolean
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-set-bool[OK_SORT, Reified_Term, Text, Text] :: Text;
+
+{#env}
+T-then-set-bool[OK, #Term, #sink, #variable] 
+→ 
+{#env}
+T-set-bool[#Term, #sink, #variable]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-bool[Reified_Term, Text, Text] :: Text;
+
+{#env} T-set-bool[LITERAL[#Literal, #Sort],              #sink, #bool] → T-set-bool2[#bool, STRING[#Literal]] ;
+{#env} T-set-bool[CONSTRUCTION[#Symbol, #Binders],       #sink, #bool] → T-set-bool2[#bool, STRING[#Symbol]] ;
+
+-[Free[v::Reified_Variable]]
+:  
+{#env}
+T-set-bool[VARIABLE-USE[v], #sink, #bool] 
+→ 
+T-set-bool2[#bool, %n⟪«v»->name⟫] // Error? 
+;
+
+{#env} 
+T-set-bool[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #bool] 
+→ 
+T-set-bool2[#bool, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫];
+
+{#env} T-set-bool[PROPERTY-REF[#Ref, #Term],              #sink, #bool] → {#env} T-set-bool[#Term, #sink, #bool] ;
+{#env} T-set-bool[PROPERTY[#Key, #Value, #Term],          #sink, #bool] → {#env} T-set-bool[#Term, #sink, #bool] ;
+{#env} T-set-bool[PROPERTY-NOT[#Key, #Term],              #sink, #bool] → {#env} T-set-bool[#Term, #sink, #bool] ;
+{#env} T-set-bool[EVALUATOR[#Primitive, #Args, #Options], #sink, #bool] → {#env} E-set-bool[Primitive[#Primitive], #Args, #Options, #sink, #bool] ;
+
+T-set-bool2[Text, Text] :: Text;
+
+T-set-bool2[#bool, #string]
+→
+%n⟪«#bool» = !strcmp(«#string», True);
+⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to capture term to an existing variable of type $Numeric where an integer is needed
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-set-int[OK_SORT, Reified_Term, Text, Text] :: Text;
+
+{#env}
+T-then-set-int[OK, #Term, #sink, #variable] 
+→ 
+{#env}
+T-set-int[#Term, #sink, #variable]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-int[Reified_Term, Text, Text] :: Text;
+
+{#env}T-set-int[LITERAL[#Literal, #Sort],              #sink, #int] → T-set-int2[#int, %n⟪«TOKEN[#Literal]»ll⟫] ;
+{#env}T-set-int[META-APPLICATION[#MetaVar, #Args, #C], #sink, #int] → T-set-int2[#int, %n⟪LONGLONG(« {#env}MetaVar[#MetaVar] »)⟫] ;
+{#env}T-set-int[CONSTRUCTION[#Symbol, #Binders],       #sink, #int] → T-set-int2[#int, %n⟪«TOKEN[#Symbol]»ll⟫] ;
+
+-[Free[v::Text]]
+:
+{#env}
+T-set-int[VARIABLE-USE[v], #sink, #int]
+→ 
+T-set-int2[#int, %n⟪LONGLONG(«v»->name)⟫]
+; // Error?
+
+{#env}T-set-int[PROPERTY-REF[#Ref, #Term],         #sink, #int] → {#env} T-set-int[#Term, #sink, #int] ;
+{#env}T-set-int[PROPERTY[#Key, #Value, #Term],     #sink, #int] → {#env} T-set-int[#Term, #sink, #int] ;
+{#env}T-set-int[PROPERTY-NOT[#Key, #Term],         #sink, #int] → {#env} T-set-int[#Term, #sink, #int] ;
+
+{#env}T-set-int[EVALUATOR[#Primitive, #Args, #Options], #sink, #int] → {#env} E-set-int[Primitive[#Primitive], #Args, #Options, #sink, #int] ;
+
+T-set-int2[Text, Text] :: Text;
+
+T-set-int2[#int, #integer]
+→
+%n⟪«#int» = «#integer»;
+⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to capture term to an existing variable of type $Numeric when a double is needed
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-set-num[OK_SORT, Reified_Term, Text, Text] :: Text;
+
+{#env}
+T-then-set-num[OK, #Term, #sink, #variable]
+→ 
+{#env}
+T-set-num[#Term, #sink, #variable]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-num[Reified_Term, Text, Text] :: Text;
+
+{#env} T-set-num[LITERAL[#Literal, #Sort],              #sink, #num] → T-set-num2[#num, %n⟪(double) «TOKEN[#Literal]»⟫] ;
+{#env} T-set-num[CONSTRUCTION[#Symbol, #Binders],       #sink, #num] → T-set-num2[#num, %n⟪(double) «TOKEN[#Symbol]»⟫] ;
+
+-[Free[v::Text]]
+:
+{#env}
+T-set-num[VARIABLE-USE[v], #sink, #num] 
+→
+T-set-num2[#num, %n⟪DOUBLE(«v»->name)⟫]
+; // Error?
+
+{#env}
+T-set-num[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #num] 
+→  
+T-set-num2[#num, %n⟪DOUBLE(« {#env}MetaVar[#MetaVar] »)⟫] ; // TODO: Unlink
+
+{#env} T-set-num[PROPERTY-REF[#Ref, #Term],         #sink, #num] → {#env} T-set-num[#Term, #sink, #num] ;
+{#env} T-set-num[PROPERTY[#Key, #Value, #Term],     #sink, #num] → {#env} T-set-num[#Term, #sink, #num] ;
+{#env} T-set-num[PROPERTY-NOT[#Key, #Term],         #sink, #num] → {#env} T-set-num[#Term, #sink, #num] ;
+
+{#env} T-set-num[EVALUATOR[#Primitive, #Args, #Options], #sink, #num] → {#env} E-set-num[Primitive[#Primitive], #Args, #Options, #sink, #num] ;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-num2[Text, Text] :: Text;
+
+T-set-num2[#num, #number]
+→
+%n⟪«#num» = «#number»;
+⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to capture term to an existing allocated variable of type $String
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-set-string[OK_SORT, Reified_Term, Text, Text] :: Text;
+
+{#env}
+T-then-set-string[OK, #Term, #sink, #variable]
+→ 
+{#env}
+T-set-string[#Term, #sink, #variable]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-string[Reified_Term, Text, Text] :: Text;
+
+{#env}T-set-string[LITERAL[#Literal, #Sort],              #sink, #string] → T-set-string2[#string, STRING[#Literal]] ;
+{#env}T-set-string[CONSTRUCTION[#Symbol, #Binders],       #sink, #string] → T-set-string2[#string, STRING[#Symbol]] ;
+
+-[Free[v::Text]]
+: 
+{#env}
+T-set-string[VARIABLE-USE[v], #sink, #string] 
+→ 
+T-set-string2[#string, %n⟪«v»->name⟫]
+;
+
+{#env} 
+T-set-string[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #string] 
+→ 
+T-set-string2[#string, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫] ; // TODO unlink
+
+{#env}T-set-string[PROPERTY-REF[#Ref, #Term],         #sink, #string] → {#env} T-set-string[#Term, #sink, #string] ;
+{#env}T-set-string[PROPERTY[#Key, #Value, #Term],     #sink, #string] → {#env} T-set-string[#Term, #sink, #string] ;
+{#env}T-set-string[PROPERTY-NOT[#Key, #Term],         #sink, #string] → {#env} T-set-string[#Term, #sink, #string] ;
+
+{#env}T-set-string[EVALUATOR[#Primitive, #Args, #Options], #sink, #string] → {#env} E-set-string[Primitive[#Primitive], #Args, #Options, #sink, #string] ;
+
+T-set-string2[Text, Text] :: Text;
+
+T-set-string2[#str, #string]
+→
+%n⟪«#str» = «#string»;
+⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate code to insert one instance of a string value.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-then-local-string[OK_SORT, Reified_Term, Text, s::Text p::Text.Text] :: Text;
+
+{#env}
+T-then-local-string[OK, #Term, #sink, s p .#[s,p]]
+→ 
+{#env}
+T-local-string[#Term, #sink, s p .#[s,p]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-local-string[Reified_Term, Text, s::Text p::Text.Text] :: Text;
+
+{#env}
+T-local-string[LITERAL[#Literal, #Sort], #sink, s p.#[s,p]]
+→
+#[STRING[#Literal], %n⟪⟫]
+;
+
+{#env}
+T-local-string[META-APPLICATION[#MetaVar, #Args, #Use], sink, s p.#[s,p]] 
+→ 
+%n⟪FORCE(«sink»->context, « {#env}MetaVar[#MetaVar] »);
+« #[%n⟨SYMBOL(‹ {#env}MetaVar[#MetaVar] ›)⟩, {#env}T-UnlinkLastMetaUse[#MetaVar, #Use, sink]] »⟫
+;
+
+{#env}
+T-local-string[VARIABLE-USE[v], #sink, s p.#[s, p]]
+→
+#[%n⟪«v»->name⟫, %n⟪⟫]
+;
+
+{#env}
+T-local-string[EVALUATOR[#Primitive, #Args, #Options], #sink, s p.#[s,p]]
+→
+{#env}
+E-local-string[Primitive[#Primitive], #Args, #Options, #sink, s p.#[s,p]]
+;
+
+{#env}T-local-string[CONSTRUCTION[#Symbol, #Binders], #sink, s p.#[s,p]] → {#env}T-local-string2[CONSTRUCTION[#Symbol, #Binders], #sink, s p.#[s, p]] ;
+{#env}T-local-string[PROPERTY-REF[#Ref, #Term],       #sink, s p.#[s,p]] → {#env}T-local-string2[PROPERTY-REF[#Ref, #Term],       #sink, s p.#[s,p]] ;
+{#env}T-local-string[PROPERTY[#Key, #Value, #Term],   #sink, s p.#[s,p]] → {#env}T-local-string2[PROPERTY[#Key, #Value, #Term],   #sink, s p.#[s,p]] ;
+{#env}T-local-string[PROPERTY-NOT[#Key, #Term],       #sink, s p.#[s,p]] → {#env}T-local-string2[PROPERTY-NOT[#Key, #Term],       #sink, s p.#[s,p]] ;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-local-string2[Reified_Term, Text, s::Text p::Text.Text] :: Text;
+
+-[Fresh[t::Text]]
+:
+{#env}T-local-string2[#Term, #sink, s p.#[s,p]]
+→
+%n⟪{⟦ Term «t»;
+« {#env} T-set-ref[#Term, #sink, t] »FORCE(«#sink»->context, «t»);
+« #[%n⟨SYMBOL(‹t›)⟩, T-unlink-ref[#sink, t]] »⟧
+}⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //T

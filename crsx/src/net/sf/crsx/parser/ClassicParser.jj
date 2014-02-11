@@ -1,0 +1,1021 @@
+/* Copyright (c) 2007, 2013 IBM Corporation. */
+
+// JavaCC specification to generate parser for CRS terms.
+
+// JavaCC options.
+options {
+	JDK_VERSION = "1.5";
+	LOOKAHEAD = 1;
+	STATIC = false;
+	ERROR_REPORTING = true;
+	JAVA_UNICODE_ESCAPE = false;
+	USER_CHAR_STREAM = true;
+	UNICODE_INPUT = true;
+	BUILD_PARSER = true;
+	BUILD_TOKEN_MANAGER = true;
+	SANITY_CHECK = true;
+	FORCE_LA_CHECK = true;
+	KEEP_LINE_COLUMN = true;
+	DEBUG_PARSER = true; // disabled by constructor
+//	GENERATE_GENERICS = true;
+//	DEBUG_TOKEN_MANAGER = true;
+}
+
+// JavaCC parser class.
+PARSER_BEGIN(ClassicParser)
+package net.sf.crsx.parser;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import net.sf.crsx.Builder;
+import net.sf.crsx.CRS;
+import net.sf.crsx.CRSException;
+import net.sf.crsx.Constructor;
+import net.sf.crsx.Factory;
+import net.sf.crsx.Kind;
+import net.sf.crsx.Maker;
+import net.sf.crsx.Parser;
+import net.sf.crsx.Sink;
+import net.sf.crsx.Stub;
+import net.sf.crsx.Term;
+import net.sf.crsx.Variable;
+import net.sf.crsx.generic.PropertiesWrapperConstructor;
+import net.sf.crsx.util.Buffer;
+import net.sf.crsx.util.ExtensibleMap;
+import net.sf.crsx.util.LinkedExtensibleMap;
+import net.sf.crsx.util.Pair;
+import net.sf.crsx.util.PropertiesConstructor;
+import net.sf.crsx.util.SinkContentHandler;
+import net.sf.crsx.util.SmallSet;
+import net.sf.crsx.util.Util;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+/**
+ * JavaCC parser for populating {@link CRS} terms using a generic syntax.
+ * The syntax is described in the "CRSX HOWTO" document.
+ *
+ * @author <a href="http://www.research.ibm.com/people/k/krisrose">Kristoffer Rose</a>.
+ * @version $Id: ClassicParser.jj,v 3.6 2013/12/09 05:48:40 krisrose Exp $
+ */
+@SuppressWarnings("unused")
+public class ClassicParser implements Parser
+{
+	// State.
+
+	/** Standard application (left recursive concatenation) constructor. */
+	private Constructor applicationConstructor;
+	
+	/** Standard list (right recursive concatenation) constructor. */
+	private Constructor sequenceCons;
+	
+	/** Standard list (right recursive concatenation) constructor. */
+	private Constructor sequenceNil;
+	
+	/** Minimal null term inserted where nothing is given in a sequence. */
+	private Stub sequenceNull;
+
+	/** Patterns for infix operators. */
+	private Map<String[], Constructor> infixPatterns = new HashMap<String[], Constructor>();
+
+	/** Factory set for parser. */
+	private Factory<? extends Term> factory;
+
+	/** Compilation unit name... */
+	private String unit;
+
+	/** Whether this parser has been used. */
+	private boolean used;
+
+	/** Whether location properties are added to constructors. */
+	private boolean captureLocations;
+	private Constructor makeConstructor(Sink sink, Token t, String s, String sort)
+	{
+		Constructor c = sort == null ? sink.makeConstructor(s) : sink.makeLiteral(s, sort);
+		return locateConstructor(sink, t, c);
+	}
+	private Constructor locateConstructor(Sink sink, Token t, Constructor c)
+	{
+		if (captureLocations && t != null)
+		{
+            c = net.sf.crsx.util.Util.wrapWithLocation(sink, c, unit, t.beginLine, t.beginColumn); //endLine and endColumn not yet used
+		}
+		return c;
+	}
+
+	// Constructors.
+	
+	/**
+	 * Create parser instance.
+	 * The parser cannot read anything, in particular it has factory == null.
+	 */
+	public ClassicParser()
+	{
+		disable_tracing();
+	}
+	
+	// Methods.
+	
+	/**
+	 * Add a new infix pattern.
+	 * @param pattern should contain a null value for each subterm and the string representation of
+	 *   the symbol for each constructor that must be present
+	 * @param constructor to actually use for such occurrences
+	 */
+	public void addInfix(String[] pattern, Constructor constructor)
+	{
+		infixPatterns.put(pattern, constructor);
+	}
+	
+	/** Remove wrapping {{...}} or .... (double ASCII or single other unicode character from each end) */
+	public String unembed(String s)
+	{
+		return s.charAt(0) <= '~' ? s.substring(2, s.length()-2) : s.substring(1, s.length()-1);
+	}
+	
+	/** Remove wrapping #'...' or &lt;em&gt;...&lt;/em&gt; pairs. */
+	private String unmeta(String s)
+	{
+		return s.startsWith("#'") ? unquote(s.substring(1)) : s.startsWith("#\"") ? unquote(s.substring(1)) : s.startsWith("<em>") ? untag(s) : s;
+	}
+	
+	/** Remove wrapping v'...' or &lt;var&gt;...&lt;/var&gt; pairs. */
+	private String unvar(String s)
+	{
+		return s.startsWith("v'") ? unquote(s.substring(1)) : s.startsWith("v\"") ? unquote(s.substring(1)) : s.startsWith("<var>") ? untag(s) : s;
+	}
+	
+	/** Remove &lt;...&gt;...&lt;/...&gt;. */
+	private String untag(String s)
+	{
+		return s.substring(s.indexOf(">")+1, s.lastIndexOf("</"));
+	}
+	
+	/** Extract category=... attribute. */
+	private String classify(String s)
+	{
+		int tagend = s.indexOf(">");
+		int attbegin = s.indexOf(" category=\"");
+		if (attbegin < tagend)
+		{
+			int catbegin = attbegin + 11;
+			int catend = s.indexOf("\"", catbegin);
+			if (catbegin < catend)
+				return s.substring(catbegin, catend);
+		}
+		return null;
+	}
+	
+	/** Remove "s from string. */
+	private static String unquote(String s)
+	{
+		return Util.unquoteJava(s);
+	}
+	
+	private boolean isLinear(String s)
+	{
+		return (s.contains("&sup1;") || s.contains("\u00B9"));
+	}
+	
+	private String unLinear(String s)
+	{
+		if (isLinear(s))
+		{
+			StringBuilder b = new StringBuilder();
+			for (int i = 0; i < s.length(); ++i)
+			{
+			    if (s.startsWith("&sup1;", i))
+				i += 5; // skip
+				else if (s.charAt(i) != '\u00B9')
+					b.append(s.charAt(i));
+			}
+			s = b.toString();
+		}
+		return s;
+	}
+	
+	/** Create a parse error on the current token with a nicely formatted message. */
+	ParseException oops(String summary, Token t, Throwable e)
+	{
+		return new ParseException(summary
+			+ (t == null ? "" : ": " + shorten(t.toString()) + " at line " + t.beginLine + ", column " + t.beginColumn)
+			+ (e == null ? "" : "\n " + e.getMessage()));
+	}
+	
+	/** Utility to dump at most 60 characters of string. */
+	static String shorten(String text)
+	{
+		return (text.length() < 60 ? text : text.substring(0,60)+"...");
+	}
+	
+	// Parser...
+	
+	public Parser parser(Factory<? extends Term> f)
+	{
+		//if (factory != null)
+		//{
+		//	Parser parser = new ClassicParser().parser(factory);
+		//	return parser;
+		//}
+		//else
+		//{
+			factory = f;
+			return this;
+		//}
+	}
+
+	private Sink realParse(Sink sink, String unit, ExtensibleMap<String, Variable> bound) throws CRSException, IOException
+	{
+		try
+		{
+			// Setup
+			this.unit = unit;
+
+			applicationConstructor = sink.makeConstructor(CRS.APPLICATION_SYMBOL);
+			sequenceCons = sink.makeConstructor(CRS.CONS_SYMBOL);
+			sequenceNil = sink.makeConstructor(CRS.NIL_SYMBOL);
+	
+			Constructor ruleConstructor = sink.makeConstructor(Builder.RULE_SYMBOL);
+			String[] ruleInfix1 = {null, "&rarr;", null};
+			addInfix(ruleInfix1, ruleConstructor);
+			String[] ruleInfix2 = {null, ":", null, "&rarr;", null};
+			addInfix(ruleInfix2, ruleConstructor);
+			String[] ruleInfix3 = {null, "\u2192", null};
+			addInfix(ruleInfix3, ruleConstructor);
+			String[] ruleInfix4 = {null, ":", null, "\u2192", null};
+			addInfix(ruleInfix4, ruleConstructor);
+	
+			Constructor sortConstructor = sink.makeConstructor(Builder.DATA_SORT_SYMBOL);
+			String[] sortInfix1 = {null, "::=", null};
+			addInfix(sortInfix1, sortConstructor);
+			Constructor funSortConstructor = sink.makeConstructor(Builder.FUNCTION_SORT_SYMBOL);
+			String[] sortInfix2 = {null, "::", null};
+			addInfix(sortInfix2, funSortConstructor);
+	
+			Buffer b = new Buffer(sink);
+			b.sink().start(sequenceNil).end();
+			sequenceNull = b.term(true);
+			if (bound == null) bound = new LinkedExtensibleMap<String, net.sf.crsx.Variable>();
+			return CompleteSequence(sink, bound);
+		}
+		catch (ParseException e)
+		{
+			throw new CRSException(e);
+		}
+	}
+	
+	public Sink parse(Sink sink, String category, Reader reader, String unit, int line, int column, ExtensibleMap<String, Variable> bound) throws CRSException, IOException
+	{
+		assert factory != null && !used : "Parser must be instantiated with .parser() and only have one use of parse()!";
+		if (category == null || category.length() == 0)
+		{
+			ClassicParser realParser = new ClassicParser(new FixedSimpleCharStream(reader, line, column));
+			realParser.parser(factory);
+			realParser.setParserVerbose(trace_enabled);
+			return realParser.realParse(sink, unit, bound);
+		}
+		else if (category.equals(CRS.XML))
+		{
+			try
+			{
+				SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+				parserFactory.setFeature("http://xml.org/sax/features/namespaces", true);
+				parserFactory.setFeature("http://xml.org/sax/features/namespace-prefixes", true);
+				SAXParser parser = parserFactory.newSAXParser();
+				SinkContentHandler handler = new SinkContentHandler(sink, this, bound, null);
+				parser.parse(new InputSource(reader), handler);
+				return handler.getSink();
+			}
+			catch (ParserConfigurationException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (SAXException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+			finally
+			{
+				//inUse = false;
+			}
+		}
+		else
+		{
+			throw new CRSException("Parser invocation error: does not support categories ("+category+")");
+		}
+	}
+
+	public final Set<String> categories = new SmallSet<String>();
+	{ categories.add(""); categories.add(CRS.XML); }
+	public Iterable<String> categories()
+	{
+		return categories;
+	}
+	
+	public void setParserVerbose(boolean verbose)
+	{
+		if (verbose)
+			enable_tracing();
+		else
+			disable_tracing();
+	}
+	
+	public void setParserLocation(boolean capture)
+	{
+		captureLocations = capture;
+	}
+}
+PARSER_END(ClassicParser)
+
+/**
+ * Top-level that requires EOF afterwards.
+ */
+Sink CompleteSequence(Sink sink, ExtensibleMap<String, Variable> bound) :
+{}
+{
+	[ <HASHBANG > ] // permit executable scripts
+	sink=Sequence(sink, bound)
+	<EOF>
+	{return sink;}
+}
+
+/**
+ * Sequence  ::=  Application ( ";" [Application] )*  .
+ */
+Sink Sequence(Sink sink, ExtensibleMap<String, Variable> bound) :
+{
+	Stub head, tail = null; // list ends
+	List<Stub> list = new ArrayList<Stub>(1);
+}
+{
+	head=BufferedApplication(sink, bound)
+	{list.add(head);}
+	(
+		<SEMI> {tail=sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING);}
+		[ tail=BufferedApplication(sink, bound) ]
+		{list.add(tail);}
+	)*
+	{
+		// t is echoed as t
+		// t1;...;tn;t, n>0, is echoed as $Cons[$t1, ...$Cons[$tn, t]...]
+		final int lastIndex = list.size() - 1;
+		for (int i = 0; i < lastIndex; ++i)
+			sink = sink.start(sequenceCons).copy(list.get(i), true);
+		sink = sink.copy(list.get(lastIndex), true); // t or $Nil
+		for (int i = 0; i < lastIndex; ++i)
+			sink = sink.end();
+		return sink;
+	}
+}
+
+/** Materialized application. */
+Term BufferedApplication(Maker maker, ExtensibleMap<String, Variable> bound) :
+{
+	Buffer buffer = new Buffer(maker);
+	Sink sink = buffer.sink();
+}
+{
+	sink=Application(sink, bound, true, null)
+	{return buffer.term(true);}
+}
+
+/**
+ * Application	::=  (Simple)+	|  C (v (":" Simple)?)* "." Application
+ * BApplication	 ::=  (v)+ "." Application  |  Application  .  // when allowBinders
+ */
+Sink Application(Sink sink, ExtensibleMap<String, Variable> bound, boolean allowBinders, Map<Variable,Term> contextVariableMap) :
+{
+	Token t;
+	Term head, tail;
+	List<Term> list = new ArrayList<Term>(1);
+	int starts = 0;
+	Map<Variable,Term> variableMap = null;
+}
+{
+	{
+		if (contextVariableMap != null && !contextVariableMap.isEmpty())
+		{
+			sink = PropertiesWrapperConstructor.start(sink, null, null, contextVariableMap, null);
+			++starts;
+		}
+	}
+	head=BufferedSimple(sink, bound) {list.add(head);}
+	( tail=BufferedSimple(sink, bound) {list.add(tail);} )*
+	[
+		// Concatenation is lambda-style abstraction.
+		t=<DOT>
+		{
+			if (head.kind() == Kind.CONSTRUCTION && head.arity() == 0)
+			{
+				// Composite form: "C v1...vn . t" = C[[v1] ... C[[vn]t]...].
+				Constructor constructor = head.constructor();
+				Variable lastVariableWithProperty = null;
+				Term lastVariableProperty = null;
+				// Get the variables...but make new ones to ensure unicity!
+				for (int i = 1; i < list.size(); ++i)
+				{
+					Term term = list.get(i);
+					if (term.kind() != Kind.VARIABLE_USE)
+						throw oops("CRS error: dot abstraction must only have variables (with optional inner property) between constructor and dot", t, null);
+					Variable tv = term.variable();
+					Variable v = sink.makeVariable(tv.name(), tv.promiscuous()); // vi
+					Variable[] bs = {v};
+					Constructor c = constructor;
+					if (lastVariableWithProperty != null)
+					{						c = Util.wrapWithProperty(sink, c, lastVariableWithProperty, lastVariableProperty);
+						lastVariableWithProperty = null;
+					}
+					sink = sink.start(captureLocations ? Util.copyLocation(sink, c, term.constructor()) : c).binds(bs); // emit C[vi.
+					++starts;
+					bound = bound.extend(v.name(), v);
+					if (i+2 < list.size() && (":".equals(Util.symbol(list.get(i+1))) || "::".equals(Util.symbol(list.get(i+1))))) // got : type
+					{
+						lastVariableWithProperty = v;
+						lastVariableProperty = list.get(i += 2);
+					}
+				}
+				if (lastVariableWithProperty != null) // last variable property bleeds to contained term
+				{
+					variableMap = new HashMap<Variable,Term>();
+					variableMap.put(lastVariableWithProperty, lastVariableProperty);
+				}
+			}
+			else if (allowBinders && head.kind() == Kind.VARIABLE_USE)
+			{
+				// Optional composite form: subterm with binders "v1:t1...vn:tn . t" = [v1,...,vn]t.
+				List<Variable> bs = new ArrayList<Variable>();
+				Variable lastVariable = null;
+				boolean afterColon = false;
+				for (int i = 0; i < list.size(); ++i)
+				{
+					Term term = list.get(i);
+					if (term.kind() != Kind.VARIABLE_USE)
+						throw oops("CRS error: binders for argument must only have variables (with optional inner property) before dot", t, null);
+					Variable tv = term.variable();
+					Variable v = sink.makeVariable(tv.name(), tv.promiscuous()); // vi
+					bs.add(v);
+					bound = bound.extend(v.name(), v);
+					if (i+2 < list.size() && (":".equals(Util.symbol(list.get(i+1))) || "::".equals(Util.symbol(list.get(i+1))))) // got : type
+					{
+						if (variableMap == null)
+							 variableMap = new HashMap<Variable,Term>();
+						variableMap.put(v, list.get(i += 2));
+					}
+				}
+				sink = sink.binds(bs.toArray(new Variable[bs.size()]));
+			}
+			else
+				throw oops("CRS error: Dot abstraction must start with simple constructor", t, null);
+		}
+		sink=Application(sink, bound, false, variableMap) // t
+		{
+			while (starts-- > 0)
+				sink = sink.end(); // emit ] after start events
+			return sink;
+		}
+	]
+	{
+	    // Check for special infix form...
+	    if (list.size() > 1)
+	    {
+			Entries : for (Map.Entry<String[], Constructor> e : infixPatterns.entrySet())
+			{
+				String[] ss = e.getKey();
+				Constructor first = null;
+				if (list.size() != ss.length)
+					continue Entries; // length mismatch
+				for (int i = 0; i < ss.length; ++i)
+				{
+					if (ss[i] != null)
+					{
+						Term term = list.get(i);
+						if (term.kind() != Kind.CONSTRUCTION || term.arity() != 0 || !ss[i].equals(term.constructor().symbol()))
+							continue Entries; // operator mismatch
+						if (first == null)
+							first = term.constructor();
+					}
+				}
+				// Match!
+				Constructor c = e.getValue();
+				if (captureLocations)
+					c = Util.copyLocation(sink, c, first);
+				sink = sink.start(c);
+				++starts;
+				for (int i = 0; i < ss.length; ++i)
+				{
+					if (ss[i] == null)
+					{
+						Term term = list.get(i);
+						sink = sink.copy(term, false);
+					}
+				}
+				while (starts-- > 0)
+					sink = sink.end(); // emit ] after start events
+				return sink;
+			}
+	    }
+
+		// Fall back to basic applicative form "f a1...an" = @[...@[f, a1],...,an].
+		for (int i = 1; i < list.size(); ++i)
+			sink = sink.start(applicationConstructor); // emit @[
+		boolean argument = false;
+		for (Term term : list)
+		{
+			sink = sink.copy(term, true); // emit f or ai
+			if (argument)
+				sink = sink.end(); // emit ] after ai
+			else
+				argument = true;
+		}
+		while (starts-- > 0)
+			sink = sink.end(); // emit ] after start events
+		return sink;
+	}
+}
+
+/** Materialized simple CRS term. */
+Term BufferedSimple(Maker maker, ExtensibleMap<String, Variable> bound) :
+{
+	Buffer buffer = new Buffer(maker);
+	Sink sink = buffer.sink();
+}
+{
+	Simple(sink, bound, new HashMap<String, Term>(), new HashMap<Variable, Term>(), new HashMap<String,Term>(), new HashSet<String>())
+	{return buffer.term(true);}
+}
+
+/**
+ * Simple  ::=	"(" Sequence? ")"  |  v[Â¹]  |	[PropPrefix] C ["[" BindingList "]"]  |	 [PropPrefix] # ["[" List "]"]	|  "{{"..."}}"	|  "%" C "{{"..."}}"
+ * PropPrefix  ::=  "{" [# ";"] [PropertyList] "}" 
+ */
+Sink Simple(Sink sink, ExtensibleMap<String, Variable> bound, Map<String, Term> properties, Map<Variable, Term> varProperties, HashMap<String,Term> metaProperties, Set<String> refs) :
+{
+	Token t; String sort = null, s, category; int embeddedOffset = 0;
+	boolean wrap = false, linear = false;
+	if (properties != null) for (Map.Entry<String, Term> e : properties.entrySet()) if (e.getValue() == null) wrap = true;
+	if (varProperties != null) for (Map.Entry<Variable, Term> e : varProperties.entrySet()) if (e.getValue() == null) wrap = true;
+	if (metaProperties != null && !metaProperties.isEmpty()) wrap = true;
+	if (!refs.isEmpty()) wrap = true;
+}
+{
+	<LROUND>
+	{
+		// Deal with property context...
+		if (wrap || properties.size() > 0 || varProperties.size() > 0 || metaProperties.size() > 0)
+		{
+			String ref = refs.isEmpty() ? null : refs.iterator().next();
+			sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
+		}
+	}
+	(
+		// (t;...;t).
+		sink=Sequence(sink, bound)
+		<RROUND>
+	|
+		// ().
+		{sink = sink.copy(sequenceNull, false);}
+		<RROUND>
+	)
+	{return wrap ? sink.end() : sink;}
+|
+	// C[b,...,b]...(including special lexical forms of constructors)
+	(
+		t=<CONSTRUCTOR> {s = t.toString();}
+	|
+		t=<ATOM> {s = unquote(t.toString());}
+	|
+		t=<NUMERIC> {s = t.toString(); sort = "$Numeric";}
+	|
+		t=<STRING> {s = unquote(t.toString()); sort = "$String";}
+	|
+		t=<COLON> {s = t.toString();}
+	|
+		t=<NOT> {s = t.toString();}
+	)
+	{
+		// Deal with property context...
+		if (wrap)
+		{
+			// Meta-properties...we need fully general pattern/contraction wrapper.
+			String ref = (refs.isEmpty() ? null : refs.iterator().next());
+			sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
+			sink=sink.start(makeConstructor(sink, t, s, sort));
+		}
+		else
+		{
+			// At most simple key=value properties so use property-extended constructor.
+		try
+			{
+				sink=sink.start(Util.wrapWithProperties(sink, makeConstructor(sink, t, s, sort), properties, varProperties));
+			}
+			catch (CRSException e)
+			{
+				throw oops("CRS Error", t, e);
+			}
+		}
+	}
+	[ <LSQUARE> [ sink=List(sink, bound, true) ] <RSQUARE> ]
+	{
+		sink = sink.end();
+		return wrap ? sink.end() : sink;
+	}
+|
+	// x | x¹ .
+	( t=<VARIABLE> {s=t.toString(); linear = isLinear(s); s = unLinear(s);} | t=<QUOTED_VARIABLE> {s=unvar(t.toString()); linear = isLinear(s); s = unLinear(s);} )
+	{{
+		if (!refs.isEmpty() || properties.size() > 0 || varProperties.size() > 0 || metaProperties.size() > 0)
+		{
+			String ref = (refs.isEmpty() ? null : refs.iterator().next());
+			sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
+			wrap = true; 
+		}
+		Variable v = bound.get(s);
+		if (v == null) v = factory.freeVariable(s, !linear, true);
+		sink = sink.use(v);
+		return wrap ? sink.end() : sink;
+	}}
+|
+	// #[t,...,t].
+	( t=<METAVARIABLE> {s=t.toString();} |	t=<QUOTED_METAVARIABLE> {s=unmeta(t.toString());} )
+	{
+		if (!refs.isEmpty() || properties.size() > 0 || varProperties.size() > 0 || metaProperties.size() > 0)
+		{{
+			String ref = (refs.isEmpty() ? null : refs.iterator().next());
+			sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
+			wrap = true; 
+		}}
+		sink = sink.startMetaApplication(s);
+	}
+	[ <LSQUARE> [ sink=List(sink, bound, false) ] <RSQUARE> ]
+	{
+		sink = sink.endMetaApplication();
+		return wrap ? sink.end() : sink;
+	}
+|
+	(
+		// {{text}}.
+		{category = null;}
+		( t=Embedded() {s = unembed(t.toString()); embeddedOffset = 1;} )
+	|
+		// %category{{text}}.
+		t=<PERCENT_NAME> {category = t.toString().substring(1).trim();}
+		( t=Embedded() {s = unembed(t.toString()); embeddedOffset = 1;} | t=<STRING> {s = unquote(t.toString()); embeddedOffset = 1;} )
+	)
+	{
+		if (!refs.isEmpty() || properties.size() > 0 || varProperties.size() > 0 || metaProperties.size() > 0)
+		{
+			String ref = (refs.isEmpty() ? null : refs.iterator().next());
+			sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
+			wrap = true; 
+		}
+		try
+		{
+			StringReader reader = new StringReader(new String(s.toCharArray())); // real clone!!
+			sink = factory.parse(sink, category, reader, unit, t.beginLine, t.beginColumn + embeddedOffset, bound);
+		}
+		catch (CRSException e)
+		{
+			Throwable cause = e.getCause();
+			if (cause instanceof ParseException)
+			{
+				// Recast parse error.
+				throw (ParseException) cause;
+			} 
+			throw oops((unit==null?"":unit + ": ")+"Parse error in embedded "+(category==null?"":category+" ")+"term at line "+t.beginLine+", column "+t.beginColumn, t, e);
+		}
+		catch (IOException e)
+		{
+			throw oops((unit==null?"":unit + ": ")+"Read error for embedded "+category+" term", t, e);
+		}
+		catch (TokenMgrError e)
+		{
+			throw oops((unit==null?"":unit + ": ")+"Read error for embedded "+category+" term", t, e);
+		}
+		return wrap ? sink.end() : sink;
+	}
+|
+	// {properties}t.
+	<LCURLY>
+	[ Property(sink, bound, properties, varProperties, metaProperties, refs) ]
+	( <SEMI> [ Property(sink, bound, properties, varProperties, metaProperties, refs) ] )*
+	<RCURLY>
+	sink=Simple(sink, bound, properties, varProperties, metaProperties, refs)
+	{
+		return sink;
+	}
+}
+
+/**
+ * List	 ::=  Application ( "," Application )*
+ * BList  ::=  BApplication ( "," BApplication )*
+ */
+Sink List(Sink sink, ExtensibleMap<String, Variable> bound, boolean allowBinders) :
+{}
+{
+	// t,...,t.
+	sink=Application(sink,bound, allowBinders, null)
+	( <COMMA> sink=Application(sink, bound, allowBinders, null) )*
+	{return sink;}
+}
+
+/**
+ * Property  ::=  ¬C  |	 C  |	C ":" Simple  |	 v  |  Â¬v  |  v ":" Simple | # | Â¬# | #name ":" Simple.
+ */
+void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Term> properties, Map<Variable, Term> varProperties, HashMap<String,Term> metaProperties, Set<String> refs) :
+{
+	Token t;
+	Term term = null;
+	boolean linear = false;
+	String p, s, category;
+}
+{
+	<NOT>
+	(
+		// ¬ C
+		( t=<CONSTRUCTOR> {p = t.toString();} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
+		{
+//			if (properties.containsKey(p))
+//				throw oops("CRS error: Cannot explicitly repeat property name in property pattern!", t, null);
+			properties.put(p, null);
+		}
+	|
+		// ¬ v
+	    ( t=<VARIABLE> {s=t.toString(); linear = isLinear(s); s = unLinear(s);} | t=<QUOTED_VARIABLE> {s=unvar(t.toString()); linear = isLinear(s); s = unLinear(s);} )
+		{{
+			Variable v = bound.get(s);
+			if (v == null) v = factory.freeVariable(s, !linear, true);
+//			if (varProperties.containsKey(v))
+//				throw oops("CRS error: Cannot explicitly repeat property variable in property pattern!", t, null);
+			varProperties.put(v, null);
+		}}
+	|
+		// ¬ #
+		( t=<METAVARIABLE> {s=t.toString();} | t=<QUOTED_METAVARIABLE> {s=unmeta(t.toString());} )
+		{
+			metaProperties.put(s, null);
+		}
+	| 
+		// ¬ %category{{text}}
+		t=<PERCENT_NAME> {category = t.toString().substring(1).trim();}
+		( t=Embedded() {s = unembed(t.toString());} | t=<STRING> {s = unquote(t.toString());} )
+		{
+			try
+			{
+				StringReader reader = new StringReader(new String(s.toCharArray())); // real clone!!
+				Term key = factory.parse(reader, category, unit, t.beginLine, t.beginColumn + 1, bound);
+				switch (key.kind())
+				{				case VARIABLE_USE : varProperties.put(key.variable(), null); break;
+				case CONSTRUCTION : properties.put(Util.symbol(key), null); break;
+				case META_APPLICATION : metaProperties.put(key.metaVariable(), null); break;
+				}
+			}
+			catch (CRSException e)
+			{
+				Throwable cause = e.getCause();
+				if (cause instanceof ParseException)
+				{
+					// Recast parse error.
+					throw (ParseException) cause;
+				} 
+				throw oops((unit==null?"":unit + ": ")+"Parse error in embedded "+(category==null?"":category+" ")+"term at line "+t.beginLine+", column "+t.beginColumn, t, e);
+			}
+			catch (TokenMgrError e)
+			{
+				throw oops((unit==null?"":unit + ": ")+"Read error for embedded "+category+" term", t, e);
+			}
+		}
+	)
+|
+	// C:t or C (short for C:()).
+	( t=<CONSTRUCTOR> {p = t.toString();} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
+	[ <COLON> term=BufferedSimple(maker, bound) ]
+	{
+//			if (properties.containsKey(p))
+//				throw oops("CRS error: Cannot explicitly repeat property name!", t, null);
+		properties.put(p, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
+	}
+|
+    ( t=<VARIABLE> {s=t.toString(); linear = isLinear(s); s = unLinear(s);} | t=<QUOTED_VARIABLE> {s=unvar(t.toString()); linear = isLinear(s); s = unLinear(s);} )
+	[ <COLON> term=BufferedSimple(maker, bound) ]
+	{{
+		Variable v = bound.get(s);
+		if (v == null) v = factory.freeVariable(s, !linear, true);
+//		if (varProperties.containsKey(v))
+//			throw oops("CRS error: Cannot explicitly repeat property variable!", t, null);
+		varProperties.put(v, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
+	}}
+|
+	// %category{{text}} : t
+	t=<PERCENT_NAME> {category = t.toString().substring(1).trim();}
+	( t=Embedded() {s = unembed(t.toString());} | t=<STRING> {s = unquote(t.toString());} )
+	[ <COLON> term=BufferedSimple(maker, bound) ]
+	{
+		try
+		{
+			StringReader reader = new StringReader(new String(s.toCharArray())); // real clone!!
+			Term key = factory.parse(reader, category, unit, t.beginLine, t.beginColumn + 1, bound);
+			switch (key.kind())
+			{
+			case VARIABLE_USE : varProperties.put(key.variable(), term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING)); break;
+			case CONSTRUCTION : properties.put(Util.symbol(key), term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING)); break;
+			case META_APPLICATION : metaProperties.put(key.metaVariable(), term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING)); break;
+			}
+		}
+		catch (CRSException e)
+		{
+			Throwable cause = e.getCause();
+			if (cause instanceof ParseException)
+			{
+				// Recast parse error.
+				throw (ParseException) cause;
+			} 
+			throw oops((unit==null?"":unit + ": ")+"Parse error in embedded "+(category==null?"":category+" ")+"term at line "+t.beginLine+", column "+t.beginColumn, t, e);
+		}
+		catch (TokenMgrError e)
+		{
+			throw oops((unit==null?"":unit + ": ")+"Read error for embedded "+category+" term", t, e);
+		}
+	}
+| 
+	( t=<METAVARIABLE> {s=t.toString();} | t=<QUOTED_METAVARIABLE> {s=unmeta(t.toString());} )
+	(
+		// #name:t
+		<COLON> term=BufferedSimple(maker, bound)
+		{
+			metaProperties.put(s, term);
+		}
+	|
+		// #rest
+		{
+			if (!refs.isEmpty())
+				throw oops("CRS error: Cannot have two property collector meta-mariables in property pattern", t, null);
+			refs.add(s);
+		}
+	)
+}
+
+/* Spaces and line comments. */
+SKIP : { " " | "\t" | "\n" | "\r" | < "//" (["\t"," "-"~","\u0080"-"\uFFF0"])* > }
+
+/* Comments. */
+SKIP : { "/*" : IN_JAVA_COMMENT }
+<IN_JAVA_COMMENT> SKIP : { <~[] | ["\u0080"-"\uFFF0"]> | "*/" : DEFAULT }
+SKIP : { "<!--" : IN_SGML_COMMENT }
+<IN_SGML_COMMENT> SKIP : { <~[] | ["\u0080"-"\uFFF0"]> | "-->" : DEFAULT }
+
+/** Basic tokens. */
+TOKEN :
+{
+	< HASHBANG : "#!" (["\t"," "-"~","\u0080"-"\uFFF0"])* > |
+  
+	/* Reserved characters. */
+	< DOT : "." > |
+	< COLON : ":" > |
+	< COMMA : "," > |
+	< SEMI : ";" > |
+	< LROUND : "(" > |
+	< RROUND : ")" > |
+	< LCURLY : "{" > |
+	< RCURLY :"}" > |
+	< LSQUARE : "[" > |
+	< RSQUARE : "]" > |
+	< NOT : "\u00AC" | "&not;" > |
+	
+	/* Names. */
+	< CONSTRUCTOR : (<CONSTRUCTOR_PREFIX> | <CONNECTOR> <PART>) (<CONNECTOR> <PART>)* > |
+	< VARIABLE : (<LINEAR>)? <VARIABLE_PREFIX> (<CONNECTOR> <PART>)* (<LINEAR>)? > |
+	< METAVARIABLE : <METAVARIABLE_PREFIX> (<CONNECTOR> <PART>)* > |
+
+	< #LINEAR : "&sup1;" | "\u00B9" > |
+
+    < QUOTED_VARIABLE : (<LINEAR>)? ("v" <STRING>) > |
+    < QUOTED_METAVARIABLE : "#" <STRING> > |
+
+	/* Internals. */
+	< #CONSTRUCTOR_PREFIX :
+		<UPPER> (<ALPHANUMERIC>)*
+		| (<OTHER>)+
+		| (<ALPHANUMERIC>)* "$" (<ALPHANUMERIC>)* // internal constructors...
+		| (["\u00D7","\u00F7","\u0391"-"\u2038","\u203B"-"\u218F","\u2200"-"\u2307","\u230C"-"\u2767","\u276A"-"\u27E5","\u27EC"-"\u2982","\u2985"-"\uF000"])+ // Unicode...
+	> |
+	< #VARIABLE_PREFIX :
+		<LOWER> (<ALPHANUMERIC>)*
+	> |
+	< #METAVARIABLE_PREFIX :
+		(<ALPHANUMERIC> | ["$","\u0391"-"\u03C9"])* ("#" (<ALPHANUMERIC> | ["$","\u0391"-"\u03C9"])* (["?","*","+"] (<DIGIT>)*)?)+
+	> |
+	< #PART : (<CONSTRUCTOR_PREFIX> | <VARIABLE_PREFIX> | <METAVARIABLE_PREFIX> | <NUMERIC> | <ATOM> | <STRING> )? > |
+	
+	/* Character classes...TODO: more of Unicode! */
+	< #UPPER : ["A"-"Z","_","$","\u00C0"-"\u00D6","\u00D8"-"\u00DE"] > |
+	< #LOWER : ["a"-"z","\u00DF"-"\u00F6","\u00F8"-"\u00FF"] > |
+	< #DIGIT : ["0"-"9"] > |
+	< #ALPHANUMERIC : <UPPER>|<LOWER>|<DIGIT> > |
+	< #CONNECTOR : ["-","_"] > |
+	< #OTHER : ["@","^","*","+","-","`","|", "/","!","?","%","=","~",":","\u2190"-"\u21ff"] > |
+	
+	/* Special. */
+	< PERCENT_NAME : "%" (<ALPHANUMERIC>)* (<CONNECTOR> <PART>)* (["?","*","+"])? > |
+
+	/* String and number literals. */
+	< STRING : "\"" (~["\\","\"","\n"] | "\\" ~["\n"])* "\""
+			 | ["\u2018","\u201A"] (~["\\","\u2019","\n"] | "\\" ~["\n"])* "\u2019"
+			 | ["\u201C","\u201E"] (~["\\","\u201D","\n"] | "\\" ~["\n"])* "\u201D"
+	> |
+	< ATOM : "\'" (~["\\","'","\n"] | "\\" ~["\n"])* "\'" > |
+	< NUMERIC : (<DIGIT>)+ ("." (<DIGIT>)+)? (["E","e"] (<DIGIT>)+)? >}
+
+// EMBEDDED STRINGS
+
+Token Embedded() :
+{Token t;}
+{
+	t=<EMBEDDED>
+	{return t;}
+}
+
+TOKEN_MGR_DECLS :
+{
+  // Nesting needs to be reentrant...so we keep track of several facts.
+  int nesting = -1; // accumulated depth of nesting (0-based)
+  int[] bases = new int[100]; // context nesting for the current nesting
+  int[] starts = new int[100]; // start bracket for current nesting
+  int[] ends = new int[100]; // end bracket for current nesting
+
+  // Action on start bracket (either for new embedded token or same as current top start bracket).
+  void startEmbedded(int start, int end, int base)
+  {
+    ++nesting;
+  	if (nesting < 100) { starts[nesting] = start; ends[nesting] = end; bases[nesting] = base; SwitchTo(EMBEDDED_IN); }
+  	else { SwitchTo(EMBEDDED_OVERFLOW); }
+  }
+
+  // Action on current end bracket.
+  void endEmbedded()
+  {
+    if (nesting-1 == bases[nesting]) { SwitchTo(EMBEDDED_END); }
+    --nesting;   }
+}
+
+// «...» Bracket.
+
+// - Initial opening bracket increases the nesting and records the start/end bracket and nesting (which is then the base nesting).
+<DEFAULT>     MORE : { "\u00AB" {startEmbedded(0x00AB, 0x00BB, nesting);} }
+// - Inner opening bracket increases the nesting and duplicates parent start/end/base-nesting.<EMBEDDED_IN> MORE : { "\u00AB" {if (starts[nesting] == 0x00AB) startEmbedded(0x00AB, 0x00BB, bases[nesting]);} }
+// - End bracket terminates the matching start bracket and possibly the entire embedded expression.
+<EMBEDDED_IN> MORE : { "\u00BB" {if (ends[nesting] == 0x00BB) endEmbedded();} }
+
+// - After the end we merely reset the nesting and produce the token.
+<EMBEDDED_END> TOKEN : { <EMBEDDED : ""> : DEFAULT }
+// --- or an error.
+<EMBEDDED_OVERFLOW> TOKEN : { "? Overflow of EMBEDDED" {nesting = 0;} : DEFAULT }
+
+// ‹...›
+<DEFAULT>     MORE : { "\u2039" {startEmbedded(0x2039, 0x203A, nesting);} }
+<EMBEDDED_IN> MORE : { "\u2039" {if (starts[nesting] == 0x2039) startEmbedded(0x2039, 0x203A, bases[nesting]);} }
+<EMBEDDED_IN> MORE : { "\u203A" {if (ends[nesting] == 0x203A) endEmbedded();} }
+
+// ❨...❩
+<DEFAULT>     MORE : { "\u2768" {startEmbedded(0x2768, 0x2769, nesting);} }
+<EMBEDDED_IN> MORE : { "\u2768" {if (starts[nesting] == 0x2768) startEmbedded(0x2768, 0x2769, bases[nesting]);} }
+<EMBEDDED_IN> MORE : { "\u2769" {if (ends[nesting] == 0x2769) endEmbedded();} }
+
+// ⟦...⟧
+<DEFAULT>     MORE : { "\u27E6" {startEmbedded(0x27E6, 0x27E7, nesting);} }
+<EMBEDDED_IN> MORE : { "\u27E6" {if (starts[nesting] == 0x27E6) startEmbedded(0x27E6, 0x27E7, bases[nesting]);} }
+<EMBEDDED_IN> MORE : { "\u27E7" {if (ends[nesting] == 0x27E7) endEmbedded();} }
+
+// ⟨...⟩
+<DEFAULT>     MORE : { "\u27E8" {startEmbedded(0x27E8, 0x27E9, nesting);} }
+<EMBEDDED_IN> MORE : { "\u27E8" {if (starts[nesting] == 0x27E8) startEmbedded(0x27E8, 0x27E9, bases[nesting]);} }
+<EMBEDDED_IN> MORE : { "\u27E9" {if (ends[nesting] == 0x27E9) endEmbedded();} }
+
+// ⟪...⟫
+<DEFAULT>     MORE : { "\u27EA" {startEmbedded(0x27EA, 0x27EB, nesting);} }
+<EMBEDDED_IN> MORE : { "\u27EA" {if (starts[nesting] == 0x27EA) startEmbedded(0x27EA, 0x27EB, bases[nesting]);} }
+<EMBEDDED_IN> MORE : { "\u27EB" {if (ends[nesting] == 0x27EB) endEmbedded();} }
+
+// ⦃...⦄
+<DEFAULT>     MORE : { "\u2983" {startEmbedded(0x2983, 0x2984, nesting);} }
+<EMBEDDED_IN> MORE : { "\u2983" {if (starts[nesting] == 0x2983) startEmbedded(0x2983, 0x2984, bases[nesting]);} }
+<EMBEDDED_IN> MORE : { "\u2984" {if (ends[nesting] == 0x2984) endEmbedded();} }
+
+// All other content just included (must be last).
+<EMBEDDED_IN> MORE : { <~[]> }

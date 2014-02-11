@@ -1,0 +1,102 @@
+// Copyright
+// $Id: infer2,v 1.1 2013/05/15 21:31:05 krisrose Exp $
+
+// Usage: $Meta[$Use['std/Infer.crs']]
+//
+// Translating deterministic inference rules to CRSX rules.
+//
+// The rules below rewrite inference rules of the form
+//
+//   ∀ v-1 v-2..v-k . (  #Question-1  ⇒[#Name-1]  #Answer-1 ;  ...  #Question-n  ⇒[#Name-n]  #Answer-n ; )
+//   ----[#Rule]
+//   #Question ⇒[#Name] #Answer
+//
+// (with n,k ≥ 0) into sequences of rewrite rules.
+//
+// The generated rewrite rules implement a rewrite system such that a term of the form
+//   ?-Name [ Question ]
+// rewrites to the term
+//   Answer
+// if and only if if a proof tree can be constructed deterministically, using all the rules, for the judgment
+//   Question ⇒[Name] Answer
+//
+// Determinacy is ensured by requiring that every inference rule is subject to the following restrictions:
+//
+//   1. Each #Rule and #Name should be a legal CRSX rule name, optionally including rule options as required by the following points.
+//   2. #Question and #Answer-i (1≤i≤n) must each be a permissible rule pattern. The meta-variables used across all these patterns must be distinct.
+//   3. Each #Question-i (1≤i≤n) must be a permissible rule contractum where meta-variables from the #Question and #Answer-j (1≤j<i) patterns are permitted.
+//   4. #Answer must be a permissible rule contractum, where meta-variables from all the patterns are permitted.
+//   5. Free variables x can be used with the same occurrence restrictions as meta-variables, however, in that case the name of the rule must declare it with #Name[Free[x]] just as it would have to be in rules.
+//   6. Fresh free variables x may be introduced in a contractum without having occurred in a pattern, in that case they must instead be declared with #Name[Fresh[x]] just as in normal rules. 
+//
+// Terms with n = 0 are called "axioms", and rules where k > 0 are described as "higher order".
+
+Infer2Rules[(
+
+// For each ?-Name[Question] we use a series of special terms
+//   !-Rule-Name-i[Question, ?-Rule-i[Question-i], Answer-i-1,...,Answer-1]
+// (with 1≤i≤n) where each then permits recursive evaluation of the i'th premise.
+//
+Inference[Share[#Name,#Options,#Rule,#Question]]
+:
+(
+ #Premises
+ ----[$[C,#Rule,#Options]]
+ #Question ⇒[#Name] #Answer
+)
+→
+(
+ ($[C,$[:,#Rule,-,0],#Options] : $[C,$[:,?,-,#Name],(#Question;)] → $[C,$[:,!,-,#Rule,-,#Name,-,1],(#Question;)])
+ ;
+ $InferencePremises[#Premises, #Name, #Options, #Rule, 1, #Question, (), #Answer]
+)
+;
+
+// Premises are translated with free variables.
+//
+$InferencePremises[∀ v.#Ps[v], #N, #Os, #R, #i, #Q, #As, #A]
+→
+( ∀ v . $InferencePremises[#Ps[v], #N, (Free[v];#Os), #R, #i, #Q, #As, #A] )
+;
+
+// Advance to the i'th premise: the pattern
+//   !-R-N-i[(Q; (Ai-1;...;A1;)]
+// matches after we successfully proved the (i-1)'th premise. We use
+//   !-R-N-i+1[(Q; ?-Ri[Qi]; Ai-1;...;A1;)]
+// to initiate building the proof for the i'th premise and continue.
+//
+Inference-Premise-Next [Share[#N,#Os,#R,#Q,#As]]
+:
+$InferencePremises[(#Qi ⇒[#Ri] #Ai ; #Ps), #N,#Os,#R,#i, #Q, #As, #A]
+→ (
+ ($[C,$[:,#N,-,#i],(Lax;#Os)] : $[C,$[:,!,-,#R,-,#N,-,#i], (#Q; #As)] → $[C,$[:,!,-,#R,-,#N,-,$[Plus,#i,1]], (#Q; $[C,$[:,?,-,#Ri],(#Qi;)]; #As)])
+ ;
+ $InferencePremises[#Ps, #N,#Os,#R,$[Plus,#i,1], #Q, (#Ai ; #As), #A]
+)
+;
+
+// Wrap it up: the pattern !-R-N-n+1[(Q; An;...;A1;)] matches after we successfully
+// proved all n premises and thus the entire proof step.
+//
+Inference-Premise-Done [Share[#N,#i]]
+:
+$InferencePremises[(), #N,#Os,#R,#i, #Q, #As, #A]
+→
+( $[C,$[:,#N,-,#i],(Lax;#Os)] : $[C,$[:,!,-,#R,-,#N,-,#i],(#Q; #As)] → #A )
+;
+
+// Handle tail premise gracefully.
+//
+Inference-Premise-Tail
+:
+$InferencePremises[(#Qi ⇒[#Ri] #Ai), #N,#Os,#R,#i, #Q, #As, #A]
+→
+$InferencePremises[(#Qi ⇒[#Ri] #Ai ;), #N,#Os,#R,#i, #Q, #As, #A]
+;
+
+// Name the anonymous inference line and judgment arrow. 
+//
+⇒ → ⇒[''] ;
+---- → ----[''] ;
+
+)]

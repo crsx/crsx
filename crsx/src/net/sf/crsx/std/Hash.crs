@@ -1,0 +1,57 @@
+// Copyright © 2014 IBM Corporation.
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// SUPPORT FOR TERM HASHING.
+//
+// A Hash[TermSort, IdSort] is a mapping from terms of TermSort to values of IdSort.
+//
+// It only supports two operation:
+//
+//    NewHash :: Hash[TermSort, IdSort]
+//    HashInsert[ #hash :: Hash[TermSort, IdSort], #term :: TermSort, #new :: IdSort]
+//
+// The NewHash operation just returns an empty hash.
+//
+// The HashInsert operation can return one of two values:
+//
+// * H_NEW[#hash :: Hash[TermSort, IdSort]] :: HashResult[TermSort,IdSort]
+//     indicates that the #term was inserted and will now map to the #new id in the updated #hash.
+//
+// * H_OLD[#hash :: Hash[TermSort, IdSort], #old :: IdSort] :: HashResult[TermSort, IdSort]
+//    indicates that the #term was already recorded as mapping to the #old id but we still return a new #hash.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+Hash[(
+
+∀ a b . Hash[a,b] ::=( {$String : $List[HashMember[a,b]]} HASH; );
+∀ a b . HashMember[a,b] ::=( H_MEMBER[a<!--term-->, b<!--variable-->]; );
+∀ a b . HashResult[a,b] ::=( H_NEW[Hash[a,b]]; H_OLD[Hash[a,b], b<!--variable-->]; );
+
+∀ a b . HashInsert[Hash[a,b], a<!--term-->, b<!--new variable-->] :: HashResult[a,b] ;
+-[Share[#term]] : HashInsert[#hash, #term, #new] → HashInsert2[#hash, #term, $[HashCode, #term], #new] ;
+
+∀ a b . HashInsert2[Hash[a,b], a, $String, b] → HashResult[a] ;
+-[Share[#code]] : HashInsert2[{#H}HASH, #term, #code, #new] → HashInsert3[{#H}HASH, #term, $[{#H}Get[$List[HashMember[a,b]]], #code, ()], #code, #new] ;
+
+∀ a b . HashInsert3[Hash[a,b], a, $List[HashMember[a,b]], $String, b] → HashResult[a,b] ;
+-[Copy[#members]] : HashInsert3[#hash, #term, #members, #code, #new] → HashInsert4[#members, #hash, #term, #members, #code, #new] ;
+
+∀ a b . HashInsert4[$List[HashMember[a,b]], Hash[a,b], a, $List[HashMember[a,b]], $String, b] → HashResult[a,b] ;
+//
+HashInsert4[(), {#H}HASH, #term, #members, #code, #new]
+→
+H_NEW[{#H; #code : ( H_MEMBER[#term, #new] ; #members )}HASH]  // did not find the term: update hash
+;
+//
+-[Share[#term]]:
+HashInsert4[(H_MEMBER[#candidate, #old]; #rest), #hash, #term, #members, #code, #new]
+→
+$[If, $[DeepEqual, #candidate, #term], // check the #candidate...
+  H_OLD[#hash, #old], // ...found the term: return existing id
+  HashInsert4[#rest, #hash, #term, #members, #code, #new] // ...not right candidate, search on
+]
+;
+
+)]

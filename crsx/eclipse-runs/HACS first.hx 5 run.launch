@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/crsx/src/net/sf/crsx/run/Crsx.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sf.crsx.run.Crsx"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="allow-unnamed-rules&#10;&quot;grammar=('net.sf.crsx.samples.gentle.FirstParser';'net.sf.crsx.text.Text';)&quot;&#10;rules=/home/krisrose/workspace/crsx/samples/gentle/first.crs-ref&#10;sink=net.sf.crsx.text.TextSink width=40&#10;category=firstStat&#10;&quot;term={ initial := 1; rate := 1.0; position := initial + rate * 60; }&quot;&#10;&quot;wrapper=$Print-Action-Compile&quot;&#10;verbose=3"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="crsx"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:crsx/samples/gentle}"/>
+</launchConfiguration>

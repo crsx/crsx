@@ -1,0 +1,41 @@
+// Copyright (c) 2010 IBM Corporation.
+// $Id: Lib.crs,v 3.0 2012/12/17 18:04:57 krisrose Exp $
+
+/**
+<h3>Lib: Standard declarations</h3>
+*/
+
+Lib[(
+
+/** #u is the standard unit type (that does not permit variables). */
+#u ::=( $u ;);
+
+/** Token location information. */
+#location ::=( $location[$String] ;) ;
+
+/** Standard booleans. */
+#boolean ::=( $false ; $true ;);
+
+/** Standard lists. */
+∀ a . #list[a] ::=( () ; (a;#list[a]) ;);
+
+∀ a . Length[#list[a]] :: $Numeric ;
+Length[#] → Length2[#, 0] ;
+
+∀ a . Length2[#list[a], $Numeric] :: $Numeric ;
+-             : Length2[()    , #n] → #n ;
+-[Discard[#]] : Length2[(#;##), #n] → Length2[##, $[Plus,1,#n]] ;
+
+
+
+
+
+
+∀ a b . Map[x:a.b, #list[a]] :: #list[b] ;
+-[Copy[#,#x]] : Map[x.#[x], (#x; #xs)] → ( #[#x]; Map[x.#[x], #xs]) ;
+-[Discard[#]] : Map[x.#[x], ()       ] → () ;
+
+∀ a . IfZero[$Numeric, a, a] :: a ;
+-[Data[#n]] : IfZero[#n, #true, #false] → $["IfZero", #n, #true, #false] ;
+
+)]

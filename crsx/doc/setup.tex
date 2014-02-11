@@ -1,0 +1,45 @@
+%% $Id: setup.tex,v 3.1 2013/08/23 07:12:32 krisrose Exp $
+
+%% Format.
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,stmaryrd,textcomp}
+\allowdisplaybreaks %style
+\usepackage[normalem]{ulem}
+\usepackage{utf8math}
+\usepackage{url}
+\usepackage{xspace}
+\usepackage{rcs}
+\usepackage[all]{xy}
+
+%% Macros.
+\newcommand{\HAX}{\text{HACS}\xspace}
+\newcommand{\CRSX}{\text{CRSX}\xspace}
+\newcommand{\ie}{\textit{i.e.}\xspace}
+\newcommand{\eg}{\textit{e.g.}\xspace}
+\newcommand{\etc}{\textit{etc.}\xspace}
+\newcommand{\aka}{\textit{aka.}\xspace}
+\newcommand{\TBD}[1][]{\textit{To Be Done…#1}\marginpar{\bf TBD}}
+
+%% Units
+\usepackage{amsthm}
+\swapnumbers %style
+\newtheorem{theorem}{Theorem}[subsection]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{invariant}[theorem]{Invariant}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+%% Code listings.
+\usepackage{fancyvrb}
+\CustomVerbatimEnvironment{code}{Verbatim}{tabsize=4,fontsize=\small,numbers=left,numberblanklines=false,xleftmargin=\parindent}
+\CustomVerbatimCommand{\inputcode}{VerbatimInput}{tabsize=4,fontsize=\footnotesize,numbers=left,numberblanklines=false,xleftmargin=\parindent}
+\DefineShortVerb{\"} % makes " work in verbatim even when \active
+
+%% Identifiers
+\newcommand{\set}[1]{\textit{#1}}
+\newcommand{\op}[1]{\operatorname{#1}}

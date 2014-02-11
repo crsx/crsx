@@ -1,0 +1,58 @@
+<h2>Translate Block expression to string</h2>
+
+<h3>Grammar</h3>
+<blockquote>
+  P ::= Block[<em>string</em>, B] .<br>
+  B ::= ()  |  ( B ; B ) | Open[<em>string</em>] | Close[<em>string</em>] | State | Push[<em>string</em>] | Wrap[<em>string</em>, <em>string</em>] | Join[<em>string</em>] .
+</blockquote>
+
+<h3>Semantics</h3>
+<div>
+<dl>
+
+<dt>Block[<em>filename</em>, ( B<sub>1</sub> ;...; B<sub>n</sub> ;)]
+<dd>Do individual blocks in sequence, dumping the result on the <em>filename</em>.
+
+<dt>Open[<em>string</em>]
+<dd>Open a new block (using the string as delimiter). Open and Close must match.
+
+<dt>Close[<em>string</em>]
+<dd>Open a block (using the string as delimiter). Open and Close must match.
+
+<dt>State
+<dd>Add the top expression as a statement onto the current block.
+
+<dt>Push[<em>string</em>]
+<dd>Push the specified constant on the current expression stack.
+
+<dt>Wrap[<em>string</em>, <em>string</em>]
+<dd>Wrap the indicated pre- and post-fix around the current expression.
+
+<dt>Join[<em>string</em>]
+<dd>Pop the top expression off the expression stack, and then append it to the top expression on the stack separated by the string.
+
+</dl>
+</div>
+
+<h3>Rules</h3>
+<div>
+The rules translate each Block construction to Joel instructions to dump the corresponding text on a file.
+</div>
+<PRE>
+Block2String[(
+  Block[#file, #block] &rarr; Let["net.sf.crsx.SourceBuilder", New["net.sf.crsx.util.PlainSourceBuilder", #file], b._B[b, #]] ;
+
+  _B[#builder, ()] &rarr; ( Invoke[#builder, close] ;) ;
+  _B[#builder, (#first ; #rest)] &rarr; ( _B[#builder, #first] ; _B[#builder, #rest] ) ;
+
+  _B[#builder, Open[#open]] &rarr; Invoke[#builder, "openBlock", String[#open]] ;
+  _B[#builder, Close[#close]] &rarr; Invoke[#builder, "closeBlock", String[#close]] ;
+
+  _B[#builder, State] &rarr; Invoke[#builder, "addStatement", Invoke[#builder, "harvest"]] ;
+
+  _B[#builder, Push[#seed]] &rarr; Invoke[#builder, "seedExpression", String[#seed]] ;
+  _B[#builder, Wrap[#pre,#post]] &rarr; Invoke[#builder, "wrapExpression", String[#pre], String[#post]] ;
+  _B[#builder, Join[#separator]] &rarr; Invoke[Invoke[#builder, "wrapExpression", String[""], String[#separator]], "wrapExpression", String[""], Invoke[#builder, "harvest"]] ;
+
+)] ;
+</PRE>

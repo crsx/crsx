@@ -1,0 +1,216 @@
+<html><head><title>infer.crs</title></head><body>
+<h2>Translating inference rules to CRSX rules</h2>
+<blockquote>
+  <p>
+    The rules below rewrite inference rules of the form
+  <p align="center">
+    <TABLE cellpadding="0" cellspacing="0" summary="">
+      <TR valign="middle" align="center">
+        <TD>
+          <span>
+          <em>Question</em><sub>1</sub>  &rArr; <em>Conclusion</em><sub>1</sub>
+          &emsp;...&emsp;
+          <em>Question</em><sub>n</sub>  &rArr; <em>Conclusion</em><sub>n</sub>
+          </span>
+      </TR>
+      <TR>
+        <TD><HR noshade="noshade" size="1" style="color:black" />
+        <TD>&ensp;<em>Name</em>
+      </TR>
+      <TR valign="middle" align="center">
+        <TD><em>Question</em> &rArr; <em>Conclusion</em>
+      </TR>
+    </TABLE>
+  <p>
+    or, equivalently in pure ASCII CRSX form,
+<pre>
+    (
+     ( #Question-1 &amp;rArr; #Conclusion-1 ; ...; #Question-n &amp;rArr; #Conclusion-n )
+     #Name
+     #Question &amp;rArr; #Conclusion
+    )
+</pre>
+    with n&ge;0 (terms with n=0 are called "axioms") into sequences of
+    rewrite rules.
+  <p>
+    An inference rule is subject to the following restrictions:
+    <ol>
+
+      <li>
+        <em>Name</em> should be a legal CRSX rule name, optionally
+        including rule options as required by the following points.
+
+      <li>
+        <em>Question</em> and <em>Conclusion</em><sub>i</sub>
+        (1&le;i&le;n) must each be a permissible
+        rule <em>pattern</em>.  The meta-variables used across all
+        these patterns must be distinct.
+
+      <li>
+        Each <em>Question</em><sub>i</sub> (1&le;i&le;n) must be a
+        permissible rule <em>contractum</em> where meta-variables from
+        the <em>Question</em> and <em>Conclusion</em><sub>j</sub>
+        (1&le;j&lt;i) patterns are permitted.
+
+      <li>
+        <em>Conclusion</em> must be a permissible
+        rule <em>contractum</em>, where meta-variables from all the
+        patterns are permitted.
+
+      <li>
+        Free variables <var>x</var> can be used with the same
+        occurrence restrictions as meta-variables, however, in that
+        case the name of the rule must declare it
+        with <em>Name</em>[Free[<var>x</var>]] just as it would have
+        to be in rules.
+
+      <li>
+        Fresh free variables <var>x</var> may be introduced in a
+        contractum without having occurred in a pattern, in that case
+        they must instead be declared
+        with <em>Name</em>[Fresh[<var>x</var>]] just as in normal
+        rules.
+
+    </ol>
+  <p>
+    The generated rules implement rewrites such that the "query" term
+    ?-[<em>Question</em>] rewrites to the term <em>Conclusion</em> if
+    and only if a proof tree can be constructed deterministically with
+    the involved rule(s) for the judgment
+    <em>Question</em> &rArr; <em>Conclusion</em>.  (Some cases of
+    non-determinism are handled by transforming the generated rules
+    but that is not discussed here.)
+  <p>
+    Finally, each double arrow can be given a name as an argument,
+    like &rArr;[<em>Rule</em>], which makes the query term take the form
+    ?-<em>Rule</em>[<em>Question</em>] .
+  </p>  
+
+  <h5>Usage</h5>
+<pre>
+    $Meta[ $Load['infer'] ] ;
+</pre>  
+
+</blockquote>
+
+<H4>Infer2Rules[(</H4>
+<DL>
+
+<DT>
+  Inference [Share[<em>Name</em>,<em>Free</em>,<em>Rule</em>,<em>Question</em>]] :
+<DD>
+  <blockquote>
+    The use of an inference rule corresponds to a rewrite from
+    ?-<em>Rule</em>[<em>Question</em>] to a series of special terms
+    !-<em>Rule</em>-<em>Name</em>-i[<em>Question</em>,
+    ?-<em>Rule</em><sub>i</sub>[<em>Question</em><sub>i</sub>],
+    <em>Conclusion</em><sub>i-1</sub>,...,<em>Conclusion</em><sub>1</sub>]
+    (1&le;i&le;n) where each then permits recursive evaluation of
+    the i'th premise.
+  </blockquote>
+  <P>
+    <span>
+      <TABLE cellpadding="0" cellspacing="0" summary="">
+        <TR align="center">
+          <TD>
+            <em>Premises</em>
+        </TR>
+        <TR>
+          <TD><HR noshade="noshade" size="1" style="color:black" />
+          <TD>&ensp; $[C,<em>Name</em>,<em>Free</em>]
+        </TR>
+        <TR align="center">
+          <TD><em>Question</em> &rArr;[<em>Rule</em>] <em>Conclusion</em>
+        </TR>
+      </TABLE>
+    </span>
+  <P>
+    &rarr;
+  <P>
+    (<BR>&ensp;
+    $[C,$[:,<em>Name</em>,-,0],<em>Free</em>] :
+    $[C,$[:,?,-,<em>Rule</em>],(<em>Question</em>;)]
+    &rarr;
+    $[C,$[:,!,-,<em>Rule</em>,-,<em>Name</em>,-,1],(<em>Question</em>;)]<BR>&ensp;
+    ;
+    <BR>&ensp;
+    $InferencePremises[<em>Premises</em>, <em>Name</em>,<em>Free</em>,<em>Rule</em>,1, <em>Question</em>, (), <em>Conclusion</em>]
+    <BR>
+    ) ;
+  <P>
+
+<DT>
+  Inference-Premise-Next [Share[<em>N</em>,<em>F</em>,<em>R</em>,<em>Q</em>,<em>Cs</em>]] :
+<DD>
+  <blockquote>
+    Advance to the <em>i</em>'th premise: the pattern
+    !-<em>R</em>-<em>N</em>-<em>i</em>[(<em>Q</em>;
+    (<em>C</em><sub><em>i</em>-1</sub>;...;<em>C</em><sub>1</sub>;)]
+    matches after we successfully proved the (<em>i</em>-1)'th premise.
+    We use 
+    !-<em>R</em>-<em>N</em>-<em>i</em>+1[(<em>Q</em>;
+    ?-<em>R</em><sub><em>i</em></sub>[<em>Q</em><sub><em>i</em></sub>];
+    <em>C</em><sub><em>i</em>-1</sub>;...;<em>C</em><sub>1</sub>;)]
+    to initiate building the proof for the <em>i</em>'th premise and
+    continue.
+  </blockquote>
+  <P>
+    $InferencePremises[(<em>Q</em><sub>i</sub> &rArr;[<em>R</em><sub>i</sub>] <em>C</em><sub>i</sub> ; <em>Ps</em>), <em>N</em>,<em>F</em>,<em>R</em>,<em>i</em>, <em>Q</em>, <em>Cs</em>, <em>C</em>]
+    <BR>
+    &rarr; (<BR>&ensp;
+      $[C,$[:,<em>N</em>,-,<em>i</em>],(Lax;<em>F</em>)] :<BR>&ensp;&ensp;
+        $[C,$[:,!,-,<em>R</em>,-,<em>N</em>,-,<em>i</em>], (<em>Q</em>; <em>Cs</em>)]<BR>&ensp;&ensp;
+        &rarr; $[C,$[:,!,-,<em>R</em>,-,<em>N</em>,-,$[Plus,<em>i</em>,1]], (<em>Q</em>; $[C,$[:,?,-,<em>R</em><sub>i</sub>],(<em>Q</em><sub>i</sub>;)]; <em>Cs</em>)]<BR>&ensp;
+      ;<BR>&ensp;
+      $InferencePremises[<em>Ps</em>, <em>N</em>,<em>F</em>,<em>R</em>,$[Plus,<em>i</em>,1], <em>Q</em>, (<em>C</em><sub>i</sub> ; <em>Cs</em>), <em>C</em>]<BR>
+    ) ;
+  <P>
+
+<DT>
+   Inference-Premise-Done [Share[<em>N</em>,<em>i</em>]] :
+<DD>
+  <blockquote>
+    Wrap it up: the pattern
+    !-<em>R</em>-<em>N</em>-n+1[(<em>Q</em>;
+    <em>C</em><sub>n</sub>;...;<em>C</em><sub>1</sub>;)] matches
+    after we successfully proved all n premises and thus the entire
+    proof step.
+  </blockquote>
+  <P>
+    $InferencePremises[(), <em>N</em>,<em>F</em>,<em>R</em>,<em>i</em>, <em>Q</em>, <em>Cs</em>, <em>C</em>]<BR>
+    &rarr; ( $[C,$[:,<em>N</em>,-,<em>i</em>],(Lax;<em>F</em>)] : $[C,$[:,!,-,<em>R</em>,-,<em>N</em>,-,<em>i</em>],(<em>Q</em>; <em>Cs</em>)] &rarr; <em>C</em> ) ;
+  <P>
+
+<DT>
+  Inference-Premise-Last :
+<DD>
+  <blockquote>
+    Handle last premise gracefully.
+  </blockquote>
+  <P>
+    $InferencePremises[(<em>Q</em><sub>i</sub> &rArr;[<em>R</em><sub>i</sub>] <em>C</em><sub>i</sub>), <em>N</em>,<em>F</em>,<em>R</em>,<em>i</em>, <em>Q</em>, <em>Cs</em>, <em>C</em>]
+    <BR>
+    &rarr; 
+      $InferencePremises[(<em>Q</em><sub>i</sub> &rArr;[<em>R</em><sub>i</sub>] <em>C</em><sub>i</sub> ;), <em>N</em>,<em>F</em>,<em>R</em>,<em>i</em>, <em>Q</em>, <em>Cs</em>, <em>C</em>]
+    ;
+  <P>
+
+<DT>
+  Inference-Anonymous :
+<DD>
+  <blockquote>
+    Names the anonymous judgment arrow.
+  </blockquote>
+  <P>
+    &rArr;
+    &rarr;
+    &rArr;['']
+    ;
+  <P>
+
+</DL>
+<H4>)]</h4>
+
+<hr><address>$Id: infer.old.html,v 3.0 2012/12/17 18:04:57 krisrose Exp $</address>
+</body>
+</html>

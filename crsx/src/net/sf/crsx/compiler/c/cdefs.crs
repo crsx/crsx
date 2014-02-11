@@ -1,0 +1,22 @@
+// Copyright © 2012 IBM Corporation
+// $Id: cdefs.crs,v 3.5 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPER FUNCTIONS TO ANALYZE REIFIED CRSX RULES AND WRITE C TEXT
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+CDEFS[(
+
+$Use["compiler/reify.crs"];
+$Use["compiler/defs.crs"];
+
+$Lax;
+
+D-check-sort[Text, Text, Reified_Sort] :: Text;
+
+D-check-sort[#sink, #termp, SORT-PROPERTY[#1,#2,#sort]] → D-check-sort[#sink, #termp, #sort] ;
+D-check-sort[#sink, #termp, SORT-VARIABLE[#var]] → %n⟪⟫ ;
+D-check-sort[#sink, #termp, SORT[#sort, #args]] → $[If, $[Contains, #sort, "$"], %n⟪⟫, %n⟪CRSX_CHECK_SORT(«#sink»->context, «#termp», &« Sort[#sort] »); ⟫] ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //D

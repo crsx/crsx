@@ -1,0 +1,65 @@
+class net.sf.crsx.parser.CrsxParser : <ConfiguredTerm>
+
+<ConfiguredTerm> ::= <Configuration>? <Term> .
+
+<Configuration> ::= "configuration" .
+
+<Term> ::= <Simple>+#				⟦ $[Normalize, Simple#] ⟧ .
+
+<Simple> ::= <Properties>*# <Unit({{Properties#}})> .
+
+<Unit(Properties#)>
+		VARIABLE#!!!
+	     	( "[" <CommaList>?# "]"		⟦ $[M, VARIABLE#, CommaList#] ⟧
+		|				⟦ $[V, VARIABLE#] ⟧
+		)
+         |
+		CONSTRUCTOR#$
+	     	( "[" <CommaScopedList>?# "]"	⟦ $[C, Constructor#, CommaScopedList#] ⟧
+		|     			  	⟦ $[C, Constructor#[]] ⟧
+		)
+         .
+
+<CommaScopedList> ::= <ScopedTerm> ( "," <ScopedTerm> )* .
+
+<CommaList> ::= <Term> ( "," <Term> )* .
+
+<ScopedTerm> ::= <Simple>+#
+                 ( "." <Term>#			⟦ $[Binds, Simple#, Term#] ⟧
+                 |     				⟦ $[Normalize, Simple#] ⟧
+                 )
+	     .
+
+NOT ::= "&not;" | #xAC .
+LINEAR ::= "&sup1;" | #xB9 .
+
+CONSTRUCTOR ::= (CONSTRUCTOR_PREFIX | CONNECTOR PART) CONNECTOR PART* .
+VARIABLE ::= VARIABLE_PREFIX CONNECTOR PART* .
+STRING ::= "\"" (~["\\","\"","\n"] | "\\" ~["\n"])* "\"" | "\'" (~["\\","'","\n"] | "\\" ~["\n"])* "\'" .
+
+fragment CONSTRUCTOR_PREFIX ::=
+      UPPER (ALPHANUMERIC)*
+      | (DIGIT)+ ("." (DIGIT)+)? (["E","e"] (DIGIT)+)?
+      | (ENTITY)+
+      | (OTHER)+
+      | "$" (ALPHANUMERIC)* // internal constructors...
+      .
+
+fragment VARIABLE_PREFIX ::=
+      LOWER (ALPHANUMERIC)*
+      ((ALPHANUMERIC)+ | (ENTITY)+)? ("#" ((ALPHANUMERIC)+ | (ENTITY)+)? (["?","*","+"])?)+
+      .
+
+fragment PART ::= (CONSTRUCTOR_PREFIX | VARIABLE_PREFIX)? .
+
+fragment UPPER ::= ["A"-"Z","_"] .
+fragment LOWER ::= ["a"-"z"] .
+fragment DIGIT ::= ["0"-"9"] .
+fragment ALPHANUMERIC ::= UPPER|LOWER|DIGIT .
+fragment CONNECTOR ::= ["-"] .
+fragment OTHER ::= ["@","^","*","+","-","`","|", "/","\\","!","?","$","%","=","~",":",#x2190-#x21ff] .
+
+fragment ENTITY ::= ("&" ("#" (DIGIT)+ | (ALPHANUMERIC|CONNECTOR)+) ";") .
+fragment MATCHEDTEXT ::= ( ~["<",">","&"] | ENTITY)* .
+
+skip ::= (" " | "\t" | "\n" | "\r" | "&ensp;" | "&thinsp;" | "//" ~['\n']* ) .

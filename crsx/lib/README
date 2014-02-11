@@ -1,0 +1,12 @@
+Populate this directory with the following libraries:
+
+* Get http://java.net/projects/javacc/downloads/download/oldversions%252Fjavacc-4.2.zip
+	(or any later version), extract javacc-4.2/bin/lib/javacc.jar, and
+    store it here as javacc.jar.
+
+* Get http://www.antlr.org/download/antlr-runtime-3.1.3.jar and
+	store it here as antlr-runtime-3.1.3.jar.
+
+* Optionally get http://www.antlr.org/download/antlr-3.1.3.jar and
+	store it here as antlr-3.1.3.jar
+	(and optionally download and make the source available as antlr-3.1.3.src.zip).

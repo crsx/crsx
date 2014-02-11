@@ -1,0 +1,22 @@
+// Copyright (c) 2010 IBM Corporation.
+// $Id: Text.crs,v 3.0 2012/12/17 18:04:57 krisrose Exp $
+
+// Text support.
+// Should probably be combined with 
+
+Text[(
+
+// Support the special text syntax.
+$AddGrammar['net.sf.crsx.text.Text'] ;
+
+// Sorts using constructors from grammar.
+Text ::= ( $TextCons[Text-Part, Text] ; $TextNil ; ) ;
+Text-Part ::= (
+	$TextChars[$String] ;
+	$TextBreak[$String] ;
+	$TextSeparator ;
+	$TextGroup[Text] ;
+	$TextIndent[Text] ;
+) ;
+
+)]

@@ -1,0 +1,119 @@
+// Copyright © 2012,2013 IBM Corporation
+// $Id: symbols.crs,v 3.4 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C SYMBOLS FILE TEXT FROM REIFIED CRSX.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SYMBOLS[(
+
+$Use["compiler/c/cdefs.crs"];
+
+$Lax;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// C HEADER FILE TEMPLATE.
+//
+// Create text of name.h file.
+//
+// Environment:
+// - HEADERS: ;-separated list of header file base names.
+
+ComputeSymbols[Reify_CRSX] :: Text;
+
+ComputeSymbols[CRSX[#name, #Declarations]]
+→
+ComputeSymbols2[#name, #Declarations, $[Get[$String], "MODULE", ""]]
+;
+
+ComputeSymbols2[$String, $List[Reified_Declaration], $String] :: Text;
+
+-[Discard[#name, #module]]
+:
+ComputeSymbols2[#name, #Declarations, #module]
+→
+%n⟪«X-Declarations[#Declarations]»
+⟫
+;
+
+// « MapText[x.X-Declaration[x], #Declarations] »
+
+X-Declarations[$List[Reified_Declaration]] :: Text;
+
+X-Declarations[(#Declaration; #Rest)] 	→ %n⟪«X-Declaration[#Declaration]»«X-Declarations[#Rest]»⟫;
+X-Declarations[()]						→ %n⟪⟫;
+
+X-Declaration[Reified_Declaration] :: Text;
+
+Polymorphic[Fresh[arg::Reified_Variable]] : X-Declaration[POLYMORPHIC[a.#Declaration[a]]                          ]        → X-Declaration[#Declaration[arg]] ;
+Data                                      : X-Declaration[DATA[#Sort, #Forms]                                     ]        → X-Data[#Sort, #Forms] ;
+Function                                  : X-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]] → X-Function[#name, #kind, #path, #function, #Forms, #Sort, #Rules] ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// DATA SORT HEADER DECLARATIONS.
+
+X-Data[Reified_Sort, $List[Reified_Form]] :: Text;
+
+//-[Copy[#Sort,#Forms],Discard[#args]]
+-[Discard[#Sort,#args]]
+:
+X-Data[SORT[#Sort, #args], #Forms]
+→
+%n⟪« MapText[f.X-Form[f], #Forms] »⟫
+;
+
+-[Discard[#Sort1, #Sort2]]
+:
+X-Data[SORT-PROPERTY[#Sort1, #Sort2, #Sort3], #Forms] 
+→ 
+X-Data[#Sort3, #Forms]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// FUNCTION SORT HEADER DECLARATIONS.
+
+X-Function[$String, $String, $List[$Numeric], $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+
+-[Copy[#Forms],Discard[#name,#kind,#path,#function,#Sort,#Rules]]
+:
+X-Function[#name, #kind, #path, #function, #Forms, #Sort, #Rules]
+→
+%n⟪« MapText[f.X-Form[f], #Forms] »⟫
+;
+
+X-Form[Reified_Form] :: Text;
+
+// ------------------
+-[Discard[#Sort1,#Sort2]]
+:
+X-Form[SORT-SET[#Sort1, #Sort2, #Form]]
+→
+X-Form[#Form]
+;
+
+X-Form[SORT-ALLOWS-VARIABLES]
+→
+%n⟪⟫
+;
+
+-[Copy[#name]]
+:
+X-Form[FORM[#name, ()]]
+→
+%n⟪
+{«STRING[#name]», &« Descriptor[#name] »},⟫
+;
+
+-[Copy[#name], Discard[#FormArgument1, #FormArguments]]
+:
+X-Form[FORM[#name, (#FormArgument1;#FormArguments)]]
+→
+%n⟪
+{«STRING[#name]», &« Descriptor[#name] »},⟫
+;
+
+// TODO: TOKEN must escape */ combination!
+//« TOKEN[#function] » 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //SYMBOLS,

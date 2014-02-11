@@ -1,0 +1,7 @@
+HOW TO RUN THE "deriv" HOACS SYSTEM
+
+  make deriv.crs
+  java -cp "../../build:../lib/javacc.jar:" net.sf.crsx.run.Crsx \
+    "grammar=('net.sf.crsx.samples.guide.DerivParser';'net.sf.crsx.text.Text';)" \
+    "rules=deriv.crs" \
+    "term= [x↦-1+2-3*(4/ln x)]' " category=derivFun

@@ -1,0 +1,62 @@
+Index: crsx.c
+===================================================================
+RCS file: /cvsroot/crsx/crsx/src/net/sf/crsx/compiler/c/crsx.c,v
+retrieving revision 3.118
+diff -u -r3.118 crsx.c
+--- crsx.c	15 Jan 2014 20:25:46 -0000	3.118
++++ crsx.c	16 Jan 2014 14:04:29 -0000
+@@ -160,27 +160,41 @@
+ Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear)
+ {
+     ASSERT(context, context && name);
+-    Variable v = ALLOCATE(context, sizeof(struct _Variable));
+-    int len = strlen(name);
+ 
+-    char *nameu = name;
+-    while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
+-    if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
++    // Identify tail.
++    char *tail = name + strlen(name);
+     {
+-        if (nameu < name+len)
+-            v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
+-        else
+-            v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
++    	char *n;
++    	for (n = tail; name < (n-1) && (*(n-1) == '_' || (*(n-1) >= '0' && *(n-1) <= '9')); --n);
++    	tail = n;
+     }
+-    else
++
++    // Allocate clean name with copied characters except embedded linear markers...
++	char *cleanname = ALLOCATE(context, (tail-name)+10);
+     {
+-        v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
++    	char *p, *n1 = name, *n2;
++    	for (n1 = name; (n2 = strstr(n1, "\302\271")); n1 = n2 + 2)
++    	{
++    		if (n1 < n2)
++    		{
++    			memcpy(p, n1, n2-n1);
++    			p += (n2 - n1);
++    		}
++    	}
++		if (n1 < tail)
++		{
++			memcpy(p, n1, tail-n1);
++			p += (tail - n1);
++		}
++        snprintf(p, 10, "_%u", ++context->stamp);
+     }
++    DEBUGENV("crsx-debug-variables", DEBUGF(context, "//%*sMAKE_VARIABLE: %s\n", (int)stepNesting, "", cleanname));
+ 
++    // Create and populate variable structure.
++    Variable v = ALLOCATE(context, sizeof(struct _Variable));
++    v->name = cleanname;
+     v->bound = bound;
+     v->linear = linear;
+-
+-    DEBUGENV("crsx-debug-variables", DEBUGF(context, "//%*sMAKE_VARIABLE: %s\n", (int)stepNesting, "", v->name));
+     return v;
+ }
+ 

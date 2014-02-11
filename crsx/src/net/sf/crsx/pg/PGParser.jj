@@ -1,0 +1,2378 @@
+/* Copyright (c) 2007,2010 IBM Corporation. */
+
+// JavaCC options.
+options {
+	JDK_VERSION = "1.5";
+	STATIC = false;
+	ERROR_REPORTING = true;
+	JAVA_UNICODE_ESCAPE = false;
+	UNICODE_INPUT = true;
+	BUILD_PARSER = true;
+	BUILD_TOKEN_MANAGER = true;
+	SANITY_CHECK = true;
+	FORCE_LA_CHECK = true;
+    KEEP_LINE_COLUMN = true;
+    GENERATE_GENERICS = true;
+//	DEBUG_PARSER = true;
+//	DEBUG_TOKEN_MANAGER = true;
+}
+
+// JavaCC parser class.
+PARSER_BEGIN(PGParser)
+package net.sf.crsx.pg;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
+import java.net.URL;
+import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sf.crsx.CRSException;
+import net.sf.crsx.Constructor;
+import net.sf.crsx.Factory;
+import net.sf.crsx.Kind;
+import net.sf.crsx.Maker;
+import net.sf.crsx.Parser;
+import net.sf.crsx.Sink;
+import net.sf.crsx.SourceBuilder;
+import net.sf.crsx.Term;
+import net.sf.crsx.Variable;
+import net.sf.crsx.generic.GenericFactory;
+import net.sf.crsx.util.Buffer;
+import net.sf.crsx.util.ExpandingJavaSink;
+import net.sf.crsx.util.ExtensibleMap;
+import net.sf.crsx.util.FormattingAppendable;
+import net.sf.crsx.util.LinkedExtensibleMap;
+import net.sf.crsx.util.PlainJavaSink;
+import net.sf.crsx.util.PlainSourceBuilder;
+import net.sf.crsx.util.Triple;
+import net.sf.crsx.util.Util;
+
+/**
+ * Generated JavaCC parser to generate JavaCC parser for populating CRS structure.
+ *
+ * @author <a href="http://www.research.ibm.com/people/k/krisrose">Kristoffer Rose</a>.
+ * @version $Id: PGParser.jj,v 3.15 2013/12/12 08:04:39 krisrose Exp $
+ */
+class PGParser
+{
+	// Static.
+
+	/** Class name of {@link Kind}. */
+	private static final String KIND = Kind.class.getCanonicalName();
+	/** Class name of {@link Term}. */
+	private static final String TERM = Term.class.getCanonicalName();
+	/** Class name of {@link Constructor}. */
+	private static final String CONSTRUCTOR = Constructor.class.getCanonicalName();
+	/** Class name of {@link Variable}. */
+	private static final String VARIABLE = Variable.class.getCanonicalName();
+	/** Class name of {@link Sink}. */
+	private static final String SINK = Sink.class.getCanonicalName();
+	/** Class name of {@link Maker}. */
+	private static final String MAKER = Maker.class.getCanonicalName();
+	/** Class name of {@link Buffer}. */
+	private static final String BUFFER = Buffer.class.getCanonicalName();
+	/** Class name of {@link Parser}. */
+	private static final String PARSER = Parser.class.getCanonicalName();
+	/** Class name of {@link Factory}. */
+	private static final String FACTORY = Factory.class.getCanonicalName();
+	/** Class name of {@link CRSException}. */
+	private static final String CRS_EXCEPTION = CRSException.class.getCanonicalName();
+	/** Class name of {@link Util}. */
+	private static final String UTIL = Util.class.getCanonicalName();
+
+	
+	/** Class name of {@link ExtensibleMap}. */
+	private static final String EXTENSIBLE_MAP = ExtensibleMap.class.getCanonicalName();
+	/** Class name of {@link LinkedExtensibleMap}. */
+	private static final String LINKED_EXTENSIBLE_MAP = LinkedExtensibleMap.class.getCanonicalName();
+	/** Class name of {@link Map} from {@link Variable} to {@link Variable}. */
+	private static final String EXTENSIBLE_STRING_TO_VARIABLE = EXTENSIBLE_MAP + "<String, " + VARIABLE + ">";
+	/** Class name of {@link Map} from {@link Variable} to {@link Variable}. */
+	private static final String STRING_TO_VARIABLE = "java.util.Map<String, " + VARIABLE + ">";
+	
+	/** How to mark generation annotations. */	
+	private static final String HTML_START_A = "<font color=\"red\">";
+	/** How to mark generation annotations. */	
+	private static final String HTML_END_A = "</font>";
+	
+	/** Helper to construct Java form of String. */
+	private static String q(String s)
+	{
+		return Util.quoteJava(s);
+	}
+	
+	/** Helper to convert <STRING> to actual String. */
+	private static String unq(String s)
+	{
+		return Util.unquoteJava(s);
+	}
+	
+	/** Helper to convert single character code to string with actual unicode character (or surrogate pair). */
+	private static String unChar(String code)
+	{
+		switch (code.charAt(0))
+		{
+		case '\\' :
+			switch (code.charAt(1))
+			{
+			case '0' : case '1' : case '2' : case '3' : // octal
+				return PlainJavaSink.unicode(Integer.parseInt(code.substring(1), 8));
+
+			case 'b' : return "\b";
+			case 'f' : return "\f";
+			case 'n' : return "\n";
+			case 'r' : return "\r";
+			case 't' : return "\t";
+
+			default : return code.substring(1); // permit gratuitous backslash characters
+
+			case 'u' : case 'x' :
+				// Fall through to do hexadecimal code
+			}
+		case '#' :
+			// Two character unicode prefix (#x or escape-u or escape-x) followed by hexadecimal code.
+			return PlainJavaSink.unicode(Integer.parseInt(code.substring(2), 16));
+		}
+		return code; // sic
+	}
+	
+	/** Helper to convert arbitrary string to Java identifier. */
+	private static String javaq(String s)
+	{
+		return PlainJavaSink.javaIdentify(s);
+	}
+	
+	/** Helper to convert string to HTML-printable form. */
+	private static String htmlq(String s)
+	{
+		return s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;").replace("\\","&#92;");
+	}
+	
+	/** Helper hack to convert comment with Javadoc stuff to HTML. */
+	private static String htmlcommentify(String comment)
+	{
+		// String manipulation in Java!	 Wee!
+		StringBuilder w = new StringBuilder(comment);
+		if (w.substring(0,2).equals("/*")) w.delete(0,2);
+		while (w.substring(0,1).equals("*")) w.delete(0,1);
+		if (w.substring(w.length()-2).equals("*/")) w.delete(w.length()-2,w.length());
+		for (int i = w.indexOf("\n * @"); i >= 0; i = w.indexOf("\n * @")) w.replace(i+2, i+5, "<br>");
+		for (int i = w.indexOf("\n *"); i >= 0; i = w.indexOf("\n *")) w.delete(i+1, i+3);
+		for (int i = w.indexOf("\n*"); i >= 0; i = w.indexOf("\n*")) w.delete(i+1, i+2);
+		return "<font size=1>/*<br></font>" + w.toString() + "<font size=1><br>*/</font>";
+	}
+	
+	/** Helper to remove surrounding {}s. */
+	private static String unbrace(String s)
+	{
+		return s.substring(1, s.length()-1);
+	}
+	
+	/** Helper to extract embedded term. */
+	private static String unembed(String s)
+	{
+		return s.charAt(0) < '~' ? s.substring(2, s.length()-2) : s.substring(1, s.length()-1);
+	}
+	
+	/** Helper to add production fragment to top level of production (with access to the sink). */
+	private static void top(SourceBuilder production, CharSequence fragment)
+	{
+		// Make sure sink is available.
+		if (production.seeded())
+		{
+			if (production.nesting() == 0)
+				production.openBlock("{");
+			production.addStatement(production.wrapExpression("sink =", ";").harvest());
+		}
+		// Close all actions.
+		while (production.nesting() > 0) production.closeBlock("}");
+		
+		// Emit production fragment.
+		if (fragment.length() > 0)
+			production.addStatement(fragment);
+	}
+	
+	/** Helper to add statement into production action (with access to the updated sink). */ 
+	private static void action(SourceBuilder production, CharSequence statement)
+	{
+		// Make sure action has been started.
+		if (production.nesting() == 0)
+			production.openBlock("{");
+		
+		// Make sure sink is available.
+		if (production.seeded())
+			production.wrapExpression("sink =", ";").harvest();
+		
+		// Emit action.
+		if (statement.length() > 0)
+			production.addStatement(statement);
+	}
+	
+	/** Helper to drop any current expression.  Use after having generated to foreign sink. */
+	private static void drop(SourceBuilder production)
+	{
+		// Make sure action has been started.
+		if (production.nesting() == 0)
+			production.openBlock("{");
+		
+		// Make sure sink is available.
+		if (production.seeded())
+			production.addStatement(production.wrapExpression("", ";").harvest());
+	}
+	
+	/** Helper to add local declaration inside local scope in action. The declaration does NOT have access to the updated sink. */
+	private static void declare(SourceBuilder production, CharSequence declaration)
+	{
+		// Make sure we're inside a scope inside an action.
+		switch (production.nesting())
+		{
+			case 0 :
+				assert !production.seeded() : "declare: Seeded at top?";
+				production.openBlock("{");
+			case 1 :
+				production.openBlock("{");
+		}
+		// Emit declaration.
+		if (declaration.length() > 0)
+			production.addStatement(declaration);
+	}
+	
+	/** Helper to extend the current sink expression with one more invocation. */
+	private static void sink(SourceBuilder production, CharSequence invocation)
+	{
+		if (!production.seeded()) production.seedExpression("sink");
+		production.wrapExpression("", invocation);
+	}
+	
+	/** Increase JavaCC indentation. */
+	private static void in(SourceBuilder production)
+	{
+		top(production, "");
+		production.setPrefix(production.prefix() + "\t");
+	}
+	
+	/** Decrease JavaCC indentation. */
+	private static void out(SourceBuilder production)
+	{
+		top(production, "");
+		String prefix = production.prefix();
+		if (prefix.length() > 0)
+			production.setPrefix(prefix.substring(1));
+	}
+	
+	// State.
+	
+	/** For term creation. */
+	private Maker maker;
+	
+	/** For embedded terms. */
+	private Factory<? extends Term> factory = new GenericFactory();
+	
+	/** Parser options. */
+	private Map<String, String> parserOptions;
+	
+	/** Constants. */
+	private final List<String> constants = new ArrayList<String>();
+	
+	/** Package name. */
+	private String packageName;
+
+	/** Category prefix. */
+	private String categoryPrefix = "";
+
+	/** Constants class name. */
+	private String constantsClass;
+
+	/** Token manager class name. */
+	private String tokenManagerClass;
+
+	/** JavaCC output. */
+	private PrintStream javacc;
+	
+	/** HTML output or null. */
+	private Writer html;
+	
+	/** Serializer output or null. */
+	private Writer serializer;
+	
+	/** Java constant constructor string list output or null. */ 
+	private Writer consts;
+	
+	/** All defined nonterminals. */
+	private final Set<String> definedNonterminals = new HashSet<String>();
+
+	/** All used nonterminals. */
+	private final Set<String> usedNonterminals = new HashSet<String>();
+	
+	/** All derived nonterminals (with names ending in $[Maybe][Sequence]). */
+	private final Set<String> derivedNonterminals = new HashSet<String>();
+	
+	/** Collect tokens. */
+	private final StringBuilder tokens = new StringBuilder();
+
+	/** Exported names. */
+	private final List<String> exportedNames = new ArrayList<String>();
+	
+	/** #cast declaration (or null). */
+	private String castName, castHead, castOpen = "\"[\"", castClose = "\"]\"";
+	
+	/**
+	 * If non-null then meta-variables with this production are automatically generated.
+	 * The token <PRODUCTION_NAME> is automatically replaced with the production name.
+	 */
+	private String metaProduction, metaArgumentNonterminal, metaArgumentOpen = "\"[\"", metaArgumentClose = "\"]\"", metaArgumentSep = "\",\"";
+	
+	/**
+	 * If non-null then inject-tokens with this production are automatically generated.
+	 * The token <PRODUCTION_NAME> is automatically replaced with the production name.
+	 */
+	private String injectProduction, injectArgumentNonterminal, injectArgumentOpen = "\"[\"", injectArgumentClose = "\"]\"";
+	
+	/**
+	 * Apply "Use" description to specific constant.
+	 * @param use Use description
+	 * @param name Base name
+	 * @param decls accumulator of declarations for header portion of enclosing JavaCC production
+	 * @param production under construction
+	 * @param endings contains the sink "closing brackets" for open constructions and meta-applications
+	 * @param html where the printable version of the production should be appended
+	 * @param variable2java maps variables to the name of the Java variable with the variable
+	 * @param variables maps variables in term to the parsed variable name
+	 * @param metavariables maps meta-variables in term to triples for {@link ExpandingJavaSink}
+	 */
+	private void useUsage(Usage use, String name, Map<String, String> decls, SourceBuilder production,
+		StringBuilder endings, Map<Variable, String> variable2java, Map<String, Variable> variables,
+		Map<String, Triple<String, String, String>> metavariables) throws IOException, ParseException
+	{
+		if (use.embedded) // embedded literal
+		{
+			assert !use.definition && !use.use && !use.meta && !use.construct;
+			// Insert canned code to reparse string.
+			String sinkPut = "sink = ", sinkGet = "sink";
+			if (use.buffer)
+			{
+			  	String b_name = "b_"+name;
+			  	decls.put(b_name, BUFFER+" "+b_name+" = new "+BUFFER+"("+sinkGet+");");				sinkGet = b_name+".sink()";
+				sinkPut = "";
+				metavariables.put(use.name, new Triple<String, String, String>("", ".copy("+b_name+",false)", null));
+			}
+			action(production,
+				"try {"+sinkPut+"factory.parser(factory).parse("+sinkGet+", "+(use.category==null?"null":"\""+use.category+"\"")+", new java.io.StringReader("+use.converted+"), unit, t.beginLine, t.beginColumn+1, env);}\n"+
+				"catch (java.io.IOException e) {throw new ParseException(e.getMessage());}\n"+
+				"catch ("+CRS_EXCEPTION+" e) {Throwable cause = e.getCause(); if (cause instanceof ParseException) throw (ParseException) cause; else throw new ParseException(e.getMessage());}");
+		}
+		else if (use.definition) // variable definition
+		{
+			assert !use.use && !use.meta && !use.construct && !use.embedded;
+			// Generate fresh variable in code, used wherever the alias is used.
+			Variable alias = variables.get(use.name);
+			if (alias == null)
+			{
+				alias = maker.makeVariable(use.name, !use.linear); // reuse variant defined in other nested choice
+				variables.put(use.name, alias);
+			}
+			String s_name = "s_" + name;
+			decls.put(s_name, "String "+s_name+" = null;");
+			action(production, s_name+" = "+use.converted+";");
+			String v_name = "v_" + name;
+			decls.put(v_name, VARIABLE+" "+v_name+" = null;");
+			action(production, v_name+" = sink.makeVariable("+s_name+","+(!use.linear)+");");
+			if (use.buffer)
+			{
+				// Reference as meta-variable.
+				metavariables.put(use.name, new Triple<String, String, String>("", ".use("+v_name+")", ""));
+			}
+		  	// Keep alias.			variable2java.put(alias, v_name);
+		}
+		else if (use.use) // variable use
+		{
+			assert !use.meta && !use.construct && !use.embedded;
+			// Generate variable occurrence using variable generated by context (or free, if allowed).
+			String s_name = "s_" + name;
+			decls.put(s_name, "String "+s_name+" = null;");
+			action(production, s_name+" = "+use.converted+";");
+			String v_name = "v_" + name;
+			decls.put(v_name, VARIABLE+" "+v_name+" = null;");
+			
+			if (use.freshVar) // whether variable may be fresh or not
+				action(production, v_name+" = (env.containsKey("+s_name+") ? env.get("+s_name+") : factory.freeVariable("+s_name+", "+(!use.linear)+", true));");
+			else if (use.freeVar) // any predefined variable allowed
+				action(production, v_name+" = (env.containsKey("+s_name+") ? env.get("+s_name+") : factory.freeVariable("+s_name+", "+(!use.linear)+", false));");
+			else // only bound variable
+				action(production, v_name+" = env.get("+s_name+");");
+			action(production, "if ("+v_name+" == null) throw new ParseException(\"Variable \"+"+s_name+"+\" cannot be resolved?\");");
+			
+			if (use.buffer)
+			{
+				// Reference as meta-variable.
+				metavariables.put(use.name, new Triple<String, String, String>("", ".use("+v_name+")", ""));
+			}
+			else
+			{
+				// Emit reference.
+				sink(production, ".use("+v_name+")");
+				if (use.name != null)
+				{
+				  	// Permit future use of name.
+				  	Variable alias = variables.get(use.name);
+					if (alias == null)
+					{
+						alias = maker.makeVariable(use.name, !use.linear); // reuse variant defined in other nested choice
+						variables.put(use.name, alias);
+					}
+					variable2java.put(alias, v_name);
+				}
+			}
+		}
+		else if (use.meta) // meta-application
+		{
+			assert !use.construct;
+			if (use.buffer)
+			{
+				// Make meta-variable expand to code for meta-application.
+				metavariables.put(use.name, new Triple<String, String, String>("", ".startMetaApplication("+use.converted+")", ".endMetaApplication()"));
+			}
+			else
+			{
+				// Emit meta-variable wrapper.
+				sink(production, ".startMetaApplication("+use.converted+")");
+				endings.insert(0, ".endMetaApplication()");
+			}
+		}
+		else if (use.literal) // string
+		{
+			use.construct = true;
+			if (use.buffer)
+			{
+				// Make meta-variable expand to use constructor on arguments.
+				metavariables.put(use.name, 
+					new Triple<String, String, String>("", ".start(makeTConstructor(sink, t, "+use.converted+", net.sf.crsx.CRS.STRING_SORT))", ".end()"));
+			}
+			else
+			{
+				// Emit construction wrapper.
+				sink(production, ".start(makeTConstructor(sink, t, "+use.converted+", net.sf.crsx.CRS.STRING_SORT))");
+				endings.insert(0, ".end()");
+			}
+		}
+		else // construction
+		{
+			use.construct = true;
+			if (use.buffer)
+			{
+				// Make meta-variable expand to use constructor on arguments.
+				metavariables.put(use.name, 
+					new Triple<String, String, String>("", ".start(makeTConstructor(sink, t, "+use.converted+", null))", ".end()"));
+			}
+			else
+			{
+				// Emit construction wrapper.
+				sink(production, ".start(makeTConstructor(sink, t, "+use.converted+", null))");
+				endings.insert(0, ".end()");
+			}
+		}
+	}
+	
+}
+PARSER_END(PGParser)
+
+/**
+ * Entire grammar.
+ * Print JavaCC file corresponding to the url.
+ * Append HTML version of grammar to the html writer when requested.
+ * Append Reverse rewrite system to the reverse writer when requested.
+ */
+void Grammar(Maker maker, String jjcrs, String sourcePrefix, boolean makeHtml,
+	boolean makeConstants, boolean makeSerializer, Map<String, String> parserOptions) throws IOException :
+{
+	String comment = null;
+	List<String> comments = new ArrayList<String>();
+}
+{
+	// Generate JavaCC header.
+	{
+		this.maker = maker;
+		this.parserOptions = parserOptions;
+	}
+	(
+		comment=Comment() {comments.add(comment);}
+	)*
+	
+	// Parse header (and create output files).
+	ClassDirective(comments, jjcrs, sourcePrefix, makeHtml, makeConstants, makeSerializer)
+	
+	// Start files.
+	{
+		if (html != null) html.append("<p>\n");
+		if (serializer != null) serializer.append(q(jjcrs+"-serializer") + "[(\n");
+	}
+	
+	// Parse actual productions.
+	Productions(javacc, html, serializer)
+	
+	// Add derived productions.
+	{
+		for (String derived : derivedNonterminals)
+		{
+			String userName = derived.replace("$MaybeSequence","*").replace("$Maybe","?").replace("$Sequence","+");
+			String stem = derived.replace("$MaybeSequence","").replace("$Maybe","").replace("$Sequence","");
+			String cons = stem + "$Cons";
+			String nil = stem + "$Nil";
+			
+			// Emit extra tokens.
+			// Start production, if needed with meta-variable token.
+
+			// Tokens for meta-syntax, if any.
+			if (metaProduction != null)
+			{
+				javacc.append("\n/** Special meta-variable for " + userName + " production. */\n"  +
+					"TOKEN : {<MT_" + derived + " : " + metaProduction.replace("<PRODUCTION_NAME>", userName) + ">}\n");
+			}
+			if (injectProduction != null)
+			{
+				javacc.append("\n/** Special injection token for " + userName + " production. */\n"  +
+					"TOKEN : {<IT_" + derived + " : " + injectProduction.replace("<PRODUCTION_NAME>", userName) + ">}\n");
+			}
+
+			// Top-level production, if any.
+			if (exportedNames.contains(derived))
+				javacc.append("\n/** "+userName+" top level. */\n" +
+					SINK + " N_" + derived + "$WithEOF(" + SINK + " sink, " + EXTENSIBLE_STRING_TO_VARIABLE + " env) :\n" +
+					"{}\n" +
+					"{ sink=N_" + derived + "(sink, env) <EOF> {return sink;} }\n");
+			// Production.
+			javacc.append("\n/** "+userName+". */\n" +
+				SINK + " N_" + derived + "(" + SINK + " sink, " + EXTENSIBLE_STRING_TO_VARIABLE + " env) :\n" +
+				"{ Token t = null; }\n" +
+				"{\n");
+			if (metaProduction != null)
+			{
+				String metaArg = "sink=N_" + metaArgumentNonterminal + "(sink, env)";
+				javacc.append(
+					"\tt=<MT_"+derived+"> {sink = sink.startMetaApplication(t.toString());}" +
+						" [ " + metaArgumentOpen + " " + metaArg + "( " + metaArgumentSep + " " + metaArg + ")* " + metaArgumentClose + " ]" +
+						" {return sink.endMetaApplication();}\n" +
+					"|\n");
+			}
+			if (injectProduction != null)
+			{
+				javacc.append(
+					"\t<IT_"+derived+"> " + injectArgumentOpen + " {sink=N_" + injectArgumentNonterminal + "(sink, env);} " + injectArgumentClose +
+						" {return sink;}\n" +
+					"|\n");
+			}
+			if (derived.endsWith("$Maybe"))
+			{
+				javacc.append(
+					"\t(\t{sink=sink.start(makeTConstructor(sink, t, \""+cons+"\", null));} sink=N_"+stem+"(sink,env) {sink=sink.start(makeTConstructor(sink, t, \""+nil+"\", null)).end().end();}\n" +
+					"\t|\t{sink=sink.start(makeTConstructor(sink, t, \""+nil+"\", null)).end();}\n" +
+					"\t)\n");
+			}
+			else if (derived.endsWith("$Sequence"))
+			{
+				javacc.append(
+					"\t{sink=sink.start(makeTConstructor(sink, t, \""+cons+"\", null));} sink=N_"+stem+"(sink,env)\n" +
+					"\t( sink=N_"+derived+"(sink,env) | {sink=sink.start(makeTConstructor(sink, t, \""+nil+"\", null)).end();} )\n" +
+					"\t{sink=sink.end();}\n");
+			}
+			else if (derived.endsWith("$MaybeSequence"))
+			{
+				javacc.append(
+					"\t(\t{sink=sink.start(makeTConstructor(sink, t, \""+cons+"\", null));} sink=N_"+stem+"(sink,env) sink=N_"+derived+"(sink,env) {sink=sink.end();}\n" +
+					"\t|\t{sink=sink.start(makeTConstructor(sink, t, \""+nil+"\", null)).end();}\n" +
+					"\t)\n");
+			}
+			else
+			{
+				assert false : "Impossible derived nonterminal: "+derived;
+			}
+			javacc.append("\t{return sink;}\n" + "}\n");
+			definedNonterminals.add(derived);
+			usedNonterminals.add(stem);
+		}
+	}
+	
+	// Add casting production, if any.
+	{
+		if (castName != null)
+		{
+			// Store production...
+			definedNonterminals.add(castName);
+
+			// Production.
+			javacc.append("\n/** Cast production of all nonterminals. */\n" +
+				SINK + " N_" + castName + "(" + SINK + " sink, " + EXTENSIBLE_STRING_TO_VARIABLE + " env) :\n" +
+				"{}\n" +
+				"{\n" +
+				"\t(");
+			String lead = "";
+			for (String derived : definedNonterminals)
+			{
+				String userName = derived.replace("$MaybeSequence","*").replace("$Maybe","?").replace("$Sequence","+");
+				javacc.append(lead + "\t" + castHead.replace("<PRODUCTION_NAME>", userName) + " " + castOpen + " sink=N_" + derived + "(sink, env) " + castClose.replace("<PRODUCTION_NAME>", userName) + "\n");
+				usedNonterminals.add(derived);
+				lead = "\t|";
+			}
+			javacc.append("\t)\n" + "\t{return sink;}\n" + "}\n");
+		}
+	}
+	
+	// Check for undefined and unused nonternminals.
+	{
+	  /*
+		for (String used : usedNonterminals)
+			if (! definedNonterminals.contains(used))
+				throw new ParseException("PG error: Nonterminal "+used+" not defined!");
+		for (String defined : definedNonterminals)
+			if (! usedNonterminals.contains(defined))
+				throw new ParseException("PG error: Nonterminal "+defined+" not used!");
+       */
+	}
+	
+	// Append the tokens.
+	{
+		javacc.append(tokens);
+	}
+	
+	// Wrap up files.
+	{
+		javacc.close();
+		if (html != null)
+		{
+			html.append("<p>\n");
+			html.close();
+		}
+		if (serializer != null)
+		{
+			serializer.append(")]\n");
+			serializer.close();
+		}
+		
+		// Echo constants.
+		if (consts != null)
+		{
+			FormattingAppendable c = FormattingAppendable.format(consts, 80, 0, 300);
+			c.append("/* "+constantsClass+": PG-generated JavaCC parser constructor constants. */\n"+
+				"package "+packageName+";\n"+
+				"public class "+constantsClass+"\n");
+			c.open("{");
+			c.append("\n/** Constant list. */\n"+"public static final String[] STRING =");
+			c.open("{");
+			c.append("\nnull");
+			for (String constant : constants)
+				c.append(",\n"+q(constant));
+			c.close("};");
+			c.append("\n\n/* Constants for use in switch statements */\n");
+			for (int i = 0; i < constants.size(); ++i)
+			{
+				String constant = constants.get(i);
+				c.append("public static final int C_"+javaq(constant)+" = "+(i+1)+";\n");
+			}
+			c.close("}");
+			c.append("\n");
+			consts.close();
+		}
+	}
+	
+	<EOF>
+}
+
+/**
+ * Class directive.
+ * Print JavaCC options and parser declaration.
+ * Append HTML version of grammar to the html writer when non-null.
+ */
+void ClassDirective(List<String> comments, String jjcrs, String sourcePrefix,
+	boolean makeHtml, boolean makeConstants, boolean makeSerializer) throws IOException :
+{
+	Token t, o;
+	String n;
+	String className, s;
+	StringBuilder declarations = new StringBuilder();
+	StringBuilder imports = new StringBuilder();
+	StringBuilder rules = new StringBuilder();
+}
+{
+	( "class" | "grammar" )
+	t=Name() {className = t.toString();}
+	":"
+	{
+	    if (makeHtml)
+	    {
+			html = new FileWriter(jjcrs + ".html");
+			for (String comment : comments)
+				html.append(htmlcommentify(comment));
+			
+			html.append("<p>" + HTML_START_A + "<b>class</b> "+className+" : ");
+			for (int i = 0; i < exportedNames.size(); ++i)
+				html.append((i>0 ? ", " : "")+"<em>"+exportedNames.get(i)+"</em>");
+		}
+	}
+	n=NonterminalName(html) {exportedNames.add(n); }
+	( "," {if (html!=null) html.append(", ");} n=NonterminalName(html) {exportedNames.add(n);} )*
+	(
+		"prefix"
+		( t=Name() {categoryPrefix = t.toString();}
+		| t=<STRING> {categoryPrefix = unq(t.toString());}
+		)
+	|
+		"options"
+		t=Name() ( "=" (o=Name()|o=<NUMBER>|o=<STRING>) {parserOptions.put(t.toString(), o.toString());} | {parserOptions.put(t.toString(), "true");} )
+		( "," t=Name() ( "=" (o=Name()|o=<NUMBER>|o=<STRING>) {parserOptions.put(t.toString(), o.toString());} | {parserOptions.put(t.toString(), "true");} ) )*
+	|
+		"imports"
+		t=Name() {imports.append("import "+t.toString()+";\n");}
+		( "," t=Name() {imports.append("import "+t.toString()+";\n");} )*
+	|
+		"declarations"
+		t=<EMBEDDED>
+		{s = t.toString(); declarations.append(unembed(s)+"\n");}
+	)*
+	{{
+		// Extract package components.
+		int lastDot = className.lastIndexOf('.');
+		String p, c;
+		if (lastDot < 0)
+		{
+			p = null;
+			c = className;
+		}
+		else
+		{
+			p = className.substring(0, lastDot);
+			c = className.substring(lastDot+1);
+		}
+		packageName = p;
+		
+		// Create derived files.
+		String prefix = (sourcePrefix == null ? "" : sourcePrefix + "/") + (p == null ? "" : p.replace(".", "/") + "/");
+		
+		javacc = new PrintStream(prefix + c + ".jj");
+		tokenManagerClass = c + "TokenManager";
+		if (makeConstants)
+		{
+			constantsClass = c + "ConstructorStrings";
+			consts = new FileWriter(prefix + constantsClass + ".java");
+		}
+		if (makeSerializer)
+			serializer = new FileWriter(jjcrs + ".serialize.crs");
+
+		// Output header for parser.
+		javacc.append("/* "+className+": PG-generated JavaCC parser specification. */\n");
+
+		String docComment = "";
+		for (String comment : comments)
+		{
+			if (comment.startsWith("/**"))
+				docComment = comment + "\n";
+			else
+				javacc.append(comment);
+		}
+		
+		parserOptions.put("DEBUG_PARSER", "true");
+		javacc.append("\noptions {\n");
+		for (Map.Entry<String, String> option : parserOptions.entrySet())
+			javacc.append("\t"+option.getKey()+" = "+option.getValue()+";\n");
+		javacc.append("}\n\n");
+		
+		// Parser specification.
+		javacc.append("PARSER_BEGIN("+c+")\n");
+		if (p != null) javacc.append("package "+p+";\n");
+		javacc.append(imports.toString());
+		javacc.append("\n"+docComment+
+			"public class "+c+" implements "+PARSER+"\n"+
+			"{\n");
+		
+		// State.
+		javacc.append(
+			"\t/** Factory. */\n"+
+			"\t"+FACTORY+"<? extends "+TERM+"> factory;\n"+
+			"\t/** Compilation unit name for error messages. */\n"+
+			"\tString unit;\n"+
+			"\t/** Whether the parser should capture token locations. */\n"+
+			"\tboolean captureLocations = true;\n"+
+			"\t/** Constructor with token location information. */\n"+
+			"\tprivate "+CONSTRUCTOR+" makeTConstructor("+SINK+" sink, Token t, Object object, String sort)\n"+
+			"\t{\n"+
+			"\t\t"+CONSTRUCTOR+" c = sort == null ? sink.makeConstructor(object) : sink.makeLiteral(object, sort);\n"+
+			"\t\tif (t == null) t = token;\n"+
+			"\t\tif (captureLocations && t != null)\n"+
+			"\t\t{\n"+
+			"\t\t\tif (factory.get(\"meta\") == null)\n"+
+			"\t\t\t\tc = "+UTIL+".wrapWithLocation(sink, c, unit, t.beginLine, t.beginColumn);\n"+
+			"\t\t}\n"+
+			"\t\treturn c;\n"+
+			"\t}\n\n");
+		
+		// State: category actions!
+		javacc.append(
+			"\t/** Helper interface with category non-terminal calls. */\n"+
+			"\tabstract class CategoryCall { abstract "+SINK+" call("+SINK+" sink, "+EXTENSIBLE_STRING_TO_VARIABLE+" bound) throws ParseException; }\n"+
+			"\t/** Direct category invocations. */\n"+
+			"\tjava.util.Map<String,CategoryCall> categoryCall = new java.util.HashMap<String,CategoryCall>();\n"+
+			"\t{\n");
+		if (categoryPrefix.length() > 0)
+			javacc.append("\t\tcategoryCall.put("+q(categoryPrefix)+", "
+				+"new CategoryCall(){ "+SINK+" call("+SINK+" sink, "+EXTENSIBLE_STRING_TO_VARIABLE+" bound) throws ParseException {return N_"+exportedNames.get(0)+"$WithEOF(sink, bound);} });\n");
+		for (String name : exportedNames)
+			javacc.append(
+				"\t\tcategoryCall.put("
+				+q(categoryPrefix+name.replace("$MaybeSequence","*").replace("$Maybe","?").replace("$Sequence","+"))+", "
+				+"new CategoryCall(){ "+SINK+" call("+SINK+" sink, "+EXTENSIBLE_STRING_TO_VARIABLE+" bound) throws ParseException {return N_"+name+"$WithEOF(sink, bound);} });\n");
+		javacc.append(
+			"\t}\n\n");
+		
+		// Nullary constructor.
+		javacc.append(		
+			"\t// Constructor.\n\n"+
+			"\t/** Construct dummy instance. */\n"+
+			"\tpublic "+c+"()\n"+
+			"\t{\n"+
+			"\t\tthis((java.io.Reader) null);\n"+
+			"\t\tdisable_tracing();\n"+
+			"\t}\n\n");
+		
+		// Parser implementation.
+		javacc.append(		
+			"\t// Parser implementation.\n\n"+
+			"\tpublic "+PARSER+" parser("+FACTORY+"<? extends "+TERM+"> f)\n"+
+			"\t{\n"+
+			"\t\tif (factory != null)\n"+
+			"\t\t{\n"+
+			"\t\t\t"+PARSER+" parser = new "+c+"().parser(f);\n"+
+			"\t\t\tparser.setParserVerbose(trace_enabled); parser.setParserLocation(captureLocations);\n"+
+			"\t\t\treturn parser;\n"+
+			"\t\t}\n"+
+			"\t\telse\n"+
+			"\t\t{\n"+
+			"\t\t\tfactory = f;\n"+
+			"\t\t\tassert f != null : \"Or Else!\";\n"+
+			"\t\t\treturn this;\n"+
+			"\t\t}\n"+
+			"\t}\n\n"+
+			"\tpublic void setParserVerbose(boolean verbose)\n"+
+			"\t{\n"+
+			"\t\tif (verbose)\n"+
+			"\t\t\tenable_tracing();\n"+
+			"\t\telse\n"+
+			"\t\t\tdisable_tracing();\n"+
+			"\t}\n\n"+
+			"\tpublic void setParserLocation(boolean capture)\n"+
+			"\t{\n"+
+			"\t\tcaptureLocations = capture;\n"+
+			"\t}\n\n"+
+			"\tpublic void setEmbeddedParser("+PARSER+" subparser) throws "+CRS_EXCEPTION+"\n"+
+			"\t{}\n\n"+
+			"\tpublic Iterable<String> categories()\n"+
+			"\t{\n"+
+			"\t\treturn categoryCall.keySet();\n"+
+			"\t}\n\n"+
+			"\tpublic "+SINK+" parse("+SINK+" sink, String category, java.io.Reader reader, String unit, int firstLine, int firstColumn, "+EXTENSIBLE_STRING_TO_VARIABLE+" bound) throws "+CRS_EXCEPTION+", java.io.IOException\n"+
+			"\t{\n"+
+			"\t\ttry\n"+
+			"\t\t{\n"+
+			"\t\t\tthis.unit = unit;\n"+
+			"\t\t\tReInit((java.io.Reader) null);\n"+
+			"\t\t\tjj_input_stream.ReInit(reader, firstLine, firstColumn); token_source = new "+tokenManagerClass+"(jj_input_stream); // hacks to update line and column numbers\n"+
+			"\t\t\tif (bound == null) bound = new "+LINKED_EXTENSIBLE_MAP+"<String, "+VARIABLE+">();\n"+
+			"\t\t\tif (category == null || category.length() == 0) return N_"+exportedNames.get(0)+"(sink, bound);\n"+
+			"\t\t\telse if (categoryCall.containsKey(category)) return categoryCall.get(category).call(sink, bound);\n"+
+			"\t\t\telse throw new "+CRS_EXCEPTION+"(\"Parser category '\"+category+\"' not supported!\");\n"+
+			"\t\t}\n"+
+			"\t\tcatch (ParseException e)\n"+
+			"\t\t{\n"+
+			"\t\t\tthrow new "+CRS_EXCEPTION+"(e.getMessage());\n"+
+			"\t\t}\n"+
+			"\t}\n\n"+
+			"\tpublic "+TERM+" parseTerm("+MAKER+" maker, String category, java.io.Reader reader, "+EXTENSIBLE_STRING_TO_VARIABLE+" bound) throws "+CRS_EXCEPTION+", java.io.IOException\n"+
+			"\t{\n"+
+			"\t\t"+BUFFER+" buffer = new "+BUFFER+"(maker);\n"+
+			"\t\tparse(buffer.sink(), category, reader, null, 1, 1, bound);\n"+
+			"\t\treturn buffer.term(true);\n"+
+			"\t}\n\n");
+		
+		// User additions.
+		javacc.append(declarations);
+		
+		// Main function.
+		javacc.append(
+			"\t/**\n"+
+			"\t * Run the parser and print the resulting term.\n"+
+			"\t * @param args should contain two strings: the category and an input file name\n"+
+			"\t */\n"+
+			"\tpublic static void main(String[] args)\n"+
+			"\t{\n"+
+			"\t\ttry\n"+
+			"\t\t{\n"+
+			"\t\t\tif (args.length != 2)\n"+
+			"\t\t\t{\n"+
+			"\t\t\t\tSystem.err.println(\"Usage: "+c+" category input\");\n"+
+			"\t\t\t\tSystem.exit(2);\n"+
+			"\t\t\t}\n"+
+			"\t\t\tString category = args[0];\n"+
+			"\t\t\tjava.io.Reader reader = new java.io.FileReader(args[1]);\n"+
+			"\t\t\tnet.sf.crsx.Factory<net.sf.crsx.generic.GenericTerm> factory = new net.sf.crsx.generic.GenericFactory();\n"+
+			"\t\t\tnet.sf.crsx.Parser parser = new "+c+"();\n"+
+			"\t\t\tnet.sf.crsx.Sink sink = factory.sink(System.out);\n"+
+			"\t\t\tparser.parser(factory).parse(sink, category, reader, null, 1, 1, null);\n"+
+			"\t\t}\n"+
+			"\t\tcatch (net.sf.crsx.CRSException e)\n"+
+			"\t\t{\n"+
+			"\t\t\tSystem.err.println(\"CRS error: \"+e);\n"+
+			"\t\t\tSystem.exit(1);\n"+
+			"\t\t}\n"+
+			"\t\tcatch (java.io.IOException e)\n"+
+			"\t\t{\n"+
+			"\t\t\tSystem.err.println(\"I/O error: \"+e);\n"+
+			"\t\t\tSystem.exit(1);\n"+
+			"\t\t}\n"+
+			"\t}\n\n");
+	
+		// End of parser declaration.
+		javacc.append(	
+			"}\n"+
+			"PARSER_END("+c+")\n"
+		);
+		
+		// Productions for top-level productions (include EOF).
+		//for (String name : exportedNames)
+		//{
+		//	javacc.append("\n" +
+		//		"/** <em>" + name + "$WithEOF</em> ::= <em>" + name + "</em> EOF . */\n" +
+		//		SINK + " N_" + name + "$WithEOF(" + SINK + " sink, " + EXTENSIBLE_STRING_TO_VARIABLE + " env) :\n" +
+		//		"{}\n" +
+		//		"{ sink=N_" + name + "(sink, env) <EOF> {return sink;} }\n");
+		//}
+		usedNonterminals.addAll(exportedNames); // exported names are implicitly used
+		
+		if (html != null)
+		{
+			if (categoryPrefix.length() > 0)
+				html.append("<br><b>prefix</b> " + categoryPrefix + "\n");
+				
+			if (parserOptions.size() > 0)
+				html.append("<br><b>options</b> " + unbrace(parserOptions.toString()) + "\n");
+				
+			if (declarations.length() > 0)
+				html.append("<br><b>declarations</b><br>%{<pre>\n" + declarations.toString().trim() + "\n</pre>%}<br>");
+				
+			if (rules.length() > 0)
+				html.append("<br><b>rules</b><blockquote>" + rules.toString().trim() + "</blockquote>");
+				
+			html.append(HTML_END_A+"</p>\n");
+		}
+		
+		// TODO: Parse rules!
+	}}
+}
+
+/**
+ * Actual productions and directives.
+ * Print JavaCC options and parser declaration.
+ * Append HTML version of grammar to the html writer when non-null.
+ */
+void Productions(Appendable javacc, Appendable html, Appendable serializer) throws IOException :
+{
+	String comment, docComment = null;
+}
+{
+	// Parse and generate productions and other directives.
+	{if (html != null) html.append("<blockquote>\n");}
+	(
+		comment=Comment()
+		{
+			if (comment.startsWith("/**"))
+				docComment=comment;
+			else
+			{
+				javacc.append("\n"+comment+"\n");
+				if (html != null) html.append("</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n");
+			}
+		}
+	|
+		(
+			Structural(docComment, javacc, html, serializer) {docComment = null;}
+		|
+			Lexical(docComment, javacc, html) {docComment = null;}
+		|
+			Skip(docComment, html) {docComment = null;}
+		|
+			Cast(docComment, javacc, html) {docComment = null;}
+		|
+			Meta(docComment, javacc, html) {docComment = null;}
+		|
+			Copy(docComment, javacc) {docComment = null;}
+		|
+			Include(docComment, javacc, html, serializer) {docComment = null;}
+		)
+		{if (html != null) html.append("<p>\n");}
+	)*
+	{if (html != null) html.append("</blockquote>\n");}
+}
+
+/**
+ * Structural (normal) production.
+ * Prints the production in JavaCC form to javacc.
+ * @param html where the HTML summary is appended, or null if none is needed
+ * @return HTML summary of production
+ */
+void Structural(String comment, Appendable javacc, Appendable html, Appendable serializer) throws IOException :
+{
+	Token t; // scratch token
+	String name; // production name
+	String arg = "", extraArgs = "", htmlArgs = "";
+	Map<String, Triple<String, String, String>> globalMetavariables = new HashMap<String, Triple<String, String, String>>();
+	Map<String, String> decls = new HashMap<String, String>(); // production declared variable accumulator
+	StringBuilder body = new StringBuilder(); // production body text accumulator
+	StringBuilder localHtml = new StringBuilder();
+	String topConstructor = null, pre = "";
+	List<String> states = new ArrayList<String>();
+	Reverser.Builder rev, rev2;
+}
+{
+	// Non-terminal production.
+	(
+	  // New style.
+	  t=MetaVar() {name = t.toString().replace("#", ""); definedNonterminals.add(name);}	  // Note: no optional arguments in new format yet.	|
+	  // Old style.
+	  <LANGLE>
+	  t=Name()
+	  {
+		name = t.toString();
+		definedNonterminals.add(name);
+	  }
+	  // Optional argument to production.
+	  [
+		[ t=Name() {arg = t.toString();} ] t=MetaVar() {arg = arg + t.toString();}
+		{{
+			String b = "b_" + arg.replace("#", "_");
+			extraArgs = extraArgs + ", " + BUFFER + " " + b;
+			htmlArgs = htmlArgs + HTML_START_A + arg + HTML_END_A;
+			// Use of the argument in subsequent embedded terms should copy the buffer.
+			globalMetavariables.put(arg, new Triple<String, String, String>("", ".copy("+b+", false)", null));
+		}}
+		(
+			[ t=Name() {arg = t.toString();} ] t=MetaVar() {arg = arg + t.toString();}
+			{{
+				String b = "b_" + arg.replace("#", "_");
+				extraArgs = extraArgs + ", " + BUFFER + " " + b;
+				htmlArgs = htmlArgs + "," + HTML_START_A + arg + HTML_END_A;
+				// Use of the argument in subsequent embedded terms should copy the buffer.
+				globalMetavariables.put(arg, new Triple<String, String, String>("", ".copy("+b+", false)", null));
+			}}
+		)*
+	  ]
+	  <RANGLE>
+	)
+	
+	[ "$" {topConstructor = "";}
+    | ":" t=Name() {topConstructor = t.toString();}
+    ]
+    [	"("
+		[	Names(states)	{pre = states.toString().replace("[","<").replace("]",">").trim()+" ";}
+		|	"*" {pre = "<*> ";}
+		]
+		")"
+	]
+	"::="
+	rev=TopConcatenation(name, topConstructor, globalMetavariables, decls, body, localHtml)
+	(
+		"|" {body.append(" |\n"); localHtml.append(" <br>\n | ");}
+		rev2=TopConcatenation(name, topConstructor, globalMetavariables, decls, body, localHtml)
+		{rev = rev.choice(rev2);}
+	)*
+	"."
+	{{
+		// Production for top-level (include EOF) if exported.
+		if (exportedNames.contains(name))
+		{
+			String stateset = "";
+			if (!pre.isEmpty())
+				stateset = " {token_source.SwitchTo("+states.get(0)+");}";
+			javacc.append("\n" +
+				"/** <em>" + name + "$WithEOF</em> ::= <em>" + name + "</em> EOF . */\n" +
+				SINK + " N_" + name + "$WithEOF(" + SINK + " sink, " + EXTENSIBLE_STRING_TO_VARIABLE + " env) :\n" +
+				"{}\n" +
+				"{"+stateset+" sink=N_" + name + "(sink, env) <EOF> {return sink;} }\n");
+		}
+	  
+		// If needed then create meta-variable and inject tokens.
+		decls.put("t", "Token t = null;");
+		if (metaProduction != null)
+		{
+			javacc.append("\n" +
+				"/** Special meta-variable for " + name + " production. */\n"  +
+				pre + "TOKEN : {<MT_" + name + " : " + metaProduction.replace("<PRODUCTION_NAME>", name)+">}\n");
+		}
+		if (injectProduction != null)
+		{
+			javacc.append("\n" +
+				"/** Special inject token " + name + " production. */\n"  +
+				pre + "TOKEN : {<IT_" + name + " : " + injectProduction.replace("<PRODUCTION_NAME>", name)+">}\n");
+		}
+		
+		// Documentation.
+		if (html != null)
+		{
+			html.append((comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+"<u><a name=\"N_"+name+"\">&lang;" + name + "&rang;</a></u>"+htmlArgs+(topConstructor != null?HTML_START_A+"$"+HTML_END_A:"")
+				+" ::= " + localHtml + " .<br>\n");
+		}
+		
+		// JavaCC production head.
+		javacc.append("\n" +
+				(comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()+"<p>") +
+			"\n * " +
+			"<em>" + name + "</em> ::= "+ localHtml.toString().replace("/*","").replace("*/","").replace("\n", "\n * ") +
+			"\n */\n" +
+			SINK + " N_" + name + "(" + SINK + " sink, " + EXTENSIBLE_STRING_TO_VARIABLE + " env" + extraArgs + ") :\n");
+		
+		// JavaCC production declaration.
+		if (decls.size() == 0)
+		{
+			javacc.append("{}\n");
+		}
+		else
+		{
+			javacc.append("{\n");
+			for (String decl : decls.values())
+				javacc.append("\t"+decl+"\n");
+			javacc.append("}\n");
+		}
+		javacc.append("{\n");
+		
+		// If needed then create meta-variable and inject choices.
+		if (metaProduction != null)
+		{
+			String metaArg = "sink=N_" + metaArgumentNonterminal + "(sink, env)";
+			javacc.append(
+				"\tt=<MT_"+name+"> {sink = sink .startMetaApplication(t.toString());}" +
+					" [ " + metaArgumentOpen + " " + metaArg + "( " + metaArgumentSep + " " + metaArg + ")* " + metaArgumentClose + " ]" +
+					" {return sink.endMetaApplication();}\n" +
+				"|\n");
+		}
+		if (injectProduction != null)
+		{
+			javacc.append(
+				"\t<IT_"+name+"> " +
+					injectArgumentOpen + " {sink=N_" + injectArgumentNonterminal + "(sink, env);} " + injectArgumentClose +
+					" {return sink;}\n" +
+				"|\n");
+		}
+		if (topConstructor != null)
+		{
+			javacc.append("{sink = sink.start(makeTConstructor(sink, t, "+q(topConstructor+"("+name+")")+", null));}\n");
+			javacc.append("(\n");
+			javacc.append(body);
+			javacc.append(")\n");
+			javacc.append("{return sink.end();}\n");
+		}
+		else
+		{
+			javacc.append(body);
+		}
+		javacc.append("}\n");
+		
+		// Serializer.
+		if (serializer != null)
+			rev.appendRulesTo(serializer, name);
+	}}
+}
+
+/**
+ * Lexical production.
+ * Prints the production in JavaCC form to javacc.
+ * @param comment javadoc comment for directive
+ * @param javacc target for JavaCC directives
+ * @param html where the HTML summary is appended, or null if none is needed
+ * @return HTML summary of production
+ */
+void Lexical(String comment, Appendable javacc, Appendable html) throws IOException :
+{
+	Token t; // scratch token
+	String name; // production name
+	StringBuilder body = new StringBuilder(); // production body text accumulator
+	StringBuilder localHtml = new StringBuilder();
+	boolean internal = false;
+	List<String> states = new ArrayList<String>();
+	String pre = "", post = "", statearg = "";
+}
+{
+    [ "token" ]
+	[ "fragment" {internal = true;} ]
+	t=Name() {name = t.toString();}
+	[
+		"("
+		[	Names(states)	{pre = states.toString().replace("[","<").replace("]",">").trim()+" "; statearg = pre.substring(1,pre.length()-2);}
+		|	"*" {pre = "<*> "; statearg = "*";}
+		]
+		[ ":" t=Name() {post = ": "+t.toString(); statearg = statearg + post;} ]
+		")"
+	]
+	"::="
+	LexicalChoice(name, body, localHtml)
+	[ t=<EMBEDDED> {{String s = t.toString(); post = "{"+unembed(s)+"} "+post;}} ]
+	"."
+	{{
+		// Documentation.
+		if (html != null)
+			html.append("\n"
+				+(comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+(internal? "<b>fragment</b> ":"")
+				+"<b>token</b> <a name=\"T_"+name+"\">"
+				+name
+				+"</a>"
+				+(statearg.length() > 0 ? HTML_START_A+" ("+statearg+")"+HTML_END_A : "")
+				+"  ::= " + localHtml + " .<br>\n");
+		
+		// JavaCC token declaration head.
+		tokens.append("\n" +
+			(comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()) +
+			"\n * " +
+			name + " ::= "+ localHtml.toString().replace("\n", "\n * ") +
+			"\n */\n" +
+			pre + "TOKEN : {<" + (internal?"#":"") + "T_" + name + " : " + body + " >" + post + "}\n");
+	}}
+}
+
+/**
+ * skip lexical production.
+ * Prints the production in JavaCC form to javacc.
+ * @param comment javadoc comment for directive
+ * @param javacc target for JavaCC directives
+ * @param html where the HTML summary is appended, or null if none is needed
+ */
+void Skip(String comment, Appendable html) throws IOException :
+{
+	Token t; // scratch token
+	StringBuilder body = new StringBuilder(); // production body text accumulator
+	StringBuilder localHtml = new StringBuilder();
+	List<String> states = new ArrayList<String>();
+	String pre = "", post = "", statearg = "";
+}
+{
+	// Skip production.
+	"skip"
+	[
+		"("
+		[	Names(states)	{pre = states.toString().replace("[","<").replace("]",">").trim()+" "; statearg = pre.substring(1,pre.length()-2);}
+		|	"*" {pre = "<*> "; statearg = "*";}
+		]
+		[ ":" t=Name() {post = ": "+t.toString(); statearg = statearg + post;} ]
+		")"
+	]
+	"::="
+	LexicalChoice("skip", body, localHtml)
+	[ t=<EMBEDDED> {{String s = t.toString(); post = "{"+unembed(s)+"} "+post;}} ]
+	"."
+	{{
+		// Documentation.
+		if (html != null)
+			html.append("\n"
+				+(comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+"<b>skip</b> ::= " + localHtml + " .<br>\n");
+		
+		// JavaCC token declaration head.
+		tokens.append("\n" +
+			(comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()) +
+			"\n * " +
+			"<b>skip</b>" +
+			(statearg.length() > 0 ? HTML_START_A+" ("+statearg+")"+HTML_END_A : "") +
+			" ::= "+ localHtml.toString().replace("\n", "\n * ") +
+			"\n */\n" +
+			pre + "SKIP : { <" + body + "> " + post + "}\n");
+	}}
+}
+
+/**
+ * cast .
+ * Prints the production in JavaCC form to javacc.
+ * @param comment javadoc comment for directive
+ * @param javacc target for JavaCC directives
+ * @param html where the HTML summary is appended, or null if none is needed
+ */
+void Cast(String comment, Appendable javacc, Appendable html) throws IOException :
+{
+	Token t; // scratch token
+	StringBuilder b;
+}
+{
+	{if (castName != null) throw new ParseException("PG error: Duplicate #cast declaration!");}
+	// Cast production.
+	"cast" "[" {if (html != null) html.append((comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+						  +"<a name=\"N_"+castName+"\"><b>cast</b>[");}
+	castName=NonterminalName(html)
+	"]"
+	"::="
+	{
+		if (html != null) html.append("]</a> ::= ");
+		b = new StringBuilder();
+	}
+	LexicalConcatenation("cast", b, html) {castHead = b.toString(); b = new StringBuilder();}
+	[
+		"," {if (html != null) html.append(" , ");}
+		LexicalConcatenation("cast", b, html) {castOpen = b.toString().replace("'","\"").equals("\"\"") ? "" : b.toString().replace("'","\""); b = new StringBuilder();}
+		"," {if (html != null) html.append(" , ");}
+		LexicalConcatenation("cast", b, html) {castClose = b.toString().replace("'","\"").equals("\"\"") ? "" : b.toString().replace("'","\"");}
+	]
+	"." {if (html != null) html.append(" .<p>\n");}
+}
+
+/**
+ * meta, inject, nometa, and noinject .
+ * Prints the production in JavaCC form to javacc.
+ * @param comment javadoc comment for directive
+ * @param javacc target for JavaCC directives
+ * @param html where the HTML summary is appended, or null if none is needed
+ */
+void Meta(String comment, Appendable javacc, Appendable html) throws IOException :
+{
+	Token t; // scratch token
+	StringBuilder body = new StringBuilder(); // production body text accumulator
+	StringBuilder localHtml = new StringBuilder();
+}
+{
+	// Meta production.
+	{
+		// Documentation.
+		if (html != null)
+			html.append("\n"
+				+(comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+"<b>meta</b>[");
+	}
+	"meta" "[" metaArgumentNonterminal=NonterminalName(html) "]"
+	"::="
+	LexicalConcatenation("meta", body, localHtml)
+	{
+		// Documentation.
+		if (html != null) html.append("] ::= " + localHtml);
+		// Store production...
+		metaProduction = body.toString();
+	}
+	[
+		","
+		(			t=<STRING>
+			{
+				if (html != null) html.append(", <code>\""+htmlq(unq(t.toString()))+"\"</code>");
+				metaArgumentOpen = t.toString().replace("'","\"").equals("\"\"") ? "" : q(unq(t.toString()));
+			}
+		| 
+			t=Name()
+			{
+				if (html != null) html.append(", "+t.toString());
+				metaArgumentOpen = "<T_"+t.toString()+">";
+			}
+		)
+		","
+		(
+			t=<STRING>
+			{
+				if (html != null) html.append(", <code>\""+htmlq(unq(t.toString()))+"\"</code>");
+				metaArgumentClose = t.toString().replace("'","\"").equals("\"\"") ? "" : q(unq(t.toString()));
+			}
+		| 
+			t=Name()
+			{
+				if (html != null) html.append(", "+t.toString());
+				metaArgumentClose = "<T_"+t.toString()+">";
+			}
+		)
+		[
+			","
+			(
+				t=<STRING>
+				{
+					if (html != null) html.append(", <code>\""+htmlq(unq(t.toString()))+"\"</code>");
+					metaArgumentSep = t.toString().replace("'","\"").equals("\"\"") ? "" : q(unq(t.toString()));
+				}
+			| 
+				t=Name()
+				{
+					if (html != null) html.append(", "+t.toString());
+					metaArgumentSep = "<T_"+t.toString()+">";
+				}
+			)
+		]
+	]
+	"."
+	{
+		if (html != null) html.append(" .<br>\n");
+	}
+|
+	"nometa"
+	"."
+	{
+		// Documentation.
+		if (html != null)
+			html.append("\n"
+				+(comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+"<b>nometa</b> .<br>\n");
+		// Store production...
+		metaProduction = null;
+	}
+|
+	// Inject production.
+	{
+		// Documentation.
+		if (html != null)
+			html.append("\n"
+				+(comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+"<b>inject</b>[");
+	}
+	"inject" "[" injectArgumentNonterminal=NonterminalName(html) "]"
+	"::="
+	LexicalConcatenation("inject", body, localHtml)
+	{
+		// Documentation.
+		if (html != null) html.append("] ::= " + localHtml);
+		// Store production...
+		injectProduction = body.toString();
+		usedNonterminals.add(injectArgumentNonterminal);
+	}
+	[
+		"," t=<STRING>
+		{
+			if (html != null) html.append(", <code>\""+htmlq(unq(t.toString()))+"\"</code>");
+			injectArgumentOpen = t.toString().replace("'","\"").equals("\"\"") ? "" : q(unq(t.toString()));
+		}
+		"," t=<STRING>
+		{
+			if (html != null) html.append(", <code>\""+htmlq(unq(t.toString()))+"\"</code>");
+			injectArgumentClose = t.toString().replace("'","\"").equals("\"\"") ? "" : q(unq(t.toString()));
+		}
+	]
+	"."
+	{
+		if (html != null) html.append(" .<br>\n");
+	}
+|
+	"noinject"
+	"."
+	{
+		// Documentation.
+		if (html != null)
+			html.append("\n"
+				+(comment != null ? "</blockquote>\n"+htmlcommentify(comment)+"\n<blockquote>\n" : "")
+				+"<b>noinject</b> .<br>\n");
+		// Store production...
+		injectProduction = null;
+	}
+}
+
+/**
+ * Concatenation of one outermost choice.
+ * The generated JavaCC action will return the sink argument after it has been populated by the concatenation. 
+ * @param productionName name of the production (for error messages)
+ * @param topConstructor omit return and expect context to return sink
+ * @param globalMetavariables maps argument meta-variables of production to corresponding JavaCC production name
+ * @param decls declarations for header portion of enclosing JavaCC production
+ * @param body where the body portion of the JavaCC production is appended to 
+ * @param html where the printable version of the production should be appended
+ */
+Reverser.Builder TopConcatenation(String productionName, String topConstructor,
+	Map<String, Triple<String, String, String>> globalMetavariables,
+	Map<String, String> decls, Appendable body, Appendable html) throws IOException :
+{
+	SourceBuilder production = new PlainSourceBuilder(body, "\t");
+	StringBuilder endings = new StringBuilder();
+	Map<String, Variable> variables = new HashMap<String, Variable>();
+	Map<String, Triple<String, String, String>> metavariables = new HashMap<String, Triple<String, String, String>>(globalMetavariables);
+	Map<Variable, String> variable2java = new HashMap<Variable, String>();
+	Reverser.Builder rev, rev2;
+}
+{
+	rev=Primary(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	(
+		{html.append(" ");}
+		rev2=Primary(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+		{rev = rev.concatenate(rev2);}
+	)*
+	{
+		// Emit final action to return sink.
+		if (production.nesting() == 0 && endings.length() == 0 && !production.seeded())
+		{
+			if (topConstructor == null)
+				production.addStatement("{return sink;}"); // use short form in the trivial case
+		}
+		else
+		{ 
+			if (production.nesting() == 0) production.openBlock("{"); // make sure action is started
+			if (endings.length() > 0) sink(production, endings); // close open inline constructors
+			if (!production.seeded()) production.seedExpression("sink");
+			if (topConstructor != null)
+				production.addStatement(production.wrapExpression("sink =", ";").harvest()); // make sure result is passed on
+			else
+				production.addStatement(production.wrapExpression("return", ";").harvest()); // this is where the result is actually returned
+			while (production.nesting() > 0) production.closeBlock("}"); // close all scopes
+		}
+		return rev;
+	}
+}
+
+/**
+ * Basic grammar component.
+ * @param productionName name of the production (for error messages)
+ * @param decls accumulator of declarations for header portion of enclosing JavaCC production
+ * @param production under construction
+ * @param endings contains the sink "closing brackets" for open constructions and meta-applications
+ * @param html where the printable version of the production should be appended
+ * @param variable2java maps variables to the name of the Java variable with the variable
+ * @param variables maps already parsed variable names to the created variable
+ * @param metavariables maps meta-variables in term to corresponding JavaCC production name
+ */
+Reverser.Builder Primary(String productionName, Map<String, String> decls, SourceBuilder production,
+	StringBuilder endings, Appendable html, Map<Variable, String> variable2java,
+	Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Reverser.Builder rev = Reverser.dummy();
+	String occ = "";
+}
+{
+	( Comment() )*
+	{top(production, " ( "); html.append(" ");}
+	(	rev=Literal(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	|	rev=Terminal(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	|	rev=Nonterminal(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	|	rev=Inline(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	|	rev=Generation(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	|
+		"(" {html.append("( ");}
+		(			rev=Choice(productionName, decls, production, html, variable2java, variables, metavariables)
+		|
+			{top(production, "{}");}
+		)
+		")" {html.append(" )");}
+		[ "*" {occ = "*";} | "+" {occ = "+";} | "?" {occ = "?";}]
+	)
+	{top(production, " )"+occ+" "); html.append(occ+" ");}
+	{return rev;}
+}
+
+/**
+ * Literal.
+ * @param body where the body portion of the JavaCC production is appended to 
+ * @param html where the printable version of the production should be appended
+ */
+Reverser.Builder Literal(String productionName, Map<String, String> decls, SourceBuilder production,
+	StringBuilder endings, Appendable html, Map<Variable, String> variable2java,
+	Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Token t;
+	String literal;
+	Usage use;
+}
+{
+	t=<STRING>
+	{
+		html.append(" \"<code>"+htmlq(unq(t.toString()))+"</code>\"");
+		literal = q(unq(t.toString()));
+	}
+	use=Use("", literal, html, true)
+	{
+		if (!use.touched)
+		{
+			top(production, literal);
+		}
+		else
+		{
+			if (use.needst)
+			{
+				decls.put("t", "Token t = null;");
+				top(production, "t="+literal);
+			}
+			else
+			{
+				top(production, literal);
+			}
+			useUsage(use, ""+decls.size(), decls, production, endings, variable2java, variables, metavariables);
+		}
+		return Reverser.literal(literal, use);
+	}
+}
+
+/** Inline. */
+Reverser.Builder Inline(String productionName, Map<String, String> decls, SourceBuilder production,
+	StringBuilder endings, Appendable html, Map<Variable, String> variable2java,
+	Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Token t;
+	String inline = "";
+	Usage use;
+}
+{
+	"{"
+	(
+		( t=Name() { inline += t.toString(); } )+		"}"
+		{
+			inline = q(inline);
+		}
+	| t=<STRING> "}"
+		{
+			inline = q(unq(t.toString()));
+		}
+	)
+	{		html.append(HTML_START_A+"{"+t+"}"+HTML_END_A);
+	}
+	use=Use(t.toString(), inline, html, false)
+	{
+		useUsage(use, ""+decls.size(), decls, production, endings, variable2java, variables, metavariables);
+		return Reverser.inline(inline, use);
+	}
+}
+
+/** Terminal. */
+Reverser.Builder Terminal(String productionName, Map<String, String> decls, SourceBuilder production,
+	StringBuilder endings, Appendable html, Map<Variable, String> variable2java,
+	Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Token t;
+	String terminal, s_name;
+	Usage use;
+}
+{
+	// Special case for standard end of file token.
+	"EOF"
+	{
+		html.append(" EOF");
+		top(production, "<EOF>");
+	}
+|
+	t=Name()
+	{
+		terminal = t.toString();
+		html.append(" <a href=\"#T_"+terminal+"\">"+terminal+"</a>");
+	}
+	use=Use(terminal, "t.toString()", html, false)
+	{
+		if (!use.touched)
+		{
+			// Unused terminal just parsed and ignored.
+			top(production, " <T_"+terminal+">");
+		}
+		else
+		{
+			String namebase = use.name.replace("#", "_");
+			// Gotta parse actual token string (possibly converted) and save into s_* variable!
+			decls.put("t", "Token t = null;");
+			top(production, "t=<T_"+terminal+">");
+			useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
+		}
+		return Reverser.terminal(terminal, use);
+	}
+}
+
+/** Reference to nonterminal - with optional occurrence indicator. */
+String NonterminalName(Appendable html) throws IOException :
+{
+	Token t;
+	char repeater = 0;
+	String nonterminal;
+}
+{
+	<LANGLE>
+	t=Name() {nonterminal = t.toString();}
+	<RANGLE>
+	[ "*" {repeater='*';} | "+" {repeater='+';} | "?" {repeater='?';} ]
+	{
+		// In all modes, documentation is just the nonterminal.
+		if (html != null) html.append("<a href=\"#N_"+nonterminal+"\">&lang;"+nonterminal+"&rang;</a>"+repeater);
+		String realNonterminal = null;
+		switch (repeater)
+		{
+			case '?' :
+				realNonterminal = nonterminal + "$Maybe";
+				break;
+			case '+' :
+				realNonterminal = nonterminal + "$Sequence";
+				break;
+			case '*' :
+				realNonterminal = nonterminal + "$MaybeSequence";
+				break;
+			default :
+				return nonterminal;
+		}
+		derivedNonterminals.add(realNonterminal);
+		return realNonterminal;
+	}
+}
+
+/** Nonterminal reference. */
+Reverser.Builder Nonterminal(String productionName, Map<String, String> decls, SourceBuilder production, StringBuilder endings, Appendable html, Map<Variable, String> variable2java, Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Token t, t2;
+	String nonterminal;
+	List<String> arguments = new ArrayList<String>();
+	char repeater = 0;
+	List<String> vs = new ArrayList<String>();
+	String arg = "", extraArgs = "", htmlArgs = "";
+	Usage use;
+	String namebase, c_in, s_name; // constant name, result constant, variable name for result
+}
+{
+	<LANGLE>
+	t=Name() {nonterminal = t.toString();}
+	(
+		t=<STRING> {arg = t.toString(); arguments.add(unq(arg)); htmlArgs = htmlArgs+" "+arg;}
+	|
+		t=<EMBEDDED> {arg = t.toString(); arguments.add(unembed(arg)); htmlArgs = htmlArgs+" "+arg;}
+	|
+		[ t=Name() {arg = t.toString();} ] t=MetaVar() {arg = arg + t.toString(); arguments.add(arg); htmlArgs = htmlArgs+" "+arg;}
+	)*
+	<RANGLE>
+	[ "*" {repeater='*';} | "+" {repeater='+';} | "?" {repeater='?';} ]
+	{{
+	  
+		// In all modes, documentation is just the nonterminal.
+		if (html != null) html.append("<a href=\"#N_"+nonterminal+"\">&lang;"+nonterminal+htmlArgs+"&rang;</a>"+repeater);
+		switch (repeater)
+		{
+			case '?' :
+				usedNonterminals.add(nonterminal);
+				nonterminal = nonterminal + "$Maybe";
+				derivedNonterminals.add(nonterminal);
+				break;
+			case '+' :
+				usedNonterminals.add(nonterminal);
+				nonterminal = nonterminal + "$Sequence";
+				derivedNonterminals.add(nonterminal);
+				break;
+			case '*' :
+				usedNonterminals.add(nonterminal);
+				nonterminal = nonterminal + "$MaybeSequence";
+				derivedNonterminals.add(nonterminal);
+				break;
+		}
+		usedNonterminals.add(nonterminal);
+		c_in = "c"+decls.size();
+		//
+		int argCount = 0;
+		for (String text : arguments)
+		{
+			try
+			{
+				// Store generated text into buffer to pass as parameter
+				String n = "" + (++argCount);
+				String bufferName = "b" + n;
+				decls.put(bufferName, BUFFER+" "+bufferName+" = new "+BUFFER+"(sink);");
+				String sinkName = "s" + n;
+				decls.put(sinkName, SINK+" "+sinkName+" = null;");
+				action(production, sinkName+" = "+bufferName+".sink();");
+				ExpandingJavaSink generatorSink = new ExpandingJavaSink(maker, sinkName, production, variable2java, null, metavariables);
+				factory.parser(factory).parse(generatorSink, null, new StringReader(text), null, 1, 1, new LinkedExtensibleMap<String, Variable>().extend(variables));
+				drop(production);
+				extraArgs = extraArgs + ", " + bufferName;
+			}
+			catch (IOException e)
+			{
+				throw new ParseException("CRS term read error: "+e.getMessage()+"\nin "+t.toString());
+			}
+			catch (CRSException e)
+			{
+				throw new ParseException("CRS term parse error: "+e.getMessage()+"\nin "+t.toString());
+			}
+		}
+	}}
+	[
+		// Optional variables bound in parsed subterm.
+		"[" [Names(vs)] "]"
+		{{
+			String sep = "";
+			html.append(HTML_START_A+"[");
+			for (String v : vs) {html.append(sep+v); sep = ",";}
+			html.append("]"+HTML_END_A);
+		}}
+	]
+	use=Use(nonterminal, c_in, html, false)
+	{
+		if (!use.touched)
+		{
+			// Parsed non-terminal "just" copied out inline!
+			StringBuilder ext = new StringBuilder(); // for extensions of bound passed to subterms
+			if (vs.size() > 0)
+			{
+				StringBuilder bs = new StringBuilder(); // binders to generate for inline term
+				for (String v : vs)
+				{
+					// Pass to subterm parser the actual Variable used for this variable name.
+					ext.append(".extend(s_"+v+", v_"+v+")");
+					// Add created variable to list of binders.
+					bs.append((bs.length()>0?",":"")+"v_"+v);
+				}
+				String bsName = "bs"+production.count();
+				declare(production, VARIABLE+"[] "+bsName+" = {"+bs+"};");
+				sink(production, ".binds("+bsName+")");
+			}
+			// Anonymous non-terminal recursively parsed and emitted regardless of state.
+			top(production, "sink=N_"+nonterminal+"(sink, env"+ext+extraArgs+")");
+		}
+		else
+		{
+			// Parsed non-terminal must be buffered for later use.
+			namebase = use.name.replace("#", "_");
+			String bufferName = "b_" + namebase;
+			decls.put(bufferName, BUFFER+" "+bufferName+" = new "+BUFFER+"(sink);");
+			// Collect  binders + subterm in private buffer.
+			String bufferSinkName = "bs_" + namebase;
+			decls.put(bufferSinkName, SINK+" "+bufferSinkName+" = null;");
+			action(production, bufferSinkName+" = "+bufferName+".sink();");
+			StringBuilder ext = new StringBuilder(); // for extensions of bound passed to subterms
+			if (vs.size() > 0)
+			{
+				StringBuilder bs = new StringBuilder(); // binders to generate for inline term
+				for (String v : vs)
+				{
+					// Pass to subterm parser the actual Variable used for this variable name.
+					ext.append(".extend(s_"+v+", v_"+v+")");
+					// Add created variable to list of binders.
+					bs.append((bs.length()>0?",":"")+"v_"+v);
+				}
+				String bsName = "bs"+production.count();
+				declare(production, VARIABLE+"[] "+bsName+" = {"+bs+"};");
+				action(production, bufferSinkName+" = "+bufferSinkName+".binds("+bsName+");");
+			}
+			top(production, "N_"+nonterminal+"("+bufferSinkName+", env"+ext+extraArgs+")"); // collect subterm in buffer
+			if (use.definition || use.use || use.construct || use.meta || use.wasConverted)
+			{
+				// Compute constant.
+				action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
+					+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
+				decls.put(c_in, "String "+c_in+" = null;");
+				action(production, c_in+" = "+bufferName+".term(true).constructor().symbol();");
+				// Generate use!
+				useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
+			}
+			else // no explicit marking...
+			{
+				// Use of the named meta-variable in subsequent embedded terms should just copy the buffer.
+				metavariables.put(use.name, new Triple<String, String, String>("", ".copy("+bufferName+", true)", null));
+			}
+		}
+		return Reverser.nonterminal(nonterminal, vs, use);
+	}
+}
+
+/** Generation of term. */
+Reverser.Builder Generation(String productionName, Map<String, String> decls, SourceBuilder production,
+	StringBuilder endings, Appendable html, Map<Variable, String> variable2java,
+	Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Token t;
+	String text;
+	boolean java = false;
+	Usage use;
+	String namebase, c_in;
+}
+{
+	( t=<EMBEDDED> {text = unembed(t.toString());} ) // TODO: allow naked meta-variable?
+	{
+		html.append(HTML_START_A+t+HTML_END_A);
+		c_in = "c"+decls.size();
+	}
+	use=Use(c_in, c_in, html, false)
+	{
+		if (text.startsWith(":")) 
+		{
+			action(production, text.substring(1));
+		}
+		else if (!use.touched)
+	  	{
+			try
+			{
+				action(production, ""); // make sure "sink" is available for use
+				ExpandingJavaSink generatorSink = new ExpandingJavaSink(maker, "sink", production, variable2java, null, metavariables);
+				factory.parser(factory).parse(generatorSink, use.category, new StringReader(text), null, 1, 1, new LinkedExtensibleMap<String, Variable>().extend(variables));
+			}
+			catch (IOException e)
+			{
+				throw new ParseException("CRS term read error: "+e.getMessage()+"\nin "+t.toString());
+			}
+			catch (CRSException e)
+			{
+				throw new ParseException("CRS term parse error: "+e.getMessage()+"\nin "+t.toString());
+			}
+		}
+		else
+		{
+			// Parsed embedded must be buffered for later use.
+			// Collect subterm in private buffer.
+			namebase = use.name.replace("#", "_");
+			String bufferName = "buf_" + namebase;
+			String sinkName = "sink_" + namebase;
+			decls.put(bufferName, BUFFER+" "+bufferName+" = new "+BUFFER+"(sink);");
+			decls.put(sinkName, SINK+" "+sinkName+" = null;");
+			try
+			{
+				action(production, ""); // make sure "sink" is available for use
+				production.addStatement(sinkName+" = "+bufferName+".sink();");
+				ExpandingJavaSink generatorSink = new ExpandingJavaSink(maker, sinkName, production, variable2java, null, metavariables);
+				factory.parser(factory).parse(generatorSink, use.category, new StringReader(text), null, 1, 1, new LinkedExtensibleMap<String, Variable>().extend(variables));
+				production.addStatement(production.wrapExpression(sinkName+" = ", ";").harvest());
+			}
+			catch (IOException e)
+			{
+				throw new ParseException("CRS term read error: "+e.getMessage()+"\nin "+t.toString());
+			}
+			catch (CRSException e)
+			{
+				throw new ParseException("CRS term parse error: "+e.getMessage()+"\nin "+t.toString());
+			}
+			if (use.definition || use.use || use.construct || use.meta || use.wasConverted)
+			{
+				// Compute constant.
+				action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
+					+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
+				decls.put(c_in, "String "+c_in+" = null;");
+				action(production, c_in+" = "+bufferName+".term(true).constructor().symbol();");
+				// Generate use!
+				useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
+			}
+			else // no explicit marking...
+			{
+				// Use of the named meta-variable in subsequent embedded terms should just copy the buffer.
+				metavariables.put(use.name, new Triple<String, String, String>("", ".copy("+bufferName+".term(false), true)", null));
+			}		}
+		return Reverser.generation(text);
+	}
+}
+
+/** Choice. */
+Reverser.Builder Choice(String productionName, Map<String, String> decls, SourceBuilder production,
+	Appendable html, Map<Variable, String> variable2java, Map<String, Variable> variables,
+	Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	StringBuilder localEndings;
+	Reverser.Builder rev, rev2;
+}
+{
+	{
+		in(production);
+		localEndings = new StringBuilder();
+	}
+	rev=Concatenation(productionName, decls, production, localEndings, html, 
+				new HashMap<Variable, String>(variable2java),
+				new HashMap<String, Variable>(variables),
+				new HashMap<String, Triple<String, String, String>>(metavariables))
+	{
+		if (localEndings.length() > 0) sink(production, localEndings); // close open inline constructors
+		out(production);
+	}
+	(
+		"|"
+		{
+			top(production, "|"); html.append(" | ");
+			in(production);
+			localEndings = new StringBuilder();
+		}
+		rev2=Concatenation(productionName, decls, production, localEndings, html,
+					new HashMap<Variable, String>(variable2java),
+					new HashMap<String, Variable>(variables),
+					new HashMap<String, Triple<String, String, String>>(metavariables))
+		{
+			if (localEndings.length() > 0) sink(production, localEndings); // close open inline constructors
+			out(production);
+			rev = rev.choice(rev2);
+		}
+	)*
+	{return rev;}
+}
+
+/** Nested concatenation. */
+Reverser.Builder Concatenation(String productionName, Map<String, String> decls, SourceBuilder production,
+	StringBuilder endings, Appendable html, Map<Variable, String> variable2java,
+	Map<String, Variable> variables, Map<String, Triple<String, String, String>> metavariables) throws IOException :
+{
+	Reverser.Builder rev, rev2;
+}
+{
+	rev=Primary(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+	(
+		{html.append(" ");}
+		rev2=Primary(productionName, decls, production, endings, html, variable2java, variables, metavariables)
+		{rev = rev.concatenate(rev2);}
+	)*
+	{return rev;}
+}
+
+/**
+ * Copy stuff.
+ * @return HTML text describing the effect.
+ */
+void Copy(String comment, Appendable javacc) throws IOException :
+{
+	Token t;
+}
+{
+	t=<EMBEDDED>
+	{{
+		String s = t.toString();
+		if (comment != null) javacc.append(comment);
+		javacc.append(unembed(s)+"\n");
+	}}
+}
+
+/**
+ * Include stuff.
+ * @return HTML text describing the effect.
+ */
+void Include(String comment, Appendable javacc, Appendable html, Appendable serializer) throws IOException :
+{
+	Token t;
+}
+{
+	"include"
+	(
+		t=<STRING>
+		{{
+			String s = unq(t.toString());
+			if (comment != null) javacc.append(comment);
+			InputStream input = new URL(new URL("file:."), s).openStream();
+			PGParser p = new PGParser(input);
+			p.Productions(javacc, html, serializer);
+			input.close();
+		}}
+	|
+		"JavaCC"
+		t=<STRING>
+		{{
+			String s = unq(t.toString());
+			if (comment != null) javacc.append(comment);
+			Reader input = new InputStreamReader(new URL(new URL("file:."), s).openStream());
+			CharBuffer chars = CharBuffer.allocate(1024);
+			for (int z = input.read(chars); z >= 0; z = input.read(chars))
+			{
+				chars.clear();
+				javacc.append(chars, 0, z);
+			}
+			input.close();
+		}}
+	)
+}
+
+/**
+ * List of names.
+ * @param names accumulates list of names
+ */
+void Names(List<String> names) :
+{
+	Token t;
+}
+{
+	t=Name() {names.add(t.toString());}
+	(
+		"," t=Name() {names.add(t.toString());}
+	)*
+}
+
+/** Parse usage description. */
+Usage Use(String prefix, String initial, Appendable html, boolean isConstant) throws IOException :
+{
+	Token t;
+	Usage use = new Usage(prefix, initial);
+	StringBuilder annotation = new StringBuilder();
+}
+{
+	// Old (hopefully) soon obsolete JJCRS notations.
+	(
+		{use.touched = true;}
+		"^" ["^" {use.linear = true;}]	t=<VAR>
+		{use.definition = true; use.name = t.toString(); annotation.append("^"+(use.linear?"^":"")+t);}
+	|
+		[
+			{use.touched = true;} 
+			t=MetaVar() {use.buffer = true; use.name = use.name + t.toString(); annotation.append(t.toString());}
+			[ t=<NUMBER> {use.name = use.name + t.toString(); annotation.append(t.toString());} ]
+		]
+		[
+			{use.touched = true;} 
+			"!" {use.use = true; annotation.append("!");}
+			[ "!" {use.freeVar = true; annotation.append("!");}
+			  [ "!" {use.freshVar = true; annotation.append("!");} ]
+			]
+		|
+			{use.touched = true;} 
+			"$"
+			( "$" {use.embedded = true; annotation.append("$$");}
+			| {use.literal = true; annotation.append("$");}
+			)
+		|
+			{use.touched = true;} 
+			"@" {use.meta = true; annotation.append("@");}
+		]
+	)
+	// 
+	(
+		":" {annotation.append(":");}
+		(
+			// :Name means "convert using static String Name(String) method".
+			t=Name() {use.touched = true; use.converted = t.toString() + "(" + use.converted + ")"; annotation.append(""+t); use.wasConverted = true;}
+		|
+			// :«Expr» means "convert using code of type String where # is substituted by the value!
+			t=<EMBEDDED> {use.touched = true; use.converted = unembed(t.toString()).replaceAll("#", use.converted); annotation.append(""+t); use.wasConverted = true;}
+		|
+			// :# means that whatever was generated is stored and can be referenced with the meta-application #[...] with explicit subterm group.
+			t=MetaVar() {use.touched = true; use.buffer = true; use.name = t.toString(); annotation.append(t.toString());}
+	    |
+	    	// :{category} means reparse using category. note: DOES NOT TOUCH!			"{" t=Name() "}" {use.category = t.toString(); annotation.append("{"+t+"}");}
+		)
+    |
+		// New experimental usage notations for a unit (all start with "_").
+		"_" {use.touched = true; annotation.append("_");}
+		(
+			// _? means "interpret name as (bound) variable"
+			"?" {use.use = true; annotation.append("?");}
+		|
+			// _! means "interpret name as bound or free variable" (or, if repeated, also fresh)
+			"!" {if (!use.freeVar) use.use = use.freeVar = true; else use.freshVar = true; annotation.append("!");}
+		|
+			// _x means "create binder from name" the scope of which will be the single subterm with an [x] tail.
+			t=<VAR> {use.definition = true; use.name = t.toString(); annotation.append(use.name+" .");}
+		|
+			// _$ or _{} means "use unit as the constructor for the remaining subterms in group"
+			( "$" | "{}" ) {use.construct = true; annotation.append("$");}
+		|
+			// _# means "interpret unit as an actual meta-variable applied to the remaining subterms in group".
+			t=MetaVar() {use.meta = true; annotation.append(t.toString());}
+		|
+			// _= interprets the unit as an actual term.
+			"=" {use.embedded = true; annotation.append("=");}
+		)
+	)*
+	{
+		if (annotation.length() > 0)
+		{
+			html.append(HTML_START_A + annotation.toString() + HTML_END_A);
+		}
+		if (use.construct && !use.wasConverted && isConstant && constantsClass != null)
+		{
+			String token = unq(use.converted);
+			if (!constants.contains(token)) constants.add(token);
+			use.converted = constantsClass + ".STRING[" + constantsClass + ".C_" + javaq(token) + "]";
+		}
+		return use;
+	}
+}
+
+/** Parse and echo lexical choice. */
+void LexicalChoice(String productionName, Appendable body, Appendable html) throws IOException :
+{}
+{
+	LexicalConcatenation(productionName, body, html)
+	(
+		"|" {body.append(" | "); html.append(" | ");}
+		LexicalConcatenation(productionName, body, html)
+	)*
+}
+
+/** Parse and echo lexical concatenation. */
+void LexicalConcatenation(String productionName, Appendable body, Appendable html) throws IOException :
+{}
+{
+	LexicalSimple(productionName, body, html)
+	(
+		{body.append(" "); html.append(" ");}
+		LexicalSimple(productionName, body, html)
+	)*
+}
+
+/** Parse and echo simple lexical tokens. */
+void LexicalSimple(String productionName, Appendable body, Appendable html) throws IOException :
+{
+	Token t;
+	boolean needsParentheses = false;
+	StringBuilder b = new StringBuilder();
+}
+{
+	(
+		t=<STRING>
+		{{
+			String s = t.toString(); b.append(q(unq(s)));
+			html.append(" \"<code>"+htmlq(s.substring(1, s.length()-1))+"</code>\"");
+		}}
+	|
+		t=<CHAR>
+		{{
+			String s = t.toString(); html.append("<code>"+htmlq(s)+"</code>");
+			b.append(q(unChar(s)));
+		}}
+	|
+		t=Name() {b.append("<T_"+t.toString()+">"); html.append(htmlq(t.toString()));}
+	|
+		// Character literal.
+		( <NOT> {b.append("~["); html.append("&not;[");}
+	| "[" {b.append("["); html.append("[");} )
+		[
+			LexicalChars(productionName, b, html)
+		]
+		"]" {b.append("]"); html.append("]");}
+	|
+		// Group.
+		"(" {html.append("(");}
+		LexicalChoice(productionName, b, html)
+		")" {html.append(")");}
+		{needsParentheses = true;}
+	)
+	(	"?" {body.append("("+b.toString()+")?"); html.append("?");}
+	|	"*" {body.append("("+b.toString()+")*"); html.append("*");}
+	|	"+" {body.append("("+b.toString()+")+"); html.append("+");}
+	|	{body.append(needsParentheses ? "("+b.toString()+")" : b.toString() );}
+	)
+}
+
+/** Parse and echo lexical character class. */
+void LexicalChars(String productionName, Appendable b, Appendable html) throws IOException :
+{
+	Token t;
+	boolean rangestart = false; // true when dash creates range
+	String separator = ""; // set to "-" when range active
+    String s;
+}
+{
+	(
+		(
+			t=<STRING>
+			{s = t.toString(); html.append("\"<code>"+htmlq(unq(s))+"</code>\""); s = unq(s);}
+		|
+			( t=<CHAR>
+			| t="~" | t="!" | t="@" | t="#" | t="$" | t="%" | t="^" | t="&" | t="*" | t="(" | t=")"
+			| t="_" | t="+" | t="=" | t="{" | t="}" | t="|" | t=":" | t=";" | t="." | t="?" | t="/" )
+			{s = t.toString(); html.append("<code>"+htmlq(s)+"</code>"); s = unChar(s);}
+		)
+		{
+			b.append(separator); b.append(q(s));
+			rangestart = !separator.equals("-"); separator = ",";
+		}
+	|
+		( t=Name() | t=<NUMBER> )
+		{
+			s = t.toString();
+			html.append("<code>"+htmlq(s)+"</code>");
+			for (int i = 0; i < s.length(); ++i)
+			{
+				char c = s.charAt(i);
+				if (c == '-')
+				{					if (rangestart)
+					{
+						rangestart = false; separator = "-";
+					}
+					else
+					{						b.append(separator); b.append(q("-"));
+						rangestart = !separator.equals("-"); separator = ",";
+					}
+				}
+				else
+				{					b.append(separator);
+					b.append(q(""+c));
+					rangestart = true; separator = ",";
+				}
+			}
+		}
+	|
+		<DASH>
+		{
+			html.append("&ndash;");
+			if (rangestart)
+			{
+				separator = "-";
+				rangestart = false;
+			}
+			else
+			{
+				b.append(separator); b.append(q("-"));
+				rangestart = !separator.equals("-"); separator = ",";
+			}
+		}
+	|
+		","
+		{
+			html.append(",");
+			rangestart = false; separator = ",";
+		}
+	)+
+	{
+		// Deal with hanging dash.
+		if (separator.equals("-"))
+		{
+			b.append(","); b.append(q("-"));
+		}
+	}
+}
+
+/**
+ * Comment.
+ * Return the comment as a string.
+ */
+String Comment() throws IOException :
+{
+	Token t;
+}
+{
+	t=<COMMENT> {return t.toString();}
+}
+
+/** Spaces and line comments are just skipped. */
+SKIP : { " " | "\t" | "\n" | "\r" | "//" : IN_LINE_COMMENT }
+<IN_LINE_COMMENT> SKIP : { "\n" : DEFAULT | "\r" : DEFAULT | <~[] > }
+
+/** Complex tokens. */
+Token Name() :
+{
+	Token t;
+}
+{
+	( t=<VAR> | t=<CONST> ) {return t;}
+}
+
+Token MetaVar() :
+{
+	Token t;}
+{
+	( t=<METAVAR> | t="#" ) {return t;}}
+
+TOKEN :
+{
+    < LANGLE : "<" | "\u27E8" | "&lang;" > |
+    < RANGLE : ">" | "\u27E9" | "&rang;" > |
+	< DASH : "-" | "&" ["n","m"] "dash;" > |
+	< NOT : "~[" | "\u00AC[" | "&not;[" | "[^" > |
+
+	< COMMENT : "/*" ( ~["*"] | ("*")+ ~["*","/"] )* "*/" > |
+	< STRING : "\"" ( ~["\n","\\","\""] | "\\" ~["\n"])* "\"" | "'" ( ~["\n","\\","'"] | "\\" ~["\n"])* "'" > |
+	
+	< EMBEDDED :
+		"{{" ( ~["}"] | "}" ~["}"]  )* "}}"
+		| "[[" ( ~["]"] | "]" ~["]"]  )* "]]"
+		| "%{" ( ~["%"] | "%" ~["}"]  )* "%}"
+		| "\u00AB" ( ~["\u00AB","\u00BB"] )* "\u00BB" // «...»
+		| "\u27E6" ( ~["\u27E6","\u27E7"] )* "\u27E7" // ⟦...⟧
+		| "\u27EA" ( ~["\u27EA","\u27EB"] )* "\u27EB" // ⟪...⟫
+	> |
+	
+	< VAR : <LOWER> <TAIL> > |
+	< CONST : ("$"|<UPPER>) <TAIL> > |
+	< NUMBER : (<DIGIT>)+ > |
+	< METAVAR : "#" <TAIL> > |
+	< #DIGIT : ["0"-"9"] > |
+	< #LOWER : ["a"-"z"] > |
+	< #UPPER : ["A"-"Z"] > |
+	< #LETTER : <LOWER> | <UPPER> > |
+	< #TAIL : (([".","-","_"])* (<LETTER>|<DIGIT>))* > |
+
+	< CHAR :
+		("#x" | "\\u" | "\\x") (["0"-"9","A"-"Z","a"-"z"])+
+		| "\\" ["0"-"3"] (["0"-"7"])+
+		| "\\" ~[]
+		| ~[]
+	>
+}

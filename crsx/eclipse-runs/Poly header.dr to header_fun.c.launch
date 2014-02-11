@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/crsx/src/net/sf/crsx/run/Crsx.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sf.crsx.run.Crsx"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="grammar=(\'net.sf.crsx.text.Text\';)&#10;rules=src/net/sf/crsx/compiler/c/rules.crs&#10;HEADERS=header.h&#10;sink=net.sf.crsx.text.TextSink &#10;input=gen/header.dr&#10;output=gen/header_fun.c"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="crsx"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea"/>
+</launchConfiguration>

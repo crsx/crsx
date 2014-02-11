@@ -1,0 +1,5 @@
+*.o
+*.dr
+*.tmp
+crsx
+*.symlist
