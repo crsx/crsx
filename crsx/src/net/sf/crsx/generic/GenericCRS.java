@@ -2459,7 +2459,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						// We have a data candidate without any properties reference -- add minimal clean environment.
 						result = cleanLoc ? term.wrapWithPropertiesRef(loc, true) : wrapWithPassLocation(loc, term);
 					}
-					else
+					else // if (!cleanLoc) // would use clean top loc aggressively, currently local always overrides 
 					{
 						// We have a data candidate with an existing properties reference -- propagate *that* to subterm candidates.
 						loc = ((PropertiesConstraintsWrapper) ph).getRef();
