@@ -2000,8 +2000,11 @@ Hashset minusHS(Context context, Hashset set, Hashset other)
 
 Hashset removeAllHS(Context context, Hashset set, Variable* vars, int len)
 {
-	if (!set || set == AllFreeVariables)
+	if (!set)
 		return NULL;
+
+	if (set == AllFreeVariables)
+	    return set;
 
 	if (set->nr > 1)
 	{
@@ -2050,6 +2053,8 @@ void printfHS(Context context, FILE* out, Hashset set)
 
 void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constrained, VariablePropertyLink props)
 {
+    ASSERT(context, set != AllFreeVariables);
+
 	if (!set || set->nitems == 0)
 		return;
 
@@ -2072,7 +2077,6 @@ void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constr
 
 Hashset UNLINK_Hashset(Context context, Hashset set)
 {
-
 	if (set && set != AllFreeVariables)
 	{
 		ASSERT(context, set->nr > 0);
