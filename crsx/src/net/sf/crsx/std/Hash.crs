@@ -9,7 +9,7 @@
 // It only supports two operation:
 //
 //    NewHash :: Hash[TermSort, IdSort]
-//    HashInsert[ #hash :: Hash[TermSort, IdSort], #term :: TermSort, #new :: IdSort]
+//    HashInsert[ #hash :: Hash[TermSort, IdSort], #term :: TermSort, #new :: IdSort] :: HashResult[TermSort, IdSort]
 //
 // The NewHash operation just returns an empty hash.
 //
@@ -26,26 +26,32 @@
 Hash[(
 
 ∀ a b . Hash[a,b] ::=( {$String : $List[HashMember[a,b]]} HASH; );
+
 ∀ a b . HashMember[a,b] ::=( H_MEMBER[a<!--term-->, b<!--variable-->]; );
+
 ∀ a b . HashResult[a,b] ::=( H_NEW[Hash[a,b]]; H_OLD[Hash[a,b], b<!--variable-->]; );
 
+∀ a b . ResultHash[HashResult[a,b]] :: Hash[a,b] ;
+ResultHash[H_NEW[#hash]] → #hash ;
+-[Discard[#var]] : ResultHash[H_OLD[#hash, #var]] → #hash ;
+
 ∀ a b . HashInsert[Hash[a,b], a<!--term-->, b<!--new variable-->] :: HashResult[a,b] ;
--[Share[#term]] : HashInsert[#hash, #term, #new] → HashInsert2[#hash, #term, $[HashCode, #term], #new] ;
+-[Share[#term]] : HashInsert[#hash, #term, #new] → HashInsert2[#hash, #term, $[FormatNumber, $[HashCode, #term]], #new] ;
 
-∀ a b . HashInsert2[Hash[a,b], a, $String, b] → HashResult[a] ;
--[Share[#code]] : HashInsert2[{#H}HASH, #term, #code, #new] → HashInsert3[{#H}HASH, #term, $[{#H}Get[$List[HashMember[a,b]]], #code, ()], #code, #new] ;
+∀ a b . HashInsert2[Hash[a,b], a, $String, b] :: HashResult[a,b] ;
+-[Share[#code]] : HashInsert2[{#H}HASH, #term, #code, #new] → HashInsert3[{#H}HASH, #term, $[{#H}Get, #code, ()], #code, #new] ;
 
-∀ a b . HashInsert3[Hash[a,b], a, $List[HashMember[a,b]], $String, b] → HashResult[a,b] ;
+∀ a b . HashInsert3[Hash[a,b], a, $List[HashMember[a,b]], $String, b] :: HashResult[a,b] ;
 -[Copy[#members]] : HashInsert3[#hash, #term, #members, #code, #new] → HashInsert4[#members, #hash, #term, #members, #code, #new] ;
 
-∀ a b . HashInsert4[$List[HashMember[a,b]], Hash[a,b], a, $List[HashMember[a,b]], $String, b] → HashResult[a,b] ;
+∀ a b . HashInsert4[$List[HashMember[a,b]], Hash[a,b], a, $List[HashMember[a,b]], $String, b] :: HashResult[a,b] ;
 //
 HashInsert4[(), {#H}HASH, #term, #members, #code, #new]
 →
 H_NEW[{#H; #code : ( H_MEMBER[#term, #new] ; #members )}HASH]  // did not find the term: update hash
 ;
 //
--[Share[#term]]:
+-[Share[#term, #hash]]:
 HashInsert4[(H_MEMBER[#candidate, #old]; #rest), #hash, #term, #members, #code, #new]
 →
 $[If, $[DeepEqual, #candidate, #term], // check the #candidate...

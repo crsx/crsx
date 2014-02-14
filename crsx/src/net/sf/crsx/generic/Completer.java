@@ -652,61 +652,64 @@ public class Completer
 		// if there is overlap with a rule which does not yet have a right-hand side (good case), add rules until the new pattern
 		// instantiates exactly one left-hand side, and then replace the right-hand side if it was null before
 		final List<StandardizedRule> relevantRules = ruleQuadsByConstructor.get(Util.symbol(pattern));
-		final ListIterator<StandardizedRule> iterator = relevantRules.listIterator();
-		
-		while (iterator.hasNext())
+		if (relevantRules != null)
 		{
-			StandardizedRule q = iterator.next();
-			GenericTerm l = q.getPattern();
-			GenericTerm r = q.getContractum();
+			final ListIterator<StandardizedRule> iterator = relevantRules.listIterator();
 			
-			if (!overlaps(l, pattern)) continue;
-			
-			if (r != null)
+			while (iterator.hasNext())
 			{
-				if (!allowOverlaps) warning("rule " + rulename + " overlaps with instance of " + q.three() + ".");
-				continue;
-			}
-			
-			// We have overlap! Save the sort for l, since the rule is probably going to change.
-			Map<Object,Term> sortsSave = new HashMap<Object,Term>();
-			removeSorts(l, sortsSave);
-			for (Entry<Object,Term> e : ruleSorts.entrySet())
-				sortPut(sortsSave, e.getKey(), e.getValue());
-			
-			// find the list of instantiations of l such that some instantiate pattern and the rest is disjunct
-			List<Pair<GenericTerm,Boolean>> replacement = prepareInstantiations(l, pattern, "", 0, sortsSave, keySorts, rulename);
-			if (replacement == null) continue;
-			
-			iterator.remove();
-			for (Pair<GenericTerm,Boolean> pair : replacement)
-			{
-				GenericTerm p = pair.head();
-				saveSortsRecursively(p, null, sortsSave);
+				StandardizedRule q = iterator.next();
+				GenericTerm l = q.getPattern();
+				GenericTerm r = q.getContractum();
 				
-				// instantiations of l which do not match the pattern are saved with an empty right-hand side (as the rule had before)
-				if (!pair.tail().booleanValue())
-					iterator.add(new StandardizedRule(factory, p, null, factory.makeConstructor("⟨undefined⟩"), null));
-				// if p is an instantiation of l which also instantiates pattern, determine the instantiation of the contractum
-				else
+				if (!overlaps(l, pattern)) continue;
+				
+				if (r != null)
 				{
-					// determine a substitution γ such that the left-hand side of this "rule" is pattern γ
-					Map<Variable,Variable> varSubstitution = new HashMap<Variable,Variable>();
-					Map<String,Pair<Variable[],GenericTerm>> metaSubstitution = new HashMap<String,Pair<Variable[],GenericTerm>>();
-					determineInstantiatingSubstitution(p, pattern, varSubstitution, metaSubstitution);
-
-					// map the fresh variables in the new right-hand side to themselves
-					Set<Variable> FV = new HashSet<Variable>();
-					contractum.addFree(FV, new LinkedExtensibleSet<Variable>(), true, null);
-					for (Variable v : FV)
-						if (!varSubstitution.containsKey(v)) varSubstitution.put(v, v);
+					if (!allowOverlaps) warning("rule " + rulename + " overlaps with instance of " + q.three() + ".");
+					continue;
+				}
+				
+				// We have overlap! Save the sort for l, since the rule is probably going to change.
+				Map<Object,Term> sortsSave = new HashMap<Object,Term>();
+				removeSorts(l, sortsSave);
+				for (Entry<Object,Term> e : ruleSorts.entrySet())
+					sortPut(sortsSave, e.getKey(), e.getValue());
+				
+				// find the list of instantiations of l such that some instantiate pattern and the rest is disjunct
+				List<Pair<GenericTerm,Boolean>> replacement = prepareInstantiations(l, pattern, "", 0, sortsSave, keySorts, rulename);
+				if (replacement == null) continue;
+				
+				iterator.remove();
+				for (Pair<GenericTerm,Boolean> pair : replacement)
+				{
+					GenericTerm p = pair.head();
+					saveSortsRecursively(p, null, sortsSave);
 					
-					// and apply the substitution
-					GenericTerm result = substitute(contractum, varSubstitution, metaSubstitution, sortsSave, "", false);
-					saveSortsRecursively(result, null, sortsSave);
-					checkKeyPresence(p, result, null, rulename);
-					
-					iterator.add(new StandardizedRule(factory, p, result, rulename, options));
+					// instantiations of l which do not match the pattern are saved with an empty right-hand side (as the rule had before)
+					if (!pair.tail().booleanValue())
+						iterator.add(new StandardizedRule(factory, p, null, factory.makeConstructor("⟨undefined⟩"), null));
+					// if p is an instantiation of l which also instantiates pattern, determine the instantiation of the contractum
+					else
+					{
+						// determine a substitution γ such that the left-hand side of this "rule" is pattern γ
+						Map<Variable,Variable> varSubstitution = new HashMap<Variable,Variable>();
+						Map<String,Pair<Variable[],GenericTerm>> metaSubstitution = new HashMap<String,Pair<Variable[],GenericTerm>>();
+						determineInstantiatingSubstitution(p, pattern, varSubstitution, metaSubstitution);
+	
+						// map the fresh variables in the new right-hand side to themselves
+						Set<Variable> FV = new HashSet<Variable>();
+						contractum.addFree(FV, new LinkedExtensibleSet<Variable>(), true, null);
+						for (Variable v : FV)
+							if (!varSubstitution.containsKey(v)) varSubstitution.put(v, v);
+						
+						// and apply the substitution
+						GenericTerm result = substitute(contractum, varSubstitution, metaSubstitution, sortsSave, "", false);
+						saveSortsRecursively(result, null, sortsSave);
+						checkKeyPresence(p, result, null, rulename);
+						
+						iterator.add(new StandardizedRule(factory, p, result, rulename, options));
+					}
 				}
 			}
 		}
