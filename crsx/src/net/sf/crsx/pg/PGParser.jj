@@ -1,4 +1,5 @@
-/* Copyright (c) 2007,2010 IBM Corporation. */
+/* Copyright (c) 2007,2010 IBM Corporation.
+   Copyright (c) 2014 Kristoffer H. Rose. */
 
 // JavaCC options.
 options {
@@ -171,7 +172,7 @@ class PGParser
 		for (int i = w.indexOf("\n * @"); i >= 0; i = w.indexOf("\n * @")) w.replace(i+2, i+5, "<br>");
 		for (int i = w.indexOf("\n *"); i >= 0; i = w.indexOf("\n *")) w.delete(i+1, i+3);
 		for (int i = w.indexOf("\n*"); i >= 0; i = w.indexOf("\n*")) w.delete(i+1, i+2);
-		return "<font size=1>/*<br></font>" + w.toString() + "<font size=1><br>*/</font>";
+		return "<font size=1>/*<br></font>" + w.toString().replace("*/","* /") + "<font size=1><br>*/</font>";
 	}
 	
 	/** Helper to remove surrounding {}s. */
@@ -1241,7 +1242,7 @@ void Lexical(String comment, Appendable javacc, Appendable html) throws IOExcept
 		tokens.append("\n" +
 			(comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()) +
 			"\n * " +
-			name + " ::= "+ localHtml.toString().replace("\n", "\n * ") +
+			name + " ::= "+ localHtml.toString().replace("\n", "\n * ").replace("*/", "*&zwj;/") +
 			"\n */\n" +
 			pre + "TOKEN : {<" + (internal?"#":"") + "T_" + name + " : " + body + " >" + post + "}\n");
 	}}
@@ -1285,12 +1286,12 @@ void Skip(String comment, Appendable html) throws IOException :
 				+"<b>skip</b> ::= " + localHtml + " .<br>\n");
 		
 		// JavaCC token declaration head.
-		tokens.append("\n" +
-			(comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()) +
+		tokens.append("\n/**" +
+			(comment == null ? "" : htmlcommentify(comment)) +
 			"\n * " +
 			"<b>skip</b>" +
 			(statearg.length() > 0 ? HTML_START_A+" ("+statearg+")"+HTML_END_A : "") +
-			" ::= "+ localHtml.toString().replace("\n", "\n * ") +
+			" ::= "+ localHtml.toString().replace("\n", "\n * ").replace("*/", "*&zwj;/") +
 			"\n */\n" +
 			pre + "SKIP : { <" + body + "> " + post + "}\n");
 	}}

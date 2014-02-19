@@ -1,5 +1,5 @@
 // Copyright (c) 2010, 2014 IBM Corporation.
-// $Id: linter.h,v 1.1 2014/02/11 15:56:49 villardl Exp $
+// $Id: linter.h,v 3.1 2014/02/07 20:18:10 villardl Exp $
 
 #ifndef _LINTER_H
 # define _LINTER_H

@@ -150,7 +150,7 @@ class PGParser implements PGParserConstants {
                 for (int i = w.indexOf("\u005cn * @"); i >= 0; i = w.indexOf("\u005cn * @")) w.replace(i+2, i+5, "<br>");
                 for (int i = w.indexOf("\u005cn *"); i >= 0; i = w.indexOf("\u005cn *")) w.delete(i+1, i+3);
                 for (int i = w.indexOf("\u005cn*"); i >= 0; i = w.indexOf("\u005cn*")) w.delete(i+1, i+2);
-                return "<font size=1>/*<br></font>" + w.toString() + "<font size=1><br>*/</font>";
+                return "<font size=1>/*<br></font>" + w.toString().replace("*/","* /") + "<font size=1><br>*/</font>";
         }
 
         /** Helper to remove surrounding {}s. */
@@ -1544,7 +1544,7 @@ class PGParser implements PGParserConstants {
                 tokens.append("\u005cn" +
                         (comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()) +
                         "\u005cn * " +
-                        name + " ::= "+ localHtml.toString().replace("\u005cn", "\u005cn * ") +
+                        name + " ::= "+ localHtml.toString().replace("\u005cn", "\u005cn * ").replace("*/", "*&zwj;/") +
                         "\u005cn */\u005cn" +
                         pre + "TOKEN : {<" + (internal?"#":"") + "T_" + name + " : " + body + " >" + post + "}\u005cn");
         }
@@ -1627,12 +1627,12 @@ class PGParser implements PGParserConstants {
                                 +"<b>skip</b> ::= " + localHtml + " .<br>\u005cn");
 
                 // JavaCC token declaration head.
-                tokens.append("\u005cn" +
-                        (comment == null ? "/**" : comment.substring(0, comment.length()-2).trim()) +
+                tokens.append("\u005cn/**" +
+                        (comment == null ? "" : htmlcommentify(comment)) +
                         "\u005cn * " +
                         "<b>skip</b>" +
                         (statearg.length() > 0 ? HTML_START_A+" ("+statearg+")"+HTML_END_A : "") +
-                        " ::= "+ localHtml.toString().replace("\u005cn", "\u005cn * ") +
+                        " ::= "+ localHtml.toString().replace("\u005cn", "\u005cn * ").replace("*/", "*&zwj;/") +
                         "\u005cn */\u005cn" +
                         pre + "SKIP : { <" + body + "> " + post + "}\u005cn");
         }

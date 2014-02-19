@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <alloca.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <unicode/umachine.h>
 #include <unicode/uregex.h>
