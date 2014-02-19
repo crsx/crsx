@@ -1,5 +1,5 @@
 // Copyright (c) 2010, 2014 IBM Corporation.
-// $Id: linter.c,v 1.1 2014/02/11 15:56:48 villardl Exp $
+// $Id: linter.c,v 3.1 2014/02/07 20:18:10 villardl Exp $
 
 #include "linter.h"
 

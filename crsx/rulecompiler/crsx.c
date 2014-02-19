@@ -1,5 +1,5 @@
 // Copyright (c) 2010, 2014 IBM Corporation.
-// $Id: crsx.c,v 1.9 2014/02/11 15:56:49 villardl Exp $
+// $Id: crsx.c,v 3.123 2014/02/11 15:56:48 villardl Exp $
 
 // Implementations of externals from the header file.
 #include "crsx.h"
@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <alloca.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <unicode/umachine.h>
 #include <unicode/uregex.h>
@@ -2000,8 +2001,11 @@ Hashset minusHS(Context context, Hashset set, Hashset other)
 
 Hashset removeAllHS(Context context, Hashset set, Variable* vars, int len)
 {
-	if (!set || set == AllFreeVariables)
+	if (!set)
 		return NULL;
+
+	if (set == AllFreeVariables)
+	    return set;
 
 	if (set->nr > 1)
 	{
@@ -2050,6 +2054,8 @@ void printfHS(Context context, FILE* out, Hashset set)
 
 void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constrained, VariablePropertyLink props)
 {
+    ASSERT(context, set != AllFreeVariables);
+
 	if (!set || set->nitems == 0)
 		return;
 
@@ -2072,7 +2078,6 @@ void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constr
 
 Hashset UNLINK_Hashset(Context context, Hashset set)
 {
-
 	if (set && set != AllFreeVariables)
 	{
 		ASSERT(context, set->nr > 0);
@@ -3210,8 +3215,7 @@ long long termHashCode(Context context, Term term, VariableLink deBruijn)
 			binders[bx].next = local;
 			local = &binders[bx];
 		}
-		code ^= termHashCode(context, SUB(term, index), local);
-		code <<= 1;
+		code ^= termHashCode(context, SUB(term, index), local) ^ (1<<index);
 	}
 	if (IS_LITERAL(term))
 		return code ^ stringHashCode(asLiteral(term)->text);

@@ -1,5 +1,5 @@
-// Copyright (c) 2010,2013 IBM Corporation.
-// $Id: crsx.c,v 3.119 2014/01/26 21:14:37 krisrose Exp $
+// Copyright (c) 2010, 2014 IBM Corporation.
+// $Id: crsx.c,v 3.123 2014/02/11 15:56:48 villardl Exp $
 
 // Implementations of externals from the header file.
 #include "crsx.h"
@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <alloca.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <unicode/umachine.h>
 #include <unicode/uregex.h>
@@ -1072,7 +1073,8 @@ Sink initBuffer(Context context, Buffer buffer, int free)
     // Initialize buffer to be empty.
     buffer->first = NULL;
     buffer->lastTop = -1;
-    buffer->last = NULL;
+    buffer->last = NULL;;
+    buffer->term = NULL;
 #ifdef WEAKENINGS
     buffer->pendingWeakenings = NULL;
 #endif
@@ -1999,8 +2001,11 @@ Hashset minusHS(Context context, Hashset set, Hashset other)
 
 Hashset removeAllHS(Context context, Hashset set, Variable* vars, int len)
 {
-	if (!set || set == AllFreeVariables)
+	if (!set)
 		return NULL;
+
+	if (set == AllFreeVariables)
+	    return set;
 
 	if (set->nr > 1)
 	{
@@ -2049,6 +2054,8 @@ void printfHS(Context context, FILE* out, Hashset set)
 
 void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constrained, VariablePropertyLink props)
 {
+    ASSERT(context, set != AllFreeVariables);
+
 	if (!set || set->nitems == 0)
 		return;
 
@@ -2071,7 +2078,6 @@ void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constr
 
 Hashset UNLINK_Hashset(Context context, Hashset set)
 {
-
 	if (set && set != AllFreeVariables)
 	{
 		ASSERT(context, set->nr > 0);
@@ -3168,6 +3174,53 @@ char *stringnf(Context context, size_t size, const char *format, ...)
         string[size+3] = '\0';
         return string;
     }
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+// Term hashing
+
+static long long stringHashCode(const char* string)
+{
+	long long code = 0ll;
+	int x;
+	for (x = 0; string[x]; ++x)
+		code = (code<<1) ^ string[x];
+	return code;
+}
+
+long long termHashCode(Context context, Term term, VariableLink deBruijn)
+{
+	long long code = 0ll;
+	if (IS_VARIABLE_USE(term))
+	{
+		for (; deBruijn; deBruijn = deBruijn->next)
+		{
+			if (deBruijn->variable == VARIABLE(term))
+				return code * 19ll;
+			++code;
+		}
+		return (((long long) term)>>4) * 3ll;
+	}
+	const size_t arity = ARITY(term);
+	size_t index;
+	for (index = 0; index < arity; ++index)
+	{
+		const size_t rank = RANK(term, index);
+		struct _VariableLink binders[rank];
+		VariableLink local = deBruijn;
+		int bx;
+		for (bx = 0; bx < rank; ++bx)
+		{
+			binders[bx].variable = BINDER(term, index, bx);
+			binders[bx].next = local;
+			local = &binders[bx];
+		}
+		code ^= termHashCode(context, SUB(term, index), local) ^ (1<<index);
+	}
+	if (IS_LITERAL(term))
+		return code ^ stringHashCode(asLiteral(term)->text);
+	else
+		return code ^ (term->descriptor->sortoffset*17ll + (((long long) (SORT(term)))>>4) * 7ll);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -5172,19 +5225,27 @@ void checkFreeVariables(Context context, Term term)
 
 VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort, int constrained, VariablePropertyLink props)
 {
-    VariableSet free = makeVariableSet(context);
+    VariableSet free = NULL;
 #ifdef FREEVARS
 
     if (IS_VARIABLE_USE(term))
     {
+        free = makeVariableSet(context);
         addVariable(free, VARIABLE(term));
     }
     else
     {
         Construction c = asConstruction(term);
-        VARIABLESET_ADDVARIABLESOF(context, free, c->fvs, constrained, props);
-        VARIABLESET_ADDVARIABLESOF(context, free, c->nfvs, constrained, props);
-        VARIABLESET_ADDVARIABLESOF(context, free, c->vfvs, constrained, props);
+
+        if (c->fvs != AllFreeVariables && c->nfvs != AllFreeVariables && c->vfvs != AllFreeVariables)
+        {
+            free = makeVariableSet(context);
+            VARIABLESET_ADDVARIABLESOF(context, free, c->fvs, constrained, props);
+            VARIABLESET_ADDVARIABLESOF(context, free, c->nfvs, constrained, props);
+            VARIABLESET_ADDVARIABLESOF(context, free, c->vfvs, constrained, props);
+        }
+        else
+            return computeFreeVariables(context, term); // Transfer ref
     }
 
 #else
@@ -5192,16 +5253,8 @@ VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort,
     makeFreeVariableSet2(free, term, sort, constrained, props, (VariableSetLink) NULL);
 
 #endif
-#ifdef DEBUG
-    ///printf("FREE_VARIABLES OF\n");
-    ///pt(context, term);
-    ///printf("WITH\n  ");
-    ///{VariablePropertyLink link = props; for(; link; link = link->link) if (link->variable) printf(" %s,", link->variable->name);}
-    ///printf("\nARE  ");
-    ///{VariableSetLink link = free->link; for (; link; link = link->link) printf(" %s,", link->variable->name);}
-    ///printf("\n");
-#endif
-    UNLINK(free->context, term);
+    UNLINK(context, term);
+
     return free;
 }
 
