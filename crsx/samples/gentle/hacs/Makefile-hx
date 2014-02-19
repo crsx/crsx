@@ -38,7 +38,7 @@ JAVACCJAR = $(HACS)/javacc-6.0/bin/lib/javacc.jar
 CRSX = $(JAVA) -ea -cp "$(BUILD):$(CRSXJAR):" net.sf.crsx.run.Crsx allow-unnamed-rules $(EXTRA)
 PG = $(JAVA) -cp "$(BUILD):$(CRSXJAR):$(JAVACCJAR):" net.sf.crsx.pg.PG $(EXTRA)
 JAVACC = $(JAVA) -cp "$(JAVACCJAR)" javacc
-RULEC = $(HACS)/rulecompiler/run
+RULEC = $(HACS)/rulecompiler/crsx
 COOK = $(HACS)/Cookmain
 
 all:: $(RULEC) $(COOK)
@@ -123,18 +123,18 @@ clean::; rm -f *.dr
 
 # (3b) Generate C files.
 #
-%.h: %.dr
+%.h: %.dr $(RULEC)
 	$(RULEC) wrapper=ComputeHeader HEADERS="crsx.h" input=$< output=$@
 
-%_sorts.c: %.dr
+%_sorts.c: %.dr $(RULEC)
 	$(RULEC) wrapper=ComputeSorts HEADERS="$*.h" input=$< output=$@
 %_sorts.o: %_sorts.c %.h
 
-%_rules.c: %.dr
+%_rules.c: %.dr $(RULEC)
 	$(RULEC) wrapper=ComputeRules HEADERS="$*.h" input=$< output=$@
 %_rules.o: %_rules.c %.h
 
-%.rawsymlist: %.dr
+%.rawsymlist: %.dr $(RULEC)
 	$(RULEC) wrapper=ComputeSymbols input=$< output=$@.tmp
 	sed 's/ {/\n{/g' $@.tmp | sed -n '/^[{]/p' >$@
 
@@ -236,7 +236,7 @@ $(RULEC): $(CRSXJAR)
 	@rm -fr $(HACS)/rulecompiler
 	@mkdir -p $(TMP)
 	(cd $(HACS) && $(JAR) xf $(CRSXJAR) rulecompiler)
-	$(MAKE) -C $(HACS)/rulecompiler run
+	$(MAKE) -C $(HACS)/rulecompiler crsx
 
 crsx_scan.o: crsx_scan.c crsx.h
 crsx_scan.c: crsx_scan.l

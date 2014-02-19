@@ -1,5 +1,5 @@
-// Copyright (c) 2010, 2013 IBM Corporation.
-// $Id: crsx.h,v 3.63 2014/01/26 21:14:38 krisrose Exp $
+// Copyright (c) 2010, 2014 IBM Corporation.
+// $Id: crsx.h,v 3.64 2014/02/05 23:02:01 krisrose Exp $
 #ifndef _CRSX_H
 # define _CRSX_H
 #ifdef __cplusplus
@@ -178,10 +178,16 @@ extern char *makeString(Context context, const char *src);
 // ALLOCATE copy of substring of existing string.
 extern char *makeSubstring(Context context, const char *src, size_t first, size_t length);
 
-// ALLOCATE strings corresponding to the $[Escape], $[Rescape], and $[Mangle] primitives. Does not deallocate src.
+// ALLOCATE strings corresponding to the $[Escape], $[Rescape], and $[Mangle], primitives. Does not deallocate src/term.
 extern char *makeEscaped(Context context, const char *src);
 extern char *makeRescaped(Context context, const char *src);
 extern char *makeMangled(Context context, const char *src);
+
+// Hash code for term.
+#define HASH_CODE(CONTEXT, TERM) termHashCode(CONTEXT, TERM, NULL)
+typedef struct _VariableLink *VariableLink;
+struct _VariableLink { VariableLink next; Variable variable; };
+extern long long termHashCode(Context context, Term term, VariableLink deBruijn);
 
 // Failure.
 //
