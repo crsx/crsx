@@ -6,11 +6,13 @@
 //
 // A Hash[TermSort, IdSort] is a mapping from terms of TermSort to values of IdSort.
 //
-// It only supports two operation:
+// It supports four operations:
 //
 //    NewHash :: Hash[TermSort, IdSort]
 //    HashInsert[ #hash :: Hash[TermSort, IdSort], #term :: TermSort, #new :: IdSort] :: HashResult[TermSort, IdSort]
-//
+//    HashGet[ #hash :: Hash[TermSort, IdSort], #term :: TermSort ] :: HashGetResult[IdSort]
+//    HashPut[ #hash :: Hash[TermSort, IdSort], #term :: TermSort, #new :: IdSort] :: Hash[TermSort, IdSort]
+//     
 // The NewHash operation just returns an empty hash.
 //
 // The HashInsert operation can return one of two values:
@@ -21,6 +23,10 @@
 // * H_OLD[#hash :: Hash[TermSort, IdSort], #old :: IdSort] :: HashResult[TermSort, IdSort]
 //    indicates that the #term was already recorded as mapping to the #old id but we still return a new #hash.
 //
+// The HashGet operation can return either H_NONE or H_ID[IdSort]
+//
+// The HashPut operation always adds the id in the hash and return the updated hash 
+//
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 Hash[(
@@ -30,6 +36,7 @@ Hash[(
 ∀ a b . HashMember[a,b] ::=( H_MEMBER[a<!--term-->, b<!--variable-->]; );
 
 ∀ a b . HashResult[a,b] ::=( H_NEW[Hash[a,b]]; H_OLD[Hash[a,b], b<!--variable-->]; );
+
 
 ∀ a b . ResultHash[HashResult[a,b]] :: Hash[a,b] ;
 ResultHash[H_NEW[#hash]] → #hash ;
@@ -58,6 +65,50 @@ $[If, $[DeepEqual, #candidate, #term], // check the #candidate...
   H_OLD[#hash, #old], // ...found the term: return existing id
   HashInsert4[#rest, #hash, #term, #members, #code, #new] // ...not right candidate, search on
 ]
+;
+
+∀ a. HashGetResult[a] ::=( H_NO_ID; H_ID[a]; );
+
+∀ a b . HashGet[Hash[a,b], a<!--term-->] :: HashGetResult[b] ;
+
+-[Share[#term]] : HashGet[#hash, #term] → HashGet2[#hash, #term, $[FormatNumber, $[HashCode, #term]]] ;
+
+∀ a b . HashGet2[Hash[a,b], a<!--term-->, $String<!-- HashCode -->] :: HashGetResult[b] ;
+
+HashGet2[{#H}HASH, #term, #code] → HashGet3[$[{#H}Get, #code, ()], #term];
+
+∀ a b . HashGet3[$List[HashMember[a,b]], a<!--term-->] :: HashGetResult[b] ;
+
+-[Discard[#term]]: HashGet3[(), #term] → H_NO_ID;
+
+-[Share[#term]]
+:
+HashGet3[(H_MEMBER[#candidate, #old]; #rest), #term] 
+→ 
+$[If, $[DeepEqual, #candidate, #term], // check the #candidate...
+  H_ID[#old], // ...found the term: return existing id
+  HashGet3[#rest, #term] // ...not right candidate, search on
+]
+;
+
+∀ a b . HashPut[Hash[a,b], a<!--term-->, b<!--new variable-->] :: Hash[a,b] ;
+
+-[Copy[#term]]: HashPut[#hash, #term, #new] → HashPut2[#hash, #term, #new, $[FormatNumber, $[HashCode, #term]]];
+
+∀ a b . HashPut2[Hash[a,b], a<!--term-->, b<!--new variable-->, $String] :: Hash[a,b] ;
+
+-[Copy[#code]]
+:
+HashPut2[{#H}HASH, #term, #new, #code]
+→ 
+HashPut3[{#H}HASH, #term, #new, #code, $[{#H}Get, #code, ()]]
+;
+
+∀ a b . HashPut3[Hash[a,b], a<!--term-->, b<!--new variable-->, $String, $List[HashMember[a,b]]] :: Hash[a,b] ;
+
+HashPut3[{#H}HASH, #term, #new, #code, #members]
+→
+{#H; #code : ( H_MEMBER[#term, #new] ; #members )}HASH
 ;
 
 )]
