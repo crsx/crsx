@@ -11,7 +11,5 @@ and other syntax-directed transformation systems, specifically:
 License
 =======
 
-Copyright (c) 2006, 2014 IBM Corporation. All rights reserved.
-
-This program and the accompanying materials are made available under the terms of the Common Public License v1.0, 
-which accompanies this distribution, and is available at http://www.opensource.org/licenses/cpl1.0.txt.
+This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0, 
+which accompanies this distribution, and is available at http://opensource.org/licenses/EPL-1.0.
