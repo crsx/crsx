@@ -469,7 +469,7 @@ struct _Con_M_T__send__property__ref2_s1 {struct _Construction construction; Ter
 extern struct _ConstructionDescriptor descriptor_M_T__send__property__ref2_s1;
 extern int step_M_T__send__property__ref2_s1(Sink,Term);
 
-/* FUNCTION TERM-T-CheckReuse- HEADER DECLARATIONS. */
+/* FUNCTION TERM-T-CheckReuse-2$T-CheckReuse$ HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T_CheckReuse struct _Con_M_T_CheckReuse
 struct _Con_M_T_CheckReuse {struct _Construction construction; Term sub[1]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_T_CheckReuse;
@@ -511,13 +511,13 @@ struct _Con_M_T_UnlinkLastMetaUse_s2 {struct _Construction construction; Term su
 extern struct _ConstructionDescriptor descriptor_M_T_UnlinkLastMetaUse_s2;
 extern int step_M_T_UnlinkLastMetaUse_s2(Sink,Term);
 
-/* FUNCTION TERM-T-substitute2-2$vFree HEADER DECLARATIONS. */
+/* FUNCTION TERM-T-substitute2-3$vFree HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T__substitute2_s7 struct _Con_M_T__substitute2_s7
 struct _Con_M_T__substitute2_s7 {struct _Construction construction; Term sub[10]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_T__substitute2_s7;
 extern int step_M_T__substitute2_s7(Sink,Term);
 
-/* FUNCTION TERM-T-substitute2-2$T-substitute2$5$USE HEADER DECLARATIONS. */
+/* FUNCTION TERM-T-substitute2-3$T-substitute2$5$USE HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T__substitute2_s5 struct _Con_M_T__substitute2_s5
 struct _Con_M_T__substitute2_s5 {struct _Construction construction; Term sub[10]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_T__substitute2_s5;
@@ -931,7 +931,7 @@ struct _Con_M_T__send_Binder3 {struct _Construction construction; Term sub[8]; V
 extern struct _ConstructionDescriptor descriptor_M_T__send_Binder3;
 extern int step_M_T__send_Binder3(Sink,Term);
 
-/* FUNCTION TERM-T-send-Binder4-3$T-send-Binder4$ HEADER DECLARATIONS. */
+/* FUNCTION TERM-T-send-Binder4- HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T__send_Binder4 struct _Con_M_T__send_Binder4
 struct _Con_M_T__send_Binder4 {struct _Construction construction; Term sub[8]; Variable binder[1];};
 extern struct _ConstructionDescriptor descriptor_M_T__send_Binder4;

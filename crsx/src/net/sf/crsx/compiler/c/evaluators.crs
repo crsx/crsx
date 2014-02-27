@@ -1876,32 +1876,61 @@ FormatKindOf[CONSTRUCTION[#Name, (ARGUMENT[#Sort1, CONSTRUCTION[#Kind, ()]]; )]]
 FormatKindOf[CONSTRUCTION[#Name, ()]] → TOKEN["Default"] ;
 FormatKindOf[LITERAL[#Name, #Sort]] → TOKEN["Default"] ;
 
-// $[ForgivableError[#kind], #result, #format[, #arg,...]] emits an exception or a warning
+// $[ForgivableError[#kind], #format[, #arg,..., #result]] emits an exception or a warning
 //
 POLY_PRIMITIVE[E_ForgivableError];
 
-Poly-ForgivableError-None:
-{#env} E-poly[E_ForgivableError, (#Name; #Result; #String;), #Options, #sink, ok result.#Tail[ok,result]]
+Poly-ForgivableError-Kind
+:
+{#env}
+E-poly[E_ForgivableError, (#Name; #Format; LITERAL[#Msg, #MsgSort]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env} T-local-string[#String, #sink, arg p. %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg»);
+{#env}
+E-ForgivableError[#Name, #Format, #Msg, E-SplitLast[#Args], #sink, ok result.#Tail[ok,result]]
+;
+
+
+Poly-ForgivableError-None[Fallback]
+:
+{#env}
+E-poly[E_ForgivableError, (#Name; #String; #Result; ), #Options, #sink, ok result.#Tail[ok,result]]
+→
+{#env}
+T-local-string[#String, #sink, arg p. %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg»);
 «p»«{#env}#Tail[OK,#Result] »⟫]
 ;
 
-Poly-ForgivableError-Kind:
-{#env} E-poly[E_ForgivableError, (#Name; #Result; #Format; LITERAL[#Msg, #MsgSort]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-ForgivableError[Reified_Term, Reified_Term, $String, $List[Reified_Term], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}
+E-ForgivableError[#Name, #Format, #Msg, (#Result; #Args), #sink, ok result.#Tail[ok,result]]
 →
-{#env} T-local-string[#Format, #sink, arg p.
+{#env}
+T-local-string[#Format, #sink, arg p.
  {#env} E-flatten-strings[(), #Args, #sink, %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
-«p»«{#env}#Tail[OK,#Result] »⟫]]
+«p»«{#env}#Tail[OK, #Result] »⟫]]
 ;
 
-Poly-ForgivableError-Other:
-{#env} E-poly[E_ForgivableError, (#Name; #Result; #Format; $[NotMatch,LITERAL[#Msg, #MsgSort],#Arg1]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
+// Helper moving the last element in the list to the first position
+E-SplitLast[$List[Reified_Term]] :: $List[Reified_Term];
+
+E-SplitLast[#Args] 
 →
-{#env} T-local-string[#Format, #sink, arg p.
- {#env} E-flatten-strings[(), (#Arg1; #Args), #sink, %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]»⟫, %n⟪);
-«p»«{#env}#Tail[OK,#Result] »⟫]]
+(E-Last[#Args]; E-Head[#Args])
 ;
+
+E-Last[$List[Reified_Term]] :: Reified_Term;
+
+E-Last[(#A;)]      → #A;
+E-Last[(#A;#B;#C)] → E-Last[(#B;#C)];
+
+E-Head[$List[Reified_Term]] :: $List[Reified_Term];
+
+E-Head[(#A;)]      → ();
+E-Head[(#A;#B;#C)] → (#A; E-Head[(#B;#C)]);
+
+
 
 // $[Trace[#kind], #message, #result] prints the message
 // $[Trace[#kind], #result] just returns the result
