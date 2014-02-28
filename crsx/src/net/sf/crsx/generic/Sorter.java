@@ -1385,9 +1385,10 @@ public class Sorter
 				Variable alpha = freshSortVariable();
 				sort = factory.newVariableUse(alpha);
 				
-				argumentsorts[0] = factory.newVariableUse(alpha);
-				for (int i = 1; i < argumentsorts.length; i++)
+				for (int i = 0; i < argumentsorts.length - 1; i++)
 					argumentsorts[i] = freshForm(CRS.STRING_SORT, 0);
+
+				argumentsorts[argumentsorts.length - 1] = factory.newVariableUse(alpha);
 				break;
 			}
 			case FORMAT: {

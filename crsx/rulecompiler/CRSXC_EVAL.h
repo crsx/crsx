@@ -12,7 +12,7 @@ struct _Con_M_E__set__int__to__string {struct _Construction construction; Term s
 extern struct _ConstructionDescriptor descriptor_M_E__set__int__to__string;
 extern int step_M_E__set__int__to__string(Sink,Term);
 
-/* FUNCTION EVAL-E-flatten-strings-2$E-flatten-strings$$Nil HEADER DECLARATIONS. */
+/* FUNCTION EVAL-E-flatten-strings-1$E-flatten-strings$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__flatten__strings struct _Con_M_E__flatten__strings
 struct _Con_M_E__flatten__strings {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__strings;
@@ -318,7 +318,7 @@ struct _Con_M_E__optional__nil_s3 {struct _Construction construction; Term sub[2
 extern struct _ConstructionDescriptor descriptor_M_E__optional__nil_s3;
 extern int step_M_E__optional__nil_s3(Sink,Term);
 
-/* FUNCTION EVAL-Send-FreeVariables-Constrained$E-send$34$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Send-FreeVariables-Raw$E-send$34$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__send_s34 struct _Con_M_E__send_s34
 struct _Con_M_E__send_s34 {struct _Construction construction; Term sub[3]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__send_s34;
@@ -419,6 +419,12 @@ extern int step_M_E__set__string_s2(Sink,Term);
 struct _Con_M_E__set__string_s3 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s3;
 extern int step_M_E__set__string_s3(Sink,Term);
+
+/* FUNCTION EVAL-E-SplitLast-1 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_SplitLast struct _Con_M_E_SplitLast
+struct _Con_M_E_SplitLast {struct _Construction construction; Term sub[1]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_SplitLast;
+extern int step_M_E_SplitLast(Sink,Term);
 
 /* FUNCTION EVAL-E_Absolute-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s1 struct _Con_M_E__set__string_s1
@@ -665,6 +671,18 @@ extern int step_M_E__send_s121(Sink,Term);
 struct _Con_M_E__send_s123 {struct _Construction construction; Term sub[3]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__send_s123;
 extern int step_M_E__send_s123(Sink,Term);
+
+/* FUNCTION EVAL-E-ForgivableError-1 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_ForgivableError_s2 struct _Con_M_E_ForgivableError_s2
+struct _Con_M_E_ForgivableError_s2 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E_ForgivableError_s2;
+extern int step_M_E_ForgivableError_s2(Sink,Term);
+
+/* FUNCTION EVAL-E-ForgivableError-1$E-ForgivableError$1$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_ForgivableError_s1 struct _Con_M_E_ForgivableError_s1
+struct _Con_M_E_ForgivableError_s1 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E_ForgivableError_s1;
+extern int step_M_E_ForgivableError_s1(Sink,Term);
 
 /* FUNCTION EVAL-Send-LoadTerm$E-send$115$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__send_s115 struct _Con_M_E__send_s115
@@ -1446,7 +1464,7 @@ struct _Con_M_E__set__int_s51 {struct _Construction construction; Term sub[4]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s51;
 extern int step_M_E__set__int_s51(Sink,Term);
 
-/* FUNCTION EVAL-Set-Int-Decimal-Literal$E-set-int$52$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-Int-Decimal$E-set-int$52$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s52 struct _Con_M_E__set__int_s52
 struct _Con_M_E__set__int_s52 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s52;
@@ -1962,13 +1980,13 @@ struct _Con_M_E__set__string_s92 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s92;
 extern int step_M_E__set__string_s92(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-Substring3$E-set-string$97$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-String-Substring2$E-set-string$97$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s97 struct _Con_M_E__set__string_s97
 struct _Con_M_E__set__string_s97 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s97;
 extern int step_M_E__set__string_s97(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-Substring3$E-set-string$95$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-String-Substring2$E-set-string$95$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s95 struct _Con_M_E__set__string_s95
 struct _Con_M_E__set__string_s95 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s95;
@@ -1986,7 +2004,7 @@ struct _Con_M_E__set__ref_s58 {struct _Construction construction; Term sub[4]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__ref_s58;
 extern int step_M_E__set__ref_s58(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-Substring3$E-set-string$99$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-String-Substring2$E-set-string$99$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s99 struct _Con_M_E__set__string_s99
 struct _Con_M_E__set__string_s99 {struct _Construction construction; Term sub[6]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s99;
@@ -2370,25 +2388,19 @@ struct _Con_M_E__local__string_s86 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s86;
 extern int step_M_E__local__string_s86(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfEmpty$E-poly$164$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s164 struct _Con_M_E__poly_s164
-struct _Con_M_E__poly_s164 {struct _Construction construction; Term sub[5]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s164;
-extern int step_M_E__poly_s164(Sink,Term);
+/* FUNCTION EVAL-Poly-IfDef HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s163 struct _Con_M_E__poly_s163
+struct _Con_M_E__poly_s163 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s163;
+extern int step_M_E__poly_s163(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfEmpty$E-poly$162$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef$E-poly$162$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s162 struct _Con_M_E__poly_s162
-struct _Con_M_E__poly_s162 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s162 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s162;
 extern int step_M_E__poly_s162(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s161 struct _Con_M_E__poly_s161
-struct _Con_M_E__poly_s161 {struct _Construction construction; Term sub[10]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s161;
-extern int step_M_E__poly_s161(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$160$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef$E-poly$160$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s160 struct _Con_M_E__poly_s160
 struct _Con_M_E__poly_s160 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s160;
@@ -2418,7 +2430,7 @@ struct _Con_M_E__local__string_s74 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s74;
 extern int step_M_E__local__string_s74(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$158$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef$E-poly$158$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s158 struct _Con_M_E__poly_s158
 struct _Con_M_E__poly_s158 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s158;
@@ -2436,7 +2448,7 @@ struct _Con_M_E__set__int_s149 {struct _Construction construction; Term sub[6]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s149;
 extern int step_M_E__set__int_s149(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$156$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef$E-poly$156$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s156 struct _Con_M_E__poly_s156
 struct _Con_M_E__poly_s156 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s156;
@@ -2454,7 +2466,7 @@ struct _Con_M_E__local__string_s70 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s70;
 extern int step_M_E__local__string_s70(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$154$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef$E-poly$154$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s154 struct _Con_M_E__poly_s154
 struct _Con_M_E__poly_s154 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s154;
@@ -2514,9 +2526,9 @@ struct _Con_M_E__local__string_s79 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s79;
 extern int step_M_E__local__string_s79(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfEmpty HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$173$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s173 struct _Con_M_E__poly_s173
-struct _Con_M_E__poly_s173 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s173 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s173;
 extern int step_M_E__poly_s173(Sink,Term);
 
@@ -2526,17 +2538,17 @@ struct _Con_M_E__set__string_s110 {struct _Construction construction; Term sub[4
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s110;
 extern int step_M_E__set__string_s110(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfEmpty$E-poly$172$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s172 struct _Con_M_E__poly_s172
-struct _Con_M_E__poly_s172 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s172;
-extern int step_M_E__poly_s172(Sink,Term);
-
 /* FUNCTION EVAL-E_UnionVariables-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s111 struct _Con_M_E__set__string_s111
 struct _Con_M_E__set__string_s111 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s111;
 extern int step_M_E__set__string_s111(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfEmpty$E-poly$175$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s175 struct _Con_M_E__poly_s175
+struct _Con_M_E__poly_s175 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s175;
+extern int step_M_E__poly_s175(Sink,Term);
 
 /* FUNCTION EVAL-E_UpCase-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s112 struct _Con_M_E__set__string_s112
@@ -2544,9 +2556,9 @@ struct _Con_M_E__set__string_s112 {struct _Construction construction; Term sub[4
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s112;
 extern int step_M_E__set__string_s112(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfZero$E-poly$174$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s174 struct _Con_M_E__poly_s174
-struct _Con_M_E__poly_s174 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s174 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s174;
 extern int step_M_E__poly_s174(Sink,Term);
 
@@ -2562,17 +2574,23 @@ struct _Con_M_E__bool__to__string {struct _Construction construction; Term sub[3
 extern struct _ConstructionDescriptor descriptor_M_E__bool__to__string;
 extern int step_M_E__bool__to__string(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfEmpty$E-poly$170$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s170 struct _Con_M_E__poly_s170
-struct _Con_M_E__poly_s170 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s170;
-extern int step_M_E__poly_s170(Sink,Term);
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$171$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s171 struct _Con_M_E__poly_s171
+struct _Con_M_E__poly_s171 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s171;
+extern int step_M_E__poly_s171(Sink,Term);
 
 /* FUNCTION EVAL-Set-String-FromFirst$E-local-string$63$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__local__string_s63 struct _Con_M_E__local__string_s63
 struct _Con_M_E__local__string_s63 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s63;
 extern int step_M_E__local__string_s63(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$169$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s169 struct _Con_M_E__poly_s169
+struct _Con_M_E__poly_s169 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s169;
+extern int step_M_E__poly_s169(Sink,Term);
 
 /* FUNCTION EVAL-Set-String-FromFirst HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__local__string_s64 struct _Con_M_E__local__string_s64
@@ -2598,17 +2616,17 @@ struct _Con_M_E__set__int_s158 {struct _Construction construction; Term sub[4]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s158;
 extern int step_M_E__set__int_s158(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$165$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s165 struct _Con_M_E__poly_s165
+struct _Con_M_E__poly_s165 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s165;
+extern int step_M_E__poly_s165(Sink,Term);
+
 /* FUNCTION EVAL-E_IntersectVariables-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s157 struct _Con_M_E__set__int_s157
 struct _Con_M_E__set__int_s157 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s157;
 extern int step_M_E__set__int_s157(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfEmpty$E-poly$166$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s166 struct _Con_M_E__poly_s166
-struct _Con_M_E__poly_s166 {struct _Construction construction; Term sub[6]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s166;
-extern int step_M_E__poly_s166(Sink,Term);
 
 /* FUNCTION EVAL-E_IfZero-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s156 struct _Con_M_E__set__int_s156
@@ -2616,17 +2634,17 @@ struct _Con_M_E__set__int_s156 {struct _Construction construction; Term sub[4]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s156;
 extern int step_M_E__set__int_s156(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$167$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s167 struct _Con_M_E__poly_s167
+struct _Con_M_E__poly_s167 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s167;
+extern int step_M_E__poly_s167(Sink,Term);
+
 /* FUNCTION EVAL-E_IfEmpty-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s155 struct _Con_M_E__set__int_s155
 struct _Con_M_E__set__int_s155 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s155;
 extern int step_M_E__set__int_s155(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfEmpty$E-poly$168$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s168 struct _Con_M_E__poly_s168
-struct _Con_M_E__poly_s168 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s168;
-extern int step_M_E__poly_s168(Sink,Term);
 
 /* FUNCTION EVAL-E_IfDef-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s154 struct _Con_M_E__set__int_s154
@@ -2736,11 +2754,17 @@ struct _Con_M_E__set__string_s101 {struct _Construction construction; Term sub[7
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s101;
 extern int step_M_E__set__string_s101(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef$E-poly$141$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s141 struct _Con_M_E__poly_s141
-struct _Con_M_E__poly_s141 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s141 {struct _Construction construction; Term sub[12]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s141;
 extern int step_M_E__poly_s141(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$140$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s140 struct _Con_M_E__poly_s140
+struct _Con_M_E__poly_s140 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s140;
+extern int step_M_E__poly_s140(Sink,Term);
 
 /* FUNCTION EVAL-E-set-string-1$E-set-string$10$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s10 struct _Con_M_E__set__string_s10
@@ -2808,12 +2832,6 @@ struct _Con_M_E__local__string_s51 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s51;
 extern int step_M_E__local__string_s51(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s139 struct _Con_M_E__poly_s139
-struct _Con_M_E__poly_s139 {struct _Construction construction; Term sub[11]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s139;
-extern int step_M_E__poly_s139(Sink,Term);
-
 /* FUNCTION EVAL-Set-String-FormatNumber$E-local-string$52$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__local__string_s52 struct _Con_M_E__local__string_s52
 struct _Con_M_E__local__string_s52 {struct _Construction construction; Term sub[4]; Variable binder[2];};
@@ -2868,17 +2886,17 @@ struct _Con_M_E__set__int_s120 {struct _Construction construction; Term sub[5]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s120;
 extern int step_M_E__set__int_s120(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$151$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s151 struct _Con_M_E__poly_s151
+struct _Con_M_E__poly_s151 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s151;
+extern int step_M_E__poly_s151(Sink,Term);
+
 /* FUNCTION EVAL-E_DeepEqual-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s20 struct _Con_M_E__set__string_s20
 struct _Con_M_E__set__string_s20 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s20;
 extern int step_M_E__set__string_s20(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfDef HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s150 struct _Con_M_E__poly_s150
-struct _Con_M_E__poly_s150 {struct _Construction construction; Term sub[11]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s150;
-extern int step_M_E__poly_s150(Sink,Term);
 
 /* FUNCTION EVAL-E_Div-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s21 struct _Con_M_E__set__string_s21
@@ -2886,15 +2904,15 @@ struct _Con_M_E__set__string_s21 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s21;
 extern int step_M_E__set__string_s21(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$152$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s152 struct _Con_M_E__poly_s152
-struct _Con_M_E__poly_s152 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+struct _Con_M_E__poly_s152 {struct _Construction construction; Term sub[11]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s152;
 extern int step_M_E__poly_s152(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef$E-poly$143$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$143$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s143 struct _Con_M_E__poly_s143
-struct _Con_M_E__poly_s143 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s143 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s143;
 extern int step_M_E__poly_s143(Sink,Term);
 
@@ -2916,9 +2934,9 @@ struct _Con_M_E__set__string_s13 {struct _Construction construction; Term sub[6]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s13;
 extern int step_M_E__set__string_s13(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef$E-poly$145$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$145$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s145 struct _Con_M_E__poly_s145
-struct _Con_M_E__poly_s145 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s145 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s145;
 extern int step_M_E__poly_s145(Sink,Term);
 
@@ -2934,9 +2952,9 @@ struct _Con_M_E__set__int_s132 {struct _Construction construction; Term sub[7]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s132;
 extern int step_M_E__set__int_s132(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef$E-poly$147$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$147$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s147 struct _Con_M_E__poly_s147
-struct _Con_M_E__poly_s147 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s147 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s147;
 extern int step_M_E__poly_s147(Sink,Term);
 
@@ -2964,9 +2982,9 @@ struct _Con_M_E__set__string_s17 {struct _Construction construction; Term sub[5]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s17;
 extern int step_M_E__set__string_s17(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef$E-poly$149$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$149$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s149 struct _Con_M_E__poly_s149
-struct _Con_M_E__poly_s149 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s149 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s149;
 extern int step_M_E__poly_s149(Sink,Term);
 
@@ -3090,17 +3108,17 @@ struct _Con_M_E__set__int_s183 {struct _Construction construction; Term sub[6]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s183;
 extern int step_M_E__set__int_s183(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-DownCase$E-local-string$36$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__local__string_s36 struct _Con_M_E__local__string_s36
-struct _Con_M_E__local__string_s36 {struct _Construction construction; Term sub[4]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__local__string_s36;
-extern int step_M_E__local__string_s36(Sink,Term);
-
 /* FUNCTION EVAL-E-flatten-string-2 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__flatten__string_s22 struct _Con_M_E__flatten__string_s22
 struct _Con_M_E__flatten__string_s22 {struct _Construction construction; Term sub[6]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__string_s22;
 extern int step_M_E__flatten__string_s22(Sink,Term);
+
+/* FUNCTION EVAL-Set-String-DownCase$E-local-string$36$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__local__string_s36 struct _Con_M_E__local__string_s36
+struct _Con_M_E__local__string_s36 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__local__string_s36;
+extern int step_M_E__local__string_s36(Sink,Term);
 
 /* FUNCTION EVAL-E-flatten-string-2$vFree HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__flatten__string_s21 struct _Con_M_E__flatten__string_s21
@@ -3138,17 +3156,17 @@ struct _Con_M_E__local__string_s32 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s32;
 extern int step_M_E__local__string_s32(Sink,Term);
 
-/* FUNCTION EVAL-E_Div-local-string HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__local__string_s35 struct _Con_M_E__local__string_s35
-struct _Con_M_E__local__string_s35 {struct _Construction construction; Term sub[4]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__local__string_s35;
-extern int step_M_E__local__string_s35(Sink,Term);
-
 /* FUNCTION EVAL-E-flatten-string-2 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__flatten__string_s25 struct _Con_M_E__flatten__string_s25
 struct _Con_M_E__flatten__string_s25 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__string_s25;
 extern int step_M_E__flatten__string_s25(Sink,Term);
+
+/* FUNCTION EVAL-E_Div-local-string HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__local__string_s35 struct _Con_M_E__local__string_s35
+struct _Con_M_E__local__string_s35 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__local__string_s35;
+extern int step_M_E__local__string_s35(Sink,Term);
 
 /* FUNCTION EVAL-E-set-int-5$E-set-int$181$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s181 struct _Con_M_E__set__int_s181
@@ -3156,17 +3174,17 @@ struct _Con_M_E__set__int_s181 {struct _Construction construction; Term sub[5]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s181;
 extern int step_M_E__set__int_s181(Sink,Term);
 
-/* FUNCTION EVAL-E_DeepEqual-local-string HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__local__string_s34 struct _Con_M_E__local__string_s34
-struct _Con_M_E__local__string_s34 {struct _Construction construction; Term sub[4]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__local__string_s34;
-extern int step_M_E__local__string_s34(Sink,Term);
-
 /* FUNCTION EVAL-E-flatten-string-2$vFree HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__flatten__string_s24 struct _Con_M_E__flatten__string_s24
 struct _Con_M_E__flatten__string_s24 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__string_s24;
 extern int step_M_E__flatten__string_s24(Sink,Term);
+
+/* FUNCTION EVAL-E_DeepEqual-local-string HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__local__string_s34 struct _Con_M_E__local__string_s34
+struct _Con_M_E__local__string_s34 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__local__string_s34;
+extern int step_M_E__local__string_s34(Sink,Term);
 
 /* FUNCTION EVAL-E_Error-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s26 struct _Con_M_E__set__string_s26
@@ -3222,6 +3240,12 @@ struct _Con_M_E__set__string_s23 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s23;
 extern int step_M_E__set__string_s23(Sink,Term);
 
+/* FUNCTION EVAL-Poly-SaveTerm$E-poly$199$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s199 struct _Con_M_E__poly_s199
+struct _Con_M_E__poly_s199 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s199;
+extern int step_M_E__poly_s199(Sink,Term);
+
 /* FUNCTION EVAL-Null-set-int$E-set-int$189$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s189 struct _Con_M_E__set__int_s189
 struct _Con_M_E__set__int_s189 {struct _Construction construction; Term sub[4]; Variable binder[0];};
@@ -3234,9 +3258,9 @@ struct _Con_M_E__set__string_s24 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s24;
 extern int step_M_E__set__string_s24(Sink,Term);
 
-/* FUNCTION EVAL-Poly-Trace-Message$E-poly$198$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfZero HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s198 struct _Con_M_E__poly_s198
-struct _Con_M_E__poly_s198 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s198 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s198;
 extern int step_M_E__poly_s198(Sink,Term);
 
@@ -3282,17 +3306,17 @@ struct _Con_M_E__local__string_s29 {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s29;
 extern int step_M_E__local__string_s29(Sink,Term);
 
-/* FUNCTION EVAL-E-local-string-1 HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__local__string_s28 struct _Con_M_E__local__string_s28
-struct _Con_M_E__local__string_s28 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__local__string_s28;
-extern int step_M_E__local__string_s28(Sink,Term);
-
 /* FUNCTION EVAL-E-flatten-string-2 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__flatten__string_s10 struct _Con_M_E__flatten__string_s10
 struct _Con_M_E__flatten__string_s10 {struct _Construction construction; Term sub[6]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__string_s10;
 extern int step_M_E__flatten__string_s10(Sink,Term);
+
+/* FUNCTION EVAL-E-local-string-1 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__local__string_s28 struct _Con_M_E__local__string_s28
+struct _Con_M_E__local__string_s28 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__local__string_s28;
+extern int step_M_E__local__string_s28(Sink,Term);
 
 /* FUNCTION EVAL-E-set-int-1$E-set-int$196$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s196 struct _Con_M_E__set__int_s196
@@ -3408,7 +3432,7 @@ struct _Con_M_E__set__string_s39 {struct _Construction construction; Term sub[6]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s39;
 extern int step_M_E__set__string_s39(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-Format-None$E-set-string$37$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-String-Format-Many$E-set-string$37$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s37 struct _Con_M_E__set__string_s37
 struct _Con_M_E__set__string_s37 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s37;
@@ -3420,7 +3444,7 @@ struct _Con_M_E__flatten__string_s19 {struct _Construction construction; Term su
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__string_s19;
 extern int step_M_E__flatten__string_s19(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-Format-Many$E-set-string$35$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-String-Format-None$E-set-string$35$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s35 struct _Con_M_E__set__string_s35
 struct _Con_M_E__set__string_s35 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s35;
@@ -3450,11 +3474,11 @@ struct _Con_M_E__set__string_s34 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s34;
 extern int step_M_E__set__string_s34(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfZero$E-poly$182$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s182 struct _Con_M_E__poly_s182
-struct _Con_M_E__poly_s182 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s182;
-extern int step_M_E__poly_s182(Sink,Term);
+/* FUNCTION EVAL-Poly-IfEmpty$E-poly$181$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s181 struct _Con_M_E__poly_s181
+struct _Con_M_E__poly_s181 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s181;
+extern int step_M_E__poly_s181(Sink,Term);
 
 /* FUNCTION EVAL-Set-PassLocationProperties$E-set-ref$94$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__ref_s94 struct _Con_M_E__set__ref_s94
@@ -3468,21 +3492,15 @@ struct _Con_M_E__set__string_s50 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s50;
 extern int step_M_E__set__string_s50(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfZero$E-poly$180$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s180 struct _Con_M_E__poly_s180
-struct _Con_M_E__poly_s180 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s180;
-extern int step_M_E__poly_s180(Sink,Term);
-
 /* FUNCTION EVAL-Set-PassLocationProperties$E-set-ref$92$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__ref_s92 struct _Con_M_E__set__ref_s92
 struct _Con_M_E__set__ref_s92 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__ref_s92;
 extern int step_M_E__set__ref_s92(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfZero HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfEmpty$E-poly$185$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s185 struct _Con_M_E__poly_s185
-struct _Con_M_E__poly_s185 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s185 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s185;
 extern int step_M_E__poly_s185(Sink,Term);
 
@@ -3492,9 +3510,9 @@ struct _Con_M_E__set__string_s52 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s52;
 extern int step_M_E__set__string_s52(Sink,Term);
 
-/* FUNCTION EVAL-Poly-SaveTerm$E-poly$186$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfEmpty HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s186 struct _Con_M_E__poly_s186
-struct _Con_M_E__poly_s186 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s186 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s186;
 extern int step_M_E__poly_s186(Sink,Term);
 
@@ -3510,17 +3528,17 @@ struct _Con_M_E__set__string_s51 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s51;
 extern int step_M_E__set__string_s51(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfEmpty$E-poly$183$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s183 struct _Con_M_E__poly_s183
+struct _Con_M_E__poly_s183 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s183;
+extern int step_M_E__poly_s183(Sink,Term);
+
 /* FUNCTION EVAL-E_IfEmpty-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s54 struct _Con_M_E__set__string_s54
 struct _Con_M_E__set__string_s54 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s54;
 extern int step_M_E__set__string_s54(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfZero$E-poly$184$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s184 struct _Con_M_E__poly_s184
-struct _Con_M_E__poly_s184 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s184;
-extern int step_M_E__poly_s184(Sink,Term);
 
 /* FUNCTION EVAL-E_IfDef-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s53 struct _Con_M_E__set__string_s53
@@ -3600,6 +3618,12 @@ struct _Con_M_E__set__int_s164 {struct _Construction construction; Term sub[5]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s164;
 extern int step_M_E__set__int_s164(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfEmpty$E-poly$179$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s179 struct _Con_M_E__poly_s179
+struct _Con_M_E__poly_s179 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s179;
+extern int step_M_E__poly_s179(Sink,Term);
+
 /* FUNCTION EVAL-E_LessThan-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s165 struct _Con_M_E__set__int_s165
 struct _Con_M_E__set__int_s165 {struct _Construction construction; Term sub[4]; Variable binder[0];};
@@ -3612,12 +3636,6 @@ struct _Con_M_E__set__string_s44 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s44;
 extern int step_M_E__set__string_s44(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfZero$E-poly$178$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s178 struct _Con_M_E__poly_s178
-struct _Con_M_E__poly_s178 {struct _Construction construction; Term sub[6]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s178;
-extern int step_M_E__poly_s178(Sink,Term);
-
 /* FUNCTION EVAL-E_LessThanOrEqual-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s166 struct _Con_M_E__set__int_s166
 struct _Con_M_E__set__int_s166 {struct _Construction construction; Term sub[4]; Variable binder[0];};
@@ -3629,6 +3647,12 @@ extern int step_M_E__set__int_s166(Sink,Term);
 struct _Con_M_E__set__string_s45 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s45;
 extern int step_M_E__set__string_s45(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfEmpty$E-poly$177$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s177 struct _Con_M_E__poly_s177
+struct _Con_M_E__poly_s177 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s177;
+extern int step_M_E__poly_s177(Sink,Term);
 
 /* FUNCTION EVAL-E_LesserVariable-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s167 struct _Con_M_E__set__int_s167
@@ -3647,12 +3671,6 @@ extern int step_M_E__set__ref_s89(Sink,Term);
 struct _Con_M_E__set__string_s46 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s46;
 extern int step_M_E__set__string_s46(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfZero$E-poly$176$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s176 struct _Con_M_E__poly_s176
-struct _Con_M_E__poly_s176 {struct _Construction construction; Term sub[5]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s176;
-extern int step_M_E__poly_s176(Sink,Term);
 
 /* FUNCTION EVAL-E_LoadTerm-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s168 struct _Con_M_E__set__int_s168
@@ -3708,17 +3726,17 @@ struct _Con_M_E__set__ref_s84 {struct _Construction construction; Term sub[4]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__ref_s84;
 extern int step_M_E__set__ref_s84(Sink,Term);
 
-/* FUNCTION EVAL-Poly-SaveTerm$E-poly$190$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s190 struct _Con_M_E__poly_s190
-struct _Con_M_E__poly_s190 {struct _Construction construction; Term sub[6]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s190;
-extern int step_M_E__poly_s190(Sink,Term);
-
 /* FUNCTION EVAL-E_LesserVariable-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s61 struct _Con_M_E__set__string_s61
 struct _Con_M_E__set__string_s61 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s61;
 extern int step_M_E__set__string_s61(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfZero$E-poly$191$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s191 struct _Con_M_E__poly_s191
+struct _Con_M_E__poly_s191 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s191;
+extern int step_M_E__poly_s191(Sink,Term);
 
 /* FUNCTION EVAL-E_LessThanOrEqual-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s60 struct _Con_M_E__set__string_s60
@@ -3726,17 +3744,11 @@ struct _Con_M_E__set__string_s60 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s60;
 extern int step_M_E__set__string_s60(Sink,Term);
 
-/* FUNCTION EVAL-Poly-SaveTerm$E-poly$192$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s192 struct _Con_M_E__poly_s192
-struct _Con_M_E__poly_s192 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s192;
-extern int step_M_E__poly_s192(Sink,Term);
-
-/* FUNCTION EVAL-Poly-SaveTerm$E-poly$194$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s194 struct _Con_M_E__poly_s194
-struct _Con_M_E__poly_s194 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s194;
-extern int step_M_E__poly_s194(Sink,Term);
+/* FUNCTION EVAL-Poly-IfZero$E-poly$193$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s193 struct _Con_M_E__poly_s193
+struct _Con_M_E__poly_s193 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s193;
+extern int step_M_E__poly_s193(Sink,Term);
 
 /* FUNCTION EVAL-E_Minus-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s65 struct _Con_M_E__set__string_s65
@@ -3744,17 +3756,17 @@ struct _Con_M_E__set__string_s65 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s65;
 extern int step_M_E__set__string_s65(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfZero$E-poly$195$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s195 struct _Con_M_E__poly_s195
+struct _Con_M_E__poly_s195 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s195;
+extern int step_M_E__poly_s195(Sink,Term);
+
 /* FUNCTION EVAL-E_MatchRegex-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s64 struct _Con_M_E__set__string_s64
 struct _Con_M_E__set__string_s64 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s64;
 extern int step_M_E__set__string_s64(Sink,Term);
-
-/* FUNCTION EVAL-Poly-SaveTerm$E-poly$196$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s196 struct _Con_M_E__poly_s196
-struct _Con_M_E__poly_s196 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s196;
-extern int step_M_E__poly_s196(Sink,Term);
 
 /* FUNCTION EVAL-E_Mangle-set-string HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string_s63 struct _Con_M_E__set__string_s63
@@ -3762,9 +3774,9 @@ struct _Con_M_E__set__string_s63 {struct _Construction construction; Term sub[4]
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s63;
 extern int step_M_E__set__string_s63(Sink,Term);
 
-/* FUNCTION EVAL-Poly-SaveTerm HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfZero$E-poly$197$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s197 struct _Con_M_E__poly_s197
-struct _Con_M_E__poly_s197 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s197 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s197;
 extern int step_M_E__poly_s197(Sink,Term);
 
@@ -3798,12 +3810,6 @@ struct _Con_M_E__set__int_s173 {struct _Construction construction; Term sub[5]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int_s173;
 extern int step_M_E__set__int_s173(Sink,Term);
 
-/* FUNCTION EVAL-Poly-SaveTerm$E-poly$188$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s188 struct _Con_M_E__poly_s188
-struct _Con_M_E__poly_s188 {struct _Construction construction; Term sub[5]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s188;
-extern int step_M_E__poly_s188(Sink,Term);
-
 /* FUNCTION EVAL-E-set-int-3 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s178 struct _Con_M_E__set__int_s178
 struct _Con_M_E__set__int_s178 {struct _Construction construction; Term sub[6]; Variable binder[0];};
@@ -3815,6 +3821,12 @@ extern int step_M_E__set__int_s178(Sink,Term);
 struct _Con_M_E__set__string_s57 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s57;
 extern int step_M_E__set__string_s57(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfZero$E-poly$187$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s187 struct _Con_M_E__poly_s187
+struct _Con_M_E__poly_s187 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s187;
+extern int step_M_E__poly_s187(Sink,Term);
 
 /* FUNCTION EVAL-E-set-int-5$E-set-int$179$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s179 struct _Con_M_E__set__int_s179
@@ -3839,6 +3851,12 @@ extern int step_M_E__set__string_s58(Sink,Term);
 struct _Con_M_E__set__string_s55 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__string_s55;
 extern int step_M_E__set__string_s55(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfZero$E-poly$189$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s189 struct _Con_M_E__poly_s189
+struct _Con_M_E__poly_s189 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s189;
+extern int step_M_E__poly_s189(Sink,Term);
 
 /* FUNCTION EVAL-E-set-int-3$E-set-int$177$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s177 struct _Con_M_E__set__int_s177
@@ -3924,9 +3942,15 @@ struct _Con_M_E__set {struct _Construction construction; Term sub[5]; Variable b
 extern struct _ConstructionDescriptor descriptor_M_E__set;
 extern int step_M_E__set(Sink,Term);
 
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$129$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s129 struct _Con_M_E__poly_s129
+struct _Con_M_E__poly_s129 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s129;
+extern int step_M_E__poly_s129(Sink,Term);
+
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$123$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s123 struct _Con_M_E__poly_s123
-struct _Con_M_E__poly_s123 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s123 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s123;
 extern int step_M_E__poly_s123(Sink,Term);
 
@@ -3938,39 +3962,39 @@ extern int step_M_FormatKindOf(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$121$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s121 struct _Con_M_E__poly_s121
-struct _Con_M_E__poly_s121 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s121 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s121;
 extern int step_M_E__poly_s121(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s128 struct _Con_M_E__poly_s128
-struct _Con_M_E__poly_s128 {struct _Construction construction; Term sub[12]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s128;
-extern int step_M_E__poly_s128(Sink,Term);
-
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$127$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s127 struct _Con_M_E__poly_s127
-struct _Con_M_E__poly_s127 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+struct _Con_M_E__poly_s127 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s127;
 extern int step_M_E__poly_s127(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$125$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s125 struct _Con_M_E__poly_s125
-struct _Con_M_E__poly_s125 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s125 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s125;
 extern int step_M_E__poly_s125(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$130$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s130 struct _Con_M_E__poly_s130
-struct _Con_M_E__poly_s130 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s130 {struct _Construction construction; Term sub[12]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s130;
 extern int step_M_E__poly_s130(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$119$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s119 struct _Con_M_E__poly_s119
-struct _Con_M_E__poly_s119 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s119 {struct _Construction construction; Term sub[11]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s119;
 extern int step_M_E__poly_s119(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$118$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s118 struct _Con_M_E__poly_s118
+struct _Con_M_E__poly_s118 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s118;
+extern int step_M_E__poly_s118(Sink,Term);
 
 /* FUNCTION EVAL-E-set-ref-to-string-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__ref__to__string struct _Con_M_E__set__ref__to__string
@@ -3980,45 +4004,39 @@ extern int step_M_E__set__ref__to__string(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$110$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s110 struct _Con_M_E__poly_s110
-struct _Con_M_E__poly_s110 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s110 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s110;
 extern int step_M_E__poly_s110(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$112$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s112 struct _Con_M_E__poly_s112
-struct _Con_M_E__poly_s112 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s112 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s112;
 extern int step_M_E__poly_s112(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$114$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s114 struct _Con_M_E__poly_s114
-struct _Con_M_E__poly_s114 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s114 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s114;
 extern int step_M_E__poly_s114(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s117 struct _Con_M_E__poly_s117
-struct _Con_M_E__poly_s117 {struct _Construction construction; Term sub[12]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s117;
-extern int step_M_E__poly_s117(Sink,Term);
-
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$116$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s116 struct _Con_M_E__poly_s116
-struct _Con_M_E__poly_s116 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+struct _Con_M_E__poly_s116 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s116;
 extern int step_M_E__poly_s116(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$108$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s108 struct _Con_M_E__poly_s108
-struct _Con_M_E__poly_s108 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s108 {struct _Construction construction; Term sub[12]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s108;
 extern int step_M_E__poly_s108(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s106 struct _Con_M_E__poly_s106
-struct _Con_M_E__poly_s106 {struct _Construction construction; Term sub[11]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s106;
-extern int step_M_E__poly_s106(Sink,Term);
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$107$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s107 struct _Con_M_E__poly_s107
+struct _Con_M_E__poly_s107 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s107;
+extern int step_M_E__poly_s107(Sink,Term);
 
 /* FUNCTION EVAL-E_ToFirst-set-int HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int_s213 struct _Con_M_E__set__int_s213
@@ -4674,13 +4692,13 @@ struct _Con_M_E__poly_s11 {struct _Construction construction; Term sub[6]; Varia
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s11;
 extern int step_M_E__poly_s11(Sink,Term);
 
-/* FUNCTION EVAL-Poly-Error-None$E-poly$17$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-Error-Other$E-poly$17$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s17 struct _Con_M_E__poly_s17
 struct _Con_M_E__poly_s17 {struct _Construction construction; Term sub[5]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s17;
 extern int step_M_E__poly_s17(Sink,Term);
 
-/* FUNCTION EVAL-Poly-Error-None$E-poly$15$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-Error-Other$E-poly$15$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s15 struct _Con_M_E__poly_s15
 struct _Con_M_E__poly_s15 {struct _Construction construction; Term sub[4]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s15;
@@ -4782,57 +4800,45 @@ struct _Con_M_E__set__bool_s90 {struct _Construction construction; Term sub[7]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s90;
 extern int step_M_E__set__bool_s90(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$265$$Nil HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s265 struct _Con_M_E__poly_s265
 struct _Con_M_E__poly_s265 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s265;
 extern int step_M_E__poly_s265(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs$vFree HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$264$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s264 struct _Con_M_E__poly_s264
+struct _Con_M_E__poly_s264 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s264;
+extern int step_M_E__poly_s264(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$267$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s267 struct _Con_M_E__poly_s267
-struct _Con_M_E__poly_s267 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s267 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s267;
 extern int step_M_E__poly_s267(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s266 struct _Con_M_E__poly_s266
-struct _Con_M_E__poly_s266 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s266;
-extern int step_M_E__poly_s266(Sink,Term);
-
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$41$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s41 struct _Con_M_E__poly_s41
-struct _Con_M_E__poly_s41 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s41 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s41;
 extern int step_M_E__poly_s41(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$269$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$269$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s269 struct _Con_M_E__poly_s269
-struct _Con_M_E__poly_s269 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s269 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s269;
 extern int step_M_E__poly_s269(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s40 struct _Con_M_E__poly_s40
-struct _Con_M_E__poly_s40 {struct _Construction construction; Term sub[10]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s40;
-extern int step_M_E__poly_s40(Sink,Term);
-
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s43 struct _Con_M_E__poly_s43
-struct _Con_M_E__poly_s43 {struct _Construction construction; Term sub[10]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s43;
-extern int step_M_E__poly_s43(Sink,Term);
-
-/* FUNCTION EVAL-Poly-ForgivableError-Kind HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s42 struct _Con_M_E__poly_s42
-struct _Con_M_E__poly_s42 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s42 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s42;
 extern int step_M_E__poly_s42(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$44$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s44 struct _Con_M_E__poly_s44
-struct _Con_M_E__poly_s44 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s44 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s44;
 extern int step_M_E__poly_s44(Sink,Term);
 
@@ -4842,49 +4848,43 @@ struct _Con_M_E__optional__nil {struct _Construction construction; Term sub[2]; 
 extern struct _ConstructionDescriptor descriptor_M_E__optional__nil;
 extern int step_M_E__optional__nil(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s45 struct _Con_M_E__poly_s45
-struct _Con_M_E__poly_s45 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s45 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s45;
 extern int step_M_E__poly_s45(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-Kind HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s46 struct _Con_M_E__poly_s46
-struct _Con_M_E__poly_s46 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s46 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s46;
 extern int step_M_E__poly_s46(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s47 struct _Con_M_E__poly_s47
-struct _Con_M_E__poly_s47 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s47;
-extern int step_M_E__poly_s47(Sink,Term);
-
-/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$48$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s48 struct _Con_M_E__poly_s48
-struct _Con_M_E__poly_s48 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s48 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s48;
 extern int step_M_E__poly_s48(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$271$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$271$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s271 struct _Con_M_E__poly_s271
-struct _Con_M_E__poly_s271 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s271 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s271;
 extern int step_M_E__poly_s271(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If$E-poly$49$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s49 struct _Con_M_E__poly_s49
-struct _Con_M_E__poly_s49 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s49 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s49;
 extern int step_M_E__poly_s49(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$273$$Nil HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s273 struct _Con_M_E__poly_s273
-struct _Con_M_E__poly_s273 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s273;
-extern int step_M_E__poly_s273(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s272 struct _Con_M_E__poly_s272
+struct _Con_M_E__poly_s272 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s272;
+extern int step_M_E__poly_s272(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$274$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s274 struct _Con_M_E__poly_s274
 struct _Con_M_E__poly_s274 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s274;
@@ -4908,11 +4908,11 @@ struct _Con_M_E__set__ref__to__int {struct _Construction construction; Term sub[
 extern struct _ConstructionDescriptor descriptor_M_E__set__ref__to__int;
 extern int step_M_E__set__ref__to__int(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$256$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s256 struct _Con_M_E__poly_s256
-struct _Con_M_E__poly_s256 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s256;
-extern int step_M_E__poly_s256(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$255$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s255 struct _Con_M_E__poly_s255
+struct _Con_M_E__poly_s255 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s255;
+extern int step_M_E__poly_s255(Sink,Term);
 
 /* FUNCTION EVAL-Pattern-VariableNameIs HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Pattern_s9 struct _Con_M_E_Pattern_s9
@@ -4920,23 +4920,23 @@ struct _Con_M_E_Pattern_s9 {struct _Construction construction; Term sub[8]; Vari
 extern struct _ConstructionDescriptor descriptor_M_E_Pattern_s9;
 extern int step_M_E_Pattern_s9(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$254$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s254 struct _Con_M_E__poly_s254
-struct _Con_M_E__poly_s254 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s254;
-extern int step_M_E__poly_s254(Sink,Term);
-
 /* FUNCTION EVAL-Pattern-VariableNameIs$E-Pattern$8$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Pattern_s8 struct _Con_M_E_Pattern_s8
 struct _Con_M_E_Pattern_s8 {struct _Construction construction; Term sub[9]; Variable binder[1];};
 extern struct _ConstructionDescriptor descriptor_M_E_Pattern_s8;
 extern int step_M_E_Pattern_s8(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If$E-poly$53$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s53 struct _Con_M_E__poly_s53
-struct _Con_M_E__poly_s53 {struct _Construction construction; Term sub[6]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s53;
-extern int step_M_E__poly_s53(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$253$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s253 struct _Con_M_E__poly_s253
+struct _Con_M_E__poly_s253 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s253;
+extern int step_M_E__poly_s253(Sink,Term);
+
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$54$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s54 struct _Con_M_E__poly_s54
+struct _Con_M_E__poly_s54 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s54;
+extern int step_M_E__poly_s54(Sink,Term);
 
 /* FUNCTION EVAL-Pattern-VariableNameIs$E-Pattern$6$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Pattern_s6 struct _Con_M_E_Pattern_s6
@@ -4944,21 +4944,21 @@ struct _Con_M_E_Pattern_s6 {struct _Construction construction; Term sub[8]; Vari
 extern struct _ConstructionDescriptor descriptor_M_E_Pattern_s6;
 extern int step_M_E_Pattern_s6(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s259 struct _Con_M_E__poly_s259
-struct _Con_M_E__poly_s259 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s259;
-extern int step_M_E__poly_s259(Sink,Term);
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s52 struct _Con_M_E__poly_s52
+struct _Con_M_E__poly_s52 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s52;
+extern int step_M_E__poly_s52(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$258$$Nil HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s258 struct _Con_M_E__poly_s258
 struct _Con_M_E__poly_s258 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s258;
 extern int step_M_E__poly_s258(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If$E-poly$51$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$51$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s51 struct _Con_M_E__poly_s51
-struct _Con_M_E__poly_s51 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+struct _Con_M_E__poly_s51 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s51;
 extern int step_M_E__poly_s51(Sink,Term);
 
@@ -4968,35 +4968,41 @@ struct _Con_M_E_Pattern_s4 {struct _Construction construction; Term sub[7]; Vari
 extern struct _ConstructionDescriptor descriptor_M_E_Pattern_s4;
 extern int step_M_E_Pattern_s4(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If$E-poly$57$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$257$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s257 struct _Con_M_E__poly_s257
+struct _Con_M_E__poly_s257 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s257;
+extern int step_M_E__poly_s257(Sink,Term);
+
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$57$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s57 struct _Con_M_E__poly_s57
 struct _Con_M_E__poly_s57 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s57;
 extern int step_M_E__poly_s57(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If$E-poly$55$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s58 struct _Con_M_E__poly_s58
+struct _Con_M_E__poly_s58 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s58;
+extern int step_M_E__poly_s58(Sink,Term);
+
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s55 struct _Con_M_E__poly_s55
 struct _Con_M_E__poly_s55 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s55;
 extern int step_M_E__poly_s55(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$263$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s263 struct _Con_M_E__poly_s263
-struct _Con_M_E__poly_s263 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s263;
-extern int step_M_E__poly_s263(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$262$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s262 struct _Con_M_E__poly_s262
+struct _Con_M_E__poly_s262 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s262;
+extern int step_M_E__poly_s262(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If$E-poly$59$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s59 struct _Con_M_E__poly_s59
-struct _Con_M_E__poly_s59 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s59;
-extern int step_M_E__poly_s59(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$261$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s261 struct _Con_M_E__poly_s261
-struct _Con_M_E__poly_s261 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s261;
-extern int step_M_E__poly_s261(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$260$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s260 struct _Con_M_E__poly_s260
+struct _Con_M_E__poly_s260 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s260;
+extern int step_M_E__poly_s260(Sink,Term);
 
 /* FUNCTION EVAL-Poly-Error-Other HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s21 struct _Con_M_E__poly_s21
@@ -5009,6 +5015,18 @@ extern int step_M_E__poly_s21(Sink,Term);
 struct _Con_M_E__poly_s20 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s20;
 extern int step_M_E__poly_s20(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIs HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s287 struct _Con_M_E__poly_s287
+struct _Con_M_E__poly_s287 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s287;
+extern int step_M_E__poly_s287(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$286$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s286 struct _Con_M_E__poly_s286
+struct _Con_M_E__poly_s286 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s286;
+extern int step_M_E__poly_s286(Sink,Term);
 
 /* FUNCTION EVAL-Poly-Error-Other HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s26 struct _Con_M_E__poly_s26
@@ -5064,7 +5082,7 @@ struct _Con_M_E__poly_s25 {struct _Construction construction; Term sub[9]; Varia
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s25;
 extern int step_M_E__poly_s25(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Kind$E-poly$31$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$31$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s31 struct _Con_M_E__poly_s31
 struct _Con_M_E__poly_s31 {struct _Construction construction; Term sub[4]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s31;
@@ -5076,29 +5094,65 @@ struct _Con_M_E__poly_s30 {struct _Construction construction; Term sub[5]; Varia
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s30;
 extern int step_M_E__poly_s30(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s279 struct _Con_M_E__poly_s279
+struct _Con_M_E__poly_s279 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s279;
+extern int step_M_E__poly_s279(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$278$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s278 struct _Con_M_E__poly_s278
+struct _Con_M_E__poly_s278 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s278;
+extern int step_M_E__poly_s278(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$276$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s276 struct _Con_M_E__poly_s276
+struct _Con_M_E__poly_s276 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s276;
+extern int step_M_E__poly_s276(Sink,Term);
+
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s39 struct _Con_M_E__poly_s39
-struct _Con_M_E__poly_s39 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s39 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s39;
 extern int step_M_E__poly_s39(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError- HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s37 struct _Con_M_E__poly_s37
-struct _Con_M_E__poly_s37 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s37;
-extern int step_M_E__poly_s37(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$284$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s284 struct _Con_M_E__poly_s284
+struct _Con_M_E__poly_s284 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s284;
+extern int step_M_E__poly_s284(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError- HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$282$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s282 struct _Con_M_E__poly_s282
+struct _Con_M_E__poly_s282 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s282;
+extern int step_M_E__poly_s282(Sink,Term);
+
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$38$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s38 struct _Con_M_E__poly_s38
 struct _Con_M_E__poly_s38 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s38;
 extern int step_M_E__poly_s38(Sink,Term);
 
-/* FUNCTION EVAL-Poly-ForgivableError-Other$E-poly$35$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$35$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s35 struct _Con_M_E__poly_s35
 struct _Con_M_E__poly_s35 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s35;
 extern int step_M_E__poly_s35(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIs$vFree HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s280 struct _Con_M_E__poly_s280
+struct _Con_M_E__poly_s280 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s280;
+extern int step_M_E__poly_s280(Sink,Term);
+
+/* FUNCTION EVAL-Poly-ForgivableError- HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s36 struct _Con_M_E__poly_s36
+struct _Con_M_E__poly_s36 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s36;
+extern int step_M_E__poly_s36(Sink,Term);
 
 /* FUNCTION EVAL-Poly-ForgivableError-Kind$E-poly$33$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s33 struct _Con_M_E__poly_s33
@@ -5114,9 +5168,15 @@ extern int step_M_E__int__to__bool(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$88$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s88 struct _Con_M_E__poly_s88
-struct _Con_M_E__poly_s88 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s88 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s88;
 extern int step_M_E__poly_s88(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$83$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s83 struct _Con_M_E__poly_s83
+struct _Con_M_E__poly_s83 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s83;
+extern int step_M_E__poly_s83(Sink,Term);
 
 /* FUNCTION EVAL-Set-Bool-DeepEqual$E-set-bool$39$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__bool_s39 struct _Con_M_E__set__bool_s39
@@ -5124,21 +5184,15 @@ struct _Con_M_E__set__bool_s39 {struct _Construction construction; Term sub[7]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s39;
 extern int step_M_E__set__bool_s39(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$83$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s83 struct _Con_M_E__poly_s83
-struct _Con_M_E__poly_s83 {struct _Construction construction; Term sub[11]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s83;
-extern int step_M_E__poly_s83(Sink,Term);
-
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$81$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s81 struct _Con_M_E__poly_s81
-struct _Con_M_E__poly_s81 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s81 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s81;
 extern int step_M_E__poly_s81(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$86$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s86 struct _Con_M_E__poly_s86
-struct _Con_M_E__poly_s86 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s86 {struct _Construction construction; Term sub[11]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s86;
 extern int step_M_E__poly_s86(Sink,Term);
 
@@ -5148,11 +5202,11 @@ struct _Con_M_E__set__bool_s35 {struct _Construction construction; Term sub[5]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s35;
 extern int step_M_E__set__bool_s35(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s84 struct _Con_M_E__poly_s84
-struct _Con_M_E__poly_s84 {struct _Construction construction; Term sub[12]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s84;
-extern int step_M_E__poly_s84(Sink,Term);
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$85$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s85 struct _Con_M_E__poly_s85
+struct _Con_M_E__poly_s85 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s85;
+extern int step_M_E__poly_s85(Sink,Term);
 
 /* FUNCTION EVAL-Set-Bool-DeepEqual$E-set-bool$37$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__bool_s37 struct _Con_M_E__set__bool_s37
@@ -5198,9 +5252,15 @@ extern int step_M_E__poly_s99(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$92$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s92 struct _Con_M_E__poly_s92
-struct _Con_M_E__poly_s92 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s92 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s92;
 extern int step_M_E__poly_s92(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$94$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s94 struct _Con_M_E__poly_s94
+struct _Con_M_E__poly_s94 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s94;
+extern int step_M_E__poly_s94(Sink,Term);
 
 /* FUNCTION EVAL-Set-Bool-Contains$E-set-bool$28$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__bool_s28 struct _Con_M_E__set__bool_s28
@@ -5208,17 +5268,11 @@ struct _Con_M_E__set__bool_s28 {struct _Construction construction; Term sub[7]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s28;
 extern int step_M_E__set__bool_s28(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$94$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s94 struct _Con_M_E__poly_s94
-struct _Con_M_E__poly_s94 {struct _Construction construction; Term sub[11]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s94;
-extern int step_M_E__poly_s94(Sink,Term);
-
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s95 struct _Con_M_E__poly_s95
-struct _Con_M_E__poly_s95 {struct _Construction construction; Term sub[12]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s95;
-extern int step_M_E__poly_s95(Sink,Term);
+/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$96$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s96 struct _Con_M_E__poly_s96
+struct _Con_M_E__poly_s96 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s96;
+extern int step_M_E__poly_s96(Sink,Term);
 
 /* FUNCTION EVAL-Set-Bool-Contains$E-set-bool$26$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__bool_s26 struct _Con_M_E__set__bool_s26
@@ -5226,9 +5280,9 @@ struct _Con_M_E__set__bool_s26 {struct _Construction construction; Term sub[6]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s26;
 extern int step_M_E__set__bool_s26(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$97$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s97 struct _Con_M_E__poly_s97
-struct _Con_M_E__poly_s97 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s97 {struct _Construction construction; Term sub[12]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s97;
 extern int step_M_E__poly_s97(Sink,Term);
 
@@ -5258,7 +5312,7 @@ extern int step_M_E__set__bool_s20(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$90$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s90 struct _Con_M_E__poly_s90
-struct _Con_M_E__poly_s90 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s90 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s90;
 extern int step_M_E__poly_s90(Sink,Term);
 
@@ -5292,15 +5346,15 @@ struct _Con_M_E__flatten__string_s3 {struct _Construction construction; Term sub
 extern struct _ConstructionDescriptor descriptor_M_E__flatten__string_s3;
 extern int step_M_E__flatten__string_s3(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$68$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If$E-poly$68$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s68 struct _Con_M_E__poly_s68
-struct _Con_M_E__poly_s68 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s68 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s68;
 extern int step_M_E__poly_s68(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$66$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If$E-poly$66$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s66 struct _Con_M_E__poly_s66
-struct _Con_M_E__poly_s66 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s66 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s66;
 extern int step_M_E__poly_s66(Sink,Term);
 
@@ -5310,9 +5364,9 @@ struct _Con_M_E__set__bool_s12 {struct _Construction construction; Term sub[6]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s12;
 extern int step_M_E__set__bool_s12(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$64$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If$E-poly$64$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s64 struct _Con_M_E__poly_s64
-struct _Con_M_E__poly_s64 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s64 {struct _Construction construction; Term sub[5]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s64;
 extern int step_M_E__poly_s64(Sink,Term);
 
@@ -5322,9 +5376,9 @@ struct _Con_M_E__set__bool_s14 {struct _Construction construction; Term sub[7]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s14;
 extern int step_M_E__set__bool_s14(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If$E-poly$62$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s62 struct _Con_M_E__poly_s62
-struct _Con_M_E__poly_s62 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+struct _Con_M_E__poly_s62 {struct _Construction construction; Term sub[4]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s62;
 extern int step_M_E__poly_s62(Sink,Term);
 
@@ -5340,9 +5394,9 @@ struct _Con_M_E__set__bool_s16 {struct _Construction construction; Term sub[6]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s16;
 extern int step_M_E__set__bool_s16(Sink,Term);
 
-/* FUNCTION EVAL-Poly-If HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None$E-poly$60$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s60 struct _Con_M_E__poly_s60
-struct _Con_M_E__poly_s60 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s60 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s60;
 extern int step_M_E__poly_s60(Sink,Term);
 
@@ -5352,9 +5406,9 @@ struct _Con_M_E__set__bool_s17 {struct _Construction construction; Term sub[6]; 
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s17;
 extern int step_M_E__set__bool_s17(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef$E-poly$61$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-ForgivableError-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s61 struct _Con_M_E__poly_s61
-struct _Con_M_E__poly_s61 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s61 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s61;
 extern int step_M_E__poly_s61(Sink,Term);
 
@@ -5390,37 +5444,43 @@ extern int step_M_E__flatten__strings_s3(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$77$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s77 struct _Con_M_E__poly_s77
-struct _Con_M_E__poly_s77 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s77 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s77;
 extern int step_M_E__poly_s77(Sink,Term);
 
 /* FUNCTION EVAL-Poly-IfDef-Global$E-poly$79$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s79 struct _Con_M_E__poly_s79
-struct _Con_M_E__poly_s79 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s79 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s79;
 extern int step_M_E__poly_s79(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s73 struct _Con_M_E__poly_s73
-struct _Con_M_E__poly_s73 {struct _Construction construction; Term sub[11]; Variable binder[2];};
+struct _Con_M_E__poly_s73 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s73;
 extern int step_M_E__poly_s73(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$75$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-IfDef$E-poly$74$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s74 struct _Con_M_E__poly_s74
+struct _Con_M_E__poly_s74 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s74;
+extern int step_M_E__poly_s74(Sink,Term);
+
+/* FUNCTION EVAL-Poly-IfDef HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s75 struct _Con_M_E__poly_s75
-struct _Con_M_E__poly_s75 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+struct _Con_M_E__poly_s75 {struct _Construction construction; Term sub[5]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s75;
 extern int step_M_E__poly_s75(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$70$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If$E-poly$70$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s70 struct _Con_M_E__poly_s70
-struct _Con_M_E__poly_s70 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+struct _Con_M_E__poly_s70 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s70;
 extern int step_M_E__poly_s70(Sink,Term);
 
-/* FUNCTION EVAL-Poly-IfDef-Global$E-poly$72$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-If$E-poly$72$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s72 struct _Con_M_E__poly_s72
-struct _Con_M_E__poly_s72 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s72 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s72;
 extern int step_M_E__poly_s72(Sink,Term);
 
@@ -5904,6 +5964,12 @@ struct _Con_M_E__set__bool_s139 {struct _Construction construction; Term sub[4];
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s139;
 extern int step_M_E__set__bool_s139(Sink,Term);
 
+/* FUNCTION EVAL-E-Head-1$E-Head$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Head struct _Con_M_E_Head
+struct _Con_M_E_Head {struct _Construction construction; Term sub[1]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Head;
+extern int step_M_E_Head(Sink,Term);
+
 /* FUNCTION EVAL-Set-Bool-LesserVariable$vFree HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__bool_s125 struct _Con_M_E__set__bool_s125
 struct _Con_M_E__set__bool_s125 {struct _Construction construction; Term sub[6]; Variable binder[0];};
@@ -6384,17 +6450,17 @@ struct _Con_M_E__call__compute__args_s3 {struct _Construction construction; Term
 extern struct _ConstructionDescriptor descriptor_M_E__call__compute__args_s3;
 extern int step_M_E__call__compute__args_s3(Sink,Term);
 
+/* FUNCTION EVAL-Poly-Trace-None$E-poly$213$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s213 struct _Con_M_E__poly_s213
+struct _Con_M_E__poly_s213 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s213;
+extern int step_M_E__poly_s213(Sink,Term);
+
 /* FUNCTION EVAL-E-set-int-fold-op-2 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int__fold__op_s2 struct _Con_M_E__set__int__fold__op_s2
 struct _Con_M_E__set__int__fold__op_s2 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__int__fold__op_s2;
 extern int step_M_E__set__int__fold__op_s2(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$214$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s214 struct _Con_M_E__poly_s214
-struct _Con_M_E__poly_s214 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s214;
-extern int step_M_E__poly_s214(Sink,Term);
 
 /* FUNCTION EVAL-E-set-int-fold-op-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int__fold__op_s3 struct _Con_M_E__set__int__fold__op_s3
@@ -6402,11 +6468,11 @@ struct _Con_M_E__set__int__fold__op_s3 {struct _Construction construction; Term 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int__fold__op_s3;
 extern int step_M_E__set__int__fold__op_s3(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$216$$Nil HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s216 struct _Con_M_E__poly_s216
-struct _Con_M_E__poly_s216 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s216;
-extern int step_M_E__poly_s216(Sink,Term);
+/* FUNCTION EVAL-Poly-Trace- HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s215 struct _Con_M_E__poly_s215
+struct _Con_M_E__poly_s215 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s215;
+extern int step_M_E__poly_s215(Sink,Term);
 
 /* FUNCTION EVAL-E-set-int-fold-op- HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__int__fold__op_s1 struct _Con_M_E__set__int__fold__op_s1
@@ -6414,17 +6480,17 @@ struct _Con_M_E__set__int__fold__op_s1 {struct _Construction construction; Term 
 extern struct _ConstructionDescriptor descriptor_M_E__set__int__fold__op_s1;
 extern int step_M_E__set__int__fold__op_s1(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-SaveTerm HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s210 struct _Con_M_E__poly_s210
-struct _Con_M_E__poly_s210 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s210 {struct _Construction construction; Term sub[10]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s210;
 extern int step_M_E__poly_s210(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$212$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s212 struct _Con_M_E__poly_s212
-struct _Con_M_E__poly_s212 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s212;
-extern int step_M_E__poly_s212(Sink,Term);
+/* FUNCTION EVAL-Poly-Trace-None$E-poly$211$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s211 struct _Con_M_E__poly_s211
+struct _Con_M_E__poly_s211 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s211;
+extern int step_M_E__poly_s211(Sink,Term);
 
 /* FUNCTION EVAL-E_ExceptVariables-set-num HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__num_s64 struct _Con_M_E__set__num_s64
@@ -6450,9 +6516,9 @@ struct _Con_M_E__set__num_s61 {struct _Construction construction; Term sub[4]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__num_s61;
 extern int step_M_E__set__num_s61(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-Trace-Message$E-poly$217$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s217 struct _Con_M_E__poly_s217
-struct _Con_M_E__poly_s217 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s217 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s217;
 extern int step_M_E__poly_s217(Sink,Term);
 
@@ -6462,9 +6528,15 @@ struct _Con_M_E__set__num_s60 {struct _Construction construction; Term sub[4]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__num_s60;
 extern int step_M_E__set__num_s60(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$219$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-Trace-Message HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s218 struct _Con_M_E__poly_s218
+struct _Con_M_E__poly_s218 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s218;
+extern int step_M_E__poly_s218(Sink,Term);
+
+/* FUNCTION EVAL-Poly-Trace-None HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s219 struct _Con_M_E__poly_s219
-struct _Con_M_E__poly_s219 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+struct _Con_M_E__poly_s219 {struct _Construction construction; Term sub[5]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s219;
 extern int step_M_E__poly_s219(Sink,Term);
 
@@ -6504,17 +6576,11 @@ struct _Con_M_E__set__num_s57 {struct _Construction construction; Term sub[6]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__num_s57;
 extern int step_M_E__set__num_s57(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$230$$Nil HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s230 struct _Con_M_E__poly_s230
-struct _Con_M_E__poly_s230 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s230 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s230;
 extern int step_M_E__poly_s230(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$226$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s226 struct _Con_M_E__poly_s226
-struct _Con_M_E__poly_s226 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s226;
-extern int step_M_E__poly_s226(Sink,Term);
 
 /* FUNCTION EVAL-Poly-Cast$E-poly$3$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s3 struct _Con_M_E__poly_s3
@@ -6522,17 +6588,23 @@ struct _Con_M_E__poly_s3 {struct _Construction construction; Term sub[5]; Variab
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s3;
 extern int step_M_E__poly_s3(Sink,Term);
 
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$227$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s227 struct _Con_M_E__poly_s227
+struct _Con_M_E__poly_s227 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s227;
+extern int step_M_E__poly_s227(Sink,Term);
+
 /* FUNCTION EVAL-Poly-Cast$E-poly$1$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s1 struct _Con_M_E__poly_s1
 struct _Con_M_E__poly_s1 {struct _Construction construction; Term sub[4]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s1;
 extern int step_M_E__poly_s1(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s224 struct _Con_M_E__poly_s224
-struct _Con_M_E__poly_s224 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s224;
-extern int step_M_E__poly_s224(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$225$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s225 struct _Con_M_E__poly_s225
+struct _Con_M_E__poly_s225 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s225;
+extern int step_M_E__poly_s225(Sink,Term);
 
 /* FUNCTION EVAL-Poly-Echo$E-poly$7$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s7 struct _Con_M_E__poly_s7
@@ -6540,15 +6612,21 @@ struct _Con_M_E__poly_s7 {struct _Construction construction; Term sub[4]; Variab
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s7;
 extern int step_M_E__poly_s7(Sink,Term);
 
+/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$222$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s222 struct _Con_M_E__poly_s222
+struct _Con_M_E__poly_s222 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s222;
+extern int step_M_E__poly_s222(Sink,Term);
+
 /* FUNCTION EVAL-Poly-Cast HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s6 struct _Con_M_E__poly_s6
 struct _Con_M_E__poly_s6 {struct _Construction construction; Term sub[5]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s6;
 extern int step_M_E__poly_s6(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$223$$Nil HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIs HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s223 struct _Con_M_E__poly_s223
-struct _Con_M_E__poly_s223 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s223 {struct _Construction construction; Term sub[6]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s223;
 extern int step_M_E__poly_s223(Sink,Term);
 
@@ -6558,11 +6636,11 @@ struct _Con_M_E__poly_s5 {struct _Construction construction; Term sub[6]; Variab
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s5;
 extern int step_M_E__poly_s5(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$221$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s221 struct _Con_M_E__poly_s221
-struct _Con_M_E__poly_s221 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s221;
-extern int step_M_E__poly_s221(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$220$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s220 struct _Con_M_E__poly_s220
+struct _Con_M_E__poly_s220 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s220;
+extern int step_M_E__poly_s220(Sink,Term);
 
 /* FUNCTION EVAL-E-set-num-4$E-set-num$50$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__num_s50 struct _Con_M_E__set__num_s50
@@ -6582,11 +6660,11 @@ struct _Con_M_E__set__num_s52 {struct _Construction construction; Term sub[5]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__num_s52;
 extern int step_M_E__set__num_s52(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$228$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s228 struct _Con_M_E__poly_s228
-struct _Con_M_E__poly_s228 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s228;
-extern int step_M_E__poly_s228(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$229$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s229 struct _Con_M_E__poly_s229
+struct _Con_M_E__poly_s229 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s229;
+extern int step_M_E__poly_s229(Sink,Term);
 
 /* FUNCTION EVAL-Set-Num-Decimal HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__num_s45 struct _Con_M_E__set__num_s45
@@ -6618,41 +6696,41 @@ struct _Con_M_E__set__num_s48 {struct _Construction construction; Term sub[5]; V
 extern struct _ConstructionDescriptor descriptor_M_E__set__num_s48;
 extern int step_M_E__set__num_s48(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$240$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s240 struct _Con_M_E__poly_s240
-struct _Con_M_E__poly_s240 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s240;
-extern int step_M_E__poly_s240(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$241$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s241 struct _Con_M_E__poly_s241
+struct _Con_M_E__poly_s241 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s241;
+extern int step_M_E__poly_s241(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$232$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s232 struct _Con_M_E__poly_s232
+struct _Con_M_E__poly_s232 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s232;
+extern int step_M_E__poly_s232(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$234$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s234 struct _Con_M_E__poly_s234
+struct _Con_M_E__poly_s234 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s234;
+extern int step_M_E__poly_s234(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$236$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s236 struct _Con_M_E__poly_s236
+struct _Con_M_E__poly_s236 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s236;
+extern int step_M_E__poly_s236(Sink,Term);
 
 /* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s231 struct _Con_M_E__poly_s231
-struct _Con_M_E__poly_s231 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s231;
-extern int step_M_E__poly_s231(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$233$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s233 struct _Con_M_E__poly_s233
-struct _Con_M_E__poly_s233 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s233;
-extern int step_M_E__poly_s233(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$235$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s235 struct _Con_M_E__poly_s235
-struct _Con_M_E__poly_s235 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s235;
-extern int step_M_E__poly_s235(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$237$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s237 struct _Con_M_E__poly_s237
 struct _Con_M_E__poly_s237 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s237;
 extern int step_M_E__poly_s237(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s238 struct _Con_M_E__poly_s238
-struct _Con_M_E__poly_s238 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s238;
-extern int step_M_E__poly_s238(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$239$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s239 struct _Con_M_E__poly_s239
+struct _Con_M_E__poly_s239 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s239;
+extern int step_M_E__poly_s239(Sink,Term);
 
 /* FUNCTION EVAL-Set-Num-Decimal HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__num_s42 struct _Con_M_E__set__num_s42
@@ -6703,46 +6781,40 @@ extern struct _ConstructionDescriptor descriptor_M_E__set__num_s39;
 extern int step_M_E__set__num_s39(Sink,Term);
 
 /* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s252 struct _Con_M_E__poly_s252
-struct _Con_M_E__poly_s252 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s252;
-extern int step_M_E__poly_s252(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$251$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s251 struct _Con_M_E__poly_s251
-struct _Con_M_E__poly_s251 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s251 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s251;
 extern int step_M_E__poly_s251(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$244$$Nil HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$250$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s250 struct _Con_M_E__poly_s250
+struct _Con_M_E__poly_s250 {struct _Construction construction; Term sub[9]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s250;
+extern int step_M_E__poly_s250(Sink,Term);
+
+/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s244 struct _Con_M_E__poly_s244
-struct _Con_M_E__poly_s244 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+struct _Con_M_E__poly_s244 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s244;
 extern int step_M_E__poly_s244(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s245 struct _Con_M_E__poly_s245
-struct _Con_M_E__poly_s245 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s245;
-extern int step_M_E__poly_s245(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$243$$Nil HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s243 struct _Con_M_E__poly_s243
+struct _Con_M_E__poly_s243 {struct _Construction construction; Term sub[10]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s243;
+extern int step_M_E__poly_s243(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$242$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s242 struct _Con_M_E__poly_s242
-struct _Con_M_E__poly_s242 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s242;
-extern int step_M_E__poly_s242(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$248$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s248 struct _Con_M_E__poly_s248
+struct _Con_M_E__poly_s248 {struct _Construction construction; Term sub[8]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s248;
+extern int step_M_E__poly_s248(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$249$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s249 struct _Con_M_E__poly_s249
-struct _Con_M_E__poly_s249 {struct _Construction construction; Term sub[9]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s249;
-extern int step_M_E__poly_s249(Sink,Term);
-
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$247$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s247 struct _Con_M_E__poly_s247
-struct _Con_M_E__poly_s247 {struct _Construction construction; Term sub[8]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s247;
-extern int step_M_E__poly_s247(Sink,Term);
+/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$246$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s246 struct _Con_M_E__poly_s246
+struct _Con_M_E__poly_s246 {struct _Construction construction; Term sub[7]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s246;
+extern int step_M_E__poly_s246(Sink,Term);
 
 /* FUNCTION EVAL-Set-Num-Decimal-Literal$E-set-num$30$$Nil HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__num_s30 struct _Con_M_E__set__num_s30
@@ -6852,7 +6924,7 @@ struct _Con_M_E__set__bool_s108 {struct _Construction construction; Term sub[6];
 extern struct _ConstructionDescriptor descriptor_M_E__set__bool_s108;
 extern int step_M_E__set__bool_s108(Sink,Term);
 
-/* FUNCTION EVAL-Set-Num-Decimal$E-set-num$14$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-Num-Decimal-Literal$E-set-num$14$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__num_s14 struct _Con_M_E__set__num_s14
 struct _Con_M_E__set__num_s14 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__num_s14;
@@ -6936,53 +7008,59 @@ struct _Con_M_E__set__num__to__local__string {struct _Construction construction;
 extern struct _ConstructionDescriptor descriptor_M_E__set__num__to__local__string;
 extern int step_M_E__set__num__to__local__string(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIs$E-poly$209$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-SaveTerm$E-poly$209$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s209 struct _Con_M_E__poly_s209
-struct _Con_M_E__poly_s209 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+struct _Con_M_E__poly_s209 {struct _Construction construction; Term sub[9]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s209;
 extern int step_M_E__poly_s209(Sink,Term);
 
-/* FUNCTION EVAL-Poly-VariableNameIsComputed$E-poly$207$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-SaveTerm$E-poly$207$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s207 struct _Con_M_E__poly_s207
-struct _Con_M_E__poly_s207 {struct _Construction construction; Term sub[4]; Variable binder[2];};
+struct _Con_M_E__poly_s207 {struct _Construction construction; Term sub[8]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s207;
 extern int step_M_E__poly_s207(Sink,Term);
 
-/* FUNCTION EVAL-Poly-Trace-None HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s206 struct _Con_M_E__poly_s206
-struct _Con_M_E__poly_s206 {struct _Construction construction; Term sub[5]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s206;
-extern int step_M_E__poly_s206(Sink,Term);
+/* FUNCTION EVAL-Poly-SaveTerm$E-poly$201$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s201 struct _Con_M_E__poly_s201
+struct _Con_M_E__poly_s201 {struct _Construction construction; Term sub[5]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s201;
+extern int step_M_E__poly_s201(Sink,Term);
 
-/* FUNCTION EVAL-Poly-Trace-Message$E-poly$200$$Cons HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s200 struct _Con_M_E__poly_s200
-struct _Con_M_E__poly_s200 {struct _Construction construction; Term sub[5]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s200;
-extern int step_M_E__poly_s200(Sink,Term);
-
-/* FUNCTION EVAL-Poly-Trace-Message HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Poly-SaveTerm$E-poly$205$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__poly_s205 struct _Con_M_E__poly_s205
-struct _Con_M_E__poly_s205 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+struct _Con_M_E__poly_s205 {struct _Construction construction; Term sub[7]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__poly_s205;
 extern int step_M_E__poly_s205(Sink,Term);
 
-/* FUNCTION EVAL-Poly-Trace-Message$E-poly$204$$Nil HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s204 struct _Con_M_E__poly_s204
-struct _Con_M_E__poly_s204 {struct _Construction construction; Term sub[7]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s204;
-extern int step_M_E__poly_s204(Sink,Term);
-
-/* FUNCTION EVAL-Poly-Trace- HEADER DECLARATIONS. */
-#define STRUCT_Con_M_E__poly_s202 struct _Con_M_E__poly_s202
-struct _Con_M_E__poly_s202 {struct _Construction construction; Term sub[6]; Variable binder[2];};
-extern struct _ConstructionDescriptor descriptor_M_E__poly_s202;
-extern int step_M_E__poly_s202(Sink,Term);
+/* FUNCTION EVAL-Poly-SaveTerm$E-poly$203$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E__poly_s203 struct _Con_M_E__poly_s203
+struct _Con_M_E__poly_s203 {struct _Construction construction; Term sub[6]; Variable binder[2];};
+extern struct _ConstructionDescriptor descriptor_M_E__poly_s203;
+extern int step_M_E__poly_s203(Sink,Term);
 
 /* FUNCTION EVAL-E-call-compute-typed-args- HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__call__compute__typed__args struct _Con_M_E__call__compute__typed__args
 struct _Con_M_E__call__compute__typed__args {struct _Construction construction; Term sub[6]; Variable binder[1];};
 extern struct _ConstructionDescriptor descriptor_M_E__call__compute__typed__args;
 extern int step_M_E__call__compute__typed__args(Sink,Term);
+
+/* FUNCTION EVAL-E-Last-1 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Last_s4 struct _Con_M_E_Last_s4
+struct _Con_M_E_Last_s4 {struct _Construction construction; Term sub[1]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Last_s4;
+extern int step_M_E_Last_s4(Sink,Term);
+
+/* FUNCTION EVAL-E-Last- HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Last_s2 struct _Con_M_E_Last_s2
+struct _Con_M_E_Last_s2 {struct _Construction construction; Term sub[2]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Last_s2;
+extern int step_M_E_Last_s2(Sink,Term);
+
+/* FUNCTION EVAL-E-Last-2 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Last_s3 struct _Con_M_E_Last_s3
+struct _Con_M_E_Last_s3 {struct _Construction construction; Term sub[3]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Last_s3;
+extern int step_M_E_Last_s3(Sink,Term);
 
 /* FUNCTION EVAL- HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__string struct _Con_M_E__set__string
@@ -7433,7 +7511,7 @@ struct _Con_M_E__local__string_s129 {struct _Construction construction; Term sub
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s129;
 extern int step_M_E__local__string_s129(Sink,Term);
 
-/* FUNCTION EVAL-Set-String-Substring3-Local$E-local-string$127$$Cons HEADER DECLARATIONS. */
+/* FUNCTION EVAL-Set-String-Substring2-Local$E-local-string$127$$Cons HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__local__string_s127 struct _Con_M_E__local__string_s127
 struct _Con_M_E__local__string_s127 {struct _Construction construction; Term sub[5]; Variable binder[2];};
 extern struct _ConstructionDescriptor descriptor_M_E__local__string_s127;
@@ -7618,6 +7696,24 @@ extern int step_M_E__optional_s2(Sink,Term);
 struct _Con_M_E__num__to__num {struct _Construction construction; Term sub[3]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__num__to__num;
 extern int step_M_E__num__to__num(Sink,Term);
+
+/* FUNCTION EVAL-E-Head-2 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Head_s3 struct _Con_M_E_Head_s3
+struct _Con_M_E_Head_s3 {struct _Construction construction; Term sub[3]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Head_s3;
+extern int step_M_E_Head_s3(Sink,Term);
+
+/* FUNCTION EVAL-E-Head- HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Head_s2 struct _Con_M_E_Head_s2
+struct _Con_M_E_Head_s2 {struct _Construction construction; Term sub[2]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Head_s2;
+extern int step_M_E_Head_s2(Sink,Term);
+
+/* FUNCTION EVAL-E-Head-1 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Head_s4 struct _Con_M_E_Head_s4
+struct _Con_M_E_Head_s4 {struct _Construction construction; Term sub[1]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Head_s4;
+extern int step_M_E_Head_s4(Sink,Term);
 
 /* FUNCTION EVAL-E_UpCase-set-ref HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__ref_s114 struct _Con_M_E__set__ref_s114
@@ -7899,6 +7995,12 @@ extern int step_M_E__set__ref_s107(Sink,Term);
 struct _Con_M_E__set__ref_s109 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__set__ref_s109;
 extern int step_M_E__set__ref_s109(Sink,Term);
+
+/* FUNCTION EVAL-E-Last-2$E-Last$$Cons HEADER DECLARATIONS. */
+#define STRUCT_Con_M_E_Last struct _Con_M_E_Last
+struct _Con_M_E_Last {struct _Construction construction; Term sub[1]; Variable binder[0];};
+extern struct _ConstructionDescriptor descriptor_M_E_Last;
+extern int step_M_E_Last(Sink,Term);
 
 /* FUNCTION EVAL-E_Rescape-set-ref HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__set__ref_s100 struct _Con_M_E__set__ref_s100

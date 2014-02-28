@@ -571,20 +571,6 @@ Sink bufferEnd(Sink sink, ConstructionDescriptor descriptor)
     return sink;
 }
 
-//Sink bufferLiteral(Sink sink, const char *text)
-//{
-//#   ifdef DEBUG
-//    ++eventCount;
-//#   endif
-//    ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
-//    Buffer buffer = (Buffer) sink;
-//    //DEBUGF(sink->context, "//LITERAL(%d)\n", buffer->lastTop);
-//    bufferStart(sink, &literalConstructionDescriptor);
-//    ((Literal) bufferTop(buffer)->term)->text = text; // descriptor set by start
-//    bufferEnd(sink, &literalConstructionDescriptor);
-//    return sink;
-//}
-
 Sink bufferLiteral(Sink sink, const char *text)
 {
 #   ifdef DEBUG
@@ -593,36 +579,12 @@ Sink bufferLiteral(Sink sink, const char *text)
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
 
-    Hashset2 pool = sink->context->literalPool;
+    //DEBUGF(sink->context, "//LITERAL(%d)\n", buffer->lastTop);
+    bufferStart(sink, &literalConstructionDescriptor);
+    Term literal =  bufferTop(buffer)->term;
+    ((Literal) literal)->text = text; // descriptor set by start
+    bufferEnd(sink, &literalConstructionDescriptor);
 
-    // Is literal in the pool?
-    Term literal = NULL;
-
-    if (pool)
-    	literal = (Term) getValuePtrHS2(pool, text);
-
-    if (literal)
-    {
-    	// Reuse
-    	LINK(sink->context, literal);
-        bufferInsert(buffer, literal);
-    }
-    else
-    {
-    	//DEBUGF(sink->context, "//LITERAL(%d)\n", buffer->lastTop);
-		bufferStart(sink, &literalConstructionDescriptor);
-
-		Term literal =  bufferTop(buffer)->term;
-		((Literal) literal)->text = text; // descriptor set by start
-
-		if (pool)
-		{
-			LINK(sink->context, literal); // The pool own the literal
-			addValueHS2(sink->context, pool, text, (void*) literal);
-		}
-
-		bufferEnd(sink, &literalConstructionDescriptor);
-    }
     return sink;
 }
 
@@ -3628,12 +3590,12 @@ Term compute(Context context, Term term)
     pDuplicateMemuse = 0l;
 #   endif
 
-    context->literalPool = makeHS2(context, 16);
+    context->stringPool = makeHS2(context, 16);
 
     normalize(context, &term);
 
-    unlinkHS2(context, context->literalPool);
-    context->literalPool = NULL;
+    unlinkHS2(context, context->stringPool);
+    context->stringPool = NULL;
 
 #   ifdef CRSXPROF
     printProfiling(context);
@@ -4656,29 +4618,32 @@ void passLocationProperties(Context context, Term locTerm, Term term)
 		{
 			char *key = list[i];
 			Term value = NAMED_PROPERTY(construction, key);
-			Term locvalue = NAMED_PROPERTY(locConstruction, key);
 			//if (value && (!locvalue || strcmp(SYMBOL(value), SYMBOL(locvalue))))
-			if (locvalue && value && strcmp(SYMBOL(value), SYMBOL(locvalue)))
+			if (value)
 			{
-				VARIABLESET fvs = namedPropertyFreeVars(construction->namedProperties);
+			    Term locvalue = NAMED_PROPERTY(locConstruction, key);
+			    if (locvalue && strcmp(SYMBOL(value), SYMBOL(locvalue)))
+			    {
+                    VARIABLESET fvs = namedPropertyFreeVars(construction->namedProperties);
 
-				// Location has been changed...update.
-				NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
-				link->link = construction->namedProperties;
-				link->nr = 1;
-				link->name = GLOBAL(context, key);
-				link->u.term = LINK(context, value);
-				construction->namedProperties = link;
+                    // Location has been changed...update.
+                    NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+                    link->link = construction->namedProperties;
+                    link->nr = 1;
+                    link->name = GLOBAL(context, key);
+                    link->u.term = LINK(context, value);
+                    construction->namedProperties = link;
 
-				if (fvs)
-				{
-					NamedPropertyLink fvlink = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
-					fvlink->link = link;
-					fvlink->nr = 1;
-					fvlink->name = NULL;
-					fvlink->u.weakening = (Variable) LINK_VARIABLESET(context, fvs);
-					construction->namedProperties = fvlink;
-				}
+                    if (fvs)
+                    {
+                        NamedPropertyLink fvlink = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+                        fvlink->link = link;
+                        fvlink->nr = 1;
+                        fvlink->name = NULL;
+                        fvlink->u.weakening = (Variable) LINK_VARIABLESET(context, fvs);
+                        construction->namedProperties = fvlink;
+                    }
+			    }
 			}
 		}
 	}

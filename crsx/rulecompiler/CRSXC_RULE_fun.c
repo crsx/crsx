@@ -1927,7 +1927,7 @@ int step_M_F_Pattern_s1(Sink sink__V567, Term term__V568)
   EnumOf_M_Reified_xTerm choice__V570 = (IS_VARIABLE_USE(sub__V569) ? VarOf_M_Reified_xTerm : (EnumOf_M_Reified_xTerm) TAG(sub__V569));
   switch (choice__V570)
   {
-    case Data_M_CONSTRUCTION: { /* Function RULES-Pattern-Construction-NoBinders-Dispatch$F-Pattern$1$CONSTRUCTION case CONSTRUCTION */
+    case Data_M_CONSTRUCTION: { /* Function RULES-Pattern-Construction-Dispatch$F-Pattern$1$CONSTRUCTION case CONSTRUCTION */
       ASSERT(sink__V567->context, !strcmp(SYMBOL(term__V568),  "F-Pattern$1" ));
       Term sub__V571 = SUB(term__V568, 0); permitUnusedTerm(sub__V571); int sub__V571_count = term__V568_count*LINK_COUNT(sub__V571); permitUnusedInt(sub__V571_count);
       CRSX_CHECK_SORT(sink__V567->context, sub__V571, &sort_M_Reified_xTerm); ASSERT(sink__V567->context, !strcmp(SYMBOL(sub__V571),  "CONSTRUCTION" ));
@@ -4597,7 +4597,7 @@ int step_M_F_Pattern_s71(Sink sink__V1368, Term term__V1369)
       do {
         ASSERT(sink__V1368->context, !strcmp(SYMBOL(term__V1369),  "F-Pattern$71" ));
         Term sub__V1372 = SUB(term__V1369, 0); permitUnusedTerm(sub__V1372); int sub__V1372_count = term__V1369_count*LINK_COUNT(sub__V1372); permitUnusedInt(sub__V1372_count);
-        CRSX_CHECK_SORT(sink__V1368->context, sub__V1372, &sort_M_Reified_xVariable); /* Function RULES-Pattern-Variable-Bound$vFree fall-back case for free variable */
+        CRSX_CHECK_SORT(sink__V1368->context, sub__V1372, &sort_M_Reified_xVariable); /* Function RULES-Pattern-Variable-Free$vFree fall-back case for free variable */
         Variable z__V62 = VARIABLE(sub__V1372); permitUnusedVariable(z__V62);
         Term sub__V1373 = LINK(sink__V1368->context, SUB(term__V1369, 1)); int sub__V1373_count = term__V1369_count*LINK_COUNT(sub__V1373); permitUnusedInt(sub__V1373_count);
         CRSX_CHECK_SORT(sink__V1368->context, sub__V1373, &sort_M_PASS); /* sub__V1373 = &#1 */
@@ -4933,7 +4933,7 @@ int step_M_F_Pattern_s74(Sink sink__V1501, Term term__V1502)
 {
   int term__V1502_count = LINK_COUNT(term__V1502); permitUnusedInt(term__V1502_count);
   do {
-    /* Contraction rule RULES-Pattern-Variable-Bound$F-Pattern$74. */
+    /* Contraction rule RULES-Pattern-Variable-Free$F-Pattern$74. */
     ASSERT(sink__V1501->context, !strcmp(SYMBOL(term__V1502),  "F-Pattern$74" ));
     Term sub__V1503 = LINK(sink__V1501->context, SUB(term__V1502, 0)); int sub__V1503_count = term__V1502_count*LINK_COUNT(sub__V1503); permitUnusedInt(sub__V1503_count);
     CRSX_CHECK_SORT(sink__V1501->context, sub__V1503, &sort_M_Reified_xVariable); /* sub__V1503 = &#0 */
@@ -5390,7 +5390,7 @@ int step_M_F_Pattern_s69(Sink sink__V1663, Term term__V1664)
       do {
         ASSERT(sink__V1663->context, !strcmp(SYMBOL(term__V1664),  "F-Pattern$69" ));
         Term sub__V1667 = SUB(term__V1664, 0); permitUnusedTerm(sub__V1667); int sub__V1667_count = term__V1664_count*LINK_COUNT(sub__V1667); permitUnusedInt(sub__V1667_count);
-        CRSX_CHECK_SORT(sink__V1663->context, sub__V1667, &sort_M_Reified_xVariable); /* Function RULES-Pattern-Variable-Bound$vFree fall-back case for free variable */
+        CRSX_CHECK_SORT(sink__V1663->context, sub__V1667, &sort_M_Reified_xVariable); /* Function RULES-Pattern-Variable-Free$vFree fall-back case for free variable */
         Variable z__V62 = VARIABLE(sub__V1667); permitUnusedVariable(z__V62);
         Term sub__V1668 = LINK(sink__V1663->context, SUB(term__V1664, 1)); int sub__V1668_count = term__V1664_count*LINK_COUNT(sub__V1668); permitUnusedInt(sub__V1668_count);
         CRSX_CHECK_SORT(sink__V1663->context, sub__V1668, &sort_M_PASS); /* sub__V1668 = &#1 */
@@ -5449,7 +5449,7 @@ int step_M_F_Pattern_s64(Sink sink__V1686, Term term__V1687)
   EnumOf_M_Pattern_Stage choice__V1689 = (IS_VARIABLE_USE(sub__V1688) ? VarOf_M_Pattern_Stage : (EnumOf_M_Pattern_Stage) TAG(sub__V1688));
   switch (choice__V1689)
   {
-    case Data_M_CASE: { /* Function RULES-Pattern-Variable-Case1$F-Pattern$64$CASE case CASE */
+    case Data_M_CASE: { /* Function RULES-Pattern-Variable-Case2$F-Pattern$64$CASE case CASE */
       ASSERT(sink__V1686->context, !strcmp(SYMBOL(term__V1687),  "F-Pattern$64" ));
       Term sub__V1690 = SUB(term__V1687, 0); permitUnusedTerm(sub__V1690); int sub__V1690_count = term__V1687_count*LINK_COUNT(sub__V1690); permitUnusedInt(sub__V1690_count);
       CRSX_CHECK_SORT(sink__V1686->context, sub__V1690, &sort_M_Pattern_Stage); ASSERT(sink__V1686->context, !strcmp(SYMBOL(sub__V1690),  "CASE" ));
@@ -8590,121 +8590,121 @@ int step_M_F_Pattern_Variable_Case_s1(Sink sink__V2663, Term term__V2664)
   return 0;
 }
 
-/* FUNCTION F-Freshes$4. */
-int conBindOffs_M_F_Freshes_s4[] = {0 , 0 , 0 , 0 , 0};
-char *nameFun_M_F_Freshes_s4(Term term) { return  "F-Freshes$4" ; }
-struct _ConstructionDescriptor descriptor_M_F_Freshes_s4 = {&sort_M_Reified_xVariable, 0, 4, sizeof(STRUCT_Con_M_F_Freshes_s4), conBindOffs_M_F_Freshes_s4, &nameFun_M_F_Freshes_s4, &step_M_F_Freshes_s4};
-
-int step_M_F_Freshes_s4(Sink sink__V2685, Term term__V2686)
-{
-  int term__V2686_count = LINK_COUNT(term__V2686); permitUnusedInt(term__V2686_count);
-  do {
-    /* Contraction rule RULES-F-Freshes-1. */
-    ASSERT(sink__V2685->context, !strcmp(SYMBOL(term__V2686),  "F-Freshes$4" ));
-    Term sub__V2687 = LINK(sink__V2685->context, SUB(term__V2686, 0)); int sub__V2687_count = term__V2686_count*LINK_COUNT(sub__V2687); permitUnusedInt(sub__V2687_count);
-    /* sub__V2687 = &#211 */
-    Term sub__V2688 = LINK(sink__V2685->context, SUB(term__V2686, 1)); int sub__V2688_count = term__V2686_count*LINK_COUNT(sub__V2688); permitUnusedInt(sub__V2688_count);
-    CRSX_CHECK_SORT(sink__V2685->context, sub__V2688, &sort_M_Reified_xTerm); /* sub__V2688 = &#212 */
-    Term sub__V2689 = LINK(sink__V2685->context, SUB(term__V2686, 2)); int sub__V2689_count = term__V2686_count*LINK_COUNT(sub__V2689); permitUnusedInt(sub__V2689_count);
-    /* sub__V2689 = &#22 */
-    Term sub__V2690 = LINK(sink__V2685->context, SUB(term__V2686, 3)); int sub__V2690_count = term__V2686_count*LINK_COUNT(sub__V2690); permitUnusedInt(sub__V2690_count);
-    CRSX_CHECK_SORT(sink__V2685->context, sub__V2690, &sort_M_Reified_xVariable); UNLINK_SUB(sink__V2685->context, term__V2686,  3); NORMALIZE(sink__V2685->context, sub__V2690); SUB(term__V2686,  3) = LINK(sink__V2685->context, sub__V2690);
-    /* sub__V2690 = &#1 */
-    NamedPropertyLink namedP__V2691 = LINK_NamedPropertyLink(sink__V2685->context, NAMED_PROPERTIES(term__V2686));
-    VariablePropertyLink varP__V2692 = LINK_VariablePropertyLink(sink__V2685->context, VARIABLE_PROPERTIES(term__V2686));
-    UNLINK(sink__V2685->context, term__V2686);
-    { START(sink__V2685, _M__sTextCons);
-      { START(sink__V2685, _M__sTextEmbed);
-        { START(sink__V2685, _M_AsText);
-          { START(sink__V2685, _M_F_Fresh);
-            COPY(sink__V2685, LINK(sink__V2685->context, sub__V2690));COPY(sink__V2685, sub__V2687);COPY(sink__V2685, sub__V2688);END(sink__V2685, _M_F_Fresh); }
-          END(sink__V2685, _M_AsText); }
-        END(sink__V2685, _M__sTextEmbed); }
-      { START(sink__V2685, _M__sTextCons);
-        { START(sink__V2685, _M__sTextEmbed);
-          { START(sink__V2685, _M_AsText);
-            { START(sink__V2685, _M_F_Freshes);
-              COPY(sink__V2685, sub__V2690);COPY(sink__V2685, sub__V2689);END(sink__V2685, _M_F_Freshes); }
-            END(sink__V2685, _M_AsText); }
-          END(sink__V2685, _M__sTextEmbed); }
-        { START(sink__V2685, _M__sTextNil);
-          END(sink__V2685, _M__sTextNil); }
-        END(sink__V2685, _M__sTextCons); }
-      END(sink__V2685, _M__sTextCons); }
-    UNLINK_NamedPropertyLink(sink__V2685->context, namedP__V2691); UNLINK_VariablePropertyLink(sink__V2685->context, varP__V2692);
-    return 1;
-  } while (0);
-  return 0;
-}
-
 /* FUNCTION F-PatternSub$19. */
 int conBindOffs_M_F_PatternSub_s19[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1};
 char *nameFun_M_F_PatternSub_s19(Term term) { return  "F-PatternSub$19" ; }
 struct _ConstructionDescriptor descriptor_M_F_PatternSub_s19 = {&sort_M_Reified_xVariable, 0, 12, sizeof(STRUCT_Con_M_F_PatternSub_s19), conBindOffs_M_F_PatternSub_s19, &nameFun_M_F_PatternSub_s19, &step_M_F_PatternSub_s19};
 
-int step_M_F_PatternSub_s19(Sink sink__V2693, Term term__V2694)
+int step_M_F_PatternSub_s19(Sink sink__V2685, Term term__V2686)
 {
-  int term__V2694_count = LINK_COUNT(term__V2694); permitUnusedInt(term__V2694_count);
-  Term sub__V2695 = FORCE(sink__V2693->context, SUB(term__V2694, 0));
-  EnumOf_M_Reified_xVariable choice__V2696 = (IS_VARIABLE_USE(sub__V2695) ? VarOf_M_Reified_xVariable : (EnumOf_M_Reified_xVariable) TAG(sub__V2695));
-  switch (choice__V2696)
+  int term__V2686_count = LINK_COUNT(term__V2686); permitUnusedInt(term__V2686_count);
+  Term sub__V2687 = FORCE(sink__V2685->context, SUB(term__V2686, 0));
+  EnumOf_M_Reified_xVariable choice__V2688 = (IS_VARIABLE_USE(sub__V2687) ? VarOf_M_Reified_xVariable : (EnumOf_M_Reified_xVariable) TAG(sub__V2687));
+  switch (choice__V2688)
   {
     case VarOf_M_Reified_xVariable: {
       do {
-        ASSERT(sink__V2693->context, !strcmp(SYMBOL(term__V2694),  "F-PatternSub$19" ));
-        Term sub__V2697 = SUB(term__V2694, 0); permitUnusedTerm(sub__V2697); int sub__V2697_count = term__V2694_count*LINK_COUNT(sub__V2697); permitUnusedInt(sub__V2697_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2697, &sort_M_Reified_xVariable); /* Function RULES-F-PatternSub-8$vFree fall-back case for free variable */
-        Variable z__V62 = VARIABLE(sub__V2697); permitUnusedVariable(z__V62);
-        Term sub__V2698 = LINK(sink__V2693->context, SUB(term__V2694, 1)); int sub__V2698_count = term__V2694_count*LINK_COUNT(sub__V2698); permitUnusedInt(sub__V2698_count);
-        /* sub__V2698 = &#1 */
-        Term sub__V2699 = LINK(sink__V2693->context, SUB(term__V2694, 2)); int sub__V2699_count = term__V2694_count*LINK_COUNT(sub__V2699); permitUnusedInt(sub__V2699_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2699, &sort_M_PASS); /* sub__V2699 = &#2 */
-        Term sub__V2700 = LINK(sink__V2693->context, SUB(term__V2694, 3)); int sub__V2700_count = term__V2694_count*LINK_COUNT(sub__V2700); permitUnusedInt(sub__V2700_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2700, &sort_M_Pattern_Stage); /* sub__V2700 = &#3 */
-        Term sub__V2701 = LINK(sink__V2693->context, SUB(term__V2694, 4)); int sub__V2701_count = term__V2694_count*LINK_COUNT(sub__V2701); permitUnusedInt(sub__V2701_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2701, &sort_M_Reified_xSort); /* sub__V2701 = &#4 */
-        Term sub__V2702 = LINK(sink__V2693->context, SUB(term__V2694, 5)); int sub__V2702_count = term__V2694_count*LINK_COUNT(sub__V2702); permitUnusedInt(sub__V2702_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2702, &sort_M_Reified_xTerm); /* sub__V2702 = &#5 */
-        Term sub__V2703 = LINK(sink__V2693->context, SUB(term__V2694, 6)); int sub__V2703_count = term__V2694_count*LINK_COUNT(sub__V2703); permitUnusedInt(sub__V2703_count);
-        /* sub__V2703 = &#6 */
-        Term sub__V2704 = LINK(sink__V2693->context, SUB(term__V2694, 7)); int sub__V2704_count = term__V2694_count*LINK_COUNT(sub__V2704); permitUnusedInt(sub__V2704_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2704, &sort_M_Reified_xVariable); /* sub__V2704 = &#7 */
-        Term sub__V2705 = LINK(sink__V2693->context, SUB(term__V2694, 8)); int sub__V2705_count = term__V2694_count*LINK_COUNT(sub__V2705); permitUnusedInt(sub__V2705_count);
-        /* sub__V2705 = &#8 */
-        Term sub__V2706 = LINK(sink__V2693->context, SUB(term__V2694, 9)); int sub__V2706_count = term__V2694_count*LINK_COUNT(sub__V2706); permitUnusedInt(sub__V2706_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2706, &sort_M_Reified_xVariable); /* sub__V2706 = &#9 */
-        Term sub__V2707 = LINK(sink__V2693->context, SUB(term__V2694, 10)); int sub__V2707_count = term__V2694_count*LINK_COUNT(sub__V2707); permitUnusedInt(sub__V2707_count);
-        /* sub__V2707 = &#10 */
-        Variable x__V2708 = BINDER(term__V2694,11,0); if (term__V2694_count <= 1) UNBIND(x__V2708);
-        Term sub__V2709 = LINK(sink__V2693->context, SUB(term__V2694, 11)); int sub__V2709_count = term__V2694_count*LINK_COUNT(sub__V2709); permitUnusedInt(sub__V2709_count);
-        CRSX_CHECK_SORT(sink__V2693->context, sub__V2709, &sort_M_Reified_xVariable); /* sub__V2709 = &#11 */
-        NamedPropertyLink namedP__V2710 = LINK_NamedPropertyLink(sink__V2693->context, NAMED_PROPERTIES(term__V2694));
-        VariablePropertyLink varP__V2711 = LINK_VariablePropertyLink(sink__V2693->context, VARIABLE_PROPERTIES(term__V2694));
-        UNLINK(sink__V2693->context, term__V2694);
-        ADD_PROPERTIES(sink__V2693, LINK_NamedPropertyLink(sink__V2693->context, namedP__V2710), LINK_VariablePropertyLink(sink__V2693->context, varP__V2711));
-        { START(sink__V2693, _M_F_PatternSub_s20);
-          USE(sink__V2693, z__V62); COPY(sink__V2693, sub__V2698);COPY(sink__V2693, sub__V2699);COPY(sink__V2693, sub__V2700);COPY(sink__V2693, sub__V2701);COPY(sink__V2693, sub__V2702);COPY(sink__V2693, sub__V2703);COPY(sink__V2693, sub__V2704);COPY(sink__V2693, sub__V2705);COPY(sink__V2693, sub__V2706);COPY(sink__V2693, sub__V2707);{ if (!IS_BOUND(x__V2708)) { REBIND(x__V2708);
-              Variable binds__V2712[1] = {x__V2708}; BINDS(sink__V2693, 1, binds__V2712);
-              COPY(sink__V2693, sub__V2709); /* REUSED SUBSTITUTION */  }
-            else { Variable b__V2713 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V2693->context,"b__V2713");
-              Variable binds__V2714[1] = {b__V2713}; BINDS(sink__V2693, 1, binds__V2714);
+        ASSERT(sink__V2685->context, !strcmp(SYMBOL(term__V2686),  "F-PatternSub$19" ));
+        Term sub__V2689 = SUB(term__V2686, 0); permitUnusedTerm(sub__V2689); int sub__V2689_count = term__V2686_count*LINK_COUNT(sub__V2689); permitUnusedInt(sub__V2689_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2689, &sort_M_Reified_xVariable); /* Function RULES-F-PatternSub-8$vFree fall-back case for free variable */
+        Variable z__V62 = VARIABLE(sub__V2689); permitUnusedVariable(z__V62);
+        Term sub__V2690 = LINK(sink__V2685->context, SUB(term__V2686, 1)); int sub__V2690_count = term__V2686_count*LINK_COUNT(sub__V2690); permitUnusedInt(sub__V2690_count);
+        /* sub__V2690 = &#1 */
+        Term sub__V2691 = LINK(sink__V2685->context, SUB(term__V2686, 2)); int sub__V2691_count = term__V2686_count*LINK_COUNT(sub__V2691); permitUnusedInt(sub__V2691_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2691, &sort_M_PASS); /* sub__V2691 = &#2 */
+        Term sub__V2692 = LINK(sink__V2685->context, SUB(term__V2686, 3)); int sub__V2692_count = term__V2686_count*LINK_COUNT(sub__V2692); permitUnusedInt(sub__V2692_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2692, &sort_M_Pattern_Stage); /* sub__V2692 = &#3 */
+        Term sub__V2693 = LINK(sink__V2685->context, SUB(term__V2686, 4)); int sub__V2693_count = term__V2686_count*LINK_COUNT(sub__V2693); permitUnusedInt(sub__V2693_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2693, &sort_M_Reified_xSort); /* sub__V2693 = &#4 */
+        Term sub__V2694 = LINK(sink__V2685->context, SUB(term__V2686, 5)); int sub__V2694_count = term__V2686_count*LINK_COUNT(sub__V2694); permitUnusedInt(sub__V2694_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2694, &sort_M_Reified_xTerm); /* sub__V2694 = &#5 */
+        Term sub__V2695 = LINK(sink__V2685->context, SUB(term__V2686, 6)); int sub__V2695_count = term__V2686_count*LINK_COUNT(sub__V2695); permitUnusedInt(sub__V2695_count);
+        /* sub__V2695 = &#6 */
+        Term sub__V2696 = LINK(sink__V2685->context, SUB(term__V2686, 7)); int sub__V2696_count = term__V2686_count*LINK_COUNT(sub__V2696); permitUnusedInt(sub__V2696_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2696, &sort_M_Reified_xVariable); /* sub__V2696 = &#7 */
+        Term sub__V2697 = LINK(sink__V2685->context, SUB(term__V2686, 8)); int sub__V2697_count = term__V2686_count*LINK_COUNT(sub__V2697); permitUnusedInt(sub__V2697_count);
+        /* sub__V2697 = &#8 */
+        Term sub__V2698 = LINK(sink__V2685->context, SUB(term__V2686, 9)); int sub__V2698_count = term__V2686_count*LINK_COUNT(sub__V2698); permitUnusedInt(sub__V2698_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2698, &sort_M_Reified_xVariable); /* sub__V2698 = &#9 */
+        Term sub__V2699 = LINK(sink__V2685->context, SUB(term__V2686, 10)); int sub__V2699_count = term__V2686_count*LINK_COUNT(sub__V2699); permitUnusedInt(sub__V2699_count);
+        /* sub__V2699 = &#10 */
+        Variable x__V2700 = BINDER(term__V2686,11,0); if (term__V2686_count <= 1) UNBIND(x__V2700);
+        Term sub__V2701 = LINK(sink__V2685->context, SUB(term__V2686, 11)); int sub__V2701_count = term__V2686_count*LINK_COUNT(sub__V2701); permitUnusedInt(sub__V2701_count);
+        CRSX_CHECK_SORT(sink__V2685->context, sub__V2701, &sort_M_Reified_xVariable); /* sub__V2701 = &#11 */
+        NamedPropertyLink namedP__V2702 = LINK_NamedPropertyLink(sink__V2685->context, NAMED_PROPERTIES(term__V2686));
+        VariablePropertyLink varP__V2703 = LINK_VariablePropertyLink(sink__V2685->context, VARIABLE_PROPERTIES(term__V2686));
+        UNLINK(sink__V2685->context, term__V2686);
+        ADD_PROPERTIES(sink__V2685, LINK_NamedPropertyLink(sink__V2685->context, namedP__V2702), LINK_VariablePropertyLink(sink__V2685->context, varP__V2703));
+        { START(sink__V2685, _M_F_PatternSub_s20);
+          USE(sink__V2685, z__V62); COPY(sink__V2685, sub__V2690);COPY(sink__V2685, sub__V2691);COPY(sink__V2685, sub__V2692);COPY(sink__V2685, sub__V2693);COPY(sink__V2685, sub__V2694);COPY(sink__V2685, sub__V2695);COPY(sink__V2685, sub__V2696);COPY(sink__V2685, sub__V2697);COPY(sink__V2685, sub__V2698);COPY(sink__V2685, sub__V2699);{ if (!IS_BOUND(x__V2700)) { REBIND(x__V2700);
+              Variable binds__V2704[1] = {x__V2700}; BINDS(sink__V2685, 1, binds__V2704);
+              COPY(sink__V2685, sub__V2701); /* REUSED SUBSTITUTION */  }
+            else { Variable b__V2705 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V2685->context,"b__V2705");
+              Variable binds__V2706[1] = {b__V2705}; BINDS(sink__V2685, 1, binds__V2706);
               {
-                Term arg__V2715;
-                { Sink buf__V2716 = ALLOCA_BUFFER(sink__V2693->context);
-                  USE(buf__V2716, b__V2713); arg__V2715 = BUFFER_TERM(buf__V2716); FREE_BUFFER(buf__V2716); }
-                Variable vars__V2717[1] = {x__V2708};
-                Term args__V2718[1] = {arg__V2715};
-                struct _SubstitutionFrame substitution__V2719 = {NULL, 0, 1, vars__V2717, args__V2718, NULL};
-                SUBSTITUTE(sink__V2693, sub__V2709, &substitution__V2719); }
+                Term arg__V2707;
+                { Sink buf__V2708 = ALLOCA_BUFFER(sink__V2685->context);
+                  USE(buf__V2708, b__V2705); arg__V2707 = BUFFER_TERM(buf__V2708); FREE_BUFFER(buf__V2708); }
+                Variable vars__V2709[1] = {x__V2700};
+                Term args__V2710[1] = {arg__V2707};
+                struct _SubstitutionFrame substitution__V2711 = {NULL, 0, 1, vars__V2709, args__V2710, NULL};
+                SUBSTITUTE(sink__V2685, sub__V2701, &substitution__V2711); }
                   }
              }
-          END(sink__V2693, _M_F_PatternSub_s20); }
-        UNLINK_NamedPropertyLink(sink__V2693->context, namedP__V2710); UNLINK_VariablePropertyLink(sink__V2693->context, varP__V2711);
+          END(sink__V2685, _M_F_PatternSub_s20); }
+        UNLINK_NamedPropertyLink(sink__V2685->context, namedP__V2702); UNLINK_VariablePropertyLink(sink__V2685->context, varP__V2703);
         
         return 1;
       } while(0);
       } default: break;
   }
+  return 0;
+}
+
+/* FUNCTION F-Freshes$4. */
+int conBindOffs_M_F_Freshes_s4[] = {0 , 0 , 0 , 0 , 0};
+char *nameFun_M_F_Freshes_s4(Term term) { return  "F-Freshes$4" ; }
+struct _ConstructionDescriptor descriptor_M_F_Freshes_s4 = {&sort_M_Reified_xVariable, 0, 4, sizeof(STRUCT_Con_M_F_Freshes_s4), conBindOffs_M_F_Freshes_s4, &nameFun_M_F_Freshes_s4, &step_M_F_Freshes_s4};
+
+int step_M_F_Freshes_s4(Sink sink__V2712, Term term__V2713)
+{
+  int term__V2713_count = LINK_COUNT(term__V2713); permitUnusedInt(term__V2713_count);
+  do {
+    /* Contraction rule RULES-F-Freshes-1. */
+    ASSERT(sink__V2712->context, !strcmp(SYMBOL(term__V2713),  "F-Freshes$4" ));
+    Term sub__V2714 = LINK(sink__V2712->context, SUB(term__V2713, 0)); int sub__V2714_count = term__V2713_count*LINK_COUNT(sub__V2714); permitUnusedInt(sub__V2714_count);
+    /* sub__V2714 = &#211 */
+    Term sub__V2715 = LINK(sink__V2712->context, SUB(term__V2713, 1)); int sub__V2715_count = term__V2713_count*LINK_COUNT(sub__V2715); permitUnusedInt(sub__V2715_count);
+    CRSX_CHECK_SORT(sink__V2712->context, sub__V2715, &sort_M_Reified_xTerm); /* sub__V2715 = &#212 */
+    Term sub__V2716 = LINK(sink__V2712->context, SUB(term__V2713, 2)); int sub__V2716_count = term__V2713_count*LINK_COUNT(sub__V2716); permitUnusedInt(sub__V2716_count);
+    /* sub__V2716 = &#22 */
+    Term sub__V2717 = LINK(sink__V2712->context, SUB(term__V2713, 3)); int sub__V2717_count = term__V2713_count*LINK_COUNT(sub__V2717); permitUnusedInt(sub__V2717_count);
+    CRSX_CHECK_SORT(sink__V2712->context, sub__V2717, &sort_M_Reified_xVariable); UNLINK_SUB(sink__V2712->context, term__V2713,  3); NORMALIZE(sink__V2712->context, sub__V2717); SUB(term__V2713,  3) = LINK(sink__V2712->context, sub__V2717);
+    /* sub__V2717 = &#1 */
+    NamedPropertyLink namedP__V2718 = LINK_NamedPropertyLink(sink__V2712->context, NAMED_PROPERTIES(term__V2713));
+    VariablePropertyLink varP__V2719 = LINK_VariablePropertyLink(sink__V2712->context, VARIABLE_PROPERTIES(term__V2713));
+    UNLINK(sink__V2712->context, term__V2713);
+    { START(sink__V2712, _M__sTextCons);
+      { START(sink__V2712, _M__sTextEmbed);
+        { START(sink__V2712, _M_AsText);
+          { START(sink__V2712, _M_F_Fresh);
+            COPY(sink__V2712, LINK(sink__V2712->context, sub__V2717));COPY(sink__V2712, sub__V2714);COPY(sink__V2712, sub__V2715);END(sink__V2712, _M_F_Fresh); }
+          END(sink__V2712, _M_AsText); }
+        END(sink__V2712, _M__sTextEmbed); }
+      { START(sink__V2712, _M__sTextCons);
+        { START(sink__V2712, _M__sTextEmbed);
+          { START(sink__V2712, _M_AsText);
+            { START(sink__V2712, _M_F_Freshes);
+              COPY(sink__V2712, sub__V2717);COPY(sink__V2712, sub__V2716);END(sink__V2712, _M_F_Freshes); }
+            END(sink__V2712, _M_AsText); }
+          END(sink__V2712, _M__sTextEmbed); }
+        { START(sink__V2712, _M__sTextNil);
+          END(sink__V2712, _M__sTextNil); }
+        END(sink__V2712, _M__sTextCons); }
+      END(sink__V2712, _M__sTextCons); }
+    UNLINK_NamedPropertyLink(sink__V2712->context, namedP__V2718); UNLINK_VariablePropertyLink(sink__V2712->context, varP__V2719);
+    return 1;
+  } while (0);
   return 0;
 }
 
@@ -8892,124 +8892,124 @@ int step_M_F_PatternSub_s15(Sink sink__V2734, Term term__V2735)
   return 0;
 }
 
-/* FUNCTION F-Freshes$2. */
-int conBindOffs_M_F_Freshes_s2[] = {0 , 0 , 0};
-char *nameFun_M_F_Freshes_s2(Term term) { return  "F-Freshes$2" ; }
-struct _ConstructionDescriptor descriptor_M_F_Freshes_s2 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_F_Freshes_s2), conBindOffs_M_F_Freshes_s2, &nameFun_M_F_Freshes_s2, &step_M_F_Freshes_s2};
-
-int step_M_F_Freshes_s2(Sink sink__V2787, Term term__V2788)
-{
-  int term__V2788_count = LINK_COUNT(term__V2788); permitUnusedInt(term__V2788_count);
-  Term sub__V2789 = FORCE(sink__V2787->context, SUB(term__V2788, 0));
-  EnumOf_M__sList choice__V2790 = (IS_VARIABLE_USE(sub__V2789) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V2789));
-  switch (choice__V2790)
-  {
-    case Data_M__sCons: { /* Function RULES-F-Freshes-1$F-Freshes$2$$Cons case $Cons */
-      ASSERT(sink__V2787->context, !strcmp(SYMBOL(term__V2788),  "F-Freshes$2" ));
-      Term sub__V2791 = SUB(term__V2788, 0); permitUnusedTerm(sub__V2791); int sub__V2791_count = term__V2788_count*LINK_COUNT(sub__V2791); permitUnusedInt(sub__V2791_count);
-      ASSERT(sink__V2787->context, !strcmp(SYMBOL(sub__V2791),  "$Cons" ));
-      Term sub__V2792 = LINK(sink__V2787->context, SUB(sub__V2791, 0)); int sub__V2792_count = sub__V2791_count*LINK_COUNT(sub__V2792); permitUnusedInt(sub__V2792_count);
-      /* sub__V2792 = &#0-0 */
-      Term sub__V2793 = LINK(sink__V2787->context, SUB(sub__V2791, 1)); int sub__V2793_count = sub__V2791_count*LINK_COUNT(sub__V2793); permitUnusedInt(sub__V2793_count);
-      /* sub__V2793 = &#0-1 */
-      Term sub__V2794 = LINK(sink__V2787->context, SUB(term__V2788, 1)); int sub__V2794_count = term__V2788_count*LINK_COUNT(sub__V2794); permitUnusedInt(sub__V2794_count);
-      CRSX_CHECK_SORT(sink__V2787->context, sub__V2794, &sort_M_Reified_xVariable); /* sub__V2794 = &#2 */
-      NamedPropertyLink namedP__V2795 = LINK_NamedPropertyLink(sink__V2787->context, NAMED_PROPERTIES(term__V2788));
-      VariablePropertyLink varP__V2796 = LINK_VariablePropertyLink(sink__V2787->context, VARIABLE_PROPERTIES(term__V2788));
-      UNLINK(sink__V2787->context, term__V2788);
-      ADD_PROPERTIES(sink__V2787, LINK_NamedPropertyLink(sink__V2787->context, namedP__V2795), LINK_VariablePropertyLink(sink__V2787->context, varP__V2796));
-      { START(sink__V2787, _M_F_Freshes_s3);
-        COPY(sink__V2787, sub__V2792);COPY(sink__V2787, sub__V2793);COPY(sink__V2787, sub__V2794);END(sink__V2787, _M_F_Freshes_s3); }
-      UNLINK_NamedPropertyLink(sink__V2787->context, namedP__V2795); UNLINK_VariablePropertyLink(sink__V2787->context, varP__V2796);
-      
-      return 1;
-    break; } case Data_M__sNil: { /* Function RULES-F-Freshes-2$F-Freshes$2$$Nil case $Nil */
-      ASSERT(sink__V2787->context, !strcmp(SYMBOL(term__V2788),  "F-Freshes$2" ));
-      Term sub__V2797 = SUB(term__V2788, 0); permitUnusedTerm(sub__V2797); int sub__V2797_count = term__V2788_count*LINK_COUNT(sub__V2797); permitUnusedInt(sub__V2797_count);
-      ASSERT(sink__V2787->context, !strcmp(SYMBOL(sub__V2797),  "$Nil" ));
-      Term sub__V2798 = LINK(sink__V2787->context, SUB(term__V2788, 1)); int sub__V2798_count = term__V2788_count*LINK_COUNT(sub__V2798); permitUnusedInt(sub__V2798_count);
-      CRSX_CHECK_SORT(sink__V2787->context, sub__V2798, &sort_M_Reified_xVariable); /* sub__V2798 = &#0 */
-      NamedPropertyLink namedP__V2799 = LINK_NamedPropertyLink(sink__V2787->context, NAMED_PROPERTIES(term__V2788));
-      VariablePropertyLink varP__V2800 = LINK_VariablePropertyLink(sink__V2787->context, VARIABLE_PROPERTIES(term__V2788));
-      UNLINK(sink__V2787->context, term__V2788);
-      ADD_PROPERTIES(sink__V2787, LINK_NamedPropertyLink(sink__V2787->context, namedP__V2799), LINK_VariablePropertyLink(sink__V2787->context, varP__V2800));
-      { START(sink__V2787, _M_F_Freshes_s5);
-        COPY(sink__V2787, sub__V2798);END(sink__V2787, _M_F_Freshes_s5); }
-      UNLINK_NamedPropertyLink(sink__V2787->context, namedP__V2799); UNLINK_VariablePropertyLink(sink__V2787->context, varP__V2800);
-      
-      return 1;
-    } default: break;
-  }
-  return 0;
-}
-
 /* FUNCTION F-PatternSub$17. */
 int conBindOffs_M_F_PatternSub_s17[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1};
 char *nameFun_M_F_PatternSub_s17(Term term) { return  "F-PatternSub$17" ; }
 struct _ConstructionDescriptor descriptor_M_F_PatternSub_s17 = {&sort_M_Reified_xVariable, 0, 12, sizeof(STRUCT_Con_M_F_PatternSub_s17), conBindOffs_M_F_PatternSub_s17, &nameFun_M_F_PatternSub_s17, &step_M_F_PatternSub_s17};
 
-int step_M_F_PatternSub_s17(Sink sink__V2801, Term term__V2802)
+int step_M_F_PatternSub_s17(Sink sink__V2787, Term term__V2788)
 {
-  int term__V2802_count = LINK_COUNT(term__V2802); permitUnusedInt(term__V2802_count);
-  Term sub__V2803 = FORCE(sink__V2801->context, SUB(term__V2802, 0));
-  EnumOf_M_Reified_xVariable choice__V2804 = (IS_VARIABLE_USE(sub__V2803) ? VarOf_M_Reified_xVariable : (EnumOf_M_Reified_xVariable) TAG(sub__V2803));
-  switch (choice__V2804)
+  int term__V2788_count = LINK_COUNT(term__V2788); permitUnusedInt(term__V2788_count);
+  Term sub__V2789 = FORCE(sink__V2787->context, SUB(term__V2788, 0));
+  EnumOf_M_Reified_xVariable choice__V2790 = (IS_VARIABLE_USE(sub__V2789) ? VarOf_M_Reified_xVariable : (EnumOf_M_Reified_xVariable) TAG(sub__V2789));
+  switch (choice__V2790)
   {
     case VarOf_M_Reified_xVariable: {
       do {
-        ASSERT(sink__V2801->context, !strcmp(SYMBOL(term__V2802),  "F-PatternSub$17" ));
-        Term sub__V2805 = SUB(term__V2802, 0); permitUnusedTerm(sub__V2805); int sub__V2805_count = term__V2802_count*LINK_COUNT(sub__V2805); permitUnusedInt(sub__V2805_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2805, &sort_M_Reified_xVariable); /* Function RULES-F-PatternSub-8$vFree fall-back case for free variable */
-        Variable z__V62 = VARIABLE(sub__V2805); permitUnusedVariable(z__V62);
-        Term sub__V2806 = LINK(sink__V2801->context, SUB(term__V2802, 1)); int sub__V2806_count = term__V2802_count*LINK_COUNT(sub__V2806); permitUnusedInt(sub__V2806_count);
-        /* sub__V2806 = &#1 */
-        Term sub__V2807 = LINK(sink__V2801->context, SUB(term__V2802, 2)); int sub__V2807_count = term__V2802_count*LINK_COUNT(sub__V2807); permitUnusedInt(sub__V2807_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2807, &sort_M_PASS); /* sub__V2807 = &#2 */
-        Term sub__V2808 = LINK(sink__V2801->context, SUB(term__V2802, 3)); int sub__V2808_count = term__V2802_count*LINK_COUNT(sub__V2808); permitUnusedInt(sub__V2808_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2808, &sort_M_Pattern_Stage); /* sub__V2808 = &#3 */
-        Term sub__V2809 = LINK(sink__V2801->context, SUB(term__V2802, 4)); int sub__V2809_count = term__V2802_count*LINK_COUNT(sub__V2809); permitUnusedInt(sub__V2809_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2809, &sort_M_Reified_xSort); /* sub__V2809 = &#4 */
-        Term sub__V2810 = LINK(sink__V2801->context, SUB(term__V2802, 5)); int sub__V2810_count = term__V2802_count*LINK_COUNT(sub__V2810); permitUnusedInt(sub__V2810_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2810, &sort_M_Reified_xTerm); /* sub__V2810 = &#5 */
-        Term sub__V2811 = LINK(sink__V2801->context, SUB(term__V2802, 6)); int sub__V2811_count = term__V2802_count*LINK_COUNT(sub__V2811); permitUnusedInt(sub__V2811_count);
-        /* sub__V2811 = &#6 */
-        Term sub__V2812 = LINK(sink__V2801->context, SUB(term__V2802, 7)); int sub__V2812_count = term__V2802_count*LINK_COUNT(sub__V2812); permitUnusedInt(sub__V2812_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2812, &sort_M_Reified_xVariable); /* sub__V2812 = &#7 */
-        Term sub__V2813 = LINK(sink__V2801->context, SUB(term__V2802, 8)); int sub__V2813_count = term__V2802_count*LINK_COUNT(sub__V2813); permitUnusedInt(sub__V2813_count);
-        /* sub__V2813 = &#8 */
-        Term sub__V2814 = LINK(sink__V2801->context, SUB(term__V2802, 9)); int sub__V2814_count = term__V2802_count*LINK_COUNT(sub__V2814); permitUnusedInt(sub__V2814_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2814, &sort_M_Reified_xVariable); /* sub__V2814 = &#9 */
-        Term sub__V2815 = LINK(sink__V2801->context, SUB(term__V2802, 10)); int sub__V2815_count = term__V2802_count*LINK_COUNT(sub__V2815); permitUnusedInt(sub__V2815_count);
-        /* sub__V2815 = &#10 */
-        Variable x__V2816 = BINDER(term__V2802,11,0); if (term__V2802_count <= 1) UNBIND(x__V2816);
-        Term sub__V2817 = LINK(sink__V2801->context, SUB(term__V2802, 11)); int sub__V2817_count = term__V2802_count*LINK_COUNT(sub__V2817); permitUnusedInt(sub__V2817_count);
-        CRSX_CHECK_SORT(sink__V2801->context, sub__V2817, &sort_M_Reified_xVariable); /* sub__V2817 = &#11 */
-        NamedPropertyLink namedP__V2818 = LINK_NamedPropertyLink(sink__V2801->context, NAMED_PROPERTIES(term__V2802));
-        VariablePropertyLink varP__V2819 = LINK_VariablePropertyLink(sink__V2801->context, VARIABLE_PROPERTIES(term__V2802));
-        UNLINK(sink__V2801->context, term__V2802);
-        ADD_PROPERTIES(sink__V2801, LINK_NamedPropertyLink(sink__V2801->context, namedP__V2818), LINK_VariablePropertyLink(sink__V2801->context, varP__V2819));
-        { START(sink__V2801, _M_F_PatternSub_s19);
-          COPY(sink__V2801, sub__V2814);COPY(sink__V2801, sub__V2806);COPY(sink__V2801, sub__V2807);COPY(sink__V2801, sub__V2808);COPY(sink__V2801, sub__V2809);COPY(sink__V2801, sub__V2810);COPY(sink__V2801, sub__V2811);COPY(sink__V2801, sub__V2812);COPY(sink__V2801, sub__V2813);USE(sink__V2801, z__V62); COPY(sink__V2801, sub__V2815);{ if (!IS_BOUND(x__V2816)) { REBIND(x__V2816);
-              Variable binds__V2820[1] = {x__V2816}; BINDS(sink__V2801, 1, binds__V2820);
-              COPY(sink__V2801, sub__V2817); /* REUSED SUBSTITUTION */  }
-            else { Variable b__V2821 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V2801->context,"b__V2821");
-              Variable binds__V2822[1] = {b__V2821}; BINDS(sink__V2801, 1, binds__V2822);
+        ASSERT(sink__V2787->context, !strcmp(SYMBOL(term__V2788),  "F-PatternSub$17" ));
+        Term sub__V2791 = SUB(term__V2788, 0); permitUnusedTerm(sub__V2791); int sub__V2791_count = term__V2788_count*LINK_COUNT(sub__V2791); permitUnusedInt(sub__V2791_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2791, &sort_M_Reified_xVariable); /* Function RULES-F-PatternSub-8$vFree fall-back case for free variable */
+        Variable z__V62 = VARIABLE(sub__V2791); permitUnusedVariable(z__V62);
+        Term sub__V2792 = LINK(sink__V2787->context, SUB(term__V2788, 1)); int sub__V2792_count = term__V2788_count*LINK_COUNT(sub__V2792); permitUnusedInt(sub__V2792_count);
+        /* sub__V2792 = &#1 */
+        Term sub__V2793 = LINK(sink__V2787->context, SUB(term__V2788, 2)); int sub__V2793_count = term__V2788_count*LINK_COUNT(sub__V2793); permitUnusedInt(sub__V2793_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2793, &sort_M_PASS); /* sub__V2793 = &#2 */
+        Term sub__V2794 = LINK(sink__V2787->context, SUB(term__V2788, 3)); int sub__V2794_count = term__V2788_count*LINK_COUNT(sub__V2794); permitUnusedInt(sub__V2794_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2794, &sort_M_Pattern_Stage); /* sub__V2794 = &#3 */
+        Term sub__V2795 = LINK(sink__V2787->context, SUB(term__V2788, 4)); int sub__V2795_count = term__V2788_count*LINK_COUNT(sub__V2795); permitUnusedInt(sub__V2795_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2795, &sort_M_Reified_xSort); /* sub__V2795 = &#4 */
+        Term sub__V2796 = LINK(sink__V2787->context, SUB(term__V2788, 5)); int sub__V2796_count = term__V2788_count*LINK_COUNT(sub__V2796); permitUnusedInt(sub__V2796_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2796, &sort_M_Reified_xTerm); /* sub__V2796 = &#5 */
+        Term sub__V2797 = LINK(sink__V2787->context, SUB(term__V2788, 6)); int sub__V2797_count = term__V2788_count*LINK_COUNT(sub__V2797); permitUnusedInt(sub__V2797_count);
+        /* sub__V2797 = &#6 */
+        Term sub__V2798 = LINK(sink__V2787->context, SUB(term__V2788, 7)); int sub__V2798_count = term__V2788_count*LINK_COUNT(sub__V2798); permitUnusedInt(sub__V2798_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2798, &sort_M_Reified_xVariable); /* sub__V2798 = &#7 */
+        Term sub__V2799 = LINK(sink__V2787->context, SUB(term__V2788, 8)); int sub__V2799_count = term__V2788_count*LINK_COUNT(sub__V2799); permitUnusedInt(sub__V2799_count);
+        /* sub__V2799 = &#8 */
+        Term sub__V2800 = LINK(sink__V2787->context, SUB(term__V2788, 9)); int sub__V2800_count = term__V2788_count*LINK_COUNT(sub__V2800); permitUnusedInt(sub__V2800_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2800, &sort_M_Reified_xVariable); /* sub__V2800 = &#9 */
+        Term sub__V2801 = LINK(sink__V2787->context, SUB(term__V2788, 10)); int sub__V2801_count = term__V2788_count*LINK_COUNT(sub__V2801); permitUnusedInt(sub__V2801_count);
+        /* sub__V2801 = &#10 */
+        Variable x__V2802 = BINDER(term__V2788,11,0); if (term__V2788_count <= 1) UNBIND(x__V2802);
+        Term sub__V2803 = LINK(sink__V2787->context, SUB(term__V2788, 11)); int sub__V2803_count = term__V2788_count*LINK_COUNT(sub__V2803); permitUnusedInt(sub__V2803_count);
+        CRSX_CHECK_SORT(sink__V2787->context, sub__V2803, &sort_M_Reified_xVariable); /* sub__V2803 = &#11 */
+        NamedPropertyLink namedP__V2804 = LINK_NamedPropertyLink(sink__V2787->context, NAMED_PROPERTIES(term__V2788));
+        VariablePropertyLink varP__V2805 = LINK_VariablePropertyLink(sink__V2787->context, VARIABLE_PROPERTIES(term__V2788));
+        UNLINK(sink__V2787->context, term__V2788);
+        ADD_PROPERTIES(sink__V2787, LINK_NamedPropertyLink(sink__V2787->context, namedP__V2804), LINK_VariablePropertyLink(sink__V2787->context, varP__V2805));
+        { START(sink__V2787, _M_F_PatternSub_s19);
+          COPY(sink__V2787, sub__V2800);COPY(sink__V2787, sub__V2792);COPY(sink__V2787, sub__V2793);COPY(sink__V2787, sub__V2794);COPY(sink__V2787, sub__V2795);COPY(sink__V2787, sub__V2796);COPY(sink__V2787, sub__V2797);COPY(sink__V2787, sub__V2798);COPY(sink__V2787, sub__V2799);USE(sink__V2787, z__V62); COPY(sink__V2787, sub__V2801);{ if (!IS_BOUND(x__V2802)) { REBIND(x__V2802);
+              Variable binds__V2806[1] = {x__V2802}; BINDS(sink__V2787, 1, binds__V2806);
+              COPY(sink__V2787, sub__V2803); /* REUSED SUBSTITUTION */  }
+            else { Variable b__V2807 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V2787->context,"b__V2807");
+              Variable binds__V2808[1] = {b__V2807}; BINDS(sink__V2787, 1, binds__V2808);
               {
-                Term arg__V2823;
-                { Sink buf__V2824 = ALLOCA_BUFFER(sink__V2801->context);
-                  USE(buf__V2824, b__V2821); arg__V2823 = BUFFER_TERM(buf__V2824); FREE_BUFFER(buf__V2824); }
-                Variable vars__V2825[1] = {x__V2816};
-                Term args__V2826[1] = {arg__V2823};
-                struct _SubstitutionFrame substitution__V2827 = {NULL, 0, 1, vars__V2825, args__V2826, NULL};
-                SUBSTITUTE(sink__V2801, sub__V2817, &substitution__V2827); }
+                Term arg__V2809;
+                { Sink buf__V2810 = ALLOCA_BUFFER(sink__V2787->context);
+                  USE(buf__V2810, b__V2807); arg__V2809 = BUFFER_TERM(buf__V2810); FREE_BUFFER(buf__V2810); }
+                Variable vars__V2811[1] = {x__V2802};
+                Term args__V2812[1] = {arg__V2809};
+                struct _SubstitutionFrame substitution__V2813 = {NULL, 0, 1, vars__V2811, args__V2812, NULL};
+                SUBSTITUTE(sink__V2787, sub__V2803, &substitution__V2813); }
                   }
              }
-          END(sink__V2801, _M_F_PatternSub_s19); }
-        UNLINK_NamedPropertyLink(sink__V2801->context, namedP__V2818); UNLINK_VariablePropertyLink(sink__V2801->context, varP__V2819);
+          END(sink__V2787, _M_F_PatternSub_s19); }
+        UNLINK_NamedPropertyLink(sink__V2787->context, namedP__V2804); UNLINK_VariablePropertyLink(sink__V2787->context, varP__V2805);
         
         return 1;
       } while(0);
       } default: break;
+  }
+  return 0;
+}
+
+/* FUNCTION F-Freshes$2. */
+int conBindOffs_M_F_Freshes_s2[] = {0 , 0 , 0};
+char *nameFun_M_F_Freshes_s2(Term term) { return  "F-Freshes$2" ; }
+struct _ConstructionDescriptor descriptor_M_F_Freshes_s2 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_F_Freshes_s2), conBindOffs_M_F_Freshes_s2, &nameFun_M_F_Freshes_s2, &step_M_F_Freshes_s2};
+
+int step_M_F_Freshes_s2(Sink sink__V2814, Term term__V2815)
+{
+  int term__V2815_count = LINK_COUNT(term__V2815); permitUnusedInt(term__V2815_count);
+  Term sub__V2816 = FORCE(sink__V2814->context, SUB(term__V2815, 0));
+  EnumOf_M__sList choice__V2817 = (IS_VARIABLE_USE(sub__V2816) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V2816));
+  switch (choice__V2817)
+  {
+    case Data_M__sCons: { /* Function RULES-F-Freshes-1$F-Freshes$2$$Cons case $Cons */
+      ASSERT(sink__V2814->context, !strcmp(SYMBOL(term__V2815),  "F-Freshes$2" ));
+      Term sub__V2818 = SUB(term__V2815, 0); permitUnusedTerm(sub__V2818); int sub__V2818_count = term__V2815_count*LINK_COUNT(sub__V2818); permitUnusedInt(sub__V2818_count);
+      ASSERT(sink__V2814->context, !strcmp(SYMBOL(sub__V2818),  "$Cons" ));
+      Term sub__V2819 = LINK(sink__V2814->context, SUB(sub__V2818, 0)); int sub__V2819_count = sub__V2818_count*LINK_COUNT(sub__V2819); permitUnusedInt(sub__V2819_count);
+      /* sub__V2819 = &#0-0 */
+      Term sub__V2820 = LINK(sink__V2814->context, SUB(sub__V2818, 1)); int sub__V2820_count = sub__V2818_count*LINK_COUNT(sub__V2820); permitUnusedInt(sub__V2820_count);
+      /* sub__V2820 = &#0-1 */
+      Term sub__V2821 = LINK(sink__V2814->context, SUB(term__V2815, 1)); int sub__V2821_count = term__V2815_count*LINK_COUNT(sub__V2821); permitUnusedInt(sub__V2821_count);
+      CRSX_CHECK_SORT(sink__V2814->context, sub__V2821, &sort_M_Reified_xVariable); /* sub__V2821 = &#2 */
+      NamedPropertyLink namedP__V2822 = LINK_NamedPropertyLink(sink__V2814->context, NAMED_PROPERTIES(term__V2815));
+      VariablePropertyLink varP__V2823 = LINK_VariablePropertyLink(sink__V2814->context, VARIABLE_PROPERTIES(term__V2815));
+      UNLINK(sink__V2814->context, term__V2815);
+      ADD_PROPERTIES(sink__V2814, LINK_NamedPropertyLink(sink__V2814->context, namedP__V2822), LINK_VariablePropertyLink(sink__V2814->context, varP__V2823));
+      { START(sink__V2814, _M_F_Freshes_s3);
+        COPY(sink__V2814, sub__V2819);COPY(sink__V2814, sub__V2820);COPY(sink__V2814, sub__V2821);END(sink__V2814, _M_F_Freshes_s3); }
+      UNLINK_NamedPropertyLink(sink__V2814->context, namedP__V2822); UNLINK_VariablePropertyLink(sink__V2814->context, varP__V2823);
+      
+      return 1;
+    break; } case Data_M__sNil: { /* Function RULES-F-Freshes-2$F-Freshes$2$$Nil case $Nil */
+      ASSERT(sink__V2814->context, !strcmp(SYMBOL(term__V2815),  "F-Freshes$2" ));
+      Term sub__V2824 = SUB(term__V2815, 0); permitUnusedTerm(sub__V2824); int sub__V2824_count = term__V2815_count*LINK_COUNT(sub__V2824); permitUnusedInt(sub__V2824_count);
+      ASSERT(sink__V2814->context, !strcmp(SYMBOL(sub__V2824),  "$Nil" ));
+      Term sub__V2825 = LINK(sink__V2814->context, SUB(term__V2815, 1)); int sub__V2825_count = term__V2815_count*LINK_COUNT(sub__V2825); permitUnusedInt(sub__V2825_count);
+      CRSX_CHECK_SORT(sink__V2814->context, sub__V2825, &sort_M_Reified_xVariable); /* sub__V2825 = &#0 */
+      NamedPropertyLink namedP__V2826 = LINK_NamedPropertyLink(sink__V2814->context, NAMED_PROPERTIES(term__V2815));
+      VariablePropertyLink varP__V2827 = LINK_VariablePropertyLink(sink__V2814->context, VARIABLE_PROPERTIES(term__V2815));
+      UNLINK(sink__V2814->context, term__V2815);
+      ADD_PROPERTIES(sink__V2814, LINK_NamedPropertyLink(sink__V2814->context, namedP__V2826), LINK_VariablePropertyLink(sink__V2814->context, varP__V2827));
+      { START(sink__V2814, _M_F_Freshes_s5);
+        COPY(sink__V2814, sub__V2825);END(sink__V2814, _M_F_Freshes_s5); }
+      UNLINK_NamedPropertyLink(sink__V2814->context, namedP__V2826); UNLINK_VariablePropertyLink(sink__V2814->context, varP__V2827);
+      
+      return 1;
+    } default: break;
   }
   return 0;
 }
@@ -11027,144 +11027,144 @@ int step_M_F_Dispatch_s1(Sink sink__V3490, Term term__V3491)
   return 0;
 }
 
-/* FUNCTION F-Dispatch$2. */
-int conBindOffs_M_F_Dispatch_s2[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0};
-char *nameFun_M_F_Dispatch_s2(Term term) { return  "F-Dispatch$2" ; }
-struct _ConstructionDescriptor descriptor_M_F_Dispatch_s2 = {&sort_M_Reified_xVariable, 0, 8, sizeof(STRUCT_Con_M_F_Dispatch_s2), conBindOffs_M_F_Dispatch_s2, &nameFun_M_F_Dispatch_s2, &step_M_F_Dispatch_s2};
-
-int step_M_F_Dispatch_s2(Sink sink__V3505, Term term__V3506)
-{
-  int term__V3506_count = LINK_COUNT(term__V3506); permitUnusedInt(term__V3506_count);
-  do {
-    /* Contraction rule RULES-F-Dispatch-1. */
-    ASSERT(sink__V3505->context, !strcmp(SYMBOL(term__V3506),  "F-Dispatch$2" ));
-    Term sub__V3507 = LINK(sink__V3505->context, SUB(term__V3506, 0)); int sub__V3507_count = term__V3506_count*LINK_COUNT(sub__V3507); permitUnusedInt(sub__V3507_count);
-    /* sub__V3507 = &#51 */
-    Term sub__V3508 = SUB(term__V3506, 1); permitUnusedTerm(sub__V3508); int sub__V3508_count = term__V3506_count*LINK_COUNT(sub__V3508); permitUnusedInt(sub__V3508_count);
-    /* sub__V3508 = &#52 */
-    Term sub__V3509 = LINK(sink__V3505->context, SUB(term__V3506, 2)); int sub__V3509_count = term__V3506_count*LINK_COUNT(sub__V3509); permitUnusedInt(sub__V3509_count);
-    CRSX_CHECK_SORT(sink__V3505->context, sub__V3509, &sort_M_Reified_xVariable); /* sub__V3509 = &#2 */
-    Term sub__V3510 = LINK(sink__V3505->context, SUB(term__V3506, 3)); int sub__V3510_count = term__V3506_count*LINK_COUNT(sub__V3510); permitUnusedInt(sub__V3510_count);
-    /* sub__V3510 = &#3 */
-    Term sub__V3511 = LINK(sink__V3505->context, SUB(term__V3506, 4)); int sub__V3511_count = term__V3506_count*LINK_COUNT(sub__V3511); permitUnusedInt(sub__V3511_count);
-    /* sub__V3511 = &#4 */
-    Term sub__V3512 = LINK(sink__V3505->context, SUB(term__V3506, 5)); int sub__V3512_count = term__V3506_count*LINK_COUNT(sub__V3512); permitUnusedInt(sub__V3512_count);
-    CRSX_CHECK_SORT(sink__V3505->context, sub__V3512, &sort_M_Reified_xVariable); /* sub__V3512 = &#1 */
-    Term sub__V3513 = SUB(term__V3506, 6); permitUnusedTerm(sub__V3513); int sub__V3513_count = term__V3506_count*LINK_COUNT(sub__V3513); permitUnusedInt(sub__V3513_count);
-    CRSX_CHECK_SORT(sink__V3505->context, sub__V3513, &sort_M_Reified_xSort); /* sub__V3513 = &#6 */
-    Term sub__V3514 = LINK(sink__V3505->context, SUB(term__V3506, 7)); int sub__V3514_count = term__V3506_count*LINK_COUNT(sub__V3514); permitUnusedInt(sub__V3514_count);
-    /* sub__V3514 = &#7 */
-    NamedPropertyLink namedP__V3515 = LINK_NamedPropertyLink(sink__V3505->context, NAMED_PROPERTIES(term__V3506));
-    VariablePropertyLink varP__V3516 = LINK_VariablePropertyLink(sink__V3505->context, VARIABLE_PROPERTIES(term__V3506));
-    UNLINK(sink__V3505->context, term__V3506);
-    { START(sink__V3505, _M_F_Dispatch__choice_s1);
-      COPY(sink__V3505, sub__V3507);COPY(sink__V3505, sub__V3511);COPY(sink__V3505, sub__V3512);COPY(sink__V3505, sub__V3509);COPY(sink__V3505, sub__V3510);COPY(sink__V3505, sub__V3514);END(sink__V3505, _M_F_Dispatch__choice_s1); }
-    UNLINK_NamedPropertyLink(sink__V3505->context, namedP__V3515); UNLINK_VariablePropertyLink(sink__V3505->context, varP__V3516);
-    return 1;
-  } while (0);
-  return 0;
-}
-
 /* FUNCTION F-PatternBinders$1. */
 int conBindOffs_M_F_PatternBinders_s1[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 1};
 char *nameFun_M_F_PatternBinders_s1(Term term) { return  "F-PatternBinders$1" ; }
 struct _ConstructionDescriptor descriptor_M_F_PatternBinders_s1 = {&sort_M_Reified_xVariable, 0, 7, sizeof(STRUCT_Con_M_F_PatternBinders_s1), conBindOffs_M_F_PatternBinders_s1, &nameFun_M_F_PatternBinders_s1, &step_M_F_PatternBinders_s1};
 
-int step_M_F_PatternBinders_s1(Sink sink__V3517, Term term__V3518)
+int step_M_F_PatternBinders_s1(Sink sink__V3505, Term term__V3506)
 {
-  int term__V3518_count = LINK_COUNT(term__V3518); permitUnusedInt(term__V3518_count);
-  Term sub__V3519 = FORCE(sink__V3517->context, SUB(term__V3518, 0));
-  EnumOf_M__sList choice__V3520 = (IS_VARIABLE_USE(sub__V3519) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V3519));
-  switch (choice__V3520)
+  int term__V3506_count = LINK_COUNT(term__V3506); permitUnusedInt(term__V3506_count);
+  Term sub__V3507 = FORCE(sink__V3505->context, SUB(term__V3506, 0));
+  EnumOf_M__sList choice__V3508 = (IS_VARIABLE_USE(sub__V3507) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V3507));
+  switch (choice__V3508)
   {
     case Data_M__sCons: { /* Function RULES-F-PatternBinders-1$F-PatternBinders$1$$Cons case $Cons */
-      ASSERT(sink__V3517->context, !strcmp(SYMBOL(term__V3518),  "F-PatternBinders$1" ));
-      Term sub__V3521 = SUB(term__V3518, 0); permitUnusedTerm(sub__V3521); int sub__V3521_count = term__V3518_count*LINK_COUNT(sub__V3521); permitUnusedInt(sub__V3521_count);
-      ASSERT(sink__V3517->context, !strcmp(SYMBOL(sub__V3521),  "$Cons" ));
-      Term sub__V3522 = LINK(sink__V3517->context, SUB(sub__V3521, 0)); int sub__V3522_count = sub__V3521_count*LINK_COUNT(sub__V3522); permitUnusedInt(sub__V3522_count);
-      /* sub__V3522 = &#0-0 */
-      Term sub__V3523 = LINK(sink__V3517->context, SUB(sub__V3521, 1)); int sub__V3523_count = sub__V3521_count*LINK_COUNT(sub__V3523); permitUnusedInt(sub__V3523_count);
-      /* sub__V3523 = &#0-1 */
-      Term sub__V3524 = LINK(sink__V3517->context, SUB(term__V3518, 1)); int sub__V3524_count = term__V3518_count*LINK_COUNT(sub__V3524); permitUnusedInt(sub__V3524_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3524, &sort_M_PASS); /* sub__V3524 = &#2 */
-      Term sub__V3525 = LINK(sink__V3517->context, SUB(term__V3518, 2)); int sub__V3525_count = term__V3518_count*LINK_COUNT(sub__V3525); permitUnusedInt(sub__V3525_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3525, &sort_M_Reified_xVariable); /* sub__V3525 = &#3 */
-      Term sub__V3526 = LINK(sink__V3517->context, SUB(term__V3518, 3)); int sub__V3526_count = term__V3518_count*LINK_COUNT(sub__V3526); permitUnusedInt(sub__V3526_count);
-      /* sub__V3526 = &#4 */
-      Term sub__V3527 = LINK(sink__V3517->context, SUB(term__V3518, 4)); int sub__V3527_count = term__V3518_count*LINK_COUNT(sub__V3527); permitUnusedInt(sub__V3527_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3527, &sort_M_Reified_xVariable); /* sub__V3527 = &#5 */
-      Term sub__V3528 = LINK(sink__V3517->context, SUB(term__V3518, 5)); int sub__V3528_count = term__V3518_count*LINK_COUNT(sub__V3528); permitUnusedInt(sub__V3528_count);
-      /* sub__V3528 = &#6 */
-      Variable x__V3529 = BINDER(term__V3518,6,0); if (term__V3518_count <= 1) UNBIND(x__V3529);
-      Term sub__V3530 = LINK(sink__V3517->context, SUB(term__V3518, 6)); int sub__V3530_count = term__V3518_count*LINK_COUNT(sub__V3530); permitUnusedInt(sub__V3530_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3530, &sort_M_Reified_xVariable); /* sub__V3530 = &#7 */
-      NamedPropertyLink namedP__V3531 = LINK_NamedPropertyLink(sink__V3517->context, NAMED_PROPERTIES(term__V3518));
-      VariablePropertyLink varP__V3532 = LINK_VariablePropertyLink(sink__V3517->context, VARIABLE_PROPERTIES(term__V3518));
-      UNLINK(sink__V3517->context, term__V3518);
-      ADD_PROPERTIES(sink__V3517, LINK_NamedPropertyLink(sink__V3517->context, namedP__V3531), LINK_VariablePropertyLink(sink__V3517->context, varP__V3532));
-      { START(sink__V3517, _M_F_PatternBinders_s2);
-        COPY(sink__V3517, sub__V3522);COPY(sink__V3517, sub__V3523);COPY(sink__V3517, sub__V3524);COPY(sink__V3517, sub__V3525);COPY(sink__V3517, sub__V3526);COPY(sink__V3517, sub__V3527);COPY(sink__V3517, sub__V3528);{ if (!IS_BOUND(x__V3529)) { REBIND(x__V3529);
-            Variable binds__V3533[1] = {x__V3529}; BINDS(sink__V3517, 1, binds__V3533);
-            COPY(sink__V3517, sub__V3530); /* REUSED SUBSTITUTION */  }
-          else { Variable b__V3534 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3517->context,"b__V3534");
-            Variable binds__V3535[1] = {b__V3534}; BINDS(sink__V3517, 1, binds__V3535);
+      ASSERT(sink__V3505->context, !strcmp(SYMBOL(term__V3506),  "F-PatternBinders$1" ));
+      Term sub__V3509 = SUB(term__V3506, 0); permitUnusedTerm(sub__V3509); int sub__V3509_count = term__V3506_count*LINK_COUNT(sub__V3509); permitUnusedInt(sub__V3509_count);
+      ASSERT(sink__V3505->context, !strcmp(SYMBOL(sub__V3509),  "$Cons" ));
+      Term sub__V3510 = LINK(sink__V3505->context, SUB(sub__V3509, 0)); int sub__V3510_count = sub__V3509_count*LINK_COUNT(sub__V3510); permitUnusedInt(sub__V3510_count);
+      /* sub__V3510 = &#0-0 */
+      Term sub__V3511 = LINK(sink__V3505->context, SUB(sub__V3509, 1)); int sub__V3511_count = sub__V3509_count*LINK_COUNT(sub__V3511); permitUnusedInt(sub__V3511_count);
+      /* sub__V3511 = &#0-1 */
+      Term sub__V3512 = LINK(sink__V3505->context, SUB(term__V3506, 1)); int sub__V3512_count = term__V3506_count*LINK_COUNT(sub__V3512); permitUnusedInt(sub__V3512_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3512, &sort_M_PASS); /* sub__V3512 = &#2 */
+      Term sub__V3513 = LINK(sink__V3505->context, SUB(term__V3506, 2)); int sub__V3513_count = term__V3506_count*LINK_COUNT(sub__V3513); permitUnusedInt(sub__V3513_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3513, &sort_M_Reified_xVariable); /* sub__V3513 = &#3 */
+      Term sub__V3514 = LINK(sink__V3505->context, SUB(term__V3506, 3)); int sub__V3514_count = term__V3506_count*LINK_COUNT(sub__V3514); permitUnusedInt(sub__V3514_count);
+      /* sub__V3514 = &#4 */
+      Term sub__V3515 = LINK(sink__V3505->context, SUB(term__V3506, 4)); int sub__V3515_count = term__V3506_count*LINK_COUNT(sub__V3515); permitUnusedInt(sub__V3515_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3515, &sort_M_Reified_xVariable); /* sub__V3515 = &#5 */
+      Term sub__V3516 = LINK(sink__V3505->context, SUB(term__V3506, 5)); int sub__V3516_count = term__V3506_count*LINK_COUNT(sub__V3516); permitUnusedInt(sub__V3516_count);
+      /* sub__V3516 = &#6 */
+      Variable x__V3517 = BINDER(term__V3506,6,0); if (term__V3506_count <= 1) UNBIND(x__V3517);
+      Term sub__V3518 = LINK(sink__V3505->context, SUB(term__V3506, 6)); int sub__V3518_count = term__V3506_count*LINK_COUNT(sub__V3518); permitUnusedInt(sub__V3518_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3518, &sort_M_Reified_xVariable); /* sub__V3518 = &#7 */
+      NamedPropertyLink namedP__V3519 = LINK_NamedPropertyLink(sink__V3505->context, NAMED_PROPERTIES(term__V3506));
+      VariablePropertyLink varP__V3520 = LINK_VariablePropertyLink(sink__V3505->context, VARIABLE_PROPERTIES(term__V3506));
+      UNLINK(sink__V3505->context, term__V3506);
+      ADD_PROPERTIES(sink__V3505, LINK_NamedPropertyLink(sink__V3505->context, namedP__V3519), LINK_VariablePropertyLink(sink__V3505->context, varP__V3520));
+      { START(sink__V3505, _M_F_PatternBinders_s2);
+        COPY(sink__V3505, sub__V3510);COPY(sink__V3505, sub__V3511);COPY(sink__V3505, sub__V3512);COPY(sink__V3505, sub__V3513);COPY(sink__V3505, sub__V3514);COPY(sink__V3505, sub__V3515);COPY(sink__V3505, sub__V3516);{ if (!IS_BOUND(x__V3517)) { REBIND(x__V3517);
+            Variable binds__V3521[1] = {x__V3517}; BINDS(sink__V3505, 1, binds__V3521);
+            COPY(sink__V3505, sub__V3518); /* REUSED SUBSTITUTION */  }
+          else { Variable b__V3522 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3505->context,"b__V3522");
+            Variable binds__V3523[1] = {b__V3522}; BINDS(sink__V3505, 1, binds__V3523);
             {
-              Term arg__V3536;
-              { Sink buf__V3537 = ALLOCA_BUFFER(sink__V3517->context);
-                USE(buf__V3537, b__V3534); arg__V3536 = BUFFER_TERM(buf__V3537); FREE_BUFFER(buf__V3537); }
-              Variable vars__V3538[1] = {x__V3529};
-              Term args__V3539[1] = {arg__V3536};
-              struct _SubstitutionFrame substitution__V3540 = {NULL, 0, 1, vars__V3538, args__V3539, NULL};
-              SUBSTITUTE(sink__V3517, sub__V3530, &substitution__V3540); }
+              Term arg__V3524;
+              { Sink buf__V3525 = ALLOCA_BUFFER(sink__V3505->context);
+                USE(buf__V3525, b__V3522); arg__V3524 = BUFFER_TERM(buf__V3525); FREE_BUFFER(buf__V3525); }
+              Variable vars__V3526[1] = {x__V3517};
+              Term args__V3527[1] = {arg__V3524};
+              struct _SubstitutionFrame substitution__V3528 = {NULL, 0, 1, vars__V3526, args__V3527, NULL};
+              SUBSTITUTE(sink__V3505, sub__V3518, &substitution__V3528); }
                 }
            }
-        END(sink__V3517, _M_F_PatternBinders_s2); }
-      UNLINK_NamedPropertyLink(sink__V3517->context, namedP__V3531); UNLINK_VariablePropertyLink(sink__V3517->context, varP__V3532);
+        END(sink__V3505, _M_F_PatternBinders_s2); }
+      UNLINK_NamedPropertyLink(sink__V3505->context, namedP__V3519); UNLINK_VariablePropertyLink(sink__V3505->context, varP__V3520);
       
       return 1;
     break; } case Data_M__sNil: { /* Function RULES-F-PatternBinders-2$F-PatternBinders$1$$Nil case $Nil */
-      ASSERT(sink__V3517->context, !strcmp(SYMBOL(term__V3518),  "F-PatternBinders$1" ));
-      Term sub__V3541 = SUB(term__V3518, 0); permitUnusedTerm(sub__V3541); int sub__V3541_count = term__V3518_count*LINK_COUNT(sub__V3541); permitUnusedInt(sub__V3541_count);
-      ASSERT(sink__V3517->context, !strcmp(SYMBOL(sub__V3541),  "$Nil" ));
-      Term sub__V3542 = LINK(sink__V3517->context, SUB(term__V3518, 1)); int sub__V3542_count = term__V3518_count*LINK_COUNT(sub__V3542); permitUnusedInt(sub__V3542_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3542, &sort_M_PASS); /* sub__V3542 = &#0 */
-      Term sub__V3543 = LINK(sink__V3517->context, SUB(term__V3518, 2)); int sub__V3543_count = term__V3518_count*LINK_COUNT(sub__V3543); permitUnusedInt(sub__V3543_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3543, &sort_M_Reified_xVariable); /* sub__V3543 = &#1 */
-      Term sub__V3544 = LINK(sink__V3517->context, SUB(term__V3518, 3)); int sub__V3544_count = term__V3518_count*LINK_COUNT(sub__V3544); permitUnusedInt(sub__V3544_count);
-      /* sub__V3544 = &#2 */
-      Term sub__V3545 = LINK(sink__V3517->context, SUB(term__V3518, 4)); int sub__V3545_count = term__V3518_count*LINK_COUNT(sub__V3545); permitUnusedInt(sub__V3545_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3545, &sort_M_Reified_xVariable); /* sub__V3545 = &#3 */
-      Term sub__V3546 = LINK(sink__V3517->context, SUB(term__V3518, 5)); int sub__V3546_count = term__V3518_count*LINK_COUNT(sub__V3546); permitUnusedInt(sub__V3546_count);
-      /* sub__V3546 = &#4 */
-      Variable x__V3547 = BINDER(term__V3518,6,0); if (term__V3518_count <= 1) UNBIND(x__V3547);
-      Term sub__V3548 = LINK(sink__V3517->context, SUB(term__V3518, 6)); int sub__V3548_count = term__V3518_count*LINK_COUNT(sub__V3548); permitUnusedInt(sub__V3548_count);
-      CRSX_CHECK_SORT(sink__V3517->context, sub__V3548, &sort_M_Reified_xVariable); /* sub__V3548 = &#5 */
-      NamedPropertyLink namedP__V3549 = LINK_NamedPropertyLink(sink__V3517->context, NAMED_PROPERTIES(term__V3518));
-      VariablePropertyLink varP__V3550 = LINK_VariablePropertyLink(sink__V3517->context, VARIABLE_PROPERTIES(term__V3518));
-      UNLINK(sink__V3517->context, term__V3518);
-      ADD_PROPERTIES(sink__V3517, LINK_NamedPropertyLink(sink__V3517->context, namedP__V3549), LINK_VariablePropertyLink(sink__V3517->context, varP__V3550));
-      { START(sink__V3517, _M_F_PatternBinders_s3);
-        COPY(sink__V3517, sub__V3542);COPY(sink__V3517, sub__V3543);COPY(sink__V3517, sub__V3544);COPY(sink__V3517, sub__V3545);COPY(sink__V3517, sub__V3546);{ if (!IS_BOUND(x__V3547)) { REBIND(x__V3547);
-            Variable binds__V3551[1] = {x__V3547}; BINDS(sink__V3517, 1, binds__V3551);
-            COPY(sink__V3517, sub__V3548); /* REUSED SUBSTITUTION */  }
-          else { Variable b__V3552 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3517->context,"b__V3552");
-            Variable binds__V3553[1] = {b__V3552}; BINDS(sink__V3517, 1, binds__V3553);
+      ASSERT(sink__V3505->context, !strcmp(SYMBOL(term__V3506),  "F-PatternBinders$1" ));
+      Term sub__V3529 = SUB(term__V3506, 0); permitUnusedTerm(sub__V3529); int sub__V3529_count = term__V3506_count*LINK_COUNT(sub__V3529); permitUnusedInt(sub__V3529_count);
+      ASSERT(sink__V3505->context, !strcmp(SYMBOL(sub__V3529),  "$Nil" ));
+      Term sub__V3530 = LINK(sink__V3505->context, SUB(term__V3506, 1)); int sub__V3530_count = term__V3506_count*LINK_COUNT(sub__V3530); permitUnusedInt(sub__V3530_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3530, &sort_M_PASS); /* sub__V3530 = &#0 */
+      Term sub__V3531 = LINK(sink__V3505->context, SUB(term__V3506, 2)); int sub__V3531_count = term__V3506_count*LINK_COUNT(sub__V3531); permitUnusedInt(sub__V3531_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3531, &sort_M_Reified_xVariable); /* sub__V3531 = &#1 */
+      Term sub__V3532 = LINK(sink__V3505->context, SUB(term__V3506, 3)); int sub__V3532_count = term__V3506_count*LINK_COUNT(sub__V3532); permitUnusedInt(sub__V3532_count);
+      /* sub__V3532 = &#2 */
+      Term sub__V3533 = LINK(sink__V3505->context, SUB(term__V3506, 4)); int sub__V3533_count = term__V3506_count*LINK_COUNT(sub__V3533); permitUnusedInt(sub__V3533_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3533, &sort_M_Reified_xVariable); /* sub__V3533 = &#3 */
+      Term sub__V3534 = LINK(sink__V3505->context, SUB(term__V3506, 5)); int sub__V3534_count = term__V3506_count*LINK_COUNT(sub__V3534); permitUnusedInt(sub__V3534_count);
+      /* sub__V3534 = &#4 */
+      Variable x__V3535 = BINDER(term__V3506,6,0); if (term__V3506_count <= 1) UNBIND(x__V3535);
+      Term sub__V3536 = LINK(sink__V3505->context, SUB(term__V3506, 6)); int sub__V3536_count = term__V3506_count*LINK_COUNT(sub__V3536); permitUnusedInt(sub__V3536_count);
+      CRSX_CHECK_SORT(sink__V3505->context, sub__V3536, &sort_M_Reified_xVariable); /* sub__V3536 = &#5 */
+      NamedPropertyLink namedP__V3537 = LINK_NamedPropertyLink(sink__V3505->context, NAMED_PROPERTIES(term__V3506));
+      VariablePropertyLink varP__V3538 = LINK_VariablePropertyLink(sink__V3505->context, VARIABLE_PROPERTIES(term__V3506));
+      UNLINK(sink__V3505->context, term__V3506);
+      ADD_PROPERTIES(sink__V3505, LINK_NamedPropertyLink(sink__V3505->context, namedP__V3537), LINK_VariablePropertyLink(sink__V3505->context, varP__V3538));
+      { START(sink__V3505, _M_F_PatternBinders_s3);
+        COPY(sink__V3505, sub__V3530);COPY(sink__V3505, sub__V3531);COPY(sink__V3505, sub__V3532);COPY(sink__V3505, sub__V3533);COPY(sink__V3505, sub__V3534);{ if (!IS_BOUND(x__V3535)) { REBIND(x__V3535);
+            Variable binds__V3539[1] = {x__V3535}; BINDS(sink__V3505, 1, binds__V3539);
+            COPY(sink__V3505, sub__V3536); /* REUSED SUBSTITUTION */  }
+          else { Variable b__V3540 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3505->context,"b__V3540");
+            Variable binds__V3541[1] = {b__V3540}; BINDS(sink__V3505, 1, binds__V3541);
             {
-              Term arg__V3554;
-              { Sink buf__V3555 = ALLOCA_BUFFER(sink__V3517->context);
-                USE(buf__V3555, b__V3552); arg__V3554 = BUFFER_TERM(buf__V3555); FREE_BUFFER(buf__V3555); }
-              Variable vars__V3556[1] = {x__V3547};
-              Term args__V3557[1] = {arg__V3554};
-              struct _SubstitutionFrame substitution__V3558 = {NULL, 0, 1, vars__V3556, args__V3557, NULL};
-              SUBSTITUTE(sink__V3517, sub__V3548, &substitution__V3558); }
+              Term arg__V3542;
+              { Sink buf__V3543 = ALLOCA_BUFFER(sink__V3505->context);
+                USE(buf__V3543, b__V3540); arg__V3542 = BUFFER_TERM(buf__V3543); FREE_BUFFER(buf__V3543); }
+              Variable vars__V3544[1] = {x__V3535};
+              Term args__V3545[1] = {arg__V3542};
+              struct _SubstitutionFrame substitution__V3546 = {NULL, 0, 1, vars__V3544, args__V3545, NULL};
+              SUBSTITUTE(sink__V3505, sub__V3536, &substitution__V3546); }
                 }
            }
-        END(sink__V3517, _M_F_PatternBinders_s3); }
-      UNLINK_NamedPropertyLink(sink__V3517->context, namedP__V3549); UNLINK_VariablePropertyLink(sink__V3517->context, varP__V3550);
+        END(sink__V3505, _M_F_PatternBinders_s3); }
+      UNLINK_NamedPropertyLink(sink__V3505->context, namedP__V3537); UNLINK_VariablePropertyLink(sink__V3505->context, varP__V3538);
       
       return 1;
     } default: break;
   }
+  return 0;
+}
+
+/* FUNCTION F-Dispatch$2. */
+int conBindOffs_M_F_Dispatch_s2[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0};
+char *nameFun_M_F_Dispatch_s2(Term term) { return  "F-Dispatch$2" ; }
+struct _ConstructionDescriptor descriptor_M_F_Dispatch_s2 = {&sort_M_Reified_xVariable, 0, 8, sizeof(STRUCT_Con_M_F_Dispatch_s2), conBindOffs_M_F_Dispatch_s2, &nameFun_M_F_Dispatch_s2, &step_M_F_Dispatch_s2};
+
+int step_M_F_Dispatch_s2(Sink sink__V3547, Term term__V3548)
+{
+  int term__V3548_count = LINK_COUNT(term__V3548); permitUnusedInt(term__V3548_count);
+  do {
+    /* Contraction rule RULES-F-Dispatch-1. */
+    ASSERT(sink__V3547->context, !strcmp(SYMBOL(term__V3548),  "F-Dispatch$2" ));
+    Term sub__V3549 = LINK(sink__V3547->context, SUB(term__V3548, 0)); int sub__V3549_count = term__V3548_count*LINK_COUNT(sub__V3549); permitUnusedInt(sub__V3549_count);
+    /* sub__V3549 = &#51 */
+    Term sub__V3550 = SUB(term__V3548, 1); permitUnusedTerm(sub__V3550); int sub__V3550_count = term__V3548_count*LINK_COUNT(sub__V3550); permitUnusedInt(sub__V3550_count);
+    /* sub__V3550 = &#52 */
+    Term sub__V3551 = LINK(sink__V3547->context, SUB(term__V3548, 2)); int sub__V3551_count = term__V3548_count*LINK_COUNT(sub__V3551); permitUnusedInt(sub__V3551_count);
+    CRSX_CHECK_SORT(sink__V3547->context, sub__V3551, &sort_M_Reified_xVariable); /* sub__V3551 = &#2 */
+    Term sub__V3552 = LINK(sink__V3547->context, SUB(term__V3548, 3)); int sub__V3552_count = term__V3548_count*LINK_COUNT(sub__V3552); permitUnusedInt(sub__V3552_count);
+    /* sub__V3552 = &#3 */
+    Term sub__V3553 = LINK(sink__V3547->context, SUB(term__V3548, 4)); int sub__V3553_count = term__V3548_count*LINK_COUNT(sub__V3553); permitUnusedInt(sub__V3553_count);
+    /* sub__V3553 = &#4 */
+    Term sub__V3554 = LINK(sink__V3547->context, SUB(term__V3548, 5)); int sub__V3554_count = term__V3548_count*LINK_COUNT(sub__V3554); permitUnusedInt(sub__V3554_count);
+    CRSX_CHECK_SORT(sink__V3547->context, sub__V3554, &sort_M_Reified_xVariable); /* sub__V3554 = &#1 */
+    Term sub__V3555 = SUB(term__V3548, 6); permitUnusedTerm(sub__V3555); int sub__V3555_count = term__V3548_count*LINK_COUNT(sub__V3555); permitUnusedInt(sub__V3555_count);
+    CRSX_CHECK_SORT(sink__V3547->context, sub__V3555, &sort_M_Reified_xSort); /* sub__V3555 = &#6 */
+    Term sub__V3556 = LINK(sink__V3547->context, SUB(term__V3548, 7)); int sub__V3556_count = term__V3548_count*LINK_COUNT(sub__V3556); permitUnusedInt(sub__V3556_count);
+    /* sub__V3556 = &#7 */
+    NamedPropertyLink namedP__V3557 = LINK_NamedPropertyLink(sink__V3547->context, NAMED_PROPERTIES(term__V3548));
+    VariablePropertyLink varP__V3558 = LINK_VariablePropertyLink(sink__V3547->context, VARIABLE_PROPERTIES(term__V3548));
+    UNLINK(sink__V3547->context, term__V3548);
+    { START(sink__V3547, _M_F_Dispatch__choice_s1);
+      COPY(sink__V3547, sub__V3549);COPY(sink__V3547, sub__V3553);COPY(sink__V3547, sub__V3554);COPY(sink__V3547, sub__V3551);COPY(sink__V3547, sub__V3552);COPY(sink__V3547, sub__V3556);END(sink__V3547, _M_F_Dispatch__choice_s1); }
+    UNLINK_NamedPropertyLink(sink__V3547->context, namedP__V3557); UNLINK_VariablePropertyLink(sink__V3547->context, varP__V3558);
+    return 1;
+  } while (0);
   return 0;
 }
 
@@ -12833,7 +12833,7 @@ int step_M_F_Function_s1(Sink sink__V3962, Term term__V3963)
   EnumOf_M__sList choice__V3965 = (IS_VARIABLE_USE(sub__V3964) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V3964));
   switch (choice__V3965)
   {
-    case Data_M__sCons: { /* Function RULES-F-Function-2$F-Function$1$$Cons case $Cons */
+    case Data_M__sCons: { /* Function RULES-F-Function-1$F-Function$1$$Cons case $Cons */
       ASSERT(sink__V3962->context, !strcmp(SYMBOL(term__V3963),  "F-Function$1" ));
       Term sub__V3966 = SUB(term__V3963, 0); permitUnusedTerm(sub__V3966); int sub__V3966_count = term__V3963_count*LINK_COUNT(sub__V3966); permitUnusedInt(sub__V3966_count);
       ASSERT(sink__V3962->context, !strcmp(SYMBOL(sub__V3966),  "$Cons" ));
@@ -13123,7 +13123,7 @@ int step_M_F_Dispatch__choice_s1(Sink sink__V4037, Term term__V4038)
       UNLINK_NamedPropertyLink(sink__V4037->context, namedP__V4050); UNLINK_VariablePropertyLink(sink__V4037->context, varP__V4051);
       
       return 1;
-    break; } case Data_M_FORM_ARGUMENT: { /* Function RULES-F-Dispatch-choice-3$F-Dispatch-choice$1$FORM-ARGUMENT case FORM-ARGUMENT */
+    break; } case Data_M_FORM_ARGUMENT: { /* Function RULES-F-Dispatch-choice-2$F-Dispatch-choice$1$FORM-ARGUMENT case FORM-ARGUMENT */
       ASSERT(sink__V4037->context, !strcmp(SYMBOL(term__V4038),  "F-Dispatch-choice$1" ));
       Term sub__V4060 = SUB(term__V4038, 0); permitUnusedTerm(sub__V4060); int sub__V4060_count = term__V4038_count*LINK_COUNT(sub__V4060); permitUnusedInt(sub__V4060_count);
       CRSX_CHECK_SORT(sink__V4037->context, sub__V4060, &sort_M_Reified_xFormArgument); ASSERT(sink__V4037->context, !strcmp(SYMBOL(sub__V4060),  "FORM-ARGUMENT" ));
@@ -14118,7 +14118,7 @@ int step_M_F_PatternBinder1(Sink sink__V4274, Term term__V4275)
   EnumOf_M__sList choice__V4277 = (IS_VARIABLE_USE(sub__V4276) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V4276));
   switch (choice__V4277)
   {
-    case Data_M__sCons: { /* Function RULES-F-PatternBinder1-1$F-PatternBinder1$$Cons case $Cons */
+    case Data_M__sCons: { /* Function RULES-F-PatternBinder1-2$F-PatternBinder1$$Cons case $Cons */
       ASSERT(sink__V4274->context, !strcmp(SYMBOL(term__V4275),  "F-PatternBinder1" ));
       Term sub__V4278 = SUB(term__V4275, 0); permitUnusedTerm(sub__V4278); int sub__V4278_count = term__V4275_count*LINK_COUNT(sub__V4278); permitUnusedInt(sub__V4278_count);
       ASSERT(sink__V4274->context, !strcmp(SYMBOL(sub__V4278),  "$Cons" ));

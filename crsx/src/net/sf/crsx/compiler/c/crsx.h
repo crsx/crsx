@@ -64,8 +64,8 @@ typedef struct _Pair* Pair;
 //
 struct _Context
 {
-    unsigned int stamp; // satisfy old C compilers and provide variable identity
-    Hashset2 literalPool;
+    unsigned int stamp;   // satisfy old C compilers and provide variable identity
+    Hashset2 stringPool;  // Set of char*
 };
 
 //#define DEBUG
@@ -748,7 +748,7 @@ struct _Sink
 
     Sink (*start)(Sink sink, ConstructionDescriptor descriptor); // start event
     Sink (*end)(Sink sink, ConstructionDescriptor descriptor); // end event
-    Sink (*literal)(Sink sink, const char *text); // literal event. text reference is *not* transferred
+    Sink (*literal)(Sink sink, const char *text); // literal event. Text reference is *not* transferred
     Sink (*use)(Sink sink, Variable variable); // use event
     Sink (*binds)(Sink sink, int rank, Variable binds[]); // binds event
     Sink (*copy)(Sink sink, Term term); // copy term as event(s)
