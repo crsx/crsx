@@ -43,10 +43,10 @@ ResultHash[H_NEW[#hash]] → #hash ;
 -[Discard[#var]] : ResultHash[H_OLD[#hash, #var]] → #hash ;
 
 ∀ a b . HashInsert[Hash[a,b], a<!--term-->, b<!--new variable-->] :: HashResult[a,b] ;
--[Share[#term]] : HashInsert[#hash, #term, #new] → HashInsert2[#hash, #term, $[FormatNumber, $[HashCode, #term]], #new] ;
+-[Share[#term], Data[#term]] : HashInsert[#hash, #term, #new] → HashInsert2[#hash, #term, $[FormatNumber, $[HashCode, #term]], #new] ;
 
 ∀ a b . HashInsert2[Hash[a,b], a, $String, b] :: HashResult[a,b] ;
--[Share[#code]] : HashInsert2[{#H}HASH, #term, #code, #new] → HashInsert3[{#H}HASH, #term, $[{#H}Get, #code, ()], #code, #new] ;
+-[Share[#code], Data[#code]] : HashInsert2[{#H}HASH, #term, #code, #new] → HashInsert3[{#H}HASH, #term, $[{#H}Get, #code, ()], #code, #new] ;
 
 ∀ a b . HashInsert3[Hash[a,b], a, $List[HashMember[a,b]], $String, b] :: HashResult[a,b] ;
 -[Copy[#members]] : HashInsert3[#hash, #term, #members, #code, #new] → HashInsert4[#members, #hash, #term, #members, #code, #new] ;
@@ -71,10 +71,12 @@ $[If, $[DeepEqual, #candidate, #term], // check the #candidate...
 
 ∀ a b . HashGet[Hash[a,b], a<!--term-->] :: HashGetResult[b] ;
 
--[Share[#term]] : HashGet[#hash, #term] → HashGet2[#hash, #term, $[FormatNumber, $[HashCode, #term]]] ;
+-[Share[#term], Data[#term]] : HashGet[#hash, #term] → HashGet2[#hash, #term, $[FormatNumber, $[HashCode, #term]]] ;
 
 ∀ a b . HashGet2[Hash[a,b], a<!--term-->, $String<!-- HashCode -->] :: HashGetResult[b] ;
 
+-[Data[#code]]
+:
 HashGet2[{#H}HASH, #term, #code] → HashGet3[$[{#H}Get, #code, ()], #term];
 
 ∀ a b . HashGet3[$List[HashMember[a,b]], a<!--term-->] :: HashGetResult[b] ;
@@ -93,11 +95,13 @@ $[If, $[DeepEqual, #candidate, #term], // check the #candidate...
 
 ∀ a b . HashPut[Hash[a,b], a<!--term-->, b<!--new variable-->] :: Hash[a,b] ;
 
--[Copy[#term]]: HashPut[#hash, #term, #new] → HashPut2[#hash, #term, #new, $[FormatNumber, $[HashCode, #term]]];
+-[Copy[#term], Data[#term]]
+: 
+HashPut[#hash, #term, #new] → HashPut2[#hash, #term, #new, $[FormatNumber, $[HashCode, #term]]];
 
 ∀ a b . HashPut2[Hash[a,b], a<!--term-->, b<!--new variable-->, $String] :: Hash[a,b] ;
 
--[Copy[#code]]
+-[Copy[#code], Data[#term]]
 :
 HashPut2[{#H}HASH, #term, #new, #code]
 → 

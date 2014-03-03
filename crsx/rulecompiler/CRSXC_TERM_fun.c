@@ -1721,51 +1721,14 @@ int step_M_T__send__property__ref3_s4(Sink sink__V454, Term term__V455)
     /* sub__V457 = &#12 */
     Term sub__V458 = LINK(sink__V454->context, SUB(term__V455, 2)); int sub__V458_count = term__V455_count*LINK_COUNT(sub__V458); permitUnusedInt(sub__V458_count);
     CRSX_CHECK_SORT(sink__V454->context, sub__V458, &sort_M_Reified_xTerm); /* sub__V458 = &#2 */
-    Term sub__V459 = LINK(sink__V454->context, SUB(term__V455, 3)); int sub__V459_count = term__V455_count*LINK_COUNT(sub__V459); permitUnusedInt(sub__V459_count);
-    UNLINK_SUB(sink__V454->context, term__V455,  3); NORMALIZE(sink__V454->context, sub__V459); SUB(term__V455,  3) = LINK(sink__V454->context, sub__V459);
+    Term sub__V459 = SUB(term__V455, 3); permitUnusedTerm(sub__V459); int sub__V459_count = term__V455_count*LINK_COUNT(sub__V459); permitUnusedInt(sub__V459_count);
     /* sub__V459 = &#11 */
     NamedPropertyLink namedP__V460 = LINK_NamedPropertyLink(sink__V454->context, NAMED_PROPERTIES(term__V455));
     VariablePropertyLink varP__V461 = LINK_VariablePropertyLink(sink__V454->context, VARIABLE_PROPERTIES(term__V455));
     UNLINK(sink__V454->context, term__V455);
-    { START(sink__V454, _M__sTextCons);
-      { START(sink__V454, _M__sTextChars);
-        LITERAL(sink__V454,  "ADD_PROPERTY_WEAKEN(" ); END(sink__V454, _M__sTextChars); }
-      { START(sink__V454, _M__sTextCons);
-        { START(sink__V454, _M__sTextEmbed);
-          { START(sink__V454, _M_AsText);
-            COPY(sink__V454, LINK(sink__V454->context, sub__V456));END(sink__V454, _M_AsText); }
-          END(sink__V454, _M__sTextEmbed); }
-        { START(sink__V454, _M__sTextCons);
-          { START(sink__V454, _M__sTextChars);
-            LITERAL(sink__V454,  ", " ); END(sink__V454, _M__sTextChars); }
-          { START(sink__V454, _M__sTextCons);
-            { START(sink__V454, _M__sTextEmbed);
-              { START(sink__V454, _M_AsText);
-                COPY(sink__V454, sub__V459);END(sink__V454, _M_AsText); }
-              END(sink__V454, _M__sTextEmbed); }
-            { START(sink__V454, _M__sTextCons);
-              { START(sink__V454, _M__sTextChars);
-                LITERAL(sink__V454,  ");" ); END(sink__V454, _M__sTextChars); }
-              { START(sink__V454, _M__sTextCons);
-                { START(sink__V454, _M__sTextBreak);
-                  LITERAL(sink__V454,  "\n" ); END(sink__V454, _M__sTextBreak); }
-                { START(sink__V454, _M__sTextCons);
-                  { START(sink__V454, _M__sTextEmbed);
-                    { START(sink__V454, _M_AsText);
-                      ADD_PROPERTIES(sink__V454, LINK_NamedPropertyLink(sink__V454->context, namedP__V460), LINK_VariablePropertyLink(sink__V454->context, varP__V461));
-                      { START(sink__V454, _M_T__send__property__ref3);
-                        COPY(sink__V454, sub__V457);COPY(sink__V454, sub__V458);COPY(sink__V454, sub__V456);END(sink__V454, _M_T__send__property__ref3); }
-                      END(sink__V454, _M_AsText); }
-                    END(sink__V454, _M__sTextEmbed); }
-                  { START(sink__V454, _M__sTextNil);
-                    END(sink__V454, _M__sTextNil); }
-                  END(sink__V454, _M__sTextCons); }
-                END(sink__V454, _M__sTextCons); }
-              END(sink__V454, _M__sTextCons); }
-            END(sink__V454, _M__sTextCons); }
-          END(sink__V454, _M__sTextCons); }
-        END(sink__V454, _M__sTextCons); }
-      END(sink__V454, _M__sTextCons); }
+    ADD_PROPERTIES(sink__V454, LINK_NamedPropertyLink(sink__V454->context, namedP__V460), LINK_VariablePropertyLink(sink__V454->context, varP__V461));
+    { START(sink__V454, _M_T__send__property__ref3);
+      COPY(sink__V454, sub__V457);COPY(sink__V454, sub__V458);COPY(sink__V454, sub__V456);END(sink__V454, _M_T__send__property__ref3); }
     UNLINK_NamedPropertyLink(sink__V454->context, namedP__V460); UNLINK_VariablePropertyLink(sink__V454->context, varP__V461);
     return 1;
   } while (0);
@@ -3774,51 +3737,14 @@ int step_M_T__send__meta__aplication2_s4(Sink sink__V1021, Term term__V1022)
     /* sub__V1026 = &#3 */
     Term sub__V1027 = LINK(sink__V1021->context, SUB(term__V1022, 4)); int sub__V1027_count = term__V1022_count*LINK_COUNT(sub__V1027); permitUnusedInt(sub__V1027_count);
     CRSX_CHECK_SORT(sink__V1021->context, sub__V1027, &sort_M_Reified_xUse); /* sub__V1027 = &#4 */
-    Term sub__V1028 = LINK(sink__V1021->context, SUB(term__V1022, 5)); int sub__V1028_count = term__V1022_count*LINK_COUNT(sub__V1028); permitUnusedInt(sub__V1028_count);
-    UNLINK_SUB(sink__V1021->context, term__V1022,  5); NORMALIZE(sink__V1021->context, sub__V1028); SUB(term__V1022,  5) = LINK(sink__V1021->context, sub__V1028);
+    Term sub__V1028 = SUB(term__V1022, 5); permitUnusedTerm(sub__V1028); int sub__V1028_count = term__V1022_count*LINK_COUNT(sub__V1028); permitUnusedInt(sub__V1028_count);
     /* sub__V1028 = &#11 */
     NamedPropertyLink namedP__V1029 = LINK_NamedPropertyLink(sink__V1021->context, NAMED_PROPERTIES(term__V1022));
     VariablePropertyLink varP__V1030 = LINK_VariablePropertyLink(sink__V1021->context, VARIABLE_PROPERTIES(term__V1022));
     UNLINK(sink__V1021->context, term__V1022);
-    { START(sink__V1021, _M__sTextCons);
-      { START(sink__V1021, _M__sTextChars);
-        LITERAL(sink__V1021,  "WEAKEN(" ); END(sink__V1021, _M__sTextChars); }
-      { START(sink__V1021, _M__sTextCons);
-        { START(sink__V1021, _M__sTextEmbed);
-          { START(sink__V1021, _M_AsText);
-            COPY(sink__V1021, LINK(sink__V1021->context, sub__V1023));END(sink__V1021, _M_AsText); }
-          END(sink__V1021, _M__sTextEmbed); }
-        { START(sink__V1021, _M__sTextCons);
-          { START(sink__V1021, _M__sTextChars);
-            LITERAL(sink__V1021,  ", " ); END(sink__V1021, _M__sTextChars); }
-          { START(sink__V1021, _M__sTextCons);
-            { START(sink__V1021, _M__sTextEmbed);
-              { START(sink__V1021, _M_AsText);
-                COPY(sink__V1021, sub__V1028);END(sink__V1021, _M_AsText); }
-              END(sink__V1021, _M__sTextEmbed); }
-            { START(sink__V1021, _M__sTextCons);
-              { START(sink__V1021, _M__sTextChars);
-                LITERAL(sink__V1021,  ");" ); END(sink__V1021, _M__sTextChars); }
-              { START(sink__V1021, _M__sTextCons);
-                { START(sink__V1021, _M__sTextBreak);
-                  LITERAL(sink__V1021,  "\n" ); END(sink__V1021, _M__sTextBreak); }
-                { START(sink__V1021, _M__sTextCons);
-                  { START(sink__V1021, _M__sTextEmbed);
-                    { START(sink__V1021, _M_AsText);
-                      ADD_PROPERTIES(sink__V1021, LINK_NamedPropertyLink(sink__V1021->context, namedP__V1029), LINK_VariablePropertyLink(sink__V1021->context, varP__V1030));
-                      { START(sink__V1021, _M_T__send__meta__aplication2);
-                        COPY(sink__V1021, sub__V1024);COPY(sink__V1021, sub__V1025);COPY(sink__V1021, sub__V1026);COPY(sink__V1021, sub__V1027);COPY(sink__V1021, sub__V1023);END(sink__V1021, _M_T__send__meta__aplication2); }
-                      END(sink__V1021, _M_AsText); }
-                    END(sink__V1021, _M__sTextEmbed); }
-                  { START(sink__V1021, _M__sTextNil);
-                    END(sink__V1021, _M__sTextNil); }
-                  END(sink__V1021, _M__sTextCons); }
-                END(sink__V1021, _M__sTextCons); }
-              END(sink__V1021, _M__sTextCons); }
-            END(sink__V1021, _M__sTextCons); }
-          END(sink__V1021, _M__sTextCons); }
-        END(sink__V1021, _M__sTextCons); }
-      END(sink__V1021, _M__sTextCons); }
+    ADD_PROPERTIES(sink__V1021, LINK_NamedPropertyLink(sink__V1021->context, namedP__V1029), LINK_VariablePropertyLink(sink__V1021->context, varP__V1030));
+    { START(sink__V1021, _M_T__send__meta__aplication2);
+      COPY(sink__V1021, sub__V1024);COPY(sink__V1021, sub__V1025);COPY(sink__V1021, sub__V1026);COPY(sink__V1021, sub__V1027);COPY(sink__V1021, sub__V1023);END(sink__V1021, _M_T__send__meta__aplication2); }
     UNLINK_NamedPropertyLink(sink__V1021->context, namedP__V1029); UNLINK_VariablePropertyLink(sink__V1021->context, varP__V1030);
     return 1;
   } while (0);
@@ -9653,16 +9579,16 @@ int step_M_T__send__meta__aplication1(Sink sink__V2805, Term term__V2806)
         { Sink buf__V2820 = ALLOCA_BUFFER(sink__V2805->context);
           COPY(buf__V2820, sub__V2808);list__V2816 = BUFFER_TERM(buf__V2820); FREE_BUFFER(buf__V2820); }
         while (!strcmp("$Cons",SYMBOL(list__V2816))) { Variable v__V2821 = VARIABLE(SUB(list__V2816,0)); 
-          addVariable(vs__V2817,v__V2821);
+          addVariable(vs__V2817,linkVariable(sink__V2805->context, v__V2821));
           Term next__V2822 = LINK(sink__V2805->context, SUB(list__V2816,1));
           UNLINK(sink__V2805->context, list__V2816);
           list__V2816 = next__V2822;
         }
         UNLINK(sink__V2805->context, list__V2816);
         while (!strcmp("$Cons",SYMBOL(list__V2815))) { Variable v__V2821 = VARIABLE(SUB(list__V2815,0)); 
-          if (!containsVariable(vs__V2817,v__V2821)) { addVariable(vs__V2817,v__V2821); 
+          if (!containsVariable(vs__V2817,v__V2821)) { addVariable(vs__V2817, linkVariable(sink__V2805->context, v__V2821)); 
             START(sink__V2805, _M__sCons); 
-            USE(sink__V2805, v__V2821); 
+            USE(sink__V2805, linkVariable(sink__V2805->context, v__V2821)); 
             ++size__V2818;
           } 
           Term next__V2822 = LINK(sink__V2805->context, SUB(list__V2815,1));
@@ -10578,9 +10504,9 @@ int step_M_T__send_s8(Sink sink__V3082, Term term__V3083)
           COPY(buf__V3095, LINK(buf__V3095->context, sub__V3085));term__V3094 = BUFFER_TERM(buf__V3095); FREE_BUFFER(buf__V3095); }
         VariableSet fvs__V3096 = makeFreeVariableSet(sink__V3082->context, term__V3094, NULL, 0, NULL);
         VariableSetLink link__V3097;
-        for (link__V3097 = fvs__V3096->link; link__V3097; link__V3097 = link__V3097->link) { START(sink__V3082, _M__sCons); USE(sink__V3082, link__V3097->variable); }
+        for (link__V3097 = fvs__V3096->u.link; link__V3097; link__V3097 = link__V3097->link) { START(sink__V3082, _M__sCons); USE(sink__V3082, linkVariable(sink__V3082->context, link__V3097->variable)); }
         START(sink__V3082, _M__sNil); END(sink__V3082, _M__sNil);
-        for (link__V3097 = fvs__V3096->link; link__V3097; link__V3097 = link__V3097->link) { END(sink__V3082, _M__sCons); }
+        for (link__V3097 = fvs__V3096->u.link; link__V3097; link__V3097 = link__V3097->link) { END(sink__V3082, _M__sCons); }
         freeVariableSet(fvs__V3096);
       }
       COPY(sink__V3082, sub__V3084);COPY(sink__V3082, sub__V3085);COPY(sink__V3082, sub__V3086);COPY(sink__V3082, sub__V3087);END(sink__V3082, _M_T__send__meta__aplication0); }

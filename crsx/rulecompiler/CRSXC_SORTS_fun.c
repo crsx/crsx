@@ -52,8 +52,7 @@ int step_M_S_Data_s1(Sink sink__V1, Term term__V2)
                       COPY(sink__V1, LINK(sink__V1->context, sub__V5));{ Variable x__V8 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1->context,"x__V8");
                         Variable binds__V9[1] = {x__V8}; BINDS(sink__V1, 1, binds__V9);
                         { START(sink__V1, _M_S_Data_Form_s1);
-                          USE(sink__V1, x__V8); WEAKEN(sink__V1, x__V8);
-                          COPY(sink__V1, LINK(sink__V1->context, sub__V3));END(sink__V1, _M_S_Data_Form_s1); }
+                          USE(sink__V1, x__V8); COPY(sink__V1, LINK(sink__V1->context, sub__V3));END(sink__V1, _M_S_Data_Form_s1); }
                          }
                       END(sink__V1, _M_MapText_s1); }
                     END(sink__V1, _M_AsText); }

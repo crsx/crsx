@@ -87,8 +87,7 @@ T-send-property-ref3[#Vars, #Term, #sink]
 {#env}
 T-send-property-ref3[(v;#rest), #Term, sink]
 →
-%n⟪ADD_PROPERTY_WEAKEN(«sink», «v»);
-« {#env} T-send-property-ref3[#rest, #Term, sink] »⟫
+{#env} T-send-property-ref3[#rest, #Term, sink]
 ;
 
 {#env}
@@ -194,8 +193,7 @@ T-send-meta-aplication2[$[ExceptVariables, #ContextVariables, #UsedVariables], #
 {#env}
 T-send-meta-aplication2[(v;#rest), #MetaVar, #Arguments, #Occ, sink]
 →
-%n⟪WEAKEN(«sink», «v»);
-« {#env} T-send-meta-aplication2[#rest, #MetaVar, #Arguments, #Occ, sink] »⟫
+{#env} T-send-meta-aplication2[#rest, #MetaVar, #Arguments, #Occ, sink]
 ;
 
 {#env}

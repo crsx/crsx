@@ -165,9 +165,7 @@ int step_M_F_Dispatch__cases_s5(Sink sink__V27, Term term__V28)
             COPY(sink__V27, LINK(sink__V27->context, sub__V29));{ Variable x__V47 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V27->context,"x__V47");
               Variable binds__V48[1] = {x__V47}; BINDS(sink__V27, 1, binds__V48);
               { START(sink__V27, _M_F__then_Send);
-                USE(sink__V27, x__V47); WEAKEN(sink__V27, x__V47);
-                COPY(sink__V27, LINK(sink__V27->context, sub__V29));WEAKEN(sink__V27, x__V47); COPY(sink__V27, sub__V32);WEAKEN(sink__V27, x__V47);
-                COPY(sink__V27, LINK(sink__V27->context, sub__V36));END(sink__V27, _M_F__then_Send); }
+                USE(sink__V27, x__V47); COPY(sink__V27, LINK(sink__V27->context, sub__V29));COPY(sink__V27, sub__V32);COPY(sink__V27, LINK(sink__V27->context, sub__V36));END(sink__V27, _M_F__then_Send); }
                }
             END(sink__V27, _M_F_Pattern_s1); }
           END(sink__V27, _M_AsText); }
@@ -611,13 +609,11 @@ int step_M_F_Options_s2(Sink sink__V171, Term term__V172)
       COPY(sink__V171, sub__V173);COPY(sink__V171, sub__V174);{ Variable x__V180 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V171->context,"x__V180");
         Variable binds__V181[1] = {x__V180}; BINDS(sink__V171, 1, binds__V181);
         { START(sink__V171, _M_F__then_Options);
-          USE(sink__V171, x__V180); WEAKEN(sink__V171, x__V180); COPY(sink__V171, sub__V175);{ if (!IS_BOUND(x__V176)) { REBIND(x__V176);
+          USE(sink__V171, x__V180); COPY(sink__V171, sub__V175);{ if (!IS_BOUND(x__V176)) { REBIND(x__V176);
               Variable binds__V182[1] = {x__V176}; BINDS(sink__V171, 1, binds__V182);
-              WEAKEN(sink__V171, x__V180);
               COPY(sink__V171, sub__V177); /* REUSED SUBSTITUTION */  }
             else { Variable b__V183 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V171->context,"b__V183");
               Variable binds__V184[1] = {b__V183}; BINDS(sink__V171, 1, binds__V184);
-              WEAKEN(sink__V171, x__V180);
               {
                 Term arg__V185;
                 { Sink buf__V186 = ALLOCA_BUFFER(sink__V171->context);
@@ -2538,19 +2534,12 @@ int step_M_F_Pattern_s8(Sink sink__V776, Term term__V777)
                                                         Variable binds__V794[1] = {x__V793}; BINDS(sink__V776, 1, binds__V794);
                                                         { START(sink__V776, _M_F__then_PatternBinders);
                                                           USE(sink__V776, x__V793);
-                                                          WEAKEN(sink__V776, x__V793);
-                                                          COPY(sink__V776, sub__V783);WEAKEN(sink__V776, x__V793);
-                                                          COPY(sink__V776, sub__V781);WEAKEN(sink__V776, x__V793);
-                                                          COPY(sink__V776, sub__V788);WEAKEN(sink__V776, x__V793);
-                                                          COPY(sink__V776, sub__V787);WEAKEN(sink__V776, x__V793);
-                                                          COPY(sink__V776, sub__V778);LITERAL(sink__V776,  "0" );
+                                                          COPY(sink__V776, sub__V783);COPY(sink__V776, sub__V781);COPY(sink__V776, sub__V788);COPY(sink__V776, sub__V787);COPY(sink__V776, sub__V778);LITERAL(sink__V776,  "0" );
                                                           { if (!IS_BOUND(x__V789)) { REBIND(x__V789);
                                                               Variable binds__V795[1] = {x__V789}; BINDS(sink__V776, 1, binds__V795);
-                                                              WEAKEN(sink__V776, x__V793);
                                                               COPY(sink__V776, sub__V790); /* REUSED SUBSTITUTION */  }
                                                             else { Variable b__V796 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V776->context,"b__V796");
                                                               Variable binds__V797[1] = {b__V796}; BINDS(sink__V776, 1, binds__V797);
-                                                              WEAKEN(sink__V776, x__V793);
                                                               {
                                                                 Term arg__V798;
                                                                 { Sink buf__V799 = ALLOCA_BUFFER(sink__V776->context);
@@ -5062,15 +5051,11 @@ int step_M_F_Pattern_s62(Sink sink__V1523, Term term__V1524)
                         str__V1554 = str__V1558; }
                        }
                     LITERALU(sink__V1523, str__V1554); }
-                  WEAKEN(sink__V1523, x__V1552);
-                  COPY(sink__V1523, sub__V1533);WEAKEN(sink__V1523, x__V1552);
-                  COPY(sink__V1523, sub__V1525);{ if (!IS_BOUND(x__V1534)) { REBIND(x__V1534);
+                  COPY(sink__V1523, sub__V1533);COPY(sink__V1523, sub__V1525);{ if (!IS_BOUND(x__V1534)) { REBIND(x__V1534);
                       Variable binds__V1560[1] = {x__V1534}; BINDS(sink__V1523, 1, binds__V1560);
-                      WEAKEN(sink__V1523, x__V1552);
                       COPY(sink__V1523, sub__V1535); /* REUSED SUBSTITUTION */  }
                     else { Variable b__V1561 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1523->context,"b__V1561");
                       Variable binds__V1562[1] = {b__V1561}; BINDS(sink__V1523, 1, binds__V1562);
-                      WEAKEN(sink__V1523, x__V1552);
                       {
                         Term arg__V1563;
                         { Sink buf__V1564 = ALLOCA_BUFFER(sink__V1523->context);
@@ -5125,15 +5110,11 @@ int step_M_F_Pattern_s62(Sink sink__V1523, Term term__V1524)
                     str__V1578 = str__V1582; }
                    }
                 LITERALU(sink__V1523, str__V1578); }
-              WEAKEN(sink__V1523, x__V1576);
-              COPY(sink__V1523, sub__V1533);WEAKEN(sink__V1523, x__V1576);
-              COPY(sink__V1523, sub__V1525);{ if (!IS_BOUND(x__V1534)) { REBIND(x__V1534);
+              COPY(sink__V1523, sub__V1533);COPY(sink__V1523, sub__V1525);{ if (!IS_BOUND(x__V1534)) { REBIND(x__V1534);
                   Variable binds__V1584[1] = {x__V1534}; BINDS(sink__V1523, 1, binds__V1584);
-                  WEAKEN(sink__V1523, x__V1576);
                   COPY(sink__V1523, sub__V1535); /* REUSED SUBSTITUTION */  }
                 else { Variable b__V1585 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1523->context,"b__V1585");
                   Variable binds__V1586[1] = {b__V1585}; BINDS(sink__V1523, 1, binds__V1586);
-                  WEAKEN(sink__V1523, x__V1576);
                   {
                     Term arg__V1587;
                     { Sink buf__V1588 = ALLOCA_BUFFER(sink__V1523->context);
@@ -5784,7 +5765,6 @@ int step_M_F_Declarations(Sink sink__V1781, Term term__V1782)
                                           Variable binds__V1795[1] = {x__V1794}; BINDS(sink__V1781, 1, binds__V1795);
                                           { START(sink__V1781, _M_F_Declaration);
                                             USE(sink__V1781, x__V1794);
-                                            WEAKEN(sink__V1781, x__V1794);
                                             COPY(sink__V1781, LINK(sink__V1781->context, sub__V1785));END(sink__V1781, _M_F_Declaration); }
                                            }
                                         END(sink__V1781, _M_MapText_s1); }
@@ -6063,13 +6043,11 @@ int step_M_F_Pattern_s52(Sink sink__V1847, Term term__V1848)
       COPY(sink__V1847, sub__V1851);COPY(sink__V1847, sub__V1852);COPY(sink__V1847, LINK(sink__V1847->context, sub__V1853));COPY(sink__V1847, LINK(sink__V1847->context, sub__V1858));COPY(sink__V1847, sub__V1855);{ START(sink__V1847, _M__sTrue); END(sink__V1847, _M__sTrue); } COPY(sink__V1847, sub__V1857);COPY(sink__V1847, LINK(sink__V1847->context, sub__V1849));{ Variable x__V1863 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1847->context,"x__V1863");
         Variable binds__V1864[1] = {x__V1863}; BINDS(sink__V1847, 1, binds__V1864);
         { START(sink__V1847, _M_F__then_Pattern_Property);
-          USE(sink__V1847, x__V1863); WEAKEN(sink__V1847, x__V1863); COPY(sink__V1847, sub__V1853);WEAKEN(sink__V1847, x__V1863); COPY(sink__V1847, sub__V1858);WEAKEN(sink__V1847, x__V1863); COPY(sink__V1847, sub__V1849);WEAKEN(sink__V1847, x__V1863); COPY(sink__V1847, sub__V1854);WEAKEN(sink__V1847, x__V1863); COPY(sink__V1847, sub__V1850);{ if (!IS_BOUND(x__V1859)) { REBIND(x__V1859);
+          USE(sink__V1847, x__V1863); COPY(sink__V1847, sub__V1853);COPY(sink__V1847, sub__V1858);COPY(sink__V1847, sub__V1849);COPY(sink__V1847, sub__V1854);COPY(sink__V1847, sub__V1850);{ if (!IS_BOUND(x__V1859)) { REBIND(x__V1859);
               Variable binds__V1865[1] = {x__V1859}; BINDS(sink__V1847, 1, binds__V1865);
-              WEAKEN(sink__V1847, x__V1863);
               COPY(sink__V1847, sub__V1860); /* REUSED SUBSTITUTION */  }
             else { Variable b__V1866 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1847->context,"b__V1866");
               Variable binds__V1867[1] = {b__V1866}; BINDS(sink__V1847, 1, binds__V1867);
-              WEAKEN(sink__V1847, x__V1863);
               {
                 Term arg__V1868;
                 { Sink buf__V1869 = ALLOCA_BUFFER(sink__V1847->context);
@@ -6198,13 +6176,11 @@ int step_M_F_Pattern_s57(Sink sink__V1898, Term term__V1899)
       COPY(sink__V1898, sub__V1901);COPY(sink__V1898, sub__V1902);COPY(sink__V1898, sub__V1903);COPY(sink__V1898, LINK(sink__V1898->context, sub__V1908));COPY(sink__V1898, sub__V1905);{ START(sink__V1898, _M__sTrue); END(sink__V1898, _M__sTrue); } COPY(sink__V1898, sub__V1907);COPY(sink__V1898, LINK(sink__V1898->context, sub__V1900));{ Variable x__V1913 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1898->context,"x__V1913");
         Variable binds__V1914[1] = {x__V1913}; BINDS(sink__V1898, 1, binds__V1914);
         { START(sink__V1898, _M_F__then_Pattern_Not_Property);
-          USE(sink__V1898, x__V1913); WEAKEN(sink__V1898, x__V1913); COPY(sink__V1898, sub__V1908);WEAKEN(sink__V1898, x__V1913); COPY(sink__V1898, sub__V1900);WEAKEN(sink__V1898, x__V1913); COPY(sink__V1898, sub__V1904);{ if (!IS_BOUND(x__V1909)) { REBIND(x__V1909);
+          USE(sink__V1898, x__V1913); COPY(sink__V1898, sub__V1908);COPY(sink__V1898, sub__V1900);COPY(sink__V1898, sub__V1904);{ if (!IS_BOUND(x__V1909)) { REBIND(x__V1909);
               Variable binds__V1915[1] = {x__V1909}; BINDS(sink__V1898, 1, binds__V1915);
-              WEAKEN(sink__V1898, x__V1913);
               COPY(sink__V1898, sub__V1910); /* REUSED SUBSTITUTION */  }
             else { Variable b__V1916 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1898->context,"b__V1916");
               Variable binds__V1917[1] = {b__V1916}; BINDS(sink__V1898, 1, binds__V1917);
-              WEAKEN(sink__V1898, x__V1913);
               {
                 Term arg__V1918;
                 { Sink buf__V1919 = ALLOCA_BUFFER(sink__V1898->context);
@@ -8406,17 +8382,11 @@ int step_M_F_Pattern_Variable_Case_s4(Sink sink__V2619, Term term__V2620)
                       COPY(sink__V2619, sub__V2622);{ Variable x__V2631 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V2619->context,"x__V2631");
                         Variable binds__V2632[1] = {x__V2631}; BINDS(sink__V2619, 1, binds__V2632);
                         { START(sink__V2619, _M_F__then_Pattern_Variable_Use);
-                          USE(sink__V2619, x__V2631); WEAKEN(sink__V2619, x__V2631);
-                          COPY(sink__V2619, sub__V2624);WEAKEN(sink__V2619, x__V2631);
-                          COPY(sink__V2619, sub__V2626);WEAKEN(sink__V2619, x__V2631);
-                          COPY(sink__V2619, sub__V2623);WEAKEN(sink__V2619, x__V2631);
-                          COPY(sink__V2619, sub__V2621);{ if (!IS_BOUND(x__V2627)) { REBIND(x__V2627);
+                          USE(sink__V2619, x__V2631); COPY(sink__V2619, sub__V2624);COPY(sink__V2619, sub__V2626);COPY(sink__V2619, sub__V2623);COPY(sink__V2619, sub__V2621);{ if (!IS_BOUND(x__V2627)) { REBIND(x__V2627);
                               Variable binds__V2633[1] = {x__V2627}; BINDS(sink__V2619, 1, binds__V2633);
-                              WEAKEN(sink__V2619, x__V2631);
                               COPY(sink__V2619, sub__V2628); /* REUSED SUBSTITUTION */  }
                             else { Variable b__V2634 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V2619->context,"b__V2634");
                               Variable binds__V2635[1] = {b__V2634}; BINDS(sink__V2619, 1, binds__V2635);
-                              WEAKEN(sink__V2619, x__V2631);
                               {
                                 Term arg__V2636;
                                 { Sink buf__V2637 = ALLOCA_BUFFER(sink__V2619->context);
@@ -10642,40 +10612,23 @@ int step_M_F_Contract_s3(Sink sink__V3374, Term term__V3375)
                             COPY(sink__V3374, LINK(sink__V3374->context, sub__V3377));{ Variable x__V3392 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3374->context,"x__V3392");
                               Variable binds__V3393[1] = {x__V3392}; BINDS(sink__V3374, 1, binds__V3393);
                               { START(sink__V3374, _M_F__then_Fresh);
-                                USE(sink__V3374, x__V3392); WEAKEN(sink__V3374, x__V3392);
-                                COPY(sink__V3374, LINK(sink__V3374->context, sub__V3383));WEAKEN(sink__V3374, x__V3392);
-                                COPY(sink__V3374, sub__V3377);{ Variable x__V3394 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3374->context,"x__V3394");
+                                USE(sink__V3374, x__V3392); COPY(sink__V3374, LINK(sink__V3374->context, sub__V3383));COPY(sink__V3374, sub__V3377);{ Variable x__V3394 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3374->context,"x__V3394");
                                   Variable binds__V3395[1] = {x__V3394}; BINDS(sink__V3374, 1, binds__V3395);
                                   { START(sink__V3374, _M_F__then_Pattern);
                                     USE(sink__V3374, x__V3394); { START(sink__V3374, _M_FIRST);
                                       END(sink__V3374, _M_FIRST); }
                                     { START(sink__V3374, _M_MATCH);
                                       END(sink__V3374, _M_MATCH); }
-                                    WEAKEN(sink__V3374, x__V3392);
-                                    WEAKEN(sink__V3374, x__V3394);
-                                    COPY(sink__V3374, sub__V3378);WEAKEN(sink__V3374, x__V3392);
-                                    WEAKEN(sink__V3374, x__V3394);
-                                    COPY(sink__V3374, LINK(sink__V3374->context, sub__V3383));{ START(sink__V3374, _M__sTextNil);
+                                    COPY(sink__V3374, sub__V3378);COPY(sink__V3374, LINK(sink__V3374->context, sub__V3383));{ START(sink__V3374, _M__sTextNil);
                                       END(sink__V3374, _M__sTextNil); }
                                     { START(sink__V3374, _M__sFalse);
                                       END(sink__V3374, _M__sFalse); }
                                     { START(sink__V3374, _M__sFalse);
                                       END(sink__V3374, _M__sFalse); }
-                                    WEAKEN(sink__V3374, x__V3392);
-                                    WEAKEN(sink__V3374, x__V3394);
                                     COPY(sink__V3374, LINK(sink__V3374->context, sub__V3381));{ Variable x__V3396 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3374->context,"x__V3396");
                                       Variable binds__V3397[1] = {x__V3396}; BINDS(sink__V3374, 1, binds__V3397);
                                       { START(sink__V3374, _M_F__then_Send);
-                                        USE(sink__V3374, x__V3396); WEAKEN(sink__V3374, x__V3392);
-                                        WEAKEN(sink__V3374, x__V3394);
-                                        WEAKEN(sink__V3374, x__V3396);
-                                        COPY(sink__V3374, LINK(sink__V3374->context, sub__V3381));WEAKEN(sink__V3374, x__V3392);
-                                        WEAKEN(sink__V3374, x__V3394);
-                                        WEAKEN(sink__V3374, x__V3396);
-                                        COPY(sink__V3374, sub__V3379);WEAKEN(sink__V3374, x__V3392);
-                                        WEAKEN(sink__V3374, x__V3394);
-                                        WEAKEN(sink__V3374, x__V3396);
-                                        COPY(sink__V3374, LINK(sink__V3374->context, sub__V3383));END(sink__V3374, _M_F__then_Send); }
+                                        USE(sink__V3374, x__V3396); COPY(sink__V3374, LINK(sink__V3374->context, sub__V3381));COPY(sink__V3374, sub__V3379);COPY(sink__V3374, LINK(sink__V3374->context, sub__V3383));END(sink__V3374, _M_F__then_Send); }
                                        }
                                     END(sink__V3374, _M_F__then_Pattern); }
                                    }
@@ -11208,17 +11161,15 @@ int step_M_F_PatternBinders_s2(Sink sink__V3559, Term term__V3560)
       COPY(sink__V3559, LINK(sink__V3559->context, sub__V3565));COPY(sink__V3559, LINK(sink__V3559->context, sub__V3566));COPY(sink__V3559, LINK(sink__V3559->context, sub__V3567));LITERAL(sink__V3559,  "0" ); { Variable x__V3572 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3559->context,"x__V3572");
         Variable binds__V3573[1] = {x__V3572}; BINDS(sink__V3559, 1, binds__V3573);
         { START(sink__V3559, _M_F__then_PatternBinders);
-          USE(sink__V3559, x__V3572); WEAKEN(sink__V3559, x__V3572); COPY(sink__V3559, sub__V3563);WEAKEN(sink__V3559, x__V3572); COPY(sink__V3559, sub__V3562);WEAKEN(sink__V3559, x__V3572); COPY(sink__V3559, sub__V3564);WEAKEN(sink__V3559, x__V3572); COPY(sink__V3559, sub__V3565);WEAKEN(sink__V3559, x__V3572); COPY(sink__V3559, sub__V3566);{ double num__V3574;
+          USE(sink__V3559, x__V3572); COPY(sink__V3559, sub__V3563);COPY(sink__V3559, sub__V3562);COPY(sink__V3559, sub__V3564);COPY(sink__V3559, sub__V3565);COPY(sink__V3559, sub__V3566);{ double num__V3574;
             num__V3574 = DOUBLE(sub__V3567); { double tmp__V3575;
               tmp__V3575 = (double) 1; num__V3574 += tmp__V3575; }
             LITERALNF(sink__V3559, (size_t) 31, "%G", num__V3574); }
           { if (!IS_BOUND(x__V3568)) { REBIND(x__V3568);
               Variable binds__V3576[1] = {x__V3568}; BINDS(sink__V3559, 1, binds__V3576);
-              WEAKEN(sink__V3559, x__V3572);
               COPY(sink__V3559, sub__V3569); /* REUSED SUBSTITUTION */  }
             else { Variable b__V3577 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V3559->context,"b__V3577");
               Variable binds__V3578[1] = {b__V3577}; BINDS(sink__V3559, 1, binds__V3578);
-              WEAKEN(sink__V3559, x__V3572);
               {
                 Term arg__V3579;
                 { Sink buf__V3580 = ALLOCA_BUFFER(sink__V3559->context);
@@ -16437,13 +16388,11 @@ int step_M_F_Pattern_s15(Sink sink__V5130, Term term__V5131)
       COPY(sink__V5130, LINK(sink__V5130->context, sub__V5142));COPY(sink__V5130, LINK(sink__V5130->context, sub__V5132));LITERAL(sink__V5130,  "0" ); LITERAL(sink__V5130,  "0" ); { Variable x__V5148 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V5130->context,"x__V5148");
         Variable binds__V5149[1] = {x__V5148}; BINDS(sink__V5130, 1, binds__V5149);
         { START(sink__V5130, _M_F__then_PatternBinders);
-          USE(sink__V5130, x__V5148); WEAKEN(sink__V5130, x__V5148); COPY(sink__V5130, sub__V5138);WEAKEN(sink__V5130, x__V5148); COPY(sink__V5130, sub__V5133);WEAKEN(sink__V5130, x__V5148); COPY(sink__V5130, sub__V5143);WEAKEN(sink__V5130, x__V5148); COPY(sink__V5130, sub__V5142);WEAKEN(sink__V5130, x__V5148); COPY(sink__V5130, sub__V5132);LITERAL(sink__V5130,  "1" ); { if (!IS_BOUND(x__V5144)) { REBIND(x__V5144);
+          USE(sink__V5130, x__V5148); COPY(sink__V5130, sub__V5138);COPY(sink__V5130, sub__V5133);COPY(sink__V5130, sub__V5143);COPY(sink__V5130, sub__V5142);COPY(sink__V5130, sub__V5132);LITERAL(sink__V5130,  "1" ); { if (!IS_BOUND(x__V5144)) { REBIND(x__V5144);
               Variable binds__V5150[1] = {x__V5144}; BINDS(sink__V5130, 1, binds__V5150);
-              WEAKEN(sink__V5130, x__V5148);
               COPY(sink__V5130, sub__V5145); /* REUSED SUBSTITUTION */  }
             else { Variable b__V5151 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V5130->context,"b__V5151");
               Variable binds__V5152[1] = {b__V5151}; BINDS(sink__V5130, 1, binds__V5152);
-              WEAKEN(sink__V5130, x__V5148);
               {
                 Term arg__V5153;
                 { Sink buf__V5154 = ALLOCA_BUFFER(sink__V5130->context);
@@ -19359,13 +19308,11 @@ int step_M_F__variableOption2_s2(Sink sink__V6028, Term term__V6029)
       COPY(sink__V6028, sub__V6030);COPY(sink__V6028, LINK(sink__V6028->context, sub__V6033));{ Variable x__V6038 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V6028->context,"x__V6038");
         Variable binds__V6039[1] = {x__V6038}; BINDS(sink__V6028, 1, binds__V6039);
         { START(sink__V6028, _M_F__then_VariableOption2);
-          USE(sink__V6028, x__V6038); WEAKEN(sink__V6028, x__V6038); COPY(sink__V6028, sub__V6033);WEAKEN(sink__V6028, x__V6038); COPY(sink__V6028, sub__V6032);WEAKEN(sink__V6028, x__V6038); COPY(sink__V6028, sub__V6031);{ if (!IS_BOUND(x__V6034)) { REBIND(x__V6034);
+          USE(sink__V6028, x__V6038); COPY(sink__V6028, sub__V6033);COPY(sink__V6028, sub__V6032);COPY(sink__V6028, sub__V6031);{ if (!IS_BOUND(x__V6034)) { REBIND(x__V6034);
               Variable binds__V6040[1] = {x__V6034}; BINDS(sink__V6028, 1, binds__V6040);
-              WEAKEN(sink__V6028, x__V6038);
               COPY(sink__V6028, sub__V6035); /* REUSED SUBSTITUTION */  }
             else { Variable b__V6041 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V6028->context,"b__V6041");
               Variable binds__V6042[1] = {b__V6041}; BINDS(sink__V6028, 1, binds__V6042);
-              WEAKEN(sink__V6028, x__V6038);
               {
                 Term arg__V6043;
                 { Sink buf__V6044 = ALLOCA_BUFFER(sink__V6028->context);

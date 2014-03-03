@@ -358,7 +358,7 @@ int step_M_X_Form(Sink sink__V92, Term term__V93)
       UNLINK_NamedPropertyLink(sink__V92->context, namedP__V103); UNLINK_VariablePropertyLink(sink__V92->context, varP__V104);
       
       return 1;
-    break; } case Data_M_FORM: { /* Function SYMBOLS-X-Form-4$X-Form$FORM case FORM */
+    break; } case Data_M_FORM: { /* Function SYMBOLS-X-Form-3$X-Form$FORM case FORM */
       ASSERT(sink__V92->context, !strcmp(SYMBOL(term__V93),  "X-Form" ));
       Term sub__V105 = SUB(term__V93, 0); permitUnusedTerm(sub__V105); int sub__V105_count = term__V93_count*LINK_COUNT(sub__V105); permitUnusedInt(sub__V105_count);
       CRSX_CHECK_SORT(sink__V92->context, sub__V105, &sort_M_Reified_xForm); ASSERT(sink__V92->context, !strcmp(SYMBOL(sub__V105),  "FORM" ));

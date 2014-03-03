@@ -309,9 +309,9 @@ Send-FreeVariables-Raw[Fresh[term::Text, fvs::Text, link::Text]]
 %n⟪{⟦ Term «term»;
 « {#env} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
 VariableSetLink «link»;
-for («link» = «fvs»->link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», «link»->variable); }
+for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
-for («link» = «fvs»->link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
+for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
 freeVariableSet(«fvs»);⟧
 }
 ⟫
@@ -325,9 +325,9 @@ Send-FreeVariables-Unconstrained[Fresh[term::Text, fvs::Text, link::Text]]
 %n⟪{⟦ Term «term»;
 « {#env} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
 VariableSetLink «link»;
-for («link» = «fvs»->link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», «link»->variable); }
+for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
-for («link» = «fvs»->link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
+for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
 freeVariableSet(«fvs»);⟧
 }
 ⟫
@@ -341,9 +341,9 @@ Send-FreeVariables-Constrained[Fresh[term::Text, fvs::Text, link::Text]]
 %n⟪{⟦ Term «term»;
 « {#env} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 1, «{#env}E-VariableProperties[$[:,"MetaVar$",#Ref]]»);
 VariableSetLink «link»;
-for («link» = «fvs»->link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», «link»->variable); }
+for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
-for («link» = «fvs»->link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
+for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
 freeVariableSet(«fvs»);⟧
 }
 ⟫
@@ -358,8 +358,8 @@ Send-UnionVariables[Fresh[list::Text,vs::Text,link::Text,v::Text,next::Text]]:
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); VariableSetLink «link»;
 « {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
-if (addVariable(«vs»,«v»)) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
-USE(«#sink», «v»);⟧
+if (addVariable(«vs», linkVariable(«#sink»->context, «v»))) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
+USE(«#sink», linkVariable(«#sink»->context, «v»));⟧
 } 
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
 UNLINK(«#sink»->context, «list»);
@@ -367,8 +367,8 @@ UNLINK(«#sink»->context, «list»);
 }
 UNLINK(«#sink»->context, «list»);
 « {#env} T-set[#List2, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0));
-if (addVariable(«vs»,«v»)) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
-USE(«#sink», «v»);⟧
+if (addVariable(«vs»,linkVariable(«#sink»->context, «v»))) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
+USE(«#sink», linkVariable(«#sink»->context, «v»));⟧
 }
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
 UNLINK(«#sink»->context, «list»);
@@ -376,7 +376,7 @@ UNLINK(«#sink»->context, «list»);
 }
 UNLINK(«#sink»->context, «list»);
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
-for («link» = «vs»->link; «link»; «link» = «link»->link) END(«#sink», «EventConstructor["$Cons"]»);
+for («link» = «vs»->u.link; «link»; «link» = «link»->link) END(«#sink», «EventConstructor["$Cons"]»);
 freeVariableSet(«vs»);⟧
 }
 ⟫
@@ -391,15 +391,15 @@ Send-IntersectVariables[Fresh[list::Text,vs::Text,size::Text,v::Text,next::Text]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
 « {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
-addVariable(«vs»,«v»);
+addVariable(«vs», linkVariable(«#sink»->context, «v»));
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
 UNLINK(«#sink»->context, «list»);
 «list» = «next»;⟧
 }
 UNLINK(«#sink»->context, «list»);
 « {#env} T-set[#List2, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
-if (containsVariable(«vs»,«v»)) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
-USE(«#sink», «v»); 
+if (containsVariable(«vs», linkVariable(«#sink»->context, «v»))) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
+USE(«#sink», linkVariable(«#sink»->context, «v»)); 
 ++«size»;⟧
 } 
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
@@ -425,16 +425,16 @@ E-send[E_ExceptVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list1», «list2»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
 « {#env} T-set[#List1, #sink, list1] »« {#env} T-set[#List2, #sink, list2] »while (!strcmp("$Cons",SYMBOL(«list2»))) {⟦ Variable «v» = VARIABLE(SUB(«list2»,0)); 
-addVariable(«vs»,«v»);
+addVariable(«vs»,linkVariable(«#sink»->context, «v»));
 Term «next» = LINK(«#sink»->context, SUB(«list2»,1));
 UNLINK(«#sink»->context, «list2»);
 «list2» = «next»;⟧
 }
 UNLINK(«#sink»->context, «list2»);
 while (!strcmp("$Cons",SYMBOL(«list1»))) {⟦ Variable «v» = VARIABLE(SUB(«list1»,0)); 
-if (!containsVariable(«vs»,«v»)) {⟦ addVariable(«vs»,«v»); 
+if (!containsVariable(«vs»,«v»)) {⟦ addVariable(«vs», linkVariable(«#sink»->context, «v»)); 
 START(«#sink», «EventConstructor["$Cons"]»); 
-USE(«#sink», «v»); 
+USE(«#sink», linkVariable(«#sink»->context, «v»)); 
 ++«size»;⟧
 } 
 Term «next» = LINK(«#sink»->context, SUB(«list1»,1));
