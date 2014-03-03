@@ -1,9 +1,13 @@
 # Makefile for CRSX rule compiler.
 
-# Standard programs.
+# Standard programs must be defined in a file located at $(MAKEFILE_GCC):
+#    CC should be set to C compiler, such as gcc
+#    CXX should be set to C++ compiler, such as g++
+# Example file:
+#    CC=gcc
+#    CXX=g++
+include $(MAKEFILE_CC)
 
-CC = gcc
-CCPLUS = g++
 CCFLAGS=-g -Wall 
 #-O3
 
@@ -46,8 +50,11 @@ $(foreach family, $(CRSXCFAMILIES), $(eval $(call TARGETS,$(family))))
 # bin
 
 crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
-	$(CCPLUS) $^ $(ICU4CLIB) $(ICU4CDIR) -o $@
+	$(CXX) $^ $(ICU4CLIB) -L$(ICU4CDIR)/ -o $@
 
 # Default C compilation
 %.o: %.c
-	$(CC) $(CCFLAGS) -c $< -o $@
+	$(CC) $(CCFLAGS) -I$(ICU4CDIR)/../include -c $< -o $@
+
+clean:
+	rm -f crsx $(CRSXCO_FILES) $(CRSXO_FILES)
