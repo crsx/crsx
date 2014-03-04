@@ -382,7 +382,7 @@ typedef struct _BitSet* BitSetP;
 #define LENGTH(T) strlen(TEXT(T))
 
 #define PROPERTY(T,P) c_deref(PROPERTY_P(T,P))
-#define NAMED_PROPERTY(T,N)  c_deref(NAMED_PROPERTY_P(T,N))
+#define NAMED_PROPERTY(C,T,N)  c_deref(NAMED_PROPERTY_P(T,GLOBAL(C,N)))
 #define VARIABLE_PROPERTY(T,V)  c_deref(VARIABLE_PROPERTY_P(T,V))
 
 static inline Term c_deref(Term *p) { return (p ? *p : (Term)0); }

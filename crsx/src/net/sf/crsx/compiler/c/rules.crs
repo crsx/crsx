@@ -677,37 +677,37 @@ VariablePropertyLink «varP» = LINK_VariablePropertyLink(«sink»->context, VAR
 {#env}
 F-then-Pattern-Property[OK, #pass, sink, term, #Key, #Value, ok.#[ok]]
 →
-%n⟪« {#env} F-set-value[#Key, term, value] »if (!«value») {«F-unlink[sink, $[{#env}Get[STRING_ENTRY], "$Subs"]]»«{#env}F-unlink-refs[sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]» break;} 
+%n⟪« {#env} F-set-value[#Key, sink, term, value] »if (!«value») {«F-unlink[sink, $[{#env}Get[STRING_ENTRY], "$Subs"]]»«{#env}F-unlink-refs[sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]» break;} 
 LINK(«sink»->context, «value»);« {#env} F-Pattern[#pass, SUBMATCH, #Value, sink, %n⟨⟩, $False, $True, value, ok.#[ok]] »⟫
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-set-value[Reified_Term, Text, Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-set-value[Reified_Term, Text, Text, Text] :: Text;
 
 {#env}
-F-set-value[META-APPLICATION[#MetaVar, #Args,#count], #term, #value] 
+F-set-value[META-APPLICATION[#MetaVar, #Args,#count], #sink, #term, #value] 
 → 
 %n⟪Term «#value» = PROPERTY(«#term», « {#env}MetaVar[#MetaVar] »); permitUnusedTerm(«#value»);
 ⟫
 ;
 
 {#env}
-F-set-value[LITERAL[#Literal, #Sort], #term, #value] 
+F-set-value[LITERAL[#Literal, #Sort], #sink, #term, #value] 
 → 
-%n⟪Term «#value» = NAMED_PROPERTY(«#term», «STRING[#Literal]»); permitUnusedTerm(«#value»);
+%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Literal]»); permitUnusedTerm(«#value»);
 ⟫
 ;
 
 {#env}
-F-set-value[CONSTRUCTION[#Symbol, #Binders], #term, #value] 
+F-set-value[CONSTRUCTION[#Symbol, #Binders], #sink, #term, #value] 
 → 
-%n⟪Term «#value» = NAMED_PROPERTY(«#term», «STRING[#Symbol]»); permitUnusedTerm(«#value»);
+%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Symbol]»); permitUnusedTerm(«#value»);
 ⟫
 ;
 
 -[Free[variable::Reified_Variable]]
 :
 {#env}
-F-set-value[VARIABLE-USE[variable], #term, #value] 
+F-set-value[VARIABLE-USE[variable], #sink, #term, #value] 
 → 
 %n⟪Term «#value» = VARIABLE_PROPERTY(«#term», «$[Show, variable]»); permitUnusedTerm(«#value»);
 ⟫ 
@@ -728,7 +728,7 @@ F-Pattern-Open[SECOND] → %n⟪break;
 {#env}
 F-then-Pattern-Not-Property[OK, sink, term, #Key, ok.#[ok]]
 →
-%n⟪« {#env} F-set-value[#Key, term, value] »if (!«value») {«F-unlink[sink, $[{#env}Get[STRING_ENTRY], "$Subs"]]»«{#env}F-unlink-refs[sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]» break;}
+%n⟪« {#env} F-set-value[#Key, sink, term, value] »if (!«value») {«F-unlink[sink, $[{#env}Get[STRING_ENTRY], "$Subs"]]»«{#env}F-unlink-refs[sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]» break;}
 LINK(«sink»->context, «value»);« {#env} #[OK] »⟫
 ;
 

@@ -433,17 +433,17 @@ F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, termp, ok.F-the
 {#env}
 F-then-Pattern-Property[OK, #pass, sink, termp, #Key, #Value, ok.#[ok]] 
 →
-%n⟪« {#env} F-set-value[#Key, termp, valuep] »if («valuep» == null) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;} 
+%n⟪« {#env} F-set-value[#Key, sink, termp, valuep] »if («valuep» == null) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;} 
 « {#env} F-Pattern[#pass, SUBMATCH, #Value, sink, %n⟨⟩, $False, $True, valuep, ok.#[ok]] »⟫
 ;
 
--[Free[termp,valuep],Discard[#Args]]    : {#env} F-set-value[META-APPLICATION[#MetaVar, #Args], termp, valuep] → %n⟪Term «valuep» = LINK(PROPERTY(«termp», « {#env}MetaVar[#MetaVar] »));
+-[Free[termp,valuep],Discard[#Args]]    : {#env} F-set-value[META-APPLICATION[#MetaVar, #Args], sink, termp, valuep] → %n⟪Term «valuep» = LINK(PROPERTY(«termp», « {#env}MetaVar[#MetaVar] »));
 ⟫ ;
--[Free[termp,valuep],Discard[#Sort]]    : {#env} F-set-value[LITERAL[#Literal, #Sort],          termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«termp», «STRING[#Literal]»));
+-[Free[termp,valuep],Discard[#Sort]]    : {#env} F-set-value[LITERAL[#Literal, #Sort],          sink, termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«sink»->context, «termp», «STRING[#Literal]»));
 ⟫ ;
--[Free[termp,valuep],Discard[#Binders]] : {#env} F-set-value[CONSTRUCTION[#Symbol, #Binders],   termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«termp», «STRING[#Symbol]»)); 
+-[Free[termp,valuep],Discard[#Binders]] : {#env} F-set-value[CONSTRUCTION[#Symbol, #Binders],   sink, termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«sink»->context, «termp», «STRING[#Symbol]»)); 
 ⟫ ;
--[Free[variable,termp,valuep]]          : {#env} F-set-value[VARIABLE-USE[variable],            termp, valuep] → %n⟪Term «valuep» = LINK(VARIABLE_PROPERTY(«termp», «variable»)); 
+-[Free[variable,termp,valuep]]          : {#env} F-set-value[VARIABLE-USE[variable],            sink, termp, valuep] → %n⟪Term «valuep» = LINK(VARIABLE_PROPERTY(«termp», «variable»)); 
 ⟫ ;
 
 // Pattern {¬ KEY} prefix: extract property and check for absence.
@@ -460,7 +460,7 @@ F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, termp, ok.F-the
 {#env}
 F-then-Pattern-Not-Property[OK, sink, termp, #Key, ok.#[ok]]
 →
-%n⟪« {#env} F-set-value[#Key, termp, valuep] »if («valuep» != null) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;}
+%n⟪« {#env} F-set-value[#Key, sink, termp, valuep] »if («valuep» != null) {«F-unlink[$[{#env}Get, "$Subs"]]»«{#env}F-unlink-refs[$[{#env}Get, "$Refs"]]» break;}
 « {#env} #[OK] »⟫
 ;
 

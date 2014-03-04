@@ -4617,11 +4617,11 @@ void passLocationProperties(Context context, Term locTerm, Term term)
 		for (i = 0; i < 3; ++i)
 		{
 			char *key = list[i];
-			Term value = NAMED_PROPERTY(construction, key);
+			Term value = NAMED_PROPERTY(context, construction, key);
 			//if (value && (!locvalue || strcmp(SYMBOL(value), SYMBOL(locvalue))))
 			if (value)
 			{
-			    Term locvalue = NAMED_PROPERTY(locConstruction, key);
+			    Term locvalue = NAMED_PROPERTY(context, locConstruction, key);
 			    if (locvalue && strcmp(SYMBOL(value), SYMBOL(locvalue)))
 			    {
                     VARIABLESET fvs = namedPropertyFreeVars(construction->namedProperties);
