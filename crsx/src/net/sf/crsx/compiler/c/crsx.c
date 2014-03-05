@@ -2692,6 +2692,19 @@ char *makeString(Context context, const char *src)
     return dest;
 }
 
+char *makeKeyString(Context context, const char *src)
+{
+    if (!context->keyPool) context->keyPool = makeHS2(context, 16);
+    Hashset2 pool = context->keyPool;
+    assert(pool); if (!pool) return NULL;
+    char *interned_string = (char *) getValuePtrHS2(pool, src);
+    if (interned_string) return interned_string;
+
+    interned_string = makeString(context, src);
+    addValueHS2(context, pool, interned_string, (void*) interned_string);
+    return interned_string;
+}
+
 char *makeSubstring(Context context, const char *src, size_t first, size_t length)
 {
     size_t src_length = strlen(src);
@@ -3503,11 +3516,14 @@ Term compute(Context context, Term term)
 #   endif
 
     context->stringPool = makeHS2(context, 16);
+    context->keyPool = makeHS2(context, 16);
 
     normalize(context, &term);
 
     unlinkHS2(context, context->stringPool);
     context->stringPool = NULL;
+    unlinkHS2(context, context->keyPool);
+    context->keyPool = NULL;
 
 #   ifdef CRSXPROF
     printProfiling(context);

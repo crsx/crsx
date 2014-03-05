@@ -63,6 +63,7 @@ struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
     Hashset2 stringPool;  // Set of char*
+    Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
 };
 
 //#define DEBUG
@@ -147,7 +148,7 @@ struct _Context
 #endif
 //
 #ifndef GLOBAL
-# define GLOBAL(CONTEXT,STRING) makeString(CONTEXT,STRING)
+# define GLOBAL(CONTEXT,STRING) makeKeyString(CONTEXT,STRING)
 #endif
 
 // STRING HELPERS.
@@ -171,6 +172,9 @@ extern char *stringnf(Context context, const size_t size, const char *format, ..
 
 // ALLOCATE copy of existing string on heap.
 extern char *makeString(Context context, const char *src);
+
+// ALLOCATE interned copy of existing string on heap.
+extern char *makeKeyString(Context context, const char *src);
 
 // ALLOCATE copy of substring of existing string.
 extern char *makeSubstring(Context context, const char *src, size_t first, size_t length);
