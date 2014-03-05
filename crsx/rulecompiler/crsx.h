@@ -50,9 +50,6 @@ typedef struct _Hashset* Hashset;
 typedef struct _Hashset2* Hashset2;
 typedef struct _Pair* Pair;
 
-#define FREEVARS
-//#define WEAKENINGS
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // IDIOMS
@@ -401,35 +398,12 @@ static inline void permitUnusedVariable(Variable v) {}
 struct _Term
 {
     ConstructionDescriptor descriptor; // of the term or NULL for variables
-    ssize_t nr; // number of references to this term (node)
+    size_t nr;                         // number of references to this term (node)
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
 #endif
 };
 // Pick Variable set representation
-
-//#define SET_VSL
-
-// VariableSetLink based
-
-#ifdef SET_VSL
-
-#define VARIABLESET VariableSetLink
-
-#define LINK_VARIABLESET(C,S) LINK_VariableSetLink(C,S)
-#define UNLINK_VARIABLESET(C,S) UNLINK_VariableSetLink(C,S)
-
-#define VARIABLESET_REMOVEALL(C,S,V,L) removeAllL(C,S,V,L)
-#define VARIABLESET_MERGEALL(C,S1,S2) mergeAllL(C,S1,S2)
-#define VARIABLESET_ADDVARIABLE(C,S,V) addVariableL(C,S,V)
-#define VARIABLESET_CONTAINS(S,V) containsL(S,V)
-#define VARIABLESET_CLEAR(C,S) clearL(C,S)
-#define VARIABLESET_MINUS(C,S,O) minusL(C,S,O)
-#define VARIABLESET_PRINTF(C,O,S) printfL(C,O,S)
-#define VARIABLESET_ISEMPTY(S) (S == NULL)
-#define VARIABLESET_COUNT(S) countL(S)
-
-#else
 
 // Hash set based
 
@@ -448,24 +422,6 @@ struct _Term
 #define VARIABLESET_ISEMPTY(S) ((S)== NULL || ((S) != AllFreeVariables && (S)->nitems == 0))
 #define VARIABLESET_COUNT(S) ((S)== NULL ? 0 : (S)->nitems)
 #define VARIABLESET_ADDVARIABLESOF(C, VS, S, CO, P) (addVariablesOfHS(C, VS, S, CO, P))
-
-//#define VARIABLESET Hashset2
-//
-//#define LINK_VARIABLESET(C,S) linkHS2(S)
-//#define UNLINK_VARIABLESET(C,S) unlinkHS2(C,S)
-//
-//#define VARIABLESET_REMOVEALL(C,S,V,L) removeAllHS2(C,S,(void**)V,L)
-//#define VARIABLESET_MERGEALL(C,S1,S2) mergeAllHS2(C,S1,S2)
-//#define VARIABLESET_ADDVARIABLE(C,S,V) addHS2(C,S,(void*)V)
-//#define VARIABLESET_CONTAINS(S,V) containsHS2(S,(void*)V)
-//#define VARIABLESET_CLEAR(C,S) clearHS2(C,S)
-//#define VARIABLESET_MINUS(C,S,O) minusHS2(C,S,O)
-//#define VARIABLESET_PRINTF(C,O,S) noop()
-//#define VARIABLESET_ISEMPTY(S) ((S)== NULL || (S)->size == 0)
-//#define VARIABLESET_COUNT(S) ((S)== NULL ? 0 : (S)->size)
-//#define VARIABLESET_ADDVARIABLESOF(C, VS, S, CO, P) (addVariablesOfHS2(C, VS, S, CO, P))
-
-#endif
 
 // Reference counting: ALWAYS use these when storing or eliminating Term values.
 //
@@ -504,37 +460,30 @@ struct _VariableUse
     Variable variable; // never NULL
 };
 
-// Construction has properties, weakenings, subterms, and binders (obtained by casting).
+// Construction has properties, free variables, subterms, and binders (obtained by casting).
 struct _Construction
 {
     struct _Term term; // extends _Term with term.descriptor!=NULL
 
-    // TODO: merge into 1 field
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
 
-    NamedPropertyLink namedProperties; // named properties. First link always contains set of free variables (unless all properties are closed)
+    NamedPropertyLink namedProperties;       // named properties. First link always contains set of free variables    (unless all properties are closed)
     VariablePropertyLink variableProperties; // variable properties. First link always contains set of free variables (never closed)
-#ifdef WEAKENINGS
-    VariableSetLink weakenings; // free binders known to not occur in subterm (including properties)
-#endif
-#ifdef FREEVARS
-    VARIABLESET fvs;  // free variables known to occur in subterm (excluding properties)
-    VARIABLESET nfvs; // free variables known to occur in named properties (on this construction and subterms)
+
+    VARIABLESET fvs;  // free variables known to occur in subterms only (excluding properties)
+    VARIABLESET nfvs; // free variables known to occur in named properties (on this construction and subterms)   s
     VARIABLESET vfvs; // free variables known to occur in variable properties (on this construction and subterms)
-#endif
+
     Term sub[]; // subterms -- actual size is ARITY(term)
     // Variable binder[]; // binders -- actual size is term->descriptor->binderoffset[ARITY(term)]
 };
 
-#ifdef FREEVARS
 
 // Helper computing free variables from child terms.
 extern void propagateFreeVariables(Context context, Term term);
 
 extern VARIABLESET AllFreeVariables;
-
-#endif
 
 // Helper adding modified location properties.
 extern void passLocationProperties(Context context, Term locTerm, Term term);
@@ -631,14 +580,21 @@ struct _SortDescriptor
 //
 struct _Variable
 {
-    char *name; // name...neither guaranteed to be globally unique nor the same as originally provided
+    size_t nr;               // Number of reference to this variable
+    char *name;              // name...neither guaranteed to be globally unique nor the same as originally provided
     unsigned int linear : 1; // whether this variable is linear
-    unsigned int bound : 1; // whether this variable is bound
-#ifdef BFREEVARS
-    unsigned hash;
-#endif
+    unsigned int bound : 1;  // whether this variable is bound
 };
+
+/**
+ * @Brief Make new variable
+ */
 extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear);
+
+/**
+ * @Brief Increment variable reference
+ */
+extern Variable linkVariable(Context context, Variable variable);
 
 #define IS_BOUND(v) ((v)->bound)
 #define IS_LINEAR(v) ((v)->linear)
@@ -749,8 +705,8 @@ struct _Sink
     Sink (*start)(Sink sink, ConstructionDescriptor descriptor); // start event
     Sink (*end)(Sink sink, ConstructionDescriptor descriptor); // end event
     Sink (*literal)(Sink sink, const char *text); // literal event. Text reference is *not* transferred
-    Sink (*use)(Sink sink, Variable variable); // use event
-    Sink (*binds)(Sink sink, int rank, Variable binds[]); // binds event
+    Sink (*use)(Sink sink, Variable variable); // use event. Variable reference is transferred.
+    Sink (*binds)(Sink sink, int rank, Variable binds[]); // binds event. Variable references are transferred.
     Sink (*copy)(Sink sink, Term term); // copy term as event(s)
 
     Sink (*weakeningRef)(Sink sink, Construction construction); // base weakenings for next START
@@ -760,7 +716,7 @@ struct _Sink
     Sink (*properties)(Sink sink, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
 
     Sink (*propertyNamed)(Sink sink, const char *name, Term term); // add named property to next START
-    Sink (*propertyVariable)(Sink sink, Variable variable, Term term); // add variable property to next START
+    Sink (*propertyVariable)(Sink sink, Variable variable, Term term); // add variable property to next START. Variable reference is transferred.
     Sink (*propertyWeaken)(Sink sink, Variable variable); // add properties weakening to *preceding* properties for next START
     Sink (*propertiesReset)(Sink sink); // reset property state
 };
@@ -772,6 +728,7 @@ struct _Sink
 typedef struct _Buffer *Buffer;
 typedef struct _BufferEntry *BufferEntry;
 typedef struct _BufferSegment *BufferSegment;
+
 struct _Buffer
 {
     struct _Sink sink; // the sink (including the kind, embedded FIRST to allow casting)
@@ -782,19 +739,16 @@ struct _Buffer
     VariableSetLink pendingWeakenings; // weakenings for next START (NOTE: cannot be shared)
     NamedPropertyLink pendingNamedProperties; // named properties for next START (NOTE: cannot be shared)
     VariablePropertyLink pendingVariableProperties; // variable properties for next START (NOTE: cannot be shared)
-#ifdef FREEVARS
+
     VARIABLESET pendingNamedPropertiesFreeVars; // Free variables to insert before a batch of new named properties
     VARIABLESET pendingVariablePropertiesFreeVars; // Free variables to insert before a batch of new variable properties
-#endif
+
     unsigned free : 1; // whether the buffer structure itself should be freed
 };
 struct _BufferEntry
 {
     Term term; // allocated partial construction
     int index; // subterm we are working on
-#ifdef FREEVARS
-    VARIABLESET freeVars; // subterm free variables
-#endif
 };
 struct _BufferSegment
 {
@@ -864,7 +818,7 @@ struct _SubstitutionFrame
     SubstitutionFrame parent;  // parent frame (or NULL)
     int parentCount;           // number of variable-substitute pairs in all parent frames
     int count;                 // number of variable-substitute pairs in this frame
-    Variable *variables;       // count redex variables to substitute, in order
+    Variable *variables;       // count redex variables to substitute, in order. *Not* owned by frame.
     Term *substitutes;         // count redex subterms to substitute for variables, in order
     int* renamings;            // Whether substitute is caused by a binder renaming.
 };
@@ -908,7 +862,6 @@ extern NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLin
 // Property list is not closed when the first element is a list of free variable
 #define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
 
-#ifdef FREEVARS
 
 static inline VARIABLESET namedPropertyFreeVars(NamedPropertyLink link)
 {
@@ -917,8 +870,6 @@ static inline VARIABLESET namedPropertyFreeVars(NamedPropertyLink link)
 
 	return NULL;
 }
-
-#endif
 
 extern NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
@@ -936,9 +887,6 @@ struct _VariablePropertyLink
 #endif
 };
 
-
-#ifdef FREEVARS
-
 static inline VARIABLESET variablePropertyFreeVars(VariablePropertyLink link)
 {
 	if (link && !link->variable)
@@ -947,8 +895,6 @@ static inline VARIABLESET variablePropertyFreeVars(VariablePropertyLink link)
 	return NULL;
 }
 
-#endif
-
 
 static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link) { if (link) ++(link->nr); return link; };
 #define UNLINKSET_VariablePropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
@@ -956,51 +902,34 @@ static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, Va
 extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// CONSTANT SET OF VARIABLES.
-
-struct _Variables
-{
-    size_t size;
-    Variable variables[]; // of length count
-};
-// Create fixes size variable array; seeds array by copying pointers from originals.
-extern Variables variablesMake(Context context, size_t size, Variable originals[]);
-// Check whether array contains a variable.
-extern int variablesContain(Variables vs, Variable v);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERIC VARIABLE SETS AND MAPS
 
 struct _VariableSet
 {
-    VariableSetLink link;
     Context context;
+
+    union {
+        VariableSetLink link;
+    } u;
+
+    int (*addVariable)(VariableSet, Variable);
+    void (*free)(VariableSet);
+    int (*containsVariable)(VariableSet, Variable);
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Linked-list variable set
 
 struct _VariableSetLink
 {
-	unsigned nr; // Number of references. Used for copy-and-write.
+    size_t nr;            // Number of references.
     VariableSetLink link;
     Variable variable;
 };
 
-static inline VariableSetLink LINK_VariableSetLink(Context context, VariableSetLink link)
-{
-	if (link)
-	{
-		assert(link->nr > 0);
-
-		++(link->nr);
-		return link;
-	}
-	return NULL;
-};
-
-extern VariableSetLink UNLINK_VariableSetLink(Context context, VariableSetLink link);
-
-// Make variable set.
+// Make linked-list based variable set.
 extern VariableSet makeVariableSet(Context context);
-// Add variable to set; returns 1 if variable actually added.
+// Add variable to set; returns 1 if variable actually added. Variable reference is transferred.
 extern int addVariable(VariableSet set, Variable variable);
 // Check whether set contains a variable.
 extern int containsVariable(VariableSet set, Variable variable);
@@ -1010,12 +939,13 @@ extern void freeVariableSet(VariableSet set);
 // Check whether variable array contains a variable.
 extern int containsAL(Variable* vars, int len, Variable variable);
 
-// Copy-on-write linked list set
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Copy-on-write linked-list variable set
 
 // Copy variable set.
 extern VariableSetLink copyL(Context context, VariableSetLink set);
 // Count variable set links.
-extern unsigned countL(VariableSetLink set);
+extern size_t countL(VariableSetLink set);
 // Add variable to set. Create new set if needed.
 extern VariableSetLink addVariableL(Context context, VariableSetLink set, Variable variable);
 // Check whether set contains a variable.
@@ -1023,7 +953,7 @@ extern int containsL(VariableSetLink set, Variable variable);
 // Check whether set contains a variable of given name. Debugging use only
 extern int containsNameL(VariableSetLink link, char* name);
 // Check whether variable links list contains a variable and returns the link (no ref transferred), or NULL
-extern VariableSetLink variableSetLinkFor(VariableSetLink link, Variable variable);
+//extern VariableSetLink variableSetLinkFor(VariableSetLink link, Variable variable);
 // Merge the two sets. Both references are transferred.
 extern VariableSetLink mergeAllL(Context context, VariableSetLink first, VariableSetLink second);
 // Remove all variables contains in other from set. 'set' reference is transferred. 'other' is not transferred.

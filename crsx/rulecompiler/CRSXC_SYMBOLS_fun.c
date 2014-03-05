@@ -815,7 +815,76 @@ struct _ConstructionDescriptor descriptor_M_X_Function = {&sort_M_Reified_xVaria
 
 int step_M_X_Function(Sink sink__V192, Term term__V193)
 {
+<<<<<<< HEAD
   int term__V193_count = LINK_COUNT(term__V193); permitUnusedInt(term__V193_count);
+=======
+  int term__V93_count = LINK_COUNT(term__V93); permitUnusedInt(term__V93_count);
+  Term sub__V94 = FORCE(sink__V92->context, SUB(term__V93, 0));
+  EnumOf_M_Reified_xForm choice__V95 = (IS_VARIABLE_USE(sub__V94) ? VarOf_M_Reified_xForm : (EnumOf_M_Reified_xForm) TAG(sub__V94));
+  switch (choice__V95)
+  {
+    case Data_M_SORT_SET: { /* Function SYMBOLS-X-Form-1$X-Form$SORT-SET case SORT-SET */
+      ASSERT(sink__V92->context, !strcmp(SYMBOL(term__V93),  "X-Form" ));
+      Term sub__V96 = SUB(term__V93, 0); permitUnusedTerm(sub__V96); int sub__V96_count = term__V93_count*LINK_COUNT(sub__V96); permitUnusedInt(sub__V96_count);
+      CRSX_CHECK_SORT(sink__V92->context, sub__V96, &sort_M_Reified_xForm); ASSERT(sink__V92->context, !strcmp(SYMBOL(sub__V96),  "SORT-SET" ));
+      Term sub__V97 = LINK(sink__V92->context, SUB(sub__V96, 0)); int sub__V97_count = sub__V96_count*LINK_COUNT(sub__V97); permitUnusedInt(sub__V97_count);
+      CRSX_CHECK_SORT(sink__V92->context, sub__V97, &sort_M_Reified_xSort); /* sub__V97 = &#0-0 */
+      Term sub__V98 = LINK(sink__V92->context, SUB(sub__V96, 1)); int sub__V98_count = sub__V96_count*LINK_COUNT(sub__V98); permitUnusedInt(sub__V98_count);
+      CRSX_CHECK_SORT(sink__V92->context, sub__V98, &sort_M_Reified_xSort); /* sub__V98 = &#0-1 */
+      Term sub__V99 = LINK(sink__V92->context, SUB(sub__V96, 2)); int sub__V99_count = sub__V96_count*LINK_COUNT(sub__V99); permitUnusedInt(sub__V99_count);
+      CRSX_CHECK_SORT(sink__V92->context, sub__V99, &sort_M_Reified_xForm); /* sub__V99 = &#0-2 */
+      NamedPropertyLink namedP__V100 = LINK_NamedPropertyLink(sink__V92->context, NAMED_PROPERTIES(term__V93));
+      VariablePropertyLink varP__V101 = LINK_VariablePropertyLink(sink__V92->context, VARIABLE_PROPERTIES(term__V93));
+      UNLINK(sink__V92->context, term__V93);
+      ADD_PROPERTIES(sink__V92, LINK_NamedPropertyLink(sink__V92->context, namedP__V100), LINK_VariablePropertyLink(sink__V92->context, varP__V101));
+      { START(sink__V92, _M_X_Form_s6);
+        COPY(sink__V92, sub__V97);COPY(sink__V92, sub__V98);COPY(sink__V92, sub__V99);END(sink__V92, _M_X_Form_s6); }
+      UNLINK_NamedPropertyLink(sink__V92->context, namedP__V100); UNLINK_VariablePropertyLink(sink__V92->context, varP__V101);
+      
+      return 1;
+    break; } case Data_M_SORT_ALLOWS_VARIABLES: { /* Function SYMBOLS-X-Form-2$X-Form$SORT-ALLOWS-VARIABLES case SORT-ALLOWS-VARIABLES */
+      ASSERT(sink__V92->context, !strcmp(SYMBOL(term__V93),  "X-Form" ));
+      Term sub__V102 = SUB(term__V93, 0); permitUnusedTerm(sub__V102); int sub__V102_count = term__V93_count*LINK_COUNT(sub__V102); permitUnusedInt(sub__V102_count);
+      CRSX_CHECK_SORT(sink__V92->context, sub__V102, &sort_M_Reified_xForm); ASSERT(sink__V92->context, !strcmp(SYMBOL(sub__V102),  "SORT-ALLOWS-VARIABLES" ));
+      NamedPropertyLink namedP__V103 = LINK_NamedPropertyLink(sink__V92->context, NAMED_PROPERTIES(term__V93));
+      VariablePropertyLink varP__V104 = LINK_VariablePropertyLink(sink__V92->context, VARIABLE_PROPERTIES(term__V93));
+      UNLINK(sink__V92->context, term__V93);
+      ADD_PROPERTIES(sink__V92, LINK_NamedPropertyLink(sink__V92->context, namedP__V103), LINK_VariablePropertyLink(sink__V92->context, varP__V104));
+      { START(sink__V92, _M_X_Form_s5); END(sink__V92, _M_X_Form_s5); }
+      UNLINK_NamedPropertyLink(sink__V92->context, namedP__V103); UNLINK_VariablePropertyLink(sink__V92->context, varP__V104);
+      
+      return 1;
+    break; } case Data_M_FORM: { /* Function SYMBOLS-X-Form-3$X-Form$FORM case FORM */
+      ASSERT(sink__V92->context, !strcmp(SYMBOL(term__V93),  "X-Form" ));
+      Term sub__V105 = SUB(term__V93, 0); permitUnusedTerm(sub__V105); int sub__V105_count = term__V93_count*LINK_COUNT(sub__V105); permitUnusedInt(sub__V105_count);
+      CRSX_CHECK_SORT(sink__V92->context, sub__V105, &sort_M_Reified_xForm); ASSERT(sink__V92->context, !strcmp(SYMBOL(sub__V105),  "FORM" ));
+      Term sub__V106 = LINK(sink__V92->context, SUB(sub__V105, 0)); int sub__V106_count = sub__V105_count*LINK_COUNT(sub__V106); permitUnusedInt(sub__V106_count);
+      /* sub__V106 = &#0-0 */
+      Term sub__V107 = LINK(sink__V92->context, SUB(sub__V105, 1)); int sub__V107_count = sub__V105_count*LINK_COUNT(sub__V107); permitUnusedInt(sub__V107_count);
+      /* sub__V107 = &#0-1 */
+      NamedPropertyLink namedP__V108 = LINK_NamedPropertyLink(sink__V92->context, NAMED_PROPERTIES(term__V93));
+      VariablePropertyLink varP__V109 = LINK_VariablePropertyLink(sink__V92->context, VARIABLE_PROPERTIES(term__V93));
+      UNLINK(sink__V92->context, term__V93);
+      ADD_PROPERTIES(sink__V92, LINK_NamedPropertyLink(sink__V92->context, namedP__V108), LINK_VariablePropertyLink(sink__V92->context, varP__V109));
+      { START(sink__V92, _M_X_Form_s2);
+        COPY(sink__V92, sub__V107);COPY(sink__V92, sub__V106);END(sink__V92, _M_X_Form_s2); }
+      UNLINK_NamedPropertyLink(sink__V92->context, namedP__V108); UNLINK_VariablePropertyLink(sink__V92->context, varP__V109);
+      
+      return 1;
+    } default: break;
+  }
+  return 0;
+}
+
+/* FUNCTION X-Data$2. */
+int conBindOffs_M_X_Data_s2[] = {0 , 0 , 0 , 0 , 0};
+char *nameFun_M_X_Data_s2(Term term) { return  "X-Data$2" ; }
+struct _ConstructionDescriptor descriptor_M_X_Data_s2 = {&sort_M_Reified_xVariable, 0, 4, sizeof(STRUCT_Con_M_X_Data_s2), conBindOffs_M_X_Data_s2, &nameFun_M_X_Data_s2, &step_M_X_Data_s2};
+
+int step_M_X_Data_s2(Sink sink__V110, Term term__V111)
+{
+  int term__V111_count = LINK_COUNT(term__V111); permitUnusedInt(term__V111_count);
+>>>>>>> branch 'develop' of https://github.com/crsx/crsx.git
   do {
     /* Contraction rule SYMBOLS-X-Function-1. */
     ASSERT(sink__V192->context, !strcmp(SYMBOL(term__V193),  "X-Function" ));
