@@ -258,7 +258,6 @@ int step_M_S_Data_s1(Sink sink__V33, Term term__V34)
   int term__V34_count = LINK_COUNT(term__V34); permitUnusedInt(term__V34_count);
   do {
     /* Contraction rule SORTS-S-Data-1. */
-<<<<<<< HEAD
     ASSERT(sink__V33->context, !strcmp(SYMBOL(term__V34),  "S-Data$1" ));
     Term sub__V35 = LINK(sink__V33->context, SUB(term__V34, 0)); int sub__V35_count = term__V34_count*LINK_COUNT(sub__V35); permitUnusedInt(sub__V35_count);
     UNLINK_SUB(sink__V33->context, term__V34,  0); NORMALIZE(sink__V33->context, sub__V35); SUB(term__V34,  0) = LINK(sink__V33->context, sub__V35);
@@ -297,49 +296,7 @@ int step_M_S_Data_s1(Sink sink__V33, Term term__V34)
                       COPY(sink__V33, LINK(sink__V33->context, sub__V37));{ Variable x__V40 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V33->context,"x__V40");
                         Variable binds__V41[1] = {x__V40}; BINDS(sink__V33, 1, binds__V41);
                         { START(sink__V33, _M_S_Data_Form_s1);
-                          USE(sink__V33, x__V40); WEAKEN(sink__V33, x__V40);
-                          COPY(sink__V33, LINK(sink__V33->context, sub__V35));END(sink__V33, _M_S_Data_Form_s1); }
-=======
-    ASSERT(sink__V1->context, !strcmp(SYMBOL(term__V2),  "S-Data$1" ));
-    Term sub__V3 = LINK(sink__V1->context, SUB(term__V2, 0)); int sub__V3_count = term__V2_count*LINK_COUNT(sub__V3); permitUnusedInt(sub__V3_count);
-    UNLINK_SUB(sink__V1->context, term__V2,  0); NORMALIZE(sink__V1->context, sub__V3); SUB(term__V2,  0) = LINK(sink__V1->context, sub__V3);
-    /* sub__V3 = &#11 */
-    Term sub__V4 = SUB(term__V2, 1); permitUnusedTerm(sub__V4); int sub__V4_count = term__V2_count*LINK_COUNT(sub__V4); permitUnusedInt(sub__V4_count);
-    /* sub__V4 = &#12 */
-    Term sub__V5 = LINK(sink__V1->context, SUB(term__V2, 2)); int sub__V5_count = term__V2_count*LINK_COUNT(sub__V5); permitUnusedInt(sub__V5_count);
-    UNLINK_SUB(sink__V1->context, term__V2,  2); NORMALIZE(sink__V1->context, sub__V5); SUB(term__V2,  2) = LINK(sink__V1->context, sub__V5);
-    /* sub__V5 = &#2 */
-    NamedPropertyLink namedP__V6 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
-    VariablePropertyLink varP__V7 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-    UNLINK(sink__V1->context, term__V2);
-    { START(sink__V1, _M__sTextCons);
-      { START(sink__V1, _M__sTextBreak);
-        LITERAL(sink__V1,  "\n" ); END(sink__V1, _M__sTextBreak); }
-      { START(sink__V1, _M__sTextCons);
-        { START(sink__V1, _M__sTextChars);
-          LITERAL(sink__V1,  "/* SORT " ); END(sink__V1, _M__sTextChars); }
-        { START(sink__V1, _M__sTextCons);
-          { START(sink__V1, _M__sTextEmbed);
-            { START(sink__V1, _M_AsText);
-              { START(sink__V1, _M_TOKEN);
-                COPY(sink__V1, LINK(sink__V1->context, sub__V3));END(sink__V1, _M_TOKEN); }
-              END(sink__V1, _M_AsText); }
-            END(sink__V1, _M__sTextEmbed); }
-          { START(sink__V1, _M__sTextCons);
-            { START(sink__V1, _M__sTextChars);
-              LITERAL(sink__V1,  " CONSTANTS. */" ); END(sink__V1, _M__sTextChars); }
-            { START(sink__V1, _M__sTextCons);
-              { START(sink__V1, _M__sTextBreak);
-                LITERAL(sink__V1,  "\n" ); END(sink__V1, _M__sTextBreak); }
-              { START(sink__V1, _M__sTextCons);
-                { START(sink__V1, _M__sTextEmbed);
-                  { START(sink__V1, _M_AsText);
-                    { START(sink__V1, _M_MapText_s1);
-                      COPY(sink__V1, LINK(sink__V1->context, sub__V5));{ Variable x__V8 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V1->context,"x__V8");
-                        Variable binds__V9[1] = {x__V8}; BINDS(sink__V1, 1, binds__V9);
-                        { START(sink__V1, _M_S_Data_Form_s1);
-                          USE(sink__V1, x__V8); COPY(sink__V1, LINK(sink__V1->context, sub__V3));END(sink__V1, _M_S_Data_Form_s1); }
->>>>>>> branch 'develop' of https://github.com/crsx/crsx.git
+                          USE(sink__V33, x__V40); COPY(sink__V33, LINK(sink__V33->context, sub__V35));END(sink__V33, _M_S_Data_Form_s1); }
                          }
                       END(sink__V33, _M_MapText_s1); }
                     END(sink__V33, _M_AsText); }
