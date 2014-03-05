@@ -63,6 +63,7 @@ struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
     Hashset2 stringPool;  // Set of char*
+    Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
 };
 
 //#define DEBUG
@@ -147,7 +148,7 @@ struct _Context
 #endif
 //
 #ifndef GLOBAL
-# define GLOBAL(CONTEXT,STRING) makeString(CONTEXT,STRING)
+# define GLOBAL(CONTEXT,STRING) makeKeyString(CONTEXT,STRING)
 #endif
 
 // STRING HELPERS.
@@ -171,6 +172,9 @@ extern char *stringnf(Context context, const size_t size, const char *format, ..
 
 // ALLOCATE copy of existing string on heap.
 extern char *makeString(Context context, const char *src);
+
+// ALLOCATE interned copy of existing string on heap.
+extern char *makeKeyString(Context context, const char *src);
 
 // ALLOCATE copy of substring of existing string.
 extern char *makeSubstring(Context context, const char *src, size_t first, size_t length);
@@ -308,8 +312,8 @@ typedef unsigned long long BITS;
 #endif
 
 typedef struct _BitSet {
-	unsigned size; // Number of bits
-	BITS* bits;
+    unsigned size; // Number of bits
+    BITS* bits;
 } BitSet;
 typedef struct _BitSet* BitSetP;
 
@@ -442,15 +446,15 @@ extern void freeTerm(Context context, Term term);
 
 static inline Term unlinkTerm(Context context, Term t)
 {
-	if (t->nr <= 0)
-		assert(t->nr > 0);
+    if (t->nr <= 0)
+        assert(t->nr > 0);
 
-	if ((--LINK_COUNT(t)) == 0)
-	{
-		freeTerm(context,t);
-		return NULL;
-	}
-	return t;
+    if ((--LINK_COUNT(t)) == 0)
+    {
+        freeTerm(context,t);
+        return NULL;
+    }
+    return t;
 }
 
 // Variable added for variable use subterm.
@@ -865,10 +869,10 @@ extern NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLin
 
 static inline VARIABLESET namedPropertyFreeVars(NamedPropertyLink link)
 {
-	if (link && !link->name)
-		return (VARIABLESET) link->u.weakening;
+    if (link && !link->name)
+        return (VARIABLESET) link->u.weakening;
 
-	return NULL;
+    return NULL;
 }
 
 extern NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link);
@@ -889,10 +893,10 @@ struct _VariablePropertyLink
 
 static inline VARIABLESET variablePropertyFreeVars(VariablePropertyLink link)
 {
-	if (link && !link->variable)
-		return (VARIABLESET) link->u.weakening;
+    if (link && !link->variable)
+        return (VARIABLESET) link->u.weakening;
 
-	return NULL;
+    return NULL;
 }
 
 
@@ -973,9 +977,9 @@ extern void printfL(Context context, FILE* out, VariableSetLink set);
 // Copy-on-write hash set
 
 struct _Hashset {
-	unsigned nr;
+    unsigned nr;
 #ifdef CRSXPROF
-	size_t marker;
+    size_t marker;
 #endif
     size_t nbits;
     size_t mask;
@@ -988,30 +992,30 @@ struct _Hashset {
 typedef struct _LinkedList2* LinkedList2;
 
 struct _LinkedList2 {
-	void *entry;
-	LinkedList2 next;
+    void *entry;
+    LinkedList2 next;
 };
 
 struct _Pair {
-	void* key;
-	void* value;
+    void* key;
+    void* value;
 };
 
 
 struct _Hashset2
 {
-	size_t nr;		// Number of references
-	size_t nbits;	// Number of bits for nslots
-	size_t nslots;	// Number of entry slots. Always nbits ^ 2
-	size_t size;	// Number of entries
+    size_t nr;               // Number of references
+    size_t nbits;            // Number of bits for nslots
+    size_t nslots;           // Number of entry slots. Always nbits ^ 2
+    size_t size;             // Number of entries
 
-	LinkedList2 *entries;	// Array of entries. Size of array = nslots
+    LinkedList2 *entries;    // Array of entries. Size of array = nslots
 };
 
 // Increment reference count
 static inline Hashset2 linkHS2(Hashset2 set)
 {
-	if (set) ++(set->nr); return set;
+    if (set) ++(set->nr); return set;
 }
 // Decrement reference count
 extern Hashset2 unlinkHS2(Context context, Hashset2 set);
@@ -1074,12 +1078,12 @@ extern void printfHS(Context context, FILE* out, Hashset set);
 
 struct _VariableSet2
 {
-	Context context;
-    size_t flags; 	/** See below */
+    Context context;
+    size_t flags;     /** See below */
 
     union
     {
-    	struct _Hashset2 hash;
+        struct _Hashset2 hash;
     } set;
 };
 
@@ -1225,64 +1229,64 @@ extern const char *Nil;
 
 static inline unsigned lbit(BitSetP bitset, unsigned index)
 {
-	return bitset->bits[AINDEX(index)] >> (BINDEX(index) & ONE_BITS);
+    return bitset->bits[AINDEX(index)] >> (BINDEX(index) & ONE_BITS);
 }
 
 static inline void setBit(BitSetP bitset, unsigned index)
 {
-	assert(index < bitset->size);
+    assert(index < bitset->size);
 
-	unsigned ai = AINDEX(index);
-	unsigned bi = BINDEX(index);
-	BITS newbits = bitset->bits[ai] | (ONE_BITS << bi);
-	bitset->bits[ai] = newbits;
+    unsigned ai = AINDEX(index);
+    unsigned bi = BINDEX(index);
+    BITS newbits = bitset->bits[ai] | (ONE_BITS << bi);
+    bitset->bits[ai] = newbits;
 }
 
 static inline void clearBit(BitSetP bitset, unsigned index)
 {
-	assert(index < bitset->size);
+    assert(index < bitset->size);
 
-	unsigned ai = AINDEX(index);
-	unsigned bi = BINDEX(index);
-	BITS newbits = bitset->bits[ai] & (~(ONE_BITS << bi));
-	bitset->bits[ai] = newbits;
+    unsigned ai = AINDEX(index);
+    unsigned bi = BINDEX(index);
+    BITS newbits = bitset->bits[ai] & (~(ONE_BITS << bi));
+    bitset->bits[ai] = newbits;
 }
 
 static inline void makeSetBits(BitSetP bitset, unsigned size)
 {
-	// Set all bits
-	bitset->size = size;
-	const int asize = ASIZE(size);
+    // Set all bits
+    bitset->size = size;
+    const int asize = ASIZE(size);
 
-	int i = asize - 2;
-	for (; i >= 0; i --)
-		bitset->bits[i] = (~NO_BITS);
+    int i = asize - 2;
+    for (; i >= 0; i --)
+        bitset->bits[i] = (~NO_BITS);
 
-	bitset->bits[asize - 1] = (~NO_BITS) >> (BITS_MAX_SIZE - (BSIZE(size)));
+    bitset->bits[asize - 1] = (~NO_BITS) >> (BITS_MAX_SIZE - (BSIZE(size)));
 }
 
 static inline void copyBits(Context context, BitSetP dst, unsigned size, BitSetP src)
 {
-	assert(size >= src->size);
+    assert(size >= src->size);
 
-	dst->size = size;
-	memset((void*)dst->bits, 0, ASIZE(size)*sizeof(BITS));
-	memcpy((void*)dst->bits, (void*)src->bits, ASIZE(src->size)*sizeof(BITS));
+    dst->size = size;
+    memset((void*)dst->bits, 0, ASIZE(size)*sizeof(BITS));
+    memcpy((void*)dst->bits, (void*)src->bits, ASIZE(src->size)*sizeof(BITS));
 }
 
 static inline void maskBits(BitSetP bitset1, BitSetP bitset2)
 {
-	int i = ASIZE(bitset1->size) - 1;
-	for (; i >= 0; i --)
-		bitset1->bits[i] &= bitset2->bits[i];
+    int i = ASIZE(bitset1->size) - 1;
+    for (; i >= 0; i --)
+        bitset1->bits[i] &= bitset2->bits[i];
 }
 
 static inline int anyBits(BitSetP bitset)
 {
-	int i = ASIZE(bitset->size) - 1;
-	for (; i >= 0; i --)
-		if (bitset->bits[i]) return 1;
-	return 0;
+    int i = ASIZE(bitset->size) - 1;
+    for (; i >= 0; i --)
+        if (bitset->bits[i]) return 1;
+    return 0;
 }
 
 // Bitset set
