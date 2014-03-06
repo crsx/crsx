@@ -148,7 +148,7 @@ struct _Context
 #endif
 //
 #ifndef GLOBAL
-# define GLOBAL(CONTEXT,STRING) makeString(CONTEXT,STRING)
+# define GLOBAL(CONTEXT,STRING) makeKeyString(CONTEXT,STRING)
 #endif
 
 // STRING HELPERS.
