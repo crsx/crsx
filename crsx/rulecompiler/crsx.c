@@ -136,6 +136,14 @@ static int addOccur(Context context, TermLink* linkp, void* p)
 }
 #endif
 
+void InitCRSXContext(Context context)
+{
+    context->stamp = 0;
+    context->poolRefCount = 0;
+    context->stringPool = NULL;
+    context->keyPool = NULL;
+}
+
 static void freeOccur(Context context, TermLink link)
 {
     while (link)
@@ -2616,6 +2624,18 @@ Term *c_namedProperty(NamedPropertyLink link, char *name)
     return NULL;
 }
 
+// Return the named property or NULL if none.
+// The reference is *NOT* transferred
+// This version is for any caller who has not interned their key name
+// into the pool.
+Term *c_namedPropertyNonInterned(NamedPropertyLink link, char *name)
+{
+    for (; link; link = link->link)
+        if (link->name && !strcmp(name, link->name))
+            return &(link->u.term);
+    return NULL;
+}
+
 // Return the variable property or NULL if none.
 // The reference is *NOT* transferred
 Term *c_variableProperty(VariablePropertyLink link, Variable variable)
@@ -2682,6 +2702,28 @@ void crsx_free(Context context, void *pointer)
     free(pointer);
 }
 
+void crsxAddPools(Context context)
+{
+    if (! context->poolRefCount)
+    {
+        context->stringPool = makeHS2(context, 16);
+        context->keyPool = makeHS2(context, 16);
+    }
+    ++context->poolRefCount;
+}
+
+void crsxReleasePools(Context context)
+{
+    --context->poolRefCount;
+    if (! context->poolRefCount)
+    {
+        unlinkHS2(context, context->stringPool);
+        context->stringPool = NULL;
+        unlinkHS2(context, context->keyPool);
+        context->keyPool = NULL;
+    }
+}
+
 char *makeString(Context context, const char *src)
 {
     size_t length = strlen(src);
@@ -2694,14 +2736,15 @@ char *makeString(Context context, const char *src)
 
 char *makeKeyString(Context context, const char *src)
 {
-    if (!context->keyPool) context->keyPool = makeHS2(context, 16);
     Hashset2 pool = context->keyPool;
     assert(pool); if (!pool) return NULL;
     char *interned_string = (char *) getValuePtrHS2(pool, src);
+    //if (interned_string) printf("makeKeyString finds %s : '%p'\n", interned_string, interned_string);
     if (interned_string) return interned_string;
 
     interned_string = makeString(context, src);
     addValueHS2(context, pool, interned_string, (void*) interned_string);
+    //if (interned_string) printf("makeKeyString defines %s : '%p'\n", interned_string, interned_string);
     return interned_string;
 }
 
@@ -3515,15 +3558,11 @@ Term compute(Context context, Term term)
     pDuplicateMemuse = 0l;
 #   endif
 
-    context->stringPool = makeHS2(context, 16);
-    context->keyPool = makeHS2(context, 16);
+    crsxAddPools(context);
 
     normalize(context, &term);
 
-    unlinkHS2(context, context->stringPool);
-    context->stringPool = NULL;
-    unlinkHS2(context, context->keyPool);
-    context->keyPool = NULL;
+    crsxReleasePools(context);
 
 #   ifdef CRSXPROF
     printProfiling(context);
@@ -4286,7 +4325,9 @@ void passLocationProperties(Context context, Term locTerm, Term term)
     {
         Construction construction = asConstruction(term);
         Construction locConstruction = asConstruction(locTerm);
-        char *list[] = {"$FileLocation", "$LineLocation", "$ColumnLocation"};
+        char *list[] = {GLOBAL(context, "$FileLocation"),
+                        GLOBAL(context, "$LineLocation"),
+                        GLOBAL(context, "$ColumnLocation")};
         int i;
         for (i = 0; i < 3; ++i)
         {

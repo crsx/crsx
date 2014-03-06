@@ -62,9 +62,13 @@ typedef struct _Pair* Pair;
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
+    int poolRefCount;
     Hashset2 stringPool;  // Set of char*
     Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
 };
+
+// Call this function before using a Context:
+extern void InitCRSXContext(Context context);
 
 //#define DEBUG
 
@@ -169,6 +173,12 @@ struct _Context
 // ALLOCATE a formatted string constant up to the specified maximum size.
 // (Uses an internal ALLOCA to size followed by an ALLOCATE to the actual size.)
 extern char *stringnf(Context context, const size_t size, const char *format, ...) __attribute__((format(printf, 3, 4)));
+
+// Addref pools
+extern void crsxAddPools(Context context);
+
+// Release pools
+extern void crsxReleasePools(Context context);
 
 // ALLOCATE copy of existing string on heap.
 extern char *makeString(Context context, const char *src);
@@ -839,10 +849,11 @@ extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 
 
 extern Term *c_namedProperty(NamedPropertyLink link, char *name);
+extern Term *c_namedPropertyNonInterned(NamedPropertyLink link, char *name);
 extern Term *c_variableProperty(VariablePropertyLink link, Variable variable);
 static inline Term *c_property(NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
-    return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, SYMBOL(key)));
+    return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedPropertyNonInterned(namedProperties, SYMBOL(key)));
 }
 
 struct _NamedPropertyLink

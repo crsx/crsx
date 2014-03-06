@@ -104,6 +104,8 @@ static
 int run(void)
 {
 	Context context = (Context) calloc(1, sizeof(struct _Context));
+	InitCRSXContext(context);
+	crsxAddPools(context);
 	Term term = NULL;
 	// if input: read term from file
 	char *infile = getenv("input");
@@ -196,6 +198,8 @@ int runLinter(int argp, int argc, char* argv[])
 
 
     Context context = (Context) calloc(1, sizeof(struct _Context));
+    InitCRSXContext(context);
+    crsxAddPools(context);
 
     // Parse term
     Term term = readTermFromFile (context, input);
