@@ -88,9 +88,9 @@ TOKEN_MGR_DECLS : { int nested_counter; } /* Used by all nesting constructs. */
 
 {$String<!--SortName--> : SortEntry} ProductionNames2[SortEntry, $String, $List[$String]] :: $List[$String];
 {#ND}ProductionNames2[SE_NONE, #1, #s] → {#ND}ProductionNames[#s] ;
-{#ND}ProductionNames2[SE_TOKEN[#Synthesizes, #SortName], #1, #s] → (#1 ; {#ND}ProductionNames[#s]) ;
+{#ND}ProductionNames2[SE_TOKEN[#SortName], #1, #s] → (#1 ; {#ND}ProductionNames[#s]) ;
 {#ND}ProductionNames2[SE_ATTRIBUTE[#Kind, #Name, #AttributeForm, #AttributeOptions], #1, #s] → {#ND}ProductionNames[#s] ;
-{#ND}ProductionNames2[SE_SORT[#Defines, #Synthesizes, #SortName, #Precs, #Wrapper], #1, #s] → {#ND}ProductionNames3[#Defines, #1, #s] ;
+{#ND}ProductionNames2[SE_SORT[#Defines, #SortName, #Precs, #Wrapper], #1, #s] → {#ND}ProductionNames3[#Defines, #1, #s] ;
 
 {$String<!--SortName--> : SortEntry} ProductionNames3[$List[Define], $String, $List[$String]] :: $List[$String];
 -[Fresh[dummy::RawSortParam]]:
@@ -133,7 +133,7 @@ TOKEN_MGR_DECLS : { int nested_counter; } /* Used by all nesting constructs. */
 %n⟪⟫
 ;
 
-{#ND} PG-Production1[SE_TOKEN[#Synthesizes, #SortName]]
+{#ND} PG-Production1[SE_TOKEN[#SortName]]
 →
 %n⟪
 /* Productions for †«#SortName» token. */
@@ -146,7 +146,7 @@ TOKEN_MGR_DECLS : { int nested_counter; } /* Used by all nesting constructs. */
 PG-Production-Attribute[#Kind, #Name, #AttributeForm, #AttributeOptions]
 ;
 
-{#ND} PG-Production1[SE_SORT[#Defines, #Synthesizes, #SortName, #Precs, #Wrapper]]
+{#ND} PG-Production1[SE_SORT[#Defines, #SortName, #Precs, #Wrapper]]
 →
 {#ND} PG-Production-Defines[#Defines, #SortName, 0, ()]
 ;
@@ -192,6 +192,11 @@ PFK_SORT ::=( PFK[RawParsedForm, FormKind]; );
 {#ND} PG-Production-Defines[(D_FORM[#Form1, #Kind1]; #Defines), #SortName, #Prec, #PrecPFKs]
 →
 {#ND} PG-Production-Defines2[#Form1, #Kind1, #Defines, #SortName, #Prec, #PrecPFKs]
+;
+
+{#ND} PG-Production-Defines[(D_SYNTHESIZES[#AttributeName1]; #Defines), #SortName, #Prec, #PrecPFKs]
+→
+{#ND} PG-Production-Defines[#Defines, #SortName, #Prec, #PrecPFKs]
 ;
 
 {$String<!--SortName--> : SortEntry} PG-Production-Defines2[RawForm, FormKind, $List[Define], $String, $Numeric, $List[PFK_SORT]] :: Text;
@@ -569,11 +574,11 @@ ProductionWord[#word] → %n⟪†« Stringify[#word] »⟫ ;
 
 {$String : SortEntry} PG-ProduceBodyTerm3[RawScopeSort, $Numeric, RawRepeat, FormKind, $List[PFK_SORT], $Numeric, $List[Text], $List[Text], CONSUMPTION_SORT, in::Text after::TextMapSort.Text] :: Text;
 
-{#ND} PG-ProduceBodyTerm3[%rawScopeSort⟪ [ #Sort# ] ⟫, #Prec, #Repeat, #Kind, #nonterminalPFKs, #n, #terms, #words, #consumer, in after . #[in,after]]
+{#ND} PG-ProduceBodyTerm3[%rawScopeSort⟪ [ #Variable# : #Sort# ] ⟫, #Prec, #Repeat, #Kind, #nonterminalPFKs, #n, #terms, #words, #consumer, in after . #[in,after]]
 →
 IfSingletonRepeat[#Repeat,
   {#ND} PG-ProduceBody[#nonterminalPFKs, #n, #terms,  Append[#words, (%n⟨†‹SortVar[#Sort#]›⟩;)], #consumer, in after .
-    #[%n⟪⟦ <«ProductionNameWithPrec[SortName[#Sort#], #Prec]»>^†«SortVar[#Sort#]» ⟦« in »⟧ ⟧⟫, after]],
+    #[%n⟪⟦ <«ProductionNameWithPrec[SortName[#Sort#], #Prec]»>^†«#Variable#» ⟦« in »⟧ ⟧⟫, after]],
   CookError["Cannot use repeat specification on binder"]]
 ;
 
@@ -606,7 +611,7 @@ IfSingletonRepeat[#Repeat,
 // TODO: Eliminate redundant repeat productions!
 
 ExtractSubstitutedSort[RawSubstituteSort] :: Text;
-ExtractSubstitutedSort[%rawSubstituteSort⟪ #Sort1# : #Sort2# ⟫] → %n⟪†«SortVar[#Sort1#]»⟫ ;
+ExtractSubstitutedSort[%rawSubstituteSort⟪ #Variable1# : #Sort2# ⟫] → %n⟪†«#Variable1#»⟫ ;
 
 VariableMarker[FormKind, Text] :: Text;
 -[Data[#Kind]]: VariableMarker[#Kind, #Other] → VariableMarker2[#Kind, #Other] ;
@@ -694,9 +699,9 @@ SameScopeSort2[%rawScopeSort⟪ #Sort1# [ #SubstituteSorts1# ] ⟫, %rawScopeSor
 →
 And[SameSort[#Sort1#, #Sort2#], And[SamePrec[#Prec1, #Prec2], SubRepeat[#Repeat1, #Repeat2]]]
 ;
-SameScopeSort2[%rawScopeSort⟪ [ #Sort1# ] ⟫                   , %rawScopeSort⟪ #Sort2# [ #SubstituteSorts2# ] ⟫, #P1, #R1, #P2, #R2] → B_FALSE ;
-SameScopeSort2[%rawScopeSort⟪ #Sort1# [ #SubstituteSorts1# ] ⟫, %rawScopeSort⟪ [ #Sort2# ] ⟫, #P1, #R1, #P2, #R2] → B_FALSE ;
-SameScopeSort2[%rawScopeSort⟪ [ #Sort1# ] ⟫                   , %rawScopeSort⟪ [ #Sort2# ] ⟫, #P1, #R1, #P2, #R2] → SameSort[#Sort1#, #Sort2#] ;
+SameScopeSort2[%rawScopeSort⟪ [ #Variable1# : #Sort1# ] ⟫                   , %rawScopeSort⟪ #Sort2# [ #SubstituteSorts2# ] ⟫, #P1, #R1, #P2, #R2] → B_FALSE ;
+SameScopeSort2[%rawScopeSort⟪ #Sort1# [ #SubstituteSorts1# ] ⟫, %rawScopeSort⟪ [ #Variable2# : #Sort2# ] ⟫, #P1, #R1, #P2, #R2] → B_FALSE ;
+SameScopeSort2[%rawScopeSort⟪ [ #Variable1# : #Sort1# ] ⟫                   , %rawScopeSort⟪ [ #Variable2# : #Sort2# ] ⟫, #P1, #R1, #P2, #R2] → SameSort[#Sort1#, #Sort2#] ;
 
 SameSort[RawSort, RawSort] :: Boolean;
 -[Data[#1,#2]]: SameSort[#1, #2] → SameSort2[#1, #2] ;
@@ -857,12 +862,6 @@ PG-Lexical2[%rawDeclarations⟪ #SortAlternatives# ; #Declarations# ⟫, #hasSki
 PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]]
 ;
 
-Lexical-synthesizedref:
-PG-Lexical2[%rawDeclarations⟪ #SynthesizedRefSome# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
-→
-PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]]
-;
-
 Lexical-rule:
 PG-Lexical2[%rawDeclarations⟪ rule #Rule# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
 →
@@ -973,7 +972,7 @@ PG-InlineRegExpSimple[%rawRegExpSimple⟪ #FragmentRef# ⟫, #id]
 
 PG-InlineRegExpSimple[%rawRegExpSimple⟪ . ⟫, #id]
 →
-%n⟪~['\n','\r','\f']⟫
+PG-InlineRegExpSimple[%rawRegExpSimple⟪ [^\n\r\f] ⟫, #id]
 ;
 
 PG-InlineRegExpSimple[%rawRegExpSimple⟪ #RegExpClass# ⟫, #id]

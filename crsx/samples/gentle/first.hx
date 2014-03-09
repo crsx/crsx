@@ -46,7 +46,7 @@ Unif(Float, #t2) → Float;
 /* 4. SEMANTIC ANALYSIS. */
 
 attribute ↑t(Type);  // synthesized expression type
-sort Exp; ↑t;
+sort Exp | ↑t;
 
 ⟦ (⟨Exp#1 ↑t(#t1)⟩ + ⟨Exp#2 ↑t(#t2)⟩) ⟧ ↑t(Unif(#t1,#t2));
 ⟦ (⟨Exp#1 ↑t(#t1)⟩ * ⟨Exp#2 ↑t(#t2)⟩) ⟧ ↑t(Unif(#t1,#t2));

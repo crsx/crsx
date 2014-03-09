@@ -8,7 +8,7 @@
 
 class net.sf.crsx.hoacs.bootstrap.Raw : <Module>, <ModuleName>, <EmbeddedModule>,
 <Declaration>, <Declarations>, <SortAbstraction>, <Rule>, <Sort>, <SortParam>, <SortName>, <SortNames>, <SimpleSort>, <SimpleSorts>, <SubstituteSorts>, <SubstituteSort>, <Tagging>,
-<SortAlternative>, <SortAlternatives>, <Form>, <FormPrec>, <InheritedRefs>, <InheritedRef>, <SynthesizedRefSome>, <SynthesizedRefs>, <SynthesizedRef>, <AttributeKind>, <AttributeForm>, <AttributeOptions>, <AttributeOption>,
+<SortAlternative>, <SortAlternatives>, <Form>, <FormPrec>, <InheritedRefs>, <InheritedRef>, <SynthesizedRef>, <AttributeKind>, <AttributeForm>, <AttributeOptions>, <AttributeOption>,
 <ScopeSorts>, <ScopeSort>, <ParsedForm>, <Repeat>, <Priority>,
 <FragmentName>, <FragmentRef>, <RegExp>, <RegExpChoice>, <RegExpUnits>, <RegExpUnit>, <RegExpSimple>, <RegExpLeaf>, <Word>,
 <Term>, <NotVariableTerm>, <Attributes>, <Attribute>, <AttributeValue>, <Scopes>, <Scope>, <Terms>, <Parsed>,
@@ -51,7 +51,6 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 
 | SORT:raw <SortName> <Repeat> <SortAbstraction> SEMI
 | {anonymous}:raw <SortAlternatives> SEMI
-| {synthesizedrefs}:raw <SynthesizedRefSome> SEMI
 | (RULE)? {rule}:raw <Rule> SEMI
 | {nestedDeclarations}:raw LBRACE <Declarations> RBRACE
 .
@@ -113,6 +112,7 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 
 <SortAlternative> ::= BAR (
   SCHEME:raw <Form>
+| {SynthesizedRef}:raw UP <AttributeName> 
 | SUGAR:raw <Form> ARROW <Term>
 | SYMBOL:raw <Form>
 | STATIC:raw (SYMBOL)? <Form>
@@ -129,11 +129,11 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 <ScopeSorts> ::= {$Cons} <ScopeSort> (COMMA <ScopeSorts> | {$Nil}) . 
 <ScopeSort> ::=
   {ScopeSort}:raw <Sort> <Repeat> (LBRACKET (<SubstituteSorts> | {$Nil}) RBRACKET | {$Nil})
-| {ScopeSortBinder}:raw LBRACKET <Sort> RBRACKET
+| {ScopeSortBinder}:raw LBRACKET <Variable> COLON <Sort> RBRACKET
 .
 
 <SubstituteSorts> ::= {$Cons} <SubstituteSort> (COMMA <SubstituteSorts> | {$Nil}) . 
-<SubstituteSort> ::= {SubstituteSort}:raw <Sort> COLON <Sort> .
+<SubstituteSort> ::= {SubstituteSort}:raw <Variable> COLON <Sort> .
 
 <Sort> ::= {Sort}:raw <SimpleSort> <SimpleSorts> .
 
@@ -161,9 +161,6 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 <InheritedRefs> ::=( {$Cons} <InheritedRef> <InheritedRefs> | {$Nil} ).
 <InheritedRef> ::= {InheritedRef}:raw DOWN <AttributeName> . 
 
-<SynthesizedRefSome> ::=( {$Cons} <SynthesizedRef> <SynthesizedRefs> ).
-<SynthesizedRefs> ::=( {$Cons} <SynthesizedRef> <SynthesizedRefs> | {$Nil} ).
-<SynthesizedRef> ::= {SynthesizedRef}:raw UP <AttributeName> . 
 
 //// RULES.
 

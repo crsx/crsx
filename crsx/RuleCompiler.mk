@@ -19,8 +19,8 @@ CACHE=rulecompiler
 bin: bin/crsx
 
 clean::
-	@rm -f $(CACHE)/*.*
-	@rm -f bin/crsx
+	rm -f $(CACHE)/*.*
+	rm -f bin/crsx
 
 prereq:
 	@mkdir -p bin
@@ -35,12 +35,12 @@ prereq:
 CRSX_FILES=$(CACHE)/crsx.c $(CACHE)/crsx.h $(CACHE)/crsx_scan.l $(CACHE)/main.c $(CACHE)/linter.c $(CACHE)/linter.h
 
 $(CACHE)/crsx.c $(CACHE)/crsx.h $(CACHE)/crsx_scan.l $(CACHE)/main.c $(CACHE)/linter.c $(CACHE)/linter.h: $(COMPILERSRC)/c/crsx.h $(COMPILERSRC)/c/crsx.c $(COMPILERSRC)/c/crsx_scan.l $(COMPILERSRC)/c/main.c $(COMPILERSRC)/c/linter.c  $(COMPILERSRC)/c/linter.h
-	@cp $(COMPILERSRC)/c/crsx.h $(CACHE)
-	@cp $(COMPILERSRC)/c/crsx.c $(CACHE)
-	@cp $(COMPILERSRC)/c/crsx_scan.l $(CACHE)
-	@cp $(COMPILERSRC)/c/main.c $(CACHE)
-	@cp $(COMPILERSRC)/c/linter.c $(CACHE)
-	@cp $(COMPILERSRC)/c/linter.h $(CACHE)
+	cp $(COMPILERSRC)/c/crsx.h $(CACHE)
+	cp $(COMPILERSRC)/c/crsx.c $(CACHE)
+	cp $(COMPILERSRC)/c/crsx_scan.l $(CACHE)
+	cp $(COMPILERSRC)/c/main.c $(CACHE)
+	cp $(COMPILERSRC)/c/linter.c $(CACHE)
+	cp $(COMPILERSRC)/c/linter.h $(CACHE)
 
 #
 $(CACHE)/crsx.o: $(CACHE)/crsx.c $(CACHE)/crsx.h

@@ -44,11 +44,11 @@ ParsePrefix[$String] :: $String;
 
 ScopeSortName[RawScopeSort] :: $String;
 -[Discard[#SubstituteSorts#]]: ScopeSortName[%rawScopeSort⟪ #Sort# #Repeat# [ #SubstituteSorts# ] ⟫] → SortNameWithRepeat[#Sort#, #Repeat#] ;
--                            : ScopeSortName[%rawScopeSort⟪ [ #Sort# ] ⟫                  ] → SortName[#Sort#] ;
+-                            : ScopeSortName[%rawScopeSort⟪ [ #Variable# : #Sort# ] ⟫                  ] → SortName[#Sort#] ;
 
 ScopeSortMetaVar[RawScopeSort, $Numeric] :: $String;
 -[Discard[#SubstituteSorts#]]: ScopeSortMetaVar[%rawScopeSort⟪ #Sort# [ #SubstituteSorts# ] ⟫, #n] → SortMetaVar[#Sort#, #n] ;
--                            : ScopeSortMetaVar[%rawScopeSort⟪ [ #Sort# ] ⟫                  , #n] → SortMetaVar[#Sort#, #n] ;
+-                            : ScopeSortMetaVar[%rawScopeSort⟪ [ #Variable# : #Sort# ] ⟫                  , #n] → SortMetaVar[#Sort#, #n] ;
 
 SortName[RawSort] :: $String;
 -[Data[#Sort]]: SortName[#Sort] → SortName2[#Sort] ;

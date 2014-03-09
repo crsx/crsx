@@ -33,7 +33,6 @@ RawDeclaration ::=(
  %rawDeclaration⟪ sort %SortName«$String» %Repeat«RawRepeat» %SortAbstraction«RawSortAbstraction» ; ⟫;
  %rawDeclaration⟪ %SortAlternatives«$List[RawSortAlternative]» ; ⟫;
  %rawDeclaration⟪ rule %Rule«RawRule» ; ⟫;
- %rawDeclaration⟪ %SynthesizedRefSome«$List[RawSynthesizedRef]» ; ⟫;
  %rawDeclaration⟪ { %Declarations«RawDeclarations» } ⟫;
 );
 
@@ -95,6 +94,7 @@ RawSortAbstraction ::=(
 RawSortAlternative ::=(
  %rawSortAlternative⟪ | data %Form«RawForm» %Tagging« $List[$String] » ⟫;
  %rawSortAlternative⟪ | scheme %Form«RawForm» ⟫;
+ %rawSortAlternative⟪ | ↑ %AttributeName«$String» ⟫;
  %rawSortAlternative⟪ | symbol %Form«RawForm» ⟫;
  %rawSortAlternative⟪ | static symbol %Form«RawForm» ⟫;
  %rawSortAlternative⟪ | sugar %Form«RawForm» → %Term«RawTerm» ⟫;
@@ -110,12 +110,12 @@ RawForm ::=(
 {$String : $StringEntrySort}
 RawScopeSort ::=(
  %rawScopeSort⟪ %Sort«RawSort» %Repeat«RawRepeat» [ %SubstituteSorts«$List[RawSubstituteSort]» ] ⟫;
- %rawScopeSort⟪ [ %Sort«RawSort» ] ⟫;
+ %rawScopeSort⟪ [ %Variable«$String» : %Sort«RawSort» ] ⟫;
 );
 
 {$String : $StringEntrySort}
 RawSubstituteSort ::=(
- %rawSubstituteSort⟪ %Sort«RawSort» : %Sort«RawSort» ⟫;
+ %rawSubstituteSort⟪ %Variable«$String» : %Sort«RawSort» ⟫;
 );
 
 {$String : $StringEntrySort}
@@ -154,11 +154,6 @@ RawAttributeOption ::=(
 {$String : $StringEntrySort}
 RawInheritedRef ::=(
  %rawInheritedRef⟪ ↓ %AttributeName«$String» ⟫;
-);
-
-{$String : $StringEntrySort}
-RawSynthesizedRef ::=(
- %rawSynthesizedRef⟪ ↑ %AttributeName«$String» ⟫;
 );
 
 

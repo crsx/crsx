@@ -180,7 +180,7 @@ CRS-MetaDeclaration1[SE_NONE, #ParsePrefix] → %n⟪⟫ ;
 
 // Token declaration.
 
-CRS-MetaDeclaration1[SE_TOKEN[#Synthesizes, #Name], #ParsePrefix] → %n⟪⟫;
+CRS-MetaDeclaration1[SE_TOKEN[#Name], #ParsePrefix] → %n⟪⟫;
 
 // Attribute declaration.
 
@@ -218,7 +218,7 @@ CRS-MetaDeclarations-AttributeOptions[#Kind, #Name, (), #names]
 
 // Sort declaration.
 
-CRS-MetaDeclaration1[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper], #ParsePrefix]
+CRS-MetaDeclaration1[SE_SORT[#Defines, #Name, #Precs, #Wrapper], #ParsePrefix]
 →
 CRS-MetaDeclarations-PrecWrapper[#Name, #ParsePrefix, #Wrapper]
 ;
@@ -261,18 +261,11 @@ CRS-MetaDeclarations-PrecWrapper[#Name, #ParsePrefix, Wrapper[#ParsedForm]] → 
 
 // Token declaration.
 
-{#ND}CRS-Declaration1[SE_TOKEN[#Synthesizes, #Name], #ParsePrefix] → %n⟪
+{#ND}CRS-Declaration1[SE_TOKEN[#Name], #ParsePrefix] → %n⟪
 <!-- All declarations for †«#Name» token sort. -->
 $Drop-†«#Name»[†«#Name»] :: Text ;
 $Print-†«#Name»[†«#Name»] :: Text ;
 $PrintP-†«#Name»[†«#Name», $Numeric] :: Text ;
-« TextFold[MapWhen[ok a.CRS-Declarations-TokenSynth[ok, a, #Name], NameSetList[#Synthesizes]], %n⟨⟩] »
-⟫;
-
-CRS-Declarations-TokenSynth[Ok, $String<!--attribute-->, $String] :: Text;
-CRS-Declarations-TokenSynth[OK, #attribute, #Name]
-→
-%n⟪«NeedSynthesizedName[#attribute]»[†«#Name»] :: †«#Name» ;
 ⟫;
 
 // Attribute declaration.
@@ -310,7 +303,7 @@ CRS-Forms-AttributeForm[%rawAttributeKind⟪ ↑ ⟫, #Name, %rawAttributeForm�
 
 -[Data[#Synthesizes]]:
 {#ND}
-CRS-Declaration1[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper], #ParsePrefix]
+CRS-Declaration1[SE_SORT[#Defines, #Name, #Precs, #Wrapper], #ParsePrefix]
 →
 %n⟪
 <!-- All declarations for †«#Name» sort. -->
@@ -318,7 +311,7 @@ $Drop-†«#Name»[†«#Name»] :: Text ;
 « CRS-Declarations-PrecWrapper[#Name, #ParsePrefix, #Wrapper] »
 $Print-†«#Name»[†«#Name»] :: Text ;
 $PrintP-†«#Name»[†«#Name», $Numeric] :: Text ; <!--per data form-->
-« TextFold[MapWhen[ok a.{#ND}CRS-Declarations-DefineSynth[ok, a, ProductionName[#Name]], NameSetList[#Synthesizes]], %n⟨⟩] »
+« TextFold[MapWhen[ok a.{#ND}CRS-Declarations-DefineSynth[ok, a, ProductionName[#Name]], NameSetList[DefinesSynthesize[#Defines, NoNames]]], %n⟨⟩] »
 « {#ND}CRS-Declarations-Defines[#Defines, #Name, #ParsePrefix, #Wrapper] »
 ⟫;
 
@@ -326,7 +319,7 @@ $PrintP-†«#Name»[†«#Name», $Numeric] :: Text ; <!--per data form-->
 {#ND; "$AllSynthesizedMapNames" : NAMES[#SynthesizedMapNames]}
 CRS-Declarations-DefineSynth[OK, #attribute, #ProductionName]
 →
-%n⟪«NeedSynthesizedName[#attribute]»[«#ProductionName»] :: «#ProductionName» ;
+%n⟪«NeedsSynthesizedName[#attribute]»[«#ProductionName»] :: «#ProductionName» ;
 «CollectSynthesizedName[#attribute]»[«#ProductionName»] :: «#ProductionName» ;
 ⟫;
 
@@ -366,6 +359,8 @@ CRS-Declarations-PrecWrapper[#Name, #ParsePrefix, Wrapper[#ParsedForm]]
 $Print-Action-†‹c›‹ {#ND}CRS-FormScopeSorts[(ss;), #Name, $False, ok s p q r . StringToText[SortNameWithRepeat[s, r]], %n⟨[⟩, %n⟨⟩, 1] › :: Text ;
 ⟩] »⟫
 ;
+
+{#ND}CRS-Declarations-Define[D_SYNTHESIZES[#AttributeName], #Name, #ParsePrefix, #Wrapper, #params] → %n⟪⟫ ;
 
 // Helper: insert _Alternate wrapper when appropriate.
 Make_Alternate[$String, Text] :: Text;
@@ -420,8 +415,8 @@ CRS-ParamSequence[()] → %n⟪⟫ ;
   $[If, #topinherit, {#ND}CRS-Form-PatternEnv[#InheritedRefs, #ParsePrefix], %n⟨⟩]
 »«
   $[If, #Sorted,
-   CRS-User[#ParsePrefix, %n⟨†‹ #Sort ›⟩, CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]],
-   CRS-User[#ParsePrefix, %n⟨⟩, CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]]]
+   CRS-User[#ParsePrefix, %n⟨†‹ #Sort ›⟩, {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]],
+   CRS-User[#ParsePrefix, %n⟨⟩, {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]]]
 »⟫;
 
 {#ND}CRS-Term-Form[RAW-FormParsedUnsorted[#ParsedForm, #Prec, #InheritedRefs], #Name, #ParsePrefix, #Sorted, #makeForm, #topinherit, ok s p q r.#Wrap[ok,s,p,q,r]]
@@ -430,8 +425,8 @@ CRS-ParamSequence[()] → %n⟪⟫ ;
   $[If, #topinherit, {#ND}CRS-Form-PatternEnv[#InheritedRefs, #ParsePrefix], %n⟨⟩]
 »«
   $[If, #Sorted,
-   CRS-User[#ParsePrefix, %n⟨†‹ #Name ›⟩, CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]],
-   CRS-User[#ParsePrefix, %n⟨⟩, CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]]]
+   CRS-User[#ParsePrefix, %n⟨†‹ #Name ›⟩, {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]],
+   CRS-User[#ParsePrefix, %n⟨⟩, {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], 1]]]
 »⟫;
 
 {#ND}CRS-Term-Form[RAW-FormConstruction[#Constructor, #ScopeSorts, #InheritedRefs], #Name, #ParsePrefix, #Sorted, #makeForm, #topinherit, ok s p q r.#Wrap[ok,s,p,q,r]]
@@ -497,7 +492,8 @@ TextFold[Map[a.%n⟪; "†«a»" : {#InheritedMap_†«a»}«InheritedName[a]»�
 // Helper for form or pattern binders. 
 {$String : SortEntry} CRS-Binders-SubstituteSorts[$List[RawSubstituteSort], $Numeric, Text, $Boolean] :: Text;
 {#ND}CRS-Binders-SubstituteSorts[(), #n, #post, #makeForm] → #post ;
-{#ND}CRS-Binders-SubstituteSorts[(%rawSubstituteSort⟪ #Sort1# : #Sort2# ⟫; #SubstituteSorts), #n, #post, #makeForm]
+{#ND; #Variable1# : #Sort1#}
+CRS-Binders-SubstituteSorts[(%rawSubstituteSort⟪ #Variable1# : #Sort2# ⟫; #SubstituteSorts), #n, #post, #makeForm]
 →
 %n⟪«
   $[If, #makeForm, %n⟨ v†‹$[FormatNumber,#n]›::†‹ SortName[#Sort1#] ›⟩, %n⟨ v†‹$[FormatNumber,#n]›⟩]
@@ -512,46 +508,46 @@ CRS-FormScopeMetaApplication[#mv, #SubstituteSorts, #Dummy] → %n⟪«#mv»« C
 
 CRS-FormScopeMetaApplication2[$List[RawSubstituteSort], $Boolean, $Numeric, Text, Text] :: Text;
 CRS-FormScopeMetaApplication2[(), #Dummy, #n, #pre, #post] → #post ;
-CRS-FormScopeMetaApplication2[(%rawSubstituteSort⟪ #Sort1# : #Sort2# ⟫; #SubstituteSorts), #Dummy, #n, #pre, #post]
+CRS-FormScopeMetaApplication2[(%rawSubstituteSort⟪ #Variable1# : #Sort2# ⟫; #SubstituteSorts), #Dummy, #n, #pre, #post]
 →
-%n⟪« #pre »« $[If, #Dummy, %n⟨v†‹$[FormatNumber,#n]›⟩, %n⟨†‹ SortVar[#Sort1#] ›⟩] »« CRS-FormScopeMetaApplication2[#SubstituteSorts, #Dummy, $[Plus,#n,1], %n⟨, ⟩, %n⟨]⟩] »⟫
+%n⟪« #pre »« $[If, #Dummy, %n⟨v†‹$[FormatNumber,#n]›⟩, %n⟨†‹ #Variable1# ›⟩] »« CRS-FormScopeMetaApplication2[#SubstituteSorts, #Dummy, $[Plus,#n,1], %n⟨, ⟩, %n⟨]⟩] »⟫
 ;
 
-CRS-ParsedForm-ParsedForm[RawParsedForm, $Boolean, $Boolean, ok::Ok s::RawSort p::$Numeric q::Text r::RawRepeat.Text, $Numeric] :: Text;
+{$String : SortEntry} CRS-ParsedForm-ParsedForm[RawParsedForm, $Boolean, $Boolean, ok::Ok s::RawSort p::$Numeric q::Text r::RawRepeat.Text, $Numeric] :: Text;
 
-CRS-ParsedForm-ParsedForm[RAW-ParsedFormDone, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] → %n⟪⟫ ;
+{#ND}CRS-ParsedForm-ParsedForm[RAW-ParsedFormDone, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] → %n⟪⟫ ;
 
 -[Data[#Space1]]:
-CRS-ParsedForm-ParsedForm[RAW-ParsedFormSpace[#Space1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
+{#ND}CRS-ParsedForm-ParsedForm[RAW-ParsedFormSpace[#Space1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 →
 $[If, #Sorted,
- %n⟪ « CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
- %n⟪« $[If,$[Contains,#Space1,"¶"], CRS-Embed["", %n⟨NewLine⟩], %n⟨ ⟩] »« CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
+ %n⟪ « {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
+ %n⟪« $[If,$[Contains,#Space1,"¶"], CRS-Embed["", %n⟨NewLine⟩], %n⟨ ⟩] »« {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
 ;
-
-CRS-ParsedForm-ParsedForm[RAW-ParsedFormWord[#Word1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
+riable1# : 
+{#ND}CRS-ParsedForm-ParsedForm[RAW-ParsedFormWord[#Word1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 →
-%n⟪†« #Word1 »« CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫
+%n⟪†« #Word1 »« {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫
 ;
 
-CRS-ParsedForm-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ [ #Sort1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
+{#ND}CRS-ParsedForm-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ [ #Variable1# : #Sort1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 →
 $[If, #Sorted,
- %n⟪†«"\u27e8"»†«SortName[#Sort1#]»"†« SortVar[#Sort1#] »"†«"\u27e9"» « CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
- %n⟪†«"\u27e8"»†«SortVar[#Sort1#]»†«"\u27e9"» « CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
+ %n⟪†«"\u27e8"»†«SortName[#Sort1#]»"†« #Variable1# »"†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
+ %n⟪†«"\u27e8"»†«#Variable1#»†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
 ;
 // NOTE: the above is a real CRSX hack to achieve the strange CRSX3 variable sorting notation: the internal variable name is created as a string.
 
-CRS-ParsedForm-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ #Sort1# #Repeat1# [ #SubstituteSorts1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
+{#ND}CRS-ParsedForm-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ #Sort1# #Repeat1# [ #SubstituteSorts1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 →
 %n⟪†«"\u27e8"»†«
  $[If, #Sorted, SortRepeatString[SortName[#Sort1#], NestedRepeat[#Repeat1#, #Repeat1]], ""]
 »«
  $[If, #makeForm,
-     CRS-ScopeBinderSort1[#SubstituteSorts1#, #Sort1#, NestedRepeat[#Repeat1#, #Repeat1]],
+     {#ND}CRS-ScopeBinderSort1[#SubstituteSorts1#, #Sort1#, NestedRepeat[#Repeat1#, #Repeat1]],
      #Wrap[OK, #Sort1#, #Prec1, CRS-FormScopeMetaApplication[CRS-SortMetaVar[#Sort1#, #n], #SubstituteSorts1#, $False<!--bound-->], NestedRepeat[#Repeat1#, #Repeat1]]]
 »†«"\u27e9"» «
- CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], $[Plus,#n,1]]
+ {#ND}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], $[Plus,#n,1]]
 »⟫
 ;
 
@@ -586,7 +582,7 @@ CRS-ParsedForm-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ #Sort1# #Repeat1# 
 // Token declaration.
 
 {#ND}
-CRS-Rule1[SE_TOKEN[#Synthesizes, #Name], #ParsePrefix] → %n⟪
+CRS-Rule1[SE_TOKEN[#Name], #ParsePrefix] → %n⟪
 <!-- All declarations for †«#Name» token sort. -->
 $Drop-†«#Name»[†«#Name»] :: Text ;
 $Drop-†«#Name»[#] → $TextCons[$TextChars[#], $TextNil] ;
@@ -596,14 +592,6 @@ $Print-†«#Name»[†«#Name»] :: Text ;
 
 $PrintP-†«#Name»[†«#Name», $Numeric] :: Text ;
 $PrintP-†«#Name»[#, #Prec] → $TextCons[$TextChars[#], $TextNil] ;
-
-« TextFold[MapWhen[ok a.CRS-Rules-TokenSynth[ok, a, #Name], NameSetList[#Synthesizes]], %n⟨⟩] »
-⟫;
-
-CRS-Rules-TokenSynth[Ok, $String, $String] :: Text;
-CRS-Rules-TokenSynth[OK, #attribute, #Name]
-→
-%n⟪-[Priority]: «NeedSynthesizedName[#attribute]»[{"†«#Name»" : #a}#] → # ;
 ⟫;
 
 // TODO: Allow text read/show actions for tokens.
@@ -626,7 +614,7 @@ CRS-Rules-TokenSynth[OK, #attribute, #Name]
 // Define top level $Print and $Drop functions.
 
 {#ND}
-CRS-Rule1[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper], #ParsePrefix]
+CRS-Rule1[SE_SORT[#Defines, #Name, #Precs, #Wrapper], #ParsePrefix]
 →
 %n⟪
 <!-- All rules for †«#Name» sort. -->
@@ -637,9 +625,9 @@ $PrintP-†«#Name»[v, #Prec] → $TextCons[$TextEmbed[v], $TextNil] ;
 <!--Precedence wrappers.-->
 « CRS-Rules-PrecWrapper[#Name, #ParsePrefix, #Wrapper] »
 <!--Defined synthetic.-->
-« TextFold[MapWhen[ok a.{#ND}CRS-Rules-DefineSynth[ok, a, ProductionName[#Name]], NameSetList[#Synthesizes]], %n⟨<!--AND-->⟩] »
+« TextFold[MapWhen[ok a.{#ND}CRS-Rules-DefineSynth[ok, a, ProductionName[#Name]], NameSetList[DefinesSynthesize[#Defines, NoNames]]], %n⟨<!--AND-->⟩] »
 <!--Contained Rules.-->
-« {#ND}CRS-Rules-Defines[#Defines, #Synthesizes, #Name, #ParsePrefix, #Wrapper] »
+« {#ND}CRS-Rules-Defines[#Defines, DefinesSynthesize[#Defines, NoNames], #Name, #ParsePrefix, #Wrapper] »
 ⟫;
 
 CRS-Rules-PrecWrapper[$String, $String, Wrapper] :: Text;
@@ -649,7 +637,7 @@ CRS-Rules-PrecWrapper[#Name, #ParsePrefix, NoWrapper]
 
 CRS-Rules-PrecWrapper[#Name, #ParsePrefix, Wrapper[#ParsedForm]]
 → %n⟪-[Data[#Prec,#InnerPrec]]: $PrecWrap-†«#Name»[#Prec, #InnerPrec, #] → $[If, $[LessThanOrEqual, #Prec, #InnerPrec], #, ⟦«
-  CRS-Text[CRS-ParsedForm-ParsedForm[#ParsedForm, $False<!--Unsorted-->, $False<!--NotForm-->, ok s p q r.%n⟨#⟩, 1]]
+  CRS-Text[{} CRS-ParsedForm-ParsedForm[#ParsedForm, $False<!--Unsorted-->, $False<!--NotForm-->, ok s p q r.%n⟨#⟩, 1]]
 »⟧] ;
 ⟫;
 
@@ -657,7 +645,7 @@ CRS-Rules-PrecWrapper[#Name, #ParsePrefix, Wrapper[#ParsedForm]]
 {#ND; "$AllSynthesizedMapNames" : NAMES[#SynthesizedMapNames]}
 CRS-Rules-DefineSynth[OK, #attribute, #ProductionName]
 →
-%n⟪-[Priority]: «NeedSynthesizedName[#attribute]»[{"†«#attribute»" : #a}#] → # ;
+%n⟪-[Priority]: «NeedsSynthesizedName[#attribute]»[{"†«#attribute»" : #a}#] → # ;
 ⟫
 ;
 
@@ -711,7 +699,7 @@ CRS-then-PrintP[OK, #Name, #Prec, #Quoted, #Repeat]
 {$String : SortEntry}CRS-Rules-DataSynth[Ok, $String, $String, Text, RawForm, $String] :: Text;
 {#ND}CRS-Rules-DataSynth[OK, #AttributeName, #SortName, #ProductionName, #Form, #ParsePrefix]
 →
-%n⟪«NeedSynthesizedName[#AttributeName]»[{#Synthesized}«
+%n⟪«NeedsSynthesizedName[#AttributeName]»[{#Synthesized}«
    {#ND}CRS-Term-Form[#Form, #SortName, #ParsePrefix, $True<!--Sorted-->, $False<!--Pattern-->, $False<!--NoInherit-->, ok s p q r.q]
   »] →  «CollectSynthesizedName[#AttributeName]»[{#Synthesized}«
    {#ND}CRS-Term-Form[#Form, #SortName, #ParsePrefix, $True<!--Sorted-->, $False<!--Pattern-->, $False<!--NoInherit-->, ok s p q r.{#ND}CRS-then-Rules-DataSynth-Need[ok, SortName[s], r, #AttributeName, q]]
@@ -730,7 +718,7 @@ CRS-then-PrintP[OK, #Name, #Prec, #Quoted, #Repeat]
 {$String : SortEntry} CRS-then-Rules-DataSynth-Need[Ok, $String, RawRepeat, $String, Text] :: Text;
 {#ND} CRS-then-Rules-DataSynth-Need[OK, #Name, #Repeat, #AttributeName, #Body]
 →
-{#ND} IfSortSynthesizes[#Name, #AttributeName, %n⟪ «NeedSynthesizedName[#AttributeName]»[«#Body»]⟫, #Body]
+{#ND} IfSortSynthesizes[#Name, #AttributeName, %n⟪ «NeedsSynthesizedName[#AttributeName]»[«#Body»]⟫, #Body]
 ;
 {$String : SortEntry} CRS-then-Rules-DataSynth-Got[Ok, $String, RawRepeat, $String, Text] :: Text;
 {#ND} CRS-then-Rules-DataSynth-Got[OK, #Name, #Repeat, #AttributeName, #Body]
@@ -767,9 +755,18 @@ If[SameString[Trim[TextToString[#AV1]], $[Trim,$[:,"Unit-",#AttributeName]]], CR
 {#ND} SortSynthesizes[#Name] → SortSynthesizes2[$[{#ND}Get[SortEntry], #Name, SE_NONE]] ;
 
 SortSynthesizes2[SortEntry] :: NameSet;
-SortSynthesizes2[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper]] → #Synthesizes ;
-SortSynthesizes2[SE_TOKEN[#Synthesizes, #Name]] → #Synthesizes ;
--[Data[#_]]: SortSynthesizes2[$[NotMatch,SE_SORT[#Defines1, #Synthesizes1, #Name1, #Precs1, #Wrapper1], $[NotMatch,SE_TOKEN[#Synthesizes2, #Name2],#_]]] → NoNames ;
+SortSynthesizes2[SE_SORT[#Defines, #Name, #Precs, #Wrapper]] → DefinesSynthesize[#Defines, NoNames] ;
+SortSynthesizes2[SE_TOKEN[#Name]] → NoNames ;
+-[Data[#_]]: SortSynthesizes2[$[NotMatch,SE_SORT[#Defines1, #Name1, #Precs1, #Wrapper1], $[NotMatch,SE_TOKEN[#Name2],#_]]] → NoNames ;
+
+DefinesSynthesize[$List[Define], NameSet] :: NameSet ;
+-[Fresh[dummy::RawSortParam]]:
+DefinesSynthesize[(D_ABSTRACTION[a.#Define[a]]; #Defines), #NameSet] → DefinesSynthesize[(#Define[dummy]; #Defines), #NameSet] ;
+DefinesSynthesize[(D_SYNTHESIZES[#AttributeName]; #Defines), #NameSet] → DefinesSynthesize[#Defines, AddName[#NameSet, #AttributeName]] ;
+DefinesSynthesize[(D_FORM[#Form, #fk]; #Defines), #NameSet] → DefinesSynthesize[#Defines, #NameSet] ;
+DefinesSynthesize[(D_RULE[#RawRule, #sort, #IsDataEquivalence]; #Defines), #NameSet] → DefinesSynthesize[#Defines, #NameSet] ;
+DefinesSynthesize[(D_NONE; #Defines), #NameSet] → DefinesSynthesize[#Defines, #NameSet] ;
+DefinesSynthesize[(), #NameSet] → #NameSet ;
 
 {#ND}CRS-Rules-Define[D_FORM[#Form, FK_SYMBOL[#IsStatic]], #Synthesizes, #Name, #ParsePrefix, #Wrapper, #params] → %n⟪⟫ ;
 
@@ -794,6 +791,9 @@ $Meta[({#Inherited}« {#ND}CRS-Term-Form[#Form, #Name, #ParsePrefix, $True<!--So
 ⟫
 ;
 
+// Synthesized attribute...
+{#ND}CRS-Rules-Define[D_SYNTHESIZES[#AttributeName], #Synthesizes, #Name, #ParsePrefix, #Wrapper, #params] → %n⟪⟫ ;
+
 // A rule (already supposed declared by the scheme declaration).
 {#ND}CRS-Rules-Define[D_RULE[#Rule, #SortName, #IsData], #Synthesizes, #Name, #ParsePrefix, #Wrapper, #params] → {#ND}CRS-Rules-Rule[#Rule, #SortName, #IsData, #ParsePrefix] ;
 
@@ -802,13 +802,13 @@ $Meta[({#Inherited}« {#ND}CRS-Term-Form[#Form, #Name, #ParsePrefix, $True<!--So
 // TEXT OF INDIVIDUAL DECLARATIONS.
 
 // Helpers for list sorts.
-CRS-ScopeBinderSort1[$List[RawSubstituteSort], RawSort, RawRepeat] :: Text;
-CRS-ScopeBinderSort1[(), #Sort, #Repeat] → IfSingletonRepeat[#Repeat, %n⟪⟫, %n⟪ $List[†« SortName[#Sort] »]⟫] ;
-CRS-ScopeBinderSort1[(%rawSubstituteSort⟪ #Sort1# : #Sort2# ⟫; #SubstituteSorts), #Sort, #Repeat] →  %n⟪{†« SortVar[#Sort1#] » : †« SortName[#Sort2#] »« CRS-ScopeBinderSort2[#SubstituteSorts] »}« CRS-RepeatSort[#Repeat, #Sort] »⟫ ;
+{$String : SortEntry} CRS-ScopeBinderSort1[$List[RawSubstituteSort], RawSort, RawRepeat] :: Text;
+{#ND}CRS-ScopeBinderSort1[(), #Sort, #Repeat] → IfSingletonRepeat[#Repeat, %n⟪⟫, %n⟪ $List[†« SortName[#Sort] »]⟫] ;
+{#ND}CRS-ScopeBinderSort1[(%rawSubstituteSort⟪ #Variable1# : #Sort2# ⟫; #SubstituteSorts), #Sort, #Repeat] →  %n⟪{†« #Variable1# » : †« SortName[#Sort2#] »« {#ND}CRS-ScopeBinderSort2[#SubstituteSorts] »}« CRS-RepeatSort[#Repeat, #Sort] »⟫ ;
 
-CRS-ScopeBinderSort2[$List[RawSubstituteSort]] :: Text;
-CRS-ScopeBinderSort2[()] → %n⟪⟫ ;
-CRS-ScopeBinderSort2[(%rawSubstituteSort⟪ #Sort1# : #Sort2# ⟫; #SubstituteSorts)] →  %n⟪, †« SortVar[#Sort1#] » : †« SortName[#Sort2#] »« CRS-ScopeBinderSort2[#SubstituteSorts] »⟫ ;
+{$String : SortEntry} CRS-ScopeBinderSort2[$List[RawSubstituteSort]] :: Text;
+{#ND}CRS-ScopeBinderSort2[()] → %n⟪⟫ ;
+{#ND; #Variable1# : #Sort1#}CRS-ScopeBinderSort2[(%rawSubstituteSort⟪ #Variable1# : #Sort2# ⟫; #SubstituteSorts)] →  %n⟪, †« SortVar[#Sort1#] » : †« SortName[#Sort2#] »« {#ND}CRS-ScopeBinderSort2[#SubstituteSorts] »⟫ ;
 
 CRS-RepeatSort[RawRepeat, RawSort] :: Text;
 CRS-RepeatSort[#Repeat, #Sort] → IfSingletonRepeat[#Repeat, %n⟪†« SortName[#Sort] »⟫, %n⟪$List[†« SortName[#Sort] »]⟫] ;
@@ -863,7 +863,7 @@ CRS-SortMetaVar[#Sort, #n] → %n⟨†‹SortMetaVar[#Sort, #n]›⟩ ;
 /// {#ND}CRS-ArgList-ParsedForm[#ParsedForm1, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 /// ;
 /// 
-/// {#ND}CRS-ArgList-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ [ #Sort1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], ok s p q r.#Wrap[ok,s,p,q,r], #n]
+/// {#ND}CRS-ArgList-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ [ #Variable1# : #Sort1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], ok s p q r.#Wrap[ok,s,p,q,r], #n]
 /// →
 /// {#ND}CRS-ArgList-ParsedForm[#ParsedForm1, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 /// ;
@@ -940,7 +940,7 @@ CRS-SortMetaVar[#Sort, #n] → %n⟨†‹SortMetaVar[#Sort, #n]›⟩ ;
 CRS-AddSynthesisNeeds[Ok, Text, $List[RawAttribute],  $String<!--Sort-->, $String] :: Text;
 CRS-AddSynthesisNeeds[OK, #Term, (%rawAttribute⟪ ↑ #AttributeName# #AttributeValue# ⟫; #Attributes), #Name, #ParsePrefix]
 →
-%n⟪« NeedSynthesizedName[#AttributeName#] »[« CRS-AddSynthesisNeeds[OK, #Term, #Attributes, #Name, #ParsePrefix] »]⟫
+%n⟪« NeedsSynthesizedName[#AttributeName#] »[« CRS-AddSynthesisNeeds[OK, #Term, #Attributes, #Name, #ParsePrefix] »]⟫
 ;
 CRS-AddSynthesisNeeds[OK, #Term, (%rawAttribute⟪ ↓ #AttributeName# #AttributeValue# ⟫; #Attributes), #Name, #ParsePrefix]
 →
@@ -1313,7 +1313,7 @@ $PrintP-«#ProductionName»[v, #Prec] → $TextCons[$TextEmbed[v], $TextNil] ;
   {#ND}CRS-Rules-DefineSynth[OK, #a, #ProductionName]
 »«
   CRS-then-RepeatRules[OK, #SortName, #Prec, #Repeat, #ParsePrefix, #ParsePrefix, #ProductionName, #NameText, #ProductionName, #InnerProductionName,
-    p q.%n⟨‹NeedSynthesizedName[#a]›[‹q›]⟩, q.q, u p q.%n⟨‹u› ‹NeedSynthesizedName[#a]›[‹q›]⟩, p q qs.%n⟨‹CollectSynthesizedName[#a]›[‹q›]⟩]
+    p q.%n⟨‹NeedsSynthesizedName[#a]›[‹q›]⟩, q.q, u p q.%n⟨‹u› ‹NeedsSynthesizedName[#a]›[‹q›]⟩, p q qs.%n⟨‹CollectSynthesizedName[#a]›[‹q›]⟩]
 »«
   CRS-then-RepeatRules[OK, #SortName, #Prec, #Repeat, #ParsePrefix, #ParsePrefix, #ProductionName, #NameText, #ProductionName, #InnerProductionName,
     p q.%n⟨{#Inherited}‹CollectSynthesizedName[#a]›[‹q›]⟩, q.%n⟨ {†‹#a›:‹q›†‹#a›}‹q›⟩, u p q.%n⟨‹u›‹q›⟩, p q qs.%n⟨{#Inherited}‹ CRS-then-Rules-DataSynth-Fold[OK, #ProductionName, #a, qs, q] ›⟩]
@@ -1602,7 +1602,7 @@ CRS-User[#ParsePrefix, %n⟨†« #Name »⟩,{#ND}CRS-Parsed-In[#Parsed, #Parse
 // Simple attributes can only have one value so do NOT recurse.
 {#ND}CRS-AttributeValues[(%rawAttribute⟪↓ #AttributeName# ( #Term# ) ⟫; #Rest), #ParsePrefix, ok s t as.#[ok,s,t,as], #first, #terminator]
 →
-%n⟪«InheritedName[#AttributeName#]»[« {#ND}CRS-Term[#Term#, {#ND}AttributeValueSortName[#AttributeName#], #ParsePrefix, RM_NONE, $False, $False, "", ok s t as.#[ok,s,t,as]] »⟫
+%n⟪«InheritedName[#AttributeName#]»[« {#ND}CRS-Term[#Term#, {#ND}AttributeValueSortName[#AttributeName#], #ParsePrefix, RM_NONE, $False, $False, "", ok s t as.#[ok,s,t,as]] »]⟫
 ;
 {#ND}CRS-AttributeValues[(%rawAttribute⟪↑ #AttributeName# ( #Term# ) ⟫; #Rest), #ParsePrefix, ok s t as.#[ok,s,t,as], #first, #terminator]
 →
@@ -1728,10 +1728,10 @@ IfRefModeHides[#refmode,
 /// CRS-FormHead-Entry[$StringEntrySort, $String<!--SortName-->, $String<!--Prefix-->, FormHeadIndex] :: FormHeadIndex ;
 /// //
 /// CRS-FormHead-Entry[SE_NONE,                                     #SortName, #Prefix, #FHI] → #FHI ;
-/// CRS-FormHead-Entry[SE_TOKEN[#Syhthesizes, #Name],    #SortName, #Prefix, #FHI] → #FHI ;
+/// CRS-FormHead-Entry[SE_TOKEN[#Name],    #SortName, #Prefix, #FHI] → #FHI ;
 /// CRS-FormHead-Entry[SE_ATTRIBUTE[#Kind, #Name, #Form, #Options], #SortName, #Prefix, #FHI] → #FHI ;
 /// //
-/// CRS-FormHead-Entry[SE_SORT[#Defines, #Synthesizes, #FullName, #Precs, #Wrapper], #SortName, #Prefix, {#FHI}FHI]
+/// CRS-FormHead-Entry[SE_SORT[#Defines, #FullName, #Precs, #Wrapper], #SortName, #Prefix, {#FHI}FHI]
 /// →
 /// Fold[d hi.CRS-FormHead-Define[d, #SortName, #Prefix, hi], #Defines, {#FHI}FHI]
 /// ;
@@ -1805,8 +1805,8 @@ IfRefModeHides[#refmode,
 SynthesizedName[$String] :: Text;
 SynthesizedName[#AttributeName] → %n⟪Synthesized_†«#AttributeName»⟫ ;
 
-NeedSynthesizedName[$String] :: Text;
--[Data[#AttributeName]]: NeedSynthesizedName[#AttributeName] → %n⟪Needs-synthesized-†«#AttributeName»⟫ ;
+NeedsSynthesizedName[$String] :: Text;
+-[Data[#AttributeName]]: NeedsSynthesizedName[#AttributeName] → %n⟪Needs-synthesized-†«#AttributeName»⟫ ;
 
 CollectSynthesizedName[$String] :: Text;
 -[Data[#ProductionName,#AttributeName]]: CollectSynthesizedName[#AttributeName] → %n⟪Collect-synthesized-†«#AttributeName»⟫ ;

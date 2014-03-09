@@ -143,319 +143,307 @@ public interface RawConstants {
   /** RegularExpression Id. */
   int IT_InheritedRef = 69;
   /** RegularExpression Id. */
-  int MT_SynthesizedRefSome = 70;
+  int MT_Rule = 70;
   /** RegularExpression Id. */
-  int IT_SynthesizedRefSome = 71;
+  int IT_Rule = 71;
   /** RegularExpression Id. */
-  int MT_SynthesizedRefs = 72;
+  int MT_Priority = 72;
   /** RegularExpression Id. */
-  int IT_SynthesizedRefs = 73;
+  int IT_Priority = 73;
   /** RegularExpression Id. */
-  int MT_SynthesizedRef = 74;
+  int MT_Term = 74;
   /** RegularExpression Id. */
-  int IT_SynthesizedRef = 75;
+  int IT_Term = 75;
   /** RegularExpression Id. */
-  int MT_Rule = 76;
+  int MT_NotVariableTerm = 76;
   /** RegularExpression Id. */
-  int IT_Rule = 77;
+  int IT_NotVariableTerm = 77;
   /** RegularExpression Id. */
-  int MT_Priority = 78;
+  int MT_Construction = 78;
   /** RegularExpression Id. */
-  int IT_Priority = 79;
+  int IT_Construction = 79;
   /** RegularExpression Id. */
-  int MT_Term = 80;
+  int MT_Scopes = 80;
   /** RegularExpression Id. */
-  int IT_Term = 81;
+  int IT_Scopes = 81;
   /** RegularExpression Id. */
-  int MT_NotVariableTerm = 82;
+  int MT_Scope = 82;
   /** RegularExpression Id. */
-  int IT_NotVariableTerm = 83;
+  int IT_Scope = 83;
   /** RegularExpression Id. */
-  int MT_Construction = 84;
+  int MT_Variables = 84;
   /** RegularExpression Id. */
-  int IT_Construction = 85;
+  int IT_Variables = 85;
   /** RegularExpression Id. */
-  int MT_Scopes = 86;
+  int MT_VariableList = 86;
   /** RegularExpression Id. */
-  int IT_Scopes = 87;
+  int IT_VariableList = 87;
   /** RegularExpression Id. */
-  int MT_Scope = 88;
+  int MT_Terms = 88;
   /** RegularExpression Id. */
-  int IT_Scope = 89;
+  int IT_Terms = 89;
   /** RegularExpression Id. */
-  int MT_Variables = 90;
+  int MT_Parsed = 90;
   /** RegularExpression Id. */
-  int IT_Variables = 91;
+  int IT_Parsed = 91;
   /** RegularExpression Id. */
-  int MT_VariableList = 92;
+  int MT_Attributes = 92;
   /** RegularExpression Id. */
-  int IT_VariableList = 93;
+  int IT_Attributes = 93;
   /** RegularExpression Id. */
-  int MT_Terms = 94;
+  int MT_Attribute = 94;
   /** RegularExpression Id. */
-  int IT_Terms = 95;
+  int IT_Attribute = 95;
   /** RegularExpression Id. */
-  int MT_Parsed = 96;
+  int MT_AttributeKind = 96;
   /** RegularExpression Id. */
-  int IT_Parsed = 97;
+  int IT_AttributeKind = 97;
   /** RegularExpression Id. */
-  int MT_Attributes = 98;
+  int MT_AttributeValue = 98;
   /** RegularExpression Id. */
-  int IT_Attributes = 99;
+  int IT_AttributeValue = 99;
   /** RegularExpression Id. */
-  int MT_Attribute = 100;
+  int MT_ConcreteSpace = 100;
   /** RegularExpression Id. */
-  int IT_Attribute = 101;
+  int IT_ConcreteSpace = 101;
   /** RegularExpression Id. */
-  int MT_AttributeKind = 102;
+  int MT_ConcreteWord = 102;
   /** RegularExpression Id. */
-  int IT_AttributeKind = 103;
+  int IT_ConcreteWord = 103;
   /** RegularExpression Id. */
-  int MT_AttributeValue = 104;
+  int MT_ModuleName = 108;
   /** RegularExpression Id. */
-  int IT_AttributeValue = 105;
+  int IT_ModuleName = 109;
   /** RegularExpression Id. */
-  int MT_ConcreteSpace = 106;
+  int MT_SortName = 110;
   /** RegularExpression Id. */
-  int IT_ConcreteSpace = 107;
+  int IT_SortName = 111;
   /** RegularExpression Id. */
-  int MT_ConcreteWord = 108;
+  int MT_FragmentName = 112;
   /** RegularExpression Id. */
-  int IT_ConcreteWord = 109;
+  int IT_FragmentName = 113;
   /** RegularExpression Id. */
-  int MT_ModuleName = 114;
+  int MT_FragmentRef = 114;
   /** RegularExpression Id. */
-  int IT_ModuleName = 115;
+  int IT_FragmentRef = 115;
   /** RegularExpression Id. */
-  int MT_SortName = 116;
+  int MT_AttributeName = 116;
   /** RegularExpression Id. */
-  int IT_SortName = 117;
+  int IT_AttributeName = 117;
   /** RegularExpression Id. */
-  int MT_FragmentName = 118;
+  int MT_Constructor = 118;
   /** RegularExpression Id. */
-  int IT_FragmentName = 119;
+  int IT_Constructor = 119;
   /** RegularExpression Id. */
-  int MT_FragmentRef = 120;
+  int MT_Variable = 120;
   /** RegularExpression Id. */
-  int IT_FragmentRef = 121;
+  int IT_Variable = 121;
   /** RegularExpression Id. */
-  int MT_AttributeName = 122;
+  int MT_MetaVariable = 122;
   /** RegularExpression Id. */
-  int IT_AttributeName = 123;
+  int IT_MetaVariable = 123;
   /** RegularExpression Id. */
-  int MT_Constructor = 124;
+  int MT_Separator = 124;
   /** RegularExpression Id. */
-  int IT_Constructor = 125;
+  int IT_Separator = 125;
   /** RegularExpression Id. */
-  int MT_Variable = 126;
+  int MT_Literal = 126;
   /** RegularExpression Id. */
-  int IT_Variable = 127;
+  int IT_Literal = 127;
   /** RegularExpression Id. */
-  int MT_MetaVariable = 128;
+  int MT_Number = 128;
   /** RegularExpression Id. */
-  int IT_MetaVariable = 129;
+  int IT_Number = 129;
   /** RegularExpression Id. */
-  int MT_Separator = 130;
+  int MT_Natural = 130;
   /** RegularExpression Id. */
-  int IT_Separator = 131;
+  int IT_Natural = 131;
   /** RegularExpression Id. */
-  int MT_Literal = 132;
+  int MT_String = 132;
   /** RegularExpression Id. */
-  int IT_Literal = 133;
+  int IT_String = 133;
   /** RegularExpression Id. */
-  int MT_Number = 134;
+  int MT_Word = 134;
   /** RegularExpression Id. */
-  int IT_Number = 135;
+  int IT_Word = 135;
   /** RegularExpression Id. */
-  int MT_Natural = 136;
+  int MT_RegExpClass = 136;
   /** RegularExpression Id. */
-  int IT_Natural = 137;
+  int IT_RegExpClass = 137;
   /** RegularExpression Id. */
-  int MT_String = 138;
+  int MT_CC = 138;
   /** RegularExpression Id. */
-  int IT_String = 139;
+  int IT_CC = 139;
   /** RegularExpression Id. */
-  int MT_Word = 140;
+  int MT_CC_RangesTop = 140;
   /** RegularExpression Id. */
-  int IT_Word = 141;
+  int IT_CC_RangesTop = 141;
   /** RegularExpression Id. */
-  int MT_RegExpClass = 142;
+  int MT_CC_Ranges = 142;
   /** RegularExpression Id. */
-  int IT_RegExpClass = 143;
+  int IT_CC_Ranges = 143;
   /** RegularExpression Id. */
-  int MT_CC = 144;
+  int MT_CC_RangeTail = 144;
   /** RegularExpression Id. */
-  int IT_CC = 145;
+  int IT_CC_RangeTail = 145;
   /** RegularExpression Id. */
-  int MT_CC_RangesTop = 146;
+  int MT_CC_FirstRangeStartChar = 146;
   /** RegularExpression Id. */
-  int IT_CC_RangesTop = 147;
+  int IT_CC_FirstRangeStartChar = 147;
   /** RegularExpression Id. */
-  int MT_CC_Ranges = 148;
+  int MT_CC_NonDashRangeStartChar = 148;
   /** RegularExpression Id. */
-  int IT_CC_Ranges = 149;
+  int IT_CC_NonDashRangeStartChar = 149;
   /** RegularExpression Id. */
-  int MT_CC_RangeTail = 150;
+  int MT_CC_RangeChar = 150;
   /** RegularExpression Id. */
-  int IT_CC_RangeTail = 151;
+  int IT_CC_RangeChar = 151;
   /** RegularExpression Id. */
-  int MT_CC_FirstRangeStartChar = 152;
+  int T_Embedded = 152;
   /** RegularExpression Id. */
-  int IT_CC_FirstRangeStartChar = 153;
+  int T_CONCRETESTART = 153;
   /** RegularExpression Id. */
-  int MT_CC_NonDashRangeStartChar = 154;
+  int T_CONCRETEEND = 154;
   /** RegularExpression Id. */
-  int IT_CC_NonDashRangeStartChar = 155;
+  int T_CONCRETEPUSH = 155;
   /** RegularExpression Id. */
-  int MT_CC_RangeChar = 156;
+  int T_CONCRETEPOP = 156;
   /** RegularExpression Id. */
-  int IT_CC_RangeChar = 157;
+  int T_CONCRETESPACE = 157;
   /** RegularExpression Id. */
-  int T_Embedded = 158;
+  int T_CONCRETEWORD = 158;
   /** RegularExpression Id. */
-  int T_CONCRETESTART = 159;
+  int T_SEMI = 160;
   /** RegularExpression Id. */
-  int T_CONCRETEEND = 160;
+  int T_BAR = 161;
   /** RegularExpression Id. */
-  int T_CONCRETEPUSH = 161;
+  int T_LPAREN = 162;
   /** RegularExpression Id. */
-  int T_CONCRETEPOP = 162;
+  int T_RPAREN = 163;
   /** RegularExpression Id. */
-  int T_CONCRETESPACE = 163;
+  int T_STAR = 164;
   /** RegularExpression Id. */
-  int T_CONCRETEWORD = 164;
+  int T_PLUS = 165;
   /** RegularExpression Id. */
-  int T_SEMI = 166;
+  int T_QUEST = 166;
   /** RegularExpression Id. */
-  int T_BAR = 167;
+  int T_SUB = 167;
   /** RegularExpression Id. */
-  int T_LPAREN = 168;
+  int T_DOT = 168;
   /** RegularExpression Id. */
-  int T_RPAREN = 169;
+  int T_COLON = 169;
   /** RegularExpression Id. */
-  int T_STAR = 170;
+  int T_LBRACE = 170;
   /** RegularExpression Id. */
-  int T_PLUS = 171;
+  int T_RBRACE = 171;
   /** RegularExpression Id. */
-  int T_QUEST = 172;
+  int T_HASH = 172;
   /** RegularExpression Id. */
-  int T_SUB = 173;
+  int T_LBRACKET = 173;
   /** RegularExpression Id. */
-  int T_DOT = 174;
+  int T_RBRACKET = 174;
   /** RegularExpression Id. */
-  int T_COLON = 175;
+  int T_COMMA = 175;
   /** RegularExpression Id. */
-  int T_LBRACE = 176;
+  int T_FORALL = 176;
   /** RegularExpression Id. */
-  int T_RBRACE = 177;
+  int T_ARROW = 177;
   /** RegularExpression Id. */
-  int T_HASH = 178;
+  int T_UP = 178;
   /** RegularExpression Id. */
-  int T_LBRACKET = 179;
+  int T_DOWN = 179;
   /** RegularExpression Id. */
-  int T_RBRACKET = 180;
+  int T_NOT = 180;
   /** RegularExpression Id. */
-  int T_COMMA = 181;
+  int T_AT = 181;
   /** RegularExpression Id. */
-  int T_FORALL = 182;
+  int T_DASH = 182;
   /** RegularExpression Id. */
-  int T_ARROW = 183;
+  int T_DIGIT = 183;
   /** RegularExpression Id. */
-  int T_UP = 184;
+  int T_LOWER = 184;
   /** RegularExpression Id. */
-  int T_DOWN = 185;
+  int T_UPPER = 185;
   /** RegularExpression Id. */
-  int T_NOT = 186;
+  int T_MODULE = 186;
   /** RegularExpression Id. */
-  int T_AT = 187;
+  int T_SORT = 187;
   /** RegularExpression Id. */
-  int T_DASH = 188;
+  int T_DATA = 188;
   /** RegularExpression Id. */
-  int T_DIGIT = 189;
+  int T_SCHEME = 189;
   /** RegularExpression Id. */
-  int T_LOWER = 190;
+  int T_AUTOMATIC = 190;
   /** RegularExpression Id. */
-  int T_UPPER = 191;
+  int T_SYMBOL = 191;
   /** RegularExpression Id. */
-  int T_MODULE = 192;
+  int T_STATIC = 192;
   /** RegularExpression Id. */
-  int T_SORT = 193;
+  int T_ATTRIBUTE = 193;
   /** RegularExpression Id. */
-  int T_DATA = 194;
+  int T_COMPOSE = 194;
   /** RegularExpression Id. */
-  int T_SCHEME = 195;
+  int T_SUGAR = 195;
   /** RegularExpression Id. */
-  int T_AUTOMATIC = 196;
+  int T_RULE = 196;
   /** RegularExpression Id. */
-  int T_SYMBOL = 197;
+  int T_PRIORITY = 197;
   /** RegularExpression Id. */
-  int T_STATIC = 198;
+  int T_DEFAULT = 198;
   /** RegularExpression Id. */
-  int T_ATTRIBUTE = 199;
+  int T_IMPORT = 199;
   /** RegularExpression Id. */
-  int T_COMPOSE = 200;
+  int T_TAG = 200;
   /** RegularExpression Id. */
-  int T_SUGAR = 201;
+  int T_SPACE = 201;
   /** RegularExpression Id. */
-  int T_RULE = 202;
+  int T_TOKEN = 202;
   /** RegularExpression Id. */
-  int T_PRIORITY = 203;
+  int T_FRAGMENT = 203;
   /** RegularExpression Id. */
-  int T_DEFAULT = 204;
+  int T_NESTED = 204;
   /** RegularExpression Id. */
-  int T_IMPORT = 205;
+  int T_META = 205;
   /** RegularExpression Id. */
-  int T_TAG = 206;
+  int T_VAR = 206;
   /** RegularExpression Id. */
-  int T_SPACE = 207;
+  int T_CON = 207;
   /** RegularExpression Id. */
-  int T_TOKEN = 208;
+  int T_SUFFIX = 208;
   /** RegularExpression Id. */
-  int T_FRAGMENT = 209;
+  int T_NAME = 209;
   /** RegularExpression Id. */
-  int T_NESTED = 210;
+  int T_FRAGMENT_REF = 210;
   /** RegularExpression Id. */
-  int T_META = 211;
+  int T_NATURAL = 211;
   /** RegularExpression Id. */
-  int T_VAR = 212;
+  int T_INTEGER = 212;
   /** RegularExpression Id. */
-  int T_CON = 213;
+  int T_UNNATURAL = 213;
   /** RegularExpression Id. */
-  int T_SUFFIX = 214;
+  int T_STRING = 214;
   /** RegularExpression Id. */
-  int T_NAME = 215;
+  int T_STRING1CHAR = 215;
   /** RegularExpression Id. */
-  int T_FRAGMENT_REF = 216;
+  int T_STRING2CHAR = 216;
   /** RegularExpression Id. */
-  int T_NATURAL = 217;
+  int T_ESCAPEDCHAR = 217;
   /** RegularExpression Id. */
-  int T_INTEGER = 218;
+  int T_HEX = 218;
   /** RegularExpression Id. */
-  int T_UNNATURAL = 219;
+  int T_OTHERCHAR = 219;
   /** RegularExpression Id. */
-  int T_STRING = 220;
+  int T_WORD = 220;
   /** RegularExpression Id. */
-  int T_STRING1CHAR = 221;
+  int T_CHAR_CLASS = 221;
   /** RegularExpression Id. */
-  int T_STRING2CHAR = 222;
+  int T_CC_NOT = 222;
   /** RegularExpression Id. */
-  int T_ESCAPEDCHAR = 223;
+  int T_CC_RBRACKET = 223;
   /** RegularExpression Id. */
-  int T_HEX = 224;
+  int T_CC_DASH = 224;
   /** RegularExpression Id. */
-  int T_OTHERCHAR = 225;
-  /** RegularExpression Id. */
-  int T_WORD = 226;
-  /** RegularExpression Id. */
-  int T_CHAR_CLASS = 227;
-  /** RegularExpression Id. */
-  int T_CC_NOT = 228;
-  /** RegularExpression Id. */
-  int T_CC_RBRACKET = 229;
-  /** RegularExpression Id. */
-  int T_CC_DASH = 230;
-  /** RegularExpression Id. */
-  int T_CC_OTHER = 231;
+  int T_CC_OTHER = 225;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -540,12 +528,6 @@ public interface RawConstants {
     "\"%InheritedRefs\"",
     "<MT_InheritedRef>",
     "\"%InheritedRef\"",
-    "<MT_SynthesizedRefSome>",
-    "\"%SynthesizedRefSome\"",
-    "<MT_SynthesizedRefs>",
-    "\"%SynthesizedRefs\"",
-    "<MT_SynthesizedRef>",
-    "\"%SynthesizedRef\"",
     "<MT_Rule>",
     "\"%Rule\"",
     "<MT_Priority>",
@@ -583,7 +565,7 @@ public interface RawConstants {
     "\"/*\"",
     "\"/*\"",
     "\"*/\"",
-    "<token of kind 113>",
+    "<token of kind 107>",
     "<MT_ModuleName>",
     "\"%ModuleName\"",
     "<MT_SortName>",
@@ -635,7 +617,7 @@ public interface RawConstants {
     "\"\\u27e9\"",
     "<T_CONCRETESPACE>",
     "<T_CONCRETEWORD>",
-    "<token of kind 165>",
+    "<token of kind 159>",
     "\";\"",
     "\"|\"",
     "\"(\"",

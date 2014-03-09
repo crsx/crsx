@@ -21,9 +21,9 @@ NormalizedSortMap ::=( NSM[NameSet<!--Names-->]; );
 Wrapper ::=( NoWrapper; Wrapper[RawParsedForm]; );
 
 SortEntry ::=(
- SE_TOKEN[NameSet<!--synthesizes-->, $String<!--FullSortName-->];
+ SE_TOKEN[$String<!--FullSortName-->];
  SE_ATTRIBUTE[RawAttributeKind, $String<!--AttributeName-->, RawAttributeForm, $List[RawAttributeOption]];
- SE_SORT[$List[Define], NameSet<!--synthesizes-->, $String<!--FullSortName-->, NameSet<!--precs-->, Wrapper];
+ SE_SORT[$List[Define], $String<!--FullSortName-->, NameSet<!--precs-->, Wrapper];
  SE_NONE;
 );
 
@@ -31,6 +31,7 @@ SortEntry ::=(
 Define ::=(
  D_ABSTRACTION[a::RawSortParam . Define];
  D_FORM[RawForm, FormKind];
+ D_SYNTHESIZES[$String<!--AttributeName-->];
  D_RULE[RawRule, $String<!--sort-->, Boolean<!--IsDataEquivalence?-->];
  D_NONE;
 );
@@ -93,12 +94,6 @@ N-resolve[{#LOC}%rawDeclarations⟪ #SortAlternatives# ; #Declarations# ⟫]
 {#LOC}%rawDeclarations⟪ #SortAlternatives# ; %Declarations« N-resolve[#Declarations#] » ⟫
 ;
 
-ResolveSynthesize:
-N-resolve[{#LOC}%rawDeclarations⟪ #SynthesizedRefSome# ; #Declarations# ⟫]
-→
-{#LOC}%rawDeclarations⟪ #SynthesizedRefSome# ; %Declarations« N-resolve[#Declarations#] » ⟫
-;
-
 ResolveRule:
 N-resolve[{#LOC}%rawDeclarations⟪ rule #Rule# ; #Declarations# ⟫]
 →
@@ -159,7 +154,7 @@ Declarations-token[Data[#SortName]]:
 {#ND}
 N-Declarations1[%rawDeclarations⟪ token #SortName# | #RegExp# ; #Declarations# ⟫, #ModuleName, #LastSortName, #SortNames, ok¹ s ss.#[ok¹,s,ss]]
 →
-{#ND; #SortName# : SE_TOKEN[NoNames, #SortName#]}
+{#ND; #SortName# : SE_TOKEN[#SortName#]}
 N-Declarations1[#Declarations#, #ModuleName, "", AddName[#SortNames, #SortName#], ok¹ s ss.#[ok¹,s,ss]]
 ;
 
@@ -193,14 +188,6 @@ N-Declarations1[%rawDeclarations⟪ #SortAlternatives# ; #Declarations# ⟫, #Mo
 →
 {#ND}
 N-SortAlternatives[#SortAlternatives#, #ModuleName, #LastSortName, #Names, ok¹ s ss.N-then-Declarations1[ok¹, #Declarations#, #ModuleName, s, ss, ok2¹ s2 ss2.#[ok2¹,s2,ss2]]]
-;
-
-Declarations-synthesizedrefs:
-{#ND}
-N-Declarations1[%rawDeclarations⟪ #SynthesizedRefSome# ; #Declarations# ⟫, #ModuleName, #LastSortName, #Names, ok¹ s ss.#[ok¹,s,ss]]
-→
-{#ND}
-_InsertSynthesizedRefs[#SynthesizedRefSome#, #LastSortName, ok¹.N-then-Declarations1[ok¹, #Declarations#, #ModuleName, #LastSortName, #Names, ok2¹ s2 ss2.#[ok2¹,s2,ss2]]]
 ;
 
 Declarations-rule:
@@ -287,11 +274,15 @@ N-SortAlternativesDefines[%rawSortAlternatives⟪ #SortAlternative# #SortAlterna
 ; 
 
 N-SortAlternativeDefine[RawSortAlternative] :: Define ;
+
+N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | scheme #Form#         ⟫] → {#LOC} D_FORM[#Form#, FK_SCHEME[N-FormInheritedAttributes[#Form#]]] ;
 N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | data #Form# #Tagging# ⟫] → {#LOC} D_FORM[#Form#, FK_DATA[#Tagging#]];
 N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | symbol #Form#         ⟫] → {#LOC} D_FORM[#Form#, FK_SYMBOL[$False]];
 N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | static symbol #Form#  ⟫] → {#LOC} D_FORM[#Form#, FK_SYMBOL[$True]];
-N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | scheme #Form#         ⟫] → {#LOC} D_FORM[#Form#, FK_SCHEME[N-FormInheritedAttributes[#Form#]]] ;
 N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | sugar #Form# → #Term# ⟫] → {#LOC} D_FORM[#Form#, FK_SUGAR[#Term#]] ;
+
+N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | ↑ #AttributeName# ⟫] → {#LOC} D_SYNTHESIZES[#AttributeName#] ;
+
 
 /////////////////////////////////////////////////////////////////////
 // Just extract (TODO: check) list of attributes from Form.
@@ -334,7 +325,7 @@ AddName[N-InheritedRefsList[#refs], #AttributeName1#]
 {#ND} N-Finish0[#RestNames, #Names]
 ;
 
-{#ND} N-Finish3[SE_TOKEN[#Synthesizes, #Name], #RestNames, #Names]
+{#ND} N-Finish3[SE_TOKEN[#Name], #RestNames, #Names]
 →
 {#ND} N-Finish0[#RestNames, #Names]
 ;
@@ -344,7 +335,7 @@ AddName[N-InheritedRefsList[#refs], #AttributeName1#]
 {#ND} N-Finish0[#RestNames, #Names]
 ;
 
-{#ND} N-Finish3[SE_SORT[#Defines1, #Synthesizes1, #Name1, #Precs1, #Wrapper1], #RestNames, #Names]
+{#ND} N-Finish3[SE_SORT[#Defines1, #Name1, #Precs1, #Wrapper1], #RestNames, #Names]
 →
 {#ND} N-Finish4[#Precs1, 0, #Name1, #RestNames, #Names]
 ;
@@ -446,12 +437,11 @@ _InsertDefine1[SortEntry<!--existing-->, Define<!--new-->, $String<!--SortName--
                 ok¹::Ok s::$String<!--SortName--> ss::NameSet<!--SortNames--> . NormalizedSortMap] :: NormalizedSortMap ;
 //
 {#ND}
-_InsertDefine1[SE_SORT[#existingDefines1, #Synthesizes1, #Name1, #Precs1, #Wrapper1], #newDefine, #Name, #Names, ok¹ s ss.#[ok¹, s, ss]]
+_InsertDefine1[SE_SORT[#existingDefines1, #Name1, #Precs1, #Wrapper1], #newDefine, #Name, #Names, ok¹ s ss.#[ok¹, s, ss]]
 →
 {#ND}
 _InsertDefine4[
 	_InsertDefine2[#existingDefines1, #newDefine],
-	#Synthesizes1,
 	AddNameNumber[#Precs1, _DefinePrec[#newDefine]],
 	#Name1,
 	#Names,
@@ -473,7 +463,7 @@ _InsertDefine1b[$String<!--SortName-->, NameSet<!--SortNames-->, Define, NameSet
 {#ND}
 _InsertDefine1b[#Name, #Names, #newDefine, #Precs, #Wrapper, ok¹ s ss.#[ok¹, s, ss]]
 →
-{#ND; #Name : SE_SORT[(#newDefine;), NoNames, #Name, #Precs, #Wrapper]}
+{#ND; #Name : SE_SORT[(#newDefine;), #Name, #Precs, #Wrapper]}
 #[OK, #Name, AddName[#Names, #Name]]
 ;
 
@@ -492,14 +482,14 @@ _InsertDefine3[B_TRUE , #newDefine, #Define1, #Defines] → (#newDefine; #Define
 _InsertDefine3[B_FALSE, #newDefine, #Define1, #Defines] → (#Define1; _InsertDefine2[#Defines, #newDefine]) ;
 
 {$String<!--SortName--> : SortEntry}
-_InsertDefine4[$List[Define], NameSet<!--synthesizes-->, NameSet<!--precs-->, $String<!--SortName-->, NameSet<!--SortNames-->, Wrapper,
+_InsertDefine4[$List[Define], NameSet<!--precs-->, $String<!--SortName-->, NameSet<!--SortNames-->, Wrapper,
                 ok¹::Ok s::$String<!--SortName--> ss::NameSet<!--SortNames--> . NormalizedSortMap] :: NormalizedSortMap ;
 //
 -[Data[#Defines,#Name,#Precs,#Wrapper]]:
 {#ND}
-_InsertDefine4[#Defines, #Synthesizes, #Precs, #Name, #Names, #Wrapper, ok¹ s ss.#[ok¹, s, ss]]
+_InsertDefine4[#Defines, #Precs, #Name, #Names, #Wrapper, ok¹ s ss.#[ok¹, s, ss]]
 →
-{#ND; #Name : SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper]}
+{#ND; #Name : SE_SORT[#Defines, #Name, #Precs, #Wrapper]}
 #[OK, #Name, #Names]
 ;
 
@@ -535,57 +525,6 @@ _then-InsertDefines[OK, #Defines, #Name, #Names, ok¹ s ss.#[ok¹,s,ss]]
 _InsertDefines[#Defines, #Name, #Names, ok¹ s ss.#[ok¹,s,ss]]
 ;
 
-// Helper to insert synthesized attribute declarations.
-//
-{$String<!--SortName--> : SortEntry}
-_InsertSynthesizedRefs[$List[RawSynthesizedRef], $String<!--SortName-->, ok¹::Ok . NormalizedSortMap] :: NormalizedSortMap ;
-//
--[Data[#Name],Share[#Define,#]]:
-{#ND}
-_InsertSynthesizedRefs[#SynthesizedRefs#, #Name, ok¹.#[ok¹]]
-→
-{#ND}
-_InsertSynthesizedRefs1[$[{#ND}Get[SortEntry], #Name, SE_NONE], #SynthesizedRefs#, #Name, ok¹.#[ok¹]]
-;
-
-{$String<!--SortName--> : SortEntry}
-_InsertSynthesizedRefs1[SortEntry, $List[RawSynthesizedRef], $String<!--SortName-->, ok¹::Ok . NormalizedSortMap] :: NormalizedSortMap ;
-//
-{#ND}
-_InsertSynthesizedRefs1[SE_NONE<!--not found-->, #SynthesizedRefs#, #Name, ok¹.#[ok¹]]
-→
-_InsertSynthesizedRefs2[#Name, SE_SORT[(), _AddSynthesizedRefs[NoNames, #SynthesizedRefs#], #Name, NoNames, NoWrapper], ok¹.#[ok¹]]
-;
-
-{#ND}
-_InsertSynthesizedRefs1[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper], #SynthesizedRefs#, #Name, ok¹.#[ok¹]]
-→
-{#ND}
-_InsertSynthesizedRefs2[#Name, SE_SORT[#Defines, _AddSynthesizedRefs[#Synthesizes, #SynthesizedRefs#], #Name, #Precs, #Wrapper], ok¹.#[ok¹]]
-;
-
-{#ND}
-_InsertSynthesizedRefs1[SE_TOKEN[#Synthesizes, #Name], #SynthesizedRefs#, #Name, ok¹.#[ok¹]]
-→
-{#ND}
-_InsertSynthesizedRefs2[#Name, SE_TOKEN[_AddSynthesizedRefs[#Synthesizes, #SynthesizedRefs#], #Name], ok¹.#[ok¹]]
-;
-
-{$String<!--SortName--> : SortEntry}
-_InsertSynthesizedRefs2[$String<!--SortName-->, SortEntry, ok¹::Ok . NormalizedSortMap] :: NormalizedSortMap ;
-//
--[Data[#Name,#Entry]]:
-{#ND}
-_InsertSynthesizedRefs2[#Name, #Entry, ok¹.#[ok¹]]
-→
-{#ND; #Name : #Entry}
-#[OK]
-;
-
-_AddSynthesizedRefs[NameSet, $List[RawSynthesizedRef]] :: NameSet;
-_AddSynthesizedRefs[#Names, ()] → #Names ;
-_AddSynthesizedRefs[#Names, (%rawSynthesizedRef⟪ ↑ #AttributeName# ⟫; #SynthesizedRefs#)] → AddName[_AddSynthesizedRefs[#Names, #SynthesizedRefs#], #AttributeName#] ;
-
 
 /////////////////////////////////////////////////////////////////////
 // COMPARISON OF DEFINES.
@@ -599,9 +538,21 @@ _DefineLessEqual[Define, Define] :: Boolean ;
 DLE-Abstraction-Rule     : _DefineLessEqual[D_ABSTRACTION[a.#D1[a]], D_RULE[#R2, #S2, #D2]] → B_TRUE ;
 DLE-Rule-Abstraction     : _DefineLessEqual[D_RULE[#R1, #S1, #D1], D_ABSTRACTION[a.#D2[a]]] → B_FALSE ;
                          
+DLE-Synthesizes-Rule: _DefineLessEqual[D_SYNTHESIZES[#A1], D_RULE[#R2, #S2, #D2]] → B_TRUE ;
+DLE-Rule-Synthesizes: _DefineLessEqual[D_RULE[#R1, #S1, #D1], D_SYNTHESIZES[#A2]] → B_FALSE ;
+                         
 DLE-Form-Rule            : _DefineLessEqual[D_FORM[#F1, #K1], D_RULE[#R2, #S2, #D2]] → B_TRUE ;
 DLE-Rule-Form            : _DefineLessEqual[D_RULE[#R1, #S1, #D1], D_FORM[#F2, #K2]] → B_FALSE ;
-                         
+
+DLE-Abstraction-Synthesizes     : _DefineLessEqual[D_ABSTRACTION[a.#D1[a]], D_SYNTHESIZES[#A2]] → B_TRUE ;
+DLE-Synthesizes-Abstraction     : _DefineLessEqual[D_SYNTHESIZES[#A1], D_ABSTRACTION[a.#D2[a]]] → B_FALSE ;
+
+DLE-Abstraction-Form: _DefineLessEqual[D_ABSTRACTION[a.#D1[a]], D_FORM[#F2, #K2]] → B_TRUE ;
+DLE-Form-Abstraction: _DefineLessEqual[D_FORM[#F1, #K1], D_ABSTRACTION[a.#D2[a]]] → B_FALSE ;
+
+DLE-Form-Synthesizes: _DefineLessEqual[D_FORM[#F1, #K1], D_SYNTHESIZES[#A2]] → B_TRUE ;
+DLE-Synthesizes-Form: _DefineLessEqual[D_SYNTHESIZES[#A1], D_FORM[#F2, #K2]] → B_FALSE ;
+          
 // (2) Abstractions traversed in parallel.
 
 _DefineLessEqual[D_ABSTRACTION[a.#Define1[a]], D_ABSTRACTION[a.#Define2[a]]]
@@ -629,6 +580,7 @@ _DefinePrec[Define] :: $Numeric;
 _DefinePrec[D_FORM[RAW-FormParsedSorted[#Name, #ParsedForm, #Precedence, #InheritedRefs], #Kind]] → #Precedence ;
 _DefinePrec[D_FORM[RAW-FormParsedUnsorted[#ParsedForm, #Precedence, #InheritedRefs], #Kind]] → #Precedence ;
 _DefinePrec[D_FORM[RAW-FormConstruction[#Constructor, #ScopeSortList, #InheritedRefs], #Kind]] → 0 ;
+_DefinePrec[D_SYNTHESIZES[#AttributeName]] → 0 ;
 _DefinePrec[D_RULE[#Rule, #SortName, #IsData]] → 0 ;
 
 
@@ -640,6 +592,7 @@ _DefineWrapper[Define, $String<!--SortName-->, Wrapper] :: Wrapper ;
 _DefineWrapper[D_FORM[RAW-FormParsedSorted[#Name, #ParsedForm, #Prec, #InheritedRefs], #Kind], #Name, #Wrapper] → _DefineWrapperForm[#ParsedForm, #Prec, #Kind, #Name, #Wrapper] ;
 _DefineWrapper[D_FORM[RAW-FormParsedUnsorted[#ParsedForm, #Prec, #InheritedRefs], #Kind], #Name, #Wrapper] → _DefineWrapperForm[#ParsedForm, #Prec, #Kind, #Name, #Wrapper] ;
 _DefineWrapper[D_FORM[RAW-FormConstruction[#Constructor, #ScopeSortList, #InheritedRefs], #Kind], #Name, #Wrapper] →  #Wrapper ;
+_DefineWrapper[D_SYNTHESIZES[#AttributeName], #Name, #Wrapper] → #Wrapper ;
 _DefineWrapper[D_RULE[#Rule, #SortName, #IsData], #Name, #Wrapper] → #Wrapper ;
 
 _DefineWrapperForm[RawParsedForm, $Numeric, FormKind, $String<!--SortName-->, Wrapper] :: Wrapper ;
@@ -749,10 +702,10 @@ DERIVED_SORT ::=( DERIVED[$String, $Numeric<!--Precedence-->, RawRepeat]; );
 DerivedSorts2[SortEntry, $List[DERIVED_SORT]] :: $List[DERIVED_SORT];
 
 DerivedSorts2[SE_NONE, #derived] → #derived ;
-DerivedSorts2[SE_TOKEN[#synthesizes, #name], #derived] → #derived ;
+DerivedSorts2[SE_TOKEN[#name], #derived] → #derived ;
 DerivedSorts2[SE_ATTRIBUTE[#kind, #name, #form, #options], #derived] → #derived ;
 
-DerivedSorts2[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper], #derived]
+DerivedSorts2[SE_SORT[#Defines, #Name, #Precs, #Wrapper], #derived]
 →
 FoldWhen[ok defined derived.Then-DerivedSorts-Defines[ok, defined, derived], #Defines, #derived]
 ;
@@ -761,6 +714,7 @@ Then-DerivedSorts-Defines[Ok, Define, $List[DERIVED_SORT]] :: $List[DERIVED_SORT
 -[Fresh[dummy::RawSortParam]]: Then-DerivedSorts-Defines[OK, D_ABSTRACTION[a . #Define[a]], #derived] → Then-DerivedSorts-Defines[OK, #Define[dummy], #derived] ;
 Then-DerivedSorts-Defines[OK, D_FORM[#Form, #Kind], #derived] → DerivedSorts-Form[#Form, #derived] ;
 Then-DerivedSorts-Defines[OK, D_RULE[#Rule, #SortName, #IsDataEquivalence], #derived] → DerivedSorts-Rule[#Rule, #derived] ;
+Then-DerivedSorts-Defines[OK, D_SYNTHESIZES[#AttributeName], #derived] → #derived ;
 Then-DerivedSorts-Defines[OK, D_NONE, #derived] → #derived ;
 
 DerivedSorts-Form[RawForm, $List[DERIVED_SORT]] :: $List[DERIVED_SORT];
@@ -779,7 +733,7 @@ DerivedSorts-ScopeSort[#ScopeSort, #Precedence, #Repeat, DerivedSorts-ParsedForm
 
 DerivedSorts-ScopeSort[RawScopeSort, $Numeric, RawRepeat, $List[DERIVED_SORT]] :: $List[DERIVED_SORT];
 DerivedSorts-ScopeSort[%rawScopeSort⟪ #Sort# #Repeat# [ #SubstituteSorts1# ] ⟫, #Precedence, #Repeat, #derived] → DerivedSorts-Sort[#Sort#, #Precedence, NestedRepeat[#Repeat#, #Repeat], #derived] ;
-DerivedSorts-ScopeSort[%rawScopeSort⟪ [ #Sort# ] ⟫, #Precedence, #Repeat, #derived] → #derived ;
+DerivedSorts-ScopeSort[%rawScopeSort⟪ [ #Variable# : #Sort# ] ⟫, #Precedence, #Repeat, #derived] → #derived ;
 
 DerivedSorts-Sort[RawSort, $Numeric, RawRepeat, $List[DERIVED_SORT]] :: $List[DERIVED_SORT];
 -[Data[#Repeat]]:
@@ -897,11 +851,11 @@ ConstructorScopeSorts1[#Entry, #Constructor]
 
 ConstructorScopeSorts1[SortEntry, $String<!--Constructor-->] :: Lifted[$List[RawScopeSort]] ;
 
-ConstructorScopeSorts1[SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper], #Constructor]
+ConstructorScopeSorts1[SE_SORT[#Defines, #Name, #Precs, #Wrapper], #Constructor]
 →
 ConstructorScopeSorts2[#Defines, #Constructor]
 ;
-ConstructorScopeSorts1[$[NotMatch,SE_SORT[#Defines, #Synthesizes, #Name, #Precs, #Wrapper],#_], #Constructor] → BOTTOM ;
+ConstructorScopeSorts1[$[NotMatch,SE_SORT[#Defines, #Name, #Precs, #Wrapper],#_], #Constructor] → BOTTOM ;
 
 ConstructorScopeSorts2[$List[Define], $String<!--Constructor-->] :: Lifted[$List[RawScopeSort]] ;
 
@@ -916,6 +870,8 @@ ConstructorScopeSorts2[(D_FORM[#Form, #Kind]; #Defines), #Constructor]
 →
 ConstructorScopeSorts3[#Form, #Defines, #Constructor]
 ;
+
+ConstructorScopeSorts2[(D_SYNTHESIZES[#AttributeName]; #Defines), #Constructor] → ConstructorScopeSorts2[#Defines, #Constructor] ;
 
 ConstructorScopeSorts3[RawForm, $List[Define], $String<!--Constructor-->] :: Lifted[$List[RawScopeSort]] ;
 -[Data[#Constructor1,#Constructor2]]:

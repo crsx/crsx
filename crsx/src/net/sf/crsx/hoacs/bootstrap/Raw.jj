@@ -19,7 +19,7 @@ package net.sf.crsx.hoacs.bootstrap;
  * Used to bootstrap HOACS on a crsx3 system.
  *
  * @author <a href="http://www.research.ibm.com/people/k/krisrose">Kristoffer Rose</a>.
- * @version $Id: Raw.jj,v 1.34 2013/12/12 08:04:38 krisrose Exp $
+ * @version $Id: Raw.pg,v 1.32 2013/12/05 03:28:29 krisrose Exp $
  */
 public class Raw implements net.sf.crsx.Parser
 {
@@ -70,8 +70,6 @@ public class Raw implements net.sf.crsx.Parser
 		categoryCall.put("rawFormPrec", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_FormPrec$WithEOF(sink, bound);} });
 		categoryCall.put("rawInheritedRefs", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_InheritedRefs$WithEOF(sink, bound);} });
 		categoryCall.put("rawInheritedRef", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_InheritedRef$WithEOF(sink, bound);} });
-		categoryCall.put("rawSynthesizedRefSome", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_SynthesizedRefSome$WithEOF(sink, bound);} });
-		categoryCall.put("rawSynthesizedRefs", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_SynthesizedRefs$WithEOF(sink, bound);} });
 		categoryCall.put("rawSynthesizedRef", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_SynthesizedRef$WithEOF(sink, bound);} });
 		categoryCall.put("rawAttributeKind", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_AttributeKind$WithEOF(sink, bound);} });
 		categoryCall.put("rawAttributeForm", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_AttributeForm$WithEOF(sink, bound);} });
@@ -400,7 +398,6 @@ TOKEN : {<IT_Declaration : "%Declaration">}
  *  |   <a href="#T_ATTRIBUTE">ATTRIBUTE</a><font color="red">:raw</font>   <a href="#N_AttributeKind">&lang;AttributeKind&rang;</a>    <a href="#N_AttributeName">&lang;AttributeName&rang;</a>    <a href="#N_AttributeForm">&lang;AttributeForm&rang;</a>    <a href="#N_AttributeOptions">&lang;AttributeOptions&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |   <a href="#T_SORT">SORT</a><font color="red">:raw</font>   <a href="#N_SortName">&lang;SortName&rang;</a>    <a href="#N_Repeat">&lang;Repeat&rang;</a>    <a href="#N_SortAbstraction">&lang;SortAbstraction&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  <font color="red">{anonymous}</font><font color="red">:raw</font>   <a href="#N_SortAlternatives">&lang;SortAlternatives&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
- *  |  <font color="red">{synthesizedrefs}</font><font color="red">:raw</font>   <a href="#N_SynthesizedRefSome">&lang;SynthesizedRefSome&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  (   <a href="#T_RULE">RULE</a>  )?   <font color="red">{rule}</font><font color="red">:raw</font>   <a href="#N_Rule">&lang;Rule&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  <font color="red">{nestedDeclarations}</font><font color="red">:raw</font>    <a href="#T_LBRACE">LBRACE</a>   <a href="#N_Declarations">&lang;Declarations&rang;</a>     <a href="#T_RBRACE">RBRACE</a> 
  */
@@ -616,21 +613,6 @@ net.sf.crsx.Sink N_Declaration(net.sf.crsx.Sink sink, net.sf.crsx.util.Extensibl
 	 ) 
 	 ( 
 	sink=N_SortAlternatives(sink, env)
-	 ) 
-	 ( 
-	 <T_SEMI>
-	 ) 
-	{
-		return sink .end() ;
-	}
- |
-	 ( 
-	{
-		sink = sink .start(makeTConstructor(sink, t, raw("synthesizedrefs"), null)) ;
-	}
-	 ) 
-	 ( 
-	sink=N_SynthesizedRefSome(sink, env)
 	 ) 
 	 ( 
 	 <T_SEMI>
@@ -1515,7 +1497,7 @@ TOKEN : {<MT_SortAlternative : "#SortAlternative" ((<T_DIGIT>)* | "_" (<T_DIGIT>
 TOKEN : {<IT_SortAlternative : "%SortAlternative">}
 
 /**
- * <em>SortAlternative</em> ::=   <a href="#T_BAR">BAR</a>   (   <a href="#T_SCHEME">SCHEME</a><font color="red">:raw</font>   <a href="#N_Form">&lang;Form&rang;</a>   |   <a href="#T_SUGAR">SUGAR</a><font color="red">:raw</font>   <a href="#N_Form">&lang;Form&rang;</a>     <a href="#T_ARROW">ARROW</a>   <a href="#N_Term">&lang;Term&rang;</a>   |   <a href="#T_SYMBOL">SYMBOL</a><font color="red">:raw</font>   <a href="#N_Form">&lang;Form&rang;</a>   |   <a href="#T_STATIC">STATIC</a><font color="red">:raw</font>   (   <a href="#T_SYMBOL">SYMBOL</a>  )?   <a href="#N_Form">&lang;Form&rang;</a>   |  <font color="red">{data}</font><font color="red">:raw</font>   (   <a href="#T_DATA">DATA</a>  )?   <a href="#N_Form">&lang;Form&rang;</a>    <a href="#N_Tagging">&lang;Tagging&rang;</a>   ) 
+ * <em>SortAlternative</em> ::=   <a href="#T_BAR">BAR</a>   (   <a href="#T_SCHEME">SCHEME</a><font color="red">:raw</font>   <a href="#N_Form">&lang;Form&rang;</a>   |  <font color="red">{SynthesizedRef}</font><font color="red">:raw</font>    <a href="#T_UP">UP</a>   <a href="#N_AttributeName">&lang;AttributeName&rang;</a>   |   <a href="#T_SUGAR">SUGAR</a><font color="red">:raw</font>   <a href="#N_Form">&lang;Form&rang;</a>     <a href="#T_ARROW">ARROW</a>   <a href="#N_Term">&lang;Term&rang;</a>   |   <a href="#T_SYMBOL">SYMBOL</a><font color="red">:raw</font>   <a href="#N_Form">&lang;Form&rang;</a>   |   <a href="#T_STATIC">STATIC</a><font color="red">:raw</font>   (   <a href="#T_SYMBOL">SYMBOL</a>  )?   <a href="#N_Form">&lang;Form&rang;</a>   |  <font color="red">{data}</font><font color="red">:raw</font>   (   <a href="#T_DATA">DATA</a>  )?   <a href="#N_Form">&lang;Form&rang;</a>    <a href="#N_Tagging">&lang;Tagging&rang;</a>   ) 
  */
 net.sf.crsx.Sink N_SortAlternative(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
 {
@@ -1538,6 +1520,21 @@ net.sf.crsx.Sink N_SortAlternative(net.sf.crsx.Sink sink, net.sf.crsx.util.Exten
 		 ) 
 		 ( 
 		sink=N_Form(sink, env)
+		 ) 
+		{
+			sink = sink .end() ;
+		}
+	|
+		 ( 
+		{
+			sink = sink .start(makeTConstructor(sink, t, raw("SynthesizedRef"), null)) ;
+		}
+		 ) 
+		 ( 
+		 <T_UP>
+		 ) 
+		 ( 
+		sink=N_AttributeName(sink, env)
 		 ) 
 		{
 			sink = sink .end() ;
@@ -1819,7 +1816,7 @@ TOKEN : {<IT_ScopeSort : "%ScopeSort">}
 
 /**
  * <em>ScopeSort</em> ::=  <font color="red">{ScopeSort}</font><font color="red">:raw</font>   <a href="#N_Sort">&lang;Sort&rang;</a>    <a href="#N_Repeat">&lang;Repeat&rang;</a>    (   <a href="#T_LBRACKET">LBRACKET</a>   (  <a href="#N_SubstituteSorts">&lang;SubstituteSorts&rang;</a>   |  <font color="red">{$Nil}</font>  )    <a href="#T_RBRACKET">RBRACKET</a>  |  <font color="red">{$Nil}</font>  )  <br>
- *  |  <font color="red">{ScopeSortBinder}</font><font color="red">:raw</font>    <a href="#T_LBRACKET">LBRACKET</a>   <a href="#N_Sort">&lang;Sort&rang;</a>     <a href="#T_RBRACKET">RBRACKET</a> 
+ *  |  <font color="red">{ScopeSortBinder}</font><font color="red">:raw</font>    <a href="#T_LBRACKET">LBRACKET</a>   <a href="#N_Variable">&lang;Variable&rang;</a>     <a href="#T_COLON">COLON</a>   <a href="#N_Sort">&lang;Sort&rang;</a>     <a href="#T_RBRACKET">RBRACKET</a> 
  */
 net.sf.crsx.Sink N_ScopeSort(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
 {
@@ -1883,6 +1880,12 @@ net.sf.crsx.Sink N_ScopeSort(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleM
 	 ) 
 	 ( 
 	 <T_LBRACKET>
+	 ) 
+	 ( 
+	sink=N_Variable(sink, env)
+	 ) 
+	 ( 
+	 <T_COLON>
 	 ) 
 	 ( 
 	sink=N_Sort(sink, env)
@@ -1960,7 +1963,7 @@ TOKEN : {<MT_SubstituteSort : "#SubstituteSort" ((<T_DIGIT>)* | "_" (<T_DIGIT> |
 TOKEN : {<IT_SubstituteSort : "%SubstituteSort">}
 
 /**
- * <em>SubstituteSort</em> ::=  <font color="red">{SubstituteSort}</font><font color="red">:raw</font>   <a href="#N_Sort">&lang;Sort&rang;</a>     <a href="#T_COLON">COLON</a>   <a href="#N_Sort">&lang;Sort&rang;</a>  
+ * <em>SubstituteSort</em> ::=  <font color="red">{SubstituteSort}</font><font color="red">:raw</font>   <a href="#N_Variable">&lang;Variable&rang;</a>     <a href="#T_COLON">COLON</a>   <a href="#N_Sort">&lang;Sort&rang;</a>  
  */
 net.sf.crsx.Sink N_SubstituteSort(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
 {
@@ -1977,7 +1980,7 @@ net.sf.crsx.Sink N_SubstituteSort(net.sf.crsx.Sink sink, net.sf.crsx.util.Extens
 	}
 	 ) 
 	 ( 
-	sink=N_Sort(sink, env)
+	sink=N_Variable(sink, env)
 	 ) 
 	 ( 
 	 <T_COLON>
@@ -2517,138 +2520,6 @@ net.sf.crsx.Sink N_InheritedRef(net.sf.crsx.Sink sink, net.sf.crsx.util.Extensib
 	 ) 
 	 ( 
 	 <T_DOWN>
-	 ) 
-	 ( 
-	sink=N_AttributeName(sink, env)
-	 ) 
-	{
-		return sink .end() ;
-	}
-}
-
-/** <em>SynthesizedRefSome$WithEOF</em> ::= <em>SynthesizedRefSome</em> EOF . */
-net.sf.crsx.Sink N_SynthesizedRefSome$WithEOF(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
-{}
-{ sink=N_SynthesizedRefSome(sink, env) <EOF> {return sink;} }
-
-/** Special meta-variable for SynthesizedRefSome production. */
-TOKEN : {<MT_SynthesizedRefSome : "#SynthesizedRefSome" ((<T_DIGIT>)* | "_" (<T_DIGIT> | <T_UPPER> | <T_LOWER>)*) "#">}
-
-/** Special inject token SynthesizedRefSome production. */
-TOKEN : {<IT_SynthesizedRefSome : "%SynthesizedRefSome">}
-
-/**
- * <em>SynthesizedRefSome</em> ::=  (  <font color="red">{$Cons}</font>   <a href="#N_SynthesizedRef">&lang;SynthesizedRef&rang;</a>    <a href="#N_SynthesizedRefs">&lang;SynthesizedRefs&rang;</a>   ) 
- */
-net.sf.crsx.Sink N_SynthesizedRefSome(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
-{
-	Token t = null;
-}
-{
-	t=<MT_SynthesizedRefSome> {sink = sink .startMetaApplication(t.toString());} [ "\u2983" sink=N_SortParam(sink, env)( "\u2225" sink=N_SortParam(sink, env))* "\u2984" ] {return sink.endMetaApplication();}
-|
-	<IT_SynthesizedRefSome>  {sink=N_Embedded(sink, env);}  {return sink;}
-|
-	 ( 
-		 ( 
-		{
-			sink = sink .start(makeTConstructor(sink, t, "$Cons", null)) ;
-		}
-		 ) 
-		 ( 
-		sink=N_SynthesizedRef(sink, env)
-		 ) 
-		 ( 
-		sink=N_SynthesizedRefs(sink, env)
-		 ) 
-		{
-			sink = sink .end() ;
-		}
-	 ) 
-	{return sink;}
-}
-
-/** <em>SynthesizedRefs$WithEOF</em> ::= <em>SynthesizedRefs</em> EOF . */
-net.sf.crsx.Sink N_SynthesizedRefs$WithEOF(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
-{}
-{ sink=N_SynthesizedRefs(sink, env) <EOF> {return sink;} }
-
-/** Special meta-variable for SynthesizedRefs production. */
-TOKEN : {<MT_SynthesizedRefs : "#SynthesizedRefs" ((<T_DIGIT>)* | "_" (<T_DIGIT> | <T_UPPER> | <T_LOWER>)*) "#">}
-
-/** Special inject token SynthesizedRefs production. */
-TOKEN : {<IT_SynthesizedRefs : "%SynthesizedRefs">}
-
-/**
- * <em>SynthesizedRefs</em> ::=  (  <font color="red">{$Cons}</font>   <a href="#N_SynthesizedRef">&lang;SynthesizedRef&rang;</a>    <a href="#N_SynthesizedRefs">&lang;SynthesizedRefs&rang;</a>   |  <font color="red">{$Nil}</font>  ) 
- */
-net.sf.crsx.Sink N_SynthesizedRefs(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
-{
-	Token t = null;
-}
-{
-	t=<MT_SynthesizedRefs> {sink = sink .startMetaApplication(t.toString());} [ "\u2983" sink=N_SortParam(sink, env)( "\u2225" sink=N_SortParam(sink, env))* "\u2984" ] {return sink.endMetaApplication();}
-|
-	<IT_SynthesizedRefs>  {sink=N_Embedded(sink, env);}  {return sink;}
-|
-	 ( 
-		 ( 
-		{
-			sink = sink .start(makeTConstructor(sink, t, "$Cons", null)) ;
-		}
-		 ) 
-		 ( 
-		sink=N_SynthesizedRef(sink, env)
-		 ) 
-		 ( 
-		sink=N_SynthesizedRefs(sink, env)
-		 ) 
-		{
-			sink = sink .end() ;
-		}
-	|
-		 ( 
-		{
-			sink = sink .start(makeTConstructor(sink, t, "$Nil", null)) ;
-		}
-		 ) 
-		{
-			sink = sink .end() ;
-		}
-	 ) 
-	{return sink;}
-}
-
-/** <em>SynthesizedRef$WithEOF</em> ::= <em>SynthesizedRef</em> EOF . */
-net.sf.crsx.Sink N_SynthesizedRef$WithEOF(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
-{}
-{ sink=N_SynthesizedRef(sink, env) <EOF> {return sink;} }
-
-/** Special meta-variable for SynthesizedRef production. */
-TOKEN : {<MT_SynthesizedRef : "#SynthesizedRef" ((<T_DIGIT>)* | "_" (<T_DIGIT> | <T_UPPER> | <T_LOWER>)*) "#">}
-
-/** Special inject token SynthesizedRef production. */
-TOKEN : {<IT_SynthesizedRef : "%SynthesizedRef">}
-
-/**
- * <em>SynthesizedRef</em> ::=  <font color="red">{SynthesizedRef}</font><font color="red">:raw</font>    <a href="#T_UP">UP</a>   <a href="#N_AttributeName">&lang;AttributeName&rang;</a>  
- */
-net.sf.crsx.Sink N_SynthesizedRef(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
-{
-	Token t = null;
-}
-{
-	t=<MT_SynthesizedRef> {sink = sink .startMetaApplication(t.toString());} [ "\u2983" sink=N_SortParam(sink, env)( "\u2225" sink=N_SortParam(sink, env))* "\u2984" ] {return sink.endMetaApplication();}
-|
-	<IT_SynthesizedRef>  {sink=N_Embedded(sink, env);}  {return sink;}
-|
-	 ( 
-	{
-		sink = sink .start(makeTConstructor(sink, t, raw("SynthesizedRef"), null)) ;
-	}
-	 ) 
-	 ( 
-	 <T_UP>
 	 ) 
 	 ( 
 	sink=N_AttributeName(sink, env)
