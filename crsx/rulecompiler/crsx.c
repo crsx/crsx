@@ -2619,8 +2619,12 @@ void freeVariableNameMapLinks(Context context, VariableNameMapLink link)
 Term *c_namedProperty(NamedPropertyLink link, char *name)
 {
     for (; link; link = link->link)
-        if (link->name && !strcmp(name, link->name))
+    {
+        //if (link->name && (!strcmp(name, link->name)) && (name != link->name))
+        //  printf("Missed Equality! name=%s link->name=%s\n", name, link->name);
+        if (link->name && (name == link->name))
             return &(link->u.term);
+    }
     return NULL;
 }
 
