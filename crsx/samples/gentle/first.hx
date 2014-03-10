@@ -1,26 +1,28 @@
 // $Id: first.hx,v 1.16 2014/01/06 03:11:28 krisrose Exp $
 // First HACS sample compiler (inspired by Dragonbook Fig.7).
-//
+
 module "net.sf.crsx.samples.gentle.First" {
 
 
-/* 1. LEXICAL ANALYSIS. */
+// LEXICAL ANALYSIS.
+
+// Ex.2.1
 
 space [ \t\n] ;                                 // white space convention
 
+// Ex.2.2
+
 token Int    | ⟨Digit⟩+ ;                       // tokens
 token Float  | ⟨Int⟩ "." ⟨Int⟩ ;
-token Id     | ⟨Lower⟩+ ('_'? ⟨Int⟩)? ;
+token Id     | ⟨Lower⟩+ ('_'? ⟨Int⟩)* ;
 
 token fragment Digit  | [0-9] ;
 token fragment Lower  | [a-z] ;
 
 
-/* 2. SYNTAX ANALYSIS. */
+// SYNTAX ANALYSIS.
 
-sort Stat  | ⟦ ⟨Name⟩ := ⟨Exp⟩ ; ⟧		// assignment statement (with newline)
-           | ⟦ { ⟨Stat*⟩ } ⟧                    // block statement
-           ;
+// Ex.3.1
 
 sort Exp   | ⟦ ⟨Exp@1⟩ + ⟨Exp@2⟩ ⟧@1            // addition
            | ⟦ ⟨Exp@2⟩ * ⟨Exp@3⟩ ⟧@2            // multiplication
@@ -32,8 +34,17 @@ sort Exp   | ⟦ ⟨Exp@1⟩ + ⟨Exp@2⟩ ⟧@1            // addition
 
 sort Name  | symbol ⟦ ⟨Id⟩ ⟧ ;                  // assigned symbols
 
+// Ex.3.3
 
-/* 3. SEMANTIC SORTS & SCHEMES. */
+sort Stat  | ⟦ ⟨[x:Id]⟩ := ⟨Exp⟩ ; ⟨Stat[x:Id]⟩ ⟧	    // assignment statement (with newline)
+           | ⟦ { ⟨Stat⟩ } ⟨Stat⟩ ⟧		    // block statement
+           | ⟦ ⟧                    		    // block statement
+           ;
+
+
+// SEMANTIC SORTS & SCHEMES.
+
+// Ex.4.1
 
 sort Type | Int | Float ;
 
@@ -43,7 +54,9 @@ Unif(#t1, Float) → Float;
 Unif(Float, #t2) → Float;
 
 
-/* 4. SEMANTIC ANALYSIS. */
+// SEMANTIC ANALYSIS.
+
+// Ex.5.2
 
 attribute ↑t(Type);  // synthesized expression type
 sort Exp | ↑t;
@@ -53,23 +66,9 @@ sort Exp | ↑t;
 ⟦ ⟨Int#⟩ ⟧ ↑t(Int);
 ⟦ ⟨Float#⟩ ⟧ ↑t(Float);
 
+// Ex.5.3
+
 attribute ↓e{Name:Type};  // inherited type environment
-
-// TA: Type Analysis scheme.
-
-sort Stat | scheme ⟦ TA ⟨Stat⟩ ⟧ ↓e ;
-
-⟦ TA ⟨Name id⟩ := ⟨Exp#2⟩; ⟧ → ⟦ ⟨Name id⟩ := TA ⟨Exp#2⟩; ⟧;
-
-⟦ TA {} ⟧ → ⟦{}⟧;
-
-⟦ TA { ⟨Name id⟩ := ⟨Exp#2⟩; ⟨Stat*#3⟩ } ⟧ → ⟦ TA2 { ⟨Name id⟩ := TA ⟨Exp#2⟩; ⟨Stat*#3⟩ } ⟧;
-{
-  | scheme ⟦ TA2 ⟨Stat⟩ ⟧ ↓e;
-  ⟦ TA2 { ⟨Name id⟩ := ⟨Exp#2 ↑t(#t2)⟩; ⟨Stat*#3⟩ } ⟧ →
-    ⟦ { ⟨Name id⟩ := ⟨Exp#2⟩; ⟨Stat ⟦TA {⟨Stat*#3⟩}⟧ ↓e{⟦id⟧:#t2}⟩ } ⟧;
-}
-⟦ TA { {⟨Stat*#1⟩} ⟨Stat*#2⟩ } ⟧ → ⟦ { TA {⟨Stat*#1⟩} TA {⟨Stat*#2⟩} } ⟧;
 
 sort Exp | scheme ⟦ TA ⟨Exp⟩ ⟧ ↓e ;
 
@@ -81,26 +80,43 @@ sort Exp | scheme ⟦ TA ⟨Exp⟩ ⟧ ↓e ;
 ⟦ TA (⟨Exp#1⟩ + ⟨Exp#2⟩) ⟧ → ⟦ (TA ⟨Exp#1⟩) + (TA ⟨Exp#2⟩) ⟧;
 ⟦ TA (⟨Exp#1⟩ * ⟨Exp#2⟩) ⟧ → ⟦ (TA ⟨Exp#1⟩) * (TA ⟨Exp#2⟩) ⟧;
 
+// Ex.5.4
 
-/* 5. INTERMEDIATE CODE GENERATION. */
+sort Stat | scheme ⟦ TA { ⟨Stat⟩ } ⟧ ↓e ;
 
-token T | T ('_' ⟨Int⟩)? ; // temporary
+⟦ TA { id := ⟨Exp#2⟩; ⟨Stat#3[id]⟩ } ⟧ → ⟦ TA2 { id := TA ⟨Exp#2⟩; ⟨Stat#3[id]⟩ } ⟧;
+{
+  | scheme ⟦ TA2 { ⟨Stat⟩ } ⟧ ↓e;
+  ⟦ TA2 { id := ⟨Exp#2 ↑t(#t2)⟩; ⟨Stat#3[id]⟩ } ⟧ →
+    ⟦ id := ⟨Exp#2⟩; ⟨Stat ⟦TA {⟨Stat#3[id]⟩}⟧ ↓e{id:#t2}⟩ ⟧;
+}
+
+⟦ TA { { ⟨Stat#1⟩ } ⟨Stat#2⟩ } ⟧ → ⟦ { TA { ⟨Stat#1⟩ } } TA { ⟨Stat#2⟩ } ⟧;
+
+⟦ TA { } ⟧ → ⟦ { } ⟧;
+
+
+// INTERMEDIATE CODE GENERATION.
+
+// Ex.6.1
+
+token T | T ('_' ⟨Int⟩)* ; // temporary
 
 // Concrete syntax & abstract syntax sorts.
 
-sort I_Progr | ⟦⟨I_Instr⟩ ⟨I_Progr⟩⟧ | ⟦⟧ ;
+sort I_Progr  | ⟦⟨I_Instr⟩ ⟨I_Progr⟩⟧ | ⟦⟧ ;
 
-sort I_Instr | ⟦⟨Tmp⟩ = ⟨I_Arg⟩ + ⟨I_Arg⟩;¶⟧
-   	     | ⟦⟨Tmp⟩ = ⟨I_Arg⟩ * ⟨I_Arg⟩;¶⟧
-     	     | ⟦⟨Tmp⟩ = ⟨I_Arg⟩;¶⟧
-     	     | ⟦⟨Name⟩ = ⟨Tmp⟩;¶⟧
-	     ;
+sort I_Instr  | ⟦⟨Tmp⟩ = ⟨I_Arg⟩ + ⟨I_Arg⟩;¶⟧
+   	      | ⟦⟨Tmp⟩ = ⟨I_Arg⟩ * ⟨I_Arg⟩;¶⟧
+     	      | ⟦⟨Tmp⟩ = ⟨I_Arg⟩;¶⟧
+     	      | ⟦⟨Name⟩ = ⟨Tmp⟩;¶⟧
+	      ;
 
-sort I_Arg | ⟦⟨Name⟩⟧
-     	   | ⟦⟨Float⟩⟧
-     	   | ⟦⟨Int⟩⟧
-	   | ⟦⟨Tmp⟩⟧
-	   ;
+sort I_Arg    | ⟦⟨Name⟩⟧
+     	      | ⟦⟨Float⟩⟧
+     	      | ⟦⟨Int⟩⟧
+	      | ⟦⟨Tmp⟩⟧
+	      ;
 
 sort Tmp | symbol ⟦ ⟨T⟩ ⟧ ;
 
@@ -108,12 +124,14 @@ sort Tmp | symbol ⟦ ⟨T⟩ ⟧ ;
 
 attribute ↓TmpType{Tmp:Type} ;
 
-sort I_Progr ;
+sort I_Progr;
 
-| scheme ⟦ ICG ⟨Stat⟩ ⟧ ↓TmpType ;
-⟦ ICG id := ⟨Exp#2 ↑t(#t2)⟩; ⟧ → ⟦ { ⟨I_Progr ⟦ICGExp T ⟨Exp#2⟩⟧ ↓TmpType{⟦T⟧:#t2}⟩ } id = T; ⟧ ;
+| scheme ⟦ ICG { ⟨Stat⟩ } ⟧ ↓TmpType ;
+
+⟦ ICG { id := ⟨Exp#2 ↑t(#t2)⟩; ⟨Stat#3[id]⟩ } ⟧
+   → ⟦ { ⟨I_Progr ⟦ICGExp T ⟨Exp#2⟩⟧ ↓TmpType{⟦T⟧:#t2}⟩ } id = T; ICG { ⟨Stat#3[id]⟩ }  ⟧ ;
+⟦ ICG { { ⟨Stat#1⟩ } ⟨Stat#2⟩ } ⟧ → ⟦ { ICG { ⟨Stat#1⟩ } } ICG { ⟨Stat#2⟩ } ⟧ ;
 ⟦ ICG { } ⟧ → ⟦ ⟧;
-⟦ ICG { ⟨Stat#s⟩ ⟨Stat*#ss⟩ } ⟧ → ⟦ { ICG ⟨Stat#s⟩ } ICG { ⟨Stat*#ss⟩ } ⟧ ;
 
 | scheme ⟦ ICGExp ⟨Tmp⟩ ⟨Exp⟩ ⟧ ;
 
@@ -133,7 +151,9 @@ sort I_Progr ;
 ⟦ {⟨I_Instr#1⟩ ⟨I_Progr#2⟩} ⟨I_Progr#3⟩ ⟧ → ⟦ ⟨I_Instr#1⟩ {⟨I_Progr#2⟩} ⟨I_Progr#3⟩ ⟧;
 
 
-/* 6. CODE GENERATOR. */
+// CODE GENERATOR.
+
+// Ex.7.1
 
 // Concrete syntax & abstract syntax sorts.
 
@@ -177,7 +197,7 @@ sort A_Arg ;
 /* 7. MAIN. */
 
 sort A_Progr | scheme ⟦ Compile ⟨Stat⟩ ⟧ ;
-⟦ Compile ⟨Stat#1⟩ ⟧ → ⟦ CG ICG TA ⟨Stat#1⟩ ⟧ ;
+⟦ Compile ⟨Stat#1⟩ ⟧ → ⟦ CG ICG { TA { ⟨Stat#1⟩ } } ⟧ ;
 
 | scheme Compile(Stat);
 Compile(#) → ⟦ Compile ⟨Stat#⟩ ⟧ ;
