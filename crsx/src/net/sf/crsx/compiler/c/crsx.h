@@ -65,6 +65,9 @@ struct _Context
     int poolRefCount;
     Hashset2 stringPool;  // Set of char*
     Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
+    char *str_filelocation;
+    char *str_linelocation;
+    char *str_columnlocation;
 };
 
 // Call this function before using a Context:

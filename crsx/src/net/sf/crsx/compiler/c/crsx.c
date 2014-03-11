@@ -144,6 +144,10 @@ void InitCRSXContext(Context context)
     context->keyPool = NULL;
 
     crsxAddPools(context);
+
+    context->str_filelocation = GLOBAL(context, "$FileLocation");
+    context->str_linelocation = GLOBAL(context, "$LineLocation");
+    context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 }
 
 static void freeOccur(Context context, TermLink link)
@@ -4331,9 +4335,9 @@ void passLocationProperties(Context context, Term locTerm, Term term)
     {
         Construction construction = asConstruction(term);
         Construction locConstruction = asConstruction(locTerm);
-        char *list[] = {GLOBAL(context, "$FileLocation"),
-                        GLOBAL(context, "$LineLocation"),
-                        GLOBAL(context, "$ColumnLocation")};
+        char *list[] = {context->str_filelocation,
+                        context->str_linelocation,
+                        context->str_columnlocation};
         int i;
         for (i = 0; i < 3; ++i)
         {
