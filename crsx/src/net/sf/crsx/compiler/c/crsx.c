@@ -142,6 +142,8 @@ void InitCRSXContext(Context context)
     context->poolRefCount = 0;
     context->stringPool = NULL;
     context->keyPool = NULL;
+
+    crsxAddPools(context);
 }
 
 static void freeOccur(Context context, TermLink link)
