@@ -2628,7 +2628,7 @@ Term *c_namedProperty(NamedPropertyLink link, char *name)
     {
         //if (link->name && (!strcmp(name, link->name)) && (name != link->name))
         //  printf("Missed Equality! name=%s link->name=%s\n", name, link->name);
-        if (link->name && (name == link->name))
+        if (name == link->name)
             return &(link->u.term);
     }
     return NULL;
