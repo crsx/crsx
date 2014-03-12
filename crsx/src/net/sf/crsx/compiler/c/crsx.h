@@ -65,6 +65,9 @@ struct _Context
     int poolRefCount;
     Hashset2 stringPool;  // Set of char*
     Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
+    char *str_filelocation;
+    char *str_linelocation;
+    char *str_columnlocation;
 };
 
 // Call this function before using a Context:
@@ -859,7 +862,6 @@ static inline Term *c_property(NamedPropertyLink namedProperties, VariableProper
 struct _NamedPropertyLink
 {
     NamedPropertyLink link;
-    int nr;
     const char* name;
     union {
         Term term; // when name != NULL
@@ -868,6 +870,7 @@ struct _NamedPropertyLink
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
 #endif
+    int nr;
 };
 #define LINK_NamedPropertyLink(C,L) linkNamedPropertyLink(C,L)
 extern NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLink link);
@@ -1182,8 +1185,8 @@ extern ConstructionDescriptor lookupSymbolTableDescriptor(Context context, Symbo
 // Add all free variables in term to free set. If constrained set then only include variables included in props.
 extern VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort, int constrained, VariablePropertyLink props);
 
-// Check if two terms are equal module renaming of bound variables.
-extern int deepEqual(Context context, Term term1, Term term2);
+// Check if two terms are equal module renaming of bound variables, and module environment when compenv is false
+extern int deepEqual(Context context, Term term1, Term term2, int compenv);
 
 // Check that a term structure is well defined and return the size.
 extern int check(Context context, Term term);

@@ -1012,17 +1012,41 @@ Set-Bool-MatchRegex:
 «p1»«p2»⟫]]
 ;
 
-// $[DeepEqual, #1, #2] test equality of #1, #2, as terms, result is boolean.
+// $[DeepEqual, #1, #2[, #3]] test equality of #1, #2, as terms, result is boolean. If #3 is $True, deep equal the environment too.
 //
 BOOL_PRIMITIVE[E_DeepEqual];
 
 Set-Bool-DeepEqual[Fresh[term1::Text,term2::Text],Copy[#sink]]:
-{#env} E-set-bool[E_DeepEqual, (#Name; #Term1; #Term2;), #Options, #sink, bool]
+{#env} E-set-bool[E_DeepEqual, (#Name; #Term1; #Term2; #TestEnv), #Options, #sink, bool]
 →
 %n⟪{⟦ Term «term1», «term2»;
-« {#env} T-set[#Term1, #sink, term1] »« {#env} T-set[#Term2, #sink, term2] »«bool» = deepEqual(«#sink»->context, «term1», «term2»);⟧
+« {#env} T-set[#Term1, #sink, term1] »« {#env} T-set[#Term2, #sink, term2] »«E-set-deep-equal[#TestEnv, #sink, term1, term2, bool]»⟧
 }⟫
 ;
+
+// DeepEqual Helper
+{$String:String}E-set-deep-equal[$List[Reified_Term], Text, Text, Text, Text] :: Text;
+
+{#env}
+E-set-deep-equal[(), #sink, #term1, #term2, #bool]
+→
+%n⟪«#bool» = deepEqual(«#sink»->context, «#term1», «#term2», 1);⟫
+;
+
+{#env}
+E-set-deep-equal[(CONSTRUCTION[#Value, #Sort];), #sink, #term1, #term2, #bool]
+→
+%n⟪«#bool» = deepEqual(«#sink»->context, «#term1», «#term2», «$[If, $[Equal, #Value, "$False"], %n⟨0⟩,  %n⟨1⟩]»);⟫
+;
+
+-[Fresh[checkenv::Text], Fallback]
+:
+{#env}
+E-set-deep-equal[(#BoolTerm;), #sink, #term1, #term2, #bool]
+→
+%n⟪int «checkenv»; «{#env} T-set-bool[#BoolTerm, #sink, checkenv]»«#bool» = deepEqual(«#sink»->context, «#term1», «#term2», «checkenv»);⟫
+;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // INTEGER PRIMITIVES
@@ -1212,8 +1236,8 @@ Set-Int-BitMinus[Fresh[i1::Text,i2::Text]]:
 «{#env}T-set-int[#Left, #sink, i1]»«{#env}T-set-int[#Right, #sink, i2]»«#num» = «i1» &(~«i2»); ⟧}
 ⟫;
 
-// $[HashCode, #term] returns a hash code for #term.
-//
+// $[HashCode, #term[, #bool]] returns a hash code for #term. When #bool is true, returns hashcode for term and environment.
+// TODO:
 INT_PRIMITIVE[E_HashCode];
 
 Set-Int-HashCode[Fresh[term::Text]]

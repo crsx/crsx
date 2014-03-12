@@ -546,7 +546,9 @@ class GenericEvaluator extends FixedGenericConstruction
                 return rewrapWithProperties(factory.literal(Util.symbol(sub(1)).compareTo(Util.symbol(sub(2))) < 0));
             }
             case DEEP_EQ : {
-            	// $[DeepEqual, t1, t2]
+            	// $[DeepEqual, t1, t2[, bool]]
+            	// TODO: bool
+            	
             	return rewrapWithProperties(factory.literal(sub(1).equals(sub(2))));
             }
             

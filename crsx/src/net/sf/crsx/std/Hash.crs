@@ -4,7 +4,7 @@
 //
 // SUPPORT FOR TERM HASHING.
 //
-// A Hash[TermSort, IdSort] is a mapping from terms of TermSort to values of IdSort.
+// A Hash[TermSort, IdSort] is a mapping from terms (module environment) of TermSort to values of IdSort.
 //
 // It supports four operations:
 //
@@ -61,7 +61,7 @@ H_NEW[{#H; #code : ( H_MEMBER[#term, #new] ; #members )}HASH]  // did not find t
 -[Share[#term, #hash]]:
 HashInsert4[(H_MEMBER[#candidate, #old]; #rest), #hash, #term, #members, #code, #new]
 →
-$[If, $[DeepEqual, #candidate, #term], // check the #candidate...
+$[If, $[DeepEqual, #candidate, #term, $False], // check the #candidate...
   H_OLD[#hash, #old], // ...found the term: return existing id
   HashInsert4[#rest, #hash, #term, #members, #code, #new] // ...not right candidate, search on
 ]
@@ -87,7 +87,7 @@ HashGet2[{#H}HASH, #term, #code] → HashGet3[$[{#H}Get, #code, ()], #term];
 :
 HashGet3[(H_MEMBER[#candidate, #old]; #rest), #term] 
 → 
-$[If, $[DeepEqual, #candidate, #term], // check the #candidate...
+$[If, $[DeepEqual, #candidate, #term, $False], // check the #candidate...
   H_ID[#old], // ...found the term: return existing id
   HashGet3[#rest, #term] // ...not right candidate, search on
 ]

@@ -1236,6 +1236,9 @@ public class Sorter
 				argumentsorts[0] = factory.newVariableUse(alpha);
 				argumentsorts[1] = factory.newVariableUse(alpha);
 				sort = freshForm(CRS.BOOLEAN_SORT, 0);
+				
+				if (primitive == Primitive.DEEP_EQ && argumentsorts.length == 3)
+					argumentsorts[2] = freshForm(CRS.BOOLEAN_SORT, 0);
 				break;
 			}
 			case BIT_SUB_SET_EQ :

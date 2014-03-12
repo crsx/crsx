@@ -142,6 +142,12 @@ void InitCRSXContext(Context context)
     context->poolRefCount = 0;
     context->stringPool = NULL;
     context->keyPool = NULL;
+
+    crsxAddPools(context);
+
+    context->str_filelocation = GLOBAL(context, "$FileLocation");
+    context->str_linelocation = GLOBAL(context, "$LineLocation");
+    context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 }
 
 static void freeOccur(Context context, TermLink link)
@@ -2622,7 +2628,7 @@ Term *c_namedProperty(NamedPropertyLink link, char *name)
     {
         //if (link->name && (!strcmp(name, link->name)) && (name != link->name))
         //  printf("Missed Equality! name=%s link->name=%s\n", name, link->name);
-        if (link->name && (name == link->name))
+        if (name == link->name)
             return &(link->u.term);
     }
     return NULL;
@@ -4329,9 +4335,9 @@ void passLocationProperties(Context context, Term locTerm, Term term)
     {
         Construction construction = asConstruction(term);
         Construction locConstruction = asConstruction(locTerm);
-        char *list[] = {GLOBAL(context, "$FileLocation"),
-                        GLOBAL(context, "$LineLocation"),
-                        GLOBAL(context, "$ColumnLocation")};
+        char *list[] = {context->str_filelocation,
+                        context->str_linelocation,
+                        context->str_columnlocation};
         int i;
         for (i = 0; i < 3; ++i)
         {
@@ -4849,17 +4855,17 @@ VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort,
 /////////////////////////////////////////////////////////////////////////////////
 // Deep Equality.
 
-static int deepEqual2(Context context, Term term1, Term term2, VariableMap map);
+static int deepEqual2(Context context, Term term1, Term term2, int compenv, VariableMap map);
 
-int deepEqual(Context context, Term term1, Term term2)
+int deepEqual(Context context, Term term1, Term term2, int compenv)
 {
     VariableMap map = makeVariableMap(context);
-    int result = deepEqual2(context, term1, term2, map);
+    int result = deepEqual2(context, term1, term2, compenv, map);
     freeVariableMap(map);
     return result;
 }
 
-static int deepEqual2(Context context, Term term1, Term term2, VariableMap map)
+static int deepEqual2(Context context, Term term1, Term term2, int compenv, VariableMap map)
 {
     if (IS_VARIABLE_USE(term1))
     {
@@ -4870,76 +4876,80 @@ static int deepEqual2(Context context, Term term1, Term term2, VariableMap map)
         return v1image ? (v1image == v2) : (v1 == v2);
     }
     if (IS_VARIABLE_USE(term2)) return 0;
-    // Construction or literal: check properties.
-    Construction construction1 = asConstruction(term1), construction2 = asConstruction(term2);
+
+    if (compenv)
     {
-        NamedPropertyLink link1, link2;
-        for (link1 = construction1->namedProperties; link1; link1 = link1->link)
+        // Construction or literal: check properties.
+        Construction construction1 = asConstruction(term1), construction2 = asConstruction(term2);
         {
-            const char *name = link1->name;
-            Term value1 = link1->u.term;
-            Term value2 = NULL;
-            for (link2 = construction2->namedProperties; link2; link2 = link2->link)
-            {
-                if (!strcmp(name, link2->name))
-                {
-                    value2 = link2->u.term;
-                    break;
-                }
-            }
-            if (!value2) return 0;
-            if (!deepEqual2(context, value1, value2, map)) return 0;
-        }
-        for (link2 = construction2->namedProperties; link2; link2 = link2->link)
-        {
-            const char *name = link2->name;
-            Term value1 = NULL;
+            NamedPropertyLink link1, link2;
             for (link1 = construction1->namedProperties; link1; link1 = link1->link)
             {
-                if (!strcmp(name, link1->name))
+                const char *name = link1->name;
+                Term value1 = link1->u.term;
+                Term value2 = NULL;
+                for (link2 = construction2->namedProperties; link2; link2 = link2->link)
                 {
-                    value1 = link1->u.term;
-                    break;
+                    if (!strcmp(name, link2->name))
+                    {
+                        value2 = link2->u.term;
+                        break;
+                    }
                 }
+                if (!value2) return 0;
+                if (!deepEqual2(context, value1, value2, compenv, map)) return 0;
             }
-            if (!value1) return 0; // just check that all keys are present
-        }
-    }
-    {
-        VariablePropertyLink link1, link2;
-        for (link1 = construction1->variableProperties; link1; link1 = link1->link)
-        {
-            Variable variable = link1->variable; // variable to look for
-            Term value1 = link1->u.term;
-            Variable v = lookupVariable(map, variable);
-            if (v) variable = v;
-            Term value2 = NULL;
-            for (link2 = construction2->variableProperties; link2; link2 = link2->link)
+            for (link2 = construction2->namedProperties; link2; link2 = link2->link)
             {
-                if (variable == link2->variable)
+                const char *name = link2->name;
+                Term value1 = NULL;
+                for (link1 = construction1->namedProperties; link1; link1 = link1->link)
                 {
-                    value2 = link2->u.term;
-                    break;
+                    if (!strcmp(name, link1->name))
+                    {
+                        value1 = link1->u.term;
+                        break;
+                    }
                 }
+                if (!value1) return 0; // just check that all keys are present
             }
-            if (!value2) return 0;
-            if (!deepEqual2(context, value1, value2, map)) return 0;
         }
-        for (link2 = construction2->variableProperties; link2; link2 = link2->link)
         {
-            Variable variable = link2->variable;
-            Term value1 = NULL;
+            VariablePropertyLink link1, link2;
             for (link1 = construction1->variableProperties; link1; link1 = link1->link)
             {
-                Variable v1 = link1->variable;
-                Variable v = lookupVariable(map, v1);
-                if (variable == (v ? v : v1))
+                Variable variable = link1->variable; // variable to look for
+                Term value1 = link1->u.term;
+                Variable v = lookupVariable(map, variable);
+                if (v) variable = v;
+                Term value2 = NULL;
+                for (link2 = construction2->variableProperties; link2; link2 = link2->link)
                 {
-                    value1 = link1->u.term;
-                    break;
+                    if (variable == link2->variable)
+                    {
+                        value2 = link2->u.term;
+                        break;
+                    }
                 }
+                if (!value2) return 0;
+                if (!deepEqual2(context, value1, value2, compenv, map)) return 0;
             }
-            if (!value1) return 0; // just check that all keys are present
+            for (link2 = construction2->variableProperties; link2; link2 = link2->link)
+            {
+                Variable variable = link2->variable;
+                Term value1 = NULL;
+                for (link1 = construction1->variableProperties; link1; link1 = link1->link)
+                {
+                    Variable v1 = link1->variable;
+                    Variable v = lookupVariable(map, v1);
+                    if (variable == (v ? v : v1))
+                    {
+                        value1 = link1->u.term;
+                        break;
+                    }
+                }
+                if (!value1) return 0; // just check that all keys are present
+            }
         }
     }
     if (IS_LITERAL(term1))
@@ -4958,7 +4968,7 @@ static int deepEqual2(Context context, Term term1, Term term2, VariableMap map)
         int j;
         for (j = 0; j < rank; ++j)
             addVariableMap(map, BINDER(term1, i, j), BINDER(term2, i, j));
-        if (!deepEqual2(context, SUB(term1, i), SUB(term2, i), map)) return 0;
+        if (!deepEqual2(context, SUB(term1, i), SUB(term2, i), compenv, map)) return 0;
         popVariableMap(map, rank);
     }
     return 1;

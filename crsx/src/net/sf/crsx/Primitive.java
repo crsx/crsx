@@ -173,8 +173,8 @@ public enum Primitive
 	 /** $[StringLessThan, #1, #2] for strings #1, #2, result is boolean. */
 	STRING_LT("StringLessThan", 2, 2),
 	
-	/** $[DeepEqual, #1, #2]  test equality of #1, #2 as terms, result is boolean. */
-	DEEP_EQ("DeepEqual", 2, 2),
+	/** $[DeepEqual, #1, #2 [, #3]]  test equality of #1, #2 as terms, result is boolean. If #3 is $True, also compare environment (default) */
+	DEEP_EQ("DeepEqual", 2, 3),
 	/** $[SameVariable, x, y] returns whether x and y are the same variable. */
 	SAME_VARIABLE("SameVariable", 2, 2),
 	/** $[LesserVariable, x, y] returns whether x is lesser than y in the global variable order. */
