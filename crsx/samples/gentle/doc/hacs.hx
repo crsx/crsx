@@ -2,9 +2,24 @@ module "net.sf.crsx.hacs.Hacs" {
 
 sort Module | ⟦ module ⟨String⟩ { ⟨Declaration*⟩ } ⟧ ;
 
-// LEXICAL ANALYSIS.
+// HACS SYNTAX
+
+sort Module
+| ⟦ module ⟨ModuleName⟩ { ⟨Declaration*⟩ } ⟧
+;
+sort ModuleName | ⟦⟨Name⟩⟧ | ⟦⟨String⟩⟧ ;
 
 sort Declaration
+| ⟦⟨Module⟩⟧
+| ⟦ import ⟨ModuleName⟩ ⟨SortNameList?⟩ ; ⟧
+| ⟦⟨LexicalDeclaration⟩⟧
+| ⟦⟨SyntaxDeclaration⟩⟧
+| ⟦⟨RuleDeclaration⟩⟧
+;
+
+// Lexical Analysis.
+
+sort LexicalDeclaration
 | ⟦ space ⟨RE⟩ ; ⟧
 | ⟦ token ⟨Name⟩ | ⟨RE⟩ ; ⟧
 | ⟦ fragment ⟨Name⟩ | ⟨RE⟩ ; ⟧
@@ -21,7 +36,10 @@ sort RE
 | ⟦ ⟨RE@1+⟩ ⟧
 ;
 
-sort Repeat | ⟦+⟧ | ⟦?⟧ | ⟦*⟧ | ⟦⟧ ;
+token Repeat | [+?*]? ;
+
+token LAng | "⟨" ;
+token RAng | "⟩" ;
 
 token CC | \[ \^? (\- | \] ⟨CCRange⟩)? ( ([^\]\\-] | ⟨Escape⟩) ⟨CCRange⟩ )* \-? \] ;
 
@@ -29,14 +47,15 @@ fragment CCRange | \- ([^\]\\] | ⟨Escape⟩) ;
 
 token Char | [A-Za-z0-9] | ⟨Escape⟩ ;
 
-// SYNTAX PRODUCTIONS.
-
-sort Declaration
-| ⟦ sort 
-
-
-
 token ⟨Name⟩ | ⟨Upper⟩ ⟨AlphaNum⟩* ;
+
+
+
+
+
+
+
+
 
 
 }

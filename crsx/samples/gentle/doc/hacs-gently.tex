@@ -1142,10 +1142,10 @@ mycompiler.run: mycompiler.hx
   defaults can be provided for the configuration options.
 \end{manual}
 
-%\begin{notation}[grammar]
-%This is a \emph{work in progress} ``\HAX in \HAX'' self-grammar.
-%\inputhacs{hacs.hx}
-%\end{notation}
+\begin{notation}[grammar]
+This is a \emph{work in progress} ``\HAX in \HAX'' self-grammar.
+\inputhacs{hacs.hx}
+\end{notation}
 
 \begin{notation}[used unicode characters]\label{nota:unicode}\leavevmode
 \begin{displaymath}
@@ -1202,6 +1202,7 @@ Input Method'' for this to work.
 
   \item Productions can share a prefix but only within productions for the same sort, and the prefix
     has to be literally identical unit by unit, \ie,
+    %%
 \begin{code}
 sort S | ⟦ ⟨A⟩ then ⟨B⟩ then C ⟧
        | ⟦ ⟨A⟩ then ⟨B⟩ or else D ⟧ ;
@@ -1212,6 +1213,7 @@ sort S | ⟦ ⟨A⟩ then ⟨B⟩ then C ⟧
        | ⟦ ⟨A⟩ ⟨ThenB⟩ or else D ⟧ ;
 sort ThenB | ⟦ then ⟨B⟩ ⟧;
 \end{code}
+    %%
     is not.
 
   \item It is not possible to left-factor a binder (so multiple binding constructs cannot have the
