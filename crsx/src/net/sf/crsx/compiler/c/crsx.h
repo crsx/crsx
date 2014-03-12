@@ -862,7 +862,6 @@ static inline Term *c_property(NamedPropertyLink namedProperties, VariableProper
 struct _NamedPropertyLink
 {
     NamedPropertyLink link;
-    int nr;
     const char* name;
     union {
         Term term; // when name != NULL
@@ -871,6 +870,7 @@ struct _NamedPropertyLink
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
 #endif
+    int nr;
 };
 #define LINK_NamedPropertyLink(C,L) linkNamedPropertyLink(C,L)
 extern NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLink link);
