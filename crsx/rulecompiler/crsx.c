@@ -4429,7 +4429,7 @@ void freeTerm(Context context, Term term)
     }
 }
 
-inline NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLink link)
+inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link)
 {
     if (link)
         link->nr++;

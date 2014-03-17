@@ -872,8 +872,7 @@ struct _NamedPropertyLink
 #endif
     int nr;
 };
-#define LINK_NamedPropertyLink(C,L) linkNamedPropertyLink(C,L)
-extern NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLink link);
+extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
 // Property list is not closed when the first element is a list of free variable
 #define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
