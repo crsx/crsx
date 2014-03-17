@@ -903,8 +903,6 @@ struct _NamedPropertyLink
 #define LINK_NamedPropertyLink(C,L) linkNamedPropertyLink(C,L)
 extern NamedPropertyLink linkNamedPropertyLink(Context context, NamedPropertyLink link);
 
-#define UNLINKSET_NamedPropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
-
 // Property list is not closed when the first element is a list of free variable
 #define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
 
