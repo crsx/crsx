@@ -872,6 +872,9 @@ struct _NamedPropertyLink
 #endif
     int nr;
 };
+
+extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context);
+
 extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
 // Property list is not closed when the first element is a list of free variable
