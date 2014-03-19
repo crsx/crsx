@@ -13,6 +13,13 @@
 #include <unicode/uregex.h>
 #include <unicode/ustring.h>
 
+// Debug printfs
+#if 0
+#  define crsx_debug fprintf
+#else
+#  define crsx_debug if (0) fprintf
+#endif
+
 // Collects data and output profiling analysis at the end of a rewrite
 #ifdef CRSXPROF
 
