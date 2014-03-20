@@ -5222,7 +5222,7 @@ extern int step_M_E__set__num_s89(Sink,Term);
 
 /* FUNCTION EVAL-E-Get-Property-1$E-Get-Property HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Get_Property struct _Con_M_E_Get_Property
-struct _Con_M_E_Get_Property {struct _Construction construction; Term sub[2]; Variable binder[0];};
+struct _Con_M_E_Get_Property {struct _Construction construction; Term sub[3]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E_Get_Property;
 extern int step_M_E_Get_Property(Sink,Term);
 
@@ -7393,13 +7393,13 @@ extern int step_M_E__poly_s199(Sink,Term);
 
 /* FUNCTION EVAL-E-Get-Property-1$E-Get-Property$2$PROPERTY_VARIABLE HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Get_Property_s2 struct _Con_M_E_Get_Property_s2
-struct _Con_M_E_Get_Property_s2 {struct _Construction construction; Term sub[3]; Variable binder[0];};
+struct _Con_M_E_Get_Property_s2 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E_Get_Property_s2;
 extern int step_M_E_Get_Property_s2(Sink,Term);
 
 /* FUNCTION EVAL-E-Get-Property-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Get_Property_s3 struct _Con_M_E_Get_Property_s3
-struct _Con_M_E_Get_Property_s3 {struct _Construction construction; Term sub[4]; Variable binder[0];};
+struct _Con_M_E_Get_Property_s3 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E_Get_Property_s3;
 extern int step_M_E_Get_Property_s3(Sink,Term);
 

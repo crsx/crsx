@@ -382,8 +382,8 @@ typedef struct _BitSet* BitSetP;
 #define BINDERS(T,I) c_binders(asConstruction(T),I)
 #define BINDER(T,I,BI) BINDERS(T,I)[BI]
 
-#define DPROPERTY(N,V,P) c_property(N,V,P)
-#define PROPERTY_P(T,P) DPROPERTY(asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
+#define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
+#define PROPERTY_P(C,T,P) DPROPERTY(C, asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
 #define NAMED_PROPERTY_P(T,N) c_namedProperty(asConstruction(T)->namedProperties, N)
 #define VARIABLE_PROPERTY_P(T,V) c_variableProperty(asConstruction(T)->variableProperties, V)
 #define NAMED_PROPERTIES(T) (asConstruction(T)->namedProperties)
@@ -395,7 +395,7 @@ typedef struct _BitSet* BitSetP;
 #define DOUBLE(T) atof(c_name(asConstruction(T)))
 #define LENGTH(T) strlen(TEXT(T))
 
-#define PROPERTY(T,P) c_deref(PROPERTY_P(T,P))
+#define PROPERTY(C,T,P) c_deref(PROPERTY_P(C,T,P))
 #define NAMED_PROPERTY(C,T,N)  c_deref(NAMED_PROPERTY_P(T,GLOBAL(C,N)))
 #define VARIABLE_PROPERTY(T,V)  c_deref(VARIABLE_PROPERTY_P(T,V))
 
@@ -854,7 +854,7 @@ extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 extern Term *c_namedProperty(NamedPropertyLink link, char *name);
 extern Term *c_namedPropertyNonInterned(NamedPropertyLink link, char *name);
 extern Term *c_variableProperty(VariablePropertyLink link, Variable variable);
-static inline Term *c_property(NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
+static inline Term *c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedPropertyNonInterned(namedProperties, SYMBOL(key)));
 }

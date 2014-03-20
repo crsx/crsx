@@ -437,7 +437,7 @@ F-then-Pattern-Property[OK, #pass, sink, termp, #Key, #Value, ok.#[ok]]
 « {#env} F-Pattern[#pass, SUBMATCH, #Value, sink, %n⟨⟩, $False, $True, valuep, ok.#[ok]] »⟫
 ;
 
--[Free[termp,valuep],Discard[#Args]]    : {#env} F-set-value[META-APPLICATION[#MetaVar, #Args], sink, termp, valuep] → %n⟪Term «valuep» = LINK(PROPERTY(«termp», « {#env}MetaVar[#MetaVar] »));
+-[Free[termp,valuep],Discard[#Args]]    : {#env} F-set-value[META-APPLICATION[#MetaVar, #Args], sink, termp, valuep] → %n⟪Term «valuep» = LINK(PROPERTY(«sink»->context, «termp», « {#env}MetaVar[#MetaVar] »));
 ⟫ ;
 -[Free[termp,valuep],Discard[#Sort]]    : {#env} F-set-value[LITERAL[#Literal, #Sort],          sink, termp, valuep] → %n⟪Term «valuep» = LINK(NAMED_PROPERTY(«sink»->context, «termp», «STRING[#Literal]»));
 ⟫ ;

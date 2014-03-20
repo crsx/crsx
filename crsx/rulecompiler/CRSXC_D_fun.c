@@ -1232,7 +1232,7 @@ int step_M_MetaVar(Sink sink__V282, Term term__V283)
             ASSERT(sink__V282->context, strlen(str__V292) == length__V291);
             key__V288 = makeStringLiteral(sink__V282->context, str__V292);
             }
-          Term *pp__V294 = DPROPERTY(namedP__V285, varP__V286, key__V288);UNLINK(sink__V282->context, key__V288); 
+          Term *pp__V294 = DPROPERTY(sink__V282->context, namedP__V285, varP__V286, key__V288);UNLINK(sink__V282->context, key__V288); 
           if (pp__V294) term__V287 = LINK(sink__V282->context, *pp__V294);
           else {{ Sink buf__V295 = ALLOCA_BUFFER(sink__V282->context);
               { START(buf__V295, _M_STRING_xVALUE);

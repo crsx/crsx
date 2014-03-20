@@ -686,7 +686,7 @@ LINK(«sink»->context, «value»);« {#env} F-Pattern[#pass, SUBMATCH, #Value, 
 {#env}
 F-set-value[META-APPLICATION[#MetaVar, #Args,#count], #sink, #term, #value] 
 → 
-%n⟪Term «#value» = PROPERTY(«#term», « {#env}MetaVar[#MetaVar] »); permitUnusedTerm(«#value»);
+%n⟪Term «#value» = PROPERTY(«#sink»->context, «#term», « {#env}MetaVar[#MetaVar] »); permitUnusedTerm(«#value»);
 ⟫
 ;
 
