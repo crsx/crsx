@@ -870,10 +870,11 @@ struct _NamedPropertyLink
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
 #endif
+    int count;
     int nr;
 };
 
-extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context);
+extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, NamedPropertyLink nlink);
 
 extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
