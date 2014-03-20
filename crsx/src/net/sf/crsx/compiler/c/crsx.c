@@ -13,6 +13,13 @@
 #include <unicode/uregex.h>
 #include <unicode/ustring.h>
 
+// Debug printfs
+#if 0
+#  define crsx_debug fprintf
+#else
+#  define crsx_debug if (0) fprintf
+#endif
+
 // Collects data and output profiling analysis at the end of a rewrite
 #ifdef CRSXPROF
 
@@ -305,15 +312,10 @@ Term makeStringLiteral(Context context, const char *text)
 // */
 //static NamedPropertyLink makeNamedPropertyLinkTerm(Context context, const char* name, Term term)
 //{
-//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context);
-//    link->nr = 1;
-//    link->link = NULL;
+//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, NULL);
 //    link->name = name;
 //    link->u.term = term; // Transfer ref
 //
-//#ifdef CRSXPROF
-//    link->marker = 0;
-//#endif
 //    return link;
 //}
 //
@@ -324,15 +326,10 @@ Term makeStringLiteral(Context context, const char *text)
 // */
 //static NamedPropertyLink makeNamedPropertyLinkVariable(Context context, Variable variable)
 //{
-//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context);
-//    link->nr = 1;
-//    link->link = NULL;
+//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, NULL);
 //    link->name = NULL;
 //    link->u.weakening = variable; // Transfer ref
 //
-//#ifdef CRSXPROF
-//    link->marker = 0;
-//#endif
 //    return link;
 //}
 
@@ -469,12 +466,7 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
             && namedPropertyFreeVars(buffer->pendingNamedProperties) != buffer->pendingNamedPropertiesFreeVars)
     {
         // Insert free variables
-        NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context);
-        link->nr = 1;
-#ifdef CRSXPROF
-        link->marker = 0;
-#endif
-        link->link = buffer->pendingNamedProperties; // transfer ref
+        NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, buffer->pendingNamedProperties); // transfer ref
         link->name = NULL;
         link->u.weakening = (Variable)  buffer->pendingNamedPropertiesFreeVars; // Transfer ref
         buffer->pendingNamedProperties = link;
@@ -856,12 +848,7 @@ Sink bufferPropertyNamed(Sink sink, const char *name, Term term)
     Buffer buffer = (Buffer) sink;
     //DEBUGF(sink->context, "//ADD_PROPERTY_NAMED(%d,%s)\n", buffer->lastTop, name);
 
-    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context);
-    link->link = buffer->pendingNamedProperties; // transfer ref
-    link->nr = 1;
-#ifdef CRSXPROF
-    link->marker = 0;
-#endif
+    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, buffer->pendingNamedProperties); // transfer ref
     link->name = GLOBAL(sink->context, name);
     link->u.term = term; // Transfer ref
     buffer->pendingNamedProperties = link;
@@ -1013,12 +1000,10 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (link == construction->namedProperties) // guard above ensures false on first iteration
                     break; // avoid deep duplication of lists
 
-                NamedPropertyLink newLink = memcpy(ALLOCATE_NamedPropertyLink(context), link, sizeof(struct _NamedPropertyLink));
+                NamedPropertyLink newLink = memcpy(ALLOCATE_NamedPropertyLink(context, NULL), link, sizeof(struct _NamedPropertyLink));
+
                 newLink->link = NULL;
                 newLink->nr = 0;
-#ifdef CRSXPROF
-                newLink->marker = 0;
-#endif
                 if (newLink->name) // Always the case as pending free variables are not yet been linked.
                     (void) LINK(context, newLink->u.term);
                 else
@@ -1045,12 +1030,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
         if (freeVars)
         {
-            NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context);
-            link->nr = 1;
-#ifdef CRSXPROF
-            link->marker = 0;
-#endif
-            link->link = construction->namedProperties; // transfer ref
+            NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->namedProperties); // transfer ref
             link->name = NULL;
             link->u.weakening = (Variable) freeVars;
             construction->namedProperties = link;
@@ -3917,10 +3897,8 @@ static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction,
             if (key)
             {
                 // - Regular key-value link is always inserted into prefix after substitution of value.
-                NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context);
-                newLink->link = NULL;
+                NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, NULL);
                 newLink->name = key;
-                newLink->nr = 1;
                 Sink propertysink = ALLOCA_BUFFER(sink->context);
 
                 BitSet localUnweakenedC; COPY_LBITS(sink->context, &localUnweakenedC, substitutionCount, &localUnweakened);
@@ -4351,18 +4329,15 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                     VARIABLESET fvs = namedPropertyFreeVars(construction->namedProperties);
 
                     // Location has been changed...update.
-                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context);
-                    link->link = construction->namedProperties;
-                    link->nr = 1;
+                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->namedProperties);
                     link->name = GLOBAL(context, key);
+
                     link->u.term = LINK(context, value);
                     construction->namedProperties = link;
 
                     if (fvs)
                     {
-                        NamedPropertyLink fvlink = ALLOCATE_NamedPropertyLink(context);
-                        fvlink->link = link;
-                        fvlink->nr = 1;
+                        NamedPropertyLink fvlink = ALLOCATE_NamedPropertyLink(context, link);
                         fvlink->name = NULL;
                         fvlink->u.weakening = (Variable) LINK_VARIABLESET(context, fvs);
                         construction->namedProperties = fvlink;
@@ -4429,10 +4404,70 @@ void freeTerm(Context context, Term term)
     }
 }
 
-NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context)
+NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, NamedPropertyLink nlink)
 {
-    return ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+    int count = nlink ? nlink->count + 1 : 1;
+    if (count >= 100)
+    {
+        struct _NamedPropertyLink * link = ALLOCATE(context, count * sizeof(struct _NamedPropertyLink));
+        // 0th = new, 1st = nlink, 2nd..count-1 = older
 
+        // Initialize 0th element
+#ifdef CRSXPROF
+        link[0].marker = 0;
+#endif
+        link[0].count = 0; // count==0 means front of group-allocation
+        link[0].nr = 1;
+
+        // Copy initialize old elements
+        NamedPropertyLink old_link = nlink;
+        int i;
+        for (i = 1 ; i <= (count-1) ; ++i)
+        {
+            memcpy(&link[i], old_link, sizeof(struct _NamedPropertyLink));
+            link[i].count = -1; // count==-1 means part of group-allocation
+            link[i].nr = 1;
+            if (link[i].name)
+            {
+                LINK(context, link[i].u.term);
+            }
+            else
+            {
+                LINK_VARIABLESET(context, (VARIABLESET) link[i].u.weakening);
+            }
+
+            // move on
+            old_link = old_link->link;
+        }
+
+        // Unlinking nlink will remove one reference down the line.
+        // We need to keep that reference for the ones we're not
+        // consuming, so increase the refcount for first non-consumed
+        // one first, before we decrease the ref count on the others.
+        LINK_NamedPropertyLink(context, old_link);
+        UNLINK_NamedPropertyLink(context, nlink);
+
+        // Link new elements together, last one does not change
+        for (i = 0 ; i <= (count-2) ; ++i)
+        {
+            link[i].link = &link[i+1];
+        }
+
+        // Return the first one
+        return &link[0];
+    }
+    else
+    {
+        // Just allocate one, link it, and return it
+        NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+        link->link = nlink;
+#ifdef CRSXPROF
+        link->marker = 0;
+#endif
+        link->count = nlink ? nlink->count + 1 : 1;
+        link->nr = 1;
+        return link;
+    }
 }
 
 inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link)
@@ -4464,7 +4499,14 @@ NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink li
 
             UNLINK_NamedPropertyLink(context, link->link);
             link->link = NULL;
-            FREE(context, link);
+
+            // For now, don't free group-allocations
+            // Eventually should be checking if they are all ready to free
+            // (if all nr==0) then free the whole group.
+            if (link->count >= 1)
+            {
+                FREE(context, link);
+            }
             return NULL;
         }
     }
@@ -5505,7 +5547,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
             if (isFunction)
             {
                 // Probably a cookie
-                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context);
+                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, printCookieNameList);
 
                 if (arity == 0)
                     newCookie->name = nm;
@@ -5525,7 +5567,6 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                    cons += sz;
                    (*cons) = '\0';
                 }
-                newCookie->link = printCookieNameList;
                 printCookieNameList = newCookie;
             }
 
