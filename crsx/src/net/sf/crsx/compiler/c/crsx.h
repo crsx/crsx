@@ -852,11 +852,10 @@ extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 
 
 extern Term *c_namedProperty(NamedPropertyLink link, char *name);
-extern Term *c_namedPropertyNonInterned(NamedPropertyLink link, char *name);
 extern Term *c_variableProperty(VariablePropertyLink link, Variable variable);
 static inline Term *c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
-    return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedPropertyNonInterned(namedProperties, SYMBOL(key)));
+    return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
 
 struct _NamedPropertyLink

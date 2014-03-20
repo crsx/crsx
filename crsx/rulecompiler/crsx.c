@@ -2602,6 +2602,7 @@ void freeVariableNameMapLinks(Context context, VariableNameMapLink link)
 
 // Return the named property or NULL if none.
 // The reference is *NOT* transferred
+// The name must have already been interned into the Context's keyPool
 Term *c_namedProperty(NamedPropertyLink link, char *name)
 {
     for (; link; link = link->link)
@@ -2611,18 +2612,6 @@ Term *c_namedProperty(NamedPropertyLink link, char *name)
         if (name == link->name)
             return &(link->u.term);
     }
-    return NULL;
-}
-
-// Return the named property or NULL if none.
-// The reference is *NOT* transferred
-// This version is for any caller who has not interned their key name
-// into the pool.
-Term *c_namedPropertyNonInterned(NamedPropertyLink link, char *name)
-{
-    for (; link; link = link->link)
-        if (link->name && !strcmp(name, link->name))
-            return &(link->u.term);
     return NULL;
 }
 
