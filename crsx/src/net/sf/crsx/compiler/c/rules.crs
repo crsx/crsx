@@ -660,14 +660,14 @@ F-Pattern[#pass, #stage, META-APPLICATION[#MetaVar, #MetaArgs, #Use], sink, #set
 // Helper for generating environment reference meta-variable.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-then-Pattern-Ref[OK_SORT, $String, Text, Text, ok::OK_SORT.Text] :: Text;
 
--[Fresh[namedP::Text, varP::Text], Free[sink::Text, term::Text], Data[#RefCookie]]
+-[Fresh[namedP::Text, varP::Text], Data[#RefCookie]]
 :
 {#env; "$Refs": LIST_STRING[#refs]}
-F-then-Pattern-Ref[OK, #RefCookie, sink, term, ok.#[ok]]
+F-then-Pattern-Ref[OK, #RefCookie, #sink, #term, ok.#[ok]]
 →
-%n⟪NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«sink»->context, NAMED_PROPERTIES(«term»));
-VariablePropertyLink «varP» = LINK_VariablePropertyLink(«sink»->context, VARIABLE_PROPERTIES(«term»));
-« {#env;  #RefCookie : PROPERTY_VARIABLE[term, namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
+%n⟪NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»));
+VariablePropertyLink «varP» = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));
+« {#env;  #RefCookie : PROPERTY_VARIABLE[#term, namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-then-Pattern-Property[OK_SORT, PASS, Text, Text, Reified_Term, Reified_Term, ok::OK_SORT.Text] :: Text;

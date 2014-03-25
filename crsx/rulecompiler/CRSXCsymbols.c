@@ -1,6 +1,6 @@
 /* Generated table of all CRSXC symbols. */
 #include "CRSXC.h"
-size_t symbolDescriptorCount = 2193;
+size_t symbolDescriptorCount = 2191;
 struct _SymbolDescriptor symbolDescriptorTable[] = {
 {"$Cons",&descriptor_M__sCons},
 {"$False",&descriptor_M__sFalse},
@@ -1733,11 +1733,9 @@ struct _SymbolDescriptor symbolDescriptorTable[] = {
 {"F-then-Pattern-Property$4",&descriptor_M_F__then_Pattern_Property_s4},
 {"F-then-Pattern-Property$5",&descriptor_M_F__then_Pattern_Property_s5},
 {"F-then-Pattern-Ref",&descriptor_M_F__then_Pattern_Ref},
-{"F-then-Pattern-Ref$2",&descriptor_M_F__then_Pattern_Ref_s2},
+{"F-then-Pattern-Ref$1",&descriptor_M_F__then_Pattern_Ref_s1},
+{"F-then-Pattern-Ref$3",&descriptor_M_F__then_Pattern_Ref_s3},
 {"F-then-Pattern-Ref$4",&descriptor_M_F__then_Pattern_Ref_s4},
-{"F-then-Pattern-Ref$5",&descriptor_M_F__then_Pattern_Ref_s5},
-{"F-then-Pattern-Ref$7",&descriptor_M_F__then_Pattern_Ref_s7},
-{"F-then-Pattern-Ref$8",&descriptor_M_F__then_Pattern_Ref_s8},
 {"F-then-Pattern-Variable-Use",&descriptor_M_F__then_Pattern_Variable_Use},
 {"F-then-Pattern-Variable-Use$2",&descriptor_M_F__then_Pattern_Variable_Use_s2},
 {"F-then-Pattern-Variable-Use$4",&descriptor_M_F__then_Pattern_Variable_Use_s4},

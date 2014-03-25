@@ -1500,35 +1500,23 @@ struct _Con_M_F__then_Fresh_s2 {struct _Construction construction; Term sub[3]; 
 extern struct _ConstructionDescriptor descriptor_M_F__then_Fresh_s2;
 extern int step_M_F__then_Fresh_s2(Sink,Term);
 
-/* FUNCTION RULES-F-then-Pattern-Ref-1$vFree HEADER DECLARATIONS. */
-#define STRUCT_Con_M_F__then_Pattern_Ref_s2 struct _Con_M_F__then_Pattern_Ref_s2
-struct _Con_M_F__then_Pattern_Ref_s2 {struct _Construction construction; Term sub[4]; Variable binder[1];};
-extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s2;
-extern int step_M_F__then_Pattern_Ref_s2(Sink,Term);
+/* FUNCTION RULES-F-then-Pattern-Ref-1$F-then-Pattern-Ref$1 HEADER DECLARATIONS. */
+#define STRUCT_Con_M_F__then_Pattern_Ref_s1 struct _Con_M_F__then_Pattern_Ref_s1
+struct _Con_M_F__then_Pattern_Ref_s1 {struct _Construction construction; Term sub[4]; Variable binder[1];};
+extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s1;
+extern int step_M_F__then_Pattern_Ref_s1(Sink,Term);
 
-/* FUNCTION RULES-F-then-Pattern-Ref-1$vFree HEADER DECLARATIONS. */
-#define STRUCT_Con_M_F__then_Pattern_Ref_s4 struct _Con_M_F__then_Pattern_Ref_s4
-struct _Con_M_F__then_Pattern_Ref_s4 {struct _Construction construction; Term sub[4]; Variable binder[1];};
-extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s4;
-extern int step_M_F__then_Pattern_Ref_s4(Sink,Term);
-
-/* FUNCTION RULES-F-then-Pattern-Ref-1$F-then-Pattern-Ref$5 HEADER DECLARATIONS. */
-#define STRUCT_Con_M_F__then_Pattern_Ref_s5 struct _Con_M_F__then_Pattern_Ref_s5
-struct _Con_M_F__then_Pattern_Ref_s5 {struct _Construction construction; Term sub[4]; Variable binder[1];};
-extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s5;
-extern int step_M_F__then_Pattern_Ref_s5(Sink,Term);
-
-/* FUNCTION RULES-F-then-Pattern-Ref-1$F-then-Pattern-Ref$7$LIST_STRING HEADER DECLARATIONS. */
-#define STRUCT_Con_M_F__then_Pattern_Ref_s7 struct _Con_M_F__then_Pattern_Ref_s7
-struct _Con_M_F__then_Pattern_Ref_s7 {struct _Construction construction; Term sub[5]; Variable binder[1];};
-extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s7;
-extern int step_M_F__then_Pattern_Ref_s7(Sink,Term);
+/* FUNCTION RULES-F-then-Pattern-Ref-1$F-then-Pattern-Ref$3$LIST_STRING HEADER DECLARATIONS. */
+#define STRUCT_Con_M_F__then_Pattern_Ref_s3 struct _Con_M_F__then_Pattern_Ref_s3
+struct _Con_M_F__then_Pattern_Ref_s3 {struct _Construction construction; Term sub[5]; Variable binder[1];};
+extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s3;
+extern int step_M_F__then_Pattern_Ref_s3(Sink,Term);
 
 /* FUNCTION RULES-F-then-Pattern-Ref-1 HEADER DECLARATIONS. */
-#define STRUCT_Con_M_F__then_Pattern_Ref_s8 struct _Con_M_F__then_Pattern_Ref_s8
-struct _Con_M_F__then_Pattern_Ref_s8 {struct _Construction construction; Term sub[5]; Variable binder[1];};
-extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s8;
-extern int step_M_F__then_Pattern_Ref_s8(Sink,Term);
+#define STRUCT_Con_M_F__then_Pattern_Ref_s4 struct _Con_M_F__then_Pattern_Ref_s4
+struct _Con_M_F__then_Pattern_Ref_s4 {struct _Construction construction; Term sub[5]; Variable binder[1];};
+extern struct _ConstructionDescriptor descriptor_M_F__then_Pattern_Ref_s4;
+extern int step_M_F__then_Pattern_Ref_s4(Sink,Term);
 
 /* FUNCTION RULES-F-Pattern-NeedNorm- HEADER DECLARATIONS. */
 #define STRUCT_Con_M_F_Pattern_NeedNorm_s1 struct _Con_M_F_Pattern_NeedNorm_s1
