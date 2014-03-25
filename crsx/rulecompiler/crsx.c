@@ -814,7 +814,7 @@ Sink bufferPropertyRef(Sink sink, Construction construction)
     return sink;
 }
 
-Sink bufferProperties(Sink sink, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
+Sink bufferProperties(Sink sink, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
 {
 #   ifdef DEBUG
     ++eventCount;
@@ -828,8 +828,8 @@ Sink bufferProperties(Sink sink, NamedPropertyLink namedProperties, VariableProp
     buffer->pendingNamedProperties = namedProperties;
     buffer->pendingVariableProperties = variableProperties;
 
-    buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(sink->context, namedPropertyFreeVars(namedProperties));
-    buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(sink->context, variablePropertyFreeVars(variableProperties));
+    buffer->pendingNamedPropertiesFreeVars = namedFreeVars;
+    buffer->pendingVariablePropertiesFreeVars = variableFreeVars;
 
     ASSERT(sink->context, (variableProperties && buffer->pendingVariablePropertiesFreeVars) || (!variableProperties && !buffer->pendingVariablePropertiesFreeVars));
 
@@ -4001,7 +4001,7 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
     if (namedLink || variableLink)
     {
         // We need to emit a new reference
-        ADD_PROPERTIES(sink, LINK_NamedPropertyLink(sink->context, namedLink), LINK_VariablePropertyLink(sink->context, variableLink));
+        ADD_PROPERTIES(sink, LINK_VARIABLESET(sink->context, namedPropertyFreeVars(namedLink)), LINK_VARIABLESET(sink->context, variablePropertyFreeVars(variableLink)), LINK_NamedPropertyLink(sink->context, namedLink), LINK_VariablePropertyLink(sink->context, variableLink));
         ++(*metaSubstituteSizep);
     }
 

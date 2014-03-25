@@ -426,8 +426,8 @@ struct _Term
 
 #define VARIABLESET Hashset
 
-#define LINK_VARIABLESET(C,S) LINK_Hashset(C,S)
-#define UNLINK_VARIABLESET(C,S) UNLINK_Hashset(C,S)
+#define LINK_VARIABLESET(C,S) ((VARIABLESET) LINK_Hashset(C,S))
+#define UNLINK_VARIABLESET(C,S) ((VARIABLESET) UNLINK_Hashset(C,S))
 
 #define VARIABLESET_REMOVEALL(C,S,V,L) removeAllHS(C,S,V,L)
 #define VARIABLESET_MERGEALL(C,S1,S2) mergeAllHS(C,S1,S2)
@@ -695,7 +695,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 #define LITERALF(sink,...) LITERALU(sink,ALLOCATENF((sink)->context, (size_t) LITERALF_SIZE_LIMIT, __VA_ARGS__))
 #define LITERALNF(sink,maxsize,...) LITERALU(sink, ALLOCATENF((sink)->context, maxsize, __VA_ARGS__))
 
-#define ADD_PROPERTIES(sink,namedProperties,variableProperties) ((Sink)(sink))->properties(sink,namedProperties,variableProperties)
+#define ADD_PROPERTIES(sink,namedFVs,varFVs,namedProperties,variableProperties) ((Sink)(sink))->properties(sink,namedFVs,varFVs,namedProperties,variableProperties)
 #define ADD_PROPERTY_REF(sink,construction) ((Sink)(sink))->propertyRef(sink, asConstruction(construction))
 #define ADD_PROPERTY(sink,P,value) (IS_VARIABLE_USE(P) ? ADD_PROPERTY_VARIABLE(sink, VARIABLE(P), value) : ADD_PROPERTY_NAMED(sink, SYMBOL(P), value))
 #define ADD_PROPERTY_NAMED(sink,name,value) ((Sink)(sink))->propertyNamed(sink, name, value)
@@ -730,7 +730,7 @@ struct _Sink
     Sink (*weaken)(Sink sink, Variable variable); // weaken following term to *not* permit variable
 
     Sink (*propertyRef)(Sink sink, Construction construction); // base properties for next START
-    Sink (*properties)(Sink sink, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
+    Sink (*properties)(Sink sink, VARIABLESET namedFVs, VARIABLESET varFVs, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
 
     Sink (*propertyNamed)(Sink sink, const char *name, Term term); // add named property to next START
     Sink (*propertyVariable)(Sink sink, Variable variable, Term term); // add variable property to next START. Variable reference is transferred.

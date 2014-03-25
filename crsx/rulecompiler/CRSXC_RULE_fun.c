@@ -31,7 +31,7 @@ int step_M_F__variableFreshReuseOriginOption2(Sink sink__V1, Term term__V2)
     Hashset namedFV__V10 = LINK_VARIABLESET(sink__V1->context, namedPropertyFreeVars(namedP__V8));
     Hashset varFV__V11 = LINK_VARIABLESET(sink__V1->context, variablePropertyFreeVars(varP__V9));
     UNLINK(sink__V1->context, term__V2);
-    ADD_PROPERTIES(sink__V1, LINK_NamedPropertyLink(sink__V1->context, namedP__V8), LINK_VariablePropertyLink(sink__V1->context, varP__V9));
+    ADD_PROPERTIES(sink__V1, LINK_VARIABLESET(sink__V1->context, namedFV__V10), LINK_VARIABLESET(sink__V1->context, varFV__V11), LINK_NamedPropertyLink(sink__V1->context, namedP__V8), LINK_VariablePropertyLink(sink__V1->context, varP__V9));
     { Term key__V12, value__V13;
       key__V12 = sub__V4; { Sink buf__V14 = ALLOCA_BUFFER(sink__V1->context);
         { START(buf__V14, _M_VARIABLE);
@@ -102,7 +102,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V40 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V38));
       Hashset varFV__V41 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V39));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V38), LINK_VariablePropertyLink(sink__V20->context, varP__V39));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V40), LINK_VARIABLESET(sink__V20->context, varFV__V41), LINK_NamedPropertyLink(sink__V20->context, namedP__V38), LINK_VariablePropertyLink(sink__V20->context, varP__V39));
       { START(sink__V20, _M_F_PatternSub_s37);
         COPY(sink__V20, sub__V31);COPY(sink__V20, sub__V26);COPY(sink__V20, sub__V27);COPY(sink__V20, sub__V28);COPY(sink__V20, sub__V29);COPY(sink__V20, sub__V30);COPY(sink__V20, sub__V25);COPY(sink__V20, sub__V32);COPY(sink__V20, sub__V33);COPY(sink__V20, sub__V34);COPY(sink__V20, sub__V35);{ if (!IS_BOUND(x__V36)) { REBIND(x__V36);
             Variable binds__V42[1] = {x__V36}; BINDS(sink__V20, 1, binds__V42);
@@ -161,7 +161,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V67 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V65));
       Hashset varFV__V68 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V66));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V65), LINK_VariablePropertyLink(sink__V20->context, varP__V66));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V67), LINK_VARIABLESET(sink__V20->context, varFV__V68), LINK_NamedPropertyLink(sink__V20->context, namedP__V65), LINK_VariablePropertyLink(sink__V20->context, varP__V66));
       { START(sink__V20, _M_F_PatternSub_s27);
         COPY(sink__V20, sub__V58);COPY(sink__V20, sub__V52);COPY(sink__V20, sub__V53);COPY(sink__V20, sub__V54);COPY(sink__V20, sub__V55);COPY(sink__V20, sub__V56);COPY(sink__V20, sub__V57);COPY(sink__V20, sub__V51);COPY(sink__V20, sub__V59);COPY(sink__V20, sub__V60);COPY(sink__V20, sub__V61);COPY(sink__V20, sub__V62);{ if (!IS_BOUND(x__V63)) { REBIND(x__V63);
             Variable binds__V69[1] = {x__V63}; BINDS(sink__V20, 1, binds__V69);
@@ -218,7 +218,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V93 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V91));
       Hashset varFV__V94 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V92));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V91), LINK_VariablePropertyLink(sink__V20->context, varP__V92));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V93), LINK_VARIABLESET(sink__V20->context, varFV__V94), LINK_NamedPropertyLink(sink__V20->context, namedP__V91), LINK_VariablePropertyLink(sink__V20->context, varP__V92));
       { START(sink__V20, _M_F_PatternSub_s32);
         COPY(sink__V20, sub__V84);COPY(sink__V20, sub__V79);COPY(sink__V20, sub__V80);COPY(sink__V20, sub__V81);COPY(sink__V20, sub__V82);COPY(sink__V20, sub__V83);COPY(sink__V20, sub__V78);COPY(sink__V20, sub__V85);COPY(sink__V20, sub__V86);COPY(sink__V20, sub__V87);COPY(sink__V20, sub__V88);{ if (!IS_BOUND(x__V89)) { REBIND(x__V89);
             Variable binds__V95[1] = {x__V89}; BINDS(sink__V20, 1, binds__V95);
@@ -275,7 +275,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V119 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V117));
       Hashset varFV__V120 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V118));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V117), LINK_VariablePropertyLink(sink__V20->context, varP__V118));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V119), LINK_VARIABLESET(sink__V20->context, varFV__V120), LINK_NamedPropertyLink(sink__V20->context, namedP__V117), LINK_VariablePropertyLink(sink__V20->context, varP__V118));
       { START(sink__V20, _M_F_PatternSub_s2);
         COPY(sink__V20, sub__V110);COPY(sink__V20, sub__V105);COPY(sink__V20, sub__V106);COPY(sink__V20, sub__V107);COPY(sink__V20, sub__V108);COPY(sink__V20, sub__V109);COPY(sink__V20, sub__V104);COPY(sink__V20, sub__V111);COPY(sink__V20, sub__V112);COPY(sink__V20, sub__V113);COPY(sink__V20, sub__V114);{ if (!IS_BOUND(x__V115)) { REBIND(x__V115);
             Variable binds__V121[1] = {x__V115}; BINDS(sink__V20, 1, binds__V121);
@@ -332,7 +332,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V145 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V143));
       Hashset varFV__V146 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V144));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V143), LINK_VariablePropertyLink(sink__V20->context, varP__V144));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V145), LINK_VARIABLESET(sink__V20->context, varFV__V146), LINK_NamedPropertyLink(sink__V20->context, namedP__V143), LINK_VariablePropertyLink(sink__V20->context, varP__V144));
       { START(sink__V20, _M_F_PatternSub_s10);
         COPY(sink__V20, sub__V136);COPY(sink__V20, sub__V131);COPY(sink__V20, sub__V132);COPY(sink__V20, sub__V133);COPY(sink__V20, sub__V134);COPY(sink__V20, sub__V135);COPY(sink__V20, sub__V130);COPY(sink__V20, sub__V137);COPY(sink__V20, sub__V138);COPY(sink__V20, sub__V139);COPY(sink__V20, sub__V140);{ if (!IS_BOUND(x__V141)) { REBIND(x__V141);
             Variable binds__V147[1] = {x__V141}; BINDS(sink__V20, 1, binds__V147);
@@ -387,7 +387,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V170 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V168));
       Hashset varFV__V171 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V169));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V168), LINK_VariablePropertyLink(sink__V20->context, varP__V169));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V170), LINK_VARIABLESET(sink__V20->context, varFV__V171), LINK_NamedPropertyLink(sink__V20->context, namedP__V168), LINK_VariablePropertyLink(sink__V20->context, varP__V169));
       { START(sink__V20, _M_F_PatternSub_s42);
         COPY(sink__V20, sub__V161);COPY(sink__V20, sub__V157);COPY(sink__V20, sub__V158);COPY(sink__V20, sub__V159);COPY(sink__V20, sub__V160);COPY(sink__V20, sub__V156);COPY(sink__V20, sub__V162);COPY(sink__V20, sub__V163);COPY(sink__V20, sub__V164);COPY(sink__V20, sub__V165);{ if (!IS_BOUND(x__V166)) { REBIND(x__V166);
             Variable binds__V172[1] = {x__V166}; BINDS(sink__V20, 1, binds__V172);
@@ -446,7 +446,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V197 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V195));
       Hashset varFV__V198 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V196));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V195), LINK_VariablePropertyLink(sink__V20->context, varP__V196));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V197), LINK_VARIABLESET(sink__V20->context, varFV__V198), LINK_NamedPropertyLink(sink__V20->context, namedP__V195), LINK_VariablePropertyLink(sink__V20->context, varP__V196));
       { START(sink__V20, _M_F_PatternSub_s15);
         COPY(sink__V20, sub__V183);COPY(sink__V20, sub__V182);COPY(sink__V20, sub__V181);COPY(sink__V20, sub__V184);COPY(sink__V20, sub__V185);COPY(sink__V20, sub__V186);COPY(sink__V20, sub__V187);COPY(sink__V20, sub__V188);COPY(sink__V20, sub__V189);COPY(sink__V20, sub__V190);COPY(sink__V20, sub__V191);COPY(sink__V20, sub__V192);{ if (!IS_BOUND(x__V193)) { REBIND(x__V193);
             Variable binds__V199[1] = {x__V193}; BINDS(sink__V20, 1, binds__V199);
@@ -505,7 +505,7 @@ int step_M_F_PatternSub(Sink sink__V20, Term term__V21)
       Hashset namedFV__V224 = LINK_VARIABLESET(sink__V20->context, namedPropertyFreeVars(namedP__V222));
       Hashset varFV__V225 = LINK_VARIABLESET(sink__V20->context, variablePropertyFreeVars(varP__V223));
       UNLINK(sink__V20->context, term__V21);
-      ADD_PROPERTIES(sink__V20, LINK_NamedPropertyLink(sink__V20->context, namedP__V222), LINK_VariablePropertyLink(sink__V20->context, varP__V223));
+      ADD_PROPERTIES(sink__V20, LINK_VARIABLESET(sink__V20->context, namedFV__V224), LINK_VARIABLESET(sink__V20->context, varFV__V225), LINK_NamedPropertyLink(sink__V20->context, namedP__V222), LINK_VariablePropertyLink(sink__V20->context, varP__V223));
       { START(sink__V20, _M_F_PatternSub_s7);
         COPY(sink__V20, sub__V218);COPY(sink__V20, sub__V209);COPY(sink__V20, sub__V210);COPY(sink__V20, sub__V211);COPY(sink__V20, sub__V212);COPY(sink__V20, sub__V213);COPY(sink__V20, sub__V214);COPY(sink__V20, sub__V215);COPY(sink__V20, sub__V216);COPY(sink__V20, sub__V217);COPY(sink__V20, sub__V208);COPY(sink__V20, sub__V219);{ if (!IS_BOUND(x__V220)) { REBIND(x__V220);
             Variable binds__V226[1] = {x__V220}; BINDS(sink__V20, 1, binds__V226);
@@ -556,7 +556,7 @@ int step_M_F__unlink__refs2_s1(Sink sink__V234, Term term__V235)
       Hashset namedFV__V242 = LINK_VARIABLESET(sink__V234->context, namedPropertyFreeVars(namedP__V240));
       Hashset varFV__V243 = LINK_VARIABLESET(sink__V234->context, variablePropertyFreeVars(varP__V241));
       UNLINK(sink__V234->context, term__V235);
-      ADD_PROPERTIES(sink__V234, LINK_NamedPropertyLink(sink__V234->context, namedP__V240), LINK_VariablePropertyLink(sink__V234->context, varP__V241));
+      ADD_PROPERTIES(sink__V234, LINK_VARIABLESET(sink__V234->context, namedFV__V242), LINK_VARIABLESET(sink__V234->context, varFV__V243), LINK_NamedPropertyLink(sink__V234->context, namedP__V240), LINK_VariablePropertyLink(sink__V234->context, varP__V241));
       { START(sink__V234, _M_F__unlink__refs2_s3);
         COPY(sink__V234, sub__V239);END(sink__V234, _M_F__unlink__refs2_s3); }
       UNLINK_VARIABLESET(sink__V234->context, namedFV__V242); UNLINK_VARIABLESET(sink__V234->context, varFV__V243);
@@ -579,7 +579,7 @@ int step_M_F__unlink__refs2_s1(Sink sink__V234, Term term__V235)
       Hashset namedFV__V250 = LINK_VARIABLESET(sink__V234->context, namedPropertyFreeVars(namedP__V248));
       Hashset varFV__V251 = LINK_VARIABLESET(sink__V234->context, variablePropertyFreeVars(varP__V249));
       UNLINK(sink__V234->context, term__V235);
-      ADD_PROPERTIES(sink__V234, LINK_NamedPropertyLink(sink__V234->context, namedP__V248), LINK_VariablePropertyLink(sink__V234->context, varP__V249));
+      ADD_PROPERTIES(sink__V234, LINK_VARIABLESET(sink__V234->context, namedFV__V250), LINK_VARIABLESET(sink__V234->context, varFV__V251), LINK_NamedPropertyLink(sink__V234->context, namedP__V248), LINK_VariablePropertyLink(sink__V234->context, varP__V249));
       { START(sink__V234, _M_F__unlink__refs2_s2);
         COPY(sink__V234, sub__V245);COPY(sink__V234, sub__V246);COPY(sink__V234, sub__V247);END(sink__V234, _M_F__unlink__refs2_s2); }
       UNLINK_VARIABLESET(sink__V234->context, namedFV__V250); UNLINK_VARIABLESET(sink__V234->context, varFV__V251);
@@ -614,7 +614,7 @@ int step_M_F__unlink__refs2_s2(Sink sink__V252, Term term__V253)
     Hashset namedFV__V259 = LINK_VARIABLESET(sink__V252->context, namedPropertyFreeVars(namedP__V257));
     Hashset varFV__V260 = LINK_VARIABLESET(sink__V252->context, variablePropertyFreeVars(varP__V258));
     UNLINK(sink__V252->context, term__V253);
-    ADD_PROPERTIES(sink__V252, LINK_NamedPropertyLink(sink__V252->context, namedP__V257), LINK_VariablePropertyLink(sink__V252->context, varP__V258));
+    ADD_PROPERTIES(sink__V252, LINK_VARIABLESET(sink__V252->context, namedFV__V259), LINK_VARIABLESET(sink__V252->context, varFV__V260), LINK_NamedPropertyLink(sink__V252->context, namedP__V257), LINK_VariablePropertyLink(sink__V252->context, varP__V258));
     { START(sink__V252, _M_F__unlink__refs3_s1);
       { Term term__V261;
         { Term key__V262;
@@ -689,7 +689,7 @@ int step_M_F_Fresh(Sink sink__V272, Term term__V273)
         Hashset namedFV__V282 = LINK_VARIABLESET(sink__V272->context, namedPropertyFreeVars(namedP__V280));
         Hashset varFV__V283 = LINK_VARIABLESET(sink__V272->context, variablePropertyFreeVars(varP__V281));
         UNLINK(sink__V272->context, term__V273);
-        ADD_PROPERTIES(sink__V272, LINK_NamedPropertyLink(sink__V272->context, namedP__V280), LINK_VariablePropertyLink(sink__V272->context, varP__V281));
+        ADD_PROPERTIES(sink__V272, LINK_VARIABLESET(sink__V272->context, namedFV__V282), LINK_VARIABLESET(sink__V272->context, varFV__V283), LINK_NamedPropertyLink(sink__V272->context, namedP__V280), LINK_VariablePropertyLink(sink__V272->context, varP__V281));
         { START(sink__V272, _M_F_Fresh_s1);
           USE(sink__V272, z__V277); COPY(sink__V272, sub__V278);COPY(sink__V272, sub__V279);END(sink__V272, _M_F_Fresh_s1); }
         UNLINK_VARIABLESET(sink__V272->context, namedFV__V282); UNLINK_VARIABLESET(sink__V272->context, varFV__V283);
@@ -735,7 +735,7 @@ int step_M_F__then_Pattern_Variable_Use(Sink sink__V284, Term term__V285)
       Hashset namedFV__V297 = LINK_VARIABLESET(sink__V284->context, namedPropertyFreeVars(namedP__V295));
       Hashset varFV__V298 = LINK_VARIABLESET(sink__V284->context, variablePropertyFreeVars(varP__V296));
       UNLINK(sink__V284->context, term__V285);
-      ADD_PROPERTIES(sink__V284, LINK_NamedPropertyLink(sink__V284->context, namedP__V295), LINK_VariablePropertyLink(sink__V284->context, varP__V296));
+      ADD_PROPERTIES(sink__V284, LINK_VARIABLESET(sink__V284->context, namedFV__V297), LINK_VARIABLESET(sink__V284->context, varFV__V298), LINK_NamedPropertyLink(sink__V284->context, namedP__V295), LINK_VariablePropertyLink(sink__V284->context, varP__V296));
       { START(sink__V284, _M_F__then_Pattern_Variable_Use_s2);
         COPY(sink__V284, sub__V290);COPY(sink__V284, sub__V289);COPY(sink__V284, sub__V291);COPY(sink__V284, sub__V292);{ if (!IS_BOUND(x__V293)) { REBIND(x__V293);
             Variable binds__V299[1] = {x__V293}; BINDS(sink__V284, 1, binds__V299);
@@ -809,7 +809,7 @@ int step_M_F_PatternSub_s10(Sink sink__V307, Term term__V308)
         Hashset namedFV__V326 = LINK_VARIABLESET(sink__V307->context, namedPropertyFreeVars(namedP__V324));
         Hashset varFV__V327 = LINK_VARIABLESET(sink__V307->context, variablePropertyFreeVars(varP__V325));
         UNLINK(sink__V307->context, term__V308);
-        ADD_PROPERTIES(sink__V307, LINK_NamedPropertyLink(sink__V307->context, namedP__V324), LINK_VariablePropertyLink(sink__V307->context, varP__V325));
+        ADD_PROPERTIES(sink__V307, LINK_VARIABLESET(sink__V307->context, namedFV__V326), LINK_VARIABLESET(sink__V307->context, varFV__V327), LINK_NamedPropertyLink(sink__V307->context, namedP__V324), LINK_VariablePropertyLink(sink__V307->context, varP__V325));
         { START(sink__V307, _M_F_PatternSub_s12);
           COPY(sink__V307, sub__V320);COPY(sink__V307, sub__V312);COPY(sink__V307, sub__V313);COPY(sink__V307, sub__V314);COPY(sink__V307, sub__V315);COPY(sink__V307, sub__V316);COPY(sink__V307, sub__V317);COPY(sink__V307, sub__V318);COPY(sink__V307, sub__V319);USE(sink__V307, z__V277); COPY(sink__V307, sub__V321);{ if (!IS_BOUND(x__V322)) { REBIND(x__V322);
               Variable binds__V328[1] = {x__V322}; BINDS(sink__V307, 1, binds__V328);
@@ -884,7 +884,7 @@ int step_M_F_PatternSub_s12(Sink sink__V336, Term term__V337)
         Hashset namedFV__V355 = LINK_VARIABLESET(sink__V336->context, namedPropertyFreeVars(namedP__V353));
         Hashset varFV__V356 = LINK_VARIABLESET(sink__V336->context, variablePropertyFreeVars(varP__V354));
         UNLINK(sink__V336->context, term__V337);
-        ADD_PROPERTIES(sink__V336, LINK_NamedPropertyLink(sink__V336->context, namedP__V353), LINK_VariablePropertyLink(sink__V336->context, varP__V354));
+        ADD_PROPERTIES(sink__V336, LINK_VARIABLESET(sink__V336->context, namedFV__V355), LINK_VARIABLESET(sink__V336->context, varFV__V356), LINK_NamedPropertyLink(sink__V336->context, namedP__V353), LINK_VariablePropertyLink(sink__V336->context, varP__V354));
         { START(sink__V336, _M_F_PatternSub_s13);
           USE(sink__V336, z__V277); COPY(sink__V336, sub__V341);COPY(sink__V336, sub__V342);COPY(sink__V336, sub__V343);COPY(sink__V336, sub__V344);COPY(sink__V336, sub__V345);COPY(sink__V336, sub__V346);COPY(sink__V336, sub__V347);COPY(sink__V336, sub__V348);COPY(sink__V336, sub__V349);COPY(sink__V336, sub__V350);{ if (!IS_BOUND(x__V351)) { REBIND(x__V351);
               Variable binds__V357[1] = {x__V351}; BINDS(sink__V336, 1, binds__V357);
@@ -956,7 +956,7 @@ int step_M_F_PatternSub_s13(Sink sink__V365, Term term__V366)
     Hashset namedFV__V382 = LINK_VARIABLESET(sink__V365->context, namedPropertyFreeVars(namedP__V380));
     Hashset varFV__V383 = LINK_VARIABLESET(sink__V365->context, variablePropertyFreeVars(varP__V381));
     UNLINK(sink__V365->context, term__V366);
-    ADD_PROPERTIES(sink__V365, LINK_NamedPropertyLink(sink__V365->context, namedP__V380), LINK_VariablePropertyLink(sink__V365->context, varP__V381));
+    ADD_PROPERTIES(sink__V365, LINK_VARIABLESET(sink__V365->context, namedFV__V382), LINK_VARIABLESET(sink__V365->context, varFV__V383), LINK_NamedPropertyLink(sink__V365->context, namedP__V380), LINK_VariablePropertyLink(sink__V365->context, varP__V381));
     { START(sink__V365, _M_F_PatternSub2);
       { START(sink__V365, _M__sFalse); END(sink__V365, _M__sFalse); } COPY(sink__V365, sub__V369);COPY(sink__V365, sub__V370);COPY(sink__V365, sub__V371);COPY(sink__V365, sub__V372);COPY(sink__V365, sub__V376);COPY(sink__V365, sub__V374);COPY(sink__V365, sub__V375);COPY(sink__V365, sub__V367);COPY(sink__V365, sub__V377);{ if (!IS_BOUND(x__V378)) { REBIND(x__V378);
           Variable binds__V384[1] = {x__V378}; BINDS(sink__V365, 1, binds__V384);
@@ -1030,7 +1030,7 @@ int step_M_F_PatternSub_s15(Sink sink__V392, Term term__V393)
       Hashset namedFV__V413 = LINK_VARIABLESET(sink__V392->context, namedPropertyFreeVars(namedP__V411));
       Hashset varFV__V414 = LINK_VARIABLESET(sink__V392->context, variablePropertyFreeVars(varP__V412));
       UNLINK(sink__V392->context, term__V393);
-      ADD_PROPERTIES(sink__V392, LINK_NamedPropertyLink(sink__V392->context, namedP__V411), LINK_VariablePropertyLink(sink__V392->context, varP__V412));
+      ADD_PROPERTIES(sink__V392, LINK_VARIABLESET(sink__V392->context, namedFV__V413), LINK_VARIABLESET(sink__V392->context, varFV__V414), LINK_NamedPropertyLink(sink__V392->context, namedP__V411), LINK_VariablePropertyLink(sink__V392->context, varP__V412));
       { START(sink__V392, _M_F_PatternSub_s22);
         COPY(sink__V392, sub__V404);COPY(sink__V392, sub__V398);COPY(sink__V392, sub__V399);COPY(sink__V392, sub__V400);COPY(sink__V392, sub__V401);COPY(sink__V392, sub__V402);COPY(sink__V392, sub__V403);COPY(sink__V392, sub__V397);COPY(sink__V392, sub__V405);COPY(sink__V392, sub__V406);COPY(sink__V392, sub__V407);COPY(sink__V392, sub__V408);{ if (!IS_BOUND(x__V409)) { REBIND(x__V409);
             Variable binds__V415[1] = {x__V409}; BINDS(sink__V392, 1, binds__V415);
@@ -1087,7 +1087,7 @@ int step_M_F_PatternSub_s15(Sink sink__V392, Term term__V393)
       Hashset namedFV__V439 = LINK_VARIABLESET(sink__V392->context, namedPropertyFreeVars(namedP__V437));
       Hashset varFV__V440 = LINK_VARIABLESET(sink__V392->context, variablePropertyFreeVars(varP__V438));
       UNLINK(sink__V392->context, term__V393);
-      ADD_PROPERTIES(sink__V392, LINK_NamedPropertyLink(sink__V392->context, namedP__V437), LINK_VariablePropertyLink(sink__V392->context, varP__V438));
+      ADD_PROPERTIES(sink__V392, LINK_VARIABLESET(sink__V392->context, namedFV__V439), LINK_VARIABLESET(sink__V392->context, varFV__V440), LINK_NamedPropertyLink(sink__V392->context, namedP__V437), LINK_VariablePropertyLink(sink__V392->context, varP__V438));
       { START(sink__V392, _M_F_PatternSub_s17);
         COPY(sink__V392, sub__V430);COPY(sink__V392, sub__V425);COPY(sink__V392, sub__V426);COPY(sink__V392, sub__V427);COPY(sink__V392, sub__V428);COPY(sink__V392, sub__V429);COPY(sink__V392, sub__V424);COPY(sink__V392, sub__V431);COPY(sink__V392, sub__V432);COPY(sink__V392, sub__V433);COPY(sink__V392, sub__V434);{ if (!IS_BOUND(x__V435)) { REBIND(x__V435);
             Variable binds__V441[1] = {x__V435}; BINDS(sink__V392, 1, binds__V441);
@@ -1161,7 +1161,7 @@ int step_M_F_PatternSub_s17(Sink sink__V449, Term term__V450)
         Hashset namedFV__V468 = LINK_VARIABLESET(sink__V449->context, namedPropertyFreeVars(namedP__V466));
         Hashset varFV__V469 = LINK_VARIABLESET(sink__V449->context, variablePropertyFreeVars(varP__V467));
         UNLINK(sink__V449->context, term__V450);
-        ADD_PROPERTIES(sink__V449, LINK_NamedPropertyLink(sink__V449->context, namedP__V466), LINK_VariablePropertyLink(sink__V449->context, varP__V467));
+        ADD_PROPERTIES(sink__V449, LINK_VARIABLESET(sink__V449->context, namedFV__V468), LINK_VARIABLESET(sink__V449->context, varFV__V469), LINK_NamedPropertyLink(sink__V449->context, namedP__V466), LINK_VariablePropertyLink(sink__V449->context, varP__V467));
         { START(sink__V449, _M_F_PatternSub_s19);
           COPY(sink__V449, sub__V462);COPY(sink__V449, sub__V454);COPY(sink__V449, sub__V455);COPY(sink__V449, sub__V456);COPY(sink__V449, sub__V457);COPY(sink__V449, sub__V458);COPY(sink__V449, sub__V459);COPY(sink__V449, sub__V460);COPY(sink__V449, sub__V461);USE(sink__V449, z__V277); COPY(sink__V449, sub__V463);{ if (!IS_BOUND(x__V464)) { REBIND(x__V464);
               Variable binds__V470[1] = {x__V464}; BINDS(sink__V449, 1, binds__V470);
@@ -1236,7 +1236,7 @@ int step_M_F_PatternSub_s19(Sink sink__V478, Term term__V479)
         Hashset namedFV__V497 = LINK_VARIABLESET(sink__V478->context, namedPropertyFreeVars(namedP__V495));
         Hashset varFV__V498 = LINK_VARIABLESET(sink__V478->context, variablePropertyFreeVars(varP__V496));
         UNLINK(sink__V478->context, term__V479);
-        ADD_PROPERTIES(sink__V478, LINK_NamedPropertyLink(sink__V478->context, namedP__V495), LINK_VariablePropertyLink(sink__V478->context, varP__V496));
+        ADD_PROPERTIES(sink__V478, LINK_VARIABLESET(sink__V478->context, namedFV__V497), LINK_VARIABLESET(sink__V478->context, varFV__V498), LINK_NamedPropertyLink(sink__V478->context, namedP__V495), LINK_VariablePropertyLink(sink__V478->context, varP__V496));
         { START(sink__V478, _M_F_PatternSub_s20);
           USE(sink__V478, z__V277); COPY(sink__V478, sub__V483);COPY(sink__V478, sub__V484);COPY(sink__V478, sub__V485);COPY(sink__V478, sub__V486);COPY(sink__V478, sub__V487);COPY(sink__V478, sub__V488);COPY(sink__V478, sub__V489);COPY(sink__V478, sub__V490);COPY(sink__V478, sub__V491);COPY(sink__V478, sub__V492);{ if (!IS_BOUND(x__V493)) { REBIND(x__V493);
               Variable binds__V499[1] = {x__V493}; BINDS(sink__V478, 1, binds__V499);
@@ -1308,7 +1308,7 @@ int step_M_F_PatternSub_s20(Sink sink__V507, Term term__V508)
     Hashset namedFV__V524 = LINK_VARIABLESET(sink__V507->context, namedPropertyFreeVars(namedP__V522));
     Hashset varFV__V525 = LINK_VARIABLESET(sink__V507->context, variablePropertyFreeVars(varP__V523));
     UNLINK(sink__V507->context, term__V508);
-    ADD_PROPERTIES(sink__V507, LINK_NamedPropertyLink(sink__V507->context, namedP__V522), LINK_VariablePropertyLink(sink__V507->context, varP__V523));
+    ADD_PROPERTIES(sink__V507, LINK_VARIABLESET(sink__V507->context, namedFV__V524), LINK_VARIABLESET(sink__V507->context, varFV__V525), LINK_NamedPropertyLink(sink__V507->context, namedP__V522), LINK_VariablePropertyLink(sink__V507->context, varP__V523));
     { START(sink__V507, _M_F_PatternSub2);
       { START(sink__V507, _M__sFalse); END(sink__V507, _M__sFalse); } COPY(sink__V507, sub__V511);COPY(sink__V507, sub__V512);COPY(sink__V507, sub__V513);COPY(sink__V507, sub__V514);COPY(sink__V507, sub__V518);COPY(sink__V507, sub__V516);COPY(sink__V507, sub__V517);COPY(sink__V507, sub__V509);COPY(sink__V507, sub__V519);{ if (!IS_BOUND(x__V520)) { REBIND(x__V520);
           Variable binds__V526[1] = {x__V520}; BINDS(sink__V507, 1, binds__V526);
@@ -1382,7 +1382,7 @@ int step_M_F_PatternSub_s22(Sink sink__V534, Term term__V535)
         Hashset namedFV__V554 = LINK_VARIABLESET(sink__V534->context, namedPropertyFreeVars(namedP__V552));
         Hashset varFV__V555 = LINK_VARIABLESET(sink__V534->context, variablePropertyFreeVars(varP__V553));
         UNLINK(sink__V534->context, term__V535);
-        ADD_PROPERTIES(sink__V534, LINK_NamedPropertyLink(sink__V534->context, namedP__V552), LINK_VariablePropertyLink(sink__V534->context, varP__V553));
+        ADD_PROPERTIES(sink__V534, LINK_VARIABLESET(sink__V534->context, namedFV__V554), LINK_VARIABLESET(sink__V534->context, varFV__V555), LINK_NamedPropertyLink(sink__V534->context, namedP__V552), LINK_VariablePropertyLink(sink__V534->context, varP__V553));
         { START(sink__V534, _M_F_PatternSub_s24);
           COPY(sink__V534, sub__V548);COPY(sink__V534, sub__V539);COPY(sink__V534, sub__V540);COPY(sink__V534, sub__V541);COPY(sink__V534, sub__V542);COPY(sink__V534, sub__V543);COPY(sink__V534, sub__V544);COPY(sink__V534, sub__V545);COPY(sink__V534, sub__V546);COPY(sink__V534, sub__V547);USE(sink__V534, z__V277); COPY(sink__V534, sub__V549);{ if (!IS_BOUND(x__V550)) { REBIND(x__V550);
               Variable binds__V556[1] = {x__V550}; BINDS(sink__V534, 1, binds__V556);
@@ -1459,7 +1459,7 @@ int step_M_F_PatternSub_s24(Sink sink__V564, Term term__V565)
         Hashset namedFV__V584 = LINK_VARIABLESET(sink__V564->context, namedPropertyFreeVars(namedP__V582));
         Hashset varFV__V585 = LINK_VARIABLESET(sink__V564->context, variablePropertyFreeVars(varP__V583));
         UNLINK(sink__V564->context, term__V565);
-        ADD_PROPERTIES(sink__V564, LINK_NamedPropertyLink(sink__V564->context, namedP__V582), LINK_VariablePropertyLink(sink__V564->context, varP__V583));
+        ADD_PROPERTIES(sink__V564, LINK_VARIABLESET(sink__V564->context, namedFV__V584), LINK_VARIABLESET(sink__V564->context, varFV__V585), LINK_NamedPropertyLink(sink__V564->context, namedP__V582), LINK_VariablePropertyLink(sink__V564->context, varP__V583));
         { START(sink__V564, _M_F_PatternSub_s25);
           USE(sink__V564, z__V277); COPY(sink__V564, sub__V569);COPY(sink__V564, sub__V570);COPY(sink__V564, sub__V571);COPY(sink__V564, sub__V572);COPY(sink__V564, sub__V573);COPY(sink__V564, sub__V574);COPY(sink__V564, sub__V575);COPY(sink__V564, sub__V576);COPY(sink__V564, sub__V577);COPY(sink__V564, sub__V578);COPY(sink__V564, sub__V579);{ if (!IS_BOUND(x__V580)) { REBIND(x__V580);
               Variable binds__V586[1] = {x__V580}; BINDS(sink__V564, 1, binds__V586);
@@ -1533,7 +1533,7 @@ int step_M_F_PatternSub_s25(Sink sink__V594, Term term__V595)
     Hashset namedFV__V612 = LINK_VARIABLESET(sink__V594->context, namedPropertyFreeVars(namedP__V610));
     Hashset varFV__V613 = LINK_VARIABLESET(sink__V594->context, variablePropertyFreeVars(varP__V611));
     UNLINK(sink__V594->context, term__V595);
-    ADD_PROPERTIES(sink__V594, LINK_NamedPropertyLink(sink__V594->context, namedP__V610), LINK_VariablePropertyLink(sink__V594->context, varP__V611));
+    ADD_PROPERTIES(sink__V594, LINK_VARIABLESET(sink__V594->context, namedFV__V612), LINK_VARIABLESET(sink__V594->context, varFV__V613), LINK_NamedPropertyLink(sink__V594->context, namedP__V610), LINK_VariablePropertyLink(sink__V594->context, varP__V611));
     { START(sink__V594, _M_F_PatternSub2);
       { START(sink__V594, _M__sTrue); END(sink__V594, _M__sTrue); } COPY(sink__V594, sub__V599);COPY(sink__V594, sub__V600);COPY(sink__V594, sub__V601);COPY(sink__V594, sub__V602);COPY(sink__V594, sub__V606);COPY(sink__V594, sub__V604);COPY(sink__V594, sub__V605);COPY(sink__V594, sub__V596);COPY(sink__V594, sub__V607);{ if (!IS_BOUND(x__V608)) { REBIND(x__V608);
           Variable binds__V614[1] = {x__V608}; BINDS(sink__V594, 1, binds__V614);
@@ -1607,7 +1607,7 @@ int step_M_F_PatternSub_s27(Sink sink__V622, Term term__V623)
         Hashset namedFV__V642 = LINK_VARIABLESET(sink__V622->context, namedPropertyFreeVars(namedP__V640));
         Hashset varFV__V643 = LINK_VARIABLESET(sink__V622->context, variablePropertyFreeVars(varP__V641));
         UNLINK(sink__V622->context, term__V623);
-        ADD_PROPERTIES(sink__V622, LINK_NamedPropertyLink(sink__V622->context, namedP__V640), LINK_VariablePropertyLink(sink__V622->context, varP__V641));
+        ADD_PROPERTIES(sink__V622, LINK_VARIABLESET(sink__V622->context, namedFV__V642), LINK_VARIABLESET(sink__V622->context, varFV__V643), LINK_NamedPropertyLink(sink__V622->context, namedP__V640), LINK_VariablePropertyLink(sink__V622->context, varP__V641));
         { START(sink__V622, _M_F_PatternSub_s29);
           COPY(sink__V622, sub__V636);COPY(sink__V622, sub__V627);COPY(sink__V622, sub__V628);COPY(sink__V622, sub__V629);COPY(sink__V622, sub__V630);COPY(sink__V622, sub__V631);COPY(sink__V622, sub__V632);COPY(sink__V622, sub__V633);COPY(sink__V622, sub__V634);COPY(sink__V622, sub__V635);USE(sink__V622, z__V277); COPY(sink__V622, sub__V637);{ if (!IS_BOUND(x__V638)) { REBIND(x__V638);
               Variable binds__V644[1] = {x__V638}; BINDS(sink__V622, 1, binds__V644);
@@ -1684,7 +1684,7 @@ int step_M_F_PatternSub_s29(Sink sink__V652, Term term__V653)
         Hashset namedFV__V672 = LINK_VARIABLESET(sink__V652->context, namedPropertyFreeVars(namedP__V670));
         Hashset varFV__V673 = LINK_VARIABLESET(sink__V652->context, variablePropertyFreeVars(varP__V671));
         UNLINK(sink__V652->context, term__V653);
-        ADD_PROPERTIES(sink__V652, LINK_NamedPropertyLink(sink__V652->context, namedP__V670), LINK_VariablePropertyLink(sink__V652->context, varP__V671));
+        ADD_PROPERTIES(sink__V652, LINK_VARIABLESET(sink__V652->context, namedFV__V672), LINK_VARIABLESET(sink__V652->context, varFV__V673), LINK_NamedPropertyLink(sink__V652->context, namedP__V670), LINK_VariablePropertyLink(sink__V652->context, varP__V671));
         { START(sink__V652, _M_F_PatternSub_s30);
           USE(sink__V652, z__V277); COPY(sink__V652, sub__V657);COPY(sink__V652, sub__V658);COPY(sink__V652, sub__V659);COPY(sink__V652, sub__V660);COPY(sink__V652, sub__V661);COPY(sink__V652, sub__V662);COPY(sink__V652, sub__V663);COPY(sink__V652, sub__V664);COPY(sink__V652, sub__V665);COPY(sink__V652, sub__V666);COPY(sink__V652, sub__V667);{ if (!IS_BOUND(x__V668)) { REBIND(x__V668);
               Variable binds__V674[1] = {x__V668}; BINDS(sink__V652, 1, binds__V674);
@@ -1745,7 +1745,7 @@ int step_M_F_Pattern_MetaArgs_Copy_s1(Sink sink__V682, Term term__V683)
         Hashset namedFV__V694 = LINK_VARIABLESET(sink__V682->context, namedPropertyFreeVars(namedP__V692));
         Hashset varFV__V695 = LINK_VARIABLESET(sink__V682->context, variablePropertyFreeVars(varP__V693));
         UNLINK(sink__V682->context, term__V683);
-        ADD_PROPERTIES(sink__V682, LINK_NamedPropertyLink(sink__V682->context, namedP__V692), LINK_VariablePropertyLink(sink__V682->context, varP__V693));
+        ADD_PROPERTIES(sink__V682, LINK_VARIABLESET(sink__V682->context, namedFV__V694), LINK_VARIABLESET(sink__V682->context, varFV__V695), LINK_NamedPropertyLink(sink__V682->context, namedP__V692), LINK_VariablePropertyLink(sink__V682->context, varP__V693));
         { START(sink__V682, _M_F_Pattern_MetaArgs_Copy_s3);
           COPY(sink__V682, sub__V689);COPY(sink__V682, sub__V687);COPY(sink__V682, sub__V688);USE(sink__V682, z__V277); { if (!IS_BOUND(x__V690)) { REBIND(x__V690);
               Variable binds__V696[1] = {x__V690}; BINDS(sink__V682, 1, binds__V696);
@@ -1819,7 +1819,7 @@ int step_M_F_PatternSub_s30(Sink sink__V704, Term term__V705)
     Hashset namedFV__V722 = LINK_VARIABLESET(sink__V704->context, namedPropertyFreeVars(namedP__V720));
     Hashset varFV__V723 = LINK_VARIABLESET(sink__V704->context, variablePropertyFreeVars(varP__V721));
     UNLINK(sink__V704->context, term__V705);
-    ADD_PROPERTIES(sink__V704, LINK_NamedPropertyLink(sink__V704->context, namedP__V720), LINK_VariablePropertyLink(sink__V704->context, varP__V721));
+    ADD_PROPERTIES(sink__V704, LINK_VARIABLESET(sink__V704->context, namedFV__V722), LINK_VARIABLESET(sink__V704->context, varFV__V723), LINK_NamedPropertyLink(sink__V704->context, namedP__V720), LINK_VariablePropertyLink(sink__V704->context, varP__V721));
     { START(sink__V704, _M_F_PatternSub);
       COPY(sink__V704, sub__V708);COPY(sink__V704, sub__V709);COPY(sink__V704, sub__V710);COPY(sink__V704, sub__V711);COPY(sink__V704, sub__V712);COPY(sink__V704, sub__V716);COPY(sink__V704, sub__V714);COPY(sink__V704, sub__V715);COPY(sink__V704, sub__V706);COPY(sink__V704, sub__V717);{ if (!IS_BOUND(x__V718)) { REBIND(x__V718);
           Variable binds__V724[1] = {x__V718}; BINDS(sink__V704, 1, binds__V724);
@@ -1877,7 +1877,7 @@ int step_M_F_Pattern_MetaArgs_Copy_s3(Sink sink__V732, Term term__V733)
         Hashset namedFV__V744 = LINK_VARIABLESET(sink__V732->context, namedPropertyFreeVars(namedP__V742));
         Hashset varFV__V745 = LINK_VARIABLESET(sink__V732->context, variablePropertyFreeVars(varP__V743));
         UNLINK(sink__V732->context, term__V733);
-        ADD_PROPERTIES(sink__V732, LINK_NamedPropertyLink(sink__V732->context, namedP__V742), LINK_VariablePropertyLink(sink__V732->context, varP__V743));
+        ADD_PROPERTIES(sink__V732, LINK_VARIABLESET(sink__V732->context, namedFV__V744), LINK_VARIABLESET(sink__V732->context, varFV__V745), LINK_NamedPropertyLink(sink__V732->context, namedP__V742), LINK_VariablePropertyLink(sink__V732->context, varP__V743));
         { START(sink__V732, _M_F_Pattern_MetaArgs_Copy_s4);
           USE(sink__V732, z__V277); COPY(sink__V732, sub__V737);COPY(sink__V732, sub__V738);COPY(sink__V732, sub__V739);{ if (!IS_BOUND(x__V740)) { REBIND(x__V740);
               Variable binds__V746[1] = {x__V740}; BINDS(sink__V732, 1, binds__V746);
@@ -1952,7 +1952,7 @@ int step_M_F_PatternSub_s32(Sink sink__V754, Term term__V755)
         Hashset namedFV__V773 = LINK_VARIABLESET(sink__V754->context, namedPropertyFreeVars(namedP__V771));
         Hashset varFV__V774 = LINK_VARIABLESET(sink__V754->context, variablePropertyFreeVars(varP__V772));
         UNLINK(sink__V754->context, term__V755);
-        ADD_PROPERTIES(sink__V754, LINK_NamedPropertyLink(sink__V754->context, namedP__V771), LINK_VariablePropertyLink(sink__V754->context, varP__V772));
+        ADD_PROPERTIES(sink__V754, LINK_VARIABLESET(sink__V754->context, namedFV__V773), LINK_VARIABLESET(sink__V754->context, varFV__V774), LINK_NamedPropertyLink(sink__V754->context, namedP__V771), LINK_VariablePropertyLink(sink__V754->context, varP__V772));
         { START(sink__V754, _M_F_PatternSub_s34);
           COPY(sink__V754, sub__V767);COPY(sink__V754, sub__V759);COPY(sink__V754, sub__V760);COPY(sink__V754, sub__V761);COPY(sink__V754, sub__V762);COPY(sink__V754, sub__V763);COPY(sink__V754, sub__V764);COPY(sink__V754, sub__V765);COPY(sink__V754, sub__V766);USE(sink__V754, z__V277); COPY(sink__V754, sub__V768);{ if (!IS_BOUND(x__V769)) { REBIND(x__V769);
               Variable binds__V775[1] = {x__V769}; BINDS(sink__V754, 1, binds__V775);
@@ -2010,7 +2010,7 @@ int step_M_F_Pattern_MetaArgs_Copy_s4(Sink sink__V783, Term term__V784)
     Hashset namedFV__V793 = LINK_VARIABLESET(sink__V783->context, namedPropertyFreeVars(namedP__V791));
     Hashset varFV__V794 = LINK_VARIABLESET(sink__V783->context, variablePropertyFreeVars(varP__V792));
     UNLINK(sink__V783->context, term__V784);
-    ADD_PROPERTIES(sink__V783, LINK_NamedPropertyLink(sink__V783->context, namedP__V791), LINK_VariablePropertyLink(sink__V783->context, varP__V792));
+    ADD_PROPERTIES(sink__V783, LINK_VARIABLESET(sink__V783->context, namedFV__V793), LINK_VARIABLESET(sink__V783->context, varFV__V794), LINK_NamedPropertyLink(sink__V783->context, namedP__V791), LINK_VariablePropertyLink(sink__V783->context, varP__V792));
     { START(sink__V783, _M_F_Pattern_MetaArgs__bind_s1);
       COPY(sink__V783, sub__V785);COPY(sink__V783, LINK(sink__V783->context, sub__V787));COPY(sink__V783, sub__V786);COPY(sink__V783, sub__V788);{ char *str__V795;
         { char *sub__V796[2]; size_t sublength__V797[2]; size_t length__V798 = 0;
@@ -2094,7 +2094,7 @@ int step_M_F_PatternSub_s34(Sink sink__V809, Term term__V810)
         Hashset namedFV__V828 = LINK_VARIABLESET(sink__V809->context, namedPropertyFreeVars(namedP__V826));
         Hashset varFV__V829 = LINK_VARIABLESET(sink__V809->context, variablePropertyFreeVars(varP__V827));
         UNLINK(sink__V809->context, term__V810);
-        ADD_PROPERTIES(sink__V809, LINK_NamedPropertyLink(sink__V809->context, namedP__V826), LINK_VariablePropertyLink(sink__V809->context, varP__V827));
+        ADD_PROPERTIES(sink__V809, LINK_VARIABLESET(sink__V809->context, namedFV__V828), LINK_VARIABLESET(sink__V809->context, varFV__V829), LINK_NamedPropertyLink(sink__V809->context, namedP__V826), LINK_VariablePropertyLink(sink__V809->context, varP__V827));
         { START(sink__V809, _M_F_PatternSub_s35);
           USE(sink__V809, z__V277); COPY(sink__V809, sub__V814);COPY(sink__V809, sub__V815);COPY(sink__V809, sub__V816);COPY(sink__V809, sub__V817);COPY(sink__V809, sub__V818);COPY(sink__V809, sub__V819);COPY(sink__V809, sub__V820);COPY(sink__V809, sub__V821);COPY(sink__V809, sub__V822);COPY(sink__V809, sub__V823);{ if (!IS_BOUND(x__V824)) { REBIND(x__V824);
               Variable binds__V830[1] = {x__V824}; BINDS(sink__V809, 1, binds__V830);
@@ -2166,7 +2166,7 @@ int step_M_F_PatternSub_s35(Sink sink__V838, Term term__V839)
     Hashset namedFV__V855 = LINK_VARIABLESET(sink__V838->context, namedPropertyFreeVars(namedP__V853));
     Hashset varFV__V856 = LINK_VARIABLESET(sink__V838->context, variablePropertyFreeVars(varP__V854));
     UNLINK(sink__V838->context, term__V839);
-    ADD_PROPERTIES(sink__V838, LINK_NamedPropertyLink(sink__V838->context, namedP__V853), LINK_VariablePropertyLink(sink__V838->context, varP__V854));
+    ADD_PROPERTIES(sink__V838, LINK_VARIABLESET(sink__V838->context, namedFV__V855), LINK_VARIABLESET(sink__V838->context, varFV__V856), LINK_NamedPropertyLink(sink__V838->context, namedP__V853), LINK_VariablePropertyLink(sink__V838->context, varP__V854));
     { START(sink__V838, _M_F_PatternSub);
       COPY(sink__V838, sub__V841);COPY(sink__V838, sub__V842);COPY(sink__V838, sub__V843);COPY(sink__V838, sub__V844);COPY(sink__V838, sub__V845);COPY(sink__V838, sub__V849);COPY(sink__V838, sub__V847);COPY(sink__V838, sub__V848);COPY(sink__V838, sub__V840);COPY(sink__V838, sub__V850);{ if (!IS_BOUND(x__V851)) { REBIND(x__V851);
           Variable binds__V857[1] = {x__V851}; BINDS(sink__V838, 1, binds__V857);
@@ -2214,7 +2214,7 @@ int step_M_F__metaOption2(Sink sink__V865, Term term__V866)
     Hashset namedFV__V872 = LINK_VARIABLESET(sink__V865->context, namedPropertyFreeVars(namedP__V870));
     Hashset varFV__V873 = LINK_VARIABLESET(sink__V865->context, variablePropertyFreeVars(varP__V871));
     UNLINK(sink__V865->context, term__V866);
-    ADD_PROPERTIES(sink__V865, LINK_NamedPropertyLink(sink__V865->context, namedP__V870), LINK_VariablePropertyLink(sink__V865->context, varP__V871));
+    ADD_PROPERTIES(sink__V865, LINK_VARIABLESET(sink__V865->context, namedFV__V872), LINK_VARIABLESET(sink__V865->context, varFV__V873), LINK_NamedPropertyLink(sink__V865->context, namedP__V870), LINK_VariablePropertyLink(sink__V865->context, varP__V871));
     { Term key__V874, value__V875;
       key__V874 = sub__V867; { Sink buf__V876 = ALLOCA_BUFFER(sink__V865->context);
         { START(buf__V876, _M_LIST_xVARIABLE);
@@ -2285,7 +2285,7 @@ int step_M_F_PatternSub_s37(Sink sink__V882, Term term__V883)
         Hashset namedFV__V901 = LINK_VARIABLESET(sink__V882->context, namedPropertyFreeVars(namedP__V899));
         Hashset varFV__V902 = LINK_VARIABLESET(sink__V882->context, variablePropertyFreeVars(varP__V900));
         UNLINK(sink__V882->context, term__V883);
-        ADD_PROPERTIES(sink__V882, LINK_NamedPropertyLink(sink__V882->context, namedP__V899), LINK_VariablePropertyLink(sink__V882->context, varP__V900));
+        ADD_PROPERTIES(sink__V882, LINK_VARIABLESET(sink__V882->context, namedFV__V901), LINK_VARIABLESET(sink__V882->context, varFV__V902), LINK_NamedPropertyLink(sink__V882->context, namedP__V899), LINK_VariablePropertyLink(sink__V882->context, varP__V900));
         { START(sink__V882, _M_F_PatternSub_s39);
           COPY(sink__V882, sub__V895);COPY(sink__V882, sub__V887);COPY(sink__V882, sub__V888);COPY(sink__V882, sub__V889);COPY(sink__V882, sub__V890);COPY(sink__V882, sub__V891);COPY(sink__V882, sub__V892);COPY(sink__V882, sub__V893);COPY(sink__V882, sub__V894);USE(sink__V882, z__V277); COPY(sink__V882, sub__V896);{ if (!IS_BOUND(x__V897)) { REBIND(x__V897);
               Variable binds__V903[1] = {x__V897}; BINDS(sink__V882, 1, binds__V903);
@@ -2360,7 +2360,7 @@ int step_M_F_PatternSub_s39(Sink sink__V911, Term term__V912)
         Hashset namedFV__V930 = LINK_VARIABLESET(sink__V911->context, namedPropertyFreeVars(namedP__V928));
         Hashset varFV__V931 = LINK_VARIABLESET(sink__V911->context, variablePropertyFreeVars(varP__V929));
         UNLINK(sink__V911->context, term__V912);
-        ADD_PROPERTIES(sink__V911, LINK_NamedPropertyLink(sink__V911->context, namedP__V928), LINK_VariablePropertyLink(sink__V911->context, varP__V929));
+        ADD_PROPERTIES(sink__V911, LINK_VARIABLESET(sink__V911->context, namedFV__V930), LINK_VARIABLESET(sink__V911->context, varFV__V931), LINK_NamedPropertyLink(sink__V911->context, namedP__V928), LINK_VariablePropertyLink(sink__V911->context, varP__V929));
         { START(sink__V911, _M_F_PatternSub_s40);
           USE(sink__V911, z__V277); COPY(sink__V911, sub__V916);COPY(sink__V911, sub__V917);COPY(sink__V911, sub__V918);COPY(sink__V911, sub__V919);COPY(sink__V911, sub__V920);COPY(sink__V911, sub__V921);COPY(sink__V911, sub__V922);COPY(sink__V911, sub__V923);COPY(sink__V911, sub__V924);COPY(sink__V911, sub__V925);{ if (!IS_BOUND(x__V926)) { REBIND(x__V926);
               Variable binds__V932[1] = {x__V926}; BINDS(sink__V911, 1, binds__V932);
@@ -2432,7 +2432,7 @@ int step_M_F_PatternSub_s40(Sink sink__V940, Term term__V941)
     Hashset namedFV__V957 = LINK_VARIABLESET(sink__V940->context, namedPropertyFreeVars(namedP__V955));
     Hashset varFV__V958 = LINK_VARIABLESET(sink__V940->context, variablePropertyFreeVars(varP__V956));
     UNLINK(sink__V940->context, term__V941);
-    ADD_PROPERTIES(sink__V940, LINK_NamedPropertyLink(sink__V940->context, namedP__V955), LINK_VariablePropertyLink(sink__V940->context, varP__V956));
+    ADD_PROPERTIES(sink__V940, LINK_VARIABLESET(sink__V940->context, namedFV__V957), LINK_VARIABLESET(sink__V940->context, varFV__V958), LINK_NamedPropertyLink(sink__V940->context, namedP__V955), LINK_VariablePropertyLink(sink__V940->context, varP__V956));
     { START(sink__V940, _M_F_PatternSub);
       COPY(sink__V940, sub__V943);COPY(sink__V940, sub__V944);COPY(sink__V940, sub__V945);COPY(sink__V940, sub__V946);COPY(sink__V940, sub__V947);COPY(sink__V940, sub__V951);COPY(sink__V940, sub__V949);COPY(sink__V940, sub__V950);COPY(sink__V940, sub__V942);COPY(sink__V940, sub__V952);{ if (!IS_BOUND(x__V953)) { REBIND(x__V953);
           Variable binds__V959[1] = {x__V953}; BINDS(sink__V940, 1, binds__V959);
@@ -2502,7 +2502,7 @@ int step_M_F_PatternSub_s42(Sink sink__V967, Term term__V968)
         Hashset namedFV__V985 = LINK_VARIABLESET(sink__V967->context, namedPropertyFreeVars(namedP__V983));
         Hashset varFV__V986 = LINK_VARIABLESET(sink__V967->context, variablePropertyFreeVars(varP__V984));
         UNLINK(sink__V967->context, term__V968);
-        ADD_PROPERTIES(sink__V967, LINK_NamedPropertyLink(sink__V967->context, namedP__V983), LINK_VariablePropertyLink(sink__V967->context, varP__V984));
+        ADD_PROPERTIES(sink__V967, LINK_VARIABLESET(sink__V967->context, namedFV__V985), LINK_VARIABLESET(sink__V967->context, varFV__V986), LINK_NamedPropertyLink(sink__V967->context, namedP__V983), LINK_VariablePropertyLink(sink__V967->context, varP__V984));
         { START(sink__V967, _M_F_PatternSub_s44);
           COPY(sink__V967, sub__V979);COPY(sink__V967, sub__V972);COPY(sink__V967, sub__V973);COPY(sink__V967, sub__V974);COPY(sink__V967, sub__V975);COPY(sink__V967, sub__V976);COPY(sink__V967, sub__V977);COPY(sink__V967, sub__V978);USE(sink__V967, z__V277); COPY(sink__V967, sub__V980);{ if (!IS_BOUND(x__V981)) { REBIND(x__V981);
               Variable binds__V987[1] = {x__V981}; BINDS(sink__V967, 1, binds__V987);
@@ -2575,7 +2575,7 @@ int step_M_F_PatternSub_s44(Sink sink__V995, Term term__V996)
         Hashset namedFV__V1013 = LINK_VARIABLESET(sink__V995->context, namedPropertyFreeVars(namedP__V1011));
         Hashset varFV__V1014 = LINK_VARIABLESET(sink__V995->context, variablePropertyFreeVars(varP__V1012));
         UNLINK(sink__V995->context, term__V996);
-        ADD_PROPERTIES(sink__V995, LINK_NamedPropertyLink(sink__V995->context, namedP__V1011), LINK_VariablePropertyLink(sink__V995->context, varP__V1012));
+        ADD_PROPERTIES(sink__V995, LINK_VARIABLESET(sink__V995->context, namedFV__V1013), LINK_VARIABLESET(sink__V995->context, varFV__V1014), LINK_NamedPropertyLink(sink__V995->context, namedP__V1011), LINK_VariablePropertyLink(sink__V995->context, varP__V1012));
         { START(sink__V995, _M_F_PatternSub_s45);
           USE(sink__V995, z__V277); COPY(sink__V995, sub__V1000);COPY(sink__V995, sub__V1001);COPY(sink__V995, sub__V1002);COPY(sink__V995, sub__V1003);COPY(sink__V995, sub__V1004);COPY(sink__V995, sub__V1005);COPY(sink__V995, sub__V1006);COPY(sink__V995, sub__V1007);COPY(sink__V995, sub__V1008);{ if (!IS_BOUND(x__V1009)) { REBIND(x__V1009);
               Variable binds__V1015[1] = {x__V1009}; BINDS(sink__V995, 1, binds__V1015);
@@ -2645,7 +2645,7 @@ int step_M_F_PatternSub_s45(Sink sink__V1023, Term term__V1024)
     Hashset namedFV__V1039 = LINK_VARIABLESET(sink__V1023->context, namedPropertyFreeVars(namedP__V1037));
     Hashset varFV__V1040 = LINK_VARIABLESET(sink__V1023->context, variablePropertyFreeVars(varP__V1038));
     UNLINK(sink__V1023->context, term__V1024);
-    ADD_PROPERTIES(sink__V1023, LINK_NamedPropertyLink(sink__V1023->context, namedP__V1037), LINK_VariablePropertyLink(sink__V1023->context, varP__V1038));
+    ADD_PROPERTIES(sink__V1023, LINK_VARIABLESET(sink__V1023->context, namedFV__V1039), LINK_VARIABLESET(sink__V1023->context, varFV__V1040), LINK_NamedPropertyLink(sink__V1023->context, namedP__V1037), LINK_VariablePropertyLink(sink__V1023->context, varP__V1038));
     { START(sink__V1023, _M_F_PatternSub2);
       { START(sink__V1023, _M__sFalse); END(sink__V1023, _M__sFalse); }
       COPY(sink__V1023, sub__V1026);COPY(sink__V1023, sub__V1027);COPY(sink__V1023, sub__V1028);COPY(sink__V1023, sub__V1029);COPY(sink__V1023, sub__V1033);COPY(sink__V1023, sub__V1031);COPY(sink__V1023, sub__V1032);COPY(sink__V1023, sub__V1025);COPY(sink__V1023, sub__V1034);{ if (!IS_BOUND(x__V1035)) { REBIND(x__V1035);
@@ -2704,7 +2704,7 @@ int step_M_F__then_Pattern_Variable_Use2_s2(Sink sink__V1049, Term term__V1050)
         Hashset namedFV__V1061 = LINK_VARIABLESET(sink__V1049->context, namedPropertyFreeVars(namedP__V1059));
         Hashset varFV__V1062 = LINK_VARIABLESET(sink__V1049->context, variablePropertyFreeVars(varP__V1060));
         UNLINK(sink__V1049->context, term__V1050);
-        ADD_PROPERTIES(sink__V1049, LINK_NamedPropertyLink(sink__V1049->context, namedP__V1059), LINK_VariablePropertyLink(sink__V1049->context, varP__V1060));
+        ADD_PROPERTIES(sink__V1049, LINK_VARIABLESET(sink__V1049->context, namedFV__V1061), LINK_VARIABLESET(sink__V1049->context, varFV__V1062), LINK_NamedPropertyLink(sink__V1049->context, namedP__V1059), LINK_VariablePropertyLink(sink__V1049->context, varP__V1060));
         { START(sink__V1049, _M_F__then_Pattern_Variable_Use2_s4);
           COPY(sink__V1049, sub__V1055);COPY(sink__V1049, sub__V1054);USE(sink__V1049, z__V277); COPY(sink__V1049, sub__V1056);{ if (!IS_BOUND(x__V1057)) { REBIND(x__V1057);
               Variable binds__V1063[1] = {x__V1057}; BINDS(sink__V1049, 1, binds__V1063);
@@ -2765,7 +2765,7 @@ int step_M_F__then_Pattern_Variable_Use2_s4(Sink sink__V1071, Term term__V1072)
         Hashset namedFV__V1083 = LINK_VARIABLESET(sink__V1071->context, namedPropertyFreeVars(namedP__V1081));
         Hashset varFV__V1084 = LINK_VARIABLESET(sink__V1071->context, variablePropertyFreeVars(varP__V1082));
         UNLINK(sink__V1071->context, term__V1072);
-        ADD_PROPERTIES(sink__V1071, LINK_NamedPropertyLink(sink__V1071->context, namedP__V1081), LINK_VariablePropertyLink(sink__V1071->context, varP__V1082));
+        ADD_PROPERTIES(sink__V1071, LINK_VARIABLESET(sink__V1071->context, namedFV__V1083), LINK_VARIABLESET(sink__V1071->context, varFV__V1084), LINK_NamedPropertyLink(sink__V1071->context, namedP__V1081), LINK_VariablePropertyLink(sink__V1071->context, varP__V1082));
         { START(sink__V1071, _M_F__then_Pattern_Variable_Use2_s6);
           COPY(sink__V1071, sub__V1078);COPY(sink__V1071, sub__V1076);COPY(sink__V1071, sub__V1077);USE(sink__V1071, z__V277); { if (!IS_BOUND(x__V1079)) { REBIND(x__V1079);
               Variable binds__V1085[1] = {x__V1079}; BINDS(sink__V1071, 1, binds__V1085);
@@ -2826,7 +2826,7 @@ int step_M_F__then_Pattern_Variable_Use2_s6(Sink sink__V1093, Term term__V1094)
         Hashset namedFV__V1105 = LINK_VARIABLESET(sink__V1093->context, namedPropertyFreeVars(namedP__V1103));
         Hashset varFV__V1106 = LINK_VARIABLESET(sink__V1093->context, variablePropertyFreeVars(varP__V1104));
         UNLINK(sink__V1093->context, term__V1094);
-        ADD_PROPERTIES(sink__V1093, LINK_NamedPropertyLink(sink__V1093->context, namedP__V1103), LINK_VariablePropertyLink(sink__V1093->context, varP__V1104));
+        ADD_PROPERTIES(sink__V1093, LINK_VARIABLESET(sink__V1093->context, namedFV__V1105), LINK_VARIABLESET(sink__V1093->context, varFV__V1106), LINK_NamedPropertyLink(sink__V1093->context, namedP__V1103), LINK_VariablePropertyLink(sink__V1093->context, varP__V1104));
         { START(sink__V1093, _M_F__then_Pattern_Variable_Use2_s7);
           USE(sink__V1093, z__V277); COPY(sink__V1093, sub__V1098);COPY(sink__V1093, sub__V1099);COPY(sink__V1093, sub__V1100);{ if (!IS_BOUND(x__V1101)) { REBIND(x__V1101);
               Variable binds__V1107[1] = {x__V1101}; BINDS(sink__V1093, 1, binds__V1107);
@@ -2943,7 +2943,7 @@ int step_M_F__then_Pattern_Variable_Use2_s7(Sink sink__V1115, Term term__V1116)
                         { START(sink__V1115, _M__sTextCons);
                           { START(sink__V1115, _M__sTextEmbed);
                             { START(sink__V1115, _M_AsText);
-                              ADD_PROPERTIES(sink__V1115, LINK_NamedPropertyLink(sink__V1115->context, namedP__V1123), LINK_VariablePropertyLink(sink__V1115->context, varP__V1124));
+                              ADD_PROPERTIES(sink__V1115, LINK_VARIABLESET(sink__V1115->context, namedFV__V1125), LINK_VARIABLESET(sink__V1115->context, varFV__V1126), LINK_NamedPropertyLink(sink__V1115->context, namedP__V1123), LINK_VariablePropertyLink(sink__V1115->context, varP__V1124));
                               { START(sink__V1115, _M_F__unlink__refs_s1);
                                 { Term term__V1131;
                                   { Term key__V1132;
@@ -2969,7 +2969,7 @@ int step_M_F__then_Pattern_Variable_Use2_s7(Sink sink__V1115, Term term__V1116)
                               { START(sink__V1115, _M__sTextCons);
                                 { START(sink__V1115, _M__sTextEmbed);
                                   { START(sink__V1115, _M_AsText);
-                                    ADD_PROPERTIES(sink__V1115, LINK_NamedPropertyLink(sink__V1115->context, namedP__V1123), LINK_VariablePropertyLink(sink__V1115->context, varP__V1124));
+                                    ADD_PROPERTIES(sink__V1115, LINK_VARIABLESET(sink__V1115->context, namedFV__V1125), LINK_VARIABLESET(sink__V1115->context, varFV__V1126), LINK_NamedPropertyLink(sink__V1115->context, namedP__V1123), LINK_VariablePropertyLink(sink__V1115->context, varP__V1124));
                                     {
                                       Term arg__V1135;
                                       { Sink buf__V1136 = ALLOCA_BUFFER(sink__V1115->context);
@@ -3038,7 +3038,7 @@ int step_M_F__then_Pattern_Variable_Use2_s9(Sink sink__V1140, Term term__V1141)
         Hashset namedFV__V1152 = LINK_VARIABLESET(sink__V1140->context, namedPropertyFreeVars(namedP__V1150));
         Hashset varFV__V1153 = LINK_VARIABLESET(sink__V1140->context, variablePropertyFreeVars(varP__V1151));
         UNLINK(sink__V1140->context, term__V1141);
-        ADD_PROPERTIES(sink__V1140, LINK_NamedPropertyLink(sink__V1140->context, namedP__V1150), LINK_VariablePropertyLink(sink__V1140->context, varP__V1151));
+        ADD_PROPERTIES(sink__V1140, LINK_VARIABLESET(sink__V1140->context, namedFV__V1152), LINK_VARIABLESET(sink__V1140->context, varFV__V1153), LINK_NamedPropertyLink(sink__V1140->context, namedP__V1150), LINK_VariablePropertyLink(sink__V1140->context, varP__V1151));
         { START(sink__V1140, _M_F__then_Pattern_Variable_Use2_s11);
           COPY(sink__V1140, sub__V1146);COPY(sink__V1140, sub__V1145);USE(sink__V1140, z__V277); COPY(sink__V1140, sub__V1147);{ if (!IS_BOUND(x__V1148)) { REBIND(x__V1148);
               Variable binds__V1154[1] = {x__V1148}; BINDS(sink__V1140, 1, binds__V1154);
@@ -3097,7 +3097,7 @@ int step_M_F__then_Pattern_Not_Property(Sink sink__V1162, Term term__V1163)
       Hashset namedFV__V1174 = LINK_VARIABLESET(sink__V1162->context, namedPropertyFreeVars(namedP__V1172));
       Hashset varFV__V1175 = LINK_VARIABLESET(sink__V1162->context, variablePropertyFreeVars(varP__V1173));
       UNLINK(sink__V1162->context, term__V1163);
-      ADD_PROPERTIES(sink__V1162, LINK_NamedPropertyLink(sink__V1162->context, namedP__V1172), LINK_VariablePropertyLink(sink__V1162->context, varP__V1173));
+      ADD_PROPERTIES(sink__V1162, LINK_VARIABLESET(sink__V1162->context, namedFV__V1174), LINK_VARIABLESET(sink__V1162->context, varFV__V1175), LINK_NamedPropertyLink(sink__V1162->context, namedP__V1172), LINK_VariablePropertyLink(sink__V1162->context, varP__V1173));
       { START(sink__V1162, _M_F__then_Pattern_Not_Property_s1);
         COPY(sink__V1162, sub__V1167);COPY(sink__V1162, sub__V1168);COPY(sink__V1162, sub__V1169);{ if (!IS_BOUND(x__V1170)) { REBIND(x__V1170);
             Variable binds__V1176[1] = {x__V1170}; BINDS(sink__V1162, 1, binds__V1176);
@@ -3161,7 +3161,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s1(Sink sink__V1184, Term term__V1185)
         Hashset namedFV__V1198 = LINK_VARIABLESET(sink__V1184->context, namedPropertyFreeVars(namedP__V1196));
         Hashset varFV__V1199 = LINK_VARIABLESET(sink__V1184->context, variablePropertyFreeVars(varP__V1197));
         UNLINK(sink__V1184->context, term__V1185);
-        ADD_PROPERTIES(sink__V1184, LINK_NamedPropertyLink(sink__V1184->context, namedP__V1196), LINK_VariablePropertyLink(sink__V1184->context, varP__V1197));
+        ADD_PROPERTIES(sink__V1184, LINK_VARIABLESET(sink__V1184->context, namedFV__V1198), LINK_VARIABLESET(sink__V1184->context, varFV__V1199), LINK_NamedPropertyLink(sink__V1184->context, namedP__V1196), LINK_VariablePropertyLink(sink__V1184->context, varP__V1197));
         { START(sink__V1184, _M_F_Pattern_MetaArgs__variable2_s3);
           COPY(sink__V1184, sub__V1192);COPY(sink__V1184, sub__V1189);COPY(sink__V1184, sub__V1190);COPY(sink__V1184, sub__V1191);USE(sink__V1184, z__V277); COPY(sink__V1184, sub__V1193);{ if (!IS_BOUND(x__V1194)) { REBIND(x__V1194);
               Variable binds__V1200[1] = {x__V1194}; BINDS(sink__V1184, 1, binds__V1200);
@@ -3226,7 +3226,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s3(Sink sink__V1208, Term term__V1209)
         Hashset namedFV__V1222 = LINK_VARIABLESET(sink__V1208->context, namedPropertyFreeVars(namedP__V1220));
         Hashset varFV__V1223 = LINK_VARIABLESET(sink__V1208->context, variablePropertyFreeVars(varP__V1221));
         UNLINK(sink__V1208->context, term__V1209);
-        ADD_PROPERTIES(sink__V1208, LINK_NamedPropertyLink(sink__V1208->context, namedP__V1220), LINK_VariablePropertyLink(sink__V1208->context, varP__V1221));
+        ADD_PROPERTIES(sink__V1208, LINK_VARIABLESET(sink__V1208->context, namedFV__V1222), LINK_VARIABLESET(sink__V1208->context, varFV__V1223), LINK_NamedPropertyLink(sink__V1208->context, namedP__V1220), LINK_VariablePropertyLink(sink__V1208->context, varP__V1221));
         { START(sink__V1208, _M_F_Pattern_MetaArgs__variable2_s5);
           COPY(sink__V1208, sub__V1217);COPY(sink__V1208, sub__V1213);COPY(sink__V1208, sub__V1214);COPY(sink__V1208, sub__V1215);COPY(sink__V1208, sub__V1216);USE(sink__V1208, z__V277); { if (!IS_BOUND(x__V1218)) { REBIND(x__V1218);
               Variable binds__V1224[1] = {x__V1218}; BINDS(sink__V1208, 1, binds__V1224);
@@ -3291,7 +3291,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s5(Sink sink__V1232, Term term__V1233)
         Hashset namedFV__V1246 = LINK_VARIABLESET(sink__V1232->context, namedPropertyFreeVars(namedP__V1244));
         Hashset varFV__V1247 = LINK_VARIABLESET(sink__V1232->context, variablePropertyFreeVars(varP__V1245));
         UNLINK(sink__V1232->context, term__V1233);
-        ADD_PROPERTIES(sink__V1232, LINK_NamedPropertyLink(sink__V1232->context, namedP__V1244), LINK_VariablePropertyLink(sink__V1232->context, varP__V1245));
+        ADD_PROPERTIES(sink__V1232, LINK_VARIABLESET(sink__V1232->context, namedFV__V1246), LINK_VARIABLESET(sink__V1232->context, varFV__V1247), LINK_NamedPropertyLink(sink__V1232->context, namedP__V1244), LINK_VariablePropertyLink(sink__V1232->context, varP__V1245));
         { START(sink__V1232, _M_F_Pattern_MetaArgs__variable2_s6);
           USE(sink__V1232, z__V277); COPY(sink__V1232, sub__V1237);COPY(sink__V1232, sub__V1238);COPY(sink__V1232, sub__V1239);COPY(sink__V1232, sub__V1240);COPY(sink__V1232, sub__V1241);{ if (!IS_BOUND(x__V1242)) { REBIND(x__V1242);
               Variable binds__V1248[1] = {x__V1242}; BINDS(sink__V1232, 1, binds__V1248);
@@ -3353,7 +3353,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s6(Sink sink__V1256, Term term__V1257)
     Hashset namedFV__V1268 = LINK_VARIABLESET(sink__V1256->context, namedPropertyFreeVars(namedP__V1266));
     Hashset varFV__V1269 = LINK_VARIABLESET(sink__V1256->context, variablePropertyFreeVars(varP__V1267));
     UNLINK(sink__V1256->context, term__V1257);
-    ADD_PROPERTIES(sink__V1256, LINK_NamedPropertyLink(sink__V1256->context, namedP__V1266), LINK_VariablePropertyLink(sink__V1256->context, varP__V1267));
+    ADD_PROPERTIES(sink__V1256, LINK_VARIABLESET(sink__V1256->context, namedFV__V1268), LINK_VARIABLESET(sink__V1256->context, varFV__V1269), LINK_NamedPropertyLink(sink__V1256->context, namedP__V1266), LINK_VariablePropertyLink(sink__V1256->context, varP__V1267));
     { START(sink__V1256, _M_F_Pattern_MetaArgs_s1);
       COPY(sink__V1256, sub__V1260);COPY(sink__V1256, sub__V1259);{ double num__V1270;
         num__V1270 = DOUBLE(sub__V1261); { double tmp__V1271;
@@ -3421,7 +3421,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s7(Sink sink__V1280, Term term__V1281)
         Hashset namedFV__V1295 = LINK_VARIABLESET(sink__V1280->context, namedPropertyFreeVars(namedP__V1293));
         Hashset varFV__V1296 = LINK_VARIABLESET(sink__V1280->context, variablePropertyFreeVars(varP__V1294));
         UNLINK(sink__V1280->context, term__V1281);
-        ADD_PROPERTIES(sink__V1280, LINK_NamedPropertyLink(sink__V1280->context, namedP__V1293), LINK_VariablePropertyLink(sink__V1280->context, varP__V1294));
+        ADD_PROPERTIES(sink__V1280, LINK_VARIABLESET(sink__V1280->context, namedFV__V1295), LINK_VARIABLESET(sink__V1280->context, varFV__V1296), LINK_NamedPropertyLink(sink__V1280->context, namedP__V1293), LINK_VariablePropertyLink(sink__V1280->context, varP__V1294));
         { START(sink__V1280, _M_F_Pattern_MetaArgs__variable2_s9);
           COPY(sink__V1280, sub__V1285);USE(sink__V1280, z__V277); COPY(sink__V1280, sub__V1286);COPY(sink__V1280, sub__V1287);COPY(sink__V1280, sub__V1288);COPY(sink__V1280, sub__V1289);COPY(sink__V1280, sub__V1290);{ if (!IS_BOUND(x__V1291)) { REBIND(x__V1291);
               Variable binds__V1297[1] = {x__V1291}; BINDS(sink__V1280, 1, binds__V1297);
@@ -3488,7 +3488,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s9(Sink sink__V1305, Term term__V1306)
         Hashset namedFV__V1320 = LINK_VARIABLESET(sink__V1305->context, namedPropertyFreeVars(namedP__V1318));
         Hashset varFV__V1321 = LINK_VARIABLESET(sink__V1305->context, variablePropertyFreeVars(varP__V1319));
         UNLINK(sink__V1305->context, term__V1306);
-        ADD_PROPERTIES(sink__V1305, LINK_NamedPropertyLink(sink__V1305->context, namedP__V1318), LINK_VariablePropertyLink(sink__V1305->context, varP__V1319));
+        ADD_PROPERTIES(sink__V1305, LINK_VARIABLESET(sink__V1305->context, namedFV__V1320), LINK_VARIABLESET(sink__V1305->context, varFV__V1321), LINK_NamedPropertyLink(sink__V1305->context, namedP__V1318), LINK_VariablePropertyLink(sink__V1305->context, varP__V1319));
         { START(sink__V1305, _M_F_Pattern_MetaArgs__variable2_s11);
           COPY(sink__V1305, sub__V1314);COPY(sink__V1305, sub__V1310);COPY(sink__V1305, sub__V1311);COPY(sink__V1305, sub__V1312);COPY(sink__V1305, sub__V1313);USE(sink__V1305, z__V277); COPY(sink__V1305, sub__V1315);{ if (!IS_BOUND(x__V1316)) { REBIND(x__V1316);
               Variable binds__V1322[1] = {x__V1316}; BINDS(sink__V1305, 1, binds__V1322);
@@ -3657,7 +3657,7 @@ int step_M_F__then_VariableOption2_s1(Sink sink__V1364, Term term__V1365)
     Hashset namedFV__V1373 = LINK_VARIABLESET(sink__V1364->context, namedPropertyFreeVars(namedP__V1371));
     Hashset varFV__V1374 = LINK_VARIABLESET(sink__V1364->context, variablePropertyFreeVars(varP__V1372));
     UNLINK(sink__V1364->context, term__V1365);
-    ADD_PROPERTIES(sink__V1364, LINK_NamedPropertyLink(sink__V1364->context, namedP__V1371), LINK_VariablePropertyLink(sink__V1364->context, varP__V1372));
+    ADD_PROPERTIES(sink__V1364, LINK_VARIABLESET(sink__V1364->context, namedFV__V1373), LINK_VARIABLESET(sink__V1364->context, varFV__V1374), LINK_NamedPropertyLink(sink__V1364->context, namedP__V1371), LINK_VariablePropertyLink(sink__V1364->context, varP__V1372));
     { START(sink__V1364, _M_F__variableOption2_s1);
       COPY(sink__V1364, sub__V1368);COPY(sink__V1364, sub__V1367);COPY(sink__V1364, sub__V1366);{ if (!IS_BOUND(x__V1369)) { REBIND(x__V1369);
           Variable binds__V1375[1] = {x__V1369}; BINDS(sink__V1364, 1, binds__V1375);
@@ -3711,7 +3711,7 @@ int step_M_F__variableOption4_s1(Sink sink__V1383, Term term__V1384)
       Hashset namedFV__V1394 = LINK_VARIABLESET(sink__V1383->context, namedPropertyFreeVars(namedP__V1392));
       Hashset varFV__V1395 = LINK_VARIABLESET(sink__V1383->context, variablePropertyFreeVars(varP__V1393));
       UNLINK(sink__V1383->context, term__V1384);
-      ADD_PROPERTIES(sink__V1383, LINK_NamedPropertyLink(sink__V1383->context, namedP__V1392), LINK_VariablePropertyLink(sink__V1383->context, varP__V1393));
+      ADD_PROPERTIES(sink__V1383, LINK_VARIABLESET(sink__V1383->context, namedFV__V1394), LINK_VARIABLESET(sink__V1383->context, varFV__V1395), LINK_NamedPropertyLink(sink__V1383->context, namedP__V1392), LINK_VariablePropertyLink(sink__V1383->context, varP__V1393));
       { START(sink__V1383, _M_F__variableOption4_s3);
         COPY(sink__V1383, sub__V1388);COPY(sink__V1383, sub__V1389);{ if (!IS_BOUND(x__V1390)) { REBIND(x__V1390);
             Variable binds__V1396[1] = {x__V1390}; BINDS(sink__V1383, 1, binds__V1396);
@@ -3752,7 +3752,7 @@ int step_M_F__variableOption4_s1(Sink sink__V1383, Term term__V1384)
       Hashset namedFV__V1412 = LINK_VARIABLESET(sink__V1383->context, namedPropertyFreeVars(namedP__V1410));
       Hashset varFV__V1413 = LINK_VARIABLESET(sink__V1383->context, variablePropertyFreeVars(varP__V1411));
       UNLINK(sink__V1383->context, term__V1384);
-      ADD_PROPERTIES(sink__V1383, LINK_NamedPropertyLink(sink__V1383->context, namedP__V1410), LINK_VariablePropertyLink(sink__V1383->context, varP__V1411));
+      ADD_PROPERTIES(sink__V1383, LINK_VARIABLESET(sink__V1383->context, namedFV__V1412), LINK_VARIABLESET(sink__V1383->context, varFV__V1413), LINK_NamedPropertyLink(sink__V1383->context, namedP__V1410), LINK_VariablePropertyLink(sink__V1383->context, varP__V1411));
       { START(sink__V1383, _M_F__variableOption4_s2);
         COPY(sink__V1383, sub__V1405);COPY(sink__V1383, sub__V1406);COPY(sink__V1383, sub__V1407);{ if (!IS_BOUND(x__V1408)) { REBIND(x__V1408);
             Variable binds__V1414[1] = {x__V1408}; BINDS(sink__V1383, 1, binds__V1414);
@@ -3805,7 +3805,7 @@ int step_M_F__variableOption4_s2(Sink sink__V1422, Term term__V1423)
     Hashset namedFV__V1431 = LINK_VARIABLESET(sink__V1422->context, namedPropertyFreeVars(namedP__V1429));
     Hashset varFV__V1432 = LINK_VARIABLESET(sink__V1422->context, variablePropertyFreeVars(varP__V1430));
     UNLINK(sink__V1422->context, term__V1423);
-    ADD_PROPERTIES(sink__V1422, LINK_NamedPropertyLink(sink__V1422->context, namedP__V1429), LINK_VariablePropertyLink(sink__V1422->context, varP__V1430));
+    ADD_PROPERTIES(sink__V1422, LINK_VARIABLESET(sink__V1422->context, namedFV__V1431), LINK_VARIABLESET(sink__V1422->context, varFV__V1432), LINK_NamedPropertyLink(sink__V1422->context, namedP__V1429), LINK_VariablePropertyLink(sink__V1422->context, varP__V1430));
     {
       Term arg__V1433;
       { Sink buf__V1434 = ALLOCA_BUFFER(sink__V1422->context);
@@ -3850,7 +3850,7 @@ int step_M_F__variableOption4_s3(Sink sink__V1438, Term term__V1439)
         Hashset namedFV__V1448 = LINK_VARIABLESET(sink__V1438->context, namedPropertyFreeVars(namedP__V1446));
         Hashset varFV__V1449 = LINK_VARIABLESET(sink__V1438->context, variablePropertyFreeVars(varP__V1447));
         UNLINK(sink__V1438->context, term__V1439);
-        ADD_PROPERTIES(sink__V1438, LINK_NamedPropertyLink(sink__V1438->context, namedP__V1446), LINK_VariablePropertyLink(sink__V1438->context, varP__V1447));
+        ADD_PROPERTIES(sink__V1438, LINK_VARIABLESET(sink__V1438->context, namedFV__V1448), LINK_VARIABLESET(sink__V1438->context, varFV__V1449), LINK_NamedPropertyLink(sink__V1438->context, namedP__V1446), LINK_VariablePropertyLink(sink__V1438->context, varP__V1447));
         { START(sink__V1438, _M_F__variableOption4_s4);
           USE(sink__V1438, z__V277); COPY(sink__V1438, sub__V1443);{ if (!IS_BOUND(x__V1444)) { REBIND(x__V1444);
               Variable binds__V1450[1] = {x__V1444}; BINDS(sink__V1438, 1, binds__V1450);
@@ -3902,7 +3902,7 @@ int step_M_F__variableOption4_s4(Sink sink__V1458, Term term__V1459)
     Hashset namedFV__V1466 = LINK_VARIABLESET(sink__V1458->context, namedPropertyFreeVars(namedP__V1464));
     Hashset varFV__V1467 = LINK_VARIABLESET(sink__V1458->context, variablePropertyFreeVars(varP__V1465));
     UNLINK(sink__V1458->context, term__V1459);
-    ADD_PROPERTIES(sink__V1458, LINK_NamedPropertyLink(sink__V1458->context, namedP__V1464), LINK_VariablePropertyLink(sink__V1458->context, varP__V1465));
+    ADD_PROPERTIES(sink__V1458, LINK_VARIABLESET(sink__V1458->context, namedFV__V1466), LINK_VARIABLESET(sink__V1458->context, varFV__V1467), LINK_NamedPropertyLink(sink__V1458->context, namedP__V1464), LINK_VariablePropertyLink(sink__V1458->context, varP__V1465));
     { Term key__V1468, value__V1469;
       key__V1468 = sub__V1460; { Sink buf__V1470 = ALLOCA_BUFFER(sink__V1458->context);
         COPY(buf__V1470, sub__V1461);value__V1469 = BUFFER_TERM(buf__V1470); FREE_BUFFER(buf__V1470); }
@@ -3960,7 +3960,7 @@ int step_M_F_Function_s1(Sink sink__V1476, Term term__V1477)
       Hashset namedFV__V1490 = LINK_VARIABLESET(sink__V1476->context, namedPropertyFreeVars(namedP__V1488));
       Hashset varFV__V1491 = LINK_VARIABLESET(sink__V1476->context, variablePropertyFreeVars(varP__V1489));
       UNLINK(sink__V1476->context, term__V1477);
-      ADD_PROPERTIES(sink__V1476, LINK_NamedPropertyLink(sink__V1476->context, namedP__V1488), LINK_VariablePropertyLink(sink__V1476->context, varP__V1489));
+      ADD_PROPERTIES(sink__V1476, LINK_VARIABLESET(sink__V1476->context, namedFV__V1490), LINK_VARIABLESET(sink__V1476->context, varFV__V1491), LINK_NamedPropertyLink(sink__V1476->context, namedP__V1488), LINK_VariablePropertyLink(sink__V1476->context, varP__V1489));
       { START(sink__V1476, _M_F_Function_s2);
         COPY(sink__V1476, sub__V1481);COPY(sink__V1476, sub__V1482);COPY(sink__V1476, sub__V1483);COPY(sink__V1476, sub__V1484);COPY(sink__V1476, sub__V1485);COPY(sink__V1476, sub__V1486);COPY(sink__V1476, sub__V1487);END(sink__V1476, _M_F_Function_s2); }
       UNLINK_VARIABLESET(sink__V1476->context, namedFV__V1490); UNLINK_VARIABLESET(sink__V1476->context, varFV__V1491);
@@ -3987,7 +3987,7 @@ int step_M_F_Function_s1(Sink sink__V1476, Term term__V1477)
       Hashset namedFV__V1500 = LINK_VARIABLESET(sink__V1476->context, namedPropertyFreeVars(namedP__V1498));
       Hashset varFV__V1501 = LINK_VARIABLESET(sink__V1476->context, variablePropertyFreeVars(varP__V1499));
       UNLINK(sink__V1476->context, term__V1477);
-      ADD_PROPERTIES(sink__V1476, LINK_NamedPropertyLink(sink__V1476->context, namedP__V1498), LINK_VariablePropertyLink(sink__V1476->context, varP__V1499));
+      ADD_PROPERTIES(sink__V1476, LINK_VARIABLESET(sink__V1476->context, namedFV__V1500), LINK_VARIABLESET(sink__V1476->context, varFV__V1501), LINK_NamedPropertyLink(sink__V1476->context, namedP__V1498), LINK_VariablePropertyLink(sink__V1476->context, varP__V1499));
       { START(sink__V1476, _M_F_Function_s8);
         COPY(sink__V1476, sub__V1493);COPY(sink__V1476, sub__V1494);COPY(sink__V1476, sub__V1495);COPY(sink__V1476, sub__V1496);COPY(sink__V1476, sub__V1497);END(sink__V1476, _M_F_Function_s8); }
       UNLINK_VARIABLESET(sink__V1476->context, namedFV__V1500); UNLINK_VARIABLESET(sink__V1476->context, varFV__V1501);
@@ -4037,7 +4037,7 @@ int step_M_F_Function_s2(Sink sink__V1502, Term term__V1503)
     Hashset namedFV__V1516 = LINK_VARIABLESET(sink__V1502->context, namedPropertyFreeVars(namedP__V1514));
     Hashset varFV__V1517 = LINK_VARIABLESET(sink__V1502->context, variablePropertyFreeVars(varP__V1515));
     UNLINK(sink__V1502->context, term__V1503);
-    ADD_PROPERTIES(sink__V1502, LINK_NamedPropertyLink(sink__V1502->context, namedP__V1514), LINK_VariablePropertyLink(sink__V1502->context, varP__V1515));
+    ADD_PROPERTIES(sink__V1502, LINK_VARIABLESET(sink__V1502->context, namedFV__V1516), LINK_VARIABLESET(sink__V1502->context, varFV__V1517), LINK_NamedPropertyLink(sink__V1502->context, namedP__V1514), LINK_VariablePropertyLink(sink__V1502->context, varP__V1515));
     { START(sink__V1502, _M_F_Function_s7);
       COPY(sink__V1502, sub__V1505);COPY(sink__V1502, sub__V1506);COPY(sink__V1502, sub__V1507);COPY(sink__V1502, sub__V1508);COPY(sink__V1502, sub__V1509);COPY(sink__V1502, sub__V1510);COPY(sink__V1502, sub__V1511);COPY(sink__V1502, sub__V1512);COPY(sink__V1502, sub__V1513);END(sink__V1502, _M_F_Function_s7); }
     UNLINK_VARIABLESET(sink__V1502->context, namedFV__V1516); UNLINK_VARIABLESET(sink__V1502->context, varFV__V1517);
@@ -4073,7 +4073,7 @@ int step_M_F_Function_s2(Sink sink__V1502, Term term__V1503)
     Hashset namedFV__V1529 = LINK_VARIABLESET(sink__V1502->context, namedPropertyFreeVars(namedP__V1527));
     Hashset varFV__V1530 = LINK_VARIABLESET(sink__V1502->context, variablePropertyFreeVars(varP__V1528));
     UNLINK(sink__V1502->context, term__V1503);
-    ADD_PROPERTIES(sink__V1502, LINK_NamedPropertyLink(sink__V1502->context, namedP__V1527), LINK_VariablePropertyLink(sink__V1502->context, varP__V1528));
+    ADD_PROPERTIES(sink__V1502, LINK_VARIABLESET(sink__V1502->context, namedFV__V1529), LINK_VARIABLESET(sink__V1502->context, varFV__V1530), LINK_NamedPropertyLink(sink__V1502->context, namedP__V1527), LINK_VariablePropertyLink(sink__V1502->context, varP__V1528));
     { START(sink__V1502, _M_F_Function_s4);
       COPY(sink__V1502, sub__V1525);COPY(sink__V1502, sub__V1520);COPY(sink__V1502, sub__V1521);COPY(sink__V1502, sub__V1522);COPY(sink__V1502, sub__V1523);COPY(sink__V1502, sub__V1524);COPY(sink__V1502, sub__V1519);COPY(sink__V1502, sub__V1526);END(sink__V1502, _M_F_Function_s4); }
     UNLINK_VARIABLESET(sink__V1502->context, namedFV__V1529); UNLINK_VARIABLESET(sink__V1502->context, varFV__V1530);
@@ -4124,7 +4124,7 @@ int step_M_F_Function_s4(Sink sink__V1531, Term term__V1532)
       Hashset namedFV__V1547 = LINK_VARIABLESET(sink__V1531->context, namedPropertyFreeVars(namedP__V1545));
       Hashset varFV__V1548 = LINK_VARIABLESET(sink__V1531->context, variablePropertyFreeVars(varP__V1546));
       UNLINK(sink__V1531->context, term__V1532);
-      ADD_PROPERTIES(sink__V1531, LINK_NamedPropertyLink(sink__V1531->context, namedP__V1545), LINK_VariablePropertyLink(sink__V1531->context, varP__V1546));
+      ADD_PROPERTIES(sink__V1531, LINK_VARIABLESET(sink__V1531->context, namedFV__V1547), LINK_VARIABLESET(sink__V1531->context, varFV__V1548), LINK_NamedPropertyLink(sink__V1531->context, namedP__V1545), LINK_VariablePropertyLink(sink__V1531->context, varP__V1546));
       { START(sink__V1531, _M_F_Function_s5);
         COPY(sink__V1531, sub__V1536);COPY(sink__V1531, sub__V1537);COPY(sink__V1531, sub__V1538);COPY(sink__V1531, sub__V1539);COPY(sink__V1531, sub__V1540);COPY(sink__V1531, sub__V1541);COPY(sink__V1531, sub__V1542);COPY(sink__V1531, sub__V1543);COPY(sink__V1531, sub__V1544);END(sink__V1531, _M_F_Function_s5); }
       UNLINK_VARIABLESET(sink__V1531->context, namedFV__V1547); UNLINK_VARIABLESET(sink__V1531->context, varFV__V1548);
@@ -4157,7 +4157,7 @@ int step_M_F_Function_s4(Sink sink__V1531, Term term__V1532)
       Hashset namedFV__V1560 = LINK_VARIABLESET(sink__V1531->context, namedPropertyFreeVars(namedP__V1558));
       Hashset varFV__V1561 = LINK_VARIABLESET(sink__V1531->context, variablePropertyFreeVars(varP__V1559));
       UNLINK(sink__V1531->context, term__V1532);
-      ADD_PROPERTIES(sink__V1531, LINK_NamedPropertyLink(sink__V1531->context, namedP__V1558), LINK_VariablePropertyLink(sink__V1531->context, varP__V1559));
+      ADD_PROPERTIES(sink__V1531, LINK_VARIABLESET(sink__V1531->context, namedFV__V1560), LINK_VARIABLESET(sink__V1531->context, varFV__V1561), LINK_NamedPropertyLink(sink__V1531->context, namedP__V1558), LINK_VariablePropertyLink(sink__V1531->context, varP__V1559));
       { START(sink__V1531, _M_F_Function_s6);
         COPY(sink__V1531, sub__V1550);COPY(sink__V1531, sub__V1551);COPY(sink__V1531, sub__V1552);COPY(sink__V1531, sub__V1553);COPY(sink__V1531, sub__V1554);COPY(sink__V1531, sub__V1555);COPY(sink__V1531, sub__V1556);COPY(sink__V1531, sub__V1557);END(sink__V1531, _M_F_Function_s6); }
       UNLINK_VARIABLESET(sink__V1531->context, namedFV__V1560); UNLINK_VARIABLESET(sink__V1531->context, varFV__V1561);
@@ -5013,7 +5013,7 @@ int step_M_F_PatternSub2(Sink sink__V1627, Term term__V1628)
       Hashset namedFV__V1645 = LINK_VARIABLESET(sink__V1627->context, namedPropertyFreeVars(namedP__V1643));
       Hashset varFV__V1646 = LINK_VARIABLESET(sink__V1627->context, variablePropertyFreeVars(varP__V1644));
       UNLINK(sink__V1627->context, term__V1628);
-      ADD_PROPERTIES(sink__V1627, LINK_NamedPropertyLink(sink__V1627->context, namedP__V1643), LINK_VariablePropertyLink(sink__V1627->context, varP__V1644));
+      ADD_PROPERTIES(sink__V1627, LINK_VARIABLESET(sink__V1627->context, namedFV__V1645), LINK_VARIABLESET(sink__V1627->context, varFV__V1646), LINK_NamedPropertyLink(sink__V1627->context, namedP__V1643), LINK_VariablePropertyLink(sink__V1627->context, varP__V1644));
       { START(sink__V1627, _M_F_PatternSub2_s5);
         COPY(sink__V1627, sub__V1639);COPY(sink__V1627, sub__V1633);COPY(sink__V1627, sub__V1634);COPY(sink__V1627, sub__V1635);COPY(sink__V1627, sub__V1636);COPY(sink__V1627, sub__V1637);COPY(sink__V1627, sub__V1638);COPY(sink__V1627, sub__V1632);COPY(sink__V1627, sub__V1640);{ if (!IS_BOUND(x__V1641)) { REBIND(x__V1641);
             Variable binds__V1647[1] = {x__V1641}; BINDS(sink__V1627, 1, binds__V1647);
@@ -5066,7 +5066,7 @@ int step_M_F_PatternSub2(Sink sink__V1627, Term term__V1628)
       Hashset namedFV__V1669 = LINK_VARIABLESET(sink__V1627->context, namedPropertyFreeVars(namedP__V1667));
       Hashset varFV__V1670 = LINK_VARIABLESET(sink__V1627->context, variablePropertyFreeVars(varP__V1668));
       UNLINK(sink__V1627->context, term__V1628);
-      ADD_PROPERTIES(sink__V1627, LINK_NamedPropertyLink(sink__V1627->context, namedP__V1667), LINK_VariablePropertyLink(sink__V1627->context, varP__V1668));
+      ADD_PROPERTIES(sink__V1627, LINK_VARIABLESET(sink__V1627->context, namedFV__V1669), LINK_VARIABLESET(sink__V1627->context, varFV__V1670), LINK_NamedPropertyLink(sink__V1627->context, namedP__V1667), LINK_VariablePropertyLink(sink__V1627->context, varP__V1668));
       { START(sink__V1627, _M_F_PatternSub2_s2);
         COPY(sink__V1627, sub__V1663);COPY(sink__V1627, sub__V1657);COPY(sink__V1627, sub__V1658);COPY(sink__V1627, sub__V1659);COPY(sink__V1627, sub__V1660);COPY(sink__V1627, sub__V1661);COPY(sink__V1627, sub__V1662);COPY(sink__V1627, sub__V1656);COPY(sink__V1627, sub__V1664);{ if (!IS_BOUND(x__V1665)) { REBIND(x__V1665);
             Variable binds__V1671[1] = {x__V1665}; BINDS(sink__V1627, 1, binds__V1671);
@@ -5119,7 +5119,7 @@ int step_M_F__unlink__refs_s1(Sink sink__V1679, Term term__V1680)
       Hashset namedFV__V1688 = LINK_VARIABLESET(sink__V1679->context, namedPropertyFreeVars(namedP__V1686));
       Hashset varFV__V1689 = LINK_VARIABLESET(sink__V1679->context, variablePropertyFreeVars(varP__V1687));
       UNLINK(sink__V1679->context, term__V1680);
-      ADD_PROPERTIES(sink__V1679, LINK_NamedPropertyLink(sink__V1679->context, namedP__V1686), LINK_VariablePropertyLink(sink__V1679->context, varP__V1687));
+      ADD_PROPERTIES(sink__V1679, LINK_VARIABLESET(sink__V1679->context, namedFV__V1688), LINK_VARIABLESET(sink__V1679->context, varFV__V1689), LINK_NamedPropertyLink(sink__V1679->context, namedP__V1686), LINK_VariablePropertyLink(sink__V1679->context, varP__V1687));
       { START(sink__V1679, _M_F__unlink__refs_s2);
         COPY(sink__V1679, sub__V1684);COPY(sink__V1679, sub__V1685);END(sink__V1679, _M_F__unlink__refs_s2); }
       UNLINK_VARIABLESET(sink__V1679->context, namedFV__V1688); UNLINK_VARIABLESET(sink__V1679->context, varFV__V1689);
@@ -5152,7 +5152,7 @@ int step_M_F__unlink__refs_s2(Sink sink__V1690, Term term__V1691)
     Hashset namedFV__V1696 = LINK_VARIABLESET(sink__V1690->context, namedPropertyFreeVars(namedP__V1694));
     Hashset varFV__V1697 = LINK_VARIABLESET(sink__V1690->context, variablePropertyFreeVars(varP__V1695));
     UNLINK(sink__V1690->context, term__V1691);
-    ADD_PROPERTIES(sink__V1690, LINK_NamedPropertyLink(sink__V1690->context, namedP__V1694), LINK_VariablePropertyLink(sink__V1690->context, varP__V1695));
+    ADD_PROPERTIES(sink__V1690, LINK_VARIABLESET(sink__V1690->context, namedFV__V1696), LINK_VARIABLESET(sink__V1690->context, varFV__V1697), LINK_NamedPropertyLink(sink__V1690->context, namedP__V1694), LINK_VariablePropertyLink(sink__V1690->context, varP__V1695));
     { START(sink__V1690, _M_F__unlink__refs2_s1);
       COPY(sink__V1690, sub__V1692);COPY(sink__V1690, sub__V1693);END(sink__V1690, _M_F__unlink__refs2_s1); }
     UNLINK_VARIABLESET(sink__V1690->context, namedFV__V1696); UNLINK_VARIABLESET(sink__V1690->context, varFV__V1697);
@@ -5200,7 +5200,7 @@ int step_M_F_Dispatch_s1(Sink sink__V1698, Term term__V1699)
       Hashset namedFV__V1713 = LINK_VARIABLESET(sink__V1698->context, namedPropertyFreeVars(namedP__V1711));
       Hashset varFV__V1714 = LINK_VARIABLESET(sink__V1698->context, variablePropertyFreeVars(varP__V1712));
       UNLINK(sink__V1698->context, term__V1699);
-      ADD_PROPERTIES(sink__V1698, LINK_NamedPropertyLink(sink__V1698->context, namedP__V1711), LINK_VariablePropertyLink(sink__V1698->context, varP__V1712));
+      ADD_PROPERTIES(sink__V1698, LINK_VARIABLESET(sink__V1698->context, namedFV__V1713), LINK_VARIABLESET(sink__V1698->context, varFV__V1714), LINK_NamedPropertyLink(sink__V1698->context, namedP__V1711), LINK_VariablePropertyLink(sink__V1698->context, varP__V1712));
       { START(sink__V1698, _M_F_Dispatch_s2);
         COPY(sink__V1698, sub__V1703);COPY(sink__V1698, sub__V1704);COPY(sink__V1698, sub__V1705);COPY(sink__V1698, sub__V1706);COPY(sink__V1698, sub__V1707);COPY(sink__V1698, sub__V1708);COPY(sink__V1698, sub__V1709);COPY(sink__V1698, sub__V1710);END(sink__V1698, _M_F_Dispatch_s2); }
       UNLINK_VARIABLESET(sink__V1698->context, namedFV__V1713); UNLINK_VARIABLESET(sink__V1698->context, varFV__V1714);
@@ -5282,7 +5282,7 @@ int step_M_F_Freshes_s2(Sink sink__V1729, Term term__V1730)
       Hashset namedFV__V1739 = LINK_VARIABLESET(sink__V1729->context, namedPropertyFreeVars(namedP__V1737));
       Hashset varFV__V1740 = LINK_VARIABLESET(sink__V1729->context, variablePropertyFreeVars(varP__V1738));
       UNLINK(sink__V1729->context, term__V1730);
-      ADD_PROPERTIES(sink__V1729, LINK_NamedPropertyLink(sink__V1729->context, namedP__V1737), LINK_VariablePropertyLink(sink__V1729->context, varP__V1738));
+      ADD_PROPERTIES(sink__V1729, LINK_VARIABLESET(sink__V1729->context, namedFV__V1739), LINK_VARIABLESET(sink__V1729->context, varFV__V1740), LINK_NamedPropertyLink(sink__V1729->context, namedP__V1737), LINK_VariablePropertyLink(sink__V1729->context, varP__V1738));
       { START(sink__V1729, _M_F_Freshes_s3);
         COPY(sink__V1729, sub__V1734);COPY(sink__V1729, sub__V1735);COPY(sink__V1729, sub__V1736);END(sink__V1729, _M_F_Freshes_s3); }
       UNLINK_VARIABLESET(sink__V1729->context, namedFV__V1739); UNLINK_VARIABLESET(sink__V1729->context, varFV__V1740);
@@ -5301,7 +5301,7 @@ int step_M_F_Freshes_s2(Sink sink__V1729, Term term__V1730)
       Hashset namedFV__V1745 = LINK_VARIABLESET(sink__V1729->context, namedPropertyFreeVars(namedP__V1743));
       Hashset varFV__V1746 = LINK_VARIABLESET(sink__V1729->context, variablePropertyFreeVars(varP__V1744));
       UNLINK(sink__V1729->context, term__V1730);
-      ADD_PROPERTIES(sink__V1729, LINK_NamedPropertyLink(sink__V1729->context, namedP__V1743), LINK_VariablePropertyLink(sink__V1729->context, varP__V1744));
+      ADD_PROPERTIES(sink__V1729, LINK_VARIABLESET(sink__V1729->context, namedFV__V1745), LINK_VARIABLESET(sink__V1729->context, varFV__V1746), LINK_NamedPropertyLink(sink__V1729->context, namedP__V1743), LINK_VariablePropertyLink(sink__V1729->context, varP__V1744));
       { START(sink__V1729, _M_F_Freshes_s5);
         COPY(sink__V1729, sub__V1742);END(sink__V1729, _M_F_Freshes_s5); }
       UNLINK_VARIABLESET(sink__V1729->context, namedFV__V1745); UNLINK_VARIABLESET(sink__V1729->context, varFV__V1746);
@@ -5341,7 +5341,7 @@ int step_M_F_Freshes_s3(Sink sink__V1747, Term term__V1748)
     Hashset namedFV__V1756 = LINK_VARIABLESET(sink__V1747->context, namedPropertyFreeVars(namedP__V1754));
     Hashset varFV__V1757 = LINK_VARIABLESET(sink__V1747->context, variablePropertyFreeVars(varP__V1755));
     UNLINK(sink__V1747->context, term__V1748);
-    ADD_PROPERTIES(sink__V1747, LINK_NamedPropertyLink(sink__V1747->context, namedP__V1754), LINK_VariablePropertyLink(sink__V1747->context, varP__V1755));
+    ADD_PROPERTIES(sink__V1747, LINK_VARIABLESET(sink__V1747->context, namedFV__V1756), LINK_VARIABLESET(sink__V1747->context, varFV__V1757), LINK_NamedPropertyLink(sink__V1747->context, namedP__V1754), LINK_VariablePropertyLink(sink__V1747->context, varP__V1755));
     { START(sink__V1747, _M_F_Freshes_s4);
       COPY(sink__V1747, sub__V1750);COPY(sink__V1747, sub__V1751);COPY(sink__V1747, sub__V1752);COPY(sink__V1747, sub__V1753);END(sink__V1747, _M_F_Freshes_s4); }
     UNLINK_VARIABLESET(sink__V1747->context, namedFV__V1756); UNLINK_VARIABLESET(sink__V1747->context, varFV__V1757);
@@ -5465,7 +5465,7 @@ int step_M_F__set__value(Sink sink__V1775, Term term__V1776)
       Hashset namedFV__V1788 = LINK_VARIABLESET(sink__V1775->context, namedPropertyFreeVars(namedP__V1786));
       Hashset varFV__V1789 = LINK_VARIABLESET(sink__V1775->context, variablePropertyFreeVars(varP__V1787));
       UNLINK(sink__V1775->context, term__V1776);
-      ADD_PROPERTIES(sink__V1775, LINK_NamedPropertyLink(sink__V1775->context, namedP__V1786), LINK_VariablePropertyLink(sink__V1775->context, varP__V1787));
+      ADD_PROPERTIES(sink__V1775, LINK_VARIABLESET(sink__V1775->context, namedFV__V1788), LINK_VARIABLESET(sink__V1775->context, varFV__V1789), LINK_NamedPropertyLink(sink__V1775->context, namedP__V1786), LINK_VariablePropertyLink(sink__V1775->context, varP__V1787));
       { START(sink__V1775, _M_F__set__value_s3);
         COPY(sink__V1775, sub__V1780);COPY(sink__V1775, sub__V1781);COPY(sink__V1775, sub__V1782);COPY(sink__V1775, sub__V1783);COPY(sink__V1775, sub__V1784);COPY(sink__V1775, sub__V1785);END(sink__V1775, _M_F__set__value_s3); }
       UNLINK_VARIABLESET(sink__V1775->context, namedFV__V1788); UNLINK_VARIABLESET(sink__V1775->context, varFV__V1789);
@@ -5492,7 +5492,7 @@ int step_M_F__set__value(Sink sink__V1775, Term term__V1776)
       Hashset namedFV__V1798 = LINK_VARIABLESET(sink__V1775->context, namedPropertyFreeVars(namedP__V1796));
       Hashset varFV__V1799 = LINK_VARIABLESET(sink__V1775->context, variablePropertyFreeVars(varP__V1797));
       UNLINK(sink__V1775->context, term__V1776);
-      ADD_PROPERTIES(sink__V1775, LINK_NamedPropertyLink(sink__V1775->context, namedP__V1796), LINK_VariablePropertyLink(sink__V1775->context, varP__V1797));
+      ADD_PROPERTIES(sink__V1775, LINK_VARIABLESET(sink__V1775->context, namedFV__V1798), LINK_VARIABLESET(sink__V1775->context, varFV__V1799), LINK_NamedPropertyLink(sink__V1775->context, namedP__V1796), LINK_VariablePropertyLink(sink__V1775->context, varP__V1797));
       { START(sink__V1775, _M_F__set__value_s2);
         COPY(sink__V1775, sub__V1791);COPY(sink__V1775, sub__V1792);COPY(sink__V1775, sub__V1793);COPY(sink__V1775, sub__V1794);COPY(sink__V1775, sub__V1795);END(sink__V1775, _M_F__set__value_s2); }
       UNLINK_VARIABLESET(sink__V1775->context, namedFV__V1798); UNLINK_VARIABLESET(sink__V1775->context, varFV__V1799);
@@ -5519,7 +5519,7 @@ int step_M_F__set__value(Sink sink__V1775, Term term__V1776)
       Hashset namedFV__V1808 = LINK_VARIABLESET(sink__V1775->context, namedPropertyFreeVars(namedP__V1806));
       Hashset varFV__V1809 = LINK_VARIABLESET(sink__V1775->context, variablePropertyFreeVars(varP__V1807));
       UNLINK(sink__V1775->context, term__V1776);
-      ADD_PROPERTIES(sink__V1775, LINK_NamedPropertyLink(sink__V1775->context, namedP__V1806), LINK_VariablePropertyLink(sink__V1775->context, varP__V1807));
+      ADD_PROPERTIES(sink__V1775, LINK_VARIABLESET(sink__V1775->context, namedFV__V1808), LINK_VARIABLESET(sink__V1775->context, varFV__V1809), LINK_NamedPropertyLink(sink__V1775->context, namedP__V1806), LINK_VariablePropertyLink(sink__V1775->context, varP__V1807));
       { START(sink__V1775, _M_F__set__value_s1);
         COPY(sink__V1775, sub__V1801);COPY(sink__V1775, sub__V1802);COPY(sink__V1775, sub__V1803);COPY(sink__V1775, sub__V1804);COPY(sink__V1775, sub__V1805);END(sink__V1775, _M_F__set__value_s1); }
       UNLINK_VARIABLESET(sink__V1775->context, namedFV__V1808); UNLINK_VARIABLESET(sink__V1775->context, varFV__V1809);
@@ -5544,7 +5544,7 @@ int step_M_F__set__value(Sink sink__V1775, Term term__V1776)
       Hashset namedFV__V1817 = LINK_VARIABLESET(sink__V1775->context, namedPropertyFreeVars(namedP__V1815));
       Hashset varFV__V1818 = LINK_VARIABLESET(sink__V1775->context, variablePropertyFreeVars(varP__V1816));
       UNLINK(sink__V1775->context, term__V1776);
-      ADD_PROPERTIES(sink__V1775, LINK_NamedPropertyLink(sink__V1775->context, namedP__V1815), LINK_VariablePropertyLink(sink__V1775->context, varP__V1816));
+      ADD_PROPERTIES(sink__V1775, LINK_VARIABLESET(sink__V1775->context, namedFV__V1817), LINK_VARIABLESET(sink__V1775->context, varFV__V1818), LINK_NamedPropertyLink(sink__V1775->context, namedP__V1815), LINK_VariablePropertyLink(sink__V1775->context, varP__V1816));
       { START(sink__V1775, _M_F__set__value_s4);
         COPY(sink__V1775, sub__V1811);COPY(sink__V1775, sub__V1812);COPY(sink__V1775, sub__V1813);COPY(sink__V1775, sub__V1814);END(sink__V1775, _M_F__set__value_s4); }
       UNLINK_VARIABLESET(sink__V1775->context, namedFV__V1817); UNLINK_VARIABLESET(sink__V1775->context, varFV__V1818);
@@ -5587,7 +5587,7 @@ int step_M_F__then_VariableOption2(Sink sink__V1819, Term term__V1820)
       Hashset namedFV__V1831 = LINK_VARIABLESET(sink__V1819->context, namedPropertyFreeVars(namedP__V1829));
       Hashset varFV__V1832 = LINK_VARIABLESET(sink__V1819->context, variablePropertyFreeVars(varP__V1830));
       UNLINK(sink__V1819->context, term__V1820);
-      ADD_PROPERTIES(sink__V1819, LINK_NamedPropertyLink(sink__V1819->context, namedP__V1829), LINK_VariablePropertyLink(sink__V1819->context, varP__V1830));
+      ADD_PROPERTIES(sink__V1819, LINK_VARIABLESET(sink__V1819->context, namedFV__V1831), LINK_VARIABLESET(sink__V1819->context, varFV__V1832), LINK_NamedPropertyLink(sink__V1819->context, namedP__V1829), LINK_VariablePropertyLink(sink__V1819->context, varP__V1830));
       { START(sink__V1819, _M_F__then_VariableOption2_s1);
         COPY(sink__V1819, sub__V1824);COPY(sink__V1819, sub__V1825);COPY(sink__V1819, sub__V1826);{ if (!IS_BOUND(x__V1827)) { REBIND(x__V1827);
             Variable binds__V1833[1] = {x__V1827}; BINDS(sink__V1819, 1, binds__V1833);
@@ -5666,7 +5666,7 @@ int step_M_F_PatternBinder1_s1(Sink sink__V1841, Term term__V1842)
     Hashset namedFV__V1863 = LINK_VARIABLESET(sink__V1841->context, namedPropertyFreeVars(namedP__V1861));
     Hashset varFV__V1864 = LINK_VARIABLESET(sink__V1841->context, variablePropertyFreeVars(varP__V1862));
     UNLINK(sink__V1841->context, term__V1842);
-    ADD_PROPERTIES(sink__V1841, LINK_NamedPropertyLink(sink__V1841->context, namedP__V1861), LINK_VariablePropertyLink(sink__V1841->context, varP__V1862));
+    ADD_PROPERTIES(sink__V1841, LINK_VARIABLESET(sink__V1841->context, namedFV__V1863), LINK_VARIABLESET(sink__V1841->context, varFV__V1864), LINK_NamedPropertyLink(sink__V1841->context, namedP__V1861), LINK_VariablePropertyLink(sink__V1841->context, varP__V1862));
     { START(sink__V1841, _M_F_PatternBinder1_s3);
       COPY(sink__V1841, sub__V1847);COPY(sink__V1841, sub__V1845);COPY(sink__V1841, sub__V1846);COPY(sink__V1841, sub__V1844);COPY(sink__V1841, sub__V1848);COPY(sink__V1841, sub__V1849);COPY(sink__V1841, sub__V1850);{ if (!IS_BOUND(x__V1851)) { REBIND(x__V1851);
           Variable binds__V1865[1] = {x__V1851}; BINDS(sink__V1841, 1, binds__V1865);
@@ -5744,7 +5744,7 @@ int step_M_F_PatternBinder1_s1(Sink sink__V1841, Term term__V1842)
     Hashset namedFV__V1899 = LINK_VARIABLESET(sink__V1841->context, namedPropertyFreeVars(namedP__V1897));
     Hashset varFV__V1900 = LINK_VARIABLESET(sink__V1841->context, variablePropertyFreeVars(varP__V1898));
     UNLINK(sink__V1841->context, term__V1842);
-    ADD_PROPERTIES(sink__V1841, LINK_NamedPropertyLink(sink__V1841->context, namedP__V1897), LINK_VariablePropertyLink(sink__V1841->context, varP__V1898));
+    ADD_PROPERTIES(sink__V1841, LINK_VARIABLESET(sink__V1841->context, namedFV__V1899), LINK_VARIABLESET(sink__V1841->context, varFV__V1900), LINK_NamedPropertyLink(sink__V1841->context, namedP__V1897), LINK_VariablePropertyLink(sink__V1841->context, varP__V1898));
     { START(sink__V1841, _M_F_PatternBinder1_s6);
       COPY(sink__V1841, sub__V1882);COPY(sink__V1841, sub__V1883);COPY(sink__V1841, sub__V1884);COPY(sink__V1841, sub__V1885);COPY(sink__V1841, sub__V1886);{ if (!IS_BOUND(x__V1887)) { REBIND(x__V1887);
           Variable binds__V1901[1] = {x__V1887}; BINDS(sink__V1841, 1, binds__V1901);
@@ -5837,7 +5837,7 @@ int step_M_F_PatternBinder1_s3(Sink sink__V1917, Term term__V1918)
       Hashset namedFV__V1940 = LINK_VARIABLESET(sink__V1917->context, namedPropertyFreeVars(namedP__V1938));
       Hashset varFV__V1941 = LINK_VARIABLESET(sink__V1917->context, variablePropertyFreeVars(varP__V1939));
       UNLINK(sink__V1917->context, term__V1918);
-      ADD_PROPERTIES(sink__V1917, LINK_NamedPropertyLink(sink__V1917->context, namedP__V1938), LINK_VariablePropertyLink(sink__V1917->context, varP__V1939));
+      ADD_PROPERTIES(sink__V1917, LINK_VARIABLESET(sink__V1917->context, namedFV__V1940), LINK_VARIABLESET(sink__V1917->context, varFV__V1941), LINK_NamedPropertyLink(sink__V1917->context, namedP__V1938), LINK_VariablePropertyLink(sink__V1917->context, varP__V1939));
       { START(sink__V1917, _M_F_PatternBinder1_s4);
         COPY(sink__V1917, sub__V1922);COPY(sink__V1917, sub__V1923);COPY(sink__V1917, sub__V1924);COPY(sink__V1917, sub__V1925);COPY(sink__V1917, sub__V1926);COPY(sink__V1917, sub__V1927);{ if (!IS_BOUND(x__V1928)) { REBIND(x__V1928);
             Variable binds__V1942[1] = {x__V1928}; BINDS(sink__V1917, 1, binds__V1942);
@@ -5916,7 +5916,7 @@ int step_M_F_PatternBinder1_s3(Sink sink__V1917, Term term__V1918)
       Hashset namedFV__V1978 = LINK_VARIABLESET(sink__V1917->context, namedPropertyFreeVars(namedP__V1976));
       Hashset varFV__V1979 = LINK_VARIABLESET(sink__V1917->context, variablePropertyFreeVars(varP__V1977));
       UNLINK(sink__V1917->context, term__V1918);
-      ADD_PROPERTIES(sink__V1917, LINK_NamedPropertyLink(sink__V1917->context, namedP__V1976), LINK_VariablePropertyLink(sink__V1917->context, varP__V1977));
+      ADD_PROPERTIES(sink__V1917, LINK_VARIABLESET(sink__V1917->context, namedFV__V1978), LINK_VARIABLESET(sink__V1917->context, varFV__V1979), LINK_NamedPropertyLink(sink__V1917->context, namedP__V1976), LINK_VariablePropertyLink(sink__V1917->context, varP__V1977));
       { START(sink__V1917, _M_F_PatternBinder1_s5);
         COPY(sink__V1917, sub__V1959);COPY(sink__V1917, sub__V1960);COPY(sink__V1917, sub__V1961);COPY(sink__V1917, sub__V1962);COPY(sink__V1917, sub__V1963);COPY(sink__V1917, sub__V1964);COPY(sink__V1917, sub__V1965);{ if (!IS_BOUND(x__V1966)) { REBIND(x__V1966);
             Variable binds__V1980[1] = {x__V1966}; BINDS(sink__V1917, 1, binds__V1980);
@@ -6005,7 +6005,7 @@ int step_M_F_PatternBinder1_s4(Sink sink__V1996, Term term__V1997)
     Hashset namedFV__V2016 = LINK_VARIABLESET(sink__V1996->context, namedPropertyFreeVars(namedP__V2014));
     Hashset varFV__V2017 = LINK_VARIABLESET(sink__V1996->context, variablePropertyFreeVars(varP__V2015));
     UNLINK(sink__V1996->context, term__V1997);
-    ADD_PROPERTIES(sink__V1996, LINK_NamedPropertyLink(sink__V1996->context, namedP__V2014), LINK_VariablePropertyLink(sink__V1996->context, varP__V2015));
+    ADD_PROPERTIES(sink__V1996, LINK_VARIABLESET(sink__V1996->context, namedFV__V2016), LINK_VARIABLESET(sink__V1996->context, varFV__V2017), LINK_NamedPropertyLink(sink__V1996->context, namedP__V2014), LINK_VariablePropertyLink(sink__V1996->context, varP__V2015));
     { START(sink__V1996, _M_F_PatternBinder1);
       COPY(sink__V1996, sub__V1999);{ START(sink__V1996, _M_UNIQUE);
         { char *str__V2018;
@@ -6122,7 +6122,7 @@ int step_M_F_PatternBinder1_s5(Sink sink__V2044, Term term__V2045)
     Hashset namedFV__V2065 = LINK_VARIABLESET(sink__V2044->context, namedPropertyFreeVars(namedP__V2063));
     Hashset varFV__V2066 = LINK_VARIABLESET(sink__V2044->context, variablePropertyFreeVars(varP__V2064));
     UNLINK(sink__V2044->context, term__V2045);
-    ADD_PROPERTIES(sink__V2044, LINK_NamedPropertyLink(sink__V2044->context, namedP__V2063), LINK_VariablePropertyLink(sink__V2044->context, varP__V2064));
+    ADD_PROPERTIES(sink__V2044, LINK_VARIABLESET(sink__V2044->context, namedFV__V2065), LINK_VARIABLESET(sink__V2044->context, varFV__V2066), LINK_NamedPropertyLink(sink__V2044->context, namedP__V2063), LINK_VariablePropertyLink(sink__V2044->context, varP__V2064));
     { START(sink__V2044, _M_F_PatternBinder2);
       { START(sink__V2044, _M_NOTHING); END(sink__V2044, _M_NOTHING); }
       COPY(sink__V2044, sub__V2050);COPY(sink__V2044, sub__V2051);{ if (!IS_BOUND(x__V2053)) { REBIND(x__V2053);
@@ -6208,7 +6208,7 @@ int step_M_F_PatternBinder1_s6(Sink sink__V2083, Term term__V2084)
     Hashset namedFV__V2102 = LINK_VARIABLESET(sink__V2083->context, namedPropertyFreeVars(namedP__V2100));
     Hashset varFV__V2103 = LINK_VARIABLESET(sink__V2083->context, variablePropertyFreeVars(varP__V2101));
     UNLINK(sink__V2083->context, term__V2084);
-    ADD_PROPERTIES(sink__V2083, LINK_NamedPropertyLink(sink__V2083->context, namedP__V2100), LINK_VariablePropertyLink(sink__V2083->context, varP__V2101));
+    ADD_PROPERTIES(sink__V2083, LINK_VARIABLESET(sink__V2083->context, namedFV__V2102), LINK_VARIABLESET(sink__V2083->context, varFV__V2103), LINK_NamedPropertyLink(sink__V2083->context, namedP__V2100), LINK_VariablePropertyLink(sink__V2083->context, varP__V2101));
     { START(sink__V2083, _M_F_PatternBinder2);
       { START(sink__V2083, _M_NOTHING); END(sink__V2083, _M_NOTHING); }
       COPY(sink__V2083, sub__V2087);COPY(sink__V2083, sub__V2088);{ if (!IS_BOUND(x__V2090)) { REBIND(x__V2090);
@@ -6292,7 +6292,7 @@ int step_M_F_PatternBinder1_s7(Sink sink__V2120, Term term__V2121)
     Hashset namedFV__V2138 = LINK_VARIABLESET(sink__V2120->context, namedPropertyFreeVars(namedP__V2136));
     Hashset varFV__V2139 = LINK_VARIABLESET(sink__V2120->context, variablePropertyFreeVars(varP__V2137));
     UNLINK(sink__V2120->context, term__V2121);
-    ADD_PROPERTIES(sink__V2120, LINK_NamedPropertyLink(sink__V2120->context, namedP__V2136), LINK_VariablePropertyLink(sink__V2120->context, varP__V2137));
+    ADD_PROPERTIES(sink__V2120, LINK_VARIABLESET(sink__V2120->context, namedFV__V2138), LINK_VARIABLESET(sink__V2120->context, varFV__V2139), LINK_NamedPropertyLink(sink__V2120->context, namedP__V2136), LINK_VariablePropertyLink(sink__V2120->context, varP__V2137));
     { START(sink__V2120, _M_F_PatternBinder2);
       COPY(sink__V2120, sub__V2122);COPY(sink__V2120, sub__V2123);COPY(sink__V2120, sub__V2124);{ if (!IS_BOUND(x__V2126)) { REBIND(x__V2126);
           Variable binds__V2140[1] = {x__V2126}; BINDS(sink__V2120, 1, binds__V2140);
@@ -6382,7 +6382,7 @@ int step_M_F_PatternBinder_s1(Sink sink__V2156, Term term__V2157)
       Hashset namedFV__V2178 = LINK_VARIABLESET(sink__V2156->context, namedPropertyFreeVars(namedP__V2176));
       Hashset varFV__V2179 = LINK_VARIABLESET(sink__V2156->context, variablePropertyFreeVars(varP__V2177));
       UNLINK(sink__V2156->context, term__V2157);
-      ADD_PROPERTIES(sink__V2156, LINK_NamedPropertyLink(sink__V2156->context, namedP__V2176), LINK_VariablePropertyLink(sink__V2156->context, varP__V2177));
+      ADD_PROPERTIES(sink__V2156, LINK_VARIABLESET(sink__V2156->context, namedFV__V2178), LINK_VARIABLESET(sink__V2156->context, varFV__V2179), LINK_NamedPropertyLink(sink__V2156->context, namedP__V2176), LINK_VariablePropertyLink(sink__V2156->context, varP__V2177));
       { START(sink__V2156, _M_F_PatternBinder_s5);
         COPY(sink__V2156, sub__V2161);COPY(sink__V2156, sub__V2162);COPY(sink__V2156, sub__V2163);{ if (!IS_BOUND(y__V2164)) { REBIND(y__V2164);
             Variable binds__V2180[1] = {y__V2164}; BINDS(sink__V2156, 1, binds__V2180);
@@ -6452,7 +6452,7 @@ int step_M_F_PatternBinder_s1(Sink sink__V2156, Term term__V2157)
       Hashset namedFV__V2211 = LINK_VARIABLESET(sink__V2156->context, namedPropertyFreeVars(namedP__V2209));
       Hashset varFV__V2212 = LINK_VARIABLESET(sink__V2156->context, variablePropertyFreeVars(varP__V2210));
       UNLINK(sink__V2156->context, term__V2157);
-      ADD_PROPERTIES(sink__V2156, LINK_NamedPropertyLink(sink__V2156->context, namedP__V2209), LINK_VariablePropertyLink(sink__V2156->context, varP__V2210));
+      ADD_PROPERTIES(sink__V2156, LINK_VARIABLESET(sink__V2156->context, namedFV__V2211), LINK_VARIABLESET(sink__V2156->context, varFV__V2212), LINK_NamedPropertyLink(sink__V2156->context, namedP__V2209), LINK_VariablePropertyLink(sink__V2156->context, varP__V2210));
       { START(sink__V2156, _M_F_PatternBinder_s3);
         COPY(sink__V2156, sub__V2204);COPY(sink__V2156, sub__V2198);COPY(sink__V2156, sub__V2199);COPY(sink__V2156, sub__V2200);COPY(sink__V2156, sub__V2201);COPY(sink__V2156, sub__V2202);COPY(sink__V2156, sub__V2203);COPY(sink__V2156, sub__V2197);COPY(sink__V2156, sub__V2205);COPY(sink__V2156, sub__V2206);{ if (!IS_BOUND(x__V2207)) { REBIND(x__V2207);
             Variable binds__V2213[1] = {x__V2207}; BINDS(sink__V2156, 1, binds__V2213);
@@ -6524,7 +6524,7 @@ int step_M_F_PatternBinder_s3(Sink sink__V2221, Term term__V2222)
         Hashset namedFV__V2239 = LINK_VARIABLESET(sink__V2221->context, namedPropertyFreeVars(namedP__V2237));
         Hashset varFV__V2240 = LINK_VARIABLESET(sink__V2221->context, variablePropertyFreeVars(varP__V2238));
         UNLINK(sink__V2221->context, term__V2222);
-        ADD_PROPERTIES(sink__V2221, LINK_NamedPropertyLink(sink__V2221->context, namedP__V2237), LINK_VariablePropertyLink(sink__V2221->context, varP__V2238));
+        ADD_PROPERTIES(sink__V2221, LINK_VARIABLESET(sink__V2221->context, namedFV__V2239), LINK_VARIABLESET(sink__V2221->context, varFV__V2240), LINK_NamedPropertyLink(sink__V2221->context, namedP__V2237), LINK_VariablePropertyLink(sink__V2221->context, varP__V2238));
         { START(sink__V2221, _M_F_PatternBinder_s4);
           USE(sink__V2221, z__V277); COPY(sink__V2221, sub__V2226);COPY(sink__V2221, sub__V2227);COPY(sink__V2221, sub__V2228);COPY(sink__V2221, sub__V2229);COPY(sink__V2221, sub__V2230);COPY(sink__V2221, sub__V2231);COPY(sink__V2221, sub__V2232);COPY(sink__V2221, sub__V2233);COPY(sink__V2221, sub__V2234);{ if (!IS_BOUND(x__V2235)) { REBIND(x__V2235);
               Variable binds__V2241[1] = {x__V2235}; BINDS(sink__V2221, 1, binds__V2241);
@@ -6593,7 +6593,7 @@ int step_M_F_PatternBinder_s4(Sink sink__V2249, Term term__V2250)
     Hashset namedFV__V2265 = LINK_VARIABLESET(sink__V2249->context, namedPropertyFreeVars(namedP__V2263));
     Hashset varFV__V2266 = LINK_VARIABLESET(sink__V2249->context, variablePropertyFreeVars(varP__V2264));
     UNLINK(sink__V2249->context, term__V2250);
-    ADD_PROPERTIES(sink__V2249, LINK_NamedPropertyLink(sink__V2249->context, namedP__V2263), LINK_VariablePropertyLink(sink__V2249->context, varP__V2264));
+    ADD_PROPERTIES(sink__V2249, LINK_VARIABLESET(sink__V2249->context, namedFV__V2265), LINK_VARIABLESET(sink__V2249->context, varFV__V2266), LINK_NamedPropertyLink(sink__V2249->context, namedP__V2263), LINK_VariablePropertyLink(sink__V2249->context, varP__V2264));
     { START(sink__V2249, _M_F_PatternSub);
       COPY(sink__V2249, LINK(sink__V2249->context, sub__V2252));COPY(sink__V2249, sub__V2254);COPY(sink__V2249, sub__V2253);COPY(sink__V2249, sub__V2258);COPY(sink__V2249, sub__V2252);COPY(sink__V2249, sub__V2255);COPY(sink__V2249, sub__V2256);COPY(sink__V2249, sub__V2257);COPY(sink__V2249, sub__V2251);COPY(sink__V2249, sub__V2259);{ if (!IS_BOUND(x__V2261)) { REBIND(x__V2261);
           Variable binds__V2267[1] = {x__V2261}; BINDS(sink__V2249, 1, binds__V2267);
@@ -6663,7 +6663,7 @@ int step_M_F_PatternBinder_s5(Sink sink__V2275, Term term__V2276)
     Hashset namedFV__V2294 = LINK_VARIABLESET(sink__V2275->context, namedPropertyFreeVars(namedP__V2292));
     Hashset varFV__V2295 = LINK_VARIABLESET(sink__V2275->context, variablePropertyFreeVars(varP__V2293));
     UNLINK(sink__V2275->context, term__V2276);
-    ADD_PROPERTIES(sink__V2275, LINK_NamedPropertyLink(sink__V2275->context, namedP__V2292), LINK_VariablePropertyLink(sink__V2275->context, varP__V2293));
+    ADD_PROPERTIES(sink__V2275, LINK_VARIABLESET(sink__V2275->context, namedFV__V2294), LINK_VARIABLESET(sink__V2275->context, varFV__V2295), LINK_NamedPropertyLink(sink__V2275->context, namedP__V2292), LINK_VariablePropertyLink(sink__V2275->context, varP__V2293));
     { START(sink__V2275, _M_F_PatternBinder1);
       COPY(sink__V2275, sub__V2279);{ START(sink__V2275, _M_NOTHING); END(sink__V2275, _M_NOTHING); }
       COPY(sink__V2275, sub__V2283);COPY(sink__V2275, sub__V2282);COPY(sink__V2275, sub__V2277);{ if (!IS_BOUND(x__V2280)) { REBIND(x__V2280);
@@ -6730,7 +6730,7 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
     UNLINK(sink__V2312->context, term__V2313);
     { int test__V2322;
       FORCE(sink__V2312->context, sub__V2314);
-      test__V2322 = (int) !strcmp(SYMBOL(sub__V2314), "Free" ); if (test__V2322) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+      test__V2322 = (int) !strcmp(SYMBOL(sub__V2314), "Free" ); if (test__V2322) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
         { START(sink__V2312, _M_F__variableOption_s1);
           COPY(sink__V2312, sub__V2315);{ START(sink__V2312, _M_FREE); END(sink__V2312, _M_FREE); } { if (!IS_BOUND(x__V2316)) { REBIND(x__V2316);
               Variable binds__V2323[1] = {x__V2316}; BINDS(sink__V2312, 1, binds__V2323);
@@ -6751,7 +6751,7 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
          }
       else { { int test__V2331;
           FORCE(sink__V2312->context, sub__V2314);
-          test__V2331 = (int) !strcmp(SYMBOL(sub__V2314), "Fresh" ); if (test__V2331) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+          test__V2331 = (int) !strcmp(SYMBOL(sub__V2314), "Fresh" ); if (test__V2331) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
             { START(sink__V2312, _M_F__variableOption_s1);
               COPY(sink__V2312, sub__V2315);{ START(sink__V2312, _M_FRESH);
                 END(sink__V2312, _M_FRESH); }
@@ -6775,7 +6775,7 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
           else { { int test__V2340;
               FORCE(sink__V2312->context, sub__V2314);
               test__V2340 = (int) !strcmp(SYMBOL(sub__V2314), "FreshReuse" );
-              if (test__V2340) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+              if (test__V2340) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
                 { START(sink__V2312, _M_F__variableOption_s1);
                   COPY(sink__V2312, sub__V2315);{ START(sink__V2312, _M_FRESHREUSE);
                     END(sink__V2312, _M_FRESHREUSE); }
@@ -6799,7 +6799,7 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
               else { { int test__V2349;
                   FORCE(sink__V2312->context, sub__V2314);
                   test__V2349 = (int) !strcmp(SYMBOL(sub__V2314), "FreshReuseOrigin" );
-                  if (test__V2349) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+                  if (test__V2349) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
                     { START(sink__V2312, _M_F__variableFreshReuseOriginOption_s1);
                       COPY(sink__V2312, sub__V2315);LITERAL(sink__V2312,  "FreshReuseOrigin" ); { if (!IS_BOUND(x__V2316)) { REBIND(x__V2316);
                           Variable binds__V2350[1] = {x__V2316}; BINDS(sink__V2312, 1, binds__V2350);
@@ -6818,7 +6818,7 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
                          }
                       END(sink__V2312, _M_F__variableFreshReuseOriginOption_s1); }
                      }
-                  else { ADD_PROPERTIES(sink__V2312, LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+                  else { ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
                     { START(sink__V2312, _M_F__metaOption_s1);
                       COPY(sink__V2312, sub__V2315);COPY(sink__V2312, sub__V2314);{ if (!IS_BOUND(x__V2316)) { REBIND(x__V2316);
                           Variable binds__V2358[1] = {x__V2316}; BINDS(sink__V2312, 1, binds__V2358);
@@ -6873,7 +6873,7 @@ int step_M_F__then_Options_s1(Sink sink__V2366, Term term__V2367)
     Hashset namedFV__V2373 = LINK_VARIABLESET(sink__V2366->context, namedPropertyFreeVars(namedP__V2371));
     Hashset varFV__V2374 = LINK_VARIABLESET(sink__V2366->context, variablePropertyFreeVars(varP__V2372));
     UNLINK(sink__V2366->context, term__V2367);
-    ADD_PROPERTIES(sink__V2366, LINK_NamedPropertyLink(sink__V2366->context, namedP__V2371), LINK_VariablePropertyLink(sink__V2366->context, varP__V2372));
+    ADD_PROPERTIES(sink__V2366, LINK_VARIABLESET(sink__V2366->context, namedFV__V2373), LINK_VARIABLESET(sink__V2366->context, varFV__V2374), LINK_NamedPropertyLink(sink__V2366->context, namedP__V2371), LINK_VariablePropertyLink(sink__V2366->context, varP__V2372));
     { START(sink__V2366, _M_F_Options);
       COPY(sink__V2366, sub__V2368);{ if (!IS_BOUND(x__V2369)) { REBIND(x__V2369);
           Variable binds__V2375[1] = {x__V2369}; BINDS(sink__V2366, 1, binds__V2375);
@@ -6941,7 +6941,7 @@ int step_M_F_PatternSub2_s2(Sink sink__V2383, Term term__V2384)
         Hashset namedFV__V2400 = LINK_VARIABLESET(sink__V2383->context, namedPropertyFreeVars(namedP__V2398));
         Hashset varFV__V2401 = LINK_VARIABLESET(sink__V2383->context, variablePropertyFreeVars(varP__V2399));
         UNLINK(sink__V2383->context, term__V2384);
-        ADD_PROPERTIES(sink__V2383, LINK_NamedPropertyLink(sink__V2383->context, namedP__V2398), LINK_VariablePropertyLink(sink__V2383->context, varP__V2399));
+        ADD_PROPERTIES(sink__V2383, LINK_VARIABLESET(sink__V2383->context, namedFV__V2400), LINK_VARIABLESET(sink__V2383->context, varFV__V2401), LINK_NamedPropertyLink(sink__V2383->context, namedP__V2398), LINK_VariablePropertyLink(sink__V2383->context, varP__V2399));
         { START(sink__V2383, _M_F_PatternSub2_s3);
           USE(sink__V2383, z__V277); COPY(sink__V2383, sub__V2388);COPY(sink__V2383, sub__V2389);COPY(sink__V2383, sub__V2390);COPY(sink__V2383, sub__V2391);COPY(sink__V2383, sub__V2392);COPY(sink__V2383, sub__V2393);COPY(sink__V2383, sub__V2394);COPY(sink__V2383, sub__V2395);{ if (!IS_BOUND(x__V2396)) { REBIND(x__V2396);
               Variable binds__V2402[1] = {x__V2396}; BINDS(sink__V2383, 1, binds__V2402);
@@ -7009,7 +7009,7 @@ int step_M_F_PatternSub2_s3(Sink sink__V2410, Term term__V2411)
     Hashset namedFV__V2426 = LINK_VARIABLESET(sink__V2410->context, namedPropertyFreeVars(namedP__V2424));
     Hashset varFV__V2427 = LINK_VARIABLESET(sink__V2410->context, variablePropertyFreeVars(varP__V2425));
     UNLINK(sink__V2410->context, term__V2411);
-    ADD_PROPERTIES(sink__V2410, LINK_NamedPropertyLink(sink__V2410->context, namedP__V2424), LINK_VariablePropertyLink(sink__V2410->context, varP__V2425));
+    ADD_PROPERTIES(sink__V2410, LINK_VARIABLESET(sink__V2410->context, namedFV__V2426), LINK_VARIABLESET(sink__V2410->context, varFV__V2427), LINK_NamedPropertyLink(sink__V2410->context, namedP__V2424), LINK_VariablePropertyLink(sink__V2410->context, varP__V2425));
     { Term value__V2428;
       { Sink buf__V2429 = ALLOCA_BUFFER(sink__V2410->context);
         { START(buf__V2429, _M_SUB);
@@ -7297,7 +7297,7 @@ int step_M_F_PatternSub2_s5(Sink sink__V2449, Term term__V2450)
         Hashset namedFV__V2466 = LINK_VARIABLESET(sink__V2449->context, namedPropertyFreeVars(namedP__V2464));
         Hashset varFV__V2467 = LINK_VARIABLESET(sink__V2449->context, variablePropertyFreeVars(varP__V2465));
         UNLINK(sink__V2449->context, term__V2450);
-        ADD_PROPERTIES(sink__V2449, LINK_NamedPropertyLink(sink__V2449->context, namedP__V2464), LINK_VariablePropertyLink(sink__V2449->context, varP__V2465));
+        ADD_PROPERTIES(sink__V2449, LINK_VARIABLESET(sink__V2449->context, namedFV__V2466), LINK_VARIABLESET(sink__V2449->context, varFV__V2467), LINK_NamedPropertyLink(sink__V2449->context, namedP__V2464), LINK_VariablePropertyLink(sink__V2449->context, varP__V2465));
         { START(sink__V2449, _M_F_PatternSub2_s6);
           USE(sink__V2449, z__V277); COPY(sink__V2449, sub__V2454);COPY(sink__V2449, sub__V2455);COPY(sink__V2449, sub__V2456);COPY(sink__V2449, sub__V2457);COPY(sink__V2449, sub__V2458);COPY(sink__V2449, sub__V2459);COPY(sink__V2449, sub__V2460);COPY(sink__V2449, sub__V2461);{ if (!IS_BOUND(x__V2462)) { REBIND(x__V2462);
               Variable binds__V2468[1] = {x__V2462}; BINDS(sink__V2449, 1, binds__V2468);
@@ -7463,7 +7463,7 @@ int step_M_F_PatternSub2_s6(Sink sink__V2487, Term term__V2488)
     Hashset namedFV__V2503 = LINK_VARIABLESET(sink__V2487->context, namedPropertyFreeVars(namedP__V2501));
     Hashset varFV__V2504 = LINK_VARIABLESET(sink__V2487->context, variablePropertyFreeVars(varP__V2502));
     UNLINK(sink__V2487->context, term__V2488);
-    ADD_PROPERTIES(sink__V2487, LINK_NamedPropertyLink(sink__V2487->context, namedP__V2501), LINK_VariablePropertyLink(sink__V2487->context, varP__V2502));
+    ADD_PROPERTIES(sink__V2487, LINK_VARIABLESET(sink__V2487->context, namedFV__V2503), LINK_VARIABLESET(sink__V2487->context, varFV__V2504), LINK_NamedPropertyLink(sink__V2487->context, namedP__V2501), LINK_VariablePropertyLink(sink__V2487->context, varP__V2502));
     { START(sink__V2487, _M_F_PatternSub2_s8);
       COPY(sink__V2487, value__V2500);COPY(sink__V2487, sub__V2490);COPY(sink__V2487, sub__V2491);COPY(sink__V2487, sub__V2492);COPY(sink__V2487, sub__V2493);COPY(sink__V2487, sub__V2494);COPY(sink__V2487, sub__V2495);COPY(sink__V2487, sub__V2496);COPY(sink__V2487, sub__V2497);{ if (!IS_BOUND(x__V2498)) { REBIND(x__V2498);
           Variable binds__V2505[1] = {x__V2498}; BINDS(sink__V2487, 1, binds__V2505);
@@ -7547,7 +7547,7 @@ int step_M_F__set__value_s3(Sink sink__V2513, Term term__V2514)
                   { START(sink__V2513, _M__sTextCons);
                     { START(sink__V2513, _M__sTextEmbed);
                       { START(sink__V2513, _M_AsText);
-                        ADD_PROPERTIES(sink__V2513, LINK_NamedPropertyLink(sink__V2513->context, namedP__V2521), LINK_VariablePropertyLink(sink__V2513->context, varP__V2522));
+                        ADD_PROPERTIES(sink__V2513, LINK_VARIABLESET(sink__V2513->context, namedFV__V2523), LINK_VARIABLESET(sink__V2513->context, varFV__V2524), LINK_NamedPropertyLink(sink__V2513->context, namedP__V2521), LINK_VariablePropertyLink(sink__V2513->context, varP__V2522));
                         { START(sink__V2513, _M_MetaVar);
                           COPY(sink__V2513, sub__V2515);END(sink__V2513, _M_MetaVar); }
                         END(sink__V2513, _M_AsText); }
@@ -7618,7 +7618,7 @@ int step_M_F__set__value_s4(Sink sink__V2525, Term term__V2526)
         Hashset namedFV__V2535 = LINK_VARIABLESET(sink__V2525->context, namedPropertyFreeVars(namedP__V2533));
         Hashset varFV__V2536 = LINK_VARIABLESET(sink__V2525->context, variablePropertyFreeVars(varP__V2534));
         UNLINK(sink__V2525->context, term__V2526);
-        ADD_PROPERTIES(sink__V2525, LINK_NamedPropertyLink(sink__V2525->context, namedP__V2533), LINK_VariablePropertyLink(sink__V2525->context, varP__V2534));
+        ADD_PROPERTIES(sink__V2525, LINK_VARIABLESET(sink__V2525->context, namedFV__V2535), LINK_VARIABLESET(sink__V2525->context, varFV__V2536), LINK_NamedPropertyLink(sink__V2525->context, namedP__V2533), LINK_VariablePropertyLink(sink__V2525->context, varP__V2534));
         { START(sink__V2525, _M_F__set__value_s5);
           USE(sink__V2525, z__V277); COPY(sink__V2525, sub__V2530);COPY(sink__V2525, sub__V2531);COPY(sink__V2525, sub__V2532);END(sink__V2525, _M_F__set__value_s5); }
         UNLINK_VARIABLESET(sink__V2525->context, namedFV__V2535); UNLINK_VARIABLESET(sink__V2525->context, varFV__V2536);
@@ -7676,7 +7676,7 @@ int step_M_F_PatternSub2_s8(Sink sink__V2537, Term term__V2538)
       Hashset namedFV__V2556 = LINK_VARIABLESET(sink__V2537->context, namedPropertyFreeVars(namedP__V2554));
       Hashset varFV__V2557 = LINK_VARIABLESET(sink__V2537->context, variablePropertyFreeVars(varP__V2555));
       UNLINK(sink__V2537->context, term__V2538);
-      ADD_PROPERTIES(sink__V2537, LINK_NamedPropertyLink(sink__V2537->context, namedP__V2554), LINK_VariablePropertyLink(sink__V2537->context, varP__V2555));
+      ADD_PROPERTIES(sink__V2537, LINK_VARIABLESET(sink__V2537->context, namedFV__V2556), LINK_VARIABLESET(sink__V2537->context, varFV__V2557), LINK_NamedPropertyLink(sink__V2537->context, namedP__V2554), LINK_VariablePropertyLink(sink__V2537->context, varP__V2555));
       { START(sink__V2537, _M_F_PatternSub2_s9);
         COPY(sink__V2537, sub__V2542);COPY(sink__V2537, sub__V2543);COPY(sink__V2537, sub__V2544);COPY(sink__V2537, sub__V2545);COPY(sink__V2537, sub__V2546);COPY(sink__V2537, sub__V2547);COPY(sink__V2537, sub__V2548);COPY(sink__V2537, sub__V2549);COPY(sink__V2537, sub__V2550);{ if (!IS_BOUND(x__V2551)) { REBIND(x__V2551);
             Variable binds__V2558[1] = {x__V2551}; BINDS(sink__V2537, 1, binds__V2558);
@@ -7830,7 +7830,7 @@ int step_M_F_PatternSub2_s9(Sink sink__V2577, Term term__V2578)
     Hashset namedFV__V2593 = LINK_VARIABLESET(sink__V2577->context, namedPropertyFreeVars(namedP__V2591));
     Hashset varFV__V2594 = LINK_VARIABLESET(sink__V2577->context, variablePropertyFreeVars(varP__V2592));
     UNLINK(sink__V2577->context, term__V2578);
-    ADD_PROPERTIES(sink__V2577, LINK_NamedPropertyLink(sink__V2577->context, namedP__V2591), LINK_VariablePropertyLink(sink__V2577->context, varP__V2592));
+    ADD_PROPERTIES(sink__V2577, LINK_VARIABLESET(sink__V2577->context, namedFV__V2593), LINK_VARIABLESET(sink__V2577->context, varFV__V2594), LINK_NamedPropertyLink(sink__V2577->context, namedP__V2591), LINK_VariablePropertyLink(sink__V2577->context, varP__V2592));
     { Term value__V2595;
       { Sink buf__V2596 = ALLOCA_BUFFER(sink__V2577->context);
         { START(buf__V2596, _M_LIST_xVARIABLE);
@@ -8018,7 +8018,7 @@ int step_M_F__unlink__refs3_s1(Sink sink__V2607, Term term__V2608)
       Hashset namedFV__V2620 = LINK_VARIABLESET(sink__V2607->context, namedPropertyFreeVars(namedP__V2618));
       Hashset varFV__V2621 = LINK_VARIABLESET(sink__V2607->context, variablePropertyFreeVars(varP__V2619));
       UNLINK(sink__V2607->context, term__V2608);
-      ADD_PROPERTIES(sink__V2607, LINK_NamedPropertyLink(sink__V2607->context, namedP__V2618), LINK_VariablePropertyLink(sink__V2607->context, varP__V2619));
+      ADD_PROPERTIES(sink__V2607, LINK_VARIABLESET(sink__V2607->context, namedFV__V2620), LINK_VARIABLESET(sink__V2607->context, varFV__V2621), LINK_NamedPropertyLink(sink__V2607->context, namedP__V2618), LINK_VariablePropertyLink(sink__V2607->context, varP__V2619));
       { START(sink__V2607, _M_F__unlink__refs3_s2);
         COPY(sink__V2607, sub__V2612);COPY(sink__V2607, sub__V2613);COPY(sink__V2607, sub__V2614);COPY(sink__V2607, sub__V2615);COPY(sink__V2607, sub__V2616);COPY(sink__V2607, sub__V2617);END(sink__V2607, _M_F__unlink__refs3_s2); }
       UNLINK_VARIABLESET(sink__V2607->context, namedFV__V2620); UNLINK_VARIABLESET(sink__V2607->context, varFV__V2621);
@@ -8139,7 +8139,7 @@ int step_M_F__unlink__refs3_s2(Sink sink__V2622, Term term__V2623)
                                           { START(sink__V2622, _M__sTextCons);
                                             { START(sink__V2622, _M__sTextEmbed);
                                               { START(sink__V2622, _M_AsText);
-                                                ADD_PROPERTIES(sink__V2622, LINK_NamedPropertyLink(sink__V2622->context, namedP__V2630), LINK_VariablePropertyLink(sink__V2622->context, varP__V2631));
+                                                ADD_PROPERTIES(sink__V2622, LINK_VARIABLESET(sink__V2622->context, namedFV__V2632), LINK_VARIABLESET(sink__V2622->context, varFV__V2633), LINK_NamedPropertyLink(sink__V2622->context, namedP__V2630), LINK_VariablePropertyLink(sink__V2622->context, varP__V2631));
                                                 { START(sink__V2622, _M_F__unlink__refs2_s1);
                                                   COPY(sink__V2622, sub__V2629);COPY(sink__V2622, sub__V2628);END(sink__V2622, _M_F__unlink__refs2_s1); }
                                                 END(sink__V2622, _M_AsText); }
@@ -8422,7 +8422,7 @@ int step_M_F__then_Send(Sink sink__V2651, Term term__V2652)
       Hashset namedFV__V2661 = LINK_VARIABLESET(sink__V2651->context, namedPropertyFreeVars(namedP__V2659));
       Hashset varFV__V2662 = LINK_VARIABLESET(sink__V2651->context, variablePropertyFreeVars(varP__V2660));
       UNLINK(sink__V2651->context, term__V2652);
-      ADD_PROPERTIES(sink__V2651, LINK_NamedPropertyLink(sink__V2651->context, namedP__V2659), LINK_VariablePropertyLink(sink__V2651->context, varP__V2660));
+      ADD_PROPERTIES(sink__V2651, LINK_VARIABLESET(sink__V2651->context, namedFV__V2661), LINK_VARIABLESET(sink__V2651->context, varFV__V2662), LINK_NamedPropertyLink(sink__V2651->context, namedP__V2659), LINK_VariablePropertyLink(sink__V2651->context, varP__V2660));
       { START(sink__V2651, _M_F__then_Send_s1);
         COPY(sink__V2651, sub__V2656);COPY(sink__V2651, sub__V2657);COPY(sink__V2651, sub__V2658);END(sink__V2651, _M_F__then_Send_s1); }
       UNLINK_VARIABLESET(sink__V2651->context, namedFV__V2661); UNLINK_VARIABLESET(sink__V2651->context, varFV__V2662);
@@ -8470,7 +8470,7 @@ int step_M_F__then_Pattern_s1(Sink sink__V2663, Term term__V2664)
     Hashset namedFV__V2677 = LINK_VARIABLESET(sink__V2663->context, namedPropertyFreeVars(namedP__V2675));
     Hashset varFV__V2678 = LINK_VARIABLESET(sink__V2663->context, variablePropertyFreeVars(varP__V2676));
     UNLINK(sink__V2663->context, term__V2664);
-    ADD_PROPERTIES(sink__V2663, LINK_NamedPropertyLink(sink__V2663->context, namedP__V2675), LINK_VariablePropertyLink(sink__V2663->context, varP__V2676));
+    ADD_PROPERTIES(sink__V2663, LINK_VARIABLESET(sink__V2663->context, namedFV__V2677), LINK_VARIABLESET(sink__V2663->context, varFV__V2678), LINK_NamedPropertyLink(sink__V2663->context, namedP__V2675), LINK_VariablePropertyLink(sink__V2663->context, varP__V2676));
     { START(sink__V2663, _M_F_Pattern_s1);
       COPY(sink__V2663, sub__V2667);COPY(sink__V2663, sub__V2666);COPY(sink__V2663, sub__V2665);COPY(sink__V2663, sub__V2668);COPY(sink__V2663, sub__V2669);COPY(sink__V2663, sub__V2670);COPY(sink__V2663, sub__V2671);COPY(sink__V2663, sub__V2672);{ if (!IS_BOUND(x__V2673)) { REBIND(x__V2673);
           Variable binds__V2679[1] = {x__V2673}; BINDS(sink__V2663, 1, binds__V2679);
@@ -8517,7 +8517,7 @@ int step_M_F_Pattern_Open(Sink sink__V2687, Term term__V2688)
       Hashset namedFV__V2694 = LINK_VARIABLESET(sink__V2687->context, namedPropertyFreeVars(namedP__V2692));
       Hashset varFV__V2695 = LINK_VARIABLESET(sink__V2687->context, variablePropertyFreeVars(varP__V2693));
       UNLINK(sink__V2687->context, term__V2688);
-      ADD_PROPERTIES(sink__V2687, LINK_NamedPropertyLink(sink__V2687->context, namedP__V2692), LINK_VariablePropertyLink(sink__V2687->context, varP__V2693));
+      ADD_PROPERTIES(sink__V2687, LINK_VARIABLESET(sink__V2687->context, namedFV__V2694), LINK_VARIABLESET(sink__V2687->context, varFV__V2695), LINK_NamedPropertyLink(sink__V2687->context, namedP__V2692), LINK_VariablePropertyLink(sink__V2687->context, varP__V2693));
       { START(sink__V2687, _M_F_Pattern_Open_s1);
         END(sink__V2687, _M_F_Pattern_Open_s1); }
       UNLINK_VARIABLESET(sink__V2687->context, namedFV__V2694); UNLINK_VARIABLESET(sink__V2687->context, varFV__V2695);
@@ -8534,7 +8534,7 @@ int step_M_F_Pattern_Open(Sink sink__V2687, Term term__V2688)
       Hashset namedFV__V2699 = LINK_VARIABLESET(sink__V2687->context, namedPropertyFreeVars(namedP__V2697));
       Hashset varFV__V2700 = LINK_VARIABLESET(sink__V2687->context, variablePropertyFreeVars(varP__V2698));
       UNLINK(sink__V2687->context, term__V2688);
-      ADD_PROPERTIES(sink__V2687, LINK_NamedPropertyLink(sink__V2687->context, namedP__V2697), LINK_VariablePropertyLink(sink__V2687->context, varP__V2698));
+      ADD_PROPERTIES(sink__V2687, LINK_VARIABLESET(sink__V2687->context, namedFV__V2699), LINK_VARIABLESET(sink__V2687->context, varFV__V2700), LINK_NamedPropertyLink(sink__V2687->context, namedP__V2697), LINK_VariablePropertyLink(sink__V2687->context, varP__V2698));
       { START(sink__V2687, _M_F_Pattern_Open_s2);
         END(sink__V2687, _M_F_Pattern_Open_s2); }
       UNLINK_VARIABLESET(sink__V2687->context, namedFV__V2699); UNLINK_VARIABLESET(sink__V2687->context, varFV__V2700);
@@ -8581,7 +8581,7 @@ int step_M_F__then_Pattern_Property_s2(Sink sink__V2701, Term term__V2702)
         Hashset namedFV__V2714 = LINK_VARIABLESET(sink__V2701->context, namedPropertyFreeVars(namedP__V2712));
         Hashset varFV__V2715 = LINK_VARIABLESET(sink__V2701->context, variablePropertyFreeVars(varP__V2713));
         UNLINK(sink__V2701->context, term__V2702);
-        ADD_PROPERTIES(sink__V2701, LINK_NamedPropertyLink(sink__V2701->context, namedP__V2712), LINK_VariablePropertyLink(sink__V2701->context, varP__V2713));
+        ADD_PROPERTIES(sink__V2701, LINK_VARIABLESET(sink__V2701->context, namedFV__V2714), LINK_VARIABLESET(sink__V2701->context, varFV__V2715), LINK_NamedPropertyLink(sink__V2701->context, namedP__V2712), LINK_VariablePropertyLink(sink__V2701->context, varP__V2713));
         { START(sink__V2701, _M_F__then_Pattern_Property_s4);
           COPY(sink__V2701, sub__V2707);COPY(sink__V2701, sub__V2706);USE(sink__V2701, z__V277); COPY(sink__V2701, sub__V2708);COPY(sink__V2701, sub__V2709);{ if (!IS_BOUND(x__V2710)) { REBIND(x__V2710);
               Variable binds__V2716[1] = {x__V2710}; BINDS(sink__V2701, 1, binds__V2716);
@@ -8644,7 +8644,7 @@ int step_M_F__then_Pattern_Property_s4(Sink sink__V2724, Term term__V2725)
         Hashset namedFV__V2737 = LINK_VARIABLESET(sink__V2724->context, namedPropertyFreeVars(namedP__V2735));
         Hashset varFV__V2738 = LINK_VARIABLESET(sink__V2724->context, variablePropertyFreeVars(varP__V2736));
         UNLINK(sink__V2724->context, term__V2725);
-        ADD_PROPERTIES(sink__V2724, LINK_NamedPropertyLink(sink__V2724->context, namedP__V2735), LINK_VariablePropertyLink(sink__V2724->context, varP__V2736));
+        ADD_PROPERTIES(sink__V2724, LINK_VARIABLESET(sink__V2724->context, namedFV__V2737), LINK_VARIABLESET(sink__V2724->context, varFV__V2738), LINK_NamedPropertyLink(sink__V2724->context, namedP__V2735), LINK_VariablePropertyLink(sink__V2724->context, varP__V2736));
         { START(sink__V2724, _M_F__then_Pattern_Property_s5);
           USE(sink__V2724, z__V277); COPY(sink__V2724, sub__V2729);COPY(sink__V2724, sub__V2730);COPY(sink__V2724, sub__V2731);COPY(sink__V2724, sub__V2732);{ if (!IS_BOUND(x__V2733)) { REBIND(x__V2733);
               Variable binds__V2739[1] = {x__V2733}; BINDS(sink__V2724, 1, binds__V2739);
@@ -8708,7 +8708,7 @@ int step_M_F__then_Pattern_Property_s5(Sink sink__V2747, Term term__V2748)
     { START(sink__V2747, _M__sTextCons);
       { START(sink__V2747, _M__sTextEmbed);
         { START(sink__V2747, _M_AsText);
-          ADD_PROPERTIES(sink__V2747, LINK_NamedPropertyLink(sink__V2747->context, namedP__V2757), LINK_VariablePropertyLink(sink__V2747->context, varP__V2758));
+          ADD_PROPERTIES(sink__V2747, LINK_VARIABLESET(sink__V2747->context, namedFV__V2759), LINK_VARIABLESET(sink__V2747->context, varFV__V2760), LINK_NamedPropertyLink(sink__V2747->context, namedP__V2757), LINK_VariablePropertyLink(sink__V2747->context, varP__V2758));
           { START(sink__V2747, _M_F__set__value);
             COPY(sink__V2747, sub__V2753);COPY(sink__V2747, LINK(sink__V2747->context, sub__V2752));COPY(sink__V2747, sub__V2750);USE(sink__V2747, y__V2749); END(sink__V2747, _M_F__set__value); }
           END(sink__V2747, _M_AsText); }
@@ -8745,7 +8745,7 @@ int step_M_F__then_Pattern_Property_s5(Sink sink__V2747, Term term__V2748)
               { START(sink__V2747, _M__sTextCons);
                 { START(sink__V2747, _M__sTextEmbed);
                   { START(sink__V2747, _M_AsText);
-                    ADD_PROPERTIES(sink__V2747, LINK_NamedPropertyLink(sink__V2747->context, namedP__V2757), LINK_VariablePropertyLink(sink__V2747->context, varP__V2758));
+                    ADD_PROPERTIES(sink__V2747, LINK_VARIABLESET(sink__V2747->context, namedFV__V2759), LINK_VARIABLESET(sink__V2747->context, varFV__V2760), LINK_NamedPropertyLink(sink__V2747->context, namedP__V2757), LINK_VariablePropertyLink(sink__V2747->context, varP__V2758));
                     { START(sink__V2747, _M_F__unlink__refs_s1);
                       { Term term__V2765;
                         { Term key__V2766;
@@ -8789,7 +8789,7 @@ int step_M_F__then_Pattern_Property_s5(Sink sink__V2747, Term term__V2748)
                               { START(sink__V2747, _M__sTextCons);
                                 { START(sink__V2747, _M__sTextEmbed);
                                   { START(sink__V2747, _M_AsText);
-                                    ADD_PROPERTIES(sink__V2747, LINK_NamedPropertyLink(sink__V2747->context, namedP__V2757), LINK_VariablePropertyLink(sink__V2747->context, varP__V2758));
+                                    ADD_PROPERTIES(sink__V2747, LINK_VARIABLESET(sink__V2747->context, namedFV__V2759), LINK_VARIABLESET(sink__V2747->context, varFV__V2760), LINK_NamedPropertyLink(sink__V2747->context, namedP__V2757), LINK_VariablePropertyLink(sink__V2747->context, varP__V2758));
                                     { START(sink__V2747, _M_F_Pattern_s1);
                                       COPY(sink__V2747, sub__V2754);{ START(sink__V2747, _M_SUBMATCH);
                                         END(sink__V2747, _M_SUBMATCH); }
@@ -8870,7 +8870,7 @@ int step_M_F__then_Fresh(Sink sink__V2777, Term term__V2778)
       Hashset namedFV__V2788 = LINK_VARIABLESET(sink__V2777->context, namedPropertyFreeVars(namedP__V2786));
       Hashset varFV__V2789 = LINK_VARIABLESET(sink__V2777->context, variablePropertyFreeVars(varP__V2787));
       UNLINK(sink__V2777->context, term__V2778);
-      ADD_PROPERTIES(sink__V2777, LINK_NamedPropertyLink(sink__V2777->context, namedP__V2786), LINK_VariablePropertyLink(sink__V2777->context, varP__V2787));
+      ADD_PROPERTIES(sink__V2777, LINK_VARIABLESET(sink__V2777->context, namedFV__V2788), LINK_VARIABLESET(sink__V2777->context, varFV__V2789), LINK_NamedPropertyLink(sink__V2777->context, namedP__V2786), LINK_VariablePropertyLink(sink__V2777->context, varP__V2787));
       { START(sink__V2777, _M_F__then_Fresh_s1);
         COPY(sink__V2777, sub__V2782);COPY(sink__V2777, sub__V2783);{ if (!IS_BOUND(x__V2784)) { REBIND(x__V2784);
             Variable binds__V2790[1] = {x__V2784}; BINDS(sink__V2777, 1, binds__V2790);
@@ -8925,7 +8925,7 @@ int step_M_F_Fresh2_s2(Sink sink__V2798, Term term__V2799)
       Hashset namedFV__V2808 = LINK_VARIABLESET(sink__V2798->context, namedPropertyFreeVars(namedP__V2806));
       Hashset varFV__V2809 = LINK_VARIABLESET(sink__V2798->context, variablePropertyFreeVars(varP__V2807));
       UNLINK(sink__V2798->context, term__V2799);
-      ADD_PROPERTIES(sink__V2798, LINK_NamedPropertyLink(sink__V2798->context, namedP__V2806), LINK_VariablePropertyLink(sink__V2798->context, varP__V2807));
+      ADD_PROPERTIES(sink__V2798, LINK_VARIABLESET(sink__V2798->context, namedFV__V2808), LINK_VARIABLESET(sink__V2798->context, varFV__V2809), LINK_NamedPropertyLink(sink__V2798->context, namedP__V2806), LINK_VariablePropertyLink(sink__V2798->context, varP__V2807));
       { START(sink__V2798, _M_F_Fresh2_s3);
         COPY(sink__V2798, sub__V2803);COPY(sink__V2798, sub__V2804);COPY(sink__V2798, sub__V2805);END(sink__V2798, _M_F_Fresh2_s3); }
       UNLINK_VARIABLESET(sink__V2798->context, namedFV__V2808); UNLINK_VARIABLESET(sink__V2798->context, varFV__V2809);
@@ -8946,7 +8946,7 @@ int step_M_F_Fresh2_s2(Sink sink__V2798, Term term__V2799)
       Hashset namedFV__V2815 = LINK_VARIABLESET(sink__V2798->context, namedPropertyFreeVars(namedP__V2813));
       Hashset varFV__V2816 = LINK_VARIABLESET(sink__V2798->context, variablePropertyFreeVars(varP__V2814));
       UNLINK(sink__V2798->context, term__V2799);
-      ADD_PROPERTIES(sink__V2798, LINK_NamedPropertyLink(sink__V2798->context, namedP__V2813), LINK_VariablePropertyLink(sink__V2798->context, varP__V2814));
+      ADD_PROPERTIES(sink__V2798, LINK_VARIABLESET(sink__V2798->context, namedFV__V2815), LINK_VARIABLESET(sink__V2798->context, varFV__V2816), LINK_NamedPropertyLink(sink__V2798->context, namedP__V2813), LINK_VariablePropertyLink(sink__V2798->context, varP__V2814));
       { START(sink__V2798, _M_F_Fresh2_s4);
         COPY(sink__V2798, sub__V2811);COPY(sink__V2798, sub__V2812);END(sink__V2798, _M_F_Fresh2_s4); }
       UNLINK_VARIABLESET(sink__V2798->context, namedFV__V2815); UNLINK_VARIABLESET(sink__V2798->context, varFV__V2816);
@@ -9017,7 +9017,7 @@ int step_M_F_Fresh2_s4(Sink sink__V2826, Term term__V2827)
         Hashset namedFV__V2834 = LINK_VARIABLESET(sink__V2826->context, namedPropertyFreeVars(namedP__V2832));
         Hashset varFV__V2835 = LINK_VARIABLESET(sink__V2826->context, variablePropertyFreeVars(varP__V2833));
         UNLINK(sink__V2826->context, term__V2827);
-        ADD_PROPERTIES(sink__V2826, LINK_NamedPropertyLink(sink__V2826->context, namedP__V2832), LINK_VariablePropertyLink(sink__V2826->context, varP__V2833));
+        ADD_PROPERTIES(sink__V2826, LINK_VARIABLESET(sink__V2826->context, namedFV__V2834), LINK_VARIABLESET(sink__V2826->context, varFV__V2835), LINK_NamedPropertyLink(sink__V2826->context, namedP__V2832), LINK_VariablePropertyLink(sink__V2826->context, varP__V2833));
         { START(sink__V2826, _M_F_Fresh2_s5);
           USE(sink__V2826, z__V277); COPY(sink__V2826, sub__V2831);END(sink__V2826, _M_F_Fresh2_s5); }
         UNLINK_VARIABLESET(sink__V2826->context, namedFV__V2834); UNLINK_VARIABLESET(sink__V2826->context, varFV__V2835);
@@ -9159,7 +9159,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s10(Sink sink__V2849, Term term__V2850)
       Hashset namedFV__V2866 = LINK_VARIABLESET(sink__V2849->context, namedPropertyFreeVars(namedP__V2864));
       Hashset varFV__V2867 = LINK_VARIABLESET(sink__V2849->context, variablePropertyFreeVars(varP__V2865));
       UNLINK(sink__V2849->context, term__V2850);
-      ADD_PROPERTIES(sink__V2849, LINK_NamedPropertyLink(sink__V2849->context, namedP__V2864), LINK_VariablePropertyLink(sink__V2849->context, varP__V2865));
+      ADD_PROPERTIES(sink__V2849, LINK_VARIABLESET(sink__V2849->context, namedFV__V2866), LINK_VARIABLESET(sink__V2849->context, varFV__V2867), LINK_NamedPropertyLink(sink__V2849->context, namedP__V2864), LINK_VariablePropertyLink(sink__V2849->context, varP__V2865));
       { START(sink__V2849, _M_F_Pattern_MetaArgs_Norm_s11);
         COPY(sink__V2849, sub__V2854);COPY(sink__V2849, sub__V2855);COPY(sink__V2849, sub__V2856);COPY(sink__V2849, sub__V2857);COPY(sink__V2849, sub__V2858);COPY(sink__V2849, sub__V2859);COPY(sink__V2849, sub__V2860);{ if (!IS_BOUND(x__V2861)) { REBIND(x__V2861);
             Variable binds__V2868[1] = {x__V2861}; BINDS(sink__V2849, 1, binds__V2868);
@@ -9227,7 +9227,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s11(Sink sink__V2876, Term term__V2877)
         Hashset namedFV__V2892 = LINK_VARIABLESET(sink__V2876->context, namedPropertyFreeVars(namedP__V2890));
         Hashset varFV__V2893 = LINK_VARIABLESET(sink__V2876->context, variablePropertyFreeVars(varP__V2891));
         UNLINK(sink__V2876->context, term__V2877);
-        ADD_PROPERTIES(sink__V2876, LINK_NamedPropertyLink(sink__V2876->context, namedP__V2890), LINK_VariablePropertyLink(sink__V2876->context, varP__V2891));
+        ADD_PROPERTIES(sink__V2876, LINK_VARIABLESET(sink__V2876->context, namedFV__V2892), LINK_VARIABLESET(sink__V2876->context, varFV__V2893), LINK_NamedPropertyLink(sink__V2876->context, namedP__V2890), LINK_VariablePropertyLink(sink__V2876->context, varP__V2891));
         { START(sink__V2876, _M_F_Pattern_MetaArgs_Norm_s13);
           COPY(sink__V2876, sub__V2882);COPY(sink__V2876, sub__V2881);USE(sink__V2876, z__V277); COPY(sink__V2876, sub__V2883);COPY(sink__V2876, sub__V2884);COPY(sink__V2876, sub__V2885);COPY(sink__V2876, sub__V2886);{ if (!IS_BOUND(x__V2887)) { REBIND(x__V2887);
               Variable binds__V2894[1] = {x__V2887}; BINDS(sink__V2876, 1, binds__V2894);
@@ -9294,7 +9294,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s13(Sink sink__V2902, Term term__V2903)
       Hashset namedFV__V2918 = LINK_VARIABLESET(sink__V2902->context, namedPropertyFreeVars(namedP__V2916));
       Hashset varFV__V2919 = LINK_VARIABLESET(sink__V2902->context, variablePropertyFreeVars(varP__V2917));
       UNLINK(sink__V2902->context, term__V2903);
-      ADD_PROPERTIES(sink__V2902, LINK_NamedPropertyLink(sink__V2902->context, namedP__V2916), LINK_VariablePropertyLink(sink__V2902->context, varP__V2917));
+      ADD_PROPERTIES(sink__V2902, LINK_VARIABLESET(sink__V2902->context, namedFV__V2918), LINK_VARIABLESET(sink__V2902->context, varFV__V2919), LINK_NamedPropertyLink(sink__V2902->context, namedP__V2916), LINK_VariablePropertyLink(sink__V2902->context, varP__V2917));
       { START(sink__V2902, _M_F_Pattern_MetaArgs_Norm_s14);
         COPY(sink__V2902, sub__V2907);COPY(sink__V2902, sub__V2908);COPY(sink__V2902, sub__V2909);COPY(sink__V2902, sub__V2910);COPY(sink__V2902, sub__V2911);COPY(sink__V2902, sub__V2912);{ if (!IS_BOUND(x__V2913)) { REBIND(x__V2913);
             Variable binds__V2920[1] = {x__V2913}; BINDS(sink__V2902, 1, binds__V2920);
@@ -9451,7 +9451,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s14(Sink sink__V2928, Term term__V2929)
                                               { START(sink__V2928, _M__sTextCons);
                                                 { START(sink__V2928, _M__sTextEmbed);
                                                   { START(sink__V2928, _M_AsText);
-                                                    ADD_PROPERTIES(sink__V2928, LINK_NamedPropertyLink(sink__V2928->context, namedP__V2939), LINK_VariablePropertyLink(sink__V2928->context, varP__V2940));
+                                                    ADD_PROPERTIES(sink__V2928, LINK_VARIABLESET(sink__V2928->context, namedFV__V2941), LINK_VARIABLESET(sink__V2928->context, varFV__V2942), LINK_NamedPropertyLink(sink__V2928->context, namedP__V2939), LINK_VariablePropertyLink(sink__V2928->context, varP__V2940));
                                                     { START(sink__V2928, _M_F_Pattern_MetaArgs_Copy_s1);
                                                       COPY(sink__V2928, sub__V2933);COPY(sink__V2928, sub__V2932);COPY(sink__V2928, sub__V2935);COPY(sink__V2928, sub__V2938);{ if (!IS_BOUND(x__V2936)) { REBIND(x__V2936);
                                                           Variable binds__V2943[1] = {x__V2936}; BINDS(sink__V2928, 1, binds__V2943);
@@ -9531,7 +9531,7 @@ int step_M_F_Declaration(Sink sink__V2951, Term term__V2952)
       Hashset namedFV__V2961 = LINK_VARIABLESET(sink__V2951->context, namedPropertyFreeVars(namedP__V2959));
       Hashset varFV__V2962 = LINK_VARIABLESET(sink__V2951->context, variablePropertyFreeVars(varP__V2960));
       UNLINK(sink__V2951->context, term__V2952);
-      ADD_PROPERTIES(sink__V2951, LINK_NamedPropertyLink(sink__V2951->context, namedP__V2959), LINK_VariablePropertyLink(sink__V2951->context, varP__V2960));
+      ADD_PROPERTIES(sink__V2951, LINK_VARIABLESET(sink__V2951->context, namedFV__V2961), LINK_VARIABLESET(sink__V2951->context, varFV__V2962), LINK_NamedPropertyLink(sink__V2951->context, namedP__V2959), LINK_VariablePropertyLink(sink__V2951->context, varP__V2960));
       { START(sink__V2951, _M_F_Declaration_s1);
         COPY(sink__V2951, sub__V2956);COPY(sink__V2951, sub__V2957);COPY(sink__V2951, sub__V2958);END(sink__V2951, _M_F_Declaration_s1); }
       UNLINK_VARIABLESET(sink__V2951->context, namedFV__V2961); UNLINK_VARIABLESET(sink__V2951->context, varFV__V2962);
@@ -9564,7 +9564,7 @@ int step_M_F_Declaration(Sink sink__V2951, Term term__V2952)
       Hashset namedFV__V2974 = LINK_VARIABLESET(sink__V2951->context, namedPropertyFreeVars(namedP__V2972));
       Hashset varFV__V2975 = LINK_VARIABLESET(sink__V2951->context, variablePropertyFreeVars(varP__V2973));
       UNLINK(sink__V2951->context, term__V2952);
-      ADD_PROPERTIES(sink__V2951, LINK_NamedPropertyLink(sink__V2951->context, namedP__V2972), LINK_VariablePropertyLink(sink__V2951->context, varP__V2973));
+      ADD_PROPERTIES(sink__V2951, LINK_VARIABLESET(sink__V2951->context, namedFV__V2974), LINK_VARIABLESET(sink__V2951->context, varFV__V2975), LINK_NamedPropertyLink(sink__V2951->context, namedP__V2972), LINK_VariablePropertyLink(sink__V2951->context, varP__V2973));
       { START(sink__V2951, _M_F_Declaration_s2);
         COPY(sink__V2951, sub__V2964);COPY(sink__V2951, sub__V2965);COPY(sink__V2951, sub__V2966);COPY(sink__V2951, sub__V2967);COPY(sink__V2951, sub__V2968);COPY(sink__V2951, sub__V2969);COPY(sink__V2951, sub__V2970);COPY(sink__V2951, sub__V2971);END(sink__V2951, _M_F_Declaration_s2); }
       UNLINK_VARIABLESET(sink__V2951->context, namedFV__V2974); UNLINK_VARIABLESET(sink__V2951->context, varFV__V2975);
@@ -9586,7 +9586,7 @@ int step_M_F_Declaration(Sink sink__V2951, Term term__V2952)
       Hashset namedFV__V2982 = LINK_VARIABLESET(sink__V2951->context, namedPropertyFreeVars(namedP__V2980));
       Hashset varFV__V2983 = LINK_VARIABLESET(sink__V2951->context, variablePropertyFreeVars(varP__V2981));
       UNLINK(sink__V2951->context, term__V2952);
-      ADD_PROPERTIES(sink__V2951, LINK_NamedPropertyLink(sink__V2951->context, namedP__V2980), LINK_VariablePropertyLink(sink__V2951->context, varP__V2981));
+      ADD_PROPERTIES(sink__V2951, LINK_VARIABLESET(sink__V2951->context, namedFV__V2982), LINK_VARIABLESET(sink__V2951->context, varFV__V2983), LINK_NamedPropertyLink(sink__V2951->context, namedP__V2980), LINK_VariablePropertyLink(sink__V2951->context, varP__V2981));
       { START(sink__V2951, _M_F_Declaration_s3);
         { if (!IS_BOUND(y__V2977)) { REBIND(y__V2977);
             Variable binds__V2984[1] = {y__V2977}; BINDS(sink__V2951, 1, binds__V2984);
@@ -9654,7 +9654,7 @@ int step_M_F_Pattern_MetaArgs__variable_s1(Sink sink__V2992, Term term__V2993)
         Hashset namedFV__V3008 = LINK_VARIABLESET(sink__V2992->context, namedPropertyFreeVars(namedP__V3006));
         Hashset varFV__V3009 = LINK_VARIABLESET(sink__V2992->context, variablePropertyFreeVars(varP__V3007));
         UNLINK(sink__V2992->context, term__V2993);
-        ADD_PROPERTIES(sink__V2992, LINK_NamedPropertyLink(sink__V2992->context, namedP__V3006), LINK_VariablePropertyLink(sink__V2992->context, varP__V3007));
+        ADD_PROPERTIES(sink__V2992, LINK_VARIABLESET(sink__V2992->context, namedFV__V3008), LINK_VARIABLESET(sink__V2992->context, varFV__V3009), LINK_NamedPropertyLink(sink__V2992->context, namedP__V3006), LINK_VariablePropertyLink(sink__V2992->context, varP__V3007));
         { START(sink__V2992, _M_F_Pattern_MetaArgs__variable_s3);
           COPY(sink__V2992, sub__V3002);COPY(sink__V2992, sub__V2997);COPY(sink__V2992, sub__V2998);COPY(sink__V2992, sub__V2999);COPY(sink__V2992, sub__V3000);COPY(sink__V2992, sub__V3001);USE(sink__V2992, z__V277); COPY(sink__V2992, sub__V3003);{ if (!IS_BOUND(x__V3004)) { REBIND(x__V3004);
               Variable binds__V3010[1] = {x__V3004}; BINDS(sink__V2992, 1, binds__V3010);
@@ -9723,7 +9723,7 @@ int step_M_F_Pattern_MetaArgs__variable_s3(Sink sink__V3018, Term term__V3019)
         Hashset namedFV__V3034 = LINK_VARIABLESET(sink__V3018->context, namedPropertyFreeVars(namedP__V3032));
         Hashset varFV__V3035 = LINK_VARIABLESET(sink__V3018->context, variablePropertyFreeVars(varP__V3033));
         UNLINK(sink__V3018->context, term__V3019);
-        ADD_PROPERTIES(sink__V3018, LINK_NamedPropertyLink(sink__V3018->context, namedP__V3032), LINK_VariablePropertyLink(sink__V3018->context, varP__V3033));
+        ADD_PROPERTIES(sink__V3018, LINK_VARIABLESET(sink__V3018->context, namedFV__V3034), LINK_VARIABLESET(sink__V3018->context, varFV__V3035), LINK_NamedPropertyLink(sink__V3018->context, namedP__V3032), LINK_VariablePropertyLink(sink__V3018->context, varP__V3033));
         { START(sink__V3018, _M_F_Pattern_MetaArgs__variable_s5);
           COPY(sink__V3018, sub__V3029);COPY(sink__V3018, sub__V3023);COPY(sink__V3018, sub__V3024);COPY(sink__V3018, sub__V3025);COPY(sink__V3018, sub__V3026);COPY(sink__V3018, sub__V3027);COPY(sink__V3018, sub__V3028);USE(sink__V3018, z__V277); { if (!IS_BOUND(x__V3030)) { REBIND(x__V3030);
               Variable binds__V3036[1] = {x__V3030}; BINDS(sink__V3018, 1, binds__V3036);
@@ -9792,7 +9792,7 @@ int step_M_F_Pattern_MetaArgs__variable_s5(Sink sink__V3044, Term term__V3045)
         Hashset namedFV__V3060 = LINK_VARIABLESET(sink__V3044->context, namedPropertyFreeVars(namedP__V3058));
         Hashset varFV__V3061 = LINK_VARIABLESET(sink__V3044->context, variablePropertyFreeVars(varP__V3059));
         UNLINK(sink__V3044->context, term__V3045);
-        ADD_PROPERTIES(sink__V3044, LINK_NamedPropertyLink(sink__V3044->context, namedP__V3058), LINK_VariablePropertyLink(sink__V3044->context, varP__V3059));
+        ADD_PROPERTIES(sink__V3044, LINK_VARIABLESET(sink__V3044->context, namedFV__V3060), LINK_VARIABLESET(sink__V3044->context, varFV__V3061), LINK_NamedPropertyLink(sink__V3044->context, namedP__V3058), LINK_VariablePropertyLink(sink__V3044->context, varP__V3059));
         { START(sink__V3044, _M_F_Pattern_MetaArgs__variable_s6);
           USE(sink__V3044, z__V277); COPY(sink__V3044, sub__V3049);COPY(sink__V3044, sub__V3050);COPY(sink__V3044, sub__V3051);COPY(sink__V3044, sub__V3052);COPY(sink__V3044, sub__V3053);COPY(sink__V3044, sub__V3054);COPY(sink__V3044, sub__V3055);{ if (!IS_BOUND(x__V3056)) { REBIND(x__V3056);
               Variable binds__V3062[1] = {x__V3056}; BINDS(sink__V3044, 1, binds__V3062);
@@ -9859,7 +9859,7 @@ int step_M_F_Pattern_MetaArgs__variable_s6(Sink sink__V3070, Term term__V3071)
     Hashset namedFV__V3084 = LINK_VARIABLESET(sink__V3070->context, namedPropertyFreeVars(namedP__V3082));
     Hashset varFV__V3085 = LINK_VARIABLESET(sink__V3070->context, variablePropertyFreeVars(varP__V3083));
     UNLINK(sink__V3070->context, term__V3071);
-    ADD_PROPERTIES(sink__V3070, LINK_NamedPropertyLink(sink__V3070->context, namedP__V3082), LINK_VariablePropertyLink(sink__V3070->context, varP__V3083));
+    ADD_PROPERTIES(sink__V3070, LINK_VARIABLESET(sink__V3070->context, namedFV__V3084), LINK_VARIABLESET(sink__V3070->context, varFV__V3085), LINK_NamedPropertyLink(sink__V3070->context, namedP__V3082), LINK_VariablePropertyLink(sink__V3070->context, varP__V3083));
     { Term key__V3086, value__V3087;
       key__V3086 = sub__V3074; { Sink buf__V3088 = ALLOCA_BUFFER(sink__V3070->context);
         { START(buf__V3088, _M_VARIABLE);
@@ -9926,7 +9926,7 @@ int step_M_F_Pattern_MetaArgs__arity(Sink sink__V3101, Term term__V3102)
     Hashset namedFV__V3109 = LINK_VARIABLESET(sink__V3101->context, namedPropertyFreeVars(namedP__V3107));
     Hashset varFV__V3110 = LINK_VARIABLESET(sink__V3101->context, variablePropertyFreeVars(varP__V3108));
     UNLINK(sink__V3101->context, term__V3102);
-    ADD_PROPERTIES(sink__V3101, LINK_NamedPropertyLink(sink__V3101->context, namedP__V3107), LINK_VariablePropertyLink(sink__V3101->context, varP__V3108));
+    ADD_PROPERTIES(sink__V3101, LINK_VARIABLESET(sink__V3101->context, namedFV__V3109), LINK_VARIABLESET(sink__V3101->context, varFV__V3110), LINK_NamedPropertyLink(sink__V3101->context, namedP__V3107), LINK_VariablePropertyLink(sink__V3101->context, varP__V3108));
     { Term key__V3111, value__V3112;
       key__V3111 = sub__V3103; { Sink buf__V3113 = ALLOCA_BUFFER(sink__V3101->context);
         { START(buf__V3113, _M_NUM_xVALUE);
@@ -9994,7 +9994,7 @@ int step_M_F_PatternBinder2_s2(Sink sink__V3119, Term term__V3120)
         Hashset namedFV__V3137 = LINK_VARIABLESET(sink__V3119->context, namedPropertyFreeVars(namedP__V3135));
         Hashset varFV__V3138 = LINK_VARIABLESET(sink__V3119->context, variablePropertyFreeVars(varP__V3136));
         UNLINK(sink__V3119->context, term__V3120);
-        ADD_PROPERTIES(sink__V3119, LINK_NamedPropertyLink(sink__V3119->context, namedP__V3135), LINK_VariablePropertyLink(sink__V3119->context, varP__V3136));
+        ADD_PROPERTIES(sink__V3119, LINK_VARIABLESET(sink__V3119->context, namedFV__V3137), LINK_VARIABLESET(sink__V3119->context, varFV__V3138), LINK_NamedPropertyLink(sink__V3119->context, namedP__V3135), LINK_VariablePropertyLink(sink__V3119->context, varP__V3136));
         { START(sink__V3119, _M_F_PatternBinder2_s3);
           USE(sink__V3119, z__V277); COPY(sink__V3119, sub__V3124);{ if (!IS_BOUND(x__V3125)) { REBIND(x__V3125);
               Variable binds__V3139[1] = {x__V3125}; BINDS(sink__V3119, 1, binds__V3139);
@@ -10078,7 +10078,7 @@ int step_M_F_PatternBinder2_s3(Sink sink__V3155, Term term__V3156)
     Hashset namedFV__V3172 = LINK_VARIABLESET(sink__V3155->context, namedPropertyFreeVars(namedP__V3170));
     Hashset varFV__V3173 = LINK_VARIABLESET(sink__V3155->context, variablePropertyFreeVars(varP__V3171));
     UNLINK(sink__V3155->context, term__V3156);
-    ADD_PROPERTIES(sink__V3155, LINK_NamedPropertyLink(sink__V3155->context, namedP__V3170), LINK_VariablePropertyLink(sink__V3155->context, varP__V3171));
+    ADD_PROPERTIES(sink__V3155, LINK_VARIABLESET(sink__V3155->context, namedFV__V3172), LINK_VARIABLESET(sink__V3155->context, varFV__V3173), LINK_NamedPropertyLink(sink__V3155->context, namedP__V3170), LINK_VariablePropertyLink(sink__V3155->context, varP__V3171));
     { Term value__V3174;
       { Sink buf__V3175 = ALLOCA_BUFFER(sink__V3155->context);
         { START(buf__V3175, _M_BOUND); END(buf__V3175, _M_BOUND); } value__V3174 = BUFFER_TERM(buf__V3175); FREE_BUFFER(buf__V3175); }
@@ -10239,7 +10239,7 @@ int step_M_F_PatternBinder2_s5(Sink sink__V3186, Term term__V3187)
         Hashset namedFV__V3205 = LINK_VARIABLESET(sink__V3186->context, namedPropertyFreeVars(namedP__V3203));
         Hashset varFV__V3206 = LINK_VARIABLESET(sink__V3186->context, variablePropertyFreeVars(varP__V3204));
         UNLINK(sink__V3186->context, term__V3187);
-        ADD_PROPERTIES(sink__V3186, LINK_NamedPropertyLink(sink__V3186->context, namedP__V3203), LINK_VariablePropertyLink(sink__V3186->context, varP__V3204));
+        ADD_PROPERTIES(sink__V3186, LINK_VARIABLESET(sink__V3186->context, namedFV__V3205), LINK_VARIABLESET(sink__V3186->context, varFV__V3206), LINK_NamedPropertyLink(sink__V3186->context, namedP__V3203), LINK_VariablePropertyLink(sink__V3186->context, varP__V3204));
         { START(sink__V3186, _M_F_PatternBinder2_s6);
           USE(sink__V3186, z__V277); COPY(sink__V3186, sub__V3191);COPY(sink__V3186, sub__V3192);{ if (!IS_BOUND(x__V3193)) { REBIND(x__V3193);
               Variable binds__V3207[1] = {x__V3193}; BINDS(sink__V3186, 1, binds__V3207);
@@ -10325,7 +10325,7 @@ int step_M_F_PatternBinder2_s6(Sink sink__V3223, Term term__V3224)
     Hashset namedFV__V3240 = LINK_VARIABLESET(sink__V3223->context, namedPropertyFreeVars(namedP__V3238));
     Hashset varFV__V3241 = LINK_VARIABLESET(sink__V3223->context, variablePropertyFreeVars(varP__V3239));
     UNLINK(sink__V3223->context, term__V3224);
-    ADD_PROPERTIES(sink__V3223, LINK_NamedPropertyLink(sink__V3223->context, namedP__V3238), LINK_VariablePropertyLink(sink__V3223->context, varP__V3239));
+    ADD_PROPERTIES(sink__V3223, LINK_VARIABLESET(sink__V3223->context, namedFV__V3240), LINK_VARIABLESET(sink__V3223->context, varFV__V3241), LINK_NamedPropertyLink(sink__V3223->context, namedP__V3238), LINK_VariablePropertyLink(sink__V3223->context, varP__V3239));
     { Term value__V3242;
       { Sink buf__V3243 = ALLOCA_BUFFER(sink__V3223->context);
         { START(buf__V3243, _M_BOUND); END(buf__V3243, _M_BOUND); } value__V3242 = BUFFER_TERM(buf__V3243); FREE_BUFFER(buf__V3243); }
@@ -10484,7 +10484,7 @@ int step_M_F_Dispatch__cases_s1(Sink sink__V3257, Term term__V3258)
       Hashset namedFV__V3271 = LINK_VARIABLESET(sink__V3257->context, namedPropertyFreeVars(namedP__V3269));
       Hashset varFV__V3272 = LINK_VARIABLESET(sink__V3257->context, variablePropertyFreeVars(varP__V3270));
       UNLINK(sink__V3257->context, term__V3258);
-      ADD_PROPERTIES(sink__V3257, LINK_NamedPropertyLink(sink__V3257->context, namedP__V3269), LINK_VariablePropertyLink(sink__V3257->context, varP__V3270));
+      ADD_PROPERTIES(sink__V3257, LINK_VARIABLESET(sink__V3257->context, namedFV__V3271), LINK_VARIABLESET(sink__V3257->context, varFV__V3272), LINK_NamedPropertyLink(sink__V3257->context, namedP__V3269), LINK_VariablePropertyLink(sink__V3257->context, varP__V3270));
       { START(sink__V3257, _M_F_Dispatch__cases_s2);
         COPY(sink__V3257, sub__V3262);COPY(sink__V3257, sub__V3263);COPY(sink__V3257, sub__V3264);COPY(sink__V3257, sub__V3265);COPY(sink__V3257, sub__V3266);COPY(sink__V3257, sub__V3267);COPY(sink__V3257, sub__V3268);END(sink__V3257, _M_F_Dispatch__cases_s2); }
       UNLINK_VARIABLESET(sink__V3257->context, namedFV__V3271); UNLINK_VARIABLESET(sink__V3257->context, varFV__V3272);
@@ -10511,7 +10511,7 @@ int step_M_F_Dispatch__cases_s1(Sink sink__V3257, Term term__V3258)
       Hashset namedFV__V3281 = LINK_VARIABLESET(sink__V3257->context, namedPropertyFreeVars(namedP__V3279));
       Hashset varFV__V3282 = LINK_VARIABLESET(sink__V3257->context, variablePropertyFreeVars(varP__V3280));
       UNLINK(sink__V3257->context, term__V3258);
-      ADD_PROPERTIES(sink__V3257, LINK_NamedPropertyLink(sink__V3257->context, namedP__V3279), LINK_VariablePropertyLink(sink__V3257->context, varP__V3280));
+      ADD_PROPERTIES(sink__V3257, LINK_VARIABLESET(sink__V3257->context, namedFV__V3281), LINK_VARIABLESET(sink__V3257->context, varFV__V3282), LINK_NamedPropertyLink(sink__V3257->context, namedP__V3279), LINK_VariablePropertyLink(sink__V3257->context, varP__V3280));
       { START(sink__V3257, _M_F_Dispatch__cases_s7);
         COPY(sink__V3257, sub__V3275);COPY(sink__V3257, sub__V3274);COPY(sink__V3257, sub__V3276);COPY(sink__V3257, sub__V3277);COPY(sink__V3257, sub__V3278);END(sink__V3257, _M_F_Dispatch__cases_s7); }
       UNLINK_VARIABLESET(sink__V3257->context, namedFV__V3281); UNLINK_VARIABLESET(sink__V3257->context, varFV__V3282);
@@ -10563,7 +10563,7 @@ int step_M_F_Dispatch__cases_s2(Sink sink__V3283, Term term__V3284)
     Hashset namedFV__V3298 = LINK_VARIABLESET(sink__V3283->context, namedPropertyFreeVars(namedP__V3296));
     Hashset varFV__V3299 = LINK_VARIABLESET(sink__V3283->context, variablePropertyFreeVars(varP__V3297));
     UNLINK(sink__V3283->context, term__V3284);
-    ADD_PROPERTIES(sink__V3283, LINK_NamedPropertyLink(sink__V3283->context, namedP__V3296), LINK_VariablePropertyLink(sink__V3283->context, varP__V3297));
+    ADD_PROPERTIES(sink__V3283, LINK_VARIABLESET(sink__V3283->context, namedFV__V3298), LINK_VARIABLESET(sink__V3283->context, varFV__V3299), LINK_NamedPropertyLink(sink__V3283->context, namedP__V3296), LINK_VariablePropertyLink(sink__V3283->context, varP__V3297));
     { START(sink__V3283, _M_F_Dispatch__cases_s4);
       COPY(sink__V3283, sub__V3294);COPY(sink__V3283, sub__V3287);COPY(sink__V3283, sub__V3288);COPY(sink__V3283, sub__V3289);COPY(sink__V3283, sub__V3290);COPY(sink__V3283, sub__V3291);COPY(sink__V3283, sub__V3292);COPY(sink__V3283, sub__V3293);COPY(sink__V3283, sub__V3286);COPY(sink__V3283, sub__V3295);END(sink__V3283, _M_F_Dispatch__cases_s4); }
     UNLINK_VARIABLESET(sink__V3283->context, namedFV__V3298); UNLINK_VARIABLESET(sink__V3283->context, varFV__V3299);
@@ -10600,7 +10600,7 @@ int step_M_F__unlink_s1(Sink sink__V3300, Term term__V3301)
       Hashset namedFV__V3309 = LINK_VARIABLESET(sink__V3300->context, namedPropertyFreeVars(namedP__V3307));
       Hashset varFV__V3310 = LINK_VARIABLESET(sink__V3300->context, variablePropertyFreeVars(varP__V3308));
       UNLINK(sink__V3300->context, term__V3301);
-      ADD_PROPERTIES(sink__V3300, LINK_NamedPropertyLink(sink__V3300->context, namedP__V3307), LINK_VariablePropertyLink(sink__V3300->context, varP__V3308));
+      ADD_PROPERTIES(sink__V3300, LINK_VARIABLESET(sink__V3300->context, namedFV__V3309), LINK_VARIABLESET(sink__V3300->context, varFV__V3310), LINK_NamedPropertyLink(sink__V3300->context, namedP__V3307), LINK_VariablePropertyLink(sink__V3300->context, varP__V3308));
       { START(sink__V3300, _M_F__unlink_s2);
         COPY(sink__V3300, sub__V3305);COPY(sink__V3300, sub__V3306);END(sink__V3300, _M_F__unlink_s2); }
       UNLINK_VARIABLESET(sink__V3300->context, namedFV__V3309); UNLINK_VARIABLESET(sink__V3300->context, varFV__V3310);
@@ -10654,7 +10654,7 @@ int step_M_F_Dispatch__cases_s4(Sink sink__V3311, Term term__V3312)
         Hashset namedFV__V3327 = LINK_VARIABLESET(sink__V3311->context, namedPropertyFreeVars(namedP__V3325));
         Hashset varFV__V3328 = LINK_VARIABLESET(sink__V3311->context, variablePropertyFreeVars(varP__V3326));
         UNLINK(sink__V3311->context, term__V3312);
-        ADD_PROPERTIES(sink__V3311, LINK_NamedPropertyLink(sink__V3311->context, namedP__V3325), LINK_VariablePropertyLink(sink__V3311->context, varP__V3326));
+        ADD_PROPERTIES(sink__V3311, LINK_VARIABLESET(sink__V3311->context, namedFV__V3327), LINK_VARIABLESET(sink__V3311->context, varFV__V3328), LINK_NamedPropertyLink(sink__V3311->context, namedP__V3325), LINK_VariablePropertyLink(sink__V3311->context, varP__V3326));
         { START(sink__V3311, _M_F_Dispatch__cases_s5);
           USE(sink__V3311, z__V277); COPY(sink__V3311, sub__V3316);COPY(sink__V3311, sub__V3317);COPY(sink__V3311, sub__V3318);COPY(sink__V3311, sub__V3319);COPY(sink__V3311, sub__V3320);COPY(sink__V3311, sub__V3321);COPY(sink__V3311, sub__V3322);COPY(sink__V3311, sub__V3323);COPY(sink__V3311, sub__V3324);END(sink__V3311, _M_F_Dispatch__cases_s5); }
         UNLINK_VARIABLESET(sink__V3311->context, namedFV__V3327); UNLINK_VARIABLESET(sink__V3311->context, varFV__V3328);
@@ -10832,7 +10832,7 @@ int step_M_F_Dispatch__cases_s7(Sink sink__V3361, Term term__V3362)
       Hashset namedFV__V3372 = LINK_VARIABLESET(sink__V3361->context, namedPropertyFreeVars(namedP__V3370));
       Hashset varFV__V3373 = LINK_VARIABLESET(sink__V3361->context, variablePropertyFreeVars(varP__V3371));
       UNLINK(sink__V3361->context, term__V3362);
-      ADD_PROPERTIES(sink__V3361, LINK_NamedPropertyLink(sink__V3361->context, namedP__V3370), LINK_VariablePropertyLink(sink__V3361->context, varP__V3371));
+      ADD_PROPERTIES(sink__V3361, LINK_VARIABLESET(sink__V3361->context, namedFV__V3372), LINK_VARIABLESET(sink__V3361->context, varFV__V3373), LINK_NamedPropertyLink(sink__V3361->context, namedP__V3370), LINK_VariablePropertyLink(sink__V3361->context, varP__V3371));
       { START(sink__V3361, _M_F_Dispatch__cases_s8);
         COPY(sink__V3361, sub__V3366);COPY(sink__V3361, sub__V3367);COPY(sink__V3361, sub__V3368);COPY(sink__V3361, sub__V3369);END(sink__V3361, _M_F_Dispatch__cases_s8); }
       UNLINK_VARIABLESET(sink__V3361->context, namedFV__V3372); UNLINK_VARIABLESET(sink__V3361->context, varFV__V3373);
@@ -10857,7 +10857,7 @@ int step_M_F_Dispatch__cases_s7(Sink sink__V3361, Term term__V3362)
       Hashset namedFV__V3381 = LINK_VARIABLESET(sink__V3361->context, namedPropertyFreeVars(namedP__V3379));
       Hashset varFV__V3382 = LINK_VARIABLESET(sink__V3361->context, variablePropertyFreeVars(varP__V3380));
       UNLINK(sink__V3361->context, term__V3362);
-      ADD_PROPERTIES(sink__V3361, LINK_NamedPropertyLink(sink__V3361->context, namedP__V3379), LINK_VariablePropertyLink(sink__V3361->context, varP__V3380));
+      ADD_PROPERTIES(sink__V3361, LINK_VARIABLESET(sink__V3361->context, namedFV__V3381), LINK_VARIABLESET(sink__V3361->context, varFV__V3382), LINK_NamedPropertyLink(sink__V3361->context, namedP__V3379), LINK_VariablePropertyLink(sink__V3361->context, varP__V3380));
       { START(sink__V3361, _M_F_Dispatch__cases_s9);
         COPY(sink__V3361, sub__V3375);COPY(sink__V3361, sub__V3376);COPY(sink__V3361, sub__V3377);COPY(sink__V3361, sub__V3378);END(sink__V3361, _M_F_Dispatch__cases_s9); }
       UNLINK_VARIABLESET(sink__V3361->context, namedFV__V3381); UNLINK_VARIABLESET(sink__V3361->context, varFV__V3382);
@@ -10976,7 +10976,7 @@ int step_M_F__then_Pattern_Ref(Sink sink__V3403, Term term__V3404)
       Hashset namedFV__V3415 = LINK_VARIABLESET(sink__V3403->context, namedPropertyFreeVars(namedP__V3413));
       Hashset varFV__V3416 = LINK_VARIABLESET(sink__V3403->context, variablePropertyFreeVars(varP__V3414));
       UNLINK(sink__V3403->context, term__V3404);
-      ADD_PROPERTIES(sink__V3403, LINK_NamedPropertyLink(sink__V3403->context, namedP__V3413), LINK_VariablePropertyLink(sink__V3403->context, varP__V3414));
+      ADD_PROPERTIES(sink__V3403, LINK_VARIABLESET(sink__V3403->context, namedFV__V3415), LINK_VARIABLESET(sink__V3403->context, varFV__V3416), LINK_NamedPropertyLink(sink__V3403->context, namedP__V3413), LINK_VariablePropertyLink(sink__V3403->context, varP__V3414));
       { START(sink__V3403, _M_F__then_Pattern_Ref_s1);
         COPY(sink__V3403, sub__V3408);COPY(sink__V3403, sub__V3409);COPY(sink__V3403, sub__V3410);{ if (!IS_BOUND(x__V3411)) { REBIND(x__V3411);
             Variable binds__V3417[1] = {x__V3411}; BINDS(sink__V3403, 1, binds__V3417);
@@ -11029,7 +11029,7 @@ int step_M_F_Freshes(Sink sink__V3425, Term term__V3426)
         Hashset namedFV__V3433 = LINK_VARIABLESET(sink__V3425->context, namedPropertyFreeVars(namedP__V3431));
         Hashset varFV__V3434 = LINK_VARIABLESET(sink__V3425->context, variablePropertyFreeVars(varP__V3432));
         UNLINK(sink__V3425->context, term__V3426);
-        ADD_PROPERTIES(sink__V3425, LINK_NamedPropertyLink(sink__V3425->context, namedP__V3431), LINK_VariablePropertyLink(sink__V3425->context, varP__V3432));
+        ADD_PROPERTIES(sink__V3425, LINK_VARIABLESET(sink__V3425->context, namedFV__V3433), LINK_VARIABLESET(sink__V3425->context, varFV__V3434), LINK_NamedPropertyLink(sink__V3425->context, namedP__V3431), LINK_VariablePropertyLink(sink__V3425->context, varP__V3432));
         { START(sink__V3425, _M_F_Freshes_s2);
           COPY(sink__V3425, sub__V3430);USE(sink__V3425, z__V277); END(sink__V3425, _M_F_Freshes_s2); }
         UNLINK_VARIABLESET(sink__V3425->context, namedFV__V3433); UNLINK_VARIABLESET(sink__V3425->context, varFV__V3434);
@@ -11091,7 +11091,7 @@ int step_M_F_Pattern_s10(Sink sink__V3435, Term term__V3436)
       Hashset namedFV__V3456 = LINK_VARIABLESET(sink__V3435->context, namedPropertyFreeVars(namedP__V3454));
       Hashset varFV__V3457 = LINK_VARIABLESET(sink__V3435->context, variablePropertyFreeVars(varP__V3455));
       UNLINK(sink__V3435->context, term__V3436);
-      ADD_PROPERTIES(sink__V3435, LINK_NamedPropertyLink(sink__V3435->context, namedP__V3454), LINK_VariablePropertyLink(sink__V3435->context, varP__V3455));
+      ADD_PROPERTIES(sink__V3435, LINK_VARIABLESET(sink__V3435->context, namedFV__V3456), LINK_VARIABLESET(sink__V3435->context, varFV__V3457), LINK_NamedPropertyLink(sink__V3435->context, namedP__V3454), LINK_VariablePropertyLink(sink__V3435->context, varP__V3455));
       { START(sink__V3435, _M_F_Pattern_s12);
         COPY(sink__V3435, sub__V3447);COPY(sink__V3435, sub__V3441);COPY(sink__V3435, sub__V3442);COPY(sink__V3435, sub__V3443);COPY(sink__V3435, sub__V3444);COPY(sink__V3435, sub__V3445);COPY(sink__V3435, sub__V3446);COPY(sink__V3435, sub__V3440);COPY(sink__V3435, sub__V3448);COPY(sink__V3435, sub__V3449);COPY(sink__V3435, sub__V3450);COPY(sink__V3435, sub__V3451);{ if (!IS_BOUND(x__V3452)) { REBIND(x__V3452);
             Variable binds__V3458[1] = {x__V3452}; BINDS(sink__V3435, 1, binds__V3458);
@@ -11146,7 +11146,7 @@ int step_M_F_Pattern_s10(Sink sink__V3435, Term term__V3436)
       Hashset namedFV__V3481 = LINK_VARIABLESET(sink__V3435->context, namedPropertyFreeVars(namedP__V3479));
       Hashset varFV__V3482 = LINK_VARIABLESET(sink__V3435->context, variablePropertyFreeVars(varP__V3480));
       UNLINK(sink__V3435->context, term__V3436);
-      ADD_PROPERTIES(sink__V3435, LINK_NamedPropertyLink(sink__V3435->context, namedP__V3479), LINK_VariablePropertyLink(sink__V3435->context, varP__V3480));
+      ADD_PROPERTIES(sink__V3435, LINK_VARIABLESET(sink__V3435->context, namedFV__V3481), LINK_VARIABLESET(sink__V3435->context, varFV__V3482), LINK_NamedPropertyLink(sink__V3435->context, namedP__V3479), LINK_VariablePropertyLink(sink__V3435->context, varP__V3480));
       { START(sink__V3435, _M_F_Pattern_s17);
         COPY(sink__V3435, sub__V3472);COPY(sink__V3435, sub__V3468);COPY(sink__V3435, sub__V3469);COPY(sink__V3435, sub__V3470);COPY(sink__V3435, sub__V3471);COPY(sink__V3435, sub__V3467);COPY(sink__V3435, sub__V3473);COPY(sink__V3435, sub__V3474);COPY(sink__V3435, sub__V3475);COPY(sink__V3435, sub__V3476);{ if (!IS_BOUND(x__V3477)) { REBIND(x__V3477);
             Variable binds__V3483[1] = {x__V3477}; BINDS(sink__V3435, 1, binds__V3483);
@@ -11222,7 +11222,7 @@ int step_M_F_Pattern_s12(Sink sink__V3491, Term term__V3492)
         Hashset namedFV__V3511 = LINK_VARIABLESET(sink__V3491->context, namedPropertyFreeVars(namedP__V3509));
         Hashset varFV__V3512 = LINK_VARIABLESET(sink__V3491->context, variablePropertyFreeVars(varP__V3510));
         UNLINK(sink__V3491->context, term__V3492);
-        ADD_PROPERTIES(sink__V3491, LINK_NamedPropertyLink(sink__V3491->context, namedP__V3509), LINK_VariablePropertyLink(sink__V3491->context, varP__V3510));
+        ADD_PROPERTIES(sink__V3491, LINK_VARIABLESET(sink__V3491->context, namedFV__V3511), LINK_VARIABLESET(sink__V3491->context, varFV__V3512), LINK_NamedPropertyLink(sink__V3491->context, namedP__V3509), LINK_VariablePropertyLink(sink__V3491->context, varP__V3510));
         { START(sink__V3491, _M_F_Pattern_s14);
           COPY(sink__V3491, sub__V3506);COPY(sink__V3491, sub__V3496);COPY(sink__V3491, sub__V3497);COPY(sink__V3491, sub__V3498);COPY(sink__V3491, sub__V3499);COPY(sink__V3491, sub__V3500);COPY(sink__V3491, sub__V3501);COPY(sink__V3491, sub__V3502);COPY(sink__V3491, sub__V3503);COPY(sink__V3491, sub__V3504);COPY(sink__V3491, sub__V3505);USE(sink__V3491, z__V277); { if (!IS_BOUND(x__V3507)) { REBIND(x__V3507);
               Variable binds__V3513[1] = {x__V3507}; BINDS(sink__V3491, 1, binds__V3513);
@@ -11299,7 +11299,7 @@ int step_M_F_Pattern_s14(Sink sink__V3521, Term term__V3522)
         Hashset namedFV__V3541 = LINK_VARIABLESET(sink__V3521->context, namedPropertyFreeVars(namedP__V3539));
         Hashset varFV__V3542 = LINK_VARIABLESET(sink__V3521->context, variablePropertyFreeVars(varP__V3540));
         UNLINK(sink__V3521->context, term__V3522);
-        ADD_PROPERTIES(sink__V3521, LINK_NamedPropertyLink(sink__V3521->context, namedP__V3539), LINK_VariablePropertyLink(sink__V3521->context, varP__V3540));
+        ADD_PROPERTIES(sink__V3521, LINK_VARIABLESET(sink__V3521->context, namedFV__V3541), LINK_VARIABLESET(sink__V3521->context, varFV__V3542), LINK_NamedPropertyLink(sink__V3521->context, namedP__V3539), LINK_VariablePropertyLink(sink__V3521->context, varP__V3540));
         { START(sink__V3521, _M_F_Pattern_s15);
           USE(sink__V3521, z__V277); COPY(sink__V3521, sub__V3526);COPY(sink__V3521, sub__V3527);COPY(sink__V3521, sub__V3528);COPY(sink__V3521, sub__V3529);COPY(sink__V3521, sub__V3530);COPY(sink__V3521, sub__V3531);COPY(sink__V3521, sub__V3532);COPY(sink__V3521, sub__V3533);COPY(sink__V3521, sub__V3534);COPY(sink__V3521, sub__V3535);COPY(sink__V3521, sub__V3536);{ if (!IS_BOUND(x__V3537)) { REBIND(x__V3537);
               Variable binds__V3543[1] = {x__V3537}; BINDS(sink__V3521, 1, binds__V3543);
@@ -11373,7 +11373,7 @@ int step_M_F_Pattern_s15(Sink sink__V3551, Term term__V3552)
     Hashset namedFV__V3569 = LINK_VARIABLESET(sink__V3551->context, namedPropertyFreeVars(namedP__V3567));
     Hashset varFV__V3570 = LINK_VARIABLESET(sink__V3551->context, variablePropertyFreeVars(varP__V3568));
     UNLINK(sink__V3551->context, term__V3552);
-    ADD_PROPERTIES(sink__V3551, LINK_NamedPropertyLink(sink__V3551->context, namedP__V3567), LINK_VariablePropertyLink(sink__V3551->context, varP__V3568));
+    ADD_PROPERTIES(sink__V3551, LINK_VARIABLESET(sink__V3551->context, namedFV__V3569), LINK_VARIABLESET(sink__V3551->context, varFV__V3570), LINK_NamedPropertyLink(sink__V3551->context, namedP__V3567), LINK_VariablePropertyLink(sink__V3551->context, varP__V3568));
     { START(sink__V3551, _M_F_PatternBinder_s1);
       COPY(sink__V3551, sub__V3560);{ START(sink__V3551, _M_CASE);
         COPY(sink__V3551, sub__V3557);COPY(sink__V3551, sub__V3555);COPY(sink__V3551, sub__V3556);END(sink__V3551, _M_CASE); }
@@ -11498,7 +11498,7 @@ int step_M_F_Pattern_s17(Sink sink__V3581, Term term__V3582)
         Hashset namedFV__V3599 = LINK_VARIABLESET(sink__V3581->context, namedPropertyFreeVars(namedP__V3597));
         Hashset varFV__V3600 = LINK_VARIABLESET(sink__V3581->context, variablePropertyFreeVars(varP__V3598));
         UNLINK(sink__V3581->context, term__V3582);
-        ADD_PROPERTIES(sink__V3581, LINK_NamedPropertyLink(sink__V3581->context, namedP__V3597), LINK_VariablePropertyLink(sink__V3581->context, varP__V3598));
+        ADD_PROPERTIES(sink__V3581, LINK_VARIABLESET(sink__V3581->context, namedFV__V3599), LINK_VARIABLESET(sink__V3581->context, varFV__V3600), LINK_NamedPropertyLink(sink__V3581->context, namedP__V3597), LINK_VariablePropertyLink(sink__V3581->context, varP__V3598));
         { START(sink__V3581, _M_F_Pattern_s19);
           COPY(sink__V3581, sub__V3594);COPY(sink__V3581, sub__V3586);COPY(sink__V3581, sub__V3587);COPY(sink__V3581, sub__V3588);COPY(sink__V3581, sub__V3589);COPY(sink__V3581, sub__V3590);COPY(sink__V3581, sub__V3591);COPY(sink__V3581, sub__V3592);COPY(sink__V3581, sub__V3593);USE(sink__V3581, z__V277); { if (!IS_BOUND(x__V3595)) { REBIND(x__V3595);
               Variable binds__V3601[1] = {x__V3595}; BINDS(sink__V3581, 1, binds__V3601);
@@ -11571,7 +11571,7 @@ int step_M_F_Pattern_s19(Sink sink__V3609, Term term__V3610)
         Hashset namedFV__V3627 = LINK_VARIABLESET(sink__V3609->context, namedPropertyFreeVars(namedP__V3625));
         Hashset varFV__V3628 = LINK_VARIABLESET(sink__V3609->context, variablePropertyFreeVars(varP__V3626));
         UNLINK(sink__V3609->context, term__V3610);
-        ADD_PROPERTIES(sink__V3609, LINK_NamedPropertyLink(sink__V3609->context, namedP__V3625), LINK_VariablePropertyLink(sink__V3609->context, varP__V3626));
+        ADD_PROPERTIES(sink__V3609, LINK_VARIABLESET(sink__V3609->context, namedFV__V3627), LINK_VARIABLESET(sink__V3609->context, varFV__V3628), LINK_NamedPropertyLink(sink__V3609->context, namedP__V3625), LINK_VariablePropertyLink(sink__V3609->context, varP__V3626));
         { START(sink__V3609, _M_F_Pattern_s20);
           USE(sink__V3609, z__V277); COPY(sink__V3609, sub__V3614);COPY(sink__V3609, sub__V3615);COPY(sink__V3609, sub__V3616);COPY(sink__V3609, sub__V3617);COPY(sink__V3609, sub__V3618);COPY(sink__V3609, sub__V3619);COPY(sink__V3609, sub__V3620);COPY(sink__V3609, sub__V3621);COPY(sink__V3609, sub__V3622);{ if (!IS_BOUND(x__V3623)) { REBIND(x__V3623);
               Variable binds__V3629[1] = {x__V3623}; BINDS(sink__V3609, 1, binds__V3629);
@@ -11641,7 +11641,7 @@ int step_M_F_Pattern_s20(Sink sink__V3637, Term term__V3638)
     Hashset namedFV__V3653 = LINK_VARIABLESET(sink__V3637->context, namedPropertyFreeVars(namedP__V3651));
     Hashset varFV__V3654 = LINK_VARIABLESET(sink__V3637->context, variablePropertyFreeVars(varP__V3652));
     UNLINK(sink__V3637->context, term__V3638);
-    ADD_PROPERTIES(sink__V3637, LINK_NamedPropertyLink(sink__V3637->context, namedP__V3651), LINK_VariablePropertyLink(sink__V3637->context, varP__V3652));
+    ADD_PROPERTIES(sink__V3637, LINK_VARIABLESET(sink__V3637->context, namedFV__V3653), LINK_VARIABLESET(sink__V3637->context, varFV__V3654), LINK_NamedPropertyLink(sink__V3637->context, namedP__V3651), LINK_VariablePropertyLink(sink__V3637->context, varP__V3652));
     { START(sink__V3637, _M_F_Pattern_s1);
       { START(sink__V3637, _M_CONSTRUCTION);
         COPY(sink__V3637, LINK(sink__V3637->context, sub__V3642));{ START(sink__V3637, _M__sNil); END(sink__V3637, _M__sNil); } END(sink__V3637, _M_CONSTRUCTION); }
@@ -11760,7 +11760,7 @@ int step_M_F_Pattern_s22(Sink sink__V3663, Term term__V3664)
         Hashset namedFV__V3679 = LINK_VARIABLESET(sink__V3663->context, namedPropertyFreeVars(namedP__V3677));
         Hashset varFV__V3680 = LINK_VARIABLESET(sink__V3663->context, variablePropertyFreeVars(varP__V3678));
         UNLINK(sink__V3663->context, term__V3664);
-        ADD_PROPERTIES(sink__V3663, LINK_NamedPropertyLink(sink__V3663->context, namedP__V3677), LINK_VariablePropertyLink(sink__V3663->context, varP__V3678));
+        ADD_PROPERTIES(sink__V3663, LINK_VARIABLESET(sink__V3663->context, namedFV__V3679), LINK_VARIABLESET(sink__V3663->context, varFV__V3680), LINK_NamedPropertyLink(sink__V3663->context, namedP__V3677), LINK_VariablePropertyLink(sink__V3663->context, varP__V3678));
         { START(sink__V3663, _M_F_Pattern_s24);
           COPY(sink__V3663, sub__V3674);COPY(sink__V3663, sub__V3668);COPY(sink__V3663, sub__V3669);COPY(sink__V3663, sub__V3670);COPY(sink__V3663, sub__V3671);COPY(sink__V3663, sub__V3672);COPY(sink__V3663, sub__V3673);USE(sink__V3663, z__V277); { if (!IS_BOUND(x__V3675)) { REBIND(x__V3675);
               Variable binds__V3681[1] = {x__V3675}; BINDS(sink__V3663, 1, binds__V3681);
@@ -11829,7 +11829,7 @@ int step_M_F_Pattern_s24(Sink sink__V3689, Term term__V3690)
         Hashset namedFV__V3705 = LINK_VARIABLESET(sink__V3689->context, namedPropertyFreeVars(namedP__V3703));
         Hashset varFV__V3706 = LINK_VARIABLESET(sink__V3689->context, variablePropertyFreeVars(varP__V3704));
         UNLINK(sink__V3689->context, term__V3690);
-        ADD_PROPERTIES(sink__V3689, LINK_NamedPropertyLink(sink__V3689->context, namedP__V3703), LINK_VariablePropertyLink(sink__V3689->context, varP__V3704));
+        ADD_PROPERTIES(sink__V3689, LINK_VARIABLESET(sink__V3689->context, namedFV__V3705), LINK_VARIABLESET(sink__V3689->context, varFV__V3706), LINK_NamedPropertyLink(sink__V3689->context, namedP__V3703), LINK_VariablePropertyLink(sink__V3689->context, varP__V3704));
         { START(sink__V3689, _M_F_Pattern_s25);
           USE(sink__V3689, z__V277); COPY(sink__V3689, sub__V3694);COPY(sink__V3689, sub__V3695);COPY(sink__V3689, sub__V3696);COPY(sink__V3689, sub__V3697);COPY(sink__V3689, sub__V3698);COPY(sink__V3689, sub__V3699);COPY(sink__V3689, sub__V3700);{ if (!IS_BOUND(x__V3701)) { REBIND(x__V3701);
               Variable binds__V3707[1] = {x__V3701}; BINDS(sink__V3689, 1, binds__V3707);
@@ -11935,7 +11935,7 @@ int step_M_F_Pattern_s25(Sink sink__V3715, Term term__V3716)
                       { START(sink__V3715, _M__sTextCons);
                         { START(sink__V3715, _M__sTextEmbed);
                           { START(sink__V3715, _M_AsText);
-                            ADD_PROPERTIES(sink__V3715, LINK_NamedPropertyLink(sink__V3715->context, namedP__V3727), LINK_VariablePropertyLink(sink__V3715->context, varP__V3728));
+                            ADD_PROPERTIES(sink__V3715, LINK_VARIABLESET(sink__V3715->context, namedFV__V3729), LINK_VARIABLESET(sink__V3715->context, varFV__V3730), LINK_NamedPropertyLink(sink__V3715->context, namedP__V3727), LINK_VariablePropertyLink(sink__V3715->context, varP__V3728));
                             { START(sink__V3715, _M_F__then_PatternBinders);
                               { START(sink__V3715, _M_OK);
                                 END(sink__V3715, _M_OK); }
@@ -12017,7 +12017,7 @@ int step_M_F_Pattern_s27(Sink sink__V3739, Term term__V3740)
         Hashset namedFV__V3755 = LINK_VARIABLESET(sink__V3739->context, namedPropertyFreeVars(namedP__V3753));
         Hashset varFV__V3756 = LINK_VARIABLESET(sink__V3739->context, variablePropertyFreeVars(varP__V3754));
         UNLINK(sink__V3739->context, term__V3740);
-        ADD_PROPERTIES(sink__V3739, LINK_NamedPropertyLink(sink__V3739->context, namedP__V3753), LINK_VariablePropertyLink(sink__V3739->context, varP__V3754));
+        ADD_PROPERTIES(sink__V3739, LINK_VARIABLESET(sink__V3739->context, namedFV__V3755), LINK_VARIABLESET(sink__V3739->context, varFV__V3756), LINK_NamedPropertyLink(sink__V3739->context, namedP__V3753), LINK_VariablePropertyLink(sink__V3739->context, varP__V3754));
         { START(sink__V3739, _M_F_Pattern_s29);
           COPY(sink__V3739, sub__V3750);COPY(sink__V3739, sub__V3744);COPY(sink__V3739, sub__V3745);COPY(sink__V3739, sub__V3746);COPY(sink__V3739, sub__V3747);COPY(sink__V3739, sub__V3748);COPY(sink__V3739, sub__V3749);USE(sink__V3739, z__V277); { if (!IS_BOUND(x__V3751)) { REBIND(x__V3751);
               Variable binds__V3757[1] = {x__V3751}; BINDS(sink__V3739, 1, binds__V3757);
@@ -12086,7 +12086,7 @@ int step_M_F_Pattern_s29(Sink sink__V3765, Term term__V3766)
         Hashset namedFV__V3781 = LINK_VARIABLESET(sink__V3765->context, namedPropertyFreeVars(namedP__V3779));
         Hashset varFV__V3782 = LINK_VARIABLESET(sink__V3765->context, variablePropertyFreeVars(varP__V3780));
         UNLINK(sink__V3765->context, term__V3766);
-        ADD_PROPERTIES(sink__V3765, LINK_NamedPropertyLink(sink__V3765->context, namedP__V3779), LINK_VariablePropertyLink(sink__V3765->context, varP__V3780));
+        ADD_PROPERTIES(sink__V3765, LINK_VARIABLESET(sink__V3765->context, namedFV__V3781), LINK_VARIABLESET(sink__V3765->context, varFV__V3782), LINK_NamedPropertyLink(sink__V3765->context, namedP__V3779), LINK_VariablePropertyLink(sink__V3765->context, varP__V3780));
         { START(sink__V3765, _M_F_Pattern_s30);
           USE(sink__V3765, z__V277); COPY(sink__V3765, sub__V3770);COPY(sink__V3765, sub__V3771);COPY(sink__V3765, sub__V3772);COPY(sink__V3765, sub__V3773);COPY(sink__V3765, sub__V3774);COPY(sink__V3765, sub__V3775);COPY(sink__V3765, sub__V3776);{ if (!IS_BOUND(x__V3777)) { REBIND(x__V3777);
               Variable binds__V3783[1] = {x__V3777}; BINDS(sink__V3765, 1, binds__V3783);
@@ -12153,7 +12153,7 @@ int step_M_F_Pattern_s30(Sink sink__V3791, Term term__V3792)
     Hashset namedFV__V3806 = LINK_VARIABLESET(sink__V3791->context, namedPropertyFreeVars(namedP__V3804));
     Hashset varFV__V3807 = LINK_VARIABLESET(sink__V3791->context, variablePropertyFreeVars(varP__V3805));
     UNLINK(sink__V3791->context, term__V3792);
-    ADD_PROPERTIES(sink__V3791, LINK_NamedPropertyLink(sink__V3791->context, namedP__V3804), LINK_VariablePropertyLink(sink__V3791->context, varP__V3805));
+    ADD_PROPERTIES(sink__V3791, LINK_VARIABLESET(sink__V3791->context, namedFV__V3806), LINK_VARIABLESET(sink__V3791->context, varFV__V3807), LINK_NamedPropertyLink(sink__V3791->context, namedP__V3804), LINK_VariablePropertyLink(sink__V3791->context, varP__V3805));
     { START(sink__V3791, _M_F_Pattern_s32);
       COPY(sink__V3791, value__V3803);COPY(sink__V3791, sub__V3794);COPY(sink__V3791, sub__V3795);COPY(sink__V3791, sub__V3796);COPY(sink__V3791, sub__V3797);COPY(sink__V3791, sub__V3798);COPY(sink__V3791, sub__V3799);COPY(sink__V3791, sub__V3800);{ if (!IS_BOUND(x__V3801)) { REBIND(x__V3801);
           Variable binds__V3808[1] = {x__V3801}; BINDS(sink__V3791, 1, binds__V3808);
@@ -12225,7 +12225,7 @@ int step_M_F_Pattern_s32(Sink sink__V3816, Term term__V3817)
       Hashset namedFV__V3836 = LINK_VARIABLESET(sink__V3816->context, namedPropertyFreeVars(namedP__V3834));
       Hashset varFV__V3837 = LINK_VARIABLESET(sink__V3816->context, variablePropertyFreeVars(varP__V3835));
       UNLINK(sink__V3816->context, term__V3817);
-      ADD_PROPERTIES(sink__V3816, LINK_NamedPropertyLink(sink__V3816->context, namedP__V3834), LINK_VariablePropertyLink(sink__V3816->context, varP__V3835));
+      ADD_PROPERTIES(sink__V3816, LINK_VARIABLESET(sink__V3816->context, namedFV__V3836), LINK_VARIABLESET(sink__V3816->context, varFV__V3837), LINK_NamedPropertyLink(sink__V3816->context, namedP__V3834), LINK_VariablePropertyLink(sink__V3816->context, varP__V3835));
       { START(sink__V3816, _M_F_Pattern_s33);
         COPY(sink__V3816, sub__V3821);COPY(sink__V3816, sub__V3822);COPY(sink__V3816, sub__V3823);COPY(sink__V3816, sub__V3824);COPY(sink__V3816, sub__V3825);COPY(sink__V3816, sub__V3826);COPY(sink__V3816, sub__V3827);COPY(sink__V3816, sub__V3828);COPY(sink__V3816, sub__V3829);COPY(sink__V3816, sub__V3830);{ if (!IS_BOUND(x__V3831)) { REBIND(x__V3831);
             Variable binds__V3838[1] = {x__V3831}; BINDS(sink__V3816, 1, binds__V3838);
@@ -12299,7 +12299,7 @@ int step_M_F_Pattern_s33(Sink sink__V3846, Term term__V3847)
         Hashset namedFV__V3865 = LINK_VARIABLESET(sink__V3846->context, namedPropertyFreeVars(namedP__V3863));
         Hashset varFV__V3866 = LINK_VARIABLESET(sink__V3846->context, variablePropertyFreeVars(varP__V3864));
         UNLINK(sink__V3846->context, term__V3847);
-        ADD_PROPERTIES(sink__V3846, LINK_NamedPropertyLink(sink__V3846->context, namedP__V3863), LINK_VariablePropertyLink(sink__V3846->context, varP__V3864));
+        ADD_PROPERTIES(sink__V3846, LINK_VARIABLESET(sink__V3846->context, namedFV__V3865), LINK_VARIABLESET(sink__V3846->context, varFV__V3866), LINK_NamedPropertyLink(sink__V3846->context, namedP__V3863), LINK_VariablePropertyLink(sink__V3846->context, varP__V3864));
         { START(sink__V3846, _M_F_Pattern_s34);
           USE(sink__V3846, z__V277); COPY(sink__V3846, sub__V3851);COPY(sink__V3846, sub__V3852);COPY(sink__V3846, sub__V3853);COPY(sink__V3846, sub__V3854);COPY(sink__V3846, sub__V3855);COPY(sink__V3846, sub__V3856);COPY(sink__V3846, sub__V3857);COPY(sink__V3846, sub__V3858);COPY(sink__V3846, sub__V3859);{ if (!IS_BOUND(x__V3860)) { REBIND(x__V3860);
               Variable binds__V3867[1] = {x__V3860}; BINDS(sink__V3846, 1, binds__V3867);
@@ -12455,7 +12455,7 @@ int step_M_F_Pattern_s34(Sink sink__V3875, Term term__V3876)
                                           { START(sink__V3875, _M__sTextCons);
                                             { START(sink__V3875, _M__sTextEmbed);
                                               { START(sink__V3875, _M_AsText);
-                                                ADD_PROPERTIES(sink__V3875, LINK_NamedPropertyLink(sink__V3875->context, namedP__V3890), LINK_VariablePropertyLink(sink__V3875->context, varP__V3891));
+                                                ADD_PROPERTIES(sink__V3875, LINK_VARIABLESET(sink__V3875->context, namedFV__V3892), LINK_VARIABLESET(sink__V3875->context, varFV__V3893), LINK_NamedPropertyLink(sink__V3875->context, namedP__V3890), LINK_VariablePropertyLink(sink__V3875->context, varP__V3891));
                                                 { START(sink__V3875, _M_F__then_PatternBinders);
                                                   { START(sink__V3875, _M_OK);
                                                     END(sink__V3875, _M_OK); }
@@ -12558,7 +12558,7 @@ int step_M_F_Pattern_s36(Sink sink__V3902, Term term__V3903)
         Hashset namedFV__V3920 = LINK_VARIABLESET(sink__V3902->context, namedPropertyFreeVars(namedP__V3918));
         Hashset varFV__V3921 = LINK_VARIABLESET(sink__V3902->context, variablePropertyFreeVars(varP__V3919));
         UNLINK(sink__V3902->context, term__V3903);
-        ADD_PROPERTIES(sink__V3902, LINK_NamedPropertyLink(sink__V3902->context, namedP__V3918), LINK_VariablePropertyLink(sink__V3902->context, varP__V3919));
+        ADD_PROPERTIES(sink__V3902, LINK_VARIABLESET(sink__V3902->context, namedFV__V3920), LINK_VARIABLESET(sink__V3902->context, varFV__V3921), LINK_NamedPropertyLink(sink__V3902->context, namedP__V3918), LINK_VariablePropertyLink(sink__V3902->context, varP__V3919));
         { START(sink__V3902, _M_F_Pattern_s38);
           COPY(sink__V3902, sub__V3915);COPY(sink__V3902, sub__V3907);COPY(sink__V3902, sub__V3908);COPY(sink__V3902, sub__V3909);COPY(sink__V3902, sub__V3910);COPY(sink__V3902, sub__V3911);COPY(sink__V3902, sub__V3912);COPY(sink__V3902, sub__V3913);COPY(sink__V3902, sub__V3914);USE(sink__V3902, z__V277); { if (!IS_BOUND(x__V3916)) { REBIND(x__V3916);
               Variable binds__V3922[1] = {x__V3916}; BINDS(sink__V3902, 1, binds__V3922);
@@ -12631,7 +12631,7 @@ int step_M_F_Pattern_s38(Sink sink__V3930, Term term__V3931)
         Hashset namedFV__V3948 = LINK_VARIABLESET(sink__V3930->context, namedPropertyFreeVars(namedP__V3946));
         Hashset varFV__V3949 = LINK_VARIABLESET(sink__V3930->context, variablePropertyFreeVars(varP__V3947));
         UNLINK(sink__V3930->context, term__V3931);
-        ADD_PROPERTIES(sink__V3930, LINK_NamedPropertyLink(sink__V3930->context, namedP__V3946), LINK_VariablePropertyLink(sink__V3930->context, varP__V3947));
+        ADD_PROPERTIES(sink__V3930, LINK_VARIABLESET(sink__V3930->context, namedFV__V3948), LINK_VARIABLESET(sink__V3930->context, varFV__V3949), LINK_NamedPropertyLink(sink__V3930->context, namedP__V3946), LINK_VariablePropertyLink(sink__V3930->context, varP__V3947));
         { START(sink__V3930, _M_F_Pattern_s39);
           USE(sink__V3930, z__V277); COPY(sink__V3930, sub__V3935);COPY(sink__V3930, sub__V3936);COPY(sink__V3930, sub__V3937);COPY(sink__V3930, sub__V3938);COPY(sink__V3930, sub__V3939);COPY(sink__V3930, sub__V3940);COPY(sink__V3930, sub__V3941);COPY(sink__V3930, sub__V3942);COPY(sink__V3930, sub__V3943);{ if (!IS_BOUND(x__V3944)) { REBIND(x__V3944);
               Variable binds__V3950[1] = {x__V3944}; BINDS(sink__V3930, 1, binds__V3950);
@@ -12709,7 +12709,7 @@ int step_M_F_Pattern_s39(Sink sink__V3958, Term term__V3959)
       { START(sink__V3958, _M__sTextCons);
         { START(sink__V3958, _M__sTextEmbed);
           { START(sink__V3958, _M_AsText);
-            ADD_PROPERTIES(sink__V3958, LINK_NamedPropertyLink(sink__V3958->context, namedP__V3972), LINK_VariablePropertyLink(sink__V3958->context, varP__V3973));
+            ADD_PROPERTIES(sink__V3958, LINK_VARIABLESET(sink__V3958->context, namedFV__V3974), LINK_VARIABLESET(sink__V3958->context, varFV__V3975), LINK_NamedPropertyLink(sink__V3958->context, namedP__V3972), LINK_VariablePropertyLink(sink__V3958->context, varP__V3973));
             { START(sink__V3958, _M_E_Pattern);
               { START(sink__V3958, _M_Primitive);
                 COPY(sink__V3958, sub__V3965);END(sink__V3958, _M_Primitive); }
@@ -12775,7 +12775,7 @@ int step_M_F_Pattern_MetaArgs_s1(Sink sink__V3984, Term term__V3985)
       Hashset namedFV__V3997 = LINK_VARIABLESET(sink__V3984->context, namedPropertyFreeVars(namedP__V3995));
       Hashset varFV__V3998 = LINK_VARIABLESET(sink__V3984->context, variablePropertyFreeVars(varP__V3996));
       UNLINK(sink__V3984->context, term__V3985);
-      ADD_PROPERTIES(sink__V3984, LINK_NamedPropertyLink(sink__V3984->context, namedP__V3995), LINK_VariablePropertyLink(sink__V3984->context, varP__V3996));
+      ADD_PROPERTIES(sink__V3984, LINK_VARIABLESET(sink__V3984->context, namedFV__V3997), LINK_VARIABLESET(sink__V3984->context, varFV__V3998), LINK_NamedPropertyLink(sink__V3984->context, namedP__V3995), LINK_VariablePropertyLink(sink__V3984->context, varP__V3996));
       { START(sink__V3984, _M_F_Pattern_MetaArgs_s11);
         COPY(sink__V3984, sub__V3989);COPY(sink__V3984, sub__V3990);COPY(sink__V3984, sub__V3991);COPY(sink__V3984, sub__V3992);{ if (!IS_BOUND(x__V3993)) { REBIND(x__V3993);
             Variable binds__V3999[1] = {x__V3993}; BINDS(sink__V3984, 1, binds__V3999);
@@ -12822,7 +12822,7 @@ int step_M_F_Pattern_MetaArgs_s1(Sink sink__V3984, Term term__V3985)
       Hashset namedFV__V4018 = LINK_VARIABLESET(sink__V3984->context, namedPropertyFreeVars(namedP__V4016));
       Hashset varFV__V4019 = LINK_VARIABLESET(sink__V3984->context, variablePropertyFreeVars(varP__V4017));
       UNLINK(sink__V3984->context, term__V3985);
-      ADD_PROPERTIES(sink__V3984, LINK_NamedPropertyLink(sink__V3984->context, namedP__V4016), LINK_VariablePropertyLink(sink__V3984->context, varP__V4017));
+      ADD_PROPERTIES(sink__V3984, LINK_VARIABLESET(sink__V3984->context, namedFV__V4018), LINK_VARIABLESET(sink__V3984->context, varFV__V4019), LINK_NamedPropertyLink(sink__V3984->context, namedP__V4016), LINK_VariablePropertyLink(sink__V3984->context, varP__V4017));
       { START(sink__V3984, _M_F_Pattern_MetaArgs_s2);
         COPY(sink__V3984, sub__V4008);COPY(sink__V3984, sub__V4009);COPY(sink__V3984, sub__V4010);COPY(sink__V3984, sub__V4011);COPY(sink__V3984, sub__V4012);COPY(sink__V3984, sub__V4013);{ if (!IS_BOUND(x__V4014)) { REBIND(x__V4014);
             Variable binds__V4020[1] = {x__V4014}; BINDS(sink__V3984, 1, binds__V4020);
@@ -12886,7 +12886,7 @@ int step_M_F_Pattern_MetaArgs_s2(Sink sink__V4028, Term term__V4029)
     Hashset namedFV__V4042 = LINK_VARIABLESET(sink__V4028->context, namedPropertyFreeVars(namedP__V4040));
     Hashset varFV__V4043 = LINK_VARIABLESET(sink__V4028->context, variablePropertyFreeVars(varP__V4041));
     UNLINK(sink__V4028->context, term__V4029);
-    ADD_PROPERTIES(sink__V4028, LINK_NamedPropertyLink(sink__V4028->context, namedP__V4040), LINK_VariablePropertyLink(sink__V4028->context, varP__V4041));
+    ADD_PROPERTIES(sink__V4028, LINK_VARIABLESET(sink__V4028->context, namedFV__V4042), LINK_VARIABLESET(sink__V4028->context, varFV__V4043), LINK_NamedPropertyLink(sink__V4028->context, namedP__V4040), LINK_VariablePropertyLink(sink__V4028->context, varP__V4041));
     { START(sink__V4028, _M_F_Pattern_MetaArgs_s4);
       COPY(sink__V4028, sub__V4032);COPY(sink__V4028, sub__V4031);COPY(sink__V4028, sub__V4033);COPY(sink__V4028, sub__V4034);COPY(sink__V4028, sub__V4035);COPY(sink__V4028, sub__V4036);COPY(sink__V4028, sub__V4037);{ if (!IS_BOUND(x__V4038)) { REBIND(x__V4038);
           Variable binds__V4044[1] = {x__V4038}; BINDS(sink__V4028, 1, binds__V4044);
@@ -12951,7 +12951,7 @@ int step_M_F_Pattern_MetaArgs_s4(Sink sink__V4052, Term term__V4053)
       Hashset namedFV__V4068 = LINK_VARIABLESET(sink__V4052->context, namedPropertyFreeVars(namedP__V4066));
       Hashset varFV__V4069 = LINK_VARIABLESET(sink__V4052->context, variablePropertyFreeVars(varP__V4067));
       UNLINK(sink__V4052->context, term__V4053);
-      ADD_PROPERTIES(sink__V4052, LINK_NamedPropertyLink(sink__V4052->context, namedP__V4066), LINK_VariablePropertyLink(sink__V4052->context, varP__V4067));
+      ADD_PROPERTIES(sink__V4052, LINK_VARIABLESET(sink__V4052->context, namedFV__V4068), LINK_VARIABLESET(sink__V4052->context, varFV__V4069), LINK_NamedPropertyLink(sink__V4052->context, namedP__V4066), LINK_VariablePropertyLink(sink__V4052->context, varP__V4067));
       { START(sink__V4052, _M_F_Pattern_MetaArgs_s5);
         COPY(sink__V4052, sub__V4057);COPY(sink__V4052, sub__V4058);COPY(sink__V4052, sub__V4059);COPY(sink__V4052, sub__V4060);COPY(sink__V4052, sub__V4061);COPY(sink__V4052, sub__V4062);COPY(sink__V4052, sub__V4063);{ if (!IS_BOUND(x__V4064)) { REBIND(x__V4064);
             Variable binds__V4070[1] = {x__V4064}; BINDS(sink__V4052, 1, binds__V4070);
@@ -13017,7 +13017,7 @@ int step_M_F_Pattern_MetaArgs_s5(Sink sink__V4078, Term term__V4079)
         Hashset namedFV__V4093 = LINK_VARIABLESET(sink__V4078->context, namedPropertyFreeVars(namedP__V4091));
         Hashset varFV__V4094 = LINK_VARIABLESET(sink__V4078->context, variablePropertyFreeVars(varP__V4092));
         UNLINK(sink__V4078->context, term__V4079);
-        ADD_PROPERTIES(sink__V4078, LINK_NamedPropertyLink(sink__V4078->context, namedP__V4091), LINK_VariablePropertyLink(sink__V4078->context, varP__V4092));
+        ADD_PROPERTIES(sink__V4078, LINK_VARIABLESET(sink__V4078->context, namedFV__V4093), LINK_VARIABLESET(sink__V4078->context, varFV__V4094), LINK_NamedPropertyLink(sink__V4078->context, namedP__V4091), LINK_VariablePropertyLink(sink__V4078->context, varP__V4092));
         { START(sink__V4078, _M_F_Pattern_MetaArgs_s7);
           COPY(sink__V4078, sub__V4087);COPY(sink__V4078, sub__V4083);COPY(sink__V4078, sub__V4084);COPY(sink__V4078, sub__V4085);COPY(sink__V4078, sub__V4086);USE(sink__V4078, z__V277); COPY(sink__V4078, sub__V4088);{ if (!IS_BOUND(x__V4089)) { REBIND(x__V4089);
               Variable binds__V4095[1] = {x__V4089}; BINDS(sink__V4078, 1, binds__V4095);
@@ -13088,7 +13088,7 @@ int step_M_F_Pattern_s41(Sink sink__V4103, Term term__V4104)
         Hashset namedFV__V4120 = LINK_VARIABLESET(sink__V4103->context, namedPropertyFreeVars(namedP__V4118));
         Hashset varFV__V4121 = LINK_VARIABLESET(sink__V4103->context, variablePropertyFreeVars(varP__V4119));
         UNLINK(sink__V4103->context, term__V4104);
-        ADD_PROPERTIES(sink__V4103, LINK_NamedPropertyLink(sink__V4103->context, namedP__V4118), LINK_VariablePropertyLink(sink__V4103->context, varP__V4119));
+        ADD_PROPERTIES(sink__V4103, LINK_VARIABLESET(sink__V4103->context, namedFV__V4120), LINK_VARIABLESET(sink__V4103->context, varFV__V4121), LINK_NamedPropertyLink(sink__V4103->context, namedP__V4118), LINK_VariablePropertyLink(sink__V4103->context, varP__V4119));
         { START(sink__V4103, _M_F_Pattern_s42);
           USE(sink__V4103, z__V277); COPY(sink__V4103, sub__V4108);COPY(sink__V4103, sub__V4109);COPY(sink__V4103, sub__V4110);COPY(sink__V4103, sub__V4111);COPY(sink__V4103, sub__V4112);COPY(sink__V4103, sub__V4113);COPY(sink__V4103, sub__V4114);COPY(sink__V4103, sub__V4115);{ if (!IS_BOUND(x__V4116)) { REBIND(x__V4116);
               Variable binds__V4122[1] = {x__V4116}; BINDS(sink__V4103, 1, binds__V4122);
@@ -13182,7 +13182,7 @@ int step_M_F_Pattern_s42(Sink sink__V4130, Term term__V4131)
               { START(sink__V4130, _M__sTextCons);
                 { START(sink__V4130, _M__sTextEmbed);
                   { START(sink__V4130, _M_AsText);
-                    ADD_PROPERTIES(sink__V4130, LINK_NamedPropertyLink(sink__V4130->context, namedP__V4143), LINK_VariablePropertyLink(sink__V4130->context, varP__V4144));
+                    ADD_PROPERTIES(sink__V4130, LINK_VARIABLESET(sink__V4130->context, namedFV__V4145), LINK_VARIABLESET(sink__V4130->context, varFV__V4146), LINK_NamedPropertyLink(sink__V4130->context, namedP__V4143), LINK_VariablePropertyLink(sink__V4130->context, varP__V4144));
                     {
                       Term arg__V4147;
                       { Sink buf__V4148 = ALLOCA_BUFFER(sink__V4130->context);
@@ -13249,7 +13249,7 @@ int step_M_F_Pattern_MetaArgs_s7(Sink sink__V4152, Term term__V4153)
         Hashset namedFV__V4167 = LINK_VARIABLESET(sink__V4152->context, namedPropertyFreeVars(namedP__V4165));
         Hashset varFV__V4168 = LINK_VARIABLESET(sink__V4152->context, variablePropertyFreeVars(varP__V4166));
         UNLINK(sink__V4152->context, term__V4153);
-        ADD_PROPERTIES(sink__V4152, LINK_NamedPropertyLink(sink__V4152->context, namedP__V4165), LINK_VariablePropertyLink(sink__V4152->context, varP__V4166));
+        ADD_PROPERTIES(sink__V4152, LINK_VARIABLESET(sink__V4152->context, namedFV__V4167), LINK_VARIABLESET(sink__V4152->context, varFV__V4168), LINK_NamedPropertyLink(sink__V4152->context, namedP__V4165), LINK_VariablePropertyLink(sink__V4152->context, varP__V4166));
         { START(sink__V4152, _M_F_Pattern_MetaArgs_s9);
           COPY(sink__V4152, sub__V4162);COPY(sink__V4152, sub__V4157);COPY(sink__V4152, sub__V4158);COPY(sink__V4152, sub__V4159);COPY(sink__V4152, sub__V4160);COPY(sink__V4152, sub__V4161);USE(sink__V4152, z__V277); { if (!IS_BOUND(x__V4163)) { REBIND(x__V4163);
               Variable binds__V4169[1] = {x__V4163}; BINDS(sink__V4152, 1, binds__V4169);
@@ -13322,7 +13322,7 @@ int step_M_F_Pattern_s44(Sink sink__V4177, Term term__V4178)
         Hashset namedFV__V4195 = LINK_VARIABLESET(sink__V4177->context, namedPropertyFreeVars(namedP__V4193));
         Hashset varFV__V4196 = LINK_VARIABLESET(sink__V4177->context, variablePropertyFreeVars(varP__V4194));
         UNLINK(sink__V4177->context, term__V4178);
-        ADD_PROPERTIES(sink__V4177, LINK_NamedPropertyLink(sink__V4177->context, namedP__V4193), LINK_VariablePropertyLink(sink__V4177->context, varP__V4194));
+        ADD_PROPERTIES(sink__V4177, LINK_VARIABLESET(sink__V4177->context, namedFV__V4195), LINK_VARIABLESET(sink__V4177->context, varFV__V4196), LINK_NamedPropertyLink(sink__V4177->context, namedP__V4193), LINK_VariablePropertyLink(sink__V4177->context, varP__V4194));
         { START(sink__V4177, _M_F_Pattern_s46);
           COPY(sink__V4177, sub__V4190);COPY(sink__V4177, sub__V4182);COPY(sink__V4177, sub__V4183);COPY(sink__V4177, sub__V4184);COPY(sink__V4177, sub__V4185);COPY(sink__V4177, sub__V4186);COPY(sink__V4177, sub__V4187);COPY(sink__V4177, sub__V4188);COPY(sink__V4177, sub__V4189);USE(sink__V4177, z__V277); { if (!IS_BOUND(x__V4191)) { REBIND(x__V4191);
               Variable binds__V4197[1] = {x__V4191}; BINDS(sink__V4177, 1, binds__V4197);
@@ -13389,7 +13389,7 @@ int step_M_F_Pattern_MetaArgs_s9(Sink sink__V4205, Term term__V4206)
         Hashset namedFV__V4220 = LINK_VARIABLESET(sink__V4205->context, namedPropertyFreeVars(namedP__V4218));
         Hashset varFV__V4221 = LINK_VARIABLESET(sink__V4205->context, variablePropertyFreeVars(varP__V4219));
         UNLINK(sink__V4205->context, term__V4206);
-        ADD_PROPERTIES(sink__V4205, LINK_NamedPropertyLink(sink__V4205->context, namedP__V4218), LINK_VariablePropertyLink(sink__V4205->context, varP__V4219));
+        ADD_PROPERTIES(sink__V4205, LINK_VARIABLESET(sink__V4205->context, namedFV__V4220), LINK_VARIABLESET(sink__V4205->context, varFV__V4221), LINK_NamedPropertyLink(sink__V4205->context, namedP__V4218), LINK_VariablePropertyLink(sink__V4205->context, varP__V4219));
         { START(sink__V4205, _M_F_Pattern_MetaArgs_s10);
           USE(sink__V4205, z__V277); COPY(sink__V4205, sub__V4210);COPY(sink__V4205, sub__V4211);COPY(sink__V4205, sub__V4212);COPY(sink__V4205, sub__V4213);COPY(sink__V4205, sub__V4214);COPY(sink__V4205, sub__V4215);{ if (!IS_BOUND(x__V4216)) { REBIND(x__V4216);
               Variable binds__V4222[1] = {x__V4216}; BINDS(sink__V4205, 1, binds__V4222);
@@ -13462,7 +13462,7 @@ int step_M_F_Pattern_s46(Sink sink__V4230, Term term__V4231)
         Hashset namedFV__V4248 = LINK_VARIABLESET(sink__V4230->context, namedPropertyFreeVars(namedP__V4246));
         Hashset varFV__V4249 = LINK_VARIABLESET(sink__V4230->context, variablePropertyFreeVars(varP__V4247));
         UNLINK(sink__V4230->context, term__V4231);
-        ADD_PROPERTIES(sink__V4230, LINK_NamedPropertyLink(sink__V4230->context, namedP__V4246), LINK_VariablePropertyLink(sink__V4230->context, varP__V4247));
+        ADD_PROPERTIES(sink__V4230, LINK_VARIABLESET(sink__V4230->context, namedFV__V4248), LINK_VARIABLESET(sink__V4230->context, varFV__V4249), LINK_NamedPropertyLink(sink__V4230->context, namedP__V4246), LINK_VariablePropertyLink(sink__V4230->context, varP__V4247));
         { START(sink__V4230, _M_F_Pattern_s47);
           USE(sink__V4230, z__V277); COPY(sink__V4230, sub__V4235);COPY(sink__V4230, sub__V4236);COPY(sink__V4230, sub__V4237);COPY(sink__V4230, sub__V4238);COPY(sink__V4230, sub__V4239);COPY(sink__V4230, sub__V4240);COPY(sink__V4230, sub__V4241);COPY(sink__V4230, sub__V4242);COPY(sink__V4230, sub__V4243);{ if (!IS_BOUND(x__V4244)) { REBIND(x__V4244);
               Variable binds__V4250[1] = {x__V4244}; BINDS(sink__V4230, 1, binds__V4250);
@@ -13532,9 +13532,9 @@ int step_M_F_Pattern_s47(Sink sink__V4258, Term term__V4259)
     Hashset namedFV__V4274 = LINK_VARIABLESET(sink__V4258->context, namedPropertyFreeVars(namedP__V4272));
     Hashset varFV__V4275 = LINK_VARIABLESET(sink__V4258->context, variablePropertyFreeVars(varP__V4273));
     UNLINK(sink__V4258->context, term__V4259);
-    ADD_PROPERTIES(sink__V4258, LINK_NamedPropertyLink(sink__V4258->context, namedP__V4272), LINK_VariablePropertyLink(sink__V4258->context, varP__V4273));
+    ADD_PROPERTIES(sink__V4258, LINK_VARIABLESET(sink__V4258->context, namedFV__V4274), LINK_VARIABLESET(sink__V4258->context, varFV__V4275), LINK_NamedPropertyLink(sink__V4258->context, namedP__V4272), LINK_VariablePropertyLink(sink__V4258->context, varP__V4273));
     { START(sink__V4258, _M_F_Pattern_MetaArgs_Norm);
-      ADD_PROPERTIES(sink__V4258, LINK_NamedPropertyLink(sink__V4258->context, namedP__V4272), LINK_VariablePropertyLink(sink__V4258->context, varP__V4273));
+      ADD_PROPERTIES(sink__V4258, LINK_VARIABLESET(sink__V4258->context, namedFV__V4274), LINK_VARIABLESET(sink__V4258->context, varFV__V4275), LINK_NamedPropertyLink(sink__V4258->context, namedP__V4272), LINK_VariablePropertyLink(sink__V4258->context, varP__V4273));
       { START(sink__V4258, _M_F_Pattern_NeedNorm_s1);
         COPY(sink__V4258, sub__V4262);COPY(sink__V4258, LINK(sink__V4258->context, sub__V4265));END(sink__V4258, _M_F_Pattern_NeedNorm_s1); }
       COPY(sink__V4258, sub__V4265);COPY(sink__V4258, sub__V4261);COPY(sink__V4258, sub__V4269);COPY(sink__V4258, sub__V4266);COPY(sink__V4258, sub__V4260);{ if (!IS_BOUND(x__V4270)) { REBIND(x__V4270);
@@ -13605,7 +13605,7 @@ int step_M_F_Pattern_s49(Sink sink__V4284, Term term__V4285)
         Hashset namedFV__V4302 = LINK_VARIABLESET(sink__V4284->context, namedPropertyFreeVars(namedP__V4300));
         Hashset varFV__V4303 = LINK_VARIABLESET(sink__V4284->context, variablePropertyFreeVars(varP__V4301));
         UNLINK(sink__V4284->context, term__V4285);
-        ADD_PROPERTIES(sink__V4284, LINK_NamedPropertyLink(sink__V4284->context, namedP__V4300), LINK_VariablePropertyLink(sink__V4284->context, varP__V4301));
+        ADD_PROPERTIES(sink__V4284, LINK_VARIABLESET(sink__V4284->context, namedFV__V4302), LINK_VARIABLESET(sink__V4284->context, varFV__V4303), LINK_NamedPropertyLink(sink__V4284->context, namedP__V4300), LINK_VariablePropertyLink(sink__V4284->context, varP__V4301));
         { START(sink__V4284, _M_F_Pattern_s51);
           COPY(sink__V4284, sub__V4297);COPY(sink__V4284, sub__V4289);COPY(sink__V4284, sub__V4290);COPY(sink__V4284, sub__V4291);COPY(sink__V4284, sub__V4292);COPY(sink__V4284, sub__V4293);COPY(sink__V4284, sub__V4294);COPY(sink__V4284, sub__V4295);COPY(sink__V4284, sub__V4296);USE(sink__V4284, z__V277); { if (!IS_BOUND(x__V4298)) { REBIND(x__V4298);
               Variable binds__V4304[1] = {x__V4298}; BINDS(sink__V4284, 1, binds__V4304);
@@ -13670,7 +13670,7 @@ int step_M_F__then_PatternBinders(Sink sink__V4312, Term term__V4313)
       Hashset namedFV__V4327 = LINK_VARIABLESET(sink__V4312->context, namedPropertyFreeVars(namedP__V4325));
       Hashset varFV__V4328 = LINK_VARIABLESET(sink__V4312->context, variablePropertyFreeVars(varP__V4326));
       UNLINK(sink__V4312->context, term__V4313);
-      ADD_PROPERTIES(sink__V4312, LINK_NamedPropertyLink(sink__V4312->context, namedP__V4325), LINK_VariablePropertyLink(sink__V4312->context, varP__V4326));
+      ADD_PROPERTIES(sink__V4312, LINK_VARIABLESET(sink__V4312->context, namedFV__V4327), LINK_VARIABLESET(sink__V4312->context, varFV__V4328), LINK_NamedPropertyLink(sink__V4312->context, namedP__V4325), LINK_VariablePropertyLink(sink__V4312->context, varP__V4326));
       { START(sink__V4312, _M_F__then_PatternBinders_s1);
         COPY(sink__V4312, sub__V4317);COPY(sink__V4312, sub__V4318);COPY(sink__V4312, sub__V4319);COPY(sink__V4312, sub__V4320);COPY(sink__V4312, sub__V4321);COPY(sink__V4312, sub__V4322);{ if (!IS_BOUND(x__V4323)) { REBIND(x__V4323);
             Variable binds__V4329[1] = {x__V4323}; BINDS(sink__V4312, 1, binds__V4329);
@@ -13732,7 +13732,7 @@ int step_M_F_Pattern_MetaArgs__bind_s1(Sink sink__V4337, Term term__V4338)
         Hashset namedFV__V4350 = LINK_VARIABLESET(sink__V4337->context, namedPropertyFreeVars(namedP__V4348));
         Hashset varFV__V4351 = LINK_VARIABLESET(sink__V4337->context, variablePropertyFreeVars(varP__V4349));
         UNLINK(sink__V4337->context, term__V4338);
-        ADD_PROPERTIES(sink__V4337, LINK_NamedPropertyLink(sink__V4337->context, namedP__V4348), LINK_VariablePropertyLink(sink__V4337->context, varP__V4349));
+        ADD_PROPERTIES(sink__V4337, LINK_VARIABLESET(sink__V4337->context, namedFV__V4350), LINK_VARIABLESET(sink__V4337->context, varFV__V4351), LINK_NamedPropertyLink(sink__V4337->context, namedP__V4348), LINK_VariablePropertyLink(sink__V4337->context, varP__V4349));
         { START(sink__V4337, _M_F_Pattern_MetaArgs__bind_s2);
           USE(sink__V4337, z__V277); COPY(sink__V4337, sub__V4342);COPY(sink__V4337, sub__V4343);COPY(sink__V4337, sub__V4344);COPY(sink__V4337, sub__V4345);{ if (!IS_BOUND(x__V4346)) { REBIND(x__V4346);
               Variable binds__V4352[1] = {x__V4346}; BINDS(sink__V4337, 1, binds__V4352);
@@ -13818,7 +13818,7 @@ int step_M_F_Pattern_MetaArgs__bind_s2(Sink sink__V4360, Term term__V4361)
                 { START(sink__V4360, _M__sTextCons);
                   { START(sink__V4360, _M__sTextEmbed);
                     { START(sink__V4360, _M_AsText);
-                      ADD_PROPERTIES(sink__V4360, LINK_NamedPropertyLink(sink__V4360->context, namedP__V4369), LINK_VariablePropertyLink(sink__V4360->context, varP__V4370));
+                      ADD_PROPERTIES(sink__V4360, LINK_VARIABLESET(sink__V4360->context, namedFV__V4371), LINK_VARIABLESET(sink__V4360->context, varFV__V4372), LINK_NamedPropertyLink(sink__V4360->context, namedP__V4369), LINK_VariablePropertyLink(sink__V4360->context, varP__V4370));
                       { Term key__V4373, value__V4374;
                         key__V4373 = sub__V4366; { Sink buf__V4375 = ALLOCA_BUFFER(sink__V4360->context);
                           { START(buf__V4375, _M_VARIABLE);
@@ -13907,7 +13907,7 @@ int step_M_F_Pattern_s51(Sink sink__V4384, Term term__V4385)
         Hashset namedFV__V4402 = LINK_VARIABLESET(sink__V4384->context, namedPropertyFreeVars(namedP__V4400));
         Hashset varFV__V4403 = LINK_VARIABLESET(sink__V4384->context, variablePropertyFreeVars(varP__V4401));
         UNLINK(sink__V4384->context, term__V4385);
-        ADD_PROPERTIES(sink__V4384, LINK_NamedPropertyLink(sink__V4384->context, namedP__V4400), LINK_VariablePropertyLink(sink__V4384->context, varP__V4401));
+        ADD_PROPERTIES(sink__V4384, LINK_VARIABLESET(sink__V4384->context, namedFV__V4402), LINK_VARIABLESET(sink__V4384->context, varFV__V4403), LINK_NamedPropertyLink(sink__V4384->context, namedP__V4400), LINK_VariablePropertyLink(sink__V4384->context, varP__V4401));
         { START(sink__V4384, _M_F_Pattern_s52);
           USE(sink__V4384, z__V277); COPY(sink__V4384, sub__V4389);COPY(sink__V4384, sub__V4390);COPY(sink__V4384, sub__V4391);COPY(sink__V4384, sub__V4392);COPY(sink__V4384, sub__V4393);COPY(sink__V4384, sub__V4394);COPY(sink__V4384, sub__V4395);COPY(sink__V4384, sub__V4396);COPY(sink__V4384, sub__V4397);{ if (!IS_BOUND(x__V4398)) { REBIND(x__V4398);
               Variable binds__V4404[1] = {x__V4398}; BINDS(sink__V4384, 1, binds__V4404);
@@ -13977,7 +13977,7 @@ int step_M_F_Pattern_s52(Sink sink__V4412, Term term__V4413)
     Hashset namedFV__V4428 = LINK_VARIABLESET(sink__V4412->context, namedPropertyFreeVars(namedP__V4426));
     Hashset varFV__V4429 = LINK_VARIABLESET(sink__V4412->context, variablePropertyFreeVars(varP__V4427));
     UNLINK(sink__V4412->context, term__V4413);
-    ADD_PROPERTIES(sink__V4412, LINK_NamedPropertyLink(sink__V4412->context, namedP__V4426), LINK_VariablePropertyLink(sink__V4412->context, varP__V4427));
+    ADD_PROPERTIES(sink__V4412, LINK_VARIABLESET(sink__V4412->context, namedFV__V4428), LINK_VARIABLESET(sink__V4412->context, varFV__V4429), LINK_NamedPropertyLink(sink__V4412->context, namedP__V4426), LINK_VariablePropertyLink(sink__V4412->context, varP__V4427));
     { START(sink__V4412, _M_F_Pattern_s1);
       COPY(sink__V4412, sub__V4416);COPY(sink__V4412, sub__V4417);COPY(sink__V4412, LINK(sink__V4412->context, sub__V4418));COPY(sink__V4412, LINK(sink__V4412->context, sub__V4423));COPY(sink__V4412, sub__V4420);{ START(sink__V4412, _M__sTrue); END(sink__V4412, _M__sTrue); } COPY(sink__V4412, sub__V4422);COPY(sink__V4412, LINK(sink__V4412->context, sub__V4414));{ Variable x__V4430 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V4412->context,"x__V4430");
         Variable binds__V4431[1] = {x__V4430}; BINDS(sink__V4412, 1, binds__V4431);
@@ -14050,7 +14050,7 @@ int step_M_F_Pattern_s54(Sink sink__V4440, Term term__V4441)
         Hashset namedFV__V4457 = LINK_VARIABLESET(sink__V4440->context, namedPropertyFreeVars(namedP__V4455));
         Hashset varFV__V4458 = LINK_VARIABLESET(sink__V4440->context, variablePropertyFreeVars(varP__V4456));
         UNLINK(sink__V4440->context, term__V4441);
-        ADD_PROPERTIES(sink__V4440, LINK_NamedPropertyLink(sink__V4440->context, namedP__V4455), LINK_VariablePropertyLink(sink__V4440->context, varP__V4456));
+        ADD_PROPERTIES(sink__V4440, LINK_VARIABLESET(sink__V4440->context, namedFV__V4457), LINK_VARIABLESET(sink__V4440->context, varFV__V4458), LINK_NamedPropertyLink(sink__V4440->context, namedP__V4455), LINK_VariablePropertyLink(sink__V4440->context, varP__V4456));
         { START(sink__V4440, _M_F_Pattern_s56);
           COPY(sink__V4440, sub__V4452);COPY(sink__V4440, sub__V4445);COPY(sink__V4440, sub__V4446);COPY(sink__V4440, sub__V4447);COPY(sink__V4440, sub__V4448);COPY(sink__V4440, sub__V4449);COPY(sink__V4440, sub__V4450);COPY(sink__V4440, sub__V4451);USE(sink__V4440, z__V277); { if (!IS_BOUND(x__V4453)) { REBIND(x__V4453);
               Variable binds__V4459[1] = {x__V4453}; BINDS(sink__V4440, 1, binds__V4459);
@@ -14121,7 +14121,7 @@ int step_M_F_Pattern_s56(Sink sink__V4467, Term term__V4468)
         Hashset namedFV__V4484 = LINK_VARIABLESET(sink__V4467->context, namedPropertyFreeVars(namedP__V4482));
         Hashset varFV__V4485 = LINK_VARIABLESET(sink__V4467->context, variablePropertyFreeVars(varP__V4483));
         UNLINK(sink__V4467->context, term__V4468);
-        ADD_PROPERTIES(sink__V4467, LINK_NamedPropertyLink(sink__V4467->context, namedP__V4482), LINK_VariablePropertyLink(sink__V4467->context, varP__V4483));
+        ADD_PROPERTIES(sink__V4467, LINK_VARIABLESET(sink__V4467->context, namedFV__V4484), LINK_VARIABLESET(sink__V4467->context, varFV__V4485), LINK_NamedPropertyLink(sink__V4467->context, namedP__V4482), LINK_VariablePropertyLink(sink__V4467->context, varP__V4483));
         { START(sink__V4467, _M_F_Pattern_s57);
           USE(sink__V4467, z__V277); COPY(sink__V4467, sub__V4472);COPY(sink__V4467, sub__V4473);COPY(sink__V4467, sub__V4474);COPY(sink__V4467, sub__V4475);COPY(sink__V4467, sub__V4476);COPY(sink__V4467, sub__V4477);COPY(sink__V4467, sub__V4478);COPY(sink__V4467, sub__V4479);{ if (!IS_BOUND(x__V4480)) { REBIND(x__V4480);
               Variable binds__V4486[1] = {x__V4480}; BINDS(sink__V4467, 1, binds__V4486);
@@ -14189,7 +14189,7 @@ int step_M_F_Pattern_s57(Sink sink__V4494, Term term__V4495)
     Hashset namedFV__V4509 = LINK_VARIABLESET(sink__V4494->context, namedPropertyFreeVars(namedP__V4507));
     Hashset varFV__V4510 = LINK_VARIABLESET(sink__V4494->context, variablePropertyFreeVars(varP__V4508));
     UNLINK(sink__V4494->context, term__V4495);
-    ADD_PROPERTIES(sink__V4494, LINK_NamedPropertyLink(sink__V4494->context, namedP__V4507), LINK_VariablePropertyLink(sink__V4494->context, varP__V4508));
+    ADD_PROPERTIES(sink__V4494, LINK_VARIABLESET(sink__V4494->context, namedFV__V4509), LINK_VARIABLESET(sink__V4494->context, varFV__V4510), LINK_NamedPropertyLink(sink__V4494->context, namedP__V4507), LINK_VariablePropertyLink(sink__V4494->context, varP__V4508));
     { START(sink__V4494, _M_F_Pattern_s1);
       COPY(sink__V4494, sub__V4497);COPY(sink__V4494, sub__V4498);COPY(sink__V4494, sub__V4499);COPY(sink__V4494, LINK(sink__V4494->context, sub__V4504));COPY(sink__V4494, sub__V4501);{ START(sink__V4494, _M__sTrue); END(sink__V4494, _M__sTrue); } COPY(sink__V4494, sub__V4503);COPY(sink__V4494, LINK(sink__V4494->context, sub__V4496));{ Variable x__V4511 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V4494->context,"x__V4511");
         Variable binds__V4512[1] = {x__V4511}; BINDS(sink__V4494, 1, binds__V4512);
@@ -14262,7 +14262,7 @@ int step_M_F_Pattern_s59(Sink sink__V4521, Term term__V4522)
         Hashset namedFV__V4538 = LINK_VARIABLESET(sink__V4521->context, namedPropertyFreeVars(namedP__V4536));
         Hashset varFV__V4539 = LINK_VARIABLESET(sink__V4521->context, variablePropertyFreeVars(varP__V4537));
         UNLINK(sink__V4521->context, term__V4522);
-        ADD_PROPERTIES(sink__V4521, LINK_NamedPropertyLink(sink__V4521->context, namedP__V4536), LINK_VariablePropertyLink(sink__V4521->context, varP__V4537));
+        ADD_PROPERTIES(sink__V4521, LINK_VARIABLESET(sink__V4521->context, namedFV__V4538), LINK_VARIABLESET(sink__V4521->context, varFV__V4539), LINK_NamedPropertyLink(sink__V4521->context, namedP__V4536), LINK_VariablePropertyLink(sink__V4521->context, varP__V4537));
         { START(sink__V4521, _M_F_Pattern_s61);
           COPY(sink__V4521, sub__V4533);COPY(sink__V4521, sub__V4526);COPY(sink__V4521, sub__V4527);COPY(sink__V4521, sub__V4528);COPY(sink__V4521, sub__V4529);COPY(sink__V4521, sub__V4530);COPY(sink__V4521, sub__V4531);COPY(sink__V4521, sub__V4532);USE(sink__V4521, z__V277); { if (!IS_BOUND(x__V4534)) { REBIND(x__V4534);
               Variable binds__V4540[1] = {x__V4534}; BINDS(sink__V4521, 1, binds__V4540);
@@ -14316,7 +14316,7 @@ int step_M_F_Fresh2(Sink sink__V4548, Term term__V4549)
         Hashset namedFV__V4556 = LINK_VARIABLESET(sink__V4548->context, namedPropertyFreeVars(namedP__V4554));
         Hashset varFV__V4557 = LINK_VARIABLESET(sink__V4548->context, variablePropertyFreeVars(varP__V4555));
         UNLINK(sink__V4548->context, term__V4549);
-        ADD_PROPERTIES(sink__V4548, LINK_NamedPropertyLink(sink__V4548->context, namedP__V4554), LINK_VariablePropertyLink(sink__V4548->context, varP__V4555));
+        ADD_PROPERTIES(sink__V4548, LINK_VARIABLESET(sink__V4548->context, namedFV__V4556), LINK_VARIABLESET(sink__V4548->context, varFV__V4557), LINK_NamedPropertyLink(sink__V4548->context, namedP__V4554), LINK_VariablePropertyLink(sink__V4548->context, varP__V4555));
         { START(sink__V4548, _M_F_Fresh2_s2);
           COPY(sink__V4548, sub__V4553);USE(sink__V4548, z__V277); END(sink__V4548, _M_F_Fresh2_s2); }
         UNLINK_VARIABLESET(sink__V4548->context, namedFV__V4556); UNLINK_VARIABLESET(sink__V4548->context, varFV__V4557);
@@ -14355,7 +14355,7 @@ int step_M_F_Fresh4(Sink sink__V4558, Term term__V4559)
         Hashset namedFV__V4566 = LINK_VARIABLESET(sink__V4558->context, namedPropertyFreeVars(namedP__V4564));
         Hashset varFV__V4567 = LINK_VARIABLESET(sink__V4558->context, variablePropertyFreeVars(varP__V4565));
         UNLINK(sink__V4558->context, term__V4559);
-        ADD_PROPERTIES(sink__V4558, LINK_NamedPropertyLink(sink__V4558->context, namedP__V4564), LINK_VariablePropertyLink(sink__V4558->context, varP__V4565));
+        ADD_PROPERTIES(sink__V4558, LINK_VARIABLESET(sink__V4558->context, namedFV__V4566), LINK_VARIABLESET(sink__V4558->context, varFV__V4567), LINK_NamedPropertyLink(sink__V4558->context, namedP__V4564), LINK_VariablePropertyLink(sink__V4558->context, varP__V4565));
         { START(sink__V4558, _M_F_Fresh4_s2);
           COPY(sink__V4558, sub__V4563);USE(sink__V4558, z__V277); END(sink__V4558, _M_F_Fresh4_s2); }
         UNLINK_VARIABLESET(sink__V4558->context, namedFV__V4566); UNLINK_VARIABLESET(sink__V4558->context, varFV__V4567);
@@ -14411,7 +14411,7 @@ int step_M_F_Pattern_s61(Sink sink__V4568, Term term__V4569)
         Hashset namedFV__V4585 = LINK_VARIABLESET(sink__V4568->context, namedPropertyFreeVars(namedP__V4583));
         Hashset varFV__V4586 = LINK_VARIABLESET(sink__V4568->context, variablePropertyFreeVars(varP__V4584));
         UNLINK(sink__V4568->context, term__V4569);
-        ADD_PROPERTIES(sink__V4568, LINK_NamedPropertyLink(sink__V4568->context, namedP__V4583), LINK_VariablePropertyLink(sink__V4568->context, varP__V4584));
+        ADD_PROPERTIES(sink__V4568, LINK_VARIABLESET(sink__V4568->context, namedFV__V4585), LINK_VARIABLESET(sink__V4568->context, varFV__V4586), LINK_NamedPropertyLink(sink__V4568->context, namedP__V4583), LINK_VariablePropertyLink(sink__V4568->context, varP__V4584));
         { START(sink__V4568, _M_F_Pattern_s62);
           USE(sink__V4568, z__V277); COPY(sink__V4568, sub__V4573);COPY(sink__V4568, sub__V4574);COPY(sink__V4568, sub__V4575);COPY(sink__V4568, sub__V4576);COPY(sink__V4568, sub__V4577);COPY(sink__V4568, sub__V4578);COPY(sink__V4568, sub__V4579);COPY(sink__V4568, sub__V4580);{ if (!IS_BOUND(x__V4581)) { REBIND(x__V4581);
               Variable binds__V4587[1] = {x__V4581}; BINDS(sink__V4568, 1, binds__V4587);
@@ -14503,7 +14503,7 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
             key__V4619 = makeStringLiteral(sink__V4595->context, str__V4623);
             }
           Term* value__V4625 = DPROPERTY(sink__V4595->context, namedP__V4608, varP__V4609, key__V4619);
-          if (value__V4625) {  UNLINK(sink__V4595->context, sub__V4603); ADD_PROPERTIES(sink__V4595, LINK_NamedPropertyLink(sink__V4595->context, namedP__V4608), LINK_VariablePropertyLink(sink__V4595->context, varP__V4609));
+          if (value__V4625) {  UNLINK(sink__V4595->context, sub__V4603); ADD_PROPERTIES(sink__V4595, LINK_VARIABLESET(sink__V4595->context, namedFV__V4610), LINK_VARIABLESET(sink__V4595->context, varFV__V4611), LINK_NamedPropertyLink(sink__V4595->context, namedP__V4608), LINK_VariablePropertyLink(sink__V4595->context, varP__V4609));
             { START(sink__V4595, _M_F_Pattern_s1);
               COPY(sink__V4595, sub__V4598);COPY(sink__V4595, sub__V4599);COPY(sink__V4595, sub__V4600);COPY(sink__V4595, LINK(sink__V4595->context, sub__V4605));COPY(sink__V4595, sub__V4602);{ START(sink__V4595, _M__sTrue);
                 END(sink__V4595, _M__sTrue); }
@@ -14541,7 +14541,7 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
                  }
               END(sink__V4595, _M_F_Pattern_s1); }
              }
-          else { ADD_PROPERTIES(sink__V4595, LINK_NamedPropertyLink(sink__V4595->context, namedP__V4608), LINK_VariablePropertyLink(sink__V4595->context, varP__V4609));
+          else { ADD_PROPERTIES(sink__V4595, LINK_VARIABLESET(sink__V4595->context, namedFV__V4610), LINK_VARIABLESET(sink__V4595->context, varFV__V4611), LINK_NamedPropertyLink(sink__V4595->context, namedP__V4608), LINK_VariablePropertyLink(sink__V4595->context, varP__V4609));
             { START(sink__V4595, _M_F_Pattern_s1);
               COPY(sink__V4595, sub__V4598);COPY(sink__V4595, sub__V4599);COPY(sink__V4595, sub__V4600);COPY(sink__V4595, sub__V4605);COPY(sink__V4595, sub__V4602);COPY(sink__V4595, sub__V4603);COPY(sink__V4595, sub__V4604);COPY(sink__V4595, sub__V4597);{ if (!IS_BOUND(x__V4606)) { REBIND(x__V4606);
                   Variable binds__V4642[1] = {x__V4606}; BINDS(sink__V4595, 1, binds__V4642);
@@ -14562,7 +14562,7 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
              }
         }
          }
-      else { ADD_PROPERTIES(sink__V4595, LINK_NamedPropertyLink(sink__V4595->context, namedP__V4608), LINK_VariablePropertyLink(sink__V4595->context, varP__V4609));
+      else { ADD_PROPERTIES(sink__V4595, LINK_VARIABLESET(sink__V4595->context, namedFV__V4610), LINK_VARIABLESET(sink__V4595->context, varFV__V4611), LINK_NamedPropertyLink(sink__V4595->context, namedP__V4608), LINK_VariablePropertyLink(sink__V4595->context, varP__V4609));
         { START(sink__V4595, _M_F_Pattern_s1);
           COPY(sink__V4595, sub__V4598);COPY(sink__V4595, sub__V4599);COPY(sink__V4595, sub__V4600);COPY(sink__V4595, LINK(sink__V4595->context, sub__V4605));COPY(sink__V4595, sub__V4602);{ START(sink__V4595, _M__sTrue);
             END(sink__V4595, _M__sTrue); }
@@ -14647,7 +14647,7 @@ int step_M_F_Pattern_s64(Sink sink__V4666, Term term__V4667)
       Hashset namedFV__V4682 = LINK_VARIABLESET(sink__V4666->context, namedPropertyFreeVars(namedP__V4680));
       Hashset varFV__V4683 = LINK_VARIABLESET(sink__V4666->context, variablePropertyFreeVars(varP__V4681));
       UNLINK(sink__V4666->context, term__V4667);
-      ADD_PROPERTIES(sink__V4666, LINK_NamedPropertyLink(sink__V4666->context, namedP__V4680), LINK_VariablePropertyLink(sink__V4666->context, varP__V4681));
+      ADD_PROPERTIES(sink__V4666, LINK_VARIABLESET(sink__V4666->context, namedFV__V4682), LINK_VARIABLESET(sink__V4666->context, varFV__V4683), LINK_NamedPropertyLink(sink__V4666->context, namedP__V4680), LINK_VariablePropertyLink(sink__V4666->context, varP__V4681));
       { START(sink__V4666, _M_F_Pattern_s69);
         COPY(sink__V4666, sub__V4671);COPY(sink__V4666, sub__V4672);COPY(sink__V4666, sub__V4673);COPY(sink__V4666, sub__V4674);COPY(sink__V4666, sub__V4675);COPY(sink__V4666, sub__V4676);COPY(sink__V4666, sub__V4677);{ if (!IS_BOUND(x__V4678)) { REBIND(x__V4678);
             Variable binds__V4684[1] = {x__V4678}; BINDS(sink__V4666, 1, binds__V4684);
@@ -14702,7 +14702,7 @@ int step_M_F_Pattern_s64(Sink sink__V4666, Term term__V4667)
       Hashset namedFV__V4707 = LINK_VARIABLESET(sink__V4666->context, namedPropertyFreeVars(namedP__V4705));
       Hashset varFV__V4708 = LINK_VARIABLESET(sink__V4666->context, variablePropertyFreeVars(varP__V4706));
       UNLINK(sink__V4666->context, term__V4667);
-      ADD_PROPERTIES(sink__V4666, LINK_NamedPropertyLink(sink__V4666->context, namedP__V4705), LINK_VariablePropertyLink(sink__V4666->context, varP__V4706));
+      ADD_PROPERTIES(sink__V4666, LINK_VARIABLESET(sink__V4666->context, namedFV__V4707), LINK_VARIABLESET(sink__V4666->context, varFV__V4708), LINK_NamedPropertyLink(sink__V4666->context, namedP__V4705), LINK_VariablePropertyLink(sink__V4666->context, varP__V4706));
       { START(sink__V4666, _M_F_Pattern_s66);
         COPY(sink__V4666, sub__V4697);COPY(sink__V4666, sub__V4694);COPY(sink__V4666, sub__V4695);COPY(sink__V4666, sub__V4696);COPY(sink__V4666, sub__V4693);COPY(sink__V4666, sub__V4698);COPY(sink__V4666, sub__V4699);COPY(sink__V4666, sub__V4700);COPY(sink__V4666, sub__V4701);COPY(sink__V4666, sub__V4702);{ if (!IS_BOUND(x__V4703)) { REBIND(x__V4703);
             Variable binds__V4709[1] = {x__V4703}; BINDS(sink__V4666, 1, binds__V4709);
@@ -14772,7 +14772,7 @@ int step_M_F_Pattern_s66(Sink sink__V4717, Term term__V4718)
       Hashset namedFV__V4735 = LINK_VARIABLESET(sink__V4717->context, namedPropertyFreeVars(namedP__V4733));
       Hashset varFV__V4736 = LINK_VARIABLESET(sink__V4717->context, variablePropertyFreeVars(varP__V4734));
       UNLINK(sink__V4717->context, term__V4718);
-      ADD_PROPERTIES(sink__V4717, LINK_NamedPropertyLink(sink__V4717->context, namedP__V4733), LINK_VariablePropertyLink(sink__V4717->context, varP__V4734));
+      ADD_PROPERTIES(sink__V4717, LINK_VARIABLESET(sink__V4717->context, namedFV__V4735), LINK_VARIABLESET(sink__V4717->context, varFV__V4736), LINK_NamedPropertyLink(sink__V4717->context, namedP__V4733), LINK_VariablePropertyLink(sink__V4717->context, varP__V4734));
       { START(sink__V4717, _M_F_Pattern_s67);
         COPY(sink__V4717, sub__V4722);COPY(sink__V4717, sub__V4723);COPY(sink__V4717, sub__V4724);COPY(sink__V4717, sub__V4725);COPY(sink__V4717, sub__V4726);COPY(sink__V4717, sub__V4727);COPY(sink__V4717, sub__V4728);COPY(sink__V4717, sub__V4729);COPY(sink__V4717, sub__V4730);{ if (!IS_BOUND(x__V4731)) { REBIND(x__V4731);
             Variable binds__V4737[1] = {x__V4731}; BINDS(sink__V4717, 1, binds__V4737);
@@ -14825,7 +14825,7 @@ int step_M_F_Pattern_s66(Sink sink__V4717, Term term__V4718)
       Hashset namedFV__V4759 = LINK_VARIABLESET(sink__V4717->context, namedPropertyFreeVars(namedP__V4757));
       Hashset varFV__V4760 = LINK_VARIABLESET(sink__V4717->context, variablePropertyFreeVars(varP__V4758));
       UNLINK(sink__V4717->context, term__V4718);
-      ADD_PROPERTIES(sink__V4717, LINK_NamedPropertyLink(sink__V4717->context, namedP__V4757), LINK_VariablePropertyLink(sink__V4717->context, varP__V4758));
+      ADD_PROPERTIES(sink__V4717, LINK_VARIABLESET(sink__V4717->context, namedFV__V4759), LINK_VARIABLESET(sink__V4717->context, varFV__V4760), LINK_NamedPropertyLink(sink__V4717->context, namedP__V4757), LINK_VariablePropertyLink(sink__V4717->context, varP__V4758));
       { START(sink__V4717, _M_F_Pattern_s68);
         COPY(sink__V4717, sub__V4746);COPY(sink__V4717, sub__V4747);COPY(sink__V4717, sub__V4748);COPY(sink__V4717, sub__V4749);COPY(sink__V4717, sub__V4750);COPY(sink__V4717, sub__V4751);COPY(sink__V4717, sub__V4752);COPY(sink__V4717, sub__V4753);COPY(sink__V4717, sub__V4754);{ if (!IS_BOUND(x__V4755)) { REBIND(x__V4755);
             Variable binds__V4761[1] = {x__V4755}; BINDS(sink__V4717, 1, binds__V4761);
@@ -14911,7 +14911,7 @@ int step_M_F_Pattern_s67(Sink sink__V4769, Term term__V4770)
                 { START(sink__V4769, _M__sTextCons);
                   { START(sink__V4769, _M__sTextEmbed);
                     { START(sink__V4769, _M_AsText);
-                      ADD_PROPERTIES(sink__V4769, LINK_NamedPropertyLink(sink__V4769->context, namedP__V4782), LINK_VariablePropertyLink(sink__V4769->context, varP__V4783));
+                      ADD_PROPERTIES(sink__V4769, LINK_VARIABLESET(sink__V4769->context, namedFV__V4784), LINK_VARIABLESET(sink__V4769->context, varFV__V4785), LINK_NamedPropertyLink(sink__V4769->context, namedP__V4782), LINK_VariablePropertyLink(sink__V4769->context, varP__V4783));
                       { START(sink__V4769, _M_F_Pattern_Variable_Case_s1);
                         COPY(sink__V4769, sub__V4775);COPY(sink__V4769, sub__V4771);COPY(sink__V4769, sub__V4773);COPY(sink__V4769, sub__V4774);COPY(sink__V4769, sub__V4776);COPY(sink__V4769, sub__V4779);{ if (!IS_BOUND(x__V4780)) { REBIND(x__V4780);
                             Variable binds__V4786[1] = {x__V4780}; BINDS(sink__V4769, 1, binds__V4786);
@@ -14987,7 +14987,7 @@ int step_M_F_Pattern_s68(Sink sink__V4794, Term term__V4795)
     Hashset namedFV__V4809 = LINK_VARIABLESET(sink__V4794->context, namedPropertyFreeVars(namedP__V4807));
     Hashset varFV__V4810 = LINK_VARIABLESET(sink__V4794->context, variablePropertyFreeVars(varP__V4808));
     UNLINK(sink__V4794->context, term__V4795);
-    ADD_PROPERTIES(sink__V4794, LINK_NamedPropertyLink(sink__V4794->context, namedP__V4807), LINK_VariablePropertyLink(sink__V4794->context, varP__V4808));
+    ADD_PROPERTIES(sink__V4794, LINK_VARIABLESET(sink__V4794->context, namedFV__V4809), LINK_VARIABLESET(sink__V4794->context, varFV__V4810), LINK_NamedPropertyLink(sink__V4794->context, namedP__V4807), LINK_VariablePropertyLink(sink__V4794->context, varP__V4808));
     { START(sink__V4794, _M_F_Pattern_Variable_Case_s1);
       COPY(sink__V4794, sub__V4800);COPY(sink__V4794, sub__V4796);COPY(sink__V4794, sub__V4798);COPY(sink__V4794, sub__V4799);COPY(sink__V4794, sub__V4801);COPY(sink__V4794, sub__V4804);{ if (!IS_BOUND(x__V4805)) { REBIND(x__V4805);
           Variable binds__V4811[1] = {x__V4805}; BINDS(sink__V4794, 1, binds__V4811);
@@ -15051,7 +15051,7 @@ int step_M_F_Pattern_s69(Sink sink__V4819, Term term__V4820)
         Hashset namedFV__V4834 = LINK_VARIABLESET(sink__V4819->context, namedPropertyFreeVars(namedP__V4832));
         Hashset varFV__V4835 = LINK_VARIABLESET(sink__V4819->context, variablePropertyFreeVars(varP__V4833));
         UNLINK(sink__V4819->context, term__V4820);
-        ADD_PROPERTIES(sink__V4819, LINK_NamedPropertyLink(sink__V4819->context, namedP__V4832), LINK_VariablePropertyLink(sink__V4819->context, varP__V4833));
+        ADD_PROPERTIES(sink__V4819, LINK_VARIABLESET(sink__V4819->context, namedFV__V4834), LINK_VARIABLESET(sink__V4819->context, varFV__V4835), LINK_NamedPropertyLink(sink__V4819->context, namedP__V4832), LINK_VariablePropertyLink(sink__V4819->context, varP__V4833));
         { START(sink__V4819, _M_F_Pattern_s71);
           COPY(sink__V4819, sub__V4825);COPY(sink__V4819, sub__V4824);USE(sink__V4819, z__V277); COPY(sink__V4819, sub__V4826);COPY(sink__V4819, sub__V4827);COPY(sink__V4819, sub__V4828);COPY(sink__V4819, sub__V4829);{ if (!IS_BOUND(x__V4830)) { REBIND(x__V4830);
               Variable binds__V4836[1] = {x__V4830}; BINDS(sink__V4819, 1, binds__V4836);
@@ -15118,7 +15118,7 @@ int step_M_F_Pattern_s71(Sink sink__V4844, Term term__V4845)
         Hashset namedFV__V4859 = LINK_VARIABLESET(sink__V4844->context, namedPropertyFreeVars(namedP__V4857));
         Hashset varFV__V4860 = LINK_VARIABLESET(sink__V4844->context, variablePropertyFreeVars(varP__V4858));
         UNLINK(sink__V4844->context, term__V4845);
-        ADD_PROPERTIES(sink__V4844, LINK_NamedPropertyLink(sink__V4844->context, namedP__V4857), LINK_VariablePropertyLink(sink__V4844->context, varP__V4858));
+        ADD_PROPERTIES(sink__V4844, LINK_VARIABLESET(sink__V4844->context, namedFV__V4859), LINK_VARIABLESET(sink__V4844->context, varFV__V4860), LINK_NamedPropertyLink(sink__V4844->context, namedP__V4857), LINK_VariablePropertyLink(sink__V4844->context, varP__V4858));
         { START(sink__V4844, _M_F_Pattern_s73);
           COPY(sink__V4844, sub__V4854);COPY(sink__V4844, sub__V4849);COPY(sink__V4844, sub__V4850);COPY(sink__V4844, sub__V4851);COPY(sink__V4844, sub__V4852);COPY(sink__V4844, sub__V4853);USE(sink__V4844, z__V277); { if (!IS_BOUND(x__V4855)) { REBIND(x__V4855);
               Variable binds__V4861[1] = {x__V4855}; BINDS(sink__V4844, 1, binds__V4861);
@@ -15185,7 +15185,7 @@ int step_M_F_Pattern_s73(Sink sink__V4869, Term term__V4870)
         Hashset namedFV__V4884 = LINK_VARIABLESET(sink__V4869->context, namedPropertyFreeVars(namedP__V4882));
         Hashset varFV__V4885 = LINK_VARIABLESET(sink__V4869->context, variablePropertyFreeVars(varP__V4883));
         UNLINK(sink__V4869->context, term__V4870);
-        ADD_PROPERTIES(sink__V4869, LINK_NamedPropertyLink(sink__V4869->context, namedP__V4882), LINK_VariablePropertyLink(sink__V4869->context, varP__V4883));
+        ADD_PROPERTIES(sink__V4869, LINK_VARIABLESET(sink__V4869->context, namedFV__V4884), LINK_VARIABLESET(sink__V4869->context, varFV__V4885), LINK_NamedPropertyLink(sink__V4869->context, namedP__V4882), LINK_VariablePropertyLink(sink__V4869->context, varP__V4883));
         { START(sink__V4869, _M_F_Pattern_s74);
           USE(sink__V4869, z__V277); COPY(sink__V4869, sub__V4874);COPY(sink__V4869, sub__V4875);COPY(sink__V4869, sub__V4876);COPY(sink__V4869, sub__V4877);COPY(sink__V4869, sub__V4878);COPY(sink__V4869, sub__V4879);{ if (!IS_BOUND(x__V4880)) { REBIND(x__V4880);
               Variable binds__V4886[1] = {x__V4880}; BINDS(sink__V4869, 1, binds__V4886);
@@ -15250,7 +15250,7 @@ int step_M_F_Pattern_s74(Sink sink__V4894, Term term__V4895)
     Hashset namedFV__V4908 = LINK_VARIABLESET(sink__V4894->context, namedPropertyFreeVars(namedP__V4906));
     Hashset varFV__V4909 = LINK_VARIABLESET(sink__V4894->context, variablePropertyFreeVars(varP__V4907));
     UNLINK(sink__V4894->context, term__V4895);
-    ADD_PROPERTIES(sink__V4894, LINK_NamedPropertyLink(sink__V4894->context, namedP__V4906), LINK_VariablePropertyLink(sink__V4894->context, varP__V4907));
+    ADD_PROPERTIES(sink__V4894, LINK_VARIABLESET(sink__V4894->context, namedFV__V4908), LINK_VARIABLESET(sink__V4894->context, varFV__V4909), LINK_NamedPropertyLink(sink__V4894->context, namedP__V4906), LINK_VariablePropertyLink(sink__V4894->context, varP__V4907));
     { START(sink__V4894, _M_F_Pattern_s76);
       COPY(sink__V4894, value__V4905);COPY(sink__V4894, sub__V4897);COPY(sink__V4894, sub__V4898);COPY(sink__V4894, sub__V4899);COPY(sink__V4894, sub__V4900);COPY(sink__V4894, sub__V4901);COPY(sink__V4894, sub__V4902);{ if (!IS_BOUND(x__V4903)) { REBIND(x__V4903);
           Variable binds__V4910[1] = {x__V4903}; BINDS(sink__V4894, 1, binds__V4910);
@@ -15314,7 +15314,7 @@ int step_M_F_Pattern_s76(Sink sink__V4918, Term term__V4919)
       Hashset namedFV__V4934 = LINK_VARIABLESET(sink__V4918->context, namedPropertyFreeVars(namedP__V4932));
       Hashset varFV__V4935 = LINK_VARIABLESET(sink__V4918->context, variablePropertyFreeVars(varP__V4933));
       UNLINK(sink__V4918->context, term__V4919);
-      ADD_PROPERTIES(sink__V4918, LINK_NamedPropertyLink(sink__V4918->context, namedP__V4932), LINK_VariablePropertyLink(sink__V4918->context, varP__V4933));
+      ADD_PROPERTIES(sink__V4918, LINK_VARIABLESET(sink__V4918->context, namedFV__V4934), LINK_VARIABLESET(sink__V4918->context, varFV__V4935), LINK_NamedPropertyLink(sink__V4918->context, namedP__V4932), LINK_VariablePropertyLink(sink__V4918->context, varP__V4933));
       { START(sink__V4918, _M_F_Pattern_s77);
         COPY(sink__V4918, sub__V4923);COPY(sink__V4918, sub__V4924);COPY(sink__V4918, sub__V4925);COPY(sink__V4918, sub__V4926);COPY(sink__V4918, sub__V4927);COPY(sink__V4918, sub__V4928);{ if (!IS_BOUND(x__V4929)) { REBIND(x__V4929);
             Variable binds__V4936[1] = {x__V4929}; BINDS(sink__V4918, 1, binds__V4936);
@@ -15363,7 +15363,7 @@ int step_M_F_Pattern_s76(Sink sink__V4918, Term term__V4919)
       Hashset namedFV__V4956 = LINK_VARIABLESET(sink__V4918->context, namedPropertyFreeVars(namedP__V4954));
       Hashset varFV__V4957 = LINK_VARIABLESET(sink__V4918->context, variablePropertyFreeVars(varP__V4955));
       UNLINK(sink__V4918->context, term__V4919);
-      ADD_PROPERTIES(sink__V4918, LINK_NamedPropertyLink(sink__V4918->context, namedP__V4954), LINK_VariablePropertyLink(sink__V4918->context, varP__V4955));
+      ADD_PROPERTIES(sink__V4918, LINK_VARIABLESET(sink__V4918->context, namedFV__V4956), LINK_VARIABLESET(sink__V4918->context, varFV__V4957), LINK_NamedPropertyLink(sink__V4918->context, namedP__V4954), LINK_VariablePropertyLink(sink__V4918->context, varP__V4955));
       { START(sink__V4918, _M_F_Pattern_s82);
         COPY(sink__V4918, sub__V4945);COPY(sink__V4918, sub__V4946);COPY(sink__V4918, sub__V4947);COPY(sink__V4918, sub__V4948);COPY(sink__V4918, sub__V4949);COPY(sink__V4918, sub__V4950);{ if (!IS_BOUND(x__V4951)) { REBIND(x__V4951);
             Variable binds__V4958[1] = {x__V4951}; BINDS(sink__V4918, 1, binds__V4958);
@@ -15427,7 +15427,7 @@ int step_M_F_Pattern_s77(Sink sink__V4966, Term term__V4967)
     Hashset namedFV__V4980 = LINK_VARIABLESET(sink__V4966->context, namedPropertyFreeVars(namedP__V4978));
     Hashset varFV__V4981 = LINK_VARIABLESET(sink__V4966->context, variablePropertyFreeVars(varP__V4979));
     UNLINK(sink__V4966->context, term__V4967);
-    ADD_PROPERTIES(sink__V4966, LINK_NamedPropertyLink(sink__V4966->context, namedP__V4978), LINK_VariablePropertyLink(sink__V4966->context, varP__V4979));
+    ADD_PROPERTIES(sink__V4966, LINK_VARIABLESET(sink__V4966->context, namedFV__V4980), LINK_VARIABLESET(sink__V4966->context, varFV__V4981), LINK_NamedPropertyLink(sink__V4966->context, namedP__V4978), LINK_VariablePropertyLink(sink__V4966->context, varP__V4979));
     { START(sink__V4966, _M_F_Pattern_s79);
       COPY(sink__V4966, value__V4977);COPY(sink__V4966, sub__V4969);COPY(sink__V4966, sub__V4970);COPY(sink__V4966, sub__V4971);COPY(sink__V4966, sub__V4972);COPY(sink__V4966, sub__V4973);{ if (!IS_BOUND(x__V4974)) { REBIND(x__V4974);
           Variable binds__V4982[1] = {x__V4974}; BINDS(sink__V4966, 1, binds__V4982);
@@ -15497,7 +15497,7 @@ int step_M_F_Pattern_s79(Sink sink__V4990, Term term__V4991)
       Hashset namedFV__V5009 = LINK_VARIABLESET(sink__V4990->context, namedPropertyFreeVars(namedP__V5007));
       Hashset varFV__V5010 = LINK_VARIABLESET(sink__V4990->context, variablePropertyFreeVars(varP__V5008));
       UNLINK(sink__V4990->context, term__V4991);
-      ADD_PROPERTIES(sink__V4990, LINK_NamedPropertyLink(sink__V4990->context, namedP__V5007), LINK_VariablePropertyLink(sink__V4990->context, varP__V5008));
+      ADD_PROPERTIES(sink__V4990, LINK_VARIABLESET(sink__V4990->context, namedFV__V5009), LINK_VARIABLESET(sink__V4990->context, varFV__V5010), LINK_NamedPropertyLink(sink__V4990->context, namedP__V5007), LINK_VariablePropertyLink(sink__V4990->context, varP__V5008));
       { START(sink__V4990, _M_F_Pattern_s80);
         COPY(sink__V4990, sub__V4995);COPY(sink__V4990, sub__V4996);COPY(sink__V4990, sub__V4997);COPY(sink__V4990, sub__V4998);COPY(sink__V4990, sub__V4999);COPY(sink__V4990, sub__V5000);COPY(sink__V4990, sub__V5001);COPY(sink__V4990, sub__V5002);{ if (!IS_BOUND(x__V5003)) { REBIND(x__V5003);
             Variable binds__V5011[1] = {x__V5003}; BINDS(sink__V4990, 1, binds__V5011);
@@ -15569,7 +15569,7 @@ int step_M_F_Pattern_s80(Sink sink__V5019, Term term__V5020)
         Hashset namedFV__V5037 = LINK_VARIABLESET(sink__V5019->context, namedPropertyFreeVars(namedP__V5035));
         Hashset varFV__V5038 = LINK_VARIABLESET(sink__V5019->context, variablePropertyFreeVars(varP__V5036));
         UNLINK(sink__V5019->context, term__V5020);
-        ADD_PROPERTIES(sink__V5019, LINK_NamedPropertyLink(sink__V5019->context, namedP__V5035), LINK_VariablePropertyLink(sink__V5019->context, varP__V5036));
+        ADD_PROPERTIES(sink__V5019, LINK_VARIABLESET(sink__V5019->context, namedFV__V5037), LINK_VARIABLESET(sink__V5019->context, varFV__V5038), LINK_NamedPropertyLink(sink__V5019->context, namedP__V5035), LINK_VariablePropertyLink(sink__V5019->context, varP__V5036));
         { START(sink__V5019, _M_F_Pattern_s81);
           USE(sink__V5019, z__V277); COPY(sink__V5019, sub__V5024);COPY(sink__V5019, sub__V5025);COPY(sink__V5019, sub__V5026);COPY(sink__V5019, sub__V5027);COPY(sink__V5019, sub__V5028);COPY(sink__V5019, sub__V5029);COPY(sink__V5019, sub__V5030);{ if (!IS_BOUND(x__V5031)) { REBIND(x__V5031);
               Variable binds__V5039[1] = {x__V5031}; BINDS(sink__V5019, 1, binds__V5039);
@@ -15730,7 +15730,7 @@ int step_M_F_Pattern_s81(Sink sink__V5047, Term term__V5048)
                                       { START(sink__V5047, _M__sTextCons);
                                         { START(sink__V5047, _M__sTextEmbed);
                                           { START(sink__V5047, _M_AsText);
-                                            ADD_PROPERTIES(sink__V5047, LINK_NamedPropertyLink(sink__V5047->context, namedP__V5061), LINK_VariablePropertyLink(sink__V5047->context, varP__V5062));
+                                            ADD_PROPERTIES(sink__V5047, LINK_VARIABLESET(sink__V5047->context, namedFV__V5063), LINK_VARIABLESET(sink__V5047->context, varFV__V5064), LINK_NamedPropertyLink(sink__V5047->context, namedP__V5061), LINK_VariablePropertyLink(sink__V5047->context, varP__V5062));
                                             { START(sink__V5047, _M_F__unlink__refs_s1);
                                               { Term term__V5069;
                                                 { Term key__V5070;
@@ -15758,7 +15758,7 @@ int step_M_F_Pattern_s81(Sink sink__V5047, Term term__V5048)
                                             { START(sink__V5047, _M__sTextCons);
                                               { START(sink__V5047, _M__sTextEmbed);
                                                 { START(sink__V5047, _M_AsText);
-                                                  ADD_PROPERTIES(sink__V5047, LINK_NamedPropertyLink(sink__V5047->context, namedP__V5061), LINK_VariablePropertyLink(sink__V5047->context, varP__V5062));
+                                                  ADD_PROPERTIES(sink__V5047, LINK_VARIABLESET(sink__V5047->context, namedFV__V5063), LINK_VARIABLESET(sink__V5047->context, varFV__V5064), LINK_NamedPropertyLink(sink__V5047->context, namedP__V5061), LINK_VariablePropertyLink(sink__V5047->context, varP__V5062));
                                                   {
                                                     Term arg__V5073;
                                                     { Sink buf__V5074 = ALLOCA_BUFFER(sink__V5047->context);
@@ -15838,7 +15838,7 @@ int step_M_F_Pattern_s82(Sink sink__V5078, Term term__V5079)
     Hashset namedFV__V5092 = LINK_VARIABLESET(sink__V5078->context, namedPropertyFreeVars(namedP__V5090));
     Hashset varFV__V5093 = LINK_VARIABLESET(sink__V5078->context, variablePropertyFreeVars(varP__V5091));
     UNLINK(sink__V5078->context, term__V5079);
-    ADD_PROPERTIES(sink__V5078, LINK_NamedPropertyLink(sink__V5078->context, namedP__V5090), LINK_VariablePropertyLink(sink__V5078->context, varP__V5091));
+    ADD_PROPERTIES(sink__V5078, LINK_VARIABLESET(sink__V5078->context, namedFV__V5092), LINK_VARIABLESET(sink__V5078->context, varFV__V5093), LINK_NamedPropertyLink(sink__V5078->context, namedP__V5090), LINK_VariablePropertyLink(sink__V5078->context, varP__V5091));
     { START(sink__V5078, _M_F_Pattern_s84);
       COPY(sink__V5078, value__V5089);COPY(sink__V5078, sub__V5081);COPY(sink__V5078, sub__V5082);COPY(sink__V5078, sub__V5083);COPY(sink__V5078, sub__V5084);COPY(sink__V5078, sub__V5085);{ if (!IS_BOUND(x__V5086)) { REBIND(x__V5086);
           Variable binds__V5094[1] = {x__V5086}; BINDS(sink__V5078, 1, binds__V5094);
@@ -15908,7 +15908,7 @@ int step_M_F_Pattern_s84(Sink sink__V5102, Term term__V5103)
       Hashset namedFV__V5121 = LINK_VARIABLESET(sink__V5102->context, namedPropertyFreeVars(namedP__V5119));
       Hashset varFV__V5122 = LINK_VARIABLESET(sink__V5102->context, variablePropertyFreeVars(varP__V5120));
       UNLINK(sink__V5102->context, term__V5103);
-      ADD_PROPERTIES(sink__V5102, LINK_NamedPropertyLink(sink__V5102->context, namedP__V5119), LINK_VariablePropertyLink(sink__V5102->context, varP__V5120));
+      ADD_PROPERTIES(sink__V5102, LINK_VARIABLESET(sink__V5102->context, namedFV__V5121), LINK_VARIABLESET(sink__V5102->context, varFV__V5122), LINK_NamedPropertyLink(sink__V5102->context, namedP__V5119), LINK_VariablePropertyLink(sink__V5102->context, varP__V5120));
       { START(sink__V5102, _M_F_Pattern_s85);
         COPY(sink__V5102, sub__V5107);COPY(sink__V5102, sub__V5108);COPY(sink__V5102, sub__V5109);COPY(sink__V5102, sub__V5110);COPY(sink__V5102, sub__V5111);COPY(sink__V5102, sub__V5112);COPY(sink__V5102, sub__V5113);COPY(sink__V5102, sub__V5114);{ if (!IS_BOUND(x__V5115)) { REBIND(x__V5115);
             Variable binds__V5123[1] = {x__V5115}; BINDS(sink__V5102, 1, binds__V5123);
@@ -15980,7 +15980,7 @@ int step_M_F_Pattern_s85(Sink sink__V5131, Term term__V5132)
         Hashset namedFV__V5149 = LINK_VARIABLESET(sink__V5131->context, namedPropertyFreeVars(namedP__V5147));
         Hashset varFV__V5150 = LINK_VARIABLESET(sink__V5131->context, variablePropertyFreeVars(varP__V5148));
         UNLINK(sink__V5131->context, term__V5132);
-        ADD_PROPERTIES(sink__V5131, LINK_NamedPropertyLink(sink__V5131->context, namedP__V5147), LINK_VariablePropertyLink(sink__V5131->context, varP__V5148));
+        ADD_PROPERTIES(sink__V5131, LINK_VARIABLESET(sink__V5131->context, namedFV__V5149), LINK_VARIABLESET(sink__V5131->context, varFV__V5150), LINK_NamedPropertyLink(sink__V5131->context, namedP__V5147), LINK_VariablePropertyLink(sink__V5131->context, varP__V5148));
         { START(sink__V5131, _M_F_Pattern_s86);
           USE(sink__V5131, z__V277); COPY(sink__V5131, sub__V5136);COPY(sink__V5131, sub__V5137);COPY(sink__V5131, sub__V5138);COPY(sink__V5131, sub__V5139);COPY(sink__V5131, sub__V5140);COPY(sink__V5131, sub__V5141);COPY(sink__V5131, sub__V5142);{ if (!IS_BOUND(x__V5143)) { REBIND(x__V5143);
               Variable binds__V5151[1] = {x__V5143}; BINDS(sink__V5131, 1, binds__V5151);
@@ -16136,7 +16136,7 @@ int step_M_F_Pattern_s86(Sink sink__V5159, Term term__V5160)
                                           { START(sink__V5159, _M__sTextCons);
                                             { START(sink__V5159, _M__sTextEmbed);
                                               { START(sink__V5159, _M_AsText);
-                                                ADD_PROPERTIES(sink__V5159, LINK_NamedPropertyLink(sink__V5159->context, namedP__V5173), LINK_VariablePropertyLink(sink__V5159->context, varP__V5174));
+                                                ADD_PROPERTIES(sink__V5159, LINK_VARIABLESET(sink__V5159->context, namedFV__V5175), LINK_VARIABLESET(sink__V5159->context, varFV__V5176), LINK_NamedPropertyLink(sink__V5159->context, namedP__V5173), LINK_VariablePropertyLink(sink__V5159->context, varP__V5174));
                                                 {
                                                   Term arg__V5177;
                                                   { Sink buf__V5178 = ALLOCA_BUFFER(sink__V5159->context);
@@ -16226,7 +16226,7 @@ int step_M_F__then_Send_s1(Sink sink__V5182, Term term__V5183)
                 { START(sink__V5182, _M__sTextCons);
                   { START(sink__V5182, _M__sTextEmbed);
                     { START(sink__V5182, _M_AsText);
-                      ADD_PROPERTIES(sink__V5182, LINK_NamedPropertyLink(sink__V5182->context, namedP__V5187), LINK_VariablePropertyLink(sink__V5182->context, varP__V5188));
+                      ADD_PROPERTIES(sink__V5182, LINK_VARIABLESET(sink__V5182->context, namedFV__V5189), LINK_VARIABLESET(sink__V5182->context, varFV__V5190), LINK_NamedPropertyLink(sink__V5182->context, namedP__V5187), LINK_VariablePropertyLink(sink__V5182->context, varP__V5188));
                       { START(sink__V5182, _M_T__send);
                         COPY(sink__V5182, sub__V5185);COPY(sink__V5182, LINK(sink__V5182->context, sub__V5186));END(sink__V5182, _M_T__send); }
                       END(sink__V5182, _M_AsText); }
@@ -16234,7 +16234,7 @@ int step_M_F__then_Send_s1(Sink sink__V5182, Term term__V5183)
                   { START(sink__V5182, _M__sTextCons);
                     { START(sink__V5182, _M__sTextEmbed);
                       { START(sink__V5182, _M_AsText);
-                        ADD_PROPERTIES(sink__V5182, LINK_NamedPropertyLink(sink__V5182->context, namedP__V5187), LINK_VariablePropertyLink(sink__V5182->context, varP__V5188));
+                        ADD_PROPERTIES(sink__V5182, LINK_VARIABLESET(sink__V5182->context, namedFV__V5189), LINK_VARIABLESET(sink__V5182->context, varFV__V5190), LINK_NamedPropertyLink(sink__V5182->context, namedP__V5187), LINK_VariablePropertyLink(sink__V5182->context, varP__V5188));
                         { START(sink__V5182, _M_F__unlink__refs_s1);
                           { Term term__V5191;
                             { Term key__V5192;
@@ -16299,7 +16299,7 @@ int step_M_F__then_Options(Sink sink__V5195, Term term__V5196)
       Hashset namedFV__V5205 = LINK_VARIABLESET(sink__V5195->context, namedPropertyFreeVars(namedP__V5203));
       Hashset varFV__V5206 = LINK_VARIABLESET(sink__V5195->context, variablePropertyFreeVars(varP__V5204));
       UNLINK(sink__V5195->context, term__V5196);
-      ADD_PROPERTIES(sink__V5195, LINK_NamedPropertyLink(sink__V5195->context, namedP__V5203), LINK_VariablePropertyLink(sink__V5195->context, varP__V5204));
+      ADD_PROPERTIES(sink__V5195, LINK_VARIABLESET(sink__V5195->context, namedFV__V5205), LINK_VARIABLESET(sink__V5195->context, varFV__V5206), LINK_NamedPropertyLink(sink__V5195->context, namedP__V5203), LINK_VariablePropertyLink(sink__V5195->context, varP__V5204));
       { START(sink__V5195, _M_F__then_Options_s1);
         COPY(sink__V5195, sub__V5200);{ if (!IS_BOUND(x__V5201)) { REBIND(x__V5201);
             Variable binds__V5207[1] = {x__V5201}; BINDS(sink__V5195, 1, binds__V5207);
@@ -16355,7 +16355,7 @@ int step_M_F__variableOption_s1(Sink sink__V5215, Term term__V5216)
       Hashset namedFV__V5226 = LINK_VARIABLESET(sink__V5215->context, namedPropertyFreeVars(namedP__V5224));
       Hashset varFV__V5227 = LINK_VARIABLESET(sink__V5215->context, variablePropertyFreeVars(varP__V5225));
       UNLINK(sink__V5215->context, term__V5216);
-      ADD_PROPERTIES(sink__V5215, LINK_NamedPropertyLink(sink__V5215->context, namedP__V5224), LINK_VariablePropertyLink(sink__V5215->context, varP__V5225));
+      ADD_PROPERTIES(sink__V5215, LINK_VARIABLESET(sink__V5215->context, namedFV__V5226), LINK_VARIABLESET(sink__V5215->context, varFV__V5227), LINK_NamedPropertyLink(sink__V5215->context, namedP__V5224), LINK_VariablePropertyLink(sink__V5215->context, varP__V5225));
       { START(sink__V5215, _M_F__variableOption_s3);
         COPY(sink__V5215, sub__V5220);COPY(sink__V5215, sub__V5221);{ if (!IS_BOUND(x__V5222)) { REBIND(x__V5222);
             Variable binds__V5228[1] = {x__V5222}; BINDS(sink__V5215, 1, binds__V5228);
@@ -16396,7 +16396,7 @@ int step_M_F__variableOption_s1(Sink sink__V5215, Term term__V5216)
       Hashset namedFV__V5244 = LINK_VARIABLESET(sink__V5215->context, namedPropertyFreeVars(namedP__V5242));
       Hashset varFV__V5245 = LINK_VARIABLESET(sink__V5215->context, variablePropertyFreeVars(varP__V5243));
       UNLINK(sink__V5215->context, term__V5216);
-      ADD_PROPERTIES(sink__V5215, LINK_NamedPropertyLink(sink__V5215->context, namedP__V5242), LINK_VariablePropertyLink(sink__V5215->context, varP__V5243));
+      ADD_PROPERTIES(sink__V5215, LINK_VARIABLESET(sink__V5215->context, namedFV__V5244), LINK_VARIABLESET(sink__V5215->context, varFV__V5245), LINK_NamedPropertyLink(sink__V5215->context, namedP__V5242), LINK_VariablePropertyLink(sink__V5215->context, varP__V5243));
       { START(sink__V5215, _M_F__variableOption_s2);
         COPY(sink__V5215, sub__V5237);COPY(sink__V5215, sub__V5238);COPY(sink__V5215, sub__V5239);{ if (!IS_BOUND(x__V5240)) { REBIND(x__V5240);
             Variable binds__V5246[1] = {x__V5240}; BINDS(sink__V5215, 1, binds__V5246);
@@ -16449,7 +16449,7 @@ int step_M_F__variableOption_s2(Sink sink__V5254, Term term__V5255)
     Hashset namedFV__V5263 = LINK_VARIABLESET(sink__V5254->context, namedPropertyFreeVars(namedP__V5261));
     Hashset varFV__V5264 = LINK_VARIABLESET(sink__V5254->context, variablePropertyFreeVars(varP__V5262));
     UNLINK(sink__V5254->context, term__V5255);
-    ADD_PROPERTIES(sink__V5254, LINK_NamedPropertyLink(sink__V5254->context, namedP__V5261), LINK_VariablePropertyLink(sink__V5254->context, varP__V5262));
+    ADD_PROPERTIES(sink__V5254, LINK_VARIABLESET(sink__V5254->context, namedFV__V5263), LINK_VARIABLESET(sink__V5254->context, varFV__V5264), LINK_NamedPropertyLink(sink__V5254->context, namedP__V5261), LINK_VariablePropertyLink(sink__V5254->context, varP__V5262));
     { START(sink__V5254, _M_F__variableOption2_s1);
       COPY(sink__V5254, sub__V5257);COPY(sink__V5254, sub__V5256);COPY(sink__V5254, sub__V5258);{ if (!IS_BOUND(x__V5259)) { REBIND(x__V5259);
           Variable binds__V5265[1] = {x__V5259}; BINDS(sink__V5254, 1, binds__V5265);
@@ -16503,7 +16503,7 @@ int step_M_F__variableOption_s3(Sink sink__V5273, Term term__V5274)
         Hashset namedFV__V5283 = LINK_VARIABLESET(sink__V5273->context, namedPropertyFreeVars(namedP__V5281));
         Hashset varFV__V5284 = LINK_VARIABLESET(sink__V5273->context, variablePropertyFreeVars(varP__V5282));
         UNLINK(sink__V5273->context, term__V5274);
-        ADD_PROPERTIES(sink__V5273, LINK_NamedPropertyLink(sink__V5273->context, namedP__V5281), LINK_VariablePropertyLink(sink__V5273->context, varP__V5282));
+        ADD_PROPERTIES(sink__V5273, LINK_VARIABLESET(sink__V5273->context, namedFV__V5283), LINK_VARIABLESET(sink__V5273->context, varFV__V5284), LINK_NamedPropertyLink(sink__V5273->context, namedP__V5281), LINK_VariablePropertyLink(sink__V5273->context, varP__V5282));
         { START(sink__V5273, _M_F__variableOption_s4);
           USE(sink__V5273, z__V277); COPY(sink__V5273, sub__V5278);{ if (!IS_BOUND(x__V5279)) { REBIND(x__V5279);
               Variable binds__V5285[1] = {x__V5279}; BINDS(sink__V5273, 1, binds__V5285);
@@ -16555,7 +16555,7 @@ int step_M_F__variableOption_s4(Sink sink__V5293, Term term__V5294)
     Hashset namedFV__V5301 = LINK_VARIABLESET(sink__V5293->context, namedPropertyFreeVars(namedP__V5299));
     Hashset varFV__V5302 = LINK_VARIABLESET(sink__V5293->context, variablePropertyFreeVars(varP__V5300));
     UNLINK(sink__V5293->context, term__V5294);
-    ADD_PROPERTIES(sink__V5293, LINK_NamedPropertyLink(sink__V5293->context, namedP__V5299), LINK_VariablePropertyLink(sink__V5293->context, varP__V5300));
+    ADD_PROPERTIES(sink__V5293, LINK_VARIABLESET(sink__V5293->context, namedFV__V5301), LINK_VARIABLESET(sink__V5293->context, varFV__V5302), LINK_NamedPropertyLink(sink__V5293->context, namedP__V5299), LINK_VariablePropertyLink(sink__V5293->context, varP__V5300));
     { Term key__V5303, value__V5304;
       key__V5303 = sub__V5295; { Sink buf__V5305 = ALLOCA_BUFFER(sink__V5293->context);
         COPY(buf__V5305, sub__V5296);value__V5304 = BUFFER_TERM(buf__V5305); FREE_BUFFER(buf__V5305); }
@@ -16609,7 +16609,7 @@ int step_M_F_Contract_s1(Sink sink__V5311, Term term__V5312)
       Hashset namedFV__V5323 = LINK_VARIABLESET(sink__V5311->context, namedPropertyFreeVars(namedP__V5321));
       Hashset varFV__V5324 = LINK_VARIABLESET(sink__V5311->context, variablePropertyFreeVars(varP__V5322));
       UNLINK(sink__V5311->context, term__V5312);
-      ADD_PROPERTIES(sink__V5311, LINK_NamedPropertyLink(sink__V5311->context, namedP__V5321), LINK_VariablePropertyLink(sink__V5311->context, varP__V5322));
+      ADD_PROPERTIES(sink__V5311, LINK_VARIABLESET(sink__V5311->context, namedFV__V5323), LINK_VARIABLESET(sink__V5311->context, varFV__V5324), LINK_NamedPropertyLink(sink__V5311->context, namedP__V5321), LINK_VariablePropertyLink(sink__V5311->context, varP__V5322));
       { START(sink__V5311, _M_F_Contract_s2);
         COPY(sink__V5311, sub__V5316);COPY(sink__V5311, sub__V5317);COPY(sink__V5311, sub__V5318);COPY(sink__V5311, sub__V5319);COPY(sink__V5311, sub__V5320);END(sink__V5311, _M_F_Contract_s2); }
       UNLINK_VARIABLESET(sink__V5311->context, namedFV__V5323); UNLINK_VARIABLESET(sink__V5311->context, varFV__V5324);
@@ -16632,7 +16632,7 @@ int step_M_F_Contract_s1(Sink sink__V5311, Term term__V5312)
       Hashset namedFV__V5331 = LINK_VARIABLESET(sink__V5311->context, namedPropertyFreeVars(namedP__V5329));
       Hashset varFV__V5332 = LINK_VARIABLESET(sink__V5311->context, variablePropertyFreeVars(varP__V5330));
       UNLINK(sink__V5311->context, term__V5312);
-      ADD_PROPERTIES(sink__V5311, LINK_NamedPropertyLink(sink__V5311->context, namedP__V5329), LINK_VariablePropertyLink(sink__V5311->context, varP__V5330));
+      ADD_PROPERTIES(sink__V5311, LINK_VARIABLESET(sink__V5311->context, namedFV__V5331), LINK_VARIABLESET(sink__V5311->context, varFV__V5332), LINK_NamedPropertyLink(sink__V5311->context, namedP__V5329), LINK_VariablePropertyLink(sink__V5311->context, varP__V5330));
       { START(sink__V5311, _M_F_Contract_s4);
         COPY(sink__V5311, sub__V5326);COPY(sink__V5311, sub__V5327);COPY(sink__V5311, sub__V5328);END(sink__V5311, _M_F_Contract_s4); }
       UNLINK_VARIABLESET(sink__V5311->context, namedFV__V5331); UNLINK_VARIABLESET(sink__V5311->context, varFV__V5332);
@@ -16680,7 +16680,7 @@ int step_M_F_Contract_s2(Sink sink__V5333, Term term__V5334)
     Hashset namedFV__V5346 = LINK_VARIABLESET(sink__V5333->context, namedPropertyFreeVars(namedP__V5344));
     Hashset varFV__V5347 = LINK_VARIABLESET(sink__V5333->context, variablePropertyFreeVars(varP__V5345));
     UNLINK(sink__V5333->context, term__V5334);
-    ADD_PROPERTIES(sink__V5333, LINK_NamedPropertyLink(sink__V5333->context, namedP__V5344), LINK_VariablePropertyLink(sink__V5333->context, varP__V5345));
+    ADD_PROPERTIES(sink__V5333, LINK_VARIABLESET(sink__V5333->context, namedFV__V5346), LINK_VARIABLESET(sink__V5333->context, varFV__V5347), LINK_NamedPropertyLink(sink__V5333->context, namedP__V5344), LINK_VariablePropertyLink(sink__V5333->context, varP__V5345));
     { START(sink__V5333, _M_F_Contract_s3);
       COPY(sink__V5333, sub__V5336);COPY(sink__V5333, sub__V5337);COPY(sink__V5333, sub__V5338);COPY(sink__V5333, sub__V5339);COPY(sink__V5333, sub__V5340);COPY(sink__V5333, sub__V5341);COPY(sink__V5333, sub__V5342);COPY(sink__V5333, sub__V5343);END(sink__V5333, _M_F_Contract_s3); }
     UNLINK_VARIABLESET(sink__V5333->context, namedFV__V5346); UNLINK_VARIABLESET(sink__V5333->context, varFV__V5347);
@@ -16879,7 +16879,7 @@ int step_M_F_Contract_s4(Sink sink__V5374, Term term__V5375)
         Hashset namedFV__V5383 = LINK_VARIABLESET(sink__V5374->context, namedPropertyFreeVars(namedP__V5381));
         Hashset varFV__V5384 = LINK_VARIABLESET(sink__V5374->context, variablePropertyFreeVars(varP__V5382));
         UNLINK(sink__V5374->context, term__V5375);
-        ADD_PROPERTIES(sink__V5374, LINK_NamedPropertyLink(sink__V5374->context, namedP__V5381), LINK_VariablePropertyLink(sink__V5374->context, varP__V5382));
+        ADD_PROPERTIES(sink__V5374, LINK_VARIABLESET(sink__V5374->context, namedFV__V5383), LINK_VARIABLESET(sink__V5374->context, varFV__V5384), LINK_NamedPropertyLink(sink__V5374->context, namedP__V5381), LINK_VariablePropertyLink(sink__V5374->context, varP__V5382));
         { START(sink__V5374, _M_F_Contract_s6);
           COPY(sink__V5374, sub__V5380);COPY(sink__V5374, sub__V5379);USE(sink__V5374, z__V277); END(sink__V5374, _M_F_Contract_s6); }
         UNLINK_VARIABLESET(sink__V5374->context, namedFV__V5383); UNLINK_VARIABLESET(sink__V5374->context, varFV__V5384);
@@ -16920,7 +16920,7 @@ int step_M_F_Contract_s6(Sink sink__V5385, Term term__V5386)
         Hashset namedFV__V5394 = LINK_VARIABLESET(sink__V5385->context, namedPropertyFreeVars(namedP__V5392));
         Hashset varFV__V5395 = LINK_VARIABLESET(sink__V5385->context, variablePropertyFreeVars(varP__V5393));
         UNLINK(sink__V5385->context, term__V5386);
-        ADD_PROPERTIES(sink__V5385, LINK_NamedPropertyLink(sink__V5385->context, namedP__V5392), LINK_VariablePropertyLink(sink__V5385->context, varP__V5393));
+        ADD_PROPERTIES(sink__V5385, LINK_VARIABLESET(sink__V5385->context, namedFV__V5394), LINK_VARIABLESET(sink__V5385->context, varFV__V5395), LINK_NamedPropertyLink(sink__V5385->context, namedP__V5392), LINK_VariablePropertyLink(sink__V5385->context, varP__V5393));
         { START(sink__V5385, _M_F_Contract_s7);
           USE(sink__V5385, z__V277); COPY(sink__V5385, sub__V5390);COPY(sink__V5385, sub__V5391);END(sink__V5385, _M_F_Contract_s7); }
         UNLINK_VARIABLESET(sink__V5385->context, namedFV__V5394); UNLINK_VARIABLESET(sink__V5385->context, varFV__V5395);
@@ -16993,7 +16993,7 @@ int step_M_F_Fresh3_s1(Sink sink__V5405, Term term__V5406)
       Hashset namedFV__V5415 = LINK_VARIABLESET(sink__V5405->context, namedPropertyFreeVars(namedP__V5413));
       Hashset varFV__V5416 = LINK_VARIABLESET(sink__V5405->context, variablePropertyFreeVars(varP__V5414));
       UNLINK(sink__V5405->context, term__V5406);
-      ADD_PROPERTIES(sink__V5405, LINK_NamedPropertyLink(sink__V5405->context, namedP__V5413), LINK_VariablePropertyLink(sink__V5405->context, varP__V5414));
+      ADD_PROPERTIES(sink__V5405, LINK_VARIABLESET(sink__V5405->context, namedFV__V5415), LINK_VARIABLESET(sink__V5405->context, varFV__V5416), LINK_NamedPropertyLink(sink__V5405->context, namedP__V5413), LINK_VariablePropertyLink(sink__V5405->context, varP__V5414));
       { START(sink__V5405, _M_F_Fresh3_s2);
         COPY(sink__V5405, sub__V5410);COPY(sink__V5405, sub__V5411);COPY(sink__V5405, sub__V5412);END(sink__V5405, _M_F_Fresh3_s2); }
       UNLINK_VARIABLESET(sink__V5405->context, namedFV__V5415); UNLINK_VARIABLESET(sink__V5405->context, varFV__V5416);
@@ -17012,7 +17012,7 @@ int step_M_F_Fresh3_s1(Sink sink__V5405, Term term__V5406)
       Hashset namedFV__V5421 = LINK_VARIABLESET(sink__V5405->context, namedPropertyFreeVars(namedP__V5419));
       Hashset varFV__V5422 = LINK_VARIABLESET(sink__V5405->context, variablePropertyFreeVars(varP__V5420));
       UNLINK(sink__V5405->context, term__V5406);
-      ADD_PROPERTIES(sink__V5405, LINK_NamedPropertyLink(sink__V5405->context, namedP__V5419), LINK_VariablePropertyLink(sink__V5405->context, varP__V5420));
+      ADD_PROPERTIES(sink__V5405, LINK_VARIABLESET(sink__V5405->context, namedFV__V5421), LINK_VARIABLESET(sink__V5405->context, varFV__V5422), LINK_NamedPropertyLink(sink__V5405->context, namedP__V5419), LINK_VariablePropertyLink(sink__V5405->context, varP__V5420));
       { START(sink__V5405, _M_F_Fresh3_s3);
         COPY(sink__V5405, sub__V5418);END(sink__V5405, _M_F_Fresh3_s3); }
       UNLINK_VARIABLESET(sink__V5405->context, namedFV__V5421); UNLINK_VARIABLESET(sink__V5405->context, varFV__V5422);
@@ -17137,7 +17137,7 @@ int step_M_F_Pattern_MetaArgs_s10(Sink sink__V5439, Term term__V5440)
     Hashset namedFV__V5452 = LINK_VARIABLESET(sink__V5439->context, namedPropertyFreeVars(namedP__V5450));
     Hashset varFV__V5453 = LINK_VARIABLESET(sink__V5439->context, variablePropertyFreeVars(varP__V5451));
     UNLINK(sink__V5439->context, term__V5440);
-    ADD_PROPERTIES(sink__V5439, LINK_NamedPropertyLink(sink__V5439->context, namedP__V5450), LINK_VariablePropertyLink(sink__V5439->context, varP__V5451));
+    ADD_PROPERTIES(sink__V5439, LINK_VARIABLESET(sink__V5439->context, namedFV__V5452), LINK_VARIABLESET(sink__V5439->context, varFV__V5453), LINK_NamedPropertyLink(sink__V5439->context, namedP__V5450), LINK_VariablePropertyLink(sink__V5439->context, varP__V5451));
     { START(sink__V5439, _M_F_Pattern_MetaArgs__variable_s1);
       COPY(sink__V5439, sub__V5446);{ char *str__V5454;
         { char *sub__V5455[4]; size_t sublength__V5456[4]; size_t length__V5457 = 0;
@@ -17223,7 +17223,7 @@ int step_M_F_Pattern_MetaArgs_s11(Sink sink__V5478, Term term__V5479)
     Hashset namedFV__V5488 = LINK_VARIABLESET(sink__V5478->context, namedPropertyFreeVars(namedP__V5486));
     Hashset varFV__V5489 = LINK_VARIABLESET(sink__V5478->context, variablePropertyFreeVars(varP__V5487));
     UNLINK(sink__V5478->context, term__V5479);
-    ADD_PROPERTIES(sink__V5478, LINK_NamedPropertyLink(sink__V5478->context, namedP__V5486), LINK_VariablePropertyLink(sink__V5478->context, varP__V5487));
+    ADD_PROPERTIES(sink__V5478, LINK_VARIABLESET(sink__V5478->context, namedFV__V5488), LINK_VARIABLESET(sink__V5478->context, varFV__V5489), LINK_NamedPropertyLink(sink__V5478->context, namedP__V5486), LINK_VariablePropertyLink(sink__V5478->context, varP__V5487));
     { START(sink__V5478, _M_F_Pattern_MetaArgs__arity);
       { char *str__V5490;
         { char *sub__V5491[2]; size_t sublength__V5492[2]; size_t length__V5493 = 0;
@@ -17293,7 +17293,7 @@ int step_M_F__then_Pattern_Variable_Use2_s11(Sink sink__V5504, Term term__V5505)
         Hashset namedFV__V5516 = LINK_VARIABLESET(sink__V5504->context, namedPropertyFreeVars(namedP__V5514));
         Hashset varFV__V5517 = LINK_VARIABLESET(sink__V5504->context, variablePropertyFreeVars(varP__V5515));
         UNLINK(sink__V5504->context, term__V5505);
-        ADD_PROPERTIES(sink__V5504, LINK_NamedPropertyLink(sink__V5504->context, namedP__V5514), LINK_VariablePropertyLink(sink__V5504->context, varP__V5515));
+        ADD_PROPERTIES(sink__V5504, LINK_VARIABLESET(sink__V5504->context, namedFV__V5516), LINK_VARIABLESET(sink__V5504->context, varFV__V5517), LINK_NamedPropertyLink(sink__V5504->context, namedP__V5514), LINK_VariablePropertyLink(sink__V5504->context, varP__V5515));
         { START(sink__V5504, _M_F__then_Pattern_Variable_Use2_s13);
           COPY(sink__V5504, sub__V5511);COPY(sink__V5504, sub__V5509);COPY(sink__V5504, sub__V5510);USE(sink__V5504, z__V277); { if (!IS_BOUND(x__V5512)) { REBIND(x__V5512);
               Variable binds__V5518[1] = {x__V5512}; BINDS(sink__V5504, 1, binds__V5518);
@@ -17354,7 +17354,7 @@ int step_M_F__then_Pattern_Variable_Use2_s13(Sink sink__V5526, Term term__V5527)
         Hashset namedFV__V5538 = LINK_VARIABLESET(sink__V5526->context, namedPropertyFreeVars(namedP__V5536));
         Hashset varFV__V5539 = LINK_VARIABLESET(sink__V5526->context, variablePropertyFreeVars(varP__V5537));
         UNLINK(sink__V5526->context, term__V5527);
-        ADD_PROPERTIES(sink__V5526, LINK_NamedPropertyLink(sink__V5526->context, namedP__V5536), LINK_VariablePropertyLink(sink__V5526->context, varP__V5537));
+        ADD_PROPERTIES(sink__V5526, LINK_VARIABLESET(sink__V5526->context, namedFV__V5538), LINK_VARIABLESET(sink__V5526->context, varFV__V5539), LINK_NamedPropertyLink(sink__V5526->context, namedP__V5536), LINK_VariablePropertyLink(sink__V5526->context, varP__V5537));
         { START(sink__V5526, _M_F__then_Pattern_Variable_Use2_s14);
           USE(sink__V5526, z__V277); COPY(sink__V5526, sub__V5531);COPY(sink__V5526, sub__V5532);COPY(sink__V5526, sub__V5533);{ if (!IS_BOUND(x__V5534)) { REBIND(x__V5534);
               Variable binds__V5540[1] = {x__V5534}; BINDS(sink__V5526, 1, binds__V5540);
@@ -17463,7 +17463,7 @@ int step_M_F__then_Pattern_Variable_Use2_s14(Sink sink__V5548, Term term__V5549)
                             { START(sink__V5548, _M__sTextCons);
                               { START(sink__V5548, _M__sTextEmbed);
                                 { START(sink__V5548, _M_AsText);
-                                  ADD_PROPERTIES(sink__V5548, LINK_NamedPropertyLink(sink__V5548->context, namedP__V5556), LINK_VariablePropertyLink(sink__V5548->context, varP__V5557));
+                                  ADD_PROPERTIES(sink__V5548, LINK_VARIABLESET(sink__V5548->context, namedFV__V5558), LINK_VARIABLESET(sink__V5548->context, varFV__V5559), LINK_NamedPropertyLink(sink__V5548->context, namedP__V5556), LINK_VariablePropertyLink(sink__V5548->context, varP__V5557));
                                   {
                                     Term arg__V5560;
                                     { Sink buf__V5561 = ALLOCA_BUFFER(sink__V5548->context);
@@ -17531,7 +17531,7 @@ int step_M_F__variableOption2_s1(Sink sink__V5565, Term term__V5566)
       Hashset namedFV__V5578 = LINK_VARIABLESET(sink__V5565->context, namedPropertyFreeVars(namedP__V5576));
       Hashset varFV__V5579 = LINK_VARIABLESET(sink__V5565->context, variablePropertyFreeVars(varP__V5577));
       UNLINK(sink__V5565->context, term__V5566);
-      ADD_PROPERTIES(sink__V5565, LINK_NamedPropertyLink(sink__V5565->context, namedP__V5576), LINK_VariablePropertyLink(sink__V5565->context, varP__V5577));
+      ADD_PROPERTIES(sink__V5565, LINK_VARIABLESET(sink__V5565->context, namedFV__V5578), LINK_VARIABLESET(sink__V5565->context, varFV__V5579), LINK_NamedPropertyLink(sink__V5565->context, namedP__V5576), LINK_VariablePropertyLink(sink__V5565->context, varP__V5577));
       { START(sink__V5565, _M_F__variableOption2_s2);
         COPY(sink__V5565, sub__V5570);COPY(sink__V5565, sub__V5571);COPY(sink__V5565, sub__V5572);COPY(sink__V5565, sub__V5573);{ if (!IS_BOUND(x__V5574)) { REBIND(x__V5574);
             Variable binds__V5580[1] = {x__V5574}; BINDS(sink__V5565, 1, binds__V5580);
@@ -17570,7 +17570,7 @@ int step_M_F__variableOption2_s1(Sink sink__V5565, Term term__V5566)
       Hashset namedFV__V5595 = LINK_VARIABLESET(sink__V5565->context, namedPropertyFreeVars(namedP__V5593));
       Hashset varFV__V5596 = LINK_VARIABLESET(sink__V5565->context, variablePropertyFreeVars(varP__V5594));
       UNLINK(sink__V5565->context, term__V5566);
-      ADD_PROPERTIES(sink__V5565, LINK_NamedPropertyLink(sink__V5565->context, namedP__V5593), LINK_VariablePropertyLink(sink__V5565->context, varP__V5594));
+      ADD_PROPERTIES(sink__V5565, LINK_VARIABLESET(sink__V5565->context, namedFV__V5595), LINK_VARIABLESET(sink__V5565->context, varFV__V5596), LINK_NamedPropertyLink(sink__V5565->context, namedP__V5593), LINK_VariablePropertyLink(sink__V5565->context, varP__V5594));
       { START(sink__V5565, _M_F__variableOption2_s3);
         COPY(sink__V5565, sub__V5589);COPY(sink__V5565, sub__V5590);{ if (!IS_BOUND(x__V5591)) { REBIND(x__V5591);
             Variable binds__V5597[1] = {x__V5591}; BINDS(sink__V5565, 1, binds__V5597);
@@ -17625,7 +17625,7 @@ int step_M_F__variableOption2_s2(Sink sink__V5605, Term term__V5606)
     Hashset namedFV__V5615 = LINK_VARIABLESET(sink__V5605->context, namedPropertyFreeVars(namedP__V5613));
     Hashset varFV__V5616 = LINK_VARIABLESET(sink__V5605->context, variablePropertyFreeVars(varP__V5614));
     UNLINK(sink__V5605->context, term__V5606);
-    ADD_PROPERTIES(sink__V5605, LINK_NamedPropertyLink(sink__V5605->context, namedP__V5613), LINK_VariablePropertyLink(sink__V5605->context, varP__V5614));
+    ADD_PROPERTIES(sink__V5605, LINK_VARIABLESET(sink__V5605->context, namedFV__V5615), LINK_VARIABLESET(sink__V5605->context, varFV__V5616), LINK_NamedPropertyLink(sink__V5605->context, namedP__V5613), LINK_VariablePropertyLink(sink__V5605->context, varP__V5614));
     { START(sink__V5605, _M_F__variableOption3_s1);
       COPY(sink__V5605, sub__V5607);COPY(sink__V5605, LINK(sink__V5605->context, sub__V5610));{ Variable x__V5617 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V5605->context,"x__V5617");
         Variable binds__V5618[1] = {x__V5617}; BINDS(sink__V5605, 1, binds__V5618);
@@ -17679,7 +17679,7 @@ int step_M_F__variableOption2_s3(Sink sink__V5627, Term term__V5628)
     Hashset namedFV__V5635 = LINK_VARIABLESET(sink__V5627->context, namedPropertyFreeVars(namedP__V5633));
     Hashset varFV__V5636 = LINK_VARIABLESET(sink__V5627->context, variablePropertyFreeVars(varP__V5634));
     UNLINK(sink__V5627->context, term__V5628);
-    ADD_PROPERTIES(sink__V5627, LINK_NamedPropertyLink(sink__V5627->context, namedP__V5633), LINK_VariablePropertyLink(sink__V5627->context, varP__V5634));
+    ADD_PROPERTIES(sink__V5627, LINK_VARIABLESET(sink__V5627->context, namedFV__V5635), LINK_VARIABLESET(sink__V5627->context, varFV__V5636), LINK_NamedPropertyLink(sink__V5627->context, namedP__V5633), LINK_VariablePropertyLink(sink__V5627->context, varP__V5634));
     {
       Term arg__V5637;
       { Sink buf__V5638 = ALLOCA_BUFFER(sink__V5627->context);
@@ -17728,7 +17728,7 @@ int step_M_F__then_Pattern_Variable_Use2(Sink sink__V5642, Term term__V5643)
       Hashset namedFV__V5655 = LINK_VARIABLESET(sink__V5642->context, namedPropertyFreeVars(namedP__V5653));
       Hashset varFV__V5656 = LINK_VARIABLESET(sink__V5642->context, variablePropertyFreeVars(varP__V5654));
       UNLINK(sink__V5642->context, term__V5643);
-      ADD_PROPERTIES(sink__V5642, LINK_NamedPropertyLink(sink__V5642->context, namedP__V5653), LINK_VariablePropertyLink(sink__V5642->context, varP__V5654));
+      ADD_PROPERTIES(sink__V5642, LINK_VARIABLESET(sink__V5642->context, namedFV__V5655), LINK_VARIABLESET(sink__V5642->context, varFV__V5656), LINK_NamedPropertyLink(sink__V5642->context, namedP__V5653), LINK_VariablePropertyLink(sink__V5642->context, varP__V5654));
       { START(sink__V5642, _M_F__then_Pattern_Variable_Use2_s2);
         COPY(sink__V5642, sub__V5648);COPY(sink__V5642, sub__V5647);COPY(sink__V5642, sub__V5649);COPY(sink__V5642, sub__V5650);{ if (!IS_BOUND(x__V5651)) { REBIND(x__V5651);
             Variable binds__V5657[1] = {x__V5651}; BINDS(sink__V5642, 1, binds__V5657);
@@ -17771,7 +17771,7 @@ int step_M_F__then_Pattern_Variable_Use2(Sink sink__V5642, Term term__V5643)
       Hashset namedFV__V5674 = LINK_VARIABLESET(sink__V5642->context, namedPropertyFreeVars(namedP__V5672));
       Hashset varFV__V5675 = LINK_VARIABLESET(sink__V5642->context, variablePropertyFreeVars(varP__V5673));
       UNLINK(sink__V5642->context, term__V5643);
-      ADD_PROPERTIES(sink__V5642, LINK_NamedPropertyLink(sink__V5642->context, namedP__V5672), LINK_VariablePropertyLink(sink__V5642->context, varP__V5673));
+      ADD_PROPERTIES(sink__V5642, LINK_VARIABLESET(sink__V5642->context, namedFV__V5674), LINK_VARIABLESET(sink__V5642->context, varFV__V5675), LINK_NamedPropertyLink(sink__V5642->context, namedP__V5672), LINK_VariablePropertyLink(sink__V5642->context, varP__V5673));
       { START(sink__V5642, _M_F__then_Pattern_Variable_Use2_s9);
         COPY(sink__V5642, sub__V5667);COPY(sink__V5642, sub__V5666);COPY(sink__V5642, sub__V5668);COPY(sink__V5642, sub__V5669);{ if (!IS_BOUND(x__V5670)) { REBIND(x__V5670);
             Variable binds__V5676[1] = {x__V5670}; BINDS(sink__V5642, 1, binds__V5676);
@@ -17954,7 +17954,7 @@ int step_M_F__then_Pattern_Property(Sink sink__V5702, Term term__V5703)
       Hashset namedFV__V5716 = LINK_VARIABLESET(sink__V5702->context, namedPropertyFreeVars(namedP__V5714));
       Hashset varFV__V5717 = LINK_VARIABLESET(sink__V5702->context, variablePropertyFreeVars(varP__V5715));
       UNLINK(sink__V5702->context, term__V5703);
-      ADD_PROPERTIES(sink__V5702, LINK_NamedPropertyLink(sink__V5702->context, namedP__V5714), LINK_VariablePropertyLink(sink__V5702->context, varP__V5715));
+      ADD_PROPERTIES(sink__V5702, LINK_VARIABLESET(sink__V5702->context, namedFV__V5716), LINK_VARIABLESET(sink__V5702->context, varFV__V5717), LINK_NamedPropertyLink(sink__V5702->context, namedP__V5714), LINK_VariablePropertyLink(sink__V5702->context, varP__V5715));
       { START(sink__V5702, _M_F__then_Pattern_Property_s2);
         COPY(sink__V5702, sub__V5708);COPY(sink__V5702, sub__V5707);COPY(sink__V5702, sub__V5709);COPY(sink__V5702, sub__V5710);COPY(sink__V5702, sub__V5711);{ if (!IS_BOUND(x__V5712)) { REBIND(x__V5712);
             Variable binds__V5718[1] = {x__V5712}; BINDS(sink__V5702, 1, binds__V5718);
@@ -18018,7 +18018,7 @@ int step_M_F_Pattern_Variable_Case_s1(Sink sink__V5726, Term term__V5727)
         Hashset namedFV__V5740 = LINK_VARIABLESET(sink__V5726->context, namedPropertyFreeVars(namedP__V5738));
         Hashset varFV__V5741 = LINK_VARIABLESET(sink__V5726->context, variablePropertyFreeVars(varP__V5739));
         UNLINK(sink__V5726->context, term__V5727);
-        ADD_PROPERTIES(sink__V5726, LINK_NamedPropertyLink(sink__V5726->context, namedP__V5738), LINK_VariablePropertyLink(sink__V5726->context, varP__V5739));
+        ADD_PROPERTIES(sink__V5726, LINK_VARIABLESET(sink__V5726->context, namedFV__V5740), LINK_VARIABLESET(sink__V5726->context, varFV__V5741), LINK_NamedPropertyLink(sink__V5726->context, namedP__V5738), LINK_VariablePropertyLink(sink__V5726->context, varP__V5739));
         { START(sink__V5726, _M_F_Pattern_Variable_Case_s3);
           COPY(sink__V5726, sub__V5735);COPY(sink__V5726, sub__V5731);COPY(sink__V5726, sub__V5732);COPY(sink__V5726, sub__V5733);COPY(sink__V5726, sub__V5734);USE(sink__V5726, z__V277); { if (!IS_BOUND(x__V5736)) { REBIND(x__V5736);
               Variable binds__V5742[1] = {x__V5736}; BINDS(sink__V5726, 1, binds__V5742);
@@ -18083,7 +18083,7 @@ int step_M_F_Pattern_Variable_Case_s3(Sink sink__V5750, Term term__V5751)
         Hashset namedFV__V5764 = LINK_VARIABLESET(sink__V5750->context, namedPropertyFreeVars(namedP__V5762));
         Hashset varFV__V5765 = LINK_VARIABLESET(sink__V5750->context, variablePropertyFreeVars(varP__V5763));
         UNLINK(sink__V5750->context, term__V5751);
-        ADD_PROPERTIES(sink__V5750, LINK_NamedPropertyLink(sink__V5750->context, namedP__V5762), LINK_VariablePropertyLink(sink__V5750->context, varP__V5763));
+        ADD_PROPERTIES(sink__V5750, LINK_VARIABLESET(sink__V5750->context, namedFV__V5764), LINK_VARIABLESET(sink__V5750->context, varFV__V5765), LINK_NamedPropertyLink(sink__V5750->context, namedP__V5762), LINK_VariablePropertyLink(sink__V5750->context, varP__V5763));
         { START(sink__V5750, _M_F_Pattern_Variable_Case_s4);
           USE(sink__V5750, z__V277); COPY(sink__V5750, sub__V5755);COPY(sink__V5750, sub__V5756);COPY(sink__V5750, sub__V5757);COPY(sink__V5750, sub__V5758);COPY(sink__V5750, sub__V5759);{ if (!IS_BOUND(x__V5760)) { REBIND(x__V5760);
               Variable binds__V5766[1] = {x__V5760}; BINDS(sink__V5750, 1, binds__V5766);
@@ -18161,7 +18161,7 @@ int step_M_F_Pattern_Variable_Case_s4(Sink sink__V5774, Term term__V5775)
               { START(sink__V5774, _M__sTextCons);
                 { START(sink__V5774, _M__sTextEmbed);
                   { START(sink__V5774, _M_AsText);
-                    ADD_PROPERTIES(sink__V5774, LINK_NamedPropertyLink(sink__V5774->context, namedP__V5784), LINK_VariablePropertyLink(sink__V5774->context, varP__V5785));
+                    ADD_PROPERTIES(sink__V5774, LINK_VARIABLESET(sink__V5774->context, namedFV__V5786), LINK_VARIABLESET(sink__V5774->context, varFV__V5787), LINK_NamedPropertyLink(sink__V5774->context, namedP__V5784), LINK_VariablePropertyLink(sink__V5774->context, varP__V5785));
                     { START(sink__V5774, _M_F_Options);
                       COPY(sink__V5774, sub__V5777);{ Variable x__V5788 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V5774->context,"x__V5788");
                         Variable binds__V5789[1] = {x__V5788}; BINDS(sink__V5774, 1, binds__V5789);
@@ -18270,7 +18270,7 @@ int step_M_F_PatternSub_s2(Sink sink__V5798, Term term__V5799)
         Hashset namedFV__V5817 = LINK_VARIABLESET(sink__V5798->context, namedPropertyFreeVars(namedP__V5815));
         Hashset varFV__V5818 = LINK_VARIABLESET(sink__V5798->context, variablePropertyFreeVars(varP__V5816));
         UNLINK(sink__V5798->context, term__V5799);
-        ADD_PROPERTIES(sink__V5798, LINK_NamedPropertyLink(sink__V5798->context, namedP__V5815), LINK_VariablePropertyLink(sink__V5798->context, varP__V5816));
+        ADD_PROPERTIES(sink__V5798, LINK_VARIABLESET(sink__V5798->context, namedFV__V5817), LINK_VARIABLESET(sink__V5798->context, varFV__V5818), LINK_NamedPropertyLink(sink__V5798->context, namedP__V5815), LINK_VariablePropertyLink(sink__V5798->context, varP__V5816));
         { START(sink__V5798, _M_F_PatternSub_s4);
           COPY(sink__V5798, sub__V5811);COPY(sink__V5798, sub__V5803);COPY(sink__V5798, sub__V5804);COPY(sink__V5798, sub__V5805);COPY(sink__V5798, sub__V5806);COPY(sink__V5798, sub__V5807);COPY(sink__V5798, sub__V5808);COPY(sink__V5798, sub__V5809);COPY(sink__V5798, sub__V5810);USE(sink__V5798, z__V277); COPY(sink__V5798, sub__V5812);{ if (!IS_BOUND(x__V5813)) { REBIND(x__V5813);
               Variable binds__V5819[1] = {x__V5813}; BINDS(sink__V5798, 1, binds__V5819);
@@ -18345,7 +18345,7 @@ int step_M_F_PatternSub_s4(Sink sink__V5827, Term term__V5828)
         Hashset namedFV__V5846 = LINK_VARIABLESET(sink__V5827->context, namedPropertyFreeVars(namedP__V5844));
         Hashset varFV__V5847 = LINK_VARIABLESET(sink__V5827->context, variablePropertyFreeVars(varP__V5845));
         UNLINK(sink__V5827->context, term__V5828);
-        ADD_PROPERTIES(sink__V5827, LINK_NamedPropertyLink(sink__V5827->context, namedP__V5844), LINK_VariablePropertyLink(sink__V5827->context, varP__V5845));
+        ADD_PROPERTIES(sink__V5827, LINK_VARIABLESET(sink__V5827->context, namedFV__V5846), LINK_VARIABLESET(sink__V5827->context, varFV__V5847), LINK_NamedPropertyLink(sink__V5827->context, namedP__V5844), LINK_VariablePropertyLink(sink__V5827->context, varP__V5845));
         { START(sink__V5827, _M_F_PatternSub_s5);
           USE(sink__V5827, z__V277); COPY(sink__V5827, sub__V5832);COPY(sink__V5827, sub__V5833);COPY(sink__V5827, sub__V5834);COPY(sink__V5827, sub__V5835);COPY(sink__V5827, sub__V5836);COPY(sink__V5827, sub__V5837);COPY(sink__V5827, sub__V5838);COPY(sink__V5827, sub__V5839);COPY(sink__V5827, sub__V5840);COPY(sink__V5827, sub__V5841);{ if (!IS_BOUND(x__V5842)) { REBIND(x__V5842);
               Variable binds__V5848[1] = {x__V5842}; BINDS(sink__V5827, 1, binds__V5848);
@@ -18417,7 +18417,7 @@ int step_M_F_PatternSub_s5(Sink sink__V5856, Term term__V5857)
     Hashset namedFV__V5873 = LINK_VARIABLESET(sink__V5856->context, namedPropertyFreeVars(namedP__V5871));
     Hashset varFV__V5874 = LINK_VARIABLESET(sink__V5856->context, variablePropertyFreeVars(varP__V5872));
     UNLINK(sink__V5856->context, term__V5857);
-    ADD_PROPERTIES(sink__V5856, LINK_NamedPropertyLink(sink__V5856->context, namedP__V5871), LINK_VariablePropertyLink(sink__V5856->context, varP__V5872));
+    ADD_PROPERTIES(sink__V5856, LINK_VARIABLESET(sink__V5856->context, namedFV__V5873), LINK_VARIABLESET(sink__V5856->context, varFV__V5874), LINK_NamedPropertyLink(sink__V5856->context, namedP__V5871), LINK_VariablePropertyLink(sink__V5856->context, varP__V5872));
     { START(sink__V5856, _M_F_PatternSub2);
       { START(sink__V5856, _M__sFalse); END(sink__V5856, _M__sFalse); }
       COPY(sink__V5856, sub__V5860);COPY(sink__V5856, sub__V5861);COPY(sink__V5856, sub__V5862);COPY(sink__V5856, sub__V5863);COPY(sink__V5856, sub__V5867);COPY(sink__V5856, sub__V5865);COPY(sink__V5856, sub__V5866);COPY(sink__V5856, sub__V5858);COPY(sink__V5856, sub__V5868);{ if (!IS_BOUND(x__V5869)) { REBIND(x__V5869);
@@ -18492,7 +18492,7 @@ int step_M_F_PatternSub_s7(Sink sink__V5883, Term term__V5884)
         Hashset namedFV__V5903 = LINK_VARIABLESET(sink__V5883->context, namedPropertyFreeVars(namedP__V5901));
         Hashset varFV__V5904 = LINK_VARIABLESET(sink__V5883->context, variablePropertyFreeVars(varP__V5902));
         UNLINK(sink__V5883->context, term__V5884);
-        ADD_PROPERTIES(sink__V5883, LINK_NamedPropertyLink(sink__V5883->context, namedP__V5901), LINK_VariablePropertyLink(sink__V5883->context, varP__V5902));
+        ADD_PROPERTIES(sink__V5883, LINK_VARIABLESET(sink__V5883->context, namedFV__V5903), LINK_VARIABLESET(sink__V5883->context, varFV__V5904), LINK_NamedPropertyLink(sink__V5883->context, namedP__V5901), LINK_VariablePropertyLink(sink__V5883->context, varP__V5902));
         { START(sink__V5883, _M_F_PatternSub_s8);
           USE(sink__V5883, z__V277); COPY(sink__V5883, sub__V5888);COPY(sink__V5883, sub__V5889);COPY(sink__V5883, sub__V5890);COPY(sink__V5883, sub__V5891);COPY(sink__V5883, sub__V5892);COPY(sink__V5883, sub__V5893);COPY(sink__V5883, sub__V5894);COPY(sink__V5883, sub__V5895);COPY(sink__V5883, sub__V5896);COPY(sink__V5883, sub__V5897);COPY(sink__V5883, sub__V5898);{ if (!IS_BOUND(x__V5899)) { REBIND(x__V5899);
               Variable binds__V5905[1] = {x__V5899}; BINDS(sink__V5883, 1, binds__V5905);
@@ -18565,7 +18565,7 @@ int step_M_F_PatternSub_s8(Sink sink__V5913, Term term__V5914)
     Hashset namedFV__V5931 = LINK_VARIABLESET(sink__V5913->context, namedPropertyFreeVars(namedP__V5929));
     Hashset varFV__V5932 = LINK_VARIABLESET(sink__V5913->context, variablePropertyFreeVars(varP__V5930));
     UNLINK(sink__V5913->context, term__V5914);
-    ADD_PROPERTIES(sink__V5913, LINK_NamedPropertyLink(sink__V5913->context, namedP__V5929), LINK_VariablePropertyLink(sink__V5913->context, varP__V5930));
+    ADD_PROPERTIES(sink__V5913, LINK_VARIABLESET(sink__V5913->context, namedFV__V5931), LINK_VARIABLESET(sink__V5913->context, varFV__V5932), LINK_NamedPropertyLink(sink__V5913->context, namedP__V5929), LINK_VariablePropertyLink(sink__V5913->context, varP__V5930));
     { START(sink__V5913, _M_F_PatternSub2);
       { START(sink__V5913, _M__sFalse); END(sink__V5913, _M__sFalse); }
       COPY(sink__V5913, sub__V5918);COPY(sink__V5913, sub__V5919);COPY(sink__V5913, sub__V5920);COPY(sink__V5913, sub__V5921);COPY(sink__V5913, sub__V5922);COPY(sink__V5913, sub__V5923);COPY(sink__V5913, sub__V5924);COPY(sink__V5913, sub__V5915);COPY(sink__V5913, sub__V5926);{ if (!IS_BOUND(x__V5927)) { REBIND(x__V5927);
@@ -18630,7 +18630,7 @@ int step_M_F_PatternBinders_s1(Sink sink__V5941, Term term__V5942)
       Hashset namedFV__V5957 = LINK_VARIABLESET(sink__V5941->context, namedPropertyFreeVars(namedP__V5955));
       Hashset varFV__V5958 = LINK_VARIABLESET(sink__V5941->context, variablePropertyFreeVars(varP__V5956));
       UNLINK(sink__V5941->context, term__V5942);
-      ADD_PROPERTIES(sink__V5941, LINK_NamedPropertyLink(sink__V5941->context, namedP__V5955), LINK_VariablePropertyLink(sink__V5941->context, varP__V5956));
+      ADD_PROPERTIES(sink__V5941, LINK_VARIABLESET(sink__V5941->context, namedFV__V5957), LINK_VARIABLESET(sink__V5941->context, varFV__V5958), LINK_NamedPropertyLink(sink__V5941->context, namedP__V5955), LINK_VariablePropertyLink(sink__V5941->context, varP__V5956));
       { START(sink__V5941, _M_F_PatternBinders_s2);
         COPY(sink__V5941, sub__V5946);COPY(sink__V5941, sub__V5947);COPY(sink__V5941, sub__V5948);COPY(sink__V5941, sub__V5949);COPY(sink__V5941, sub__V5950);COPY(sink__V5941, sub__V5951);COPY(sink__V5941, sub__V5952);{ if (!IS_BOUND(x__V5953)) { REBIND(x__V5953);
             Variable binds__V5959[1] = {x__V5953}; BINDS(sink__V5941, 1, binds__V5959);
@@ -18675,7 +18675,7 @@ int step_M_F_PatternBinders_s1(Sink sink__V5941, Term term__V5942)
       Hashset namedFV__V5977 = LINK_VARIABLESET(sink__V5941->context, namedPropertyFreeVars(namedP__V5975));
       Hashset varFV__V5978 = LINK_VARIABLESET(sink__V5941->context, variablePropertyFreeVars(varP__V5976));
       UNLINK(sink__V5941->context, term__V5942);
-      ADD_PROPERTIES(sink__V5941, LINK_NamedPropertyLink(sink__V5941->context, namedP__V5975), LINK_VariablePropertyLink(sink__V5941->context, varP__V5976));
+      ADD_PROPERTIES(sink__V5941, LINK_VARIABLESET(sink__V5941->context, namedFV__V5977), LINK_VARIABLESET(sink__V5941->context, varFV__V5978), LINK_NamedPropertyLink(sink__V5941->context, namedP__V5975), LINK_VariablePropertyLink(sink__V5941->context, varP__V5976));
       { START(sink__V5941, _M_F_PatternBinders_s3);
         COPY(sink__V5941, sub__V5968);COPY(sink__V5941, sub__V5969);COPY(sink__V5941, sub__V5970);COPY(sink__V5941, sub__V5971);COPY(sink__V5941, sub__V5972);{ if (!IS_BOUND(x__V5973)) { REBIND(x__V5973);
             Variable binds__V5979[1] = {x__V5973}; BINDS(sink__V5941, 1, binds__V5979);
@@ -18736,7 +18736,7 @@ int step_M_F_PatternBinders_s2(Sink sink__V5987, Term term__V5988)
     Hashset namedFV__V6000 = LINK_VARIABLESET(sink__V5987->context, namedPropertyFreeVars(namedP__V5998));
     Hashset varFV__V6001 = LINK_VARIABLESET(sink__V5987->context, variablePropertyFreeVars(varP__V5999));
     UNLINK(sink__V5987->context, term__V5988);
-    ADD_PROPERTIES(sink__V5987, LINK_NamedPropertyLink(sink__V5987->context, namedP__V5998), LINK_VariablePropertyLink(sink__V5987->context, varP__V5999));
+    ADD_PROPERTIES(sink__V5987, LINK_VARIABLESET(sink__V5987->context, namedFV__V6000), LINK_VARIABLESET(sink__V5987->context, varFV__V6001), LINK_NamedPropertyLink(sink__V5987->context, namedP__V5998), LINK_VariablePropertyLink(sink__V5987->context, varP__V5999));
     { START(sink__V5987, _M_F_PatternBinder_s1);
       COPY(sink__V5987, sub__V5989);{ START(sink__V5987, _M_SUBMATCH);
         END(sink__V5987, _M_SUBMATCH); }
@@ -18804,7 +18804,7 @@ int step_M_F_PatternBinders_s3(Sink sink__V6014, Term term__V6015)
     Hashset namedFV__V6025 = LINK_VARIABLESET(sink__V6014->context, namedPropertyFreeVars(namedP__V6023));
     Hashset varFV__V6026 = LINK_VARIABLESET(sink__V6014->context, variablePropertyFreeVars(varP__V6024));
     UNLINK(sink__V6014->context, term__V6015);
-    ADD_PROPERTIES(sink__V6014, LINK_NamedPropertyLink(sink__V6014->context, namedP__V6023), LINK_VariablePropertyLink(sink__V6014->context, varP__V6024));
+    ADD_PROPERTIES(sink__V6014, LINK_VARIABLESET(sink__V6014->context, namedFV__V6025), LINK_VARIABLESET(sink__V6014->context, varFV__V6026), LINK_NamedPropertyLink(sink__V6014->context, namedP__V6023), LINK_VariablePropertyLink(sink__V6014->context, varP__V6024));
     {
       Term arg__V6027;
       { Sink buf__V6028 = ALLOCA_BUFFER(sink__V6014->context);
@@ -18890,7 +18890,7 @@ int step_M_F__variableFreshReuseOriginOption_s1(Sink sink__V6042, Term term__V60
       Hashset namedFV__V6055 = LINK_VARIABLESET(sink__V6042->context, namedPropertyFreeVars(namedP__V6053));
       Hashset varFV__V6056 = LINK_VARIABLESET(sink__V6042->context, variablePropertyFreeVars(varP__V6054));
       UNLINK(sink__V6042->context, term__V6043);
-      ADD_PROPERTIES(sink__V6042, LINK_NamedPropertyLink(sink__V6042->context, namedP__V6053), LINK_VariablePropertyLink(sink__V6042->context, varP__V6054));
+      ADD_PROPERTIES(sink__V6042, LINK_VARIABLESET(sink__V6042->context, namedFV__V6055), LINK_VARIABLESET(sink__V6042->context, varFV__V6056), LINK_NamedPropertyLink(sink__V6042->context, namedP__V6053), LINK_VariablePropertyLink(sink__V6042->context, varP__V6054));
       { START(sink__V6042, _M_F__variableFreshReuseOriginOption_s2);
         COPY(sink__V6042, sub__V6047);COPY(sink__V6042, sub__V6048);COPY(sink__V6042, sub__V6049);COPY(sink__V6042, sub__V6050);{ if (!IS_BOUND(x__V6051)) { REBIND(x__V6051);
             Variable binds__V6057[1] = {x__V6051}; BINDS(sink__V6042, 1, binds__V6057);
@@ -18945,7 +18945,7 @@ int step_M_F__variableFreshReuseOriginOption_s2(Sink sink__V6065, Term term__V60
     Hashset namedFV__V6075 = LINK_VARIABLESET(sink__V6065->context, namedPropertyFreeVars(namedP__V6073));
     Hashset varFV__V6076 = LINK_VARIABLESET(sink__V6065->context, variablePropertyFreeVars(varP__V6074));
     UNLINK(sink__V6065->context, term__V6066);
-    ADD_PROPERTIES(sink__V6065, LINK_NamedPropertyLink(sink__V6065->context, namedP__V6073), LINK_VariablePropertyLink(sink__V6065->context, varP__V6074));
+    ADD_PROPERTIES(sink__V6065, LINK_VARIABLESET(sink__V6065->context, namedFV__V6075), LINK_VARIABLESET(sink__V6065->context, varFV__V6076), LINK_NamedPropertyLink(sink__V6065->context, namedP__V6073), LINK_VariablePropertyLink(sink__V6065->context, varP__V6074));
     { START(sink__V6065, _M_F__variableFreshReuseOriginOption2);
       COPY(sink__V6065, sub__V6070);{ char *str__V6077;
         { char *sub__V6078[4]; size_t sublength__V6079[4]; size_t length__V6080 = 0;
@@ -19016,7 +19016,7 @@ int step_M_F_Options(Sink sink__V6093, Term term__V6094)
       Hashset namedFV__V6104 = LINK_VARIABLESET(sink__V6093->context, namedPropertyFreeVars(namedP__V6102));
       Hashset varFV__V6105 = LINK_VARIABLESET(sink__V6093->context, variablePropertyFreeVars(varP__V6103));
       UNLINK(sink__V6093->context, term__V6094);
-      ADD_PROPERTIES(sink__V6093, LINK_NamedPropertyLink(sink__V6093->context, namedP__V6102), LINK_VariablePropertyLink(sink__V6093->context, varP__V6103));
+      ADD_PROPERTIES(sink__V6093, LINK_VARIABLESET(sink__V6093->context, namedFV__V6104), LINK_VARIABLESET(sink__V6093->context, varFV__V6105), LINK_NamedPropertyLink(sink__V6093->context, namedP__V6102), LINK_VariablePropertyLink(sink__V6093->context, varP__V6103));
       { START(sink__V6093, _M_F_Options_s1);
         COPY(sink__V6093, sub__V6098);COPY(sink__V6093, sub__V6099);{ if (!IS_BOUND(x__V6100)) { REBIND(x__V6100);
             Variable binds__V6106[1] = {x__V6100}; BINDS(sink__V6093, 1, binds__V6106);
@@ -19051,7 +19051,7 @@ int step_M_F_Options(Sink sink__V6093, Term term__V6094)
       Hashset namedFV__V6119 = LINK_VARIABLESET(sink__V6093->context, namedPropertyFreeVars(namedP__V6117));
       Hashset varFV__V6120 = LINK_VARIABLESET(sink__V6093->context, variablePropertyFreeVars(varP__V6118));
       UNLINK(sink__V6093->context, term__V6094);
-      ADD_PROPERTIES(sink__V6093, LINK_NamedPropertyLink(sink__V6093->context, namedP__V6117), LINK_VariablePropertyLink(sink__V6093->context, varP__V6118));
+      ADD_PROPERTIES(sink__V6093, LINK_VARIABLESET(sink__V6093->context, namedFV__V6119), LINK_VARIABLESET(sink__V6093->context, varFV__V6120), LINK_NamedPropertyLink(sink__V6093->context, namedP__V6117), LINK_VariablePropertyLink(sink__V6093->context, varP__V6118));
       { START(sink__V6093, _M_F_Options_s3);
         { if (!IS_BOUND(x__V6115)) { REBIND(x__V6115);
             Variable binds__V6121[1] = {x__V6115}; BINDS(sink__V6093, 1, binds__V6121);
@@ -19113,7 +19113,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s2(Sink sink__V6129, Term term__V6130)
         Hashset namedFV__V6142 = LINK_VARIABLESET(sink__V6129->context, namedPropertyFreeVars(namedP__V6140));
         Hashset varFV__V6143 = LINK_VARIABLESET(sink__V6129->context, variablePropertyFreeVars(varP__V6141));
         UNLINK(sink__V6129->context, term__V6130);
-        ADD_PROPERTIES(sink__V6129, LINK_NamedPropertyLink(sink__V6129->context, namedP__V6140), LINK_VariablePropertyLink(sink__V6129->context, varP__V6141));
+        ADD_PROPERTIES(sink__V6129, LINK_VARIABLESET(sink__V6129->context, namedFV__V6142), LINK_VARIABLESET(sink__V6129->context, varFV__V6143), LINK_NamedPropertyLink(sink__V6129->context, namedP__V6140), LINK_VariablePropertyLink(sink__V6129->context, varP__V6141));
         { START(sink__V6129, _M_F_Pattern_MetaArgs_Norm_s4);
           COPY(sink__V6129, sub__V6137);COPY(sink__V6129, sub__V6134);COPY(sink__V6129, sub__V6135);COPY(sink__V6129, sub__V6136);USE(sink__V6129, z__V277); { if (!IS_BOUND(x__V6138)) { REBIND(x__V6138);
               Variable binds__V6144[1] = {x__V6138}; BINDS(sink__V6129, 1, binds__V6144);
@@ -19176,7 +19176,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s4(Sink sink__V6152, Term term__V6153)
         Hashset namedFV__V6165 = LINK_VARIABLESET(sink__V6152->context, namedPropertyFreeVars(namedP__V6163));
         Hashset varFV__V6166 = LINK_VARIABLESET(sink__V6152->context, variablePropertyFreeVars(varP__V6164));
         UNLINK(sink__V6152->context, term__V6153);
-        ADD_PROPERTIES(sink__V6152, LINK_NamedPropertyLink(sink__V6152->context, namedP__V6163), LINK_VariablePropertyLink(sink__V6152->context, varP__V6164));
+        ADD_PROPERTIES(sink__V6152, LINK_VARIABLESET(sink__V6152->context, namedFV__V6165), LINK_VARIABLESET(sink__V6152->context, varFV__V6166), LINK_NamedPropertyLink(sink__V6152->context, namedP__V6163), LINK_VariablePropertyLink(sink__V6152->context, varP__V6164));
         { START(sink__V6152, _M_F_Pattern_MetaArgs_Norm_s5);
           USE(sink__V6152, z__V277); COPY(sink__V6152, sub__V6157);COPY(sink__V6152, sub__V6158);COPY(sink__V6152, sub__V6159);COPY(sink__V6152, sub__V6160);{ if (!IS_BOUND(x__V6161)) { REBIND(x__V6161);
               Variable binds__V6167[1] = {x__V6161}; BINDS(sink__V6152, 1, binds__V6167);
@@ -19244,7 +19244,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s5(Sink sink__V6175, Term term__V6176)
       { START(sink__V6175, _M__sTextCons);
         { START(sink__V6175, _M__sTextEmbed);
           { START(sink__V6175, _M_AsText);
-            ADD_PROPERTIES(sink__V6175, LINK_NamedPropertyLink(sink__V6175->context, namedP__V6184), LINK_VariablePropertyLink(sink__V6175->context, varP__V6185));
+            ADD_PROPERTIES(sink__V6175, LINK_VARIABLESET(sink__V6175->context, namedFV__V6186), LINK_VARIABLESET(sink__V6175->context, varFV__V6187), LINK_NamedPropertyLink(sink__V6175->context, namedP__V6184), LINK_VariablePropertyLink(sink__V6175->context, varP__V6185));
             { START(sink__V6175, _M_F_Pattern_MetaArgs__bind_s1);
               COPY(sink__V6175, sub__V6177);COPY(sink__V6175, LINK(sink__V6175->context, sub__V6179));COPY(sink__V6175, sub__V6178);COPY(sink__V6175, sub__V6181);{ char *str__V6188;
                 { char *sub__V6189[2]; size_t sublength__V6190[2]; size_t length__V6191 = 0;
@@ -19322,7 +19322,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s7(Sink sink__V6202, Term term__V6203)
         Hashset namedFV__V6215 = LINK_VARIABLESET(sink__V6202->context, namedPropertyFreeVars(namedP__V6213));
         Hashset varFV__V6216 = LINK_VARIABLESET(sink__V6202->context, variablePropertyFreeVars(varP__V6214));
         UNLINK(sink__V6202->context, term__V6203);
-        ADD_PROPERTIES(sink__V6202, LINK_NamedPropertyLink(sink__V6202->context, namedP__V6213), LINK_VariablePropertyLink(sink__V6202->context, varP__V6214));
+        ADD_PROPERTIES(sink__V6202, LINK_VARIABLESET(sink__V6202->context, namedFV__V6215), LINK_VARIABLESET(sink__V6202->context, varFV__V6216), LINK_NamedPropertyLink(sink__V6202->context, namedP__V6213), LINK_VariablePropertyLink(sink__V6202->context, varP__V6214));
         { START(sink__V6202, _M_F_Pattern_MetaArgs_Norm_s8);
           USE(sink__V6202, z__V277); COPY(sink__V6202, sub__V6207);COPY(sink__V6202, sub__V6208);COPY(sink__V6202, sub__V6209);COPY(sink__V6202, sub__V6210);{ if (!IS_BOUND(x__V6211)) { REBIND(x__V6211);
               Variable binds__V6217[1] = {x__V6211}; BINDS(sink__V6202, 1, binds__V6217);
@@ -19383,7 +19383,7 @@ int step_M_F_Pattern_MetaArgs_Norm_s8(Sink sink__V6225, Term term__V6226)
     Hashset namedFV__V6237 = LINK_VARIABLESET(sink__V6225->context, namedPropertyFreeVars(namedP__V6235));
     Hashset varFV__V6238 = LINK_VARIABLESET(sink__V6225->context, variablePropertyFreeVars(varP__V6236));
     UNLINK(sink__V6225->context, term__V6226);
-    ADD_PROPERTIES(sink__V6225, LINK_NamedPropertyLink(sink__V6225->context, namedP__V6235), LINK_VariablePropertyLink(sink__V6225->context, varP__V6236));
+    ADD_PROPERTIES(sink__V6225, LINK_VARIABLESET(sink__V6225->context, namedFV__V6237), LINK_VARIABLESET(sink__V6225->context, varFV__V6238), LINK_NamedPropertyLink(sink__V6225->context, namedP__V6235), LINK_VariablePropertyLink(sink__V6225->context, varP__V6236));
     { START(sink__V6225, _M_F_Pattern_MetaArgs_Norm_s10);
       COPY(sink__V6225, value__V6234);COPY(sink__V6225, sub__V6228);COPY(sink__V6225, sub__V6229);COPY(sink__V6225, sub__V6230);COPY(sink__V6225, sub__V6231);{ if (!IS_BOUND(x__V6232)) { REBIND(x__V6232);
           Variable binds__V6239[1] = {x__V6232}; BINDS(sink__V6225, 1, binds__V6239);
@@ -19440,7 +19440,7 @@ int step_M_F__then_PatternBinders_s1(Sink sink__V6247, Term term__V6248)
     Hashset namedFV__V6259 = LINK_VARIABLESET(sink__V6247->context, namedPropertyFreeVars(namedP__V6257));
     Hashset varFV__V6260 = LINK_VARIABLESET(sink__V6247->context, variablePropertyFreeVars(varP__V6258));
     UNLINK(sink__V6247->context, term__V6248);
-    ADD_PROPERTIES(sink__V6247, LINK_NamedPropertyLink(sink__V6247->context, namedP__V6257), LINK_VariablePropertyLink(sink__V6247->context, varP__V6258));
+    ADD_PROPERTIES(sink__V6247, LINK_VARIABLESET(sink__V6247->context, namedFV__V6259), LINK_VARIABLESET(sink__V6247->context, varFV__V6260), LINK_NamedPropertyLink(sink__V6247->context, namedP__V6257), LINK_VariablePropertyLink(sink__V6247->context, varP__V6258));
     { START(sink__V6247, _M_F_PatternBinders_s1);
       COPY(sink__V6247, sub__V6250);COPY(sink__V6247, sub__V6249);COPY(sink__V6247, sub__V6251);COPY(sink__V6247, sub__V6252);COPY(sink__V6247, sub__V6253);COPY(sink__V6247, sub__V6254);{ if (!IS_BOUND(x__V6255)) { REBIND(x__V6255);
           Variable binds__V6261[1] = {x__V6255}; BINDS(sink__V6247, 1, binds__V6261);
@@ -19500,7 +19500,7 @@ int step_M_F_Pattern_MetaArgs_Norm(Sink sink__V6269, Term term__V6270)
       Hashset namedFV__V6283 = LINK_VARIABLESET(sink__V6269->context, namedPropertyFreeVars(namedP__V6281));
       Hashset varFV__V6284 = LINK_VARIABLESET(sink__V6269->context, variablePropertyFreeVars(varP__V6282));
       UNLINK(sink__V6269->context, term__V6270);
-      ADD_PROPERTIES(sink__V6269, LINK_NamedPropertyLink(sink__V6269->context, namedP__V6281), LINK_VariablePropertyLink(sink__V6269->context, varP__V6282));
+      ADD_PROPERTIES(sink__V6269, LINK_VARIABLESET(sink__V6269->context, namedFV__V6283), LINK_VARIABLESET(sink__V6269->context, varFV__V6284), LINK_NamedPropertyLink(sink__V6269->context, namedP__V6281), LINK_VariablePropertyLink(sink__V6269->context, varP__V6282));
       { START(sink__V6269, _M_F_Pattern_MetaArgs_Norm_s7);
         COPY(sink__V6269, sub__V6278);COPY(sink__V6269, sub__V6275);COPY(sink__V6269, sub__V6276);COPY(sink__V6269, sub__V6277);COPY(sink__V6269, sub__V6274);{ if (!IS_BOUND(x__V6279)) { REBIND(x__V6279);
             Variable binds__V6285[1] = {x__V6279}; BINDS(sink__V6269, 1, binds__V6285);
@@ -19545,7 +19545,7 @@ int step_M_F_Pattern_MetaArgs_Norm(Sink sink__V6269, Term term__V6270)
       Hashset namedFV__V6303 = LINK_VARIABLESET(sink__V6269->context, namedPropertyFreeVars(namedP__V6301));
       Hashset varFV__V6304 = LINK_VARIABLESET(sink__V6269->context, variablePropertyFreeVars(varP__V6302));
       UNLINK(sink__V6269->context, term__V6270);
-      ADD_PROPERTIES(sink__V6269, LINK_NamedPropertyLink(sink__V6269->context, namedP__V6301), LINK_VariablePropertyLink(sink__V6269->context, varP__V6302));
+      ADD_PROPERTIES(sink__V6269, LINK_VARIABLESET(sink__V6269->context, namedFV__V6303), LINK_VARIABLESET(sink__V6269->context, varFV__V6304), LINK_NamedPropertyLink(sink__V6269->context, namedP__V6301), LINK_VariablePropertyLink(sink__V6269->context, varP__V6302));
       { START(sink__V6269, _M_F_Pattern_MetaArgs_Norm_s2);
         COPY(sink__V6269, sub__V6296);COPY(sink__V6269, sub__V6295);COPY(sink__V6269, sub__V6294);COPY(sink__V6269, sub__V6297);COPY(sink__V6269, sub__V6298);{ if (!IS_BOUND(x__V6299)) { REBIND(x__V6299);
             Variable binds__V6305[1] = {x__V6299}; BINDS(sink__V6269, 1, binds__V6305);
@@ -19596,7 +19596,7 @@ int step_M_F__unlink2_s1(Sink sink__V6313, Term term__V6314)
       Hashset namedFV__V6321 = LINK_VARIABLESET(sink__V6313->context, namedPropertyFreeVars(namedP__V6319));
       Hashset varFV__V6322 = LINK_VARIABLESET(sink__V6313->context, variablePropertyFreeVars(varP__V6320));
       UNLINK(sink__V6313->context, term__V6314);
-      ADD_PROPERTIES(sink__V6313, LINK_NamedPropertyLink(sink__V6313->context, namedP__V6319), LINK_VariablePropertyLink(sink__V6313->context, varP__V6320));
+      ADD_PROPERTIES(sink__V6313, LINK_VARIABLESET(sink__V6313->context, namedFV__V6321), LINK_VARIABLESET(sink__V6313->context, varFV__V6322), LINK_NamedPropertyLink(sink__V6313->context, namedP__V6319), LINK_VariablePropertyLink(sink__V6313->context, varP__V6320));
       { START(sink__V6313, _M_F__unlink2_s6);
         COPY(sink__V6313, sub__V6318);END(sink__V6313, _M_F__unlink2_s6); }
       UNLINK_VARIABLESET(sink__V6313->context, namedFV__V6321); UNLINK_VARIABLESET(sink__V6313->context, varFV__V6322);
@@ -19619,7 +19619,7 @@ int step_M_F__unlink2_s1(Sink sink__V6313, Term term__V6314)
       Hashset namedFV__V6329 = LINK_VARIABLESET(sink__V6313->context, namedPropertyFreeVars(namedP__V6327));
       Hashset varFV__V6330 = LINK_VARIABLESET(sink__V6313->context, variablePropertyFreeVars(varP__V6328));
       UNLINK(sink__V6313->context, term__V6314);
-      ADD_PROPERTIES(sink__V6313, LINK_NamedPropertyLink(sink__V6313->context, namedP__V6327), LINK_VariablePropertyLink(sink__V6313->context, varP__V6328));
+      ADD_PROPERTIES(sink__V6313, LINK_VARIABLESET(sink__V6313->context, namedFV__V6329), LINK_VARIABLESET(sink__V6313->context, varFV__V6330), LINK_NamedPropertyLink(sink__V6313->context, namedP__V6327), LINK_VariablePropertyLink(sink__V6313->context, varP__V6328));
       { START(sink__V6313, _M_F__unlink2_s2);
         COPY(sink__V6313, sub__V6324);COPY(sink__V6313, sub__V6325);COPY(sink__V6313, sub__V6326);END(sink__V6313, _M_F__unlink2_s2); }
       UNLINK_VARIABLESET(sink__V6313->context, namedFV__V6329); UNLINK_VARIABLESET(sink__V6313->context, varFV__V6330);
@@ -19654,7 +19654,7 @@ int step_M_F__unlink2_s2(Sink sink__V6331, Term term__V6332)
     Hashset namedFV__V6338 = LINK_VARIABLESET(sink__V6331->context, namedPropertyFreeVars(namedP__V6336));
     Hashset varFV__V6339 = LINK_VARIABLESET(sink__V6331->context, variablePropertyFreeVars(varP__V6337));
     UNLINK(sink__V6331->context, term__V6332);
-    ADD_PROPERTIES(sink__V6331, LINK_NamedPropertyLink(sink__V6331->context, namedP__V6336), LINK_VariablePropertyLink(sink__V6331->context, varP__V6337));
+    ADD_PROPERTIES(sink__V6331, LINK_VARIABLESET(sink__V6331->context, namedFV__V6338), LINK_VARIABLESET(sink__V6331->context, varFV__V6339), LINK_NamedPropertyLink(sink__V6331->context, namedP__V6336), LINK_VariablePropertyLink(sink__V6331->context, varP__V6337));
     { START(sink__V6331, _M_F__unlink2_s4);
       COPY(sink__V6331, sub__V6335);COPY(sink__V6331, sub__V6334);USE(sink__V6331, z__V277); END(sink__V6331, _M_F__unlink2_s4); }
     UNLINK_VARIABLESET(sink__V6331->context, namedFV__V6338); UNLINK_VARIABLESET(sink__V6331->context, varFV__V6339);
@@ -19692,7 +19692,7 @@ int step_M_F__unlink2_s4(Sink sink__V6340, Term term__V6341)
         Hashset namedFV__V6349 = LINK_VARIABLESET(sink__V6340->context, namedPropertyFreeVars(namedP__V6347));
         Hashset varFV__V6350 = LINK_VARIABLESET(sink__V6340->context, variablePropertyFreeVars(varP__V6348));
         UNLINK(sink__V6340->context, term__V6341);
-        ADD_PROPERTIES(sink__V6340, LINK_NamedPropertyLink(sink__V6340->context, namedP__V6347), LINK_VariablePropertyLink(sink__V6340->context, varP__V6348));
+        ADD_PROPERTIES(sink__V6340, LINK_VARIABLESET(sink__V6340->context, namedFV__V6349), LINK_VARIABLESET(sink__V6340->context, varFV__V6350), LINK_NamedPropertyLink(sink__V6340->context, namedP__V6347), LINK_VariablePropertyLink(sink__V6340->context, varP__V6348));
         { START(sink__V6340, _M_F__unlink2_s5);
           USE(sink__V6340, z__V277); COPY(sink__V6340, sub__V6345);COPY(sink__V6340, sub__V6346);END(sink__V6340, _M_F__unlink2_s5); }
         UNLINK_VARIABLESET(sink__V6340->context, namedFV__V6349); UNLINK_VARIABLESET(sink__V6340->context, varFV__V6350);
@@ -19828,7 +19828,7 @@ int step_M_F__then_Fresh_s1(Sink sink__V6367, Term term__V6368)
         Hashset namedFV__V6377 = LINK_VARIABLESET(sink__V6367->context, namedPropertyFreeVars(namedP__V6375));
         Hashset varFV__V6378 = LINK_VARIABLESET(sink__V6367->context, variablePropertyFreeVars(varP__V6376));
         UNLINK(sink__V6367->context, term__V6368);
-        ADD_PROPERTIES(sink__V6367, LINK_NamedPropertyLink(sink__V6367->context, namedP__V6375), LINK_VariablePropertyLink(sink__V6367->context, varP__V6376));
+        ADD_PROPERTIES(sink__V6367, LINK_VARIABLESET(sink__V6367->context, namedFV__V6377), LINK_VARIABLESET(sink__V6367->context, varFV__V6378), LINK_NamedPropertyLink(sink__V6367->context, namedP__V6375), LINK_VariablePropertyLink(sink__V6367->context, varP__V6376));
         { START(sink__V6367, _M_F__then_Fresh_s2);
           USE(sink__V6367, z__V277); COPY(sink__V6367, sub__V6372);{ if (!IS_BOUND(x__V6373)) { REBIND(x__V6373);
               Variable binds__V6379[1] = {x__V6373}; BINDS(sink__V6367, 1, binds__V6379);
@@ -19891,7 +19891,7 @@ int step_M_F__then_Fresh_s2(Sink sink__V6387, Term term__V6388)
       { START(sink__V6387, _M__sTextCons);
         { START(sink__V6387, _M__sTextEmbed);
           { START(sink__V6387, _M_AsText);
-            ADD_PROPERTIES(sink__V6387, LINK_NamedPropertyLink(sink__V6387->context, namedP__V6393), LINK_VariablePropertyLink(sink__V6387->context, varP__V6394));
+            ADD_PROPERTIES(sink__V6387, LINK_VARIABLESET(sink__V6387->context, namedFV__V6395), LINK_VARIABLESET(sink__V6387->context, varFV__V6396), LINK_NamedPropertyLink(sink__V6387->context, namedP__V6393), LINK_VariablePropertyLink(sink__V6387->context, varP__V6394));
             {
               Term arg__V6397;
               { Sink buf__V6398 = ALLOCA_BUFFER(sink__V6387->context);
@@ -19942,7 +19942,7 @@ int step_M_F__then_Pattern_Ref_s1(Sink sink__V6402, Term term__V6403)
     Hashset namedFV__V6412 = LINK_VARIABLESET(sink__V6402->context, namedPropertyFreeVars(namedP__V6410));
     Hashset varFV__V6413 = LINK_VARIABLESET(sink__V6402->context, variablePropertyFreeVars(varP__V6411));
     UNLINK(sink__V6402->context, term__V6403);
-    ADD_PROPERTIES(sink__V6402, LINK_NamedPropertyLink(sink__V6402->context, namedP__V6410), LINK_VariablePropertyLink(sink__V6402->context, varP__V6411));
+    ADD_PROPERTIES(sink__V6402, LINK_VARIABLESET(sink__V6402->context, namedFV__V6412), LINK_VARIABLESET(sink__V6402->context, varFV__V6413), LINK_NamedPropertyLink(sink__V6402->context, namedP__V6410), LINK_VariablePropertyLink(sink__V6402->context, varP__V6411));
     { START(sink__V6402, _M_F__then_Pattern_Ref_s3);
       COPY(sink__V6402, value__V6409);COPY(sink__V6402, sub__V6405);COPY(sink__V6402, sub__V6406);{ if (!IS_BOUND(x__V6407)) { REBIND(x__V6407);
           Variable binds__V6414[1] = {x__V6407}; BINDS(sink__V6402, 1, binds__V6414);
@@ -20000,7 +20000,7 @@ int step_M_F__then_Pattern_Ref_s3(Sink sink__V6422, Term term__V6423)
       Hashset namedFV__V6435 = LINK_VARIABLESET(sink__V6422->context, namedPropertyFreeVars(namedP__V6433));
       Hashset varFV__V6436 = LINK_VARIABLESET(sink__V6422->context, variablePropertyFreeVars(varP__V6434));
       UNLINK(sink__V6422->context, term__V6423);
-      ADD_PROPERTIES(sink__V6422, LINK_NamedPropertyLink(sink__V6422->context, namedP__V6433), LINK_VariablePropertyLink(sink__V6422->context, varP__V6434));
+      ADD_PROPERTIES(sink__V6422, LINK_VARIABLESET(sink__V6422->context, namedFV__V6435), LINK_VARIABLESET(sink__V6422->context, varFV__V6436), LINK_NamedPropertyLink(sink__V6422->context, namedP__V6433), LINK_VariablePropertyLink(sink__V6422->context, varP__V6434));
       { START(sink__V6422, _M_F__then_Pattern_Ref_s4);
         COPY(sink__V6422, sub__V6427);COPY(sink__V6422, sub__V6428);COPY(sink__V6422, sub__V6429);{ if (!IS_BOUND(x__V6430)) { REBIND(x__V6430);
             Variable binds__V6437[1] = {x__V6430}; BINDS(sink__V6422, 1, binds__V6437);
@@ -20204,7 +20204,7 @@ int step_M_F__then_Pattern_Ref_s4(Sink sink__V6445, Term term__V6446)
                                                                       { START(sink__V6445, _M__sTextCons);
                                                                         { START(sink__V6445, _M__sTextEmbed);
                                                                           { START(sink__V6445, _M_AsText);
-                                                                            ADD_PROPERTIES(sink__V6445, LINK_NamedPropertyLink(sink__V6445->context, namedP__V6457), LINK_VariablePropertyLink(sink__V6445->context, varP__V6458));
+                                                                            ADD_PROPERTIES(sink__V6445, LINK_VARIABLESET(sink__V6445->context, namedFV__V6459), LINK_VARIABLESET(sink__V6445->context, varFV__V6460), LINK_NamedPropertyLink(sink__V6445->context, namedP__V6457), LINK_VariablePropertyLink(sink__V6445->context, varP__V6458));
                                                                             { Term value__V6461;
                                                                               { Sink buf__V6462 = ALLOCA_BUFFER(sink__V6445->context);
                                                                                 { START(buf__V6462, _M_LIST_xSTRING);
@@ -20309,7 +20309,7 @@ int step_M_F_Pattern_NeedNorm_s1(Sink sink__V6471, Term term__V6472)
       Hashset namedFV__V6480 = LINK_VARIABLESET(sink__V6471->context, namedPropertyFreeVars(namedP__V6478));
       Hashset varFV__V6481 = LINK_VARIABLESET(sink__V6471->context, variablePropertyFreeVars(varP__V6479));
       UNLINK(sink__V6471->context, term__V6472);
-      ADD_PROPERTIES(sink__V6471, LINK_NamedPropertyLink(sink__V6471->context, namedP__V6478), LINK_VariablePropertyLink(sink__V6471->context, varP__V6479));
+      ADD_PROPERTIES(sink__V6471, LINK_VARIABLESET(sink__V6471->context, namedFV__V6480), LINK_VARIABLESET(sink__V6471->context, varFV__V6481), LINK_NamedPropertyLink(sink__V6471->context, namedP__V6478), LINK_VariablePropertyLink(sink__V6471->context, varP__V6479));
       { START(sink__V6471, _M_F_Pattern_NeedNorm_s3);
         COPY(sink__V6471, sub__V6476);COPY(sink__V6471, sub__V6477);END(sink__V6471, _M_F_Pattern_NeedNorm_s3); }
       UNLINK_VARIABLESET(sink__V6471->context, namedFV__V6480); UNLINK_VARIABLESET(sink__V6471->context, varFV__V6481);
@@ -20328,7 +20328,7 @@ int step_M_F_Pattern_NeedNorm_s1(Sink sink__V6471, Term term__V6472)
       Hashset namedFV__V6486 = LINK_VARIABLESET(sink__V6471->context, namedPropertyFreeVars(namedP__V6484));
       Hashset varFV__V6487 = LINK_VARIABLESET(sink__V6471->context, variablePropertyFreeVars(varP__V6485));
       UNLINK(sink__V6471->context, term__V6472);
-      ADD_PROPERTIES(sink__V6471, LINK_NamedPropertyLink(sink__V6471->context, namedP__V6484), LINK_VariablePropertyLink(sink__V6471->context, varP__V6485));
+      ADD_PROPERTIES(sink__V6471, LINK_VARIABLESET(sink__V6471->context, namedFV__V6486), LINK_VARIABLESET(sink__V6471->context, varFV__V6487), LINK_NamedPropertyLink(sink__V6471->context, namedP__V6484), LINK_VariablePropertyLink(sink__V6471->context, varP__V6485));
       { START(sink__V6471, _M_F_Pattern_NeedNorm_s2);
         COPY(sink__V6471, sub__V6483);END(sink__V6471, _M_F_Pattern_NeedNorm_s2); }
       UNLINK_VARIABLESET(sink__V6471->context, namedFV__V6486); UNLINK_VARIABLESET(sink__V6471->context, varFV__V6487);
@@ -20466,7 +20466,7 @@ int step_M_F_Pattern_MetaArgs__variable2(Sink sink__V6517, Term term__V6518)
       Hashset namedFV__V6532 = LINK_VARIABLESET(sink__V6517->context, namedPropertyFreeVars(namedP__V6530));
       Hashset varFV__V6533 = LINK_VARIABLESET(sink__V6517->context, variablePropertyFreeVars(varP__V6531));
       UNLINK(sink__V6517->context, term__V6518);
-      ADD_PROPERTIES(sink__V6517, LINK_NamedPropertyLink(sink__V6517->context, namedP__V6530), LINK_VariablePropertyLink(sink__V6517->context, varP__V6531));
+      ADD_PROPERTIES(sink__V6517, LINK_VARIABLESET(sink__V6517->context, namedFV__V6532), LINK_VARIABLESET(sink__V6517->context, varFV__V6533), LINK_NamedPropertyLink(sink__V6517->context, namedP__V6530), LINK_VariablePropertyLink(sink__V6517->context, varP__V6531));
       { START(sink__V6517, _M_F_Pattern_MetaArgs__variable2_s1);
         COPY(sink__V6517, sub__V6522);COPY(sink__V6517, sub__V6523);COPY(sink__V6517, sub__V6524);COPY(sink__V6517, sub__V6525);COPY(sink__V6517, sub__V6526);COPY(sink__V6517, sub__V6527);{ if (!IS_BOUND(x__V6528)) { REBIND(x__V6528);
             Variable binds__V6534[1] = {x__V6528}; BINDS(sink__V6517, 1, binds__V6534);
@@ -20515,7 +20515,7 @@ int step_M_F_Pattern_MetaArgs__variable2(Sink sink__V6517, Term term__V6518)
       Hashset namedFV__V6554 = LINK_VARIABLESET(sink__V6517->context, namedPropertyFreeVars(namedP__V6552));
       Hashset varFV__V6555 = LINK_VARIABLESET(sink__V6517->context, variablePropertyFreeVars(varP__V6553));
       UNLINK(sink__V6517->context, term__V6518);
-      ADD_PROPERTIES(sink__V6517, LINK_NamedPropertyLink(sink__V6517->context, namedP__V6552), LINK_VariablePropertyLink(sink__V6517->context, varP__V6553));
+      ADD_PROPERTIES(sink__V6517, LINK_VARIABLESET(sink__V6517->context, namedFV__V6554), LINK_VARIABLESET(sink__V6517->context, varFV__V6555), LINK_NamedPropertyLink(sink__V6517->context, namedP__V6552), LINK_VariablePropertyLink(sink__V6517->context, varP__V6553));
       { START(sink__V6517, _M_F_Pattern_MetaArgs__variable2_s7);
         COPY(sink__V6517, sub__V6543);COPY(sink__V6517, sub__V6544);COPY(sink__V6517, sub__V6545);COPY(sink__V6517, sub__V6546);COPY(sink__V6517, sub__V6547);COPY(sink__V6517, sub__V6548);COPY(sink__V6517, sub__V6549);{ if (!IS_BOUND(x__V6550)) { REBIND(x__V6550);
             Variable binds__V6556[1] = {x__V6550}; BINDS(sink__V6517, 1, binds__V6556);
@@ -20573,7 +20573,7 @@ int step_M_F__then_Pattern_Not_Property_s1(Sink sink__V6564, Term term__V6565)
         Hashset namedFV__V6575 = LINK_VARIABLESET(sink__V6564->context, namedPropertyFreeVars(namedP__V6573));
         Hashset varFV__V6576 = LINK_VARIABLESET(sink__V6564->context, variablePropertyFreeVars(varP__V6574));
         UNLINK(sink__V6564->context, term__V6565);
-        ADD_PROPERTIES(sink__V6564, LINK_NamedPropertyLink(sink__V6564->context, namedP__V6573), LINK_VariablePropertyLink(sink__V6564->context, varP__V6574));
+        ADD_PROPERTIES(sink__V6564, LINK_VARIABLESET(sink__V6564->context, namedFV__V6575), LINK_VARIABLESET(sink__V6564->context, varFV__V6576), LINK_NamedPropertyLink(sink__V6564->context, namedP__V6573), LINK_VariablePropertyLink(sink__V6564->context, varP__V6574));
         { START(sink__V6564, _M_F__then_Pattern_Not_Property_s3);
           COPY(sink__V6564, sub__V6569);USE(sink__V6564, z__V277); COPY(sink__V6564, sub__V6570);{ if (!IS_BOUND(x__V6571)) { REBIND(x__V6571);
               Variable binds__V6577[1] = {x__V6571}; BINDS(sink__V6564, 1, binds__V6577);
@@ -20632,7 +20632,7 @@ int step_M_F__then_Pattern_Not_Property_s3(Sink sink__V6585, Term term__V6586)
         Hashset namedFV__V6596 = LINK_VARIABLESET(sink__V6585->context, namedPropertyFreeVars(namedP__V6594));
         Hashset varFV__V6597 = LINK_VARIABLESET(sink__V6585->context, variablePropertyFreeVars(varP__V6595));
         UNLINK(sink__V6585->context, term__V6586);
-        ADD_PROPERTIES(sink__V6585, LINK_NamedPropertyLink(sink__V6585->context, namedP__V6594), LINK_VariablePropertyLink(sink__V6585->context, varP__V6595));
+        ADD_PROPERTIES(sink__V6585, LINK_VARIABLESET(sink__V6585->context, namedFV__V6596), LINK_VARIABLESET(sink__V6585->context, varFV__V6597), LINK_NamedPropertyLink(sink__V6585->context, namedP__V6594), LINK_VariablePropertyLink(sink__V6585->context, varP__V6595));
         { START(sink__V6585, _M_F__then_Pattern_Not_Property_s4);
           USE(sink__V6585, z__V277); COPY(sink__V6585, sub__V6590);COPY(sink__V6585, sub__V6591);{ if (!IS_BOUND(x__V6592)) { REBIND(x__V6592);
               Variable binds__V6598[1] = {x__V6592}; BINDS(sink__V6585, 1, binds__V6598);
@@ -20692,7 +20692,7 @@ int step_M_F__then_Pattern_Not_Property_s4(Sink sink__V6606, Term term__V6607)
     { START(sink__V6606, _M__sTextCons);
       { START(sink__V6606, _M__sTextEmbed);
         { START(sink__V6606, _M_AsText);
-          ADD_PROPERTIES(sink__V6606, LINK_NamedPropertyLink(sink__V6606->context, namedP__V6613), LINK_VariablePropertyLink(sink__V6606->context, varP__V6614));
+          ADD_PROPERTIES(sink__V6606, LINK_VARIABLESET(sink__V6606->context, namedFV__V6615), LINK_VARIABLESET(sink__V6606->context, varFV__V6616), LINK_NamedPropertyLink(sink__V6606->context, namedP__V6613), LINK_VariablePropertyLink(sink__V6606->context, varP__V6614));
           { START(sink__V6606, _M_F__set__value);
             COPY(sink__V6606, sub__V6610);COPY(sink__V6606, LINK(sink__V6606->context, sub__V6609));COPY(sink__V6606, sub__V6608);USE(sink__V6606, y__V2749); END(sink__V6606, _M_F__set__value); }
           END(sink__V6606, _M_AsText); }
@@ -20729,7 +20729,7 @@ int step_M_F__then_Pattern_Not_Property_s4(Sink sink__V6606, Term term__V6607)
               { START(sink__V6606, _M__sTextCons);
                 { START(sink__V6606, _M__sTextEmbed);
                   { START(sink__V6606, _M_AsText);
-                    ADD_PROPERTIES(sink__V6606, LINK_NamedPropertyLink(sink__V6606->context, namedP__V6613), LINK_VariablePropertyLink(sink__V6606->context, varP__V6614));
+                    ADD_PROPERTIES(sink__V6606, LINK_VARIABLESET(sink__V6606->context, namedFV__V6615), LINK_VARIABLESET(sink__V6606->context, varFV__V6616), LINK_NamedPropertyLink(sink__V6606->context, namedP__V6613), LINK_VariablePropertyLink(sink__V6606->context, varP__V6614));
                     { START(sink__V6606, _M_F__unlink__refs_s1);
                       { Term term__V6621;
                         { Term key__V6622;
@@ -20773,7 +20773,7 @@ int step_M_F__then_Pattern_Not_Property_s4(Sink sink__V6606, Term term__V6607)
                               { START(sink__V6606, _M__sTextCons);
                                 { START(sink__V6606, _M__sTextEmbed);
                                   { START(sink__V6606, _M_AsText);
-                                    ADD_PROPERTIES(sink__V6606, LINK_NamedPropertyLink(sink__V6606->context, namedP__V6613), LINK_VariablePropertyLink(sink__V6606->context, varP__V6614));
+                                    ADD_PROPERTIES(sink__V6606, LINK_VARIABLESET(sink__V6606->context, namedFV__V6615), LINK_VARIABLESET(sink__V6606->context, varFV__V6616), LINK_NamedPropertyLink(sink__V6606->context, namedP__V6613), LINK_VariablePropertyLink(sink__V6606->context, varP__V6614));
                                     {
                                       Term arg__V6625;
                                       { Sink buf__V6626 = ALLOCA_BUFFER(sink__V6606->context);
@@ -20837,7 +20837,7 @@ int step_M_F_Fresh4_s2(Sink sink__V6630, Term term__V6631)
       Hashset namedFV__V6640 = LINK_VARIABLESET(sink__V6630->context, namedPropertyFreeVars(namedP__V6638));
       Hashset varFV__V6641 = LINK_VARIABLESET(sink__V6630->context, variablePropertyFreeVars(varP__V6639));
       UNLINK(sink__V6630->context, term__V6631);
-      ADD_PROPERTIES(sink__V6630, LINK_NamedPropertyLink(sink__V6630->context, namedP__V6638), LINK_VariablePropertyLink(sink__V6630->context, varP__V6639));
+      ADD_PROPERTIES(sink__V6630, LINK_VARIABLESET(sink__V6630->context, namedFV__V6640), LINK_VARIABLESET(sink__V6630->context, varFV__V6641), LINK_NamedPropertyLink(sink__V6630->context, namedP__V6638), LINK_VariablePropertyLink(sink__V6630->context, varP__V6639));
       { START(sink__V6630, _M_F_Fresh4_s3);
         COPY(sink__V6630, sub__V6635);COPY(sink__V6630, sub__V6636);COPY(sink__V6630, sub__V6637);END(sink__V6630, _M_F_Fresh4_s3); }
       UNLINK_VARIABLESET(sink__V6630->context, namedFV__V6640); UNLINK_VARIABLESET(sink__V6630->context, varFV__V6641);
@@ -20921,7 +20921,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s11(Sink sink__V6651, Term term__V6652)
         Hashset namedFV__V6666 = LINK_VARIABLESET(sink__V6651->context, namedPropertyFreeVars(namedP__V6664));
         Hashset varFV__V6667 = LINK_VARIABLESET(sink__V6651->context, variablePropertyFreeVars(varP__V6665));
         UNLINK(sink__V6651->context, term__V6652);
-        ADD_PROPERTIES(sink__V6651, LINK_NamedPropertyLink(sink__V6651->context, namedP__V6664), LINK_VariablePropertyLink(sink__V6651->context, varP__V6665));
+        ADD_PROPERTIES(sink__V6651, LINK_VARIABLESET(sink__V6651->context, namedFV__V6666), LINK_VARIABLESET(sink__V6651->context, varFV__V6667), LINK_NamedPropertyLink(sink__V6651->context, namedP__V6664), LINK_VariablePropertyLink(sink__V6651->context, varP__V6665));
         { START(sink__V6651, _M_F_Pattern_MetaArgs__variable2_s13);
           COPY(sink__V6651, sub__V6661);COPY(sink__V6651, sub__V6656);COPY(sink__V6651, sub__V6657);COPY(sink__V6651, sub__V6658);COPY(sink__V6651, sub__V6659);COPY(sink__V6651, sub__V6660);USE(sink__V6651, z__V277); { if (!IS_BOUND(x__V6662)) { REBIND(x__V6662);
               Variable binds__V6668[1] = {x__V6662}; BINDS(sink__V6651, 1, binds__V6668);
@@ -20988,7 +20988,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s13(Sink sink__V6676, Term term__V6677)
         Hashset namedFV__V6691 = LINK_VARIABLESET(sink__V6676->context, namedPropertyFreeVars(namedP__V6689));
         Hashset varFV__V6692 = LINK_VARIABLESET(sink__V6676->context, variablePropertyFreeVars(varP__V6690));
         UNLINK(sink__V6676->context, term__V6677);
-        ADD_PROPERTIES(sink__V6676, LINK_NamedPropertyLink(sink__V6676->context, namedP__V6689), LINK_VariablePropertyLink(sink__V6676->context, varP__V6690));
+        ADD_PROPERTIES(sink__V6676, LINK_VARIABLESET(sink__V6676->context, namedFV__V6691), LINK_VARIABLESET(sink__V6676->context, varFV__V6692), LINK_NamedPropertyLink(sink__V6676->context, namedP__V6689), LINK_VariablePropertyLink(sink__V6676->context, varP__V6690));
         { START(sink__V6676, _M_F_Pattern_MetaArgs__variable2_s14);
           USE(sink__V6676, z__V277); COPY(sink__V6676, sub__V6681);COPY(sink__V6676, sub__V6682);COPY(sink__V6676, sub__V6683);COPY(sink__V6676, sub__V6684);COPY(sink__V6676, sub__V6685);COPY(sink__V6676, sub__V6686);{ if (!IS_BOUND(x__V6687)) { REBIND(x__V6687);
               Variable binds__V6693[1] = {x__V6687}; BINDS(sink__V6676, 1, binds__V6693);
@@ -21087,7 +21087,7 @@ int step_M_F_Pattern_MetaArgs__variable2_s14(Sink sink__V6701, Term term__V6702)
                     { START(sink__V6701, _M__sTextCons);
                       { START(sink__V6701, _M__sTextEmbed);
                         { START(sink__V6701, _M_AsText);
-                          ADD_PROPERTIES(sink__V6701, LINK_NamedPropertyLink(sink__V6701->context, namedP__V6712), LINK_VariablePropertyLink(sink__V6701->context, varP__V6713));
+                          ADD_PROPERTIES(sink__V6701, LINK_VARIABLESET(sink__V6701->context, namedFV__V6714), LINK_VARIABLESET(sink__V6701->context, varFV__V6715), LINK_NamedPropertyLink(sink__V6701->context, namedP__V6712), LINK_VariablePropertyLink(sink__V6701->context, varP__V6713));
                           { START(sink__V6701, _M_F_Pattern_MetaArgs_s1);
                             COPY(sink__V6701, sub__V6706);COPY(sink__V6701, sub__V6705);{ double num__V6716;
                               num__V6716 = DOUBLE(sub__V6707); { double tmp__V6717;
@@ -21238,7 +21238,7 @@ int step_M_F__then_Pattern(Sink sink__V6738, Term term__V6739)
       Hashset namedFV__V6755 = LINK_VARIABLESET(sink__V6738->context, namedPropertyFreeVars(namedP__V6753));
       Hashset varFV__V6756 = LINK_VARIABLESET(sink__V6738->context, variablePropertyFreeVars(varP__V6754));
       UNLINK(sink__V6738->context, term__V6739);
-      ADD_PROPERTIES(sink__V6738, LINK_NamedPropertyLink(sink__V6738->context, namedP__V6753), LINK_VariablePropertyLink(sink__V6738->context, varP__V6754));
+      ADD_PROPERTIES(sink__V6738, LINK_VARIABLESET(sink__V6738->context, namedFV__V6755), LINK_VARIABLESET(sink__V6738->context, varFV__V6756), LINK_NamedPropertyLink(sink__V6738->context, namedP__V6753), LINK_VariablePropertyLink(sink__V6738->context, varP__V6754));
       { START(sink__V6738, _M_F__then_Pattern_s1);
         COPY(sink__V6738, sub__V6743);COPY(sink__V6738, sub__V6744);COPY(sink__V6738, sub__V6745);COPY(sink__V6738, sub__V6746);COPY(sink__V6738, sub__V6747);COPY(sink__V6738, sub__V6748);COPY(sink__V6738, sub__V6749);COPY(sink__V6738, sub__V6750);{ if (!IS_BOUND(x__V6751)) { REBIND(x__V6751);
             Variable binds__V6757[1] = {x__V6751}; BINDS(sink__V6738, 1, binds__V6757);
@@ -21298,7 +21298,7 @@ int step_M_F__then_Pattern_Variable_Use_s2(Sink sink__V6765, Term term__V6766)
         Hashset namedFV__V6777 = LINK_VARIABLESET(sink__V6765->context, namedPropertyFreeVars(namedP__V6775));
         Hashset varFV__V6778 = LINK_VARIABLESET(sink__V6765->context, variablePropertyFreeVars(varP__V6776));
         UNLINK(sink__V6765->context, term__V6766);
-        ADD_PROPERTIES(sink__V6765, LINK_NamedPropertyLink(sink__V6765->context, namedP__V6775), LINK_VariablePropertyLink(sink__V6765->context, varP__V6776));
+        ADD_PROPERTIES(sink__V6765, LINK_VARIABLESET(sink__V6765->context, namedFV__V6777), LINK_VARIABLESET(sink__V6765->context, varFV__V6778), LINK_NamedPropertyLink(sink__V6765->context, namedP__V6775), LINK_VariablePropertyLink(sink__V6765->context, varP__V6776));
         { START(sink__V6765, _M_F__then_Pattern_Variable_Use_s4);
           COPY(sink__V6765, sub__V6771);COPY(sink__V6765, sub__V6770);USE(sink__V6765, z__V277); COPY(sink__V6765, sub__V6772);{ if (!IS_BOUND(x__V6773)) { REBIND(x__V6773);
               Variable binds__V6779[1] = {x__V6773}; BINDS(sink__V6765, 1, binds__V6779);
@@ -21359,7 +21359,7 @@ int step_M_F__then_Pattern_Variable_Use_s4(Sink sink__V6787, Term term__V6788)
         Hashset namedFV__V6799 = LINK_VARIABLESET(sink__V6787->context, namedPropertyFreeVars(namedP__V6797));
         Hashset varFV__V6800 = LINK_VARIABLESET(sink__V6787->context, variablePropertyFreeVars(varP__V6798));
         UNLINK(sink__V6787->context, term__V6788);
-        ADD_PROPERTIES(sink__V6787, LINK_NamedPropertyLink(sink__V6787->context, namedP__V6797), LINK_VariablePropertyLink(sink__V6787->context, varP__V6798));
+        ADD_PROPERTIES(sink__V6787, LINK_VARIABLESET(sink__V6787->context, namedFV__V6799), LINK_VARIABLESET(sink__V6787->context, varFV__V6800), LINK_NamedPropertyLink(sink__V6787->context, namedP__V6797), LINK_VariablePropertyLink(sink__V6787->context, varP__V6798));
         { START(sink__V6787, _M_F__then_Pattern_Variable_Use_s6);
           COPY(sink__V6787, sub__V6794);COPY(sink__V6787, sub__V6792);COPY(sink__V6787, sub__V6793);USE(sink__V6787, z__V277); { if (!IS_BOUND(x__V6795)) { REBIND(x__V6795);
               Variable binds__V6801[1] = {x__V6795}; BINDS(sink__V6787, 1, binds__V6801);
@@ -21420,7 +21420,7 @@ int step_M_F__then_Pattern_Variable_Use_s6(Sink sink__V6809, Term term__V6810)
         Hashset namedFV__V6821 = LINK_VARIABLESET(sink__V6809->context, namedPropertyFreeVars(namedP__V6819));
         Hashset varFV__V6822 = LINK_VARIABLESET(sink__V6809->context, variablePropertyFreeVars(varP__V6820));
         UNLINK(sink__V6809->context, term__V6810);
-        ADD_PROPERTIES(sink__V6809, LINK_NamedPropertyLink(sink__V6809->context, namedP__V6819), LINK_VariablePropertyLink(sink__V6809->context, varP__V6820));
+        ADD_PROPERTIES(sink__V6809, LINK_VARIABLESET(sink__V6809->context, namedFV__V6821), LINK_VARIABLESET(sink__V6809->context, varFV__V6822), LINK_NamedPropertyLink(sink__V6809->context, namedP__V6819), LINK_VariablePropertyLink(sink__V6809->context, varP__V6820));
         { START(sink__V6809, _M_F__then_Pattern_Variable_Use_s7);
           USE(sink__V6809, z__V277); COPY(sink__V6809, sub__V6814);COPY(sink__V6809, sub__V6815);COPY(sink__V6809, sub__V6816);{ if (!IS_BOUND(x__V6817)) { REBIND(x__V6817);
               Variable binds__V6823[1] = {x__V6817}; BINDS(sink__V6809, 1, binds__V6823);
@@ -21479,7 +21479,7 @@ int step_M_F__then_Pattern_Variable_Use_s7(Sink sink__V6831, Term term__V6832)
     Hashset namedFV__V6841 = LINK_VARIABLESET(sink__V6831->context, namedPropertyFreeVars(namedP__V6839));
     Hashset varFV__V6842 = LINK_VARIABLESET(sink__V6831->context, variablePropertyFreeVars(varP__V6840));
     UNLINK(sink__V6831->context, term__V6832);
-    ADD_PROPERTIES(sink__V6831, LINK_NamedPropertyLink(sink__V6831->context, namedP__V6839), LINK_VariablePropertyLink(sink__V6831->context, varP__V6840));
+    ADD_PROPERTIES(sink__V6831, LINK_VARIABLESET(sink__V6831->context, namedFV__V6841), LINK_VARIABLESET(sink__V6831->context, varFV__V6842), LINK_NamedPropertyLink(sink__V6831->context, namedP__V6839), LINK_VariablePropertyLink(sink__V6831->context, varP__V6840));
     { START(sink__V6831, _M_F__then_Pattern_Variable_Use2);
       { Term term__V6843;
         { Term key__V6844;
@@ -21545,7 +21545,7 @@ int step_M_F__variableOption3_s1(Sink sink__V6855, Term term__V6856)
       Hashset namedFV__V6867 = LINK_VARIABLESET(sink__V6855->context, namedPropertyFreeVars(namedP__V6865));
       Hashset varFV__V6868 = LINK_VARIABLESET(sink__V6855->context, variablePropertyFreeVars(varP__V6866));
       UNLINK(sink__V6855->context, term__V6856);
-      ADD_PROPERTIES(sink__V6855, LINK_NamedPropertyLink(sink__V6855->context, namedP__V6865), LINK_VariablePropertyLink(sink__V6855->context, varP__V6866));
+      ADD_PROPERTIES(sink__V6855, LINK_VARIABLESET(sink__V6855->context, namedFV__V6867), LINK_VARIABLESET(sink__V6855->context, varFV__V6868), LINK_NamedPropertyLink(sink__V6855->context, namedP__V6865), LINK_VariablePropertyLink(sink__V6855->context, varP__V6866));
       { START(sink__V6855, _M_F__variableOption3_s2);
         COPY(sink__V6855, sub__V6860);COPY(sink__V6855, sub__V6861);COPY(sink__V6855, sub__V6862);{ if (!IS_BOUND(x__V6863)) { REBIND(x__V6863);
             Variable binds__V6869[1] = {x__V6863}; BINDS(sink__V6855, 1, binds__V6869);
@@ -21598,7 +21598,7 @@ int step_M_F__variableOption3_s2(Sink sink__V6877, Term term__V6878)
     Hashset namedFV__V6886 = LINK_VARIABLESET(sink__V6877->context, namedPropertyFreeVars(namedP__V6884));
     Hashset varFV__V6887 = LINK_VARIABLESET(sink__V6877->context, variablePropertyFreeVars(varP__V6885));
     UNLINK(sink__V6877->context, term__V6878);
-    ADD_PROPERTIES(sink__V6877, LINK_NamedPropertyLink(sink__V6877->context, namedP__V6884), LINK_VariablePropertyLink(sink__V6877->context, varP__V6885));
+    ADD_PROPERTIES(sink__V6877, LINK_VARIABLESET(sink__V6877->context, namedFV__V6886), LINK_VARIABLESET(sink__V6877->context, varFV__V6887), LINK_NamedPropertyLink(sink__V6877->context, namedP__V6884), LINK_VariablePropertyLink(sink__V6877->context, varP__V6885));
     { START(sink__V6877, _M_F__variableOption4_s1);
       COPY(sink__V6877, sub__V6880);COPY(sink__V6877, sub__V6881);{ if (!IS_BOUND(x__V6882)) { REBIND(x__V6882);
           Variable binds__V6888[1] = {x__V6882}; BINDS(sink__V6877, 1, binds__V6888);
@@ -21675,7 +21675,7 @@ int step_M_F_PatternBinder1(Sink sink__V6896, Term term__V6897)
       Hashset namedFV__V6919 = LINK_VARIABLESET(sink__V6896->context, namedPropertyFreeVars(namedP__V6917));
       Hashset varFV__V6920 = LINK_VARIABLESET(sink__V6896->context, variablePropertyFreeVars(varP__V6918));
       UNLINK(sink__V6896->context, term__V6897);
-      ADD_PROPERTIES(sink__V6896, LINK_NamedPropertyLink(sink__V6896->context, namedP__V6917), LINK_VariablePropertyLink(sink__V6896->context, varP__V6918));
+      ADD_PROPERTIES(sink__V6896, LINK_VARIABLESET(sink__V6896->context, namedFV__V6919), LINK_VARIABLESET(sink__V6896->context, varFV__V6920), LINK_NamedPropertyLink(sink__V6896->context, namedP__V6917), LINK_VariablePropertyLink(sink__V6896->context, varP__V6918));
       { START(sink__V6896, _M_F_PatternBinder1_s1);
         COPY(sink__V6896, sub__V6901);COPY(sink__V6896, sub__V6902);COPY(sink__V6896, sub__V6903);COPY(sink__V6896, sub__V6904);COPY(sink__V6896, sub__V6905);COPY(sink__V6896, sub__V6906);{ if (!IS_BOUND(x__V6907)) { REBIND(x__V6907);
             Variable binds__V6921[1] = {x__V6907}; BINDS(sink__V6896, 1, binds__V6921);
@@ -21748,7 +21748,7 @@ int step_M_F_PatternBinder1(Sink sink__V6896, Term term__V6897)
       Hashset namedFV__V6954 = LINK_VARIABLESET(sink__V6896->context, namedPropertyFreeVars(namedP__V6952));
       Hashset varFV__V6955 = LINK_VARIABLESET(sink__V6896->context, variablePropertyFreeVars(varP__V6953));
       UNLINK(sink__V6896->context, term__V6897);
-      ADD_PROPERTIES(sink__V6896, LINK_NamedPropertyLink(sink__V6896->context, namedP__V6952), LINK_VariablePropertyLink(sink__V6896->context, varP__V6953));
+      ADD_PROPERTIES(sink__V6896, LINK_VARIABLESET(sink__V6896->context, namedFV__V6954), LINK_VARIABLESET(sink__V6896->context, varFV__V6955), LINK_NamedPropertyLink(sink__V6896->context, namedP__V6952), LINK_VariablePropertyLink(sink__V6896->context, varP__V6953));
       { START(sink__V6896, _M_F_PatternBinder1_s7);
         COPY(sink__V6896, sub__V6938);COPY(sink__V6896, sub__V6939);COPY(sink__V6896, sub__V6940);COPY(sink__V6896, sub__V6941);{ if (!IS_BOUND(x__V6942)) { REBIND(x__V6942);
             Variable binds__V6956[1] = {x__V6942}; BINDS(sink__V6896, 1, binds__V6956);
@@ -21836,7 +21836,7 @@ int step_M_F_PatternBinder2(Sink sink__V6972, Term term__V6973)
       Hashset namedFV__V6992 = LINK_VARIABLESET(sink__V6972->context, namedPropertyFreeVars(namedP__V6990));
       Hashset varFV__V6993 = LINK_VARIABLESET(sink__V6972->context, variablePropertyFreeVars(varP__V6991));
       UNLINK(sink__V6972->context, term__V6973);
-      ADD_PROPERTIES(sink__V6972, LINK_NamedPropertyLink(sink__V6972->context, namedP__V6990), LINK_VariablePropertyLink(sink__V6972->context, varP__V6991));
+      ADD_PROPERTIES(sink__V6972, LINK_VARIABLESET(sink__V6972->context, namedFV__V6992), LINK_VARIABLESET(sink__V6972->context, varFV__V6993), LINK_NamedPropertyLink(sink__V6972->context, namedP__V6990), LINK_VariablePropertyLink(sink__V6972->context, varP__V6991));
       { START(sink__V6972, _M_F_PatternBinder2_s5);
         COPY(sink__V6972, sub__V6985);COPY(sink__V6972, sub__V6978);COPY(sink__V6972, sub__V6979);{ if (!IS_BOUND(x__V6980)) { REBIND(x__V6980);
             Variable binds__V6994[1] = {x__V6980}; BINDS(sink__V6972, 1, binds__V6994);
@@ -21905,7 +21905,7 @@ int step_M_F_PatternBinder2(Sink sink__V6972, Term term__V6973)
       Hashset namedFV__V7025 = LINK_VARIABLESET(sink__V6972->context, namedPropertyFreeVars(namedP__V7023));
       Hashset varFV__V7026 = LINK_VARIABLESET(sink__V6972->context, variablePropertyFreeVars(varP__V7024));
       UNLINK(sink__V6972->context, term__V6973);
-      ADD_PROPERTIES(sink__V6972, LINK_NamedPropertyLink(sink__V6972->context, namedP__V7023), LINK_VariablePropertyLink(sink__V6972->context, varP__V7024));
+      ADD_PROPERTIES(sink__V6972, LINK_VARIABLESET(sink__V6972->context, namedFV__V7025), LINK_VARIABLESET(sink__V6972->context, varFV__V7026), LINK_NamedPropertyLink(sink__V6972->context, namedP__V7023), LINK_VariablePropertyLink(sink__V6972->context, varP__V7024));
       { START(sink__V6972, _M_F_PatternBinder2_s2);
         COPY(sink__V6972, sub__V7018);COPY(sink__V6972, sub__V7012);{ if (!IS_BOUND(x__V7013)) { REBIND(x__V7013);
             Variable binds__V7027[1] = {x__V7013}; BINDS(sink__V6972, 1, binds__V7027);
@@ -21976,7 +21976,7 @@ int step_M_F_Options_s1(Sink sink__V7043, Term term__V7044)
     Hashset namedFV__V7053 = LINK_VARIABLESET(sink__V7043->context, namedPropertyFreeVars(namedP__V7051));
     Hashset varFV__V7054 = LINK_VARIABLESET(sink__V7043->context, variablePropertyFreeVars(varP__V7052));
     UNLINK(sink__V7043->context, term__V7044);
-    ADD_PROPERTIES(sink__V7043, LINK_NamedPropertyLink(sink__V7043->context, namedP__V7051), LINK_VariablePropertyLink(sink__V7043->context, varP__V7052));
+    ADD_PROPERTIES(sink__V7043, LINK_VARIABLESET(sink__V7043->context, namedFV__V7053), LINK_VARIABLESET(sink__V7043->context, varFV__V7054), LINK_NamedPropertyLink(sink__V7043->context, namedP__V7051), LINK_VariablePropertyLink(sink__V7043->context, varP__V7052));
     { START(sink__V7043, _M_F_Options_s2);
       COPY(sink__V7043, sub__V7046);COPY(sink__V7043, sub__V7047);COPY(sink__V7043, sub__V7048);{ if (!IS_BOUND(x__V7049)) { REBIND(x__V7049);
           Variable binds__V7055[1] = {x__V7049}; BINDS(sink__V7043, 1, binds__V7055);
@@ -22028,7 +22028,7 @@ int step_M_F_Options_s2(Sink sink__V7063, Term term__V7064)
     Hashset namedFV__V7072 = LINK_VARIABLESET(sink__V7063->context, namedPropertyFreeVars(namedP__V7070));
     Hashset varFV__V7073 = LINK_VARIABLESET(sink__V7063->context, variablePropertyFreeVars(varP__V7071));
     UNLINK(sink__V7063->context, term__V7064);
-    ADD_PROPERTIES(sink__V7063, LINK_NamedPropertyLink(sink__V7063->context, namedP__V7070), LINK_VariablePropertyLink(sink__V7063->context, varP__V7071));
+    ADD_PROPERTIES(sink__V7063, LINK_VARIABLESET(sink__V7063->context, namedFV__V7072), LINK_VARIABLESET(sink__V7063->context, varFV__V7073), LINK_NamedPropertyLink(sink__V7063->context, namedP__V7070), LINK_VariablePropertyLink(sink__V7063->context, varP__V7071));
     { START(sink__V7063, _M_F_Option);
       COPY(sink__V7063, sub__V7065);COPY(sink__V7063, sub__V7066);{ Variable x__V7074 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V7063->context,"x__V7074");
         Variable binds__V7075[1] = {x__V7074}; BINDS(sink__V7063, 1, binds__V7075);
@@ -22078,7 +22078,7 @@ int step_M_F_Options_s3(Sink sink__V7084, Term term__V7085)
     Hashset namedFV__V7090 = LINK_VARIABLESET(sink__V7084->context, namedPropertyFreeVars(namedP__V7088));
     Hashset varFV__V7091 = LINK_VARIABLESET(sink__V7084->context, variablePropertyFreeVars(varP__V7089));
     UNLINK(sink__V7084->context, term__V7085);
-    ADD_PROPERTIES(sink__V7084, LINK_NamedPropertyLink(sink__V7084->context, namedP__V7088), LINK_VariablePropertyLink(sink__V7084->context, varP__V7089));
+    ADD_PROPERTIES(sink__V7084, LINK_VARIABLESET(sink__V7084->context, namedFV__V7090), LINK_VARIABLESET(sink__V7084->context, varFV__V7091), LINK_NamedPropertyLink(sink__V7084->context, namedP__V7088), LINK_VariablePropertyLink(sink__V7084->context, varP__V7089));
     {
       Term arg__V7092;
       { Sink buf__V7093 = ALLOCA_BUFFER(sink__V7084->context);
@@ -22125,7 +22125,7 @@ int step_M_F__metaOption_s1(Sink sink__V7097, Term term__V7098)
       Hashset namedFV__V7109 = LINK_VARIABLESET(sink__V7097->context, namedPropertyFreeVars(namedP__V7107));
       Hashset varFV__V7110 = LINK_VARIABLESET(sink__V7097->context, variablePropertyFreeVars(varP__V7108));
       UNLINK(sink__V7097->context, term__V7098);
-      ADD_PROPERTIES(sink__V7097, LINK_NamedPropertyLink(sink__V7097->context, namedP__V7107), LINK_VariablePropertyLink(sink__V7097->context, varP__V7108));
+      ADD_PROPERTIES(sink__V7097, LINK_VARIABLESET(sink__V7097->context, namedFV__V7109), LINK_VARIABLESET(sink__V7097->context, varFV__V7110), LINK_NamedPropertyLink(sink__V7097->context, namedP__V7107), LINK_VariablePropertyLink(sink__V7097->context, varP__V7108));
       { START(sink__V7097, _M_F__metaOption_s3);
         COPY(sink__V7097, sub__V7102);COPY(sink__V7097, sub__V7103);COPY(sink__V7097, sub__V7104);{ if (!IS_BOUND(x__V7105)) { REBIND(x__V7105);
             Variable binds__V7111[1] = {x__V7105}; BINDS(sink__V7097, 1, binds__V7111);
@@ -22166,7 +22166,7 @@ int step_M_F__metaOption_s1(Sink sink__V7097, Term term__V7098)
       Hashset namedFV__V7127 = LINK_VARIABLESET(sink__V7097->context, namedPropertyFreeVars(namedP__V7125));
       Hashset varFV__V7128 = LINK_VARIABLESET(sink__V7097->context, variablePropertyFreeVars(varP__V7126));
       UNLINK(sink__V7097->context, term__V7098);
-      ADD_PROPERTIES(sink__V7097, LINK_NamedPropertyLink(sink__V7097->context, namedP__V7125), LINK_VariablePropertyLink(sink__V7097->context, varP__V7126));
+      ADD_PROPERTIES(sink__V7097, LINK_VARIABLESET(sink__V7097->context, namedFV__V7127), LINK_VARIABLESET(sink__V7097->context, varFV__V7128), LINK_NamedPropertyLink(sink__V7097->context, namedP__V7125), LINK_VariablePropertyLink(sink__V7097->context, varP__V7126));
       { START(sink__V7097, _M_F__metaOption_s2);
         COPY(sink__V7097, sub__V7120);COPY(sink__V7097, sub__V7121);COPY(sink__V7097, sub__V7122);{ if (!IS_BOUND(x__V7123)) { REBIND(x__V7123);
             Variable binds__V7129[1] = {x__V7123}; BINDS(sink__V7097, 1, binds__V7129);
@@ -22209,7 +22209,7 @@ int step_M_F__metaOption_s1(Sink sink__V7097, Term term__V7098)
       Hashset namedFV__V7146 = LINK_VARIABLESET(sink__V7097->context, namedPropertyFreeVars(namedP__V7144));
       Hashset varFV__V7147 = LINK_VARIABLESET(sink__V7097->context, variablePropertyFreeVars(varP__V7145));
       UNLINK(sink__V7097->context, term__V7098);
-      ADD_PROPERTIES(sink__V7097, LINK_NamedPropertyLink(sink__V7097->context, namedP__V7144), LINK_VariablePropertyLink(sink__V7097->context, varP__V7145));
+      ADD_PROPERTIES(sink__V7097, LINK_VARIABLESET(sink__V7097->context, namedFV__V7146), LINK_VARIABLESET(sink__V7097->context, varFV__V7147), LINK_NamedPropertyLink(sink__V7097->context, namedP__V7144), LINK_VariablePropertyLink(sink__V7097->context, varP__V7145));
       { START(sink__V7097, _M_F__metaOption_s4);
         COPY(sink__V7097, sub__V7138);COPY(sink__V7097, sub__V7139);COPY(sink__V7097, sub__V7140);COPY(sink__V7097, sub__V7141);{ if (!IS_BOUND(x__V7142)) { REBIND(x__V7142);
             Variable binds__V7148[1] = {x__V7142}; BINDS(sink__V7097, 1, binds__V7148);
@@ -22262,7 +22262,7 @@ int step_M_F__metaOption_s2(Sink sink__V7156, Term term__V7157)
     Hashset namedFV__V7165 = LINK_VARIABLESET(sink__V7156->context, namedPropertyFreeVars(namedP__V7163));
     Hashset varFV__V7166 = LINK_VARIABLESET(sink__V7156->context, variablePropertyFreeVars(varP__V7164));
     UNLINK(sink__V7156->context, term__V7157);
-    ADD_PROPERTIES(sink__V7156, LINK_NamedPropertyLink(sink__V7156->context, namedP__V7163), LINK_VariablePropertyLink(sink__V7156->context, varP__V7164));
+    ADD_PROPERTIES(sink__V7156, LINK_VARIABLESET(sink__V7156->context, namedFV__V7165), LINK_VARIABLESET(sink__V7156->context, varFV__V7166), LINK_NamedPropertyLink(sink__V7156->context, namedP__V7163), LINK_VariablePropertyLink(sink__V7156->context, varP__V7164));
     { START(sink__V7156, _M_F__metaOption2);
       { char *str__V7167;
         { char *sub__V7168[3]; size_t sublength__V7169[3]; size_t length__V7170 = 0;
@@ -22327,7 +22327,7 @@ int step_M_F__metaOption_s3(Sink sink__V7181, Term term__V7182)
     Hashset namedFV__V7190 = LINK_VARIABLESET(sink__V7181->context, namedPropertyFreeVars(namedP__V7188));
     Hashset varFV__V7191 = LINK_VARIABLESET(sink__V7181->context, variablePropertyFreeVars(varP__V7189));
     UNLINK(sink__V7181->context, term__V7182);
-    ADD_PROPERTIES(sink__V7181, LINK_NamedPropertyLink(sink__V7181->context, namedP__V7188), LINK_VariablePropertyLink(sink__V7181->context, varP__V7189));
+    ADD_PROPERTIES(sink__V7181, LINK_VARIABLESET(sink__V7181->context, namedFV__V7190), LINK_VARIABLESET(sink__V7181->context, varFV__V7191), LINK_NamedPropertyLink(sink__V7181->context, namedP__V7188), LINK_VariablePropertyLink(sink__V7181->context, varP__V7189));
     { START(sink__V7181, _M_F__metaOption2);
       { char *str__V7192;
         { char *sub__V7193[3]; size_t sublength__V7194[3]; size_t length__V7195 = 0;
@@ -22394,7 +22394,7 @@ int step_M_F__metaOption_s4(Sink sink__V7206, Term term__V7207)
     Hashset namedFV__V7216 = LINK_VARIABLESET(sink__V7206->context, namedPropertyFreeVars(namedP__V7214));
     Hashset varFV__V7217 = LINK_VARIABLESET(sink__V7206->context, variablePropertyFreeVars(varP__V7215));
     UNLINK(sink__V7206->context, term__V7207);
-    ADD_PROPERTIES(sink__V7206, LINK_NamedPropertyLink(sink__V7206->context, namedP__V7214), LINK_VariablePropertyLink(sink__V7206->context, varP__V7215));
+    ADD_PROPERTIES(sink__V7206, LINK_VARIABLESET(sink__V7206->context, namedFV__V7216), LINK_VARIABLESET(sink__V7206->context, varFV__V7217), LINK_NamedPropertyLink(sink__V7206->context, namedP__V7214), LINK_VariablePropertyLink(sink__V7206->context, varP__V7215));
     { START(sink__V7206, _M_F__metaOption2);
       { char *str__V7218;
         { char *sub__V7219[3]; size_t sublength__V7220[3]; size_t length__V7221 = 0;
@@ -22459,7 +22459,7 @@ int step_M_ComputeRules(Sink sink__V7232, Term term__V7233)
       Hashset namedFV__V7241 = LINK_VARIABLESET(sink__V7232->context, namedPropertyFreeVars(namedP__V7239));
       Hashset varFV__V7242 = LINK_VARIABLESET(sink__V7232->context, variablePropertyFreeVars(varP__V7240));
       UNLINK(sink__V7232->context, term__V7233);
-      ADD_PROPERTIES(sink__V7232, LINK_NamedPropertyLink(sink__V7232->context, namedP__V7239), LINK_VariablePropertyLink(sink__V7232->context, varP__V7240));
+      ADD_PROPERTIES(sink__V7232, LINK_VARIABLESET(sink__V7232->context, namedFV__V7241), LINK_VARIABLESET(sink__V7232->context, varFV__V7242), LINK_NamedPropertyLink(sink__V7232->context, namedP__V7239), LINK_VariablePropertyLink(sink__V7232->context, varP__V7240));
       { START(sink__V7232, _M_ComputeRules_s1);
         COPY(sink__V7232, sub__V7237);COPY(sink__V7232, sub__V7238);END(sink__V7232, _M_ComputeRules_s1); }
       UNLINK_VARIABLESET(sink__V7232->context, namedFV__V7241); UNLINK_VARIABLESET(sink__V7232->context, varFV__V7242);
@@ -22514,7 +22514,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7261 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7259));
       Hashset varFV__V7262 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7260));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7259), LINK_VariablePropertyLink(sink__V7243->context, varP__V7260));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7261), LINK_VARIABLESET(sink__V7243->context, varFV__V7262), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7259), LINK_VariablePropertyLink(sink__V7243->context, varP__V7260));
       { START(sink__V7243, _M_F_Pattern_s3);
         COPY(sink__V7243, sub__V7250);COPY(sink__V7243, sub__V7249);COPY(sink__V7243, sub__V7248);COPY(sink__V7243, sub__V7251);COPY(sink__V7243, sub__V7252);COPY(sink__V7243, sub__V7253);COPY(sink__V7243, sub__V7254);COPY(sink__V7243, sub__V7255);COPY(sink__V7243, sub__V7256);{ if (!IS_BOUND(x__V7257)) { REBIND(x__V7257);
             Variable binds__V7263[1] = {x__V7257}; BINDS(sink__V7243, 1, binds__V7263);
@@ -22569,7 +22569,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7286 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7284));
       Hashset varFV__V7287 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7285));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7284), LINK_VariablePropertyLink(sink__V7243->context, varP__V7285));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7286), LINK_VARIABLESET(sink__V7243->context, varFV__V7287), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7284), LINK_VariablePropertyLink(sink__V7243->context, varP__V7285));
       { START(sink__V7243, _M_F_Pattern_s36);
         COPY(sink__V7243, sub__V7277);COPY(sink__V7243, sub__V7273);COPY(sink__V7243, sub__V7274);COPY(sink__V7243, sub__V7275);COPY(sink__V7243, sub__V7276);COPY(sink__V7243, sub__V7272);COPY(sink__V7243, sub__V7278);COPY(sink__V7243, sub__V7279);COPY(sink__V7243, sub__V7280);COPY(sink__V7243, sub__V7281);{ if (!IS_BOUND(x__V7282)) { REBIND(x__V7282);
             Variable binds__V7288[1] = {x__V7282}; BINDS(sink__V7243, 1, binds__V7288);
@@ -22622,7 +22622,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7310 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7308));
       Hashset varFV__V7311 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7309));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7308), LINK_VariablePropertyLink(sink__V7243->context, varP__V7309));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7310), LINK_VARIABLESET(sink__V7243->context, varFV__V7311), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7308), LINK_VariablePropertyLink(sink__V7243->context, varP__V7309));
       { START(sink__V7243, _M_F_Pattern_s41);
         COPY(sink__V7243, sub__V7301);COPY(sink__V7243, sub__V7298);COPY(sink__V7243, sub__V7299);COPY(sink__V7243, sub__V7300);COPY(sink__V7243, sub__V7297);COPY(sink__V7243, sub__V7302);COPY(sink__V7243, sub__V7303);COPY(sink__V7243, sub__V7304);COPY(sink__V7243, sub__V7305);{ if (!IS_BOUND(x__V7306)) { REBIND(x__V7306);
             Variable binds__V7312[1] = {x__V7306}; BINDS(sink__V7243, 1, binds__V7312);
@@ -22677,7 +22677,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7335 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7333));
       Hashset varFV__V7336 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7334));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7333), LINK_VariablePropertyLink(sink__V7243->context, varP__V7334));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7335), LINK_VARIABLESET(sink__V7243->context, varFV__V7336), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7333), LINK_VariablePropertyLink(sink__V7243->context, varP__V7334));
       { START(sink__V7243, _M_F_Pattern_s44);
         COPY(sink__V7243, sub__V7326);COPY(sink__V7243, sub__V7322);COPY(sink__V7243, sub__V7323);COPY(sink__V7243, sub__V7324);COPY(sink__V7243, sub__V7325);COPY(sink__V7243, sub__V7321);COPY(sink__V7243, sub__V7327);COPY(sink__V7243, sub__V7328);COPY(sink__V7243, sub__V7329);COPY(sink__V7243, sub__V7330);{ if (!IS_BOUND(x__V7331)) { REBIND(x__V7331);
             Variable binds__V7337[1] = {x__V7331}; BINDS(sink__V7243, 1, binds__V7337);
@@ -22730,7 +22730,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7359 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7357));
       Hashset varFV__V7360 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7358));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7357), LINK_VariablePropertyLink(sink__V7243->context, varP__V7358));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7359), LINK_VARIABLESET(sink__V7243->context, varFV__V7360), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7357), LINK_VariablePropertyLink(sink__V7243->context, varP__V7358));
       { START(sink__V7243, _M_F_Pattern_s54);
         COPY(sink__V7243, sub__V7350);COPY(sink__V7243, sub__V7347);COPY(sink__V7243, sub__V7348);COPY(sink__V7243, sub__V7349);COPY(sink__V7243, sub__V7346);COPY(sink__V7243, sub__V7351);COPY(sink__V7243, sub__V7352);COPY(sink__V7243, sub__V7353);COPY(sink__V7243, sub__V7354);{ if (!IS_BOUND(x__V7355)) { REBIND(x__V7355);
             Variable binds__V7361[1] = {x__V7355}; BINDS(sink__V7243, 1, binds__V7361);
@@ -22785,7 +22785,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7384 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7382));
       Hashset varFV__V7385 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7383));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7382), LINK_VariablePropertyLink(sink__V7243->context, varP__V7383));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7384), LINK_VARIABLESET(sink__V7243->context, varFV__V7385), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7382), LINK_VariablePropertyLink(sink__V7243->context, varP__V7383));
       { START(sink__V7243, _M_F_Pattern_s49);
         COPY(sink__V7243, sub__V7375);COPY(sink__V7243, sub__V7371);COPY(sink__V7243, sub__V7372);COPY(sink__V7243, sub__V7373);COPY(sink__V7243, sub__V7374);COPY(sink__V7243, sub__V7370);COPY(sink__V7243, sub__V7376);COPY(sink__V7243, sub__V7377);COPY(sink__V7243, sub__V7378);COPY(sink__V7243, sub__V7379);{ if (!IS_BOUND(x__V7380)) { REBIND(x__V7380);
             Variable binds__V7386[1] = {x__V7380}; BINDS(sink__V7243, 1, binds__V7386);
@@ -22838,7 +22838,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7408 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7406));
       Hashset varFV__V7409 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7407));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7406), LINK_VariablePropertyLink(sink__V7243->context, varP__V7407));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7408), LINK_VARIABLESET(sink__V7243->context, varFV__V7409), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7406), LINK_VariablePropertyLink(sink__V7243->context, varP__V7407));
       { START(sink__V7243, _M_F_Pattern_s59);
         COPY(sink__V7243, sub__V7399);COPY(sink__V7243, sub__V7396);COPY(sink__V7243, sub__V7397);COPY(sink__V7243, sub__V7398);COPY(sink__V7243, sub__V7395);COPY(sink__V7243, sub__V7400);COPY(sink__V7243, sub__V7401);COPY(sink__V7243, sub__V7402);COPY(sink__V7243, sub__V7403);{ if (!IS_BOUND(x__V7404)) { REBIND(x__V7404);
             Variable binds__V7410[1] = {x__V7404}; BINDS(sink__V7243, 1, binds__V7410);
@@ -22889,7 +22889,7 @@ int step_M_F_Pattern_s1(Sink sink__V7243, Term term__V7244)
       Hashset namedFV__V7431 = LINK_VARIABLESET(sink__V7243->context, namedPropertyFreeVars(namedP__V7429));
       Hashset varFV__V7432 = LINK_VARIABLESET(sink__V7243->context, variablePropertyFreeVars(varP__V7430));
       UNLINK(sink__V7243->context, term__V7244);
-      ADD_PROPERTIES(sink__V7243, LINK_NamedPropertyLink(sink__V7243->context, namedP__V7429), LINK_VariablePropertyLink(sink__V7243->context, varP__V7430));
+      ADD_PROPERTIES(sink__V7243, LINK_VARIABLESET(sink__V7243->context, namedFV__V7431), LINK_VARIABLESET(sink__V7243->context, varFV__V7432), LINK_NamedPropertyLink(sink__V7243->context, namedP__V7429), LINK_VariablePropertyLink(sink__V7243->context, varP__V7430));
       { START(sink__V7243, _M_F_Pattern_s64);
         COPY(sink__V7243, sub__V7420);COPY(sink__V7243, sub__V7419);COPY(sink__V7243, sub__V7421);COPY(sink__V7243, sub__V7422);COPY(sink__V7243, sub__V7423);COPY(sink__V7243, sub__V7424);COPY(sink__V7243, sub__V7425);COPY(sink__V7243, sub__V7426);{ if (!IS_BOUND(x__V7427)) { REBIND(x__V7427);
             Variable binds__V7433[1] = {x__V7427}; BINDS(sink__V7243, 1, binds__V7433);
@@ -22963,7 +22963,7 @@ int step_M_F_Pattern_s3(Sink sink__V7441, Term term__V7442)
       Hashset namedFV__V7461 = LINK_VARIABLESET(sink__V7441->context, namedPropertyFreeVars(namedP__V7459));
       Hashset varFV__V7462 = LINK_VARIABLESET(sink__V7441->context, variablePropertyFreeVars(varP__V7460));
       UNLINK(sink__V7441->context, term__V7442);
-      ADD_PROPERTIES(sink__V7441, LINK_NamedPropertyLink(sink__V7441->context, namedP__V7459), LINK_VariablePropertyLink(sink__V7441->context, varP__V7460));
+      ADD_PROPERTIES(sink__V7441, LINK_VARIABLESET(sink__V7441->context, namedFV__V7461), LINK_VARIABLESET(sink__V7441->context, varFV__V7462), LINK_NamedPropertyLink(sink__V7441->context, namedP__V7459), LINK_VariablePropertyLink(sink__V7441->context, varP__V7460));
       { START(sink__V7441, _M_F_Pattern_s5);
         COPY(sink__V7441, sub__V7452);COPY(sink__V7441, sub__V7447);COPY(sink__V7441, sub__V7448);COPY(sink__V7441, sub__V7449);COPY(sink__V7441, sub__V7450);COPY(sink__V7441, sub__V7451);COPY(sink__V7441, sub__V7446);COPY(sink__V7441, sub__V7453);COPY(sink__V7441, sub__V7454);COPY(sink__V7441, sub__V7455);COPY(sink__V7441, sub__V7456);{ if (!IS_BOUND(x__V7457)) { REBIND(x__V7457);
             Variable binds__V7463[1] = {x__V7457}; BINDS(sink__V7441, 1, binds__V7463);
@@ -23014,7 +23014,7 @@ int step_M_F_Pattern_s3(Sink sink__V7441, Term term__V7442)
       Hashset namedFV__V7484 = LINK_VARIABLESET(sink__V7441->context, namedPropertyFreeVars(namedP__V7482));
       Hashset varFV__V7485 = LINK_VARIABLESET(sink__V7441->context, variablePropertyFreeVars(varP__V7483));
       UNLINK(sink__V7441->context, term__V7442);
-      ADD_PROPERTIES(sink__V7441, LINK_NamedPropertyLink(sink__V7441->context, namedP__V7482), LINK_VariablePropertyLink(sink__V7441->context, varP__V7483));
+      ADD_PROPERTIES(sink__V7441, LINK_VARIABLESET(sink__V7441->context, namedFV__V7484), LINK_VARIABLESET(sink__V7441->context, varFV__V7485), LINK_NamedPropertyLink(sink__V7441->context, namedP__V7482), LINK_VariablePropertyLink(sink__V7441->context, varP__V7483));
       { START(sink__V7441, _M_F_Pattern_s22);
         COPY(sink__V7441, sub__V7475);COPY(sink__V7441, sub__V7473);COPY(sink__V7441, sub__V7474);COPY(sink__V7441, sub__V7472);COPY(sink__V7441, sub__V7476);COPY(sink__V7441, sub__V7477);COPY(sink__V7441, sub__V7478);COPY(sink__V7441, sub__V7479);{ if (!IS_BOUND(x__V7480)) { REBIND(x__V7480);
             Variable binds__V7486[1] = {x__V7480}; BINDS(sink__V7441, 1, binds__V7486);
@@ -23071,7 +23071,7 @@ int step_M_F_Pattern_s3(Sink sink__V7441, Term term__V7442)
       Hashset namedFV__V7510 = LINK_VARIABLESET(sink__V7441->context, namedPropertyFreeVars(namedP__V7508));
       Hashset varFV__V7511 = LINK_VARIABLESET(sink__V7441->context, variablePropertyFreeVars(varP__V7509));
       UNLINK(sink__V7441->context, term__V7442);
-      ADD_PROPERTIES(sink__V7441, LINK_NamedPropertyLink(sink__V7441->context, namedP__V7508), LINK_VariablePropertyLink(sink__V7441->context, varP__V7509));
+      ADD_PROPERTIES(sink__V7441, LINK_VARIABLESET(sink__V7441->context, namedFV__V7510), LINK_VARIABLESET(sink__V7441->context, varFV__V7511), LINK_NamedPropertyLink(sink__V7441->context, namedP__V7508), LINK_VariablePropertyLink(sink__V7441->context, varP__V7509));
       { START(sink__V7441, _M_F_Pattern_s10);
         COPY(sink__V7441, sub__V7498);COPY(sink__V7441, sub__V7496);COPY(sink__V7441, sub__V7497);COPY(sink__V7441, sub__V7495);COPY(sink__V7441, sub__V7499);COPY(sink__V7441, sub__V7500);COPY(sink__V7441, sub__V7501);COPY(sink__V7441, sub__V7502);COPY(sink__V7441, sub__V7503);COPY(sink__V7441, sub__V7504);COPY(sink__V7441, sub__V7505);{ if (!IS_BOUND(x__V7506)) { REBIND(x__V7506);
             Variable binds__V7512[1] = {x__V7506}; BINDS(sink__V7441, 1, binds__V7512);
@@ -23122,7 +23122,7 @@ int step_M_F_Pattern_s3(Sink sink__V7441, Term term__V7442)
       Hashset namedFV__V7533 = LINK_VARIABLESET(sink__V7441->context, namedPropertyFreeVars(namedP__V7531));
       Hashset varFV__V7534 = LINK_VARIABLESET(sink__V7441->context, variablePropertyFreeVars(varP__V7532));
       UNLINK(sink__V7441->context, term__V7442);
-      ADD_PROPERTIES(sink__V7441, LINK_NamedPropertyLink(sink__V7441->context, namedP__V7531), LINK_VariablePropertyLink(sink__V7441->context, varP__V7532));
+      ADD_PROPERTIES(sink__V7441, LINK_VARIABLESET(sink__V7441->context, namedFV__V7533), LINK_VARIABLESET(sink__V7441->context, varFV__V7534), LINK_NamedPropertyLink(sink__V7441->context, namedP__V7531), LINK_VariablePropertyLink(sink__V7441->context, varP__V7532));
       { START(sink__V7441, _M_F_Pattern_s27);
         COPY(sink__V7441, sub__V7524);COPY(sink__V7441, sub__V7522);COPY(sink__V7441, sub__V7523);COPY(sink__V7441, sub__V7521);COPY(sink__V7441, sub__V7525);COPY(sink__V7441, sub__V7526);COPY(sink__V7441, sub__V7527);COPY(sink__V7441, sub__V7528);{ if (!IS_BOUND(x__V7529)) { REBIND(x__V7529);
             Variable binds__V7535[1] = {x__V7529}; BINDS(sink__V7441, 1, binds__V7535);
@@ -23196,7 +23196,7 @@ int step_M_F_Pattern_s5(Sink sink__V7543, Term term__V7544)
         Hashset namedFV__V7562 = LINK_VARIABLESET(sink__V7543->context, namedPropertyFreeVars(namedP__V7560));
         Hashset varFV__V7563 = LINK_VARIABLESET(sink__V7543->context, variablePropertyFreeVars(varP__V7561));
         UNLINK(sink__V7543->context, term__V7544);
-        ADD_PROPERTIES(sink__V7543, LINK_NamedPropertyLink(sink__V7543->context, namedP__V7560), LINK_VariablePropertyLink(sink__V7543->context, varP__V7561));
+        ADD_PROPERTIES(sink__V7543, LINK_VARIABLESET(sink__V7543->context, namedFV__V7562), LINK_VARIABLESET(sink__V7543->context, varFV__V7563), LINK_NamedPropertyLink(sink__V7543->context, namedP__V7560), LINK_VariablePropertyLink(sink__V7543->context, varP__V7561));
         { START(sink__V7543, _M_F_Pattern_s7);
           COPY(sink__V7543, sub__V7557);COPY(sink__V7543, sub__V7548);COPY(sink__V7543, sub__V7549);COPY(sink__V7543, sub__V7550);COPY(sink__V7543, sub__V7551);COPY(sink__V7543, sub__V7552);COPY(sink__V7543, sub__V7553);COPY(sink__V7543, sub__V7554);COPY(sink__V7543, sub__V7555);COPY(sink__V7543, sub__V7556);USE(sink__V7543, z__V277); { if (!IS_BOUND(x__V7558)) { REBIND(x__V7558);
               Variable binds__V7564[1] = {x__V7558}; BINDS(sink__V7543, 1, binds__V7564);
@@ -23271,7 +23271,7 @@ int step_M_F_Pattern_s7(Sink sink__V7572, Term term__V7573)
         Hashset namedFV__V7591 = LINK_VARIABLESET(sink__V7572->context, namedPropertyFreeVars(namedP__V7589));
         Hashset varFV__V7592 = LINK_VARIABLESET(sink__V7572->context, variablePropertyFreeVars(varP__V7590));
         UNLINK(sink__V7572->context, term__V7573);
-        ADD_PROPERTIES(sink__V7572, LINK_NamedPropertyLink(sink__V7572->context, namedP__V7589), LINK_VariablePropertyLink(sink__V7572->context, varP__V7590));
+        ADD_PROPERTIES(sink__V7572, LINK_VARIABLESET(sink__V7572->context, namedFV__V7591), LINK_VARIABLESET(sink__V7572->context, varFV__V7592), LINK_NamedPropertyLink(sink__V7572->context, namedP__V7589), LINK_VariablePropertyLink(sink__V7572->context, varP__V7590));
         { START(sink__V7572, _M_F_Pattern_s8);
           USE(sink__V7572, z__V277); COPY(sink__V7572, sub__V7577);COPY(sink__V7572, sub__V7578);COPY(sink__V7572, sub__V7579);COPY(sink__V7572, sub__V7580);COPY(sink__V7572, sub__V7581);COPY(sink__V7572, sub__V7582);COPY(sink__V7572, sub__V7583);COPY(sink__V7572, sub__V7584);COPY(sink__V7572, sub__V7585);COPY(sink__V7572, sub__V7586);{ if (!IS_BOUND(x__V7587)) { REBIND(x__V7587);
               Variable binds__V7593[1] = {x__V7587}; BINDS(sink__V7572, 1, binds__V7593);
@@ -23435,7 +23435,7 @@ int step_M_F_Pattern_s8(Sink sink__V7601, Term term__V7602)
                                               { START(sink__V7601, _M__sTextCons);
                                                 { START(sink__V7601, _M__sTextEmbed);
                                                   { START(sink__V7601, _M_AsText);
-                                                    ADD_PROPERTIES(sink__V7601, LINK_NamedPropertyLink(sink__V7601->context, namedP__V7616), LINK_VariablePropertyLink(sink__V7601->context, varP__V7617));
+                                                    ADD_PROPERTIES(sink__V7601, LINK_VARIABLESET(sink__V7601->context, namedFV__V7618), LINK_VARIABLESET(sink__V7601->context, varFV__V7619), LINK_NamedPropertyLink(sink__V7601->context, namedP__V7616), LINK_VariablePropertyLink(sink__V7601->context, varP__V7617));
                                                     { START(sink__V7601, _M_F_Options);
                                                       COPY(sink__V7601, sub__V7604);{ Variable x__V7620 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V7601->context,"x__V7620");
                                                         Variable binds__V7621[1] = {x__V7620}; BINDS(sink__V7601, 1, binds__V7621);
@@ -23588,7 +23588,7 @@ int step_M_F_Dispatch__choice_s1(Sink sink__V7640, Term term__V7641)
       Hashset namedFV__V7655 = LINK_VARIABLESET(sink__V7640->context, namedPropertyFreeVars(namedP__V7653));
       Hashset varFV__V7656 = LINK_VARIABLESET(sink__V7640->context, variablePropertyFreeVars(varP__V7654));
       UNLINK(sink__V7640->context, term__V7641);
-      ADD_PROPERTIES(sink__V7640, LINK_NamedPropertyLink(sink__V7640->context, namedP__V7653), LINK_VariablePropertyLink(sink__V7640->context, varP__V7654));
+      ADD_PROPERTIES(sink__V7640, LINK_VARIABLESET(sink__V7640->context, namedFV__V7655), LINK_VARIABLESET(sink__V7640->context, varFV__V7656), LINK_NamedPropertyLink(sink__V7640->context, namedP__V7653), LINK_VariablePropertyLink(sink__V7640->context, varP__V7654));
       { START(sink__V7640, _M_F_Dispatch__choice_s6);
         COPY(sink__V7640, sub__V7645);{ if (!IS_BOUND(y__V7646)) { REBIND(y__V7646);
             Variable binds__V7657[1] = {y__V7646}; BINDS(sink__V7640, 1, binds__V7657);
@@ -23632,7 +23632,7 @@ int step_M_F_Dispatch__choice_s1(Sink sink__V7640, Term term__V7641)
       Hashset namedFV__V7674 = LINK_VARIABLESET(sink__V7640->context, namedPropertyFreeVars(namedP__V7672));
       Hashset varFV__V7675 = LINK_VARIABLESET(sink__V7640->context, variablePropertyFreeVars(varP__V7673));
       UNLINK(sink__V7640->context, term__V7641);
-      ADD_PROPERTIES(sink__V7640, LINK_NamedPropertyLink(sink__V7640->context, namedP__V7672), LINK_VariablePropertyLink(sink__V7640->context, varP__V7673));
+      ADD_PROPERTIES(sink__V7640, LINK_VARIABLESET(sink__V7640->context, namedFV__V7674), LINK_VARIABLESET(sink__V7640->context, varFV__V7675), LINK_NamedPropertyLink(sink__V7640->context, namedP__V7672), LINK_VariablePropertyLink(sink__V7640->context, varP__V7673));
       { START(sink__V7640, _M_F_Dispatch__choice_s2);
         COPY(sink__V7640, sub__V7666);COPY(sink__V7640, sub__V7667);COPY(sink__V7640, sub__V7668);COPY(sink__V7640, sub__V7669);COPY(sink__V7640, sub__V7670);COPY(sink__V7640, sub__V7671);END(sink__V7640, _M_F_Dispatch__choice_s2); }
       UNLINK_VARIABLESET(sink__V7640->context, namedFV__V7674); UNLINK_VARIABLESET(sink__V7640->context, varFV__V7675);
@@ -23680,7 +23680,7 @@ int step_M_F_Dispatch__choice_s2(Sink sink__V7676, Term term__V7677)
       Hashset namedFV__V7690 = LINK_VARIABLESET(sink__V7676->context, namedPropertyFreeVars(namedP__V7688));
       Hashset varFV__V7691 = LINK_VARIABLESET(sink__V7676->context, variablePropertyFreeVars(varP__V7689));
       UNLINK(sink__V7676->context, term__V7677);
-      ADD_PROPERTIES(sink__V7676, LINK_NamedPropertyLink(sink__V7676->context, namedP__V7688), LINK_VariablePropertyLink(sink__V7676->context, varP__V7689));
+      ADD_PROPERTIES(sink__V7676, LINK_VARIABLESET(sink__V7676->context, namedFV__V7690), LINK_VARIABLESET(sink__V7676->context, varFV__V7691), LINK_NamedPropertyLink(sink__V7676->context, namedP__V7688), LINK_VariablePropertyLink(sink__V7676->context, varP__V7689));
       { START(sink__V7676, _M_F_Dispatch__choice_s3);
         COPY(sink__V7676, sub__V7681);COPY(sink__V7676, sub__V7682);COPY(sink__V7676, sub__V7683);COPY(sink__V7676, sub__V7684);COPY(sink__V7676, sub__V7685);COPY(sink__V7676, sub__V7686);COPY(sink__V7676, sub__V7687);END(sink__V7676, _M_F_Dispatch__choice_s3); }
       UNLINK_VARIABLESET(sink__V7676->context, namedFV__V7690); UNLINK_VARIABLESET(sink__V7676->context, varFV__V7691);
@@ -23709,7 +23709,7 @@ int step_M_F_Dispatch__choice_s2(Sink sink__V7676, Term term__V7677)
       Hashset namedFV__V7701 = LINK_VARIABLESET(sink__V7676->context, namedPropertyFreeVars(namedP__V7699));
       Hashset varFV__V7702 = LINK_VARIABLESET(sink__V7676->context, variablePropertyFreeVars(varP__V7700));
       UNLINK(sink__V7676->context, term__V7677);
-      ADD_PROPERTIES(sink__V7676, LINK_NamedPropertyLink(sink__V7676->context, namedP__V7699), LINK_VariablePropertyLink(sink__V7676->context, varP__V7700));
+      ADD_PROPERTIES(sink__V7676, LINK_VARIABLESET(sink__V7676->context, namedFV__V7701), LINK_VARIABLESET(sink__V7676->context, varFV__V7702), LINK_NamedPropertyLink(sink__V7676->context, namedP__V7699), LINK_VariablePropertyLink(sink__V7676->context, varP__V7700));
       { START(sink__V7676, _M_F_Dispatch__choice_s4);
         COPY(sink__V7676, sub__V7693);COPY(sink__V7676, sub__V7694);COPY(sink__V7676, sub__V7695);COPY(sink__V7676, sub__V7696);COPY(sink__V7676, sub__V7697);COPY(sink__V7676, sub__V7698);END(sink__V7676, _M_F_Dispatch__choice_s4); }
       UNLINK_VARIABLESET(sink__V7676->context, namedFV__V7701); UNLINK_VARIABLESET(sink__V7676->context, varFV__V7702);
@@ -23978,7 +23978,7 @@ int step_M_F_Dispatch__choice_s4(Sink sink__V7717, Term term__V7718)
         Hashset namedFV__V7729 = LINK_VARIABLESET(sink__V7717->context, namedPropertyFreeVars(namedP__V7727));
         Hashset varFV__V7730 = LINK_VARIABLESET(sink__V7717->context, variablePropertyFreeVars(varP__V7728));
         UNLINK(sink__V7717->context, term__V7718);
-        ADD_PROPERTIES(sink__V7717, LINK_NamedPropertyLink(sink__V7717->context, namedP__V7727), LINK_VariablePropertyLink(sink__V7717->context, varP__V7728));
+        ADD_PROPERTIES(sink__V7717, LINK_VARIABLESET(sink__V7717->context, namedFV__V7729), LINK_VARIABLESET(sink__V7717->context, varFV__V7730), LINK_NamedPropertyLink(sink__V7717->context, namedP__V7727), LINK_VariablePropertyLink(sink__V7717->context, varP__V7728));
         { START(sink__V7717, _M_F_Dispatch__choice_s5);
           USE(sink__V7717, z__V277); COPY(sink__V7717, sub__V7722);COPY(sink__V7717, sub__V7723);COPY(sink__V7717, sub__V7724);COPY(sink__V7717, sub__V7725);COPY(sink__V7717, sub__V7726);END(sink__V7717, _M_F_Dispatch__choice_s5); }
         UNLINK_VARIABLESET(sink__V7717->context, namedFV__V7729); UNLINK_VARIABLESET(sink__V7717->context, varFV__V7730);

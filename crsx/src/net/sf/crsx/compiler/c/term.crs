@@ -65,8 +65,8 @@ T-send-property-ref-helper[$[{#env}Get[STRING_ENTRY], #RefCookie], #sink]
 T-send-property-ref-helper[STRING_ENTRY, Text] :: Text;
 
 T-send-property-ref-helper[PROPERTY_VARIABLE[#namedFV, #varFV, #namedP, #varP], #sink]
-→  // namedP and varP references are NOT transferred.
-%n⟪ADD_PROPERTIES(«#sink», LINK_NamedPropertyLink(«#sink»->context, « #namedP »), LINK_VariablePropertyLink(«#sink»->context, « #varP»));
+→  // namedFV, varFV, namedP, and varP references are NOT transferred.
+%n⟪ADD_PROPERTIES(«#sink», LINK_VARIABLESET(«#sink»->context, « #namedFV »), LINK_VARIABLESET(«#sink»->context, « #varFV »), LINK_NamedPropertyLink(«#sink»->context, « #namedP »), LINK_VariablePropertyLink(«#sink»->context, « #varP»));
 ⟫
 ;
 
