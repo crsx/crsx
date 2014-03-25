@@ -426,7 +426,7 @@ extern struct _ConstructionDescriptor descriptor_M_VARIABLE;
 struct _Con_M_LIST_xVARIABLE {struct _Construction construction; Term sub[1]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_LIST_xVARIABLE;
 #define STRUCT_Con_M_PROPERTY_xVARIABLE struct _Con_M_PROPERTY_xVARIABLE
-struct _Con_M_PROPERTY_xVARIABLE {struct _Construction construction; Term sub[3]; Variable binder[0];};
+struct _Con_M_PROPERTY_xVARIABLE {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_PROPERTY_xVARIABLE;
 #define STRUCT_Con_M_NO struct _ConstantConstruction
 extern struct _ConstructionDescriptor descriptor_M_NO;

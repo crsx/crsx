@@ -611,10 +611,10 @@ int conBindOffs_M_LIST_xVARIABLE[] = {0 , 0};
 char *name_M_LIST_xVARIABLE =  "LIST_VARIABLE" ;
 char *nameFun_M_LIST_xVARIABLE(Term term) { return name_M_LIST_xVARIABLE; }
 struct _ConstructionDescriptor descriptor_M_LIST_xVARIABLE = {&sort_M_STRING_xENTRY, Data_M_LIST_xVARIABLE, 1, sizeof(STRUCT_Con_M_LIST_xVARIABLE), conBindOffs_M_LIST_xVARIABLE, &nameFun_M_LIST_xVARIABLE, &dataStep};
-int conBindOffs_M_PROPERTY_xVARIABLE[] = {0 , 0 , 0 , 0};
+int conBindOffs_M_PROPERTY_xVARIABLE[] = {0 , 0 , 0 , 0 , 0};
 char *name_M_PROPERTY_xVARIABLE =  "PROPERTY_VARIABLE" ;
 char *nameFun_M_PROPERTY_xVARIABLE(Term term) { return name_M_PROPERTY_xVARIABLE; }
-struct _ConstructionDescriptor descriptor_M_PROPERTY_xVARIABLE = {&sort_M_STRING_xENTRY, Data_M_PROPERTY_xVARIABLE, 3, sizeof(STRUCT_Con_M_PROPERTY_xVARIABLE), conBindOffs_M_PROPERTY_xVARIABLE, &nameFun_M_PROPERTY_xVARIABLE, &dataStep};
+struct _ConstructionDescriptor descriptor_M_PROPERTY_xVARIABLE = {&sort_M_STRING_xENTRY, Data_M_PROPERTY_xVARIABLE, 4, sizeof(STRUCT_Con_M_PROPERTY_xVARIABLE), conBindOffs_M_PROPERTY_xVARIABLE, &nameFun_M_PROPERTY_xVARIABLE, &dataStep};
 char *name_M_NO =  "NO" ;
 char *nameFun_M_NO(Term term) { return name_M_NO; }
 struct _ConstructionDescriptor descriptor_M_NO = {&sort_M_STRING_xENTRY, Data_M_NO, 0, sizeof(STRUCT_Con_M_NO), noBinderOffsets, &nameFun_M_NO, &dataStep};

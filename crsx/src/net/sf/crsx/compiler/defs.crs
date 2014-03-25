@@ -73,7 +73,7 @@ STRING_ENTRY ::=
 	VARIABLE[Reified_Variable];
 	LIST_VARIABLE[$List[Reified_Variable]];
 
-	PROPERTY_VARIABLE[Reified_Variable, Reified_Variable, Reified_Variable];
+	PROPERTY_VARIABLE[Reified_Variable, Reified_Variable, Reified_Variable, Reified_Variable];
 
 	NO;
 );

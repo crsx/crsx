@@ -1191,13 +1191,13 @@ extern int step_M_T__send_Binder4_s12(Sink,Term);
 
 /* FUNCTION TERM-T-send-Binder4-3$T-send-Binder4$14$COPYING HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T__send_Binder4_s14 struct _Con_M_T__send_Binder4_s14
-struct _Con_M_T__send_Binder4_s14 {struct _Construction construction; Term sub[10]; Variable binder[1];};
+struct _Con_M_T__send_Binder4_s14 {struct _Construction construction; Term sub[11]; Variable binder[1];};
 extern struct _ConstructionDescriptor descriptor_M_T__send_Binder4_s14;
 extern int step_M_T__send_Binder4_s14(Sink,Term);
 
 /* FUNCTION TERM-T-send-Binder4-3 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T__send_Binder4_s15 struct _Con_M_T__send_Binder4_s15
-struct _Con_M_T__send_Binder4_s15 {struct _Construction construction; Term sub[9]; Variable binder[1];};
+struct _Con_M_T__send_Binder4_s15 {struct _Construction construction; Term sub[10]; Variable binder[1];};
 extern struct _ConstructionDescriptor descriptor_M_T__send_Binder4_s15;
 extern int step_M_T__send_Binder4_s15(Sink,Term);
 
@@ -1263,7 +1263,7 @@ extern int step_M_T__then__set__ref_s1(Sink,Term);
 
 /* FUNCTION TERM-T-send-property-ref-helper-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_T__send__property__ref__helper_s1 struct _Con_M_T__send__property__ref__helper_s1
-struct _Con_M_T__send__property__ref__helper_s1 {struct _Construction construction; Term sub[4]; Variable binder[0];};
+struct _Con_M_T__send__property__ref__helper_s1 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_T__send__property__ref__helper_s1;
 extern int step_M_T__send__property__ref__helper_s1(Sink,Term);
 
