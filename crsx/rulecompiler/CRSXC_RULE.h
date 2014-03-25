@@ -578,7 +578,7 @@ extern int step_M_F__unlink__refs3_s1(Sink,Term);
 
 /* FUNCTION RULES-F-unlink-refs3-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_F__unlink__refs3_s2 struct _Con_M_F__unlink__refs3_s2
-struct _Con_M_F__unlink__refs3_s2 {struct _Construction construction; Term sub[4]; Variable binder[0];};
+struct _Con_M_F__unlink__refs3_s2 {struct _Construction construction; Term sub[5]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_F__unlink__refs3_s2;
 extern int step_M_F__unlink__refs3_s2(Sink,Term);
 

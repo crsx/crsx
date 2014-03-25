@@ -4196,7 +4196,7 @@ extern int step_M_E__set__int_s96(Sink,Term);
 
 /* FUNCTION EVAL-E-VariableProperties-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_VariableProperties_s3 struct _Con_M_E_VariableProperties_s3
-struct _Con_M_E_VariableProperties_s3 {struct _Construction construction; Term sub[3]; Variable binder[0];};
+struct _Con_M_E_VariableProperties_s3 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E_VariableProperties_s3;
 extern int step_M_E_VariableProperties_s3(Sink,Term);
 
@@ -6320,7 +6320,7 @@ extern int step_M_E__flatten__string__cons_s6(Sink,Term);
 
 /* FUNCTION EVAL-E-send-Keys1-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E__send_Keys1_s3 struct _Con_M_E__send_Keys1_s3
-struct _Con_M_E__send_Keys1_s3 {struct _Construction construction; Term sub[6]; Variable binder[0];};
+struct _Con_M_E__send_Keys1_s3 {struct _Construction construction; Term sub[7]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E__send_Keys1_s3;
 extern int step_M_E__send_Keys1_s3(Sink,Term);
 
@@ -7040,7 +7040,7 @@ extern int step_M_E_OptionDiscard2_s1(Sink,Term);
 
 /* FUNCTION EVAL-E-OptionDiscard2-2 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_OptionDiscard2_s2 struct _Con_M_E_OptionDiscard2_s2
-struct _Con_M_E_OptionDiscard2_s2 {struct _Construction construction; Term sub[3]; Variable binder[0];};
+struct _Con_M_E_OptionDiscard2_s2 {struct _Construction construction; Term sub[4]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E_OptionDiscard2_s2;
 extern int step_M_E_OptionDiscard2_s2(Sink,Term);
 
@@ -7399,7 +7399,7 @@ extern int step_M_E_Get_Property_s2(Sink,Term);
 
 /* FUNCTION EVAL-E-Get-Property-1 HEADER DECLARATIONS. */
 #define STRUCT_Con_M_E_Get_Property_s3 struct _Con_M_E_Get_Property_s3
-struct _Con_M_E_Get_Property_s3 {struct _Construction construction; Term sub[5]; Variable binder[0];};
+struct _Con_M_E_Get_Property_s3 {struct _Construction construction; Term sub[6]; Variable binder[0];};
 extern struct _ConstructionDescriptor descriptor_M_E_Get_Property_s3;
 extern int step_M_E_Get_Property_s3(Sink,Term);
 

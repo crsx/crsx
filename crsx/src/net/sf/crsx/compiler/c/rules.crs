@@ -667,7 +667,7 @@ F-then-Pattern-Ref[OK, #RefCookie, sink, term, ok.#[ok]]
 →
 %n⟪NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«sink»->context, NAMED_PROPERTIES(«term»));
 VariablePropertyLink «varP» = LINK_VariablePropertyLink(«sink»->context, VARIABLE_PROPERTIES(«term»));
-« {#env;  #RefCookie : PROPERTY_VARIABLE[namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
+« {#env;  #RefCookie : PROPERTY_VARIABLE[term, namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-then-Pattern-Property[OK_SORT, PASS, Text, Text, Reified_Term, Reified_Term, ok::OK_SORT.Text] :: Text;
@@ -1159,7 +1159,7 @@ F-unlink-refs3[#sink, $[{#env}Get[STRING_ENTRY], #RefCookie], #refs]
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-unlink-refs3[Text, STRING_ENTRY, $List[$String]] :: Text;
 
 {#env}
-F-unlink-refs3[#sink,  PROPERTY_VARIABLE[#namedP, #varP], #refs] 
+F-unlink-refs3[#sink,  PROPERTY_VARIABLE[#term, #namedP, #varP], #refs] 
 → 
 %n⟪UNLINK_NamedPropertyLink(«#sink»->context, «#namedP»); UNLINK_VariablePropertyLink(«#sink»->context, «#varP»);«{#env}F-unlink-refs2[#sink, #refs]»⟫
 ;

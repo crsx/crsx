@@ -158,7 +158,7 @@ E-OptionDiscard2[#sink, VARIABLE[#term]]
 %n⟪ UNLINK(«#sink»->context, «#term»); ⟫
 ;
 
-E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#namedP, #varP]] 
+E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#term, #namedP, #varP]] 
 → 
 %n⟪ ⟫
 ; // property refs are unlink at the end of the step function
@@ -742,7 +742,7 @@ else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink,
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-Get-Property[$String, Text, Text] :: Text;
 
-{#env; #RefCookie: PROPERTY_VARIABLE[#namedP, #varP]}
+{#env; #RefCookie: PROPERTY_VARIABLE[#term, #namedP, #varP]}
 E-Get-Property[#RefCookie, #sink, #key]
 →
 %n⟪DPROPERTY(«#sink»->context, «#namedP», «#varP», «#key»)⟫
@@ -750,7 +750,7 @@ E-Get-Property[#RefCookie, #sink, #key]
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-VariableProperties[$String] :: Text;
 
-{#env; #RefCookie: PROPERTY_VARIABLE[#namedP, #varP]}
+{#env; #RefCookie: PROPERTY_VARIABLE[#term, #namedP, #varP]}
 E-VariableProperties[#RefCookie]
 →
 %n⟪«#varP»⟫;
@@ -2328,7 +2328,7 @@ Send-Keys:
 
 -[Fresh[depth::Text, link::Text]]
 :
-{#env; #RefCookie : PROPERTY_VARIABLE[#namedP, #varP]}
+{#env; #RefCookie : PROPERTY_VARIABLE[#term, #namedP, #varP]}
 E-send-Keys1[#RefCookie, #Name, #Options, #sink]
 →
 %n⟪{⟦ int «depth» = 0;
