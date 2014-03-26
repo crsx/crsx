@@ -4001,7 +4001,7 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
     if (namedLink || variableLink)
     {
         // We need to emit a new reference
-        ADD_PROPERTIES(sink, LINK_VARIABLESET(sink->context, namedPropertyFreeVars(namedLink)), LINK_VARIABLESET(sink->context, variablePropertyFreeVars(variableLink)), LINK_NamedPropertyLink(sink->context, namedLink), LINK_VariablePropertyLink(sink->context, variableLink));
+        ADD_PROPERTIES(sink, NULL, NULL, LINK_NamedPropertyLink(sink->context, namedLink), LINK_VariablePropertyLink(sink->context, variableLink));
         ++(*metaSubstituteSizep);
     }
 
