@@ -33,7 +33,7 @@ int step_M_D__check__sort_s1(Sink sink__V1, Term term__V2)
       
       NamedPropertyLink namedP__V11 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
       VariablePropertyLink varP__V12 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-      Hashset namedFV__V13 = LINK_VARIABLESET(sink__V1->context, namedPropertyFreeVars(namedP__V11));
+      Hashset namedFV__V13 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->nfvs);
       Hashset varFV__V14 = LINK_VARIABLESET(sink__V1->context, variablePropertyFreeVars(varP__V12));
       UNLINK(sink__V1->context, term__V2);
       ADD_PROPERTIES(sink__V1, LINK_VARIABLESET(sink__V1->context, namedFV__V13), LINK_VARIABLESET(sink__V1->context, varFV__V14), LINK_NamedPropertyLink(sink__V1->context, namedP__V11), LINK_VariablePropertyLink(sink__V1->context, varP__V12));
@@ -56,7 +56,7 @@ int step_M_D__check__sort_s1(Sink sink__V1, Term term__V2)
       
       NamedPropertyLink namedP__V19 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
       VariablePropertyLink varP__V20 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-      Hashset namedFV__V21 = LINK_VARIABLESET(sink__V1->context, namedPropertyFreeVars(namedP__V19));
+      Hashset namedFV__V21 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->nfvs);
       Hashset varFV__V22 = LINK_VARIABLESET(sink__V1->context, variablePropertyFreeVars(varP__V20));
       UNLINK(sink__V1->context, term__V2);
       ADD_PROPERTIES(sink__V1, LINK_VARIABLESET(sink__V1->context, namedFV__V21), LINK_VARIABLESET(sink__V1->context, varFV__V22), LINK_NamedPropertyLink(sink__V1->context, namedP__V19), LINK_VariablePropertyLink(sink__V1->context, varP__V20));
@@ -81,7 +81,7 @@ int step_M_D__check__sort_s1(Sink sink__V1, Term term__V2)
       
       NamedPropertyLink namedP__V28 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
       VariablePropertyLink varP__V29 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-      Hashset namedFV__V30 = LINK_VARIABLESET(sink__V1->context, namedPropertyFreeVars(namedP__V28));
+      Hashset namedFV__V30 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->nfvs);
       Hashset varFV__V31 = LINK_VARIABLESET(sink__V1->context, variablePropertyFreeVars(varP__V29));
       UNLINK(sink__V1->context, term__V2);
       ADD_PROPERTIES(sink__V1, LINK_VARIABLESET(sink__V1->context, namedFV__V30), LINK_VARIABLESET(sink__V1->context, varFV__V31), LINK_NamedPropertyLink(sink__V1->context, namedP__V28), LINK_VariablePropertyLink(sink__V1->context, varP__V29));
@@ -118,7 +118,7 @@ int step_M_D__check__sort_s2(Sink sink__V32, Term term__V33)
     
     NamedPropertyLink namedP__V38 = LINK_NamedPropertyLink(sink__V32->context, NAMED_PROPERTIES(term__V33));
     VariablePropertyLink varP__V39 = LINK_VariablePropertyLink(sink__V32->context, VARIABLE_PROPERTIES(term__V33));
-    Hashset namedFV__V40 = LINK_VARIABLESET(sink__V32->context, namedPropertyFreeVars(namedP__V38));
+    Hashset namedFV__V40 = LINK_VARIABLESET(sink__V32->context, asConstruction(term__V33)->nfvs);
     Hashset varFV__V41 = LINK_VARIABLESET(sink__V32->context, variablePropertyFreeVars(varP__V39));
     UNLINK(sink__V32->context, term__V33);
     { int test__V42;
@@ -197,7 +197,7 @@ int step_M_D__check__sort_s3(Sink sink__V43, Term term__V44)
     
     NamedPropertyLink namedP__V50 = LINK_NamedPropertyLink(sink__V43->context, NAMED_PROPERTIES(term__V44));
     VariablePropertyLink varP__V51 = LINK_VariablePropertyLink(sink__V43->context, VARIABLE_PROPERTIES(term__V44));
-    Hashset namedFV__V52 = LINK_VARIABLESET(sink__V43->context, namedPropertyFreeVars(namedP__V50));
+    Hashset namedFV__V52 = LINK_VARIABLESET(sink__V43->context, asConstruction(term__V44)->nfvs);
     Hashset varFV__V53 = LINK_VARIABLESET(sink__V43->context, variablePropertyFreeVars(varP__V51));
     UNLINK(sink__V43->context, term__V44);
     { START(sink__V43, _M_D__check__sort_s1);
@@ -229,7 +229,7 @@ int step_M_D__check__sort_s4(Sink sink__V54, Term term__V55)
     
     NamedPropertyLink namedP__V59 = LINK_NamedPropertyLink(sink__V54->context, NAMED_PROPERTIES(term__V55));
     VariablePropertyLink varP__V60 = LINK_VariablePropertyLink(sink__V54->context, VARIABLE_PROPERTIES(term__V55));
-    Hashset namedFV__V61 = LINK_VARIABLESET(sink__V54->context, namedPropertyFreeVars(namedP__V59));
+    Hashset namedFV__V61 = LINK_VARIABLESET(sink__V54->context, asConstruction(term__V55)->nfvs);
     Hashset varFV__V62 = LINK_VARIABLESET(sink__V54->context, variablePropertyFreeVars(varP__V60));
     UNLINK(sink__V54->context, term__V55);
     { START(sink__V54, _M__sTextNil); END(sink__V54, _M__sTextNil); } UNLINK_VARIABLESET(sink__V54->context, namedFV__V61); UNLINK_VARIABLESET(sink__V54->context, varFV__V62);

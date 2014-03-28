@@ -22,7 +22,7 @@ int step_M_ComputeSymbols_s1(Sink sink__V1, Term term__V2)
     
     NamedPropertyLink namedP__V5 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
     VariablePropertyLink varP__V6 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-    Hashset namedFV__V7 = LINK_VARIABLESET(sink__V1->context, namedPropertyFreeVars(namedP__V5));
+    Hashset namedFV__V7 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->nfvs);
     Hashset varFV__V8 = LINK_VARIABLESET(sink__V1->context, variablePropertyFreeVars(varP__V6));
     UNLINK(sink__V1->context, term__V2);
     { START(sink__V1, _M_ComputeSymbols2);
@@ -63,7 +63,7 @@ int step_M_X_Declarations(Sink sink__V11, Term term__V12)
       
       NamedPropertyLink namedP__V18 = LINK_NamedPropertyLink(sink__V11->context, NAMED_PROPERTIES(term__V12));
       VariablePropertyLink varP__V19 = LINK_VariablePropertyLink(sink__V11->context, VARIABLE_PROPERTIES(term__V12));
-      Hashset namedFV__V20 = LINK_VARIABLESET(sink__V11->context, namedPropertyFreeVars(namedP__V18));
+      Hashset namedFV__V20 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->nfvs);
       Hashset varFV__V21 = LINK_VARIABLESET(sink__V11->context, variablePropertyFreeVars(varP__V19));
       UNLINK(sink__V11->context, term__V12);
       ADD_PROPERTIES(sink__V11, LINK_VARIABLESET(sink__V11->context, namedFV__V20), LINK_VARIABLESET(sink__V11->context, varFV__V21), LINK_NamedPropertyLink(sink__V11->context, namedP__V18), LINK_VariablePropertyLink(sink__V11->context, varP__V19));
@@ -80,7 +80,7 @@ int step_M_X_Declarations(Sink sink__V11, Term term__V12)
       
       NamedPropertyLink namedP__V23 = LINK_NamedPropertyLink(sink__V11->context, NAMED_PROPERTIES(term__V12));
       VariablePropertyLink varP__V24 = LINK_VariablePropertyLink(sink__V11->context, VARIABLE_PROPERTIES(term__V12));
-      Hashset namedFV__V25 = LINK_VARIABLESET(sink__V11->context, namedPropertyFreeVars(namedP__V23));
+      Hashset namedFV__V25 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->nfvs);
       Hashset varFV__V26 = LINK_VARIABLESET(sink__V11->context, variablePropertyFreeVars(varP__V24));
       UNLINK(sink__V11->context, term__V12);
       ADD_PROPERTIES(sink__V11, LINK_VARIABLESET(sink__V11->context, namedFV__V25), LINK_VARIABLESET(sink__V11->context, varFV__V26), LINK_NamedPropertyLink(sink__V11->context, namedP__V23), LINK_VariablePropertyLink(sink__V11->context, varP__V24));
@@ -113,7 +113,7 @@ int step_M_X_Declarations_s1(Sink sink__V27, Term term__V28)
     
     NamedPropertyLink namedP__V31 = LINK_NamedPropertyLink(sink__V27->context, NAMED_PROPERTIES(term__V28));
     VariablePropertyLink varP__V32 = LINK_VariablePropertyLink(sink__V27->context, VARIABLE_PROPERTIES(term__V28));
-    Hashset namedFV__V33 = LINK_VARIABLESET(sink__V27->context, namedPropertyFreeVars(namedP__V31));
+    Hashset namedFV__V33 = LINK_VARIABLESET(sink__V27->context, asConstruction(term__V28)->nfvs);
     Hashset varFV__V34 = LINK_VARIABLESET(sink__V27->context, variablePropertyFreeVars(varP__V32));
     UNLINK(sink__V27->context, term__V28);
     { START(sink__V27, _M__sTextCons);
@@ -155,7 +155,7 @@ int step_M_X_Declarations_s2(Sink sink__V35, Term term__V36)
     
     NamedPropertyLink namedP__V37 = LINK_NamedPropertyLink(sink__V35->context, NAMED_PROPERTIES(term__V36));
     VariablePropertyLink varP__V38 = LINK_VariablePropertyLink(sink__V35->context, VARIABLE_PROPERTIES(term__V36));
-    Hashset namedFV__V39 = LINK_VARIABLESET(sink__V35->context, namedPropertyFreeVars(namedP__V37));
+    Hashset namedFV__V39 = LINK_VARIABLESET(sink__V35->context, asConstruction(term__V36)->nfvs);
     Hashset varFV__V40 = LINK_VARIABLESET(sink__V35->context, variablePropertyFreeVars(varP__V38));
     UNLINK(sink__V35->context, term__V36);
     { START(sink__V35, _M__sTextNil); END(sink__V35, _M__sTextNil); } UNLINK_VARIABLESET(sink__V35->context, namedFV__V39); UNLINK_VARIABLESET(sink__V35->context, varFV__V40);
@@ -186,7 +186,7 @@ int step_M_X_Form_s2(Sink sink__V41, Term term__V42)
       
       NamedPropertyLink namedP__V47 = LINK_NamedPropertyLink(sink__V41->context, NAMED_PROPERTIES(term__V42));
       VariablePropertyLink varP__V48 = LINK_VariablePropertyLink(sink__V41->context, VARIABLE_PROPERTIES(term__V42));
-      Hashset namedFV__V49 = LINK_VARIABLESET(sink__V41->context, namedPropertyFreeVars(namedP__V47));
+      Hashset namedFV__V49 = LINK_VARIABLESET(sink__V41->context, asConstruction(term__V42)->nfvs);
       Hashset varFV__V50 = LINK_VARIABLESET(sink__V41->context, variablePropertyFreeVars(varP__V48));
       UNLINK(sink__V41->context, term__V42);
       ADD_PROPERTIES(sink__V41, LINK_VARIABLESET(sink__V41->context, namedFV__V49), LINK_VARIABLESET(sink__V41->context, varFV__V50), LINK_NamedPropertyLink(sink__V41->context, namedP__V47), LINK_VariablePropertyLink(sink__V41->context, varP__V48));
@@ -209,7 +209,7 @@ int step_M_X_Form_s2(Sink sink__V41, Term term__V42)
       
       NamedPropertyLink namedP__V55 = LINK_NamedPropertyLink(sink__V41->context, NAMED_PROPERTIES(term__V42));
       VariablePropertyLink varP__V56 = LINK_VariablePropertyLink(sink__V41->context, VARIABLE_PROPERTIES(term__V42));
-      Hashset namedFV__V57 = LINK_VARIABLESET(sink__V41->context, namedPropertyFreeVars(namedP__V55));
+      Hashset namedFV__V57 = LINK_VARIABLESET(sink__V41->context, asConstruction(term__V42)->nfvs);
       Hashset varFV__V58 = LINK_VARIABLESET(sink__V41->context, variablePropertyFreeVars(varP__V56));
       UNLINK(sink__V41->context, term__V42);
       ADD_PROPERTIES(sink__V41, LINK_VARIABLESET(sink__V41->context, namedFV__V57), LINK_VARIABLESET(sink__V41->context, varFV__V58), LINK_NamedPropertyLink(sink__V41->context, namedP__V55), LINK_VariablePropertyLink(sink__V41->context, varP__V56));
@@ -245,7 +245,7 @@ int step_M_X_Form_s3(Sink sink__V59, Term term__V60)
     
     NamedPropertyLink namedP__V64 = LINK_NamedPropertyLink(sink__V59->context, NAMED_PROPERTIES(term__V60));
     VariablePropertyLink varP__V65 = LINK_VariablePropertyLink(sink__V59->context, VARIABLE_PROPERTIES(term__V60));
-    Hashset namedFV__V66 = LINK_VARIABLESET(sink__V59->context, namedPropertyFreeVars(namedP__V64));
+    Hashset namedFV__V66 = LINK_VARIABLESET(sink__V59->context, asConstruction(term__V60)->nfvs);
     Hashset varFV__V67 = LINK_VARIABLESET(sink__V59->context, variablePropertyFreeVars(varP__V65));
     UNLINK(sink__V59->context, term__V60);
     { START(sink__V59, _M__sTextCons);
@@ -306,7 +306,7 @@ int step_M_X_Form_s4(Sink sink__V68, Term term__V69)
     
     NamedPropertyLink namedP__V71 = LINK_NamedPropertyLink(sink__V68->context, NAMED_PROPERTIES(term__V69));
     VariablePropertyLink varP__V72 = LINK_VariablePropertyLink(sink__V68->context, VARIABLE_PROPERTIES(term__V69));
-    Hashset namedFV__V73 = LINK_VARIABLESET(sink__V68->context, namedPropertyFreeVars(namedP__V71));
+    Hashset namedFV__V73 = LINK_VARIABLESET(sink__V68->context, asConstruction(term__V69)->nfvs);
     Hashset varFV__V74 = LINK_VARIABLESET(sink__V68->context, variablePropertyFreeVars(varP__V72));
     UNLINK(sink__V68->context, term__V69);
     { START(sink__V68, _M__sTextCons);
@@ -364,7 +364,7 @@ int step_M_X_Form_s5(Sink sink__V75, Term term__V76)
     
     NamedPropertyLink namedP__V77 = LINK_NamedPropertyLink(sink__V75->context, NAMED_PROPERTIES(term__V76));
     VariablePropertyLink varP__V78 = LINK_VariablePropertyLink(sink__V75->context, VARIABLE_PROPERTIES(term__V76));
-    Hashset namedFV__V79 = LINK_VARIABLESET(sink__V75->context, namedPropertyFreeVars(namedP__V77));
+    Hashset namedFV__V79 = LINK_VARIABLESET(sink__V75->context, asConstruction(term__V76)->nfvs);
     Hashset varFV__V80 = LINK_VARIABLESET(sink__V75->context, variablePropertyFreeVars(varP__V78));
     UNLINK(sink__V75->context, term__V76);
     { START(sink__V75, _M__sTextNil); END(sink__V75, _M__sTextNil); } UNLINK_VARIABLESET(sink__V75->context, namedFV__V79); UNLINK_VARIABLESET(sink__V75->context, varFV__V80);
@@ -394,7 +394,7 @@ int step_M_X_Form_s6(Sink sink__V81, Term term__V82)
     
     NamedPropertyLink namedP__V86 = LINK_NamedPropertyLink(sink__V81->context, NAMED_PROPERTIES(term__V82));
     VariablePropertyLink varP__V87 = LINK_VariablePropertyLink(sink__V81->context, VARIABLE_PROPERTIES(term__V82));
-    Hashset namedFV__V88 = LINK_VARIABLESET(sink__V81->context, namedPropertyFreeVars(namedP__V86));
+    Hashset namedFV__V88 = LINK_VARIABLESET(sink__V81->context, asConstruction(term__V82)->nfvs);
     Hashset varFV__V89 = LINK_VARIABLESET(sink__V81->context, variablePropertyFreeVars(varP__V87));
     UNLINK(sink__V81->context, term__V82);
     { START(sink__V81, _M_X_Form);
@@ -426,7 +426,7 @@ int step_M_X_Data_s1(Sink sink__V90, Term term__V91)
     
     NamedPropertyLink namedP__V95 = LINK_NamedPropertyLink(sink__V90->context, NAMED_PROPERTIES(term__V91));
     VariablePropertyLink varP__V96 = LINK_VariablePropertyLink(sink__V90->context, VARIABLE_PROPERTIES(term__V91));
-    Hashset namedFV__V97 = LINK_VARIABLESET(sink__V90->context, namedPropertyFreeVars(namedP__V95));
+    Hashset namedFV__V97 = LINK_VARIABLESET(sink__V90->context, asConstruction(term__V91)->nfvs);
     Hashset varFV__V98 = LINK_VARIABLESET(sink__V90->context, variablePropertyFreeVars(varP__V96));
     UNLINK(sink__V90->context, term__V91);
     { START(sink__V90, _M__sTextCons);
@@ -472,7 +472,7 @@ int step_M_X_Data_s2(Sink sink__V101, Term term__V102)
     
     NamedPropertyLink namedP__V107 = LINK_NamedPropertyLink(sink__V101->context, NAMED_PROPERTIES(term__V102));
     VariablePropertyLink varP__V108 = LINK_VariablePropertyLink(sink__V101->context, VARIABLE_PROPERTIES(term__V102));
-    Hashset namedFV__V109 = LINK_VARIABLESET(sink__V101->context, namedPropertyFreeVars(namedP__V107));
+    Hashset namedFV__V109 = LINK_VARIABLESET(sink__V101->context, asConstruction(term__V102)->nfvs);
     Hashset varFV__V110 = LINK_VARIABLESET(sink__V101->context, variablePropertyFreeVars(varP__V108));
     UNLINK(sink__V101->context, term__V102);
     { START(sink__V101, _M_X_Data);
@@ -509,7 +509,7 @@ int step_M_X_Form(Sink sink__V111, Term term__V112)
       
       NamedPropertyLink namedP__V119 = LINK_NamedPropertyLink(sink__V111->context, NAMED_PROPERTIES(term__V112));
       VariablePropertyLink varP__V120 = LINK_VariablePropertyLink(sink__V111->context, VARIABLE_PROPERTIES(term__V112));
-      Hashset namedFV__V121 = LINK_VARIABLESET(sink__V111->context, namedPropertyFreeVars(namedP__V119));
+      Hashset namedFV__V121 = LINK_VARIABLESET(sink__V111->context, asConstruction(term__V112)->nfvs);
       Hashset varFV__V122 = LINK_VARIABLESET(sink__V111->context, variablePropertyFreeVars(varP__V120));
       UNLINK(sink__V111->context, term__V112);
       ADD_PROPERTIES(sink__V111, LINK_VARIABLESET(sink__V111->context, namedFV__V121), LINK_VARIABLESET(sink__V111->context, varFV__V122), LINK_NamedPropertyLink(sink__V111->context, namedP__V119), LINK_VariablePropertyLink(sink__V111->context, varP__V120));
@@ -526,7 +526,7 @@ int step_M_X_Form(Sink sink__V111, Term term__V112)
       
       NamedPropertyLink namedP__V124 = LINK_NamedPropertyLink(sink__V111->context, NAMED_PROPERTIES(term__V112));
       VariablePropertyLink varP__V125 = LINK_VariablePropertyLink(sink__V111->context, VARIABLE_PROPERTIES(term__V112));
-      Hashset namedFV__V126 = LINK_VARIABLESET(sink__V111->context, namedPropertyFreeVars(namedP__V124));
+      Hashset namedFV__V126 = LINK_VARIABLESET(sink__V111->context, asConstruction(term__V112)->nfvs);
       Hashset varFV__V127 = LINK_VARIABLESET(sink__V111->context, variablePropertyFreeVars(varP__V125));
       UNLINK(sink__V111->context, term__V112);
       ADD_PROPERTIES(sink__V111, LINK_VARIABLESET(sink__V111->context, namedFV__V126), LINK_VARIABLESET(sink__V111->context, varFV__V127), LINK_NamedPropertyLink(sink__V111->context, namedP__V124), LINK_VariablePropertyLink(sink__V111->context, varP__V125));
@@ -547,7 +547,7 @@ int step_M_X_Form(Sink sink__V111, Term term__V112)
       
       NamedPropertyLink namedP__V131 = LINK_NamedPropertyLink(sink__V111->context, NAMED_PROPERTIES(term__V112));
       VariablePropertyLink varP__V132 = LINK_VariablePropertyLink(sink__V111->context, VARIABLE_PROPERTIES(term__V112));
-      Hashset namedFV__V133 = LINK_VARIABLESET(sink__V111->context, namedPropertyFreeVars(namedP__V131));
+      Hashset namedFV__V133 = LINK_VARIABLESET(sink__V111->context, asConstruction(term__V112)->nfvs);
       Hashset varFV__V134 = LINK_VARIABLESET(sink__V111->context, variablePropertyFreeVars(varP__V132));
       UNLINK(sink__V111->context, term__V112);
       ADD_PROPERTIES(sink__V111, LINK_VARIABLESET(sink__V111->context, namedFV__V133), LINK_VARIABLESET(sink__V111->context, varFV__V134), LINK_NamedPropertyLink(sink__V111->context, namedP__V131), LINK_VariablePropertyLink(sink__V111->context, varP__V132));
@@ -580,7 +580,7 @@ int step_M_X_Declaration_s1(Sink sink__V135, Term term__V136)
     
     NamedPropertyLink namedP__V139 = LINK_NamedPropertyLink(sink__V135->context, NAMED_PROPERTIES(term__V136));
     VariablePropertyLink varP__V140 = LINK_VariablePropertyLink(sink__V135->context, VARIABLE_PROPERTIES(term__V136));
-    Hashset namedFV__V141 = LINK_VARIABLESET(sink__V135->context, namedPropertyFreeVars(namedP__V139));
+    Hashset namedFV__V141 = LINK_VARIABLESET(sink__V135->context, asConstruction(term__V136)->nfvs);
     Hashset varFV__V142 = LINK_VARIABLESET(sink__V135->context, variablePropertyFreeVars(varP__V140));
     UNLINK(sink__V135->context, term__V136);
     { START(sink__V135, _M_X_Data);
@@ -620,7 +620,7 @@ int step_M_X_Declaration_s2(Sink sink__V143, Term term__V144)
     
     NamedPropertyLink namedP__V152 = LINK_NamedPropertyLink(sink__V143->context, NAMED_PROPERTIES(term__V144));
     VariablePropertyLink varP__V153 = LINK_VariablePropertyLink(sink__V143->context, VARIABLE_PROPERTIES(term__V144));
-    Hashset namedFV__V154 = LINK_VARIABLESET(sink__V143->context, namedPropertyFreeVars(namedP__V152));
+    Hashset namedFV__V154 = LINK_VARIABLESET(sink__V143->context, asConstruction(term__V144)->nfvs);
     Hashset varFV__V155 = LINK_VARIABLESET(sink__V143->context, variablePropertyFreeVars(varP__V153));
     UNLINK(sink__V143->context, term__V144);
     { START(sink__V143, _M_X_Function);
@@ -650,7 +650,7 @@ int step_M_X_Declaration_s3(Sink sink__V156, Term term__V157)
     
     NamedPropertyLink namedP__V161 = LINK_NamedPropertyLink(sink__V156->context, NAMED_PROPERTIES(term__V157));
     VariablePropertyLink varP__V162 = LINK_VariablePropertyLink(sink__V156->context, VARIABLE_PROPERTIES(term__V157));
-    Hashset namedFV__V163 = LINK_VARIABLESET(sink__V156->context, namedPropertyFreeVars(namedP__V161));
+    Hashset namedFV__V163 = LINK_VARIABLESET(sink__V156->context, asConstruction(term__V157)->nfvs);
     Hashset varFV__V164 = LINK_VARIABLESET(sink__V156->context, variablePropertyFreeVars(varP__V162));
     UNLINK(sink__V156->context, term__V157);
     { START(sink__V156, _M_X_Declaration);
@@ -682,7 +682,7 @@ int step_M_ComputeSymbols2(Sink sink__V165, Term term__V166)
     
     NamedPropertyLink namedP__V170 = LINK_NamedPropertyLink(sink__V165->context, NAMED_PROPERTIES(term__V166));
     VariablePropertyLink varP__V171 = LINK_VariablePropertyLink(sink__V165->context, VARIABLE_PROPERTIES(term__V166));
-    Hashset namedFV__V172 = LINK_VARIABLESET(sink__V165->context, namedPropertyFreeVars(namedP__V170));
+    Hashset namedFV__V172 = LINK_VARIABLESET(sink__V165->context, asConstruction(term__V166)->nfvs);
     Hashset varFV__V173 = LINK_VARIABLESET(sink__V165->context, variablePropertyFreeVars(varP__V171));
     UNLINK(sink__V165->context, term__V166);
     { START(sink__V165, _M__sTextCons);
@@ -729,7 +729,7 @@ int step_M_X_Declaration(Sink sink__V174, Term term__V175)
       
       NamedPropertyLink namedP__V181 = LINK_NamedPropertyLink(sink__V174->context, NAMED_PROPERTIES(term__V175));
       VariablePropertyLink varP__V182 = LINK_VariablePropertyLink(sink__V174->context, VARIABLE_PROPERTIES(term__V175));
-      Hashset namedFV__V183 = LINK_VARIABLESET(sink__V174->context, namedPropertyFreeVars(namedP__V181));
+      Hashset namedFV__V183 = LINK_VARIABLESET(sink__V174->context, asConstruction(term__V175)->nfvs);
       Hashset varFV__V184 = LINK_VARIABLESET(sink__V174->context, variablePropertyFreeVars(varP__V182));
       UNLINK(sink__V174->context, term__V175);
       ADD_PROPERTIES(sink__V174, LINK_VARIABLESET(sink__V174->context, namedFV__V183), LINK_VARIABLESET(sink__V174->context, varFV__V184), LINK_NamedPropertyLink(sink__V174->context, namedP__V181), LINK_VariablePropertyLink(sink__V174->context, varP__V182));
@@ -760,7 +760,7 @@ int step_M_X_Declaration(Sink sink__V174, Term term__V175)
       
       NamedPropertyLink namedP__V193 = LINK_NamedPropertyLink(sink__V174->context, NAMED_PROPERTIES(term__V175));
       VariablePropertyLink varP__V194 = LINK_VariablePropertyLink(sink__V174->context, VARIABLE_PROPERTIES(term__V175));
-      Hashset namedFV__V195 = LINK_VARIABLESET(sink__V174->context, namedPropertyFreeVars(namedP__V193));
+      Hashset namedFV__V195 = LINK_VARIABLESET(sink__V174->context, asConstruction(term__V175)->nfvs);
       Hashset varFV__V196 = LINK_VARIABLESET(sink__V174->context, variablePropertyFreeVars(varP__V194));
       UNLINK(sink__V174->context, term__V175);
       ADD_PROPERTIES(sink__V174, LINK_VARIABLESET(sink__V174->context, namedFV__V195), LINK_VARIABLESET(sink__V174->context, varFV__V196), LINK_NamedPropertyLink(sink__V174->context, namedP__V193), LINK_VariablePropertyLink(sink__V174->context, varP__V194));
@@ -780,7 +780,7 @@ int step_M_X_Declaration(Sink sink__V174, Term term__V175)
       
       NamedPropertyLink namedP__V200 = LINK_NamedPropertyLink(sink__V174->context, NAMED_PROPERTIES(term__V175));
       VariablePropertyLink varP__V201 = LINK_VariablePropertyLink(sink__V174->context, VARIABLE_PROPERTIES(term__V175));
-      Hashset namedFV__V202 = LINK_VARIABLESET(sink__V174->context, namedPropertyFreeVars(namedP__V200));
+      Hashset namedFV__V202 = LINK_VARIABLESET(sink__V174->context, asConstruction(term__V175)->nfvs);
       Hashset varFV__V203 = LINK_VARIABLESET(sink__V174->context, variablePropertyFreeVars(varP__V201));
       UNLINK(sink__V174->context, term__V175);
       ADD_PROPERTIES(sink__V174, LINK_VARIABLESET(sink__V174->context, namedFV__V202), LINK_VARIABLESET(sink__V174->context, varFV__V203), LINK_NamedPropertyLink(sink__V174->context, namedP__V200), LINK_VariablePropertyLink(sink__V174->context, varP__V201));
@@ -835,7 +835,7 @@ int step_M_X_Data(Sink sink__V212, Term term__V213)
       
       NamedPropertyLink namedP__V220 = LINK_NamedPropertyLink(sink__V212->context, NAMED_PROPERTIES(term__V213));
       VariablePropertyLink varP__V221 = LINK_VariablePropertyLink(sink__V212->context, VARIABLE_PROPERTIES(term__V213));
-      Hashset namedFV__V222 = LINK_VARIABLESET(sink__V212->context, namedPropertyFreeVars(namedP__V220));
+      Hashset namedFV__V222 = LINK_VARIABLESET(sink__V212->context, asConstruction(term__V213)->nfvs);
       Hashset varFV__V223 = LINK_VARIABLESET(sink__V212->context, variablePropertyFreeVars(varP__V221));
       UNLINK(sink__V212->context, term__V213);
       ADD_PROPERTIES(sink__V212, LINK_VARIABLESET(sink__V212->context, namedFV__V222), LINK_VARIABLESET(sink__V212->context, varFV__V223), LINK_NamedPropertyLink(sink__V212->context, namedP__V220), LINK_VariablePropertyLink(sink__V212->context, varP__V221));
@@ -860,7 +860,7 @@ int step_M_X_Data(Sink sink__V212, Term term__V213)
       
       NamedPropertyLink namedP__V229 = LINK_NamedPropertyLink(sink__V212->context, NAMED_PROPERTIES(term__V213));
       VariablePropertyLink varP__V230 = LINK_VariablePropertyLink(sink__V212->context, VARIABLE_PROPERTIES(term__V213));
-      Hashset namedFV__V231 = LINK_VARIABLESET(sink__V212->context, namedPropertyFreeVars(namedP__V229));
+      Hashset namedFV__V231 = LINK_VARIABLESET(sink__V212->context, asConstruction(term__V213)->nfvs);
       Hashset varFV__V232 = LINK_VARIABLESET(sink__V212->context, variablePropertyFreeVars(varP__V230));
       UNLINK(sink__V212->context, term__V213);
       ADD_PROPERTIES(sink__V212, LINK_VARIABLESET(sink__V212->context, namedFV__V231), LINK_VARIABLESET(sink__V212->context, varFV__V232), LINK_NamedPropertyLink(sink__V212->context, namedP__V229), LINK_VariablePropertyLink(sink__V212->context, varP__V230));
@@ -898,7 +898,7 @@ int step_M_ComputeSymbols(Sink sink__V233, Term term__V234)
       
       NamedPropertyLink namedP__V240 = LINK_NamedPropertyLink(sink__V233->context, NAMED_PROPERTIES(term__V234));
       VariablePropertyLink varP__V241 = LINK_VariablePropertyLink(sink__V233->context, VARIABLE_PROPERTIES(term__V234));
-      Hashset namedFV__V242 = LINK_VARIABLESET(sink__V233->context, namedPropertyFreeVars(namedP__V240));
+      Hashset namedFV__V242 = LINK_VARIABLESET(sink__V233->context, asConstruction(term__V234)->nfvs);
       Hashset varFV__V243 = LINK_VARIABLESET(sink__V233->context, variablePropertyFreeVars(varP__V241));
       UNLINK(sink__V233->context, term__V234);
       ADD_PROPERTIES(sink__V233, LINK_VARIABLESET(sink__V233->context, namedFV__V242), LINK_VARIABLESET(sink__V233->context, varFV__V243), LINK_NamedPropertyLink(sink__V233->context, namedP__V240), LINK_VariablePropertyLink(sink__V233->context, varP__V241));
@@ -942,7 +942,7 @@ int step_M_X_Function(Sink sink__V244, Term term__V245)
     
     NamedPropertyLink namedP__V253 = LINK_NamedPropertyLink(sink__V244->context, NAMED_PROPERTIES(term__V245));
     VariablePropertyLink varP__V254 = LINK_VariablePropertyLink(sink__V244->context, VARIABLE_PROPERTIES(term__V245));
-    Hashset namedFV__V255 = LINK_VARIABLESET(sink__V244->context, namedPropertyFreeVars(namedP__V253));
+    Hashset namedFV__V255 = LINK_VARIABLESET(sink__V244->context, asConstruction(term__V245)->nfvs);
     Hashset varFV__V256 = LINK_VARIABLESET(sink__V244->context, variablePropertyFreeVars(varP__V254));
     UNLINK(sink__V244->context, term__V245);
     { START(sink__V244, _M__sTextCons);
