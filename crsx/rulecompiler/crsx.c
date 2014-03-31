@@ -4735,7 +4735,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
             }
 
             // Quick check properties free vars wrt to term fvs
-            VARIABLESET nps = LINK_VARIABLESET(context, namedPropertyFreeVars(asConstruction(term)->namedProperties));
+            VARIABLESET nps = LINK_VARIABLESET(context, asConstruction(term)->nfvs);
             if (!VARIABLESET_ISEMPTY(nps))
             {
                 nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
