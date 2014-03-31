@@ -983,7 +983,12 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
     if (buffer->pendingNamedProperties && construction->namedProperties != buffer->pendingNamedProperties)
     {
         // There is new properties.
-        VARIABLESET freeVars = namedPropertyFreeVars(construction->namedProperties);
+
+        // Should just be using construction->nfvs, but sometimes that isn't
+        // nulled out even though construction->namedProperties is NULL.
+        // If there are no properties, then obviously there are no Free Vars,
+        // so for now this is correct and works around our bug. TODO : Fix
+        VARIABLESET freeVars = construction->namedProperties ? LINK_VARIABLESET(context, construction->nfvs) : NULL;
 
         if (!construction->namedProperties) // no existing properties. Good.
             construction->namedProperties = buffer->pendingNamedProperties; // transfer ref
@@ -4139,6 +4144,14 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
         construction->namedProperties = NULL;
         UNLINK_VariablePropertyLink(sink->context, construction->variableProperties);
         construction->variableProperties = NULL;
+
+        // TODO : Should some or all of these be unlinked?
+        // UNLINK_VARIABLESET(context, construction->fvs);
+        // construction->fvs = NULL;
+        // UNLINK_VARIABLESET(context, construction->nfvs);
+        // construction->nfvs = NULL;
+        // UNLINK_VARIABLESET(context, construction->vfvs);
+        // construction->nfvs = NULL;
 
         VariableSetLink localPendingWeakenings = NULL;
 
