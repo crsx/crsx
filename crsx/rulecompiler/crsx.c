@@ -508,7 +508,7 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     construction->variableProperties = buffer->pendingVariableProperties;
 
     construction->fvs = NULL;
-    construction->nfvs = LINK_VARIABLESET(sink->context, namedPropertyFreeVars(buffer->pendingNamedProperties));
+    construction->nfvs = LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars); // TODO : Don't LINK - instead transfer ref ?
     construction->vfvs = LINK_VARIABLESET(sink->context, variablePropertyFreeVars(buffer->pendingVariableProperties));
 
     construction->nf = 0;
