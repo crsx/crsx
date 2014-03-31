@@ -4923,10 +4923,12 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
             for (link1 = construction1->namedProperties; link1; link1 = link1->link)
             {
                 const char *name = link1->name;
+                if (! name) continue; // skip free vars
                 Term value1 = link1->u.term;
                 Term value2 = NULL;
                 for (link2 = construction2->namedProperties; link2; link2 = link2->link)
                 {
+                    if (! link2->name) continue; // skip free vars
                     if (!strcmp(name, link2->name))
                     {
                         value2 = link2->u.term;
@@ -4939,9 +4941,11 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
             for (link2 = construction2->namedProperties; link2; link2 = link2->link)
             {
                 const char *name = link2->name;
+                if (! name) continue; // skip free vars
                 Term value1 = NULL;
                 for (link1 = construction1->namedProperties; link1; link1 = link1->link)
                 {
+                    if (! link1->name) continue; // skip free vars
                     if (!strcmp(name, link1->name))
                     {
                         value1 = link1->u.term;
