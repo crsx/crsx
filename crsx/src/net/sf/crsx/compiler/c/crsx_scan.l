@@ -620,9 +620,10 @@ int scanTerm(Sink sink, const char* text)
 {
     yyscan_t scanner;
     crsx_yylex_init(&scanner);
-    crsx_yy_scan_string(text, scanner);
+    // crsx_yy_scan_string(text, scanner);
     StateLink state = makeBase(sink);
     crsx_yyset_extra(state, scanner);
+    crsx_yy_scan_string(text, scanner);
 #ifdef FLEX_DEBUG
     crsx_yyset_debug(1, scanner);
 #endif

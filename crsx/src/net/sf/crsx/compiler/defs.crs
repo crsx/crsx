@@ -252,13 +252,13 @@ EventConstructor[#name] → MANGLE[#name] ;
 // Primitives
 
 SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; E_LessThanOrEqual; E_SameVariable; E_LesserVariable;
-				 E_GreaterThanOrEqual; E_If; E_IfZero; E_IfEmpty; E_Squash; E_Contains; E_StartsWith; E_EndsWith; E_MatchRegex; E_Length;
+				 E_GreaterThanOrEqual; E_If; E_IfZero; E_IfEmpty; E_Squash; E_Contains; E_StartsWith; E_EndsWith; E_MatchRegex; E_Length; E_Index;
 				 E_Substring; E_Escape; E_Mangle; E_BeforeFirst; E_AfterFirst; E_Plus; E_Minus; E_Times; E_Absolute; E_Decimal;
 				 E_Div; E_Mod; E_Hex; E_BitAnd; E_BitOr; E_BitXOr; E_BitNot; E_BitMinus; E_BitSubSetEq;
-				 E_LoadTerm; E_SaveTerm; E_IsZero; E_IsEmpty; E_NumericEqual; E_Error; E_Trace; E_FormatNumber; E_PassLocationProperties; E_Get; E_GetRef;
+				 E_LoadTerm; E_SaveTerm; E_IsZero; E_IsEmpty; E_NumericEqual; E_Dump; E_Error; E_Trace; E_FormatNumber; E_PassLocationProperties; E_EncodePoint; E_Get; E_GetRef;
 				 E_IfDef; E_Show; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
-				 E_Match; E_Call; E_TryCall; E_Cast; E_Null; E_Nil; E_ForgivableError; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
-                 E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_Echo; E_DeepEqual; E_HashCode;
+				 E_Match; E_Call; E_TryCall; E_Cast; E_Pick; E_Null; E_Nil; E_ForgivableError; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
+                 E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_ParseText; E_Echo; E_DeepEqual; E_HashCode;
 				);
 
 Primitive[$String] :: SPrimitive;
@@ -285,6 +285,7 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Split"], 				E_Split, 
 	$[If, $[Equal, #Primitive, "MatchRegex"], 			E_MatchRegex, 
 	$[If, $[Equal, #Primitive, "Length"], 				E_Length, 
+	$[If, $[Equal, #Primitive, "Index"], 				E_Index, 
 	$[If, $[Equal, #Primitive, "Substring"], 			E_Substring,  
 	$[If, $[Equal, #Primitive, "Escape"], 				E_Escape, 
 	$[If, $[Equal, #Primitive, "Mangle"], 				E_Mangle, 
@@ -296,6 +297,7 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Format"],				E_Format,
 	$[If, $[Equal, #Primitive, "Show"],					E_Show,
 	$[If, $[Equal, #Primitive, "PassLocationProperties"], E_PassLocationProperties,
+	$[If, $[Equal, #Primitive, "EncodePoint"],			E_EncodePoint,
 
 	$[If, $[Equal, #Primitive, "Plus"], 				E_Plus,  
 	$[If, $[Equal, #Primitive, "Minus"], 				E_Minus,  
@@ -317,6 +319,7 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "GetRef"], 				E_GetRef,
 	$[If, $[Equal, #Primitive, "IfDef"], 				E_IfDef,
   
+	$[If, $[Equal, #Primitive, "Dump"], 				E_Dump,  
 	$[If, $[Equal, #Primitive, "Error"], 				E_Error,  
 	$[If, $[Equal, #Primitive, "ForgivableError"], 		E_ForgivableError,  
 	$[If, $[Equal, #Primitive, "Trace"], 				E_Trace,  
@@ -339,6 +342,7 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Call"], 				E_Call,
 
 	$[If, $[Equal, #Primitive, "Cast"], 				E_Cast,
+	$[If, $[Equal, #Primitive, "Pick"], 				E_Pick,
 	$[If, $[Equal, #Primitive, "Null"], 				E_Null,
 	$[If, $[Equal, #Primitive, "Nil"], 					E_Nil,
 
@@ -351,13 +355,14 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Rescape"],				E_Rescape,
 	$[If, $[Equal, #Primitive, "Keys"],					E_Keys,
 	$[If, $[Equal, #Primitive, "ParseURL"],				E_ParseURL,
+	$[If, $[Equal, #Primitive, "ParseText"],			E_ParseText,
 	$[If, $[Equal, #Primitive, "Echo"],					E_Echo,
 	$[If, $[Equal, #Primitive, "DeepEqual"],				E_DeepEqual,
 	$[If, $[Equal, #Primitive, "HashCode"],				E_HashCode,
 	
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 
