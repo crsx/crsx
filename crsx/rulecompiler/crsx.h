@@ -38,6 +38,7 @@ typedef struct _ConstructionDescriptor *ConstructionDescriptor;
 typedef struct _SortDescriptor *SortDescriptor;
 typedef struct _Sink *Sink;
 typedef struct _SubstitutionFrame *SubstitutionFrame;
+typedef struct _Properties *Properties;
 typedef struct _NamedPropertyLink *NamedPropertyLink;
 typedef struct _VariablePropertyLink *VariablePropertyLink;
 typedef struct _Variables *Variables;
@@ -383,11 +384,11 @@ typedef struct _BitSet* BitSetP;
 #define BINDER(T,I,BI) BINDERS(T,I)[BI]
 
 #define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
-#define PROPERTY_P(C,T,P) DPROPERTY(C, asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
-#define NAMED_PROPERTY_P(T,N) c_namedProperty(asConstruction(T)->namedProperties, N)
-#define VARIABLE_PROPERTY_P(T,V) c_variableProperty(asConstruction(T)->variableProperties, V)
-#define NAMED_PROPERTIES(T) (asConstruction(T)->namedProperties)
-#define VARIABLE_PROPERTIES(T) (asConstruction(T)->variableProperties)
+#define PROPERTY_P(C,T,P) DPROPERTY(C, asConstruction(T)->properties->namedProperties, asConstruction(T)->properties->variableProperties, P)
+#define NAMED_PROPERTY_P(T,N) c_namedProperty(asConstruction(T)->properties->namedProperties, N)
+#define VARIABLE_PROPERTY_P(T,V) c_variableProperty(asConstruction(T)->properties->variableProperties, V)
+#define NAMED_PROPERTIES(T) (asConstruction(T)->properties->namedProperties)
+#define VARIABLE_PROPERTIES(T) (asConstruction(T)->properties->variableProperties)
 
 #define SYMBOL(T) (IS_VARIABLE_USE(T) ? VARIABLE(T)->name : c_name(asConstruction(T)))
 #define TEXT(T) c_name(asConstruction(T))
@@ -485,8 +486,7 @@ struct _Construction
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
 
-    NamedPropertyLink namedProperties;       // named properties. First link always contains set of free variables    (unless all properties are closed)
-    VariablePropertyLink variableProperties; // variable properties. First link always contains set of free variables (never closed)
+    Properties properties;
 
     VARIABLESET fvs;  // free variables known to occur in subterms only (excluding properties)
     VARIABLESET nfvs; // free variables known to occur in named properties (on this construction and subterms)   s
@@ -857,6 +857,18 @@ static inline Term *c_property(Context context, NamedPropertyLink namedPropertie
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
+
+
+struct _Properties
+{
+	VARIABLESET namedFreeVars; // set of free variables in named properties (unless all properties are closed)
+	VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
+	NamedPropertyLink namedProperties; // named properties.
+	VariablePropertyLink variableProperties; // variable properties.
+};
+
+Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
+                               NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
 
 struct _NamedPropertyLink
 {
