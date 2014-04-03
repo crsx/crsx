@@ -512,8 +512,8 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
                           buffer->pendingVariableProperties);
 
     construction->fvs = NULL;
-    construction->nfvs = construction->properties->namedFreeVars;
-    construction->vfvs = construction->properties->variableFreeVars;
+    construction->nfvs = LINK_VARIABLESET(sink->context, construction->properties->namedFreeVars);
+    construction->vfvs = LINK_VARIABLESET(sink->context, construction->properties->variableFreeVars);
 
     construction->nf = 0;
     construction->nostep = 0;
@@ -4235,10 +4235,10 @@ void propagateFreeVariables(Context context, Term term)
     Construction c = asConstruction(term);
     if (arity == 0)
     {
-        if (c->nfvs != namedPropertyFreeVars(c->properties->namedProperties))
+        if (c->nfvs != c->properties->namedFreeVars)
         {
             UNLINK_VARIABLESET(context, c->nfvs);
-            c->nfvs = LINK_VARIABLESET(context, namedPropertyFreeVars(c->properties->namedProperties));
+            c->nfvs = LINK_VARIABLESET(context, c->properties->namedFreeVars);
         }
         if (c->vfvs != variablePropertyFreeVars(c->properties->variableProperties))
         {
@@ -4256,7 +4256,7 @@ void propagateFreeVariables(Context context, Term term)
         UNLINK_VARIABLESET(context, c->vfvs);
 
         VARIABLESET fvs = NULL;
-        VARIABLESET nfvs = LINK_VARIABLESET(context, namedPropertyFreeVars(c->properties->namedProperties));
+        VARIABLESET nfvs = LINK_VARIABLESET(context, c->properties->namedFreeVars);
         VARIABLESET vfvs = LINK_VARIABLESET(context, variablePropertyFreeVars(c->properties->variableProperties));
 
         int i = arity - 1;
@@ -4332,7 +4332,7 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                 Term locvalue = NAMED_PROPERTY(context, locConstruction, key);
                 if (locvalue && strcmp(SYMBOL(value), SYMBOL(locvalue)))
                 {
-                    VARIABLESET fvs = namedPropertyFreeVars(construction->properties->namedProperties);
+                    VARIABLESET fvs = construction->properties->namedFreeVars;
 
                     // Location has been changed...update.
                     NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->properties->namedProperties);
