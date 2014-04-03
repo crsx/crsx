@@ -892,15 +892,6 @@ extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLi
 // Property list is not closed when the first element is a list of free variable
 #define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
 
-
-static inline VARIABLESET namedPropertyFreeVars(NamedPropertyLink link)
-{
-    if (link && !link->name)
-        return (VARIABLESET) link->u.weakening;
-
-    return NULL;
-}
-
 extern NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
 struct _VariablePropertyLink

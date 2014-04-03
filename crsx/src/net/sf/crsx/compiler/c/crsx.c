@@ -460,22 +460,6 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
 
-    // Make sure the first property link is a free variable set
-
-    if (buffer->pendingNamedProperties && buffer->pendingNamedPropertiesFreeVars
-            && namedPropertyFreeVars(buffer->pendingNamedProperties) != buffer->pendingNamedPropertiesFreeVars)
-    {
-        // Insert free variables
-        NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, buffer->pendingNamedProperties); // transfer ref
-        link->name = NULL;
-        link->u.weakening = (Variable)  buffer->pendingNamedPropertiesFreeVars; // Transfer ref
-        buffer->pendingNamedProperties = link;
-    }
-    else
-    {
-        UNLINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars);
-    }
-
     if (buffer->pendingVariableProperties && buffer->pendingVariablePropertiesFreeVars
             && variablePropertyFreeVars(buffer->pendingVariableProperties) != buffer->pendingVariablePropertiesFreeVars)
     {
