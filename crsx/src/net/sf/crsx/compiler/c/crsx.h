@@ -908,19 +908,14 @@ struct _VariablePropertyLink
 #endif
 };
 
-static inline VARIABLESET variablePropertyFreeVars(VariablePropertyLink link)
-{
-    if (link && !link->variable)
-        return (VARIABLESET) link->u.weakening;
-
-    return NULL;
-}
-
-
 static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link) { if (link) ++(link->nr); return link; };
 #define UNLINKSET_VariablePropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
 
 extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link);
+
+#define ASSERT_VARIABLE_PROPERTIES(context, properties) \
+ASSERT(context, ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars)));
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERIC VARIABLE SETS AND MAPS

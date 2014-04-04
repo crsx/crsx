@@ -460,25 +460,6 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
 
-    if (buffer->pendingVariableProperties && buffer->pendingVariablePropertiesFreeVars
-            && variablePropertyFreeVars(buffer->pendingVariableProperties) != buffer->pendingVariablePropertiesFreeVars)
-    {
-        // Insert free variables
-        VariablePropertyLink link = ALLOCATE(sink->context, sizeof(struct _VariablePropertyLink));
-        link->nr = 1;
-#ifdef CRSXPROF
-        link->marker = 0;
-#endif
-        link->link = buffer->pendingVariableProperties; // transfer ref
-        link->variable = NULL;
-        link->u.weakening = (Variable)  buffer->pendingVariablePropertiesFreeVars; // Transfer ref
-        buffer->pendingVariableProperties = link;
-    }
-    else
-    {
-        UNLINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars);
-    }
-
     // Start construction
 
     Construction construction = ALLOCATE(sink->context, descriptor->size);
@@ -490,8 +471,8 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
 #endif
     construction->properties =
       ALLOCATE_Properties(sink->context,
-                          LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars), // TODO : Don't LINK - instead transfer ref ?
-                          LINK_VARIABLESET(sink->context, variablePropertyFreeVars(buffer->pendingVariableProperties)),
+                          LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars),
+                          LINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars),
                           buffer->pendingNamedProperties,
                           buffer->pendingVariableProperties);
 
@@ -703,9 +684,9 @@ Sink bufferCopy(Sink sink, Term term)
                 buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, c->properties->variableProperties);
 
                 VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
-                buffer->pendingNamedPropertiesFreeVars = NULL;
+                buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->namedFreeVars);
                 VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
-                buffer->pendingVariablePropertiesFreeVars = NULL;
+                buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->variableFreeVars);
 
                 sink->start(sink, c->term.descriptor);
 
@@ -1023,10 +1004,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
         if (freeVars)
         {
-            NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->properties->namedProperties); // transfer ref
-            link->name = NULL;
-            link->u.weakening = (Variable) freeVars;
-            construction->properties->namedProperties = link;
+            construction->properties->namedFreeVars = freeVars;
 
             // And add the new pending free vars also to the construction itself
             construction->nfvs = VARIABLESET_MERGEALL(context, construction->nfvs, buffer->pendingNamedPropertiesFreeVars);
@@ -1047,7 +1025,8 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
     if (buffer->pendingVariableProperties && construction->properties->variableProperties != buffer->pendingVariableProperties)
     {
-        VARIABLESET freeVars = variablePropertyFreeVars(construction->properties->variableProperties);
+        // TODO? : VARIABLESET freeVars = LINK_VARIABLESET(context, construction->properties->variableProperties);
+        VARIABLESET freeVars = construction->properties->variableFreeVars;
 
         if (!construction->properties->variableProperties)
             construction->properties->variableProperties = buffer->pendingVariableProperties;
@@ -1099,15 +1078,8 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
         ASSERT(context, freeVars);
 
-        VariablePropertyLink link = ALLOCATE(context, sizeof(struct _VariablePropertyLink));
-        link->nr = 1;
-#ifdef CRSXPROF
-        link->marker = 0;
-#endif
-        link->link = construction->properties->variableProperties; // transfer ref
-        link->variable = NULL;
-        link->u.weakening = (Variable) freeVars;
-        construction->properties->variableProperties = link;
+        construction->properties->variableFreeVars = freeVars;
+        ASSERT_VARIABLE_PROPERTIES(context, construction->properties);
 
         // And add to the construction..
         construction->vfvs =  VARIABLESET_MERGEALL(context, construction->vfvs, buffer->pendingVariablePropertiesFreeVars);
@@ -4224,10 +4196,10 @@ void propagateFreeVariables(Context context, Term term)
             UNLINK_VARIABLESET(context, c->nfvs);
             c->nfvs = LINK_VARIABLESET(context, c->properties->namedFreeVars);
         }
-        if (c->vfvs != variablePropertyFreeVars(c->properties->variableProperties))
+        if (c->vfvs != c->properties->variableFreeVars)
         {
             UNLINK_VARIABLESET(context, c->vfvs);
-            c->vfvs = LINK_VARIABLESET(context, variablePropertyFreeVars(c->properties->variableProperties));
+            c->vfvs = LINK_VARIABLESET(context, c->properties->variableFreeVars);
         }
     }
     else
@@ -4241,7 +4213,7 @@ void propagateFreeVariables(Context context, Term term)
 
         VARIABLESET fvs = NULL;
         VARIABLESET nfvs = LINK_VARIABLESET(context, c->properties->namedFreeVars);
-        VARIABLESET vfvs = LINK_VARIABLESET(context, variablePropertyFreeVars(c->properties->variableProperties));
+        VARIABLESET vfvs = LINK_VARIABLESET(context, c->properties->variableFreeVars);
 
         int i = arity - 1;
         for (; i >= 0; --i)
@@ -4327,10 +4299,7 @@ void passLocationProperties(Context context, Term locTerm, Term term)
 
                     if (fvs)
                     {
-                        NamedPropertyLink fvlink = ALLOCATE_NamedPropertyLink(context, link);
-                        fvlink->name = NULL;
-                        fvlink->u.weakening = (Variable) LINK_VARIABLESET(context, fvs);
-                        construction->properties->namedProperties = fvlink;
+                        construction->properties->namedFreeVars = LINK_VARIABLESET(context, fvs);
                     }
                 }
             }
@@ -4537,6 +4506,7 @@ Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIA
     env->variableFreeVars = variableFreeVars;
     env->namedProperties = namedProperties;
     env->variableProperties = variableProperties;
+    ASSERT_VARIABLE_PROPERTIES(context, env);
     return env;
 }
 
@@ -4763,7 +4733,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
                 }
             }
 
-            nps = LINK_VARIABLESET(context, variablePropertyFreeVars(asConstruction(term)->properties->variableProperties));
+            nps = LINK_VARIABLESET(context, asConstruction(term)->properties->variableFreeVars);
             if (!VARIABLESET_ISEMPTY(nps))
             {
                 nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);

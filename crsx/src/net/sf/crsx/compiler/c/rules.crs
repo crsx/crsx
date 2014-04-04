@@ -668,8 +668,8 @@ F-then-Pattern-Ref[OK, #RefCookie, #sink, #term, ok.#[ok]]
 %n⟪
 NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»));
 VariablePropertyLink «varP» = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));
-Hashset «namedFV» = LINK_VARIABLESET(«#sink»->context, asConstruction(«#term»)->nfvs);
-Hashset «varFV» = LINK_VARIABLESET(«#sink»->context, variablePropertyFreeVars(«varP»));
+Hashset «namedFV» = LINK_VARIABLESET(«#sink»->context, asConstruction(«#term»)->properties->namedFreeVars);
+Hashset «varFV» = LINK_VARIABLESET(«#sink»->context, asConstruction(«#term»)->properties->variableFreeVars);
 « {#env;  #RefCookie : PROPERTY_VARIABLE[namedFV, varFV, namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
 ;
 
