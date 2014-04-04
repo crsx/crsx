@@ -1,0 +1,9 @@
+*.h
+*.o
+*.rawsymlist
+*.tmp
+Cook_*
+Cookmain
+crsx_scan.c
+javacc-6.0
+rulecompiler
