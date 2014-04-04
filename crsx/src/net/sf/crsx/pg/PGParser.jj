@@ -1847,10 +1847,10 @@ Reverser.Builder Nonterminal(String productionName, Map<String, String> decls, S
 			if (use.definition || use.use || use.construct || use.meta || use.wasConverted)
 			{
 				// Compute constant.
-				action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
-					+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
+				///action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
+				///	+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
 				decls.put(c_in, "String "+c_in+" = null;");
-				action(production, c_in+" = "+bufferName+".term(true).constructor().symbol();");
+				action(production, c_in+" = "+UTIL+".symbol("+bufferName+".term(true));");
 				// Generate use!
 				useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
 			}
@@ -1932,10 +1932,10 @@ Reverser.Builder Generation(String productionName, Map<String, String> decls, So
 			if (use.definition || use.use || use.construct || use.meta || use.wasConverted)
 			{
 				// Compute constant.
-				action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
-					+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
+				///action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
+				///	+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
 				decls.put(c_in, "String "+c_in+" = null;");
-				action(production, c_in+" = "+bufferName+".term(true).constructor().symbol();");
+				action(production, c_in+" = "+UTIL+".symbol("+bufferName+".term(true));");
 				// Generate use!
 				useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
 			}
@@ -2125,7 +2125,13 @@ Usage Use(String prefix, String initial, Appendable html, boolean isConstant) th
 			// :# means that whatever was generated is stored and can be referenced with the meta-application #[...] with explicit subterm group.
 			t=MetaVar() {use.touched = true; use.buffer = true; use.name = t.toString(); annotation.append(t.toString());}
 	    |
-	    	// :{category} means reparse using category. note: DOES NOT TOUCH!			"{" t=Name() "}" {use.category = t.toString(); annotation.append("{"+t+"}");}
+	        "{"
+	    	(
+	    	    // :{:Name} means reparse using category computed by Name(String) method. note: DOES NOT TOUCH!			    ":" t=Name() "}" {use.category = t.toString() + "(" + use.converted + ")"; annotation.append("{:"+t+"}");}
+	        |
+	    	     // :{category} means reparse using category. note: DOES NOT TOUCH!
+			     t=Name() "}" {use.category = t.toString(); annotation.append("{"+t+"}");}
+	        )
 		)
     |
 		// New experimental usage notations for a unit (all start with "_").
@@ -2141,7 +2147,7 @@ Usage Use(String prefix, String initial, Appendable html, boolean isConstant) th
 			t=<VAR> {use.definition = true; use.name = t.toString(); annotation.append(use.name+" .");}
 		|
 			// _$ or _{} means "use unit as the constructor for the remaining subterms in group"
-			( "$" | "{}" ) {use.construct = true; annotation.append("$");}
+			( "$" | "{" "}" ) {use.construct = true; annotation.append("$");}
 		|
 			// _# means "interpret unit as an actual meta-variable applied to the remaining subterms in group".
 			t=MetaVar() {use.meta = true; annotation.append(t.toString());}

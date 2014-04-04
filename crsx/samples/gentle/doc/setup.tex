@@ -59,27 +59,24 @@
 \usepackage{listings}
 
 %% HACS.
-\lstdefinelanguage{HACS}{basicstyle=\rm,%
-  inputencoding=utf8,sensitive,%
-  %identifierstyle=\textit,%
-  string=[b]{"},morestring=[b]{'},morestring=[s]{[}{]},upquote=true,stringstyle=\ttfamily,%
-  showstringspaces=false,%
-  %moredelim=[s][\texttt]{⟦}{⟧},%
-  %moredelim=[s][\textit]{⟨}{⟩},%
-  comment=[l]{//},morecomment=[s]{/*}{*/},commentstyle=\color{gray}\itseries,texcl=true,%
-  keywordstyle=\color{black}\rm\textbf,%
-  keywords={attribute,data,fragment,import,module,nested,property,rule,scheme,simplify,sort,space,static,sugar,symbol,tag,token},%
+\def\Identifier#1{#1}
+\def\Keyword#1{\textsf{\bf#1}}
+
+\lstdefinelanguage{HACS}{basicstyle=\fontfamily{ccr}\selectfont,%
+  extendedchars=true,inputencoding=utf8,sensitive,%
+  identifierstyle=\Identifier,%
+  string=[d]{"},morestring=[d]{'},upquote=true,stringstyle=\ttfamily,showstringspaces=true,%
+  comment=[l]{//},morecomment=[s]{/*}{*/},commentstyle=\color{blue}\rm,%
+  keywordstyle=\Keyword,%
+  keywords={attribute,data,fragment,import,module,nested,property,rule,scheme,simplify,sort,space,static,sugar,symbol,tag,token,default,error},%
   literate=%
-    {⟦}{{\ensuremath{\llbracket}}}1 {⟧}{{\ensuremath{\rrbracket}}}1 %
-    {⟨}{{\ensuremath{\langle}}}1 {⟩}{{\ensuremath{\rangle}}}1 %
-    {→}{\ensuremath{\rightarrow}}2 {↑}{\ensuremath{\uparrow}}1 {↓}{\ensuremath{\downarrow}}1 {ε}{\ensuremath{\varepsilon}}1 %
-    {…}{\ensuremath{\dots}}2 {¬}{\ensuremath{\lnot}}1 {∧}{\ensuremath{\wedge}}2 {∨}{\ensuremath{\vee}}2 {¶}{\P}1 {↦}{\ensuremath{\mapsto}}2 %
+    {⟦}{{\ensuremath{\llbracket}}}1 {⟧}{{\ensuremath{\rrbracket}}}1 {⟨}{{\ensuremath{\langle}}}1 {⟩}{{\ensuremath{\rangle}}}1 %
+    {→}{{\ensuremath{\rightarrow}}}2 {↑}{{\ensuremath{\uparrow}}}1 {↓}{{\ensuremath{\downarrow}}}1 {¬}{{\ensuremath{\lnot}}}2 {¶}{{\P}}1 %
+    {ε}{{\ensuremath{\varepsilon}}}1 {…}{{\ensuremath{\dots}}}2 {∧}{{\ensuremath{\wedge}}}2 {∨}{{\ensuremath{\vee}}}2 {↦}{{\ensuremath{\mapsto}}}2 %
 }[comments,strings,keywords]
 %%
-
-%%
 \lstnewenvironment{hacs}[1][]{\lstset{language=HACS,basewidth={.55em,.4em},columns=flexible,#1}\upshape}{}
-\newcommand\inputhacs[2][]{\lstinputlisting[language=HACS,basewidth={.55em,.4em},columns=flexible,#1]{#2}}
+\newcommand\inputhacs[2][]{\small\lstinputlisting[language=HACS,basewidth={.55em,.4em},columns=flexible,#1]{#2}}
 \newcommand\hacsc{\lstinline[language=HACS]}
 %\lstMakeShortInline[language=HACS,columns=fullflexible]"
 

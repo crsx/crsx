@@ -1,10 +1,7 @@
-// $Id: Raw.crs,v 1.25 2013/12/05 03:28:29 krisrose Exp $
-// SORTS OF RAW HOACS FORMAT FOR CRSX3 BOOTSTRAPPING.
+// $Id: Raw2.crs,v 1.25 2013/12/05 03:28:29 krisrose Exp $
+// SORTS OF RAW2 HOACS FORMAT FOR CRSX3 BOOTSTRAPPING.
 //
 Raw[(
-
-// Syntax of raw terms.
-$CheckGrammar['net.sf.crsx.hoacs.bootstrap.Raw'];
 
 {$String : $StringEntrySort}
 RawModule ::=(
@@ -105,6 +102,8 @@ RawForm ::=(
  RAW-FormParsedSorted[$String<!--SortName-->, RawParsedForm, $Numeric<!--Prec-->, $List[RawInheritedRef]];
  RAW-FormParsedUnsorted[RawParsedForm, $Numeric<!--Prec-->, $List[RawInheritedRef]];
  RAW-FormConstruction[$String<!--Constructor-->, $List[RawScopeSort], $List[RawInheritedRef]];
+ RAW-FormUnparsedSorted[$String<!--SortName-->, $String, $Numeric<!--Prec-->, $List[RawInheritedRef]];
+ RAW-FormUnparsedUnsorted[$String, $Numeric<!--Prec-->, $List[RawInheritedRef]];
 );
 
 {$String : $StringEntrySort}
@@ -182,6 +181,9 @@ RawTerm ::=(
 
  RAW-Parsed[RawParsed, $List[RawAttribute]] ;
  RAW-ParsedSorted[$String, RawRepeat, RawParsed, $List[RawAttribute]];
+
+ RAW-Unparsed[$String, $List[RawAttribute]] ;
+ RAW-UnparsedSorted[$String, RawRepeat, $String, $List[RawAttribute]];
 
  %rawTerm⟪ %Constructor«$String» ( %Scopes«$List[RawScope]» ) %Attributes«$List[RawAttribute]» ⟫;
  %rawTerm⟪ %Constructor«$String» %Repeat«RawRepeat» %Constructor«$String» ( %Scopes«$List[RawScope]» ) %Attributes«$List[RawAttribute]» ⟫;

@@ -1,13 +1,13 @@
+// HACS SYNTAX
 module "net.sf.crsx.hacs.Hacs" {
 
-sort Module | ⟦ module ⟨String⟩ { ⟨Declaration*⟩ } ⟧ ;
 
-// HACS SYNTAX
+// MODULES.
 
 sort Module
 | ⟦ module ⟨ModuleName⟩ { ⟨Declaration*⟩ } ⟧
 ;
-sort ModuleName | ⟦⟨Name⟩⟧ | ⟦⟨String⟩⟧ ;
+sort ModuleName | ⟦⟨ProperName⟩⟧ | ⟦⟨String⟩⟧ ;
 
 sort Declaration
 | ⟦⟨Module⟩⟧
@@ -17,7 +17,8 @@ sort Declaration
 | ⟦⟨RuleDeclaration⟩⟧
 ;
 
-// Lexical Analysis.
+
+// LEXICAL ANALYSIS.
 
 sort LexicalDeclaration
 | ⟦ space ⟨RE⟩ ; ⟧
@@ -36,27 +37,43 @@ sort RE
 | ⟦ ⟨RE@1+⟩ ⟧
 ;
 
-token Repeat | [+?*]? ;
-
-token LAng | "⟨" ;
-token RAng | "⟩" ;
+sort Repeat | ⟦+⟧ | ⟦?⟧ | ⟦*⟧ | ⟦⟧ ;
 
 token CC | \[ \^? (\- | \] ⟨CCRange⟩)? ( ([^\]\\-] | ⟨Escape⟩) ⟨CCRange⟩ )* \-? \] ;
-
 fragment CCRange | \- ([^\]\\] | ⟨Escape⟩) ;
 
 token Char | [A-Za-z0-9] | ⟨Escape⟩ ;
 
-token ⟨Name⟩ | ⟨Upper⟩ ⟨AlphaNum⟩* ;
+token ProperName  | ⟨UpperEtc⟩ ⟨AlphaNum⟩* ;
+token LowerName   | ⟨Lower⟩ ⟨AlphaNum⟩* ;
+token AnyName     | (⟨Lower⟩ | ⟨UpperEtc⟩) ⟨AlphaNum⟩* ;
+fragment UpperEtc  | [A-Z$_] ;
+fragment Lower     | [a-z] ;
+fragment AlphaNum  | [A-Za-z0-9] ;
+
+
+// SYNTAX ANALYSIS.
+
+sort SyntaxDeclaration
+| ⟦ sort ⟨Name⟩ ⟨SortAlternatives⟩ ; ⟧
+| ⟦ attribute ⟨UpDown⟩ ⟨AttributeName⟩ ⟨AttributeSort⟩ ; ⟧
 
 
 
+sort AttributeName | ⟦⟨ProperName⟩⟧ | ⟦⟨VariableName⟩⟧ ;
 
 
 
+// UNICODE CHARACTERS.
 
-
-
+token Negate     | "¬" ;	// \u00AC
+token Paragraph  | "¶" ;	// \u00B6
+token Up      	 | "↑" ;	// \u2191
+token Right   	 | "→" ;	// \u2192
+token Down    	 | "↓" ;	// \u2193
+token LWhite  	 | "⟦" ;	// \u27E6
+token RWhite  	 | "⟧" ;	// \u27E7
+token LAngle  	 | "⟨" ;	// \u27E8
+token RAngle  	 | "⟩" ;	// \u27E9
 
 }
-

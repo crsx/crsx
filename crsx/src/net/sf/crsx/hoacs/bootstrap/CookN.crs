@@ -290,6 +290,8 @@ N-SortAlternativeDefine[{#LOC} %rawSortAlternative⟪ | ↑ #AttributeName# ⟫]
 N-FormInheritedAttributes[RawForm] :: NameSet;
 N-FormInheritedAttributes[RAW-FormParsedSorted[#Name, #ParsedForm, #Prec, #InheritedRefs]] → N-InheritedRefsList[#InheritedRefs] ;
 N-FormInheritedAttributes[RAW-FormParsedUnsorted[#ParsedForm, #Prec, #InheritedRefs]] → N-InheritedRefsList[#InheritedRefs] ;
+N-FormInheritedAttributes[RAW-FormUnparsedSorted[#Name, #Text, #Prec, #InheritedRefs]] → N-InheritedRefsList[#InheritedRefs] ;
+N-FormInheritedAttributes[RAW-FormUnparsedUnsorted[#Text, #Prec, #InheritedRefs]] → N-InheritedRefsList[#InheritedRefs] ;
 N-FormInheritedAttributes[RAW-FormConstruction[#Constructor, #ScopeSorts, #InheritedRefs]] → N-InheritedRefsList[#InheritedRefs] ;
 
 N-InheritedRefsList[$List[RawInheritedRef]] :: NameSet;
@@ -552,7 +554,7 @@ DLE-Form-Abstraction: _DefineLessEqual[D_FORM[#F1, #K1], D_ABSTRACTION[a.#D2[a]]
 
 DLE-Form-Synthesizes: _DefineLessEqual[D_FORM[#F1, #K1], D_SYNTHESIZES[#A2]] → B_TRUE ;
 DLE-Synthesizes-Form: _DefineLessEqual[D_SYNTHESIZES[#A1], D_FORM[#F2, #K2]] → B_FALSE ;
-          
+
 // (2) Abstractions traversed in parallel.
 
 _DefineLessEqual[D_ABSTRACTION[a.#Define1[a]], D_ABSTRACTION[a.#Define2[a]]]
@@ -570,6 +572,7 @@ DLE-Form-Form: _DefineLessEqual[D_FORM[#F1, #FK1], D_FORM[#F2, #FK2]] → _FormL
 // (4) Rules are not sorted.
 
 DLE-Rule-Rule: _DefineLessEqual[D_RULE[#R1, #S1, #D1], D_RULE[#R2, #S2, #D2]] → B_FALSE ;
+DLE-Syntesizes-Synthesizes: _DefineLessEqual[D_SYNTHESIZES[#A1], D_SYNTHESIZES[#A2]] → B_FALSE ;
 
 
 /////////////////////////////////////////////////////////////////////
@@ -579,6 +582,8 @@ _DefinePrec[Define] :: $Numeric;
 -[Fresh[dummy::RawSortParam]] : _DefinePrec[D_ABSTRACTION[a.#Define[a]]] → _DefinePrec[#Define[dummy]] ;
 _DefinePrec[D_FORM[RAW-FormParsedSorted[#Name, #ParsedForm, #Precedence, #InheritedRefs], #Kind]] → #Precedence ;
 _DefinePrec[D_FORM[RAW-FormParsedUnsorted[#ParsedForm, #Precedence, #InheritedRefs], #Kind]] → #Precedence ;
+_DefinePrec[D_FORM[RAW-FormUnparsedSorted[#Name, #Text, #Precedence, #InheritedRefs], #Kind]] → #Precedence ;
+_DefinePrec[D_FORM[RAW-FormUnparsedUnsorted[#Text, #Precedence, #InheritedRefs], #Kind]] → #Precedence ;
 _DefinePrec[D_FORM[RAW-FormConstruction[#Constructor, #ScopeSortList, #InheritedRefs], #Kind]] → 0 ;
 _DefinePrec[D_SYNTHESIZES[#AttributeName]] → 0 ;
 _DefinePrec[D_RULE[#Rule, #SortName, #IsData]] → 0 ;
@@ -591,6 +596,11 @@ _DefineWrapper[Define, $String<!--SortName-->, Wrapper] :: Wrapper ;
 -[Fresh[dummy::RawSortParam]] : _DefineWrapper[D_ABSTRACTION[a.#Define[a]], #Name, #Wrapper] → _DefineWrapper[#Define[dummy], #Name, #Wrapper] ;
 _DefineWrapper[D_FORM[RAW-FormParsedSorted[#Name, #ParsedForm, #Prec, #InheritedRefs], #Kind], #Name, #Wrapper] → _DefineWrapperForm[#ParsedForm, #Prec, #Kind, #Name, #Wrapper] ;
 _DefineWrapper[D_FORM[RAW-FormParsedUnsorted[#ParsedForm, #Prec, #InheritedRefs], #Kind], #Name, #Wrapper] → _DefineWrapperForm[#ParsedForm, #Prec, #Kind, #Name, #Wrapper] ;
+
+// TODO:
+_DefineWrapper[D_FORM[RAW-FormUnparsedSorted[#Name, #Text, #Prec, #InheritedRefs], #Kind], #Name, #Wrapper] → #Wrapper ;
+_DefineWrapper[D_FORM[RAW-FormUnparsedUnsorted[#Text, #Prec, #InheritedRefs], #Kind], #Name, #Wrapper] → #Wrapper ;
+
 _DefineWrapper[D_FORM[RAW-FormConstruction[#Constructor, #ScopeSortList, #InheritedRefs], #Kind], #Name, #Wrapper] →  #Wrapper ;
 _DefineWrapper[D_SYNTHESIZES[#AttributeName], #Name, #Wrapper] → #Wrapper ;
 _DefineWrapper[D_RULE[#Rule, #SortName, #IsData], #Name, #Wrapper] → #Wrapper ;
@@ -658,8 +668,9 @@ $[If, $[NumericEqual, #Prec1, #Prec2], _ParsedFormLess[#ParsedForm1, #ParsedForm
 _FormLess[RAW-FormConstruction[#Constructor1, #ScopeSortList1, #InheritedRefs1], #Form2] → B_FALSE ;
 
 _FormLess[RAW-FormParsedSorted[#Name1, #ParsedForm1, #Prec1, #InheritedRefs1], RAW-FormConstruction[#Constructor2, #ScopeSortList2, #InheritedRefs2]] → B_TRUE;
-
 _FormLess[RAW-FormParsedUnsorted[#ParsedForm1, #Prec1, #InheritedRefs1], RAW-FormConstruction[#Constructor2, #ScopeSortList2, #InheritedRefs2]] → B_TRUE ;
+_FormLess[RAW-FormUnparsedSorted[#Name1, #Text1, #Prec1, #InheritedRefs1], RAW-FormConstruction[#Constructor2, #ScopeSortList2, #InheritedRefs2]] → B_TRUE;
+_FormLess[RAW-FormUnparsedUnsorted[#Text1, #Prec1, #InheritedRefs1], RAW-FormConstruction[#Constructor2, #ScopeSortList2, #InheritedRefs2]] → B_TRUE ;
 
 _ParsedFormLess[RawParsedForm, RawParsedForm] :: Boolean ;
 
@@ -720,6 +731,8 @@ Then-DerivedSorts-Defines[OK, D_NONE, #derived] → #derived ;
 DerivedSorts-Form[RawForm, $List[DERIVED_SORT]] :: $List[DERIVED_SORT];
 DerivedSorts-Form[RAW-FormParsedSorted[#Sort#, #ParsedForm#, #Prec#, #InheritedRefs], #derived] → DerivedSorts-ParsedForm[#ParsedForm#, #derived] ;
 DerivedSorts-Form[RAW-FormParsedUnsorted[#ParsedForm#, #Prec#, #InheritedRefs], #derived] → DerivedSorts-ParsedForm[#ParsedForm#, #derived] ;
+DerivedSorts-Form[RAW-FormUnparsedSorted[#Sort#, #Text#, #Prec#, #InheritedRefs], #derived] → #derived ;
+DerivedSorts-Form[RAW-FormUnparsedUnsorted[#Text#, #Prec#, #InheritedRefs], #derived] → #derived ;
 DerivedSorts-Form[RAW-FormConstruction[#Constructor#, #ScopeSorts#, #InheritedRefs], #derived] → #derived ;
 
 DerivedSorts-ParsedForm[RawParsedForm, $List[DERIVED_SORT]] :: $List[DERIVED_SORT];
@@ -771,6 +784,9 @@ DerivedSorts-Term[RAW-ParsedSorted[#Name, #Repeat, #Parsed, #Attributes], #deriv
 →
 DerivedSorts-Repeat[#Name, #Repeat, DerivedSorts-Parsed[#Parsed, DerivedSorts-Attributes[#Attributes, #derived]]]
 ;
+
+DerivedSorts-Term[RAW-Unparsed[#Text, #Attributes], #derived] → DerivedSorts-Attributes[#Attributes, #derived] ;
+DerivedSorts-Term[RAW-UnparsedSorted[#Name, #Repeat, #Text, #Attributes], #derived] → DerivedSorts-Attributes[#Attributes, #derived] ;
 
 DerivedSorts-Term[%rawTerm⟪ #Constructor# (#Scopes#) #Attributes# ⟫, #derived] → DerivedSorts-Scopes[#Scopes#, DerivedSorts-Attributes[#Attributes#, #derived]] ;
 

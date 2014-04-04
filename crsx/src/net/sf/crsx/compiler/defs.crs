@@ -258,7 +258,7 @@ SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; 
 				 E_LoadTerm; E_SaveTerm; E_IsZero; E_IsEmpty; E_NumericEqual; E_Error; E_Trace; E_FormatNumber; E_PassLocationProperties; E_Get; E_GetRef;
 				 E_IfDef; E_Show; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
 				 E_Match; E_Call; E_TryCall; E_Cast; E_Null; E_Nil; E_ForgivableError; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
-                 E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_Echo; E_DeepEqual; E_HashCode;
+                 E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_Echo; E_DeepEqual; E_HashCode; E_IfData;
 				);
 
 Primitive[$String] :: SPrimitive;
@@ -354,10 +354,11 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Echo"],					E_Echo,
 	$[If, $[Equal, #Primitive, "DeepEqual"],				E_DeepEqual,
 	$[If, $[Equal, #Primitive, "HashCode"],				E_HashCode,
+	$[If, $[Equal, #Primitive, "IfData"],				E_IfData,
 	
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 

@@ -238,8 +238,10 @@ public enum Primitive
 	IF_EMPTY("IfEmpty", 2, 3),
 	/** $[{#environment}IfDef, #name, #true[, #false]] with constant #name evaluates as either #true or #false depending on whether name is defined in #environment. */
 	IF_DEF("IfDef", 2, 3),
-	/** $[IfLinear, v] is true if v is a linear variable (¹v). */
+	/** $[IfLinear, v, #true, #false] is #true if v is a linear variable (¹v) otherwise #false. */
 	IF_LINEAR("IfLinear", 2, 3),
+	/** $[IfData, #t,#true, #false] is #true if #t is a data construction, oherwise #false. */
+	IF_DATA("IfData", 2, 3),
 
 	// Environment operations.
 

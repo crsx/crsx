@@ -289,6 +289,18 @@ public final class Util
 		}
 	    return impliedVariableSorts;
     }
+
+	/**
+	 * Whether the constructor is a data constructor.
+	 * @param factory with sorts
+	 * @param constructor to check
+	 */
+	public static boolean isData(GenericFactory factory, Constructor constructor)
+    {
+		boolean result = (constructor != null && factory.isData(constructor.symbol())); 
+		System.out.println("IS_DATA("+constructor.symbol()+") = "+result);
+		return result;
+    }
 	
 	/** Return the array with the rank (number of binders) of each subterm. */
 	public static int[] ranks(Term form)

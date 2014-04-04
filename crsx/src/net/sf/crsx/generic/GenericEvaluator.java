@@ -1426,6 +1426,30 @@ class GenericEvaluator extends FixedGenericConstruction
                 }
                 break;
 			}
+
+			case IF_DATA : {
+				// $[IfData, #t, #true, #false]
+				computeArgument(1);
+				if (sub(1).kind() == Kind.CONSTRUCTION)
+				{
+					if (Util.isData(factory, sub(1).constructor()))
+					{
+						computeArgument(2);
+						return rewrapWithProperties(sub(2));
+					}
+					else
+					{
+						if (arity() == 3)
+							return rewrapWithProperties(factory.nil());
+						else
+						{
+							computeArgument(3);
+							return rewrapWithProperties(sub(3));
+						}
+					}
+				}
+				break;
+			}
 			
 			case GET :
 			case GET_REF : {
@@ -2625,18 +2649,38 @@ class GenericEvaluator extends FixedGenericConstruction
 	 * @param factory for construction?
 	 * @param props list of property units
 	 * @param term to wrap the properties around
-	 * @return
+	 * @return updated term
+	 * @see Primitive#PROPERTIES
 	 */
 	private static Term unquoteProperties(Factory<? extends Term> factory, Term props, Term term)
 	{
-		assert(false);
-		return null;
+		if (!(term instanceof GenericTerm))
+			assert false : "Cannot wrap non-generic term with meta-properties...";
+		GenericTerm t = (GenericTerm) term;
+		while (Util.isCons(props.constructor()))
+		{
+			Term instructionTerm = props.sub(0);
+			String instruction = Util.symbol(instructionTerm);
+			if ("$RP".equals(instruction))
+				t = t.wrapWithPropertiesRef(Util.symbol(instructionTerm.sub(0)), true);
+			else if ("$NP".equals(instruction))
+				t = t.wrapWithProperty(Util.symbol(instructionTerm.sub(0)), instructionTerm.sub(1), true);
+			else if ("$VP".equals(instruction))
+				t = t.wrapWithProperty(instructionTerm.sub(0).variable(), instructionTerm.sub(1), true);
+			else if ("$MP".equals(instruction))
+				t = t.wrapWithMetaProperty(Util.symbol(instructionTerm.sub(0)), instructionTerm.sub(1), true);
+			else
+				assert false : "Unimplemented quoted property "+instruction;
+			props = props.sub(1);
+		}
+		return t;
 	}
 	
 	/**
 	 * Explicit properties in the format used by {@link Primitive#PROPERTIES}.
 	 * @param term with properties
 	 * @return list of just the quoted properties
+	 * @see Primitive#PROPERTIES
 	 */
 	private static Term quoteProperties(Term term)
 	{

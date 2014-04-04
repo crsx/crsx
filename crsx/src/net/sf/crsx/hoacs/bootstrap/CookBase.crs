@@ -93,6 +93,8 @@ TermTopSort[%rawTerm⟪ #Variable# #Attributes# ⟫, #FallbackSortName] → Sort
 TermTopSort[%rawTerm⟪ #Constructor1# #Repeat1# #Variable# #Attributes# ⟫, #FallbackSortName] → SortRepeatString[#Constructor1#, #Repeat1#] ;
 TermTopSort[RAW-Parsed[#Parsed, #Attributes], #FallbackSortName] → SortName1[CheckString[#FallbackSortName]] ;
 TermTopSort[RAW-ParsedSorted[#SortName, #Repeat, #Parsed, #Attributes#], #FallbackSortName] → SortName1[#SortName] ;
+TermTopSort[RAW-Unparsed[#Text, #Attributes], #FallbackSortName] → SortName1[CheckString[#FallbackSortName]] ;
+TermTopSort[RAW-UnparsedSorted[#SortName, #Repeat, #Text, #Attributes#], #FallbackSortName] → SortName1[#SortName] ;
 TermTopSort[%rawTerm⟪ #Constructor# ( #Scopes# ) #Attributes# ⟫, #FallbackSortName] → SortName1[CheckString[#FallbackSortName]] ;
 TermTopSort[%rawTerm⟪ #Constructor1# #Repeat1# #Constructor2# ( #Scopes# ) #Attributes# ⟫, #FallbackSortName] → SortRepeatString[#Constructor1#, #Repeat1#] ;
 TermTopSort[%rawTerm⟪ #MetaVariable# [ #Terms# ] #Attributes# ⟫, #FallbackSortName] → SortName1[CheckString[#FallbackSortName]] ;

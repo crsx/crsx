@@ -1867,9 +1867,7 @@ public class Raw implements net.sf.crsx.Parser, RawConstants {
                 sink = sink .start(makeTConstructor(sink, t, raw("SortAbstractionParam"), null)) ;
                 bs_a = b_a.sink();
         N_Variable(bs_a, env);
-                if (b_a.term(false).kind() != net.sf.crsx.Kind.CONSTRUCTION || b_a.term(false).arity() != 0)
-                 {if (true) throw new ParseException("Subterm can only be used as constant if it contains a single constructor ("+b_a.term(false)+")");}
-                c0 = b_a.term(true).constructor().symbol();
+                c0 = net.sf.crsx.util.Util.symbol(b_a.term(true));
                 s_a = c0;
                 v_a = sink.makeVariable(s_a,true);
                 {
@@ -3229,9 +3227,7 @@ public class Raw implements net.sf.crsx.Parser, RawConstants {
       case T_VAR:
                 bs_Variable = b_Variable.sink();
         N_Variable(bs_Variable, env);
-                if (b_Variable.term(false).kind() != net.sf.crsx.Kind.CONSTRUCTION || b_Variable.term(false).arity() != 0)
-                 {if (true) throw new ParseException("Subterm can only be used as constant if it contains a single constructor ("+b_Variable.term(false)+")");}
-                c0 = b_Variable.term(true).constructor().symbol();
+                c0 = net.sf.crsx.util.Util.symbol(b_Variable.term(true));
                 s_Variable = c0;
                 v_Variable = env.get(s_Variable);
                 if (v_Variable == null) {if (true) throw new ParseException("Variable "+s_Variable+" cannot be resolved?");}

@@ -1,5 +1,6 @@
 # Generic setup for HACS -*-Makefile-*-.
 # $Id: Makefile-hx,v 1.20 2014/01/26 21:14:34 krisrose Exp $
+# This file is used both for HACS installation and by the HACS user make system.
 
 # Note: You should not need to modify anything in this file.
 # If any of the following system commands are not right then
@@ -62,9 +63,19 @@ SH_EXTRA = :
 
 .SECONDARY:
 
-# (0) Preprocess .hx to get simple-terms version.
+# (0a) Preprocess .hx to get simple-terms version with raw1 terms.
 #
 %.hxt : %.hx
+	@/bin/echo -e '\n* Processing $<.' && $(SH_EXTRA) \
+	&& $(NOEXEC) $(CRSX) \
+		"grammar=('net.sf.crsx.hoacs.bootstrap.Raw';'net.sf.crsx.text.Text';)" \
+		input='$<' category=rawModule \
+		output='$@.tmp' simple-terms max-indent=10 width=255 \
+	&& $(NOEXEC) mv '$@.tmp' '$@'
+
+# (0b) Preprocess .hx to get simple-terms version with raw2 terms.
+#
+%.hx2 : %.hx
 	@/bin/echo -e '\n* Processing $<.' && $(SH_EXTRA) \
 	&& $(NOEXEC) $(CRSX) \
 		"grammar=('net.sf.crsx.hoacs.bootstrap.Raw';'net.sf.crsx.text.Text';)" \

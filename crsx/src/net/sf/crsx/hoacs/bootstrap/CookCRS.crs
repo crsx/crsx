@@ -99,6 +99,43 @@ $Meta[(
 <!-- Create variant of construction. -->
 _Alternate[###Extra, {###Env}$[C, ###C, ###Args]] → {###Env}$[C, $[:,###C,###Extra], ###Args] ;
 
+/// -[Data[###Extra,###Term]]:
+/// _AlternateS[###Extra, ###Term]
+/// →
+/// $[IfData, ###Term,
+///   _IfHasProperties[###Term, ###Term, $[P, ($RP["#_Synthesized_1"];), ###Term]],
+///   _AlternateS1[###Extra, ###Term]]; 
+/// 
+/// _AlternateS1[###Extra, {###Env}$[C, ###C, ###Args]]
+/// →
+/// _AlternateS2[{###Env}ENV, $[:,###C,###Extra], _SynthesizeArgs[1,###Args]]
+/// ;
+/// 
+/// _AlternateS2[{###Env}ENV, ###C, _SynthesizeArgsDone[###Args]] → {###Env}$[C, ###C, ###Args] ;
+/// 
+/// _SynthesizeArgs[###n,()] → _SynthesizeArgsDone[()] ;
+/// _SynthesizeArgs[###n,(###Arg1;###Args)] → _SynthesizeArgs2[_SynthesizeArg[###n,###Arg1], _SynthesizeArgs[$[Plus,###n,1], ###Args]] ;
+/// _SynthesizeArgs2[_SynthesizeArgDone[###Arg1], _SynthesizeArgsDone[###Args]] → _SynthesizeArgsDone[(###Arg1;###Args)] ;
+/// 
+/// _SynthesizeArg[###n, $B[x.###Arg[x]]] → _SynthesizeArg2[x._SynthesizeArg[###n, ###Arg[x]]] ;
+/// _SynthesizeArg[###n, $[NotMatch,$B[x.###_[x]],###Arg]] → _SynthesizeArgDone[$[P, ($RP[$[:,"#Synthesized_",###n]];), ###Arg]] ;
+/// _SynthesizeArg2[x._SynthesizeArgDone[###Arg[x]]] → _SynthesizeArgDone[$B x.###Arg[x]] ;
+/// 
+/// // Helper: check if term already has properties.
+/// _IfHasProperties[$[P, (#;##), #term], #true, #false] → #true ; 
+/// _IfHasProperties[$[P, (), #term], #true, #false] → #false ; 
+/// 
+/// //_AlternateS[###Extra, {###Env}$[C, ###C, ###Args]] → _AlternateS2[{###Env}ENV, $[:,###C,###Extra], _SynthesizeArgs[1,###Args]] ;
+/// //_AlternateS2[{###Env}ENV, ###C, _SynthesizeArgsDone[###Args]] → {###Env}$[C, ###C, ###Args] ;
+/// //
+/// //_SynthesizeArgs[###n,()] → _SynthesizeArgsDone[()] ;
+/// //_SynthesizeArgs[###n,(###Arg1;###Args)] → _SynthesizeArgs2[_SynthesizeArg[###n,###Arg1], _SynthesizeArgs[$[Plus,###n,1], ###Args]] ;
+/// //_SynthesizeArgs2[_SynthesizeArgDone[###Arg1], _SynthesizeArgsDone[###Args]] → _SynthesizeArgsDone[(###Arg1;###Args)] ;
+/// //
+/// //_SynthesizeArg[###n, $B[x.###Arg[x]]] → _SynthesizeArg2[x._SynthesizeArg[###n, ###Arg[x]]] ;
+/// //_SynthesizeArg[###n, $[NotMatch,$B[x.###_[x]],###Arg]] → _SynthesizeArgDone[$[P, ($RP[$[:,"#Synthesized_",###n]];), ###Arg]] ;
+/// //_SynthesizeArg2[x._SynthesizeArgDone[###Arg[x]]] → _SynthesizeArgDone[$B x.###Arg[x]] ;
+
 <!-- Add free variables in a term as extra arguments to a construction. -->
 {###Inherited}_FreeVariableArguments[###term, $[C, ###C, ###Args]] → {###Inherited}_FreeVariableArguments1[###Args, ###C, $[FreeVariables,###term], rest.rest]; 
 {###Inherited}_FreeVariableArguments1[(), ###C, ###FreeVars, rest.###[rest]] → {###Inherited}_FreeVariableArguments2[$[C, ###C, ###[###FreeVars]]]; 
@@ -363,12 +400,58 @@ $Print-Action-†‹c›‹ {#ND}CRS-FormScopeSorts[(ss;), #Name, $False, ok s p
 {#ND}CRS-Declarations-Define[D_SYNTHESIZES[#AttributeName], #Name, #ParsePrefix, #Wrapper, #params] → %n⟪⟫ ;
 
 // Helper: insert _Alternate wrapper when appropriate.
-Make_Alternate[$String, Text] :: Text;
--[Data[#variant]]:
-Make_Alternate[#variant, #text]
+{$String : SortEntry}Make_AlternateS[$String, $String, Text] :: Text;
+-[Data[#variant,#sortname,#text]]:
+{#ND}Make_AlternateS[#variant, #sortname, #text]
 →
-$[IfEmpty, #variant, #text, %n⟪_Alternate["†«#variant»", « #text »]⟫]
+/// {#ND}IfSymbolSort[#sortname, $[IfEmpty, #variant, #text, %n⟪_Alternate["†«#variant»", « #text »]⟫], %n⟪_AlternateS["†«#variant»", « #text »]⟫]
+{#ND}IfSymbolSort[#sortname, $[IfEmpty, #variant, #text, %n⟪_Alternate["†«#variant»", « #text »]⟫], %n⟪_Alternate["†«#variant»", « #text »]⟫]
 ;
+
+// Helper: chose depending on whether sort has a symbol kind.
+
+{$String : SortEntry}IfSymbolSort[$String, Text, Text] :: Text;
+
+-[Data[#sortname]]:
+{#ND}IfSymbolSort[#sortname, #true, #false]
+→
+IfSymbolSort1[$[{#ND}Get[SortEntry], #sortname, SE_NONE], #sortname, #true, #false]
+;
+
+IfSymbolSort1[SortEntry, $String, Text, Text] :: Text;
+
+IfSymbolSort1[SE_SORT[#Defines, #name, #precs, #wrapper], #sortname, #true, #false]
+→
+IfSymbolSort2[#Defines, #sortname, #true, #false]
+;
+
+IfSymbolSort1[$[NotMatch,SE_SORT[#Defines, #name, #precs, #wrapper], #_], #sortname, #true, #false]
+→
+#false
+;
+
+IfSymbolSort2[$List[Define], $String, Text, Text] :: Text;
+
+IfSymbolSort2[(), #sortname, #true, #false] → #false;
+
+IfSymbolSort2[(D_FORM[#RawForm, FK_SYMBOL[#static]]; #Defines), #sortname, #true, #false] → #true;
+
+IfSymbolSort2[($[NotMatch,D_FORM[#RawForm, FK_SYMBOL[#static]],#_]; #Defines), #sortname, #true, #false]
+→
+IfSymbolSort2[#Defines, #sortname, #true, #false]
+;
+
+
+/// // Helper: insert _Alternate wrapper when appropriate.
+/// Make_Alternate[$String, Text] :: Text;
+/// -[Data[#variant,#text]]:
+/// Make_Alternate[#variant, #text]
+/// →
+/// $[IfEmpty, #variant,
+///   %n⟪{#_Synthesized}« #text »⟫,
+///   %n⟪_AlternateS["†«#variant»", « #text »]⟫
+/// ]
+/// ;
 
 // Helper: extract precedence from form.
 FormPrec[RawForm] :: $Numeric;
@@ -533,8 +616,11 @@ riable1# :
 {#ND}CRS-ParsedForm-ParsedForm[RAW-ParsedFormTerm[%rawScopeSort⟪ [ #Variable1# : #Sort1# ] ⟫, #Prec1, #Repeat1, #ParsedForm1], #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n]
 →
 $[If, #Sorted,
- %n⟪†«"\u27e8"»†«SortName[#Sort1#]»"†« #Variable1# »"†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
- %n⟪†«"\u27e8"»†«#Variable1#»†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
+  %n⟪ †«#Variable1#» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
+  %n⟪†«"\u27e8"»†«#Variable1#»†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
+///$[If, #Sorted,
+/// %n⟪†«"\u27e8"»†«SortName[#Sort1#]»"†« #Variable1# »"†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫,
+/// %n⟪†«"\u27e8"»†«#Variable1#»†«"\u27e9"» « {#ND; #Variable1# : #Sort1#}CRS-ParsedForm-ParsedForm[#ParsedForm1, #Sorted, #makeForm, ok s p q r.#Wrap[ok,s,p,q,r], #n] »⟫]
 ;
 // NOTE: the above is a real CRSX hack to achieve the strange CRSX3 variable sorting notation: the internal variable name is created as a string.
 
@@ -1501,7 +1587,7 @@ AddTopRefMode[RM_ALL] → RM_ALL ;
 →
 IfRefModeHides[#refmode,
   {#ND}CRS-Parsed1[#Attributes, #ParsePrefix, #Name, #Parsed, #refmode, #variant, ok s t as.#[ok,s,t,as]],
-  Make_Alternate[#variant, {#ND}CRS-Attributes[#Attributes, #Name, #ParsePrefix, ok s t as.#[ok,s,t,as], #Pattern, {#ND}CRS-Parsed2[#Name, #Parsed, #ParsePrefix, SubRefMode[#refmode], ok s t as.#[ok,s,t,as]]]]
+  {#ND}Make_AlternateS[#variant, #Name, {#ND}CRS-Attributes[#Attributes, #Name, #ParsePrefix, ok s t as.#[ok,s,t,as], #Pattern, {#ND}CRS-Parsed2[#Name, #Parsed, #ParsePrefix, SubRefMode[#refmode], ok s t as.#[ok,s,t,as]]]]
 ];
 
 {#ND}CRS-Parsed[#Parsed, #Attributes, #Name, #ParsePrefix, #refmode, #Pattern, $True<!--SprayInherited-->, #variant, ok s t as.#[ok,s,t,as]]
@@ -1514,7 +1600,7 @@ IfRefModeHides[#refmode,
 {$String : SortEntry} CRS-Parsed1[$List[RawAttribute], $String, $String, RawParsed, RefMode, $String, ok::Ok s::$String t::Text as::$List[RawAttribute].Text] :: Text;
 {#ND}CRS-Parsed1[#Attributes, #ParsePrefix, #Name, #Parsed, #refmode, #variant, ok s t as.#[ok,s,t,as]]
 →
-Make_Alternate[#variant, %n⟪« {#ND}CRS-Attributes1[#Attributes, #ParsePrefix, $False, ok s t as.#[ok,s,t,as]] »« {#ND}CRS-Parsed2[#Name, #Parsed, #ParsePrefix, #refmode, ok s t as.#[ok,s,t,as]] »⟫] //()?
+{#ND}Make_AlternateS[#variant, #Name, %n⟪« {#ND}CRS-Attributes1[#Attributes, #ParsePrefix, $False, ok s t as.#[ok,s,t,as]] »« {#ND}CRS-Parsed2[#Name, #Parsed, #ParsePrefix, #refmode, ok s t as.#[ok,s,t,as]] »⟫] //()?
 ;
 
 {$String : SortEntry} CRS-Parsed2[$String, RawParsed, $String, RefMode, ok::Ok s::$String t::Text as::$List[RawAttribute].Text] :: Text;

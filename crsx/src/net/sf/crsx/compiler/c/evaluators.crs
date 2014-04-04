@@ -2076,8 +2076,24 @@ Poly-VariableNameIsComputed[Fresh[term::Text, name::Text]]:
 %n⟪{⟦ Term «term»; « {#env} T-set[#varterm, #sink, term] »
 if (IS_VARIABLE_USE(«term»)) {⟦ char *«name»;
 « {#env} T-set-string[#name, #sink, name] »setVariableBaseName(«#sink»->context, VARIABLE(«term»), «name»);⟧
-} ⟧ }
+}
+UNLINK(«#sink»->context, «term»); ⟧ }
 « {#env}#Tail[OK,#Result] »⟫
+;
+
+// $[IfData, #term, #true[, #false]] with evaluates as either #true or #false depending on whether #term is a data construction.
+//
+POLY_PRIMITIVE[E_IfData];
+
+Poly-IfData[Fresh[term::Text, test::Text]]:
+{#env} E-poly[E_IfData, (#Name; #term; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]]
+→
+%n⟪{⟦ int «test»;
+{⟦ Term «term»; « {#env} T-set[#term, #sink, term] »test = (IS_DATA(«term»)); UNLINK(«#sink»->context, «term»); ⟧}
+if («test») { ⟦«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
+else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
+}
+⟫
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

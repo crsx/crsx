@@ -11,39 +11,39 @@ public interface PGParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int LANGLE = 53;
+  int LANGLE = 52;
   /** RegularExpression Id. */
-  int RANGLE = 54;
+  int RANGLE = 53;
   /** RegularExpression Id. */
-  int DASH = 55;
+  int DASH = 54;
   /** RegularExpression Id. */
-  int NOT = 56;
+  int NOT = 55;
   /** RegularExpression Id. */
-  int COMMENT = 57;
+  int COMMENT = 56;
   /** RegularExpression Id. */
-  int STRING = 58;
+  int STRING = 57;
   /** RegularExpression Id. */
-  int EMBEDDED = 59;
+  int EMBEDDED = 58;
   /** RegularExpression Id. */
-  int VAR = 60;
+  int VAR = 59;
   /** RegularExpression Id. */
-  int CONST = 61;
+  int CONST = 60;
   /** RegularExpression Id. */
-  int NUMBER = 62;
+  int NUMBER = 61;
   /** RegularExpression Id. */
-  int METAVAR = 63;
+  int METAVAR = 62;
   /** RegularExpression Id. */
-  int DIGIT = 64;
+  int DIGIT = 63;
   /** RegularExpression Id. */
-  int LOWER = 65;
+  int LOWER = 64;
   /** RegularExpression Id. */
-  int UPPER = 66;
+  int UPPER = 65;
   /** RegularExpression Id. */
-  int LETTER = 67;
+  int LETTER = 66;
   /** RegularExpression Id. */
-  int TAIL = 68;
+  int TAIL = 67;
   /** RegularExpression Id. */
-  int CHAR = 69;
+  int CHAR = 68;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -90,7 +90,6 @@ public interface PGParserConstants {
     "\"!\"",
     "\"@\"",
     "\"_\"",
-    "\"{}\"",
     "\"~\"",
     "\"#\"",
     "\"%\"",
@@ -104,7 +103,7 @@ public interface PGParserConstants {
     "\"//\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 52>",
+    "<token of kind 51>",
     "<LANGLE>",
     "<RANGLE>",
     "<DASH>",

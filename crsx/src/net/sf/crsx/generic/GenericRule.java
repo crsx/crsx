@@ -770,8 +770,6 @@ public class GenericRule implements Copyable
 						}
 					}
 				}
-				
-				
 
 				@Override
                 public void visitMetaProperty(String name, boolean start, boolean hasMapping) throws CRSException

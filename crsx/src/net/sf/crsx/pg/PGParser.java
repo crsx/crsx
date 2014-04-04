@@ -1077,7 +1077,7 @@ class PGParser implements PGParserConstants {
       case 25:
       case 26:
       case 32:
-      case 40:
+      case 39:
       case LANGLE:
       case COMMENT:
       case EMBEDDED:
@@ -1110,14 +1110,14 @@ class PGParser implements PGParserConstants {
       case 25:
       case 26:
       case 32:
-      case 40:
+      case 39:
       case LANGLE:
       case EMBEDDED:
       case VAR:
       case CONST:
       case METAVAR:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case 40:
+        case 39:
         case LANGLE:
         case METAVAR:
           Structural(docComment, javacc, html, serializer);
@@ -1187,7 +1187,7 @@ class PGParser implements PGParserConstants {
         List<String> states = new ArrayList<String>();
         Reverser.Builder rev, rev2;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 40:
+    case 39:
     case METAVAR:
       // New style.
                 t = MetaVar();
@@ -1199,7 +1199,7 @@ class PGParser implements PGParserConstants {
                 name = t.toString();
                 definedNonterminals.add(name);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 40:
+      case 39:
       case VAR:
       case CONST:
       case METAVAR:
@@ -1225,7 +1225,7 @@ class PGParser implements PGParserConstants {
         label_7:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case 40:
+          case 39:
           case VAR:
           case CONST:
           case METAVAR:
@@ -2208,7 +2208,7 @@ class PGParser implements PGParserConstants {
     label_12:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 40:
+      case 39:
       case STRING:
       case EMBEDDED:
       case VAR:
@@ -2229,7 +2229,7 @@ class PGParser implements PGParserConstants {
         t = jj_consume_token(EMBEDDED);
                               arg = t.toString(); arguments.add(unembed(arg)); htmlArgs = htmlArgs+" "+arg;
         break;
-      case 40:
+      case 39:
       case VAR:
       case CONST:
       case METAVAR:
@@ -2407,10 +2407,10 @@ class PGParser implements PGParserConstants {
                         if (use.definition || use.use || use.construct || use.meta || use.wasConverted)
                         {
                                 // Compute constant.
-                                action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\u005cn"
-                                        +" throw new ParseException(\u005c"Subterm can only be used as constant if it contains a single constructor (\u005c"+"+bufferName+".term(false)+\u005c")\u005c");");
+                                ///action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
+                                ///	+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
                                 decls.put(c_in, "String "+c_in+" = null;");
-                                action(production, c_in+" = "+bufferName+".term(true).constructor().symbol();");
+                                action(production, c_in+" = "+UTIL+".symbol("+bufferName+".term(true));");
                                 // Generate use!
                                 useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
                         }
@@ -2487,10 +2487,10 @@ class PGParser implements PGParserConstants {
                         if (use.definition || use.use || use.construct || use.meta || use.wasConverted)
                         {
                                 // Compute constant.
-                                action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\u005cn"
-                                        +" throw new ParseException(\u005c"Subterm can only be used as constant if it contains a single constructor (\u005c"+"+bufferName+".term(false)+\u005c")\u005c");");
+                                ///action(production, "if ("+bufferName+".term(false).kind() != "+KIND+".CONSTRUCTION || "+bufferName+".term(false).arity() != 0)\n"
+                                ///	+" throw new ParseException(\"Subterm can only be used as constant if it contains a single constructor (\"+"+bufferName+".term(false)+\")\");");
                                 decls.put(c_in, "String "+c_in+" = null;");
-                                action(production, c_in+" = "+bufferName+".term(true).constructor().symbol();");
+                                action(production, c_in+" = "+UTIL+".symbol("+bufferName+".term(true));");
                                 // Generate use!
                                 useUsage(use, namebase, decls, production, endings, variable2java, variables, metavariables);
                         }
@@ -2680,7 +2680,7 @@ class PGParser implements PGParserConstants {
     default:
       jj_la1[76] = jj_gen;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 40:
+      case 39:
       case METAVAR:
                          use.touched = true;
         t = MetaVar();
@@ -2783,7 +2783,7 @@ class PGParser implements PGParserConstants {
                                   t = jj_consume_token(EMBEDDED);
                                       use.touched = true; use.converted = unembed(t.toString()).replaceAll("#", use.converted); annotation.append(""+t); use.wasConverted = true;
           break;
-        case 40:
+        case 39:
         case METAVAR:
           // :# means that whatever was generated is stored and can be referenced with the meta-application #[...] with explicit subterm group.
                                   t = MetaVar();
@@ -2791,12 +2791,28 @@ class PGParser implements PGParserConstants {
           break;
         case 29:
           jj_consume_token(29);
-          t = Name();
-          jj_consume_token(30);
-                                          use.category = t.toString(); annotation.append("{"+t+"}");
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case 3:
+            jj_consume_token(3);
+            t = Name();
+            jj_consume_token(30);
+                                              use.category = t.toString() + "(" + use.converted + ")"; annotation.append("{:"+t+"}");
+            break;
+          case VAR:
+          case CONST:
+            // :{category} means reparse using category. note: DOES NOT TOUCH!
+                                         t = Name();
+            jj_consume_token(30);
+                                           use.category = t.toString(); annotation.append("{"+t+"}");
+            break;
+          default:
+            jj_la1[78] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
           break;
         default:
-          jj_la1[78] = jj_gen;
+          jj_la1[79] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -2819,22 +2835,23 @@ class PGParser implements PGParserConstants {
                                  use.definition = true; use.name = t.toString(); annotation.append(use.name+" .");
           break;
         case 10:
-        case 38:
+        case 29:
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case 10:
             jj_consume_token(10);
             break;
-          case 38:
-            jj_consume_token(38);
+          case 29:
+            jj_consume_token(29);
+            jj_consume_token(30);
             break;
           default:
-            jj_la1[79] = jj_gen;
+            jj_la1[80] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
-                                        use.construct = true; annotation.append("$");
+                                           use.construct = true; annotation.append("$");
           break;
-        case 40:
+        case 39:
         case METAVAR:
           // _# means "interpret unit as an actual meta-variable applied to the remaining subterms in group".
                                   t = MetaVar();
@@ -2845,13 +2862,13 @@ class PGParser implements PGParserConstants {
                              use.embedded = true; annotation.append("=");
           break;
         default:
-          jj_la1[80] = jj_gen;
+          jj_la1[81] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
       default:
-        jj_la1[81] = jj_gen;
+        jj_la1[82] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -2880,7 +2897,7 @@ class PGParser implements PGParserConstants {
         ;
         break;
       default:
-        jj_la1[82] = jj_gen;
+        jj_la1[83] = jj_gen;
         break label_17;
       }
       jj_consume_token(15);
@@ -2905,7 +2922,7 @@ class PGParser implements PGParserConstants {
         ;
         break;
       default:
-        jj_la1[83] = jj_gen;
+        jj_la1[84] = jj_gen;
         break label_18;
       }
                  body.append(" "); html.append(" ");
@@ -2950,7 +2967,7 @@ class PGParser implements PGParserConstants {
                b.append("["); html.append("[");
         break;
       default:
-        jj_la1[84] = jj_gen;
+        jj_la1[85] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -2972,12 +2989,12 @@ class PGParser implements PGParserConstants {
       case 35:
       case 36:
       case 37:
+      case 38:
       case 39:
       case 40:
       case 41:
       case 42:
       case 43:
-      case 44:
       case DASH:
       case STRING:
       case VAR:
@@ -2987,7 +3004,7 @@ class PGParser implements PGParserConstants {
         LexicalChars(productionName, b, html);
         break;
       default:
-        jj_la1[85] = jj_gen;
+        jj_la1[86] = jj_gen;
         ;
       }
       jj_consume_token(22);
@@ -3002,7 +3019,7 @@ class PGParser implements PGParserConstants {
                  needsParentheses = true;
       break;
     default:
-      jj_la1[86] = jj_gen;
+      jj_la1[87] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3020,7 +3037,7 @@ class PGParser implements PGParserConstants {
                      body.append("("+b.toString()+")+"); html.append("+");
       break;
     default:
-      jj_la1[87] = jj_gen;
+      jj_la1[88] = jj_gen;
                  body.append(needsParentheses ? "("+b.toString()+")" : b.toString() );
     }
   }
@@ -3050,12 +3067,12 @@ class PGParser implements PGParserConstants {
       case 35:
       case 36:
       case 37:
+      case 38:
       case 39:
       case 40:
       case 41:
       case 42:
       case 43:
-      case 44:
       case STRING:
       case CHAR:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -3079,19 +3096,19 @@ class PGParser implements PGParserConstants {
         case 35:
         case 36:
         case 37:
+        case 38:
         case 39:
         case 40:
         case 41:
         case 42:
         case 43:
-        case 44:
         case CHAR:
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case CHAR:
             t = jj_consume_token(CHAR);
             break;
-          case 39:
-            t = jj_consume_token(39);
+          case 38:
+            t = jj_consume_token(38);
             break;
           case 35:
             t = jj_consume_token(35);
@@ -3099,20 +3116,20 @@ class PGParser implements PGParserConstants {
           case 36:
             t = jj_consume_token(36);
             break;
-          case 40:
-            t = jj_consume_token(40);
+          case 39:
+            t = jj_consume_token(39);
             break;
           case 10:
             t = jj_consume_token(10);
             break;
-          case 41:
-            t = jj_consume_token(41);
+          case 40:
+            t = jj_consume_token(40);
             break;
           case 34:
             t = jj_consume_token(34);
             break;
-          case 42:
-            t = jj_consume_token(42);
+          case 41:
+            t = jj_consume_token(41);
             break;
           case 12:
             t = jj_consume_token(12);
@@ -3144,8 +3161,8 @@ class PGParser implements PGParserConstants {
           case 3:
             t = jj_consume_token(3);
             break;
-          case 43:
-            t = jj_consume_token(43);
+          case 42:
+            t = jj_consume_token(42);
             break;
           case 16:
             t = jj_consume_token(16);
@@ -3153,18 +3170,18 @@ class PGParser implements PGParserConstants {
           case 28:
             t = jj_consume_token(28);
             break;
-          case 44:
-            t = jj_consume_token(44);
+          case 43:
+            t = jj_consume_token(43);
             break;
           default:
-            jj_la1[88] = jj_gen;
+            jj_la1[89] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
                          s = t.toString(); html.append("<code>"+htmlq(s)+"</code>"); s = unChar(s);
           break;
         default:
-          jj_la1[89] = jj_gen;
+          jj_la1[90] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -3183,7 +3200,7 @@ class PGParser implements PGParserConstants {
           t = jj_consume_token(NUMBER);
           break;
         default:
-          jj_la1[90] = jj_gen;
+          jj_la1[91] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -3232,7 +3249,7 @@ class PGParser implements PGParserConstants {
                         rangestart = false; separator = ",";
         break;
       default:
-        jj_la1[91] = jj_gen;
+        jj_la1[92] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -3254,12 +3271,12 @@ class PGParser implements PGParserConstants {
       case 35:
       case 36:
       case 37:
+      case 38:
       case 39:
       case 40:
       case 41:
       case 42:
       case 43:
-      case 44:
       case DASH:
       case STRING:
       case VAR:
@@ -3269,7 +3286,7 @@ class PGParser implements PGParserConstants {
         ;
         break;
       default:
-        jj_la1[92] = jj_gen;
+        jj_la1[93] = jj_gen;
         break label_19;
       }
     }
@@ -3302,7 +3319,7 @@ class PGParser implements PGParserConstants {
       t = jj_consume_token(CONST);
       break;
     default:
-      jj_la1[93] = jj_gen;
+      jj_la1[94] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3316,11 +3333,11 @@ class PGParser implements PGParserConstants {
     case METAVAR:
       t = jj_consume_token(METAVAR);
       break;
-    case 40:
-      t = jj_consume_token(40);
+    case 39:
+      t = jj_consume_token(39);
       break;
     default:
-      jj_la1[94] = jj_gen;
+      jj_la1[95] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -3337,7 +3354,7 @@ class PGParser implements PGParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[95];
+  final private int[] jj_la1 = new int[96];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -3347,13 +3364,13 @@ class PGParser implements PGParserConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x6,0x10,0x360,0x0,0x0,0x80,0x10,0x0,0x80,0x10,0x360,0x79e0000,0x79e0000,0x79e0000,0x0,0x0,0x0,0x0,0x0,0x408,0x408,0x1000,0x1000,0x800,0x8000,0x20000,0x40000,0x1000,0x1000,0x8,0x800,0x0,0x1000,0x1000,0x8,0x800,0x0,0x10,0x0,0x0,0x0,0x10,0x10,0x10,0x7800000,0xa0000800,0x0,0xa0000800,0x18001000,0x18001000,0xa0000800,0x0,0x0,0x80000000,0x18001000,0x18001000,0x0,0x0,0x0,0x18001000,0x18001000,0x0,0x200000,0x8000,0xa0000800,0x0,0x10,0x0,0x0,0x0,0x0,0x0,0x400,0x400,0x400,0x0,0x8,0x20000000,0x400,0x10000480,0x8,0x8000,0x200800,0x200000,0x7801bc98,0x200800,0x18001000,0x7801bc88,0x7801bc88,0x0,0x7801bc98,0x7801bc98,0x0,0x0,};
+      jj_la1_0 = new int[] {0x0,0x6,0x10,0x360,0x0,0x0,0x80,0x10,0x0,0x80,0x10,0x360,0x79e0000,0x79e0000,0x79e0000,0x0,0x0,0x0,0x0,0x0,0x408,0x408,0x1000,0x1000,0x800,0x8000,0x20000,0x40000,0x1000,0x1000,0x8,0x800,0x0,0x1000,0x1000,0x8,0x800,0x0,0x10,0x0,0x0,0x0,0x10,0x10,0x10,0x7800000,0xa0000800,0x0,0xa0000800,0x18001000,0x18001000,0xa0000800,0x0,0x0,0x80000000,0x18001000,0x18001000,0x0,0x0,0x0,0x18001000,0x18001000,0x0,0x200000,0x8000,0xa0000800,0x0,0x10,0x0,0x0,0x0,0x0,0x0,0x400,0x400,0x400,0x0,0x8,0x8,0x20000000,0x20000400,0x30000480,0x8,0x8000,0x200800,0x200000,0x7801bc98,0x200800,0x18001000,0x7801bc88,0x7801bc88,0x0,0x7801bc98,0x7801bc98,0x0,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x2000000,0x0,0x0,0x0,0x34000000,0x74000000,0x0,0x0,0x74000000,0x0,0x0,0x0,0xba200101,0xb8200101,0xba200101,0x30000000,0xb0000100,0x30000000,0xb0000100,0x80200100,0x0,0x0,0x30000000,0x30000000,0x0,0x0,0x0,0x0,0x30000000,0x30000000,0x0,0x0,0x8000000,0x30000000,0x30000000,0x0,0x0,0x8000000,0x0,0x34000000,0x34000000,0x34000000,0x0,0x0,0x0,0x0,0x3e200000,0x2000000,0x3e200000,0x0,0x0,0x3c200000,0x30000000,0x34000000,0x30000000,0x0,0x0,0xbc000100,0x30000000,0xbc000100,0x0,0x0,0x30000000,0x0,0x0,0x3e200000,0x4000002,0x0,0x4,0x40000000,0x80000100,0x8,0x8,0x0,0x18,0x18,0x4,0x20,0xb8000100,0x40,0x90000148,0x20,0x0,0x35000000,0x1000000,0x74801fbc,0x35000000,0x0,0x1fbc,0x4001fbc,0x70000000,0x74801fbc,0x74801fbc,0x30000000,0x80000100,};
+      jj_la1_1 = new int[] {0x1000000,0x0,0x0,0x0,0x1a000000,0x3a000000,0x0,0x0,0x3a000000,0x0,0x0,0x0,0x5d100081,0x5c100081,0x5d100081,0x18000000,0x58000080,0x18000000,0x58000080,0x40100080,0x0,0x0,0x18000000,0x18000000,0x0,0x0,0x0,0x0,0x18000000,0x18000000,0x0,0x0,0x4000000,0x18000000,0x18000000,0x0,0x0,0x4000000,0x0,0x1a000000,0x1a000000,0x1a000000,0x0,0x0,0x0,0x0,0x1f100000,0x1000000,0x1f100000,0x0,0x0,0x1e100000,0x18000000,0x1a000000,0x18000000,0x0,0x0,0x5e000080,0x18000000,0x5e000080,0x0,0x0,0x18000000,0x0,0x0,0x1f100000,0x2000002,0x0,0x4,0x20000000,0x40000080,0x8,0x8,0x0,0x18,0x18,0x4,0x20,0x18000000,0x5c000080,0x0,0x48000088,0x20,0x0,0x1a800000,0x800000,0x3a400ffc,0x1a800000,0x0,0xffc,0x2000ffc,0x38000000,0x3a400ffc,0x3a400ffc,0x18000000,0x40000080,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20,0x0,0x20,0x20,0x0,0x20,0x20,0x0,0x20,0x20,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x10,0x0,0x10,0x10,0x0,0x10,0x10,0x0,0x10,0x10,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -3367,7 +3384,7 @@ class PGParser implements PGParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 95; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 96; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -3381,7 +3398,7 @@ class PGParser implements PGParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 95; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 96; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -3391,7 +3408,7 @@ class PGParser implements PGParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 95; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 96; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -3401,7 +3418,7 @@ class PGParser implements PGParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 95; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 96; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -3410,7 +3427,7 @@ class PGParser implements PGParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 95; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 96; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -3419,7 +3436,7 @@ class PGParser implements PGParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 95; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 96; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -3470,12 +3487,12 @@ class PGParser implements PGParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[70];
+    boolean[] la1tokens = new boolean[69];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 95; i++) {
+    for (int i = 0; i < 96; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -3490,7 +3507,7 @@ class PGParser implements PGParserConstants {
         }
       }
     }
-    for (int i = 0; i < 70; i++) {
+    for (int i = 0; i < 69; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
