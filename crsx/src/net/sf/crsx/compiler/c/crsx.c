@@ -953,11 +953,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
     {
         // There is new properties.
 
-        // Should just be using construction->nfvs, but sometimes that isn't
-        // nulled out even though construction->properties->namedProperties is NULL.
-        // If there are no properties, then obviously there are no Free Vars,
-        // so for now this is correct and works around our bug. TODO : Fix
-        VARIABLESET freeVars = construction->properties->namedProperties ? LINK_VARIABLESET(context, construction->nfvs) : NULL;
+        VARIABLESET freeVars = construction->properties->namedFreeVars;
 
         if (!construction->properties->namedProperties) // no existing properties. Good.
             construction->properties->namedProperties = buffer->pendingNamedProperties; // transfer ref
