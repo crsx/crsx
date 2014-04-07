@@ -4,667 +4,102 @@
 extern "C" {
 #endif
 
-/* FUNCTION H-Data$2. */
-int conBindOffs_M_H_Data_s2[] = {0 , 0 , 0 , 0 , 0};
-char *nameFun_M_H_Data_s2(Term term) { return  "H-Data$2" ; }
-struct _ConstructionDescriptor descriptor_M_H_Data_s2 = {&sort_M_Reified_xVariable, 0, 4, sizeof(STRUCT_Con_M_H_Data_s2), conBindOffs_M_H_Data_s2, &nameFun_M_H_Data_s2, &step_M_H_Data_s2};
-
-int step_M_H_Data_s2(Sink sink__V1, Term term__V2)
-{
-  int term__V2_count = LINK_COUNT(term__V2); permitUnusedInt(term__V2_count);
-  do {
-    /* Contraction rule HEADER-H-Data-2. */
-    ASSERT(sink__V1->context, !strcmp(SYMBOL(term__V2),  "H-Data$2" ));
-    Term sub__V3 = SUB(term__V2, 0); permitUnusedTerm(sub__V3); int sub__V3_count = term__V2_count*LINK_COUNT(sub__V3); permitUnusedInt(sub__V3_count);
-    CRSX_CHECK_SORT(sink__V1->context, sub__V3, &sort_M_Reified_xSort); /* sub__V3 = &#11 */
-    Term sub__V4 = SUB(term__V2, 1); permitUnusedTerm(sub__V4); int sub__V4_count = term__V2_count*LINK_COUNT(sub__V4); permitUnusedInt(sub__V4_count);
-    CRSX_CHECK_SORT(sink__V1->context, sub__V4, &sort_M_Reified_xSort); /* sub__V4 = &#12 */
-    Term sub__V5 = LINK(sink__V1->context, SUB(term__V2, 2)); int sub__V5_count = term__V2_count*LINK_COUNT(sub__V5); permitUnusedInt(sub__V5_count);
-    CRSX_CHECK_SORT(sink__V1->context, sub__V5, &sort_M_Reified_xSort); /* sub__V5 = &#13 */
-    Term sub__V6 = LINK(sink__V1->context, SUB(term__V2, 3)); int sub__V6_count = term__V2_count*LINK_COUNT(sub__V6); permitUnusedInt(sub__V6_count);
-    /* sub__V6 = &#2 */
-    
-    NamedPropertyLink namedP__V7 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
-    VariablePropertyLink varP__V8 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-    Hashset namedFV__V9 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->properties->namedFreeVars);
-    Hashset varFV__V10 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->properties->variableFreeVars);
-    UNLINK(sink__V1->context, term__V2);
-    { START(sink__V1, _M_H_Data);
-      COPY(sink__V1, sub__V5);COPY(sink__V1, sub__V6);END(sink__V1, _M_H_Data); }
-    UNLINK_VARIABLESET(sink__V1->context, namedFV__V9); UNLINK_VARIABLESET(sink__V1->context, varFV__V10);
-    UNLINK_NamedPropertyLink(sink__V1->context, namedP__V7); UNLINK_VariablePropertyLink(sink__V1->context, varP__V8);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Data$1. */
-int conBindOffs_M_H_Data_s1[] = {0 , 0 , 0 , 0};
-char *nameFun_M_H_Data_s1(Term term) { return  "H-Data$1" ; }
-struct _ConstructionDescriptor descriptor_M_H_Data_s1 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_H_Data_s1), conBindOffs_M_H_Data_s1, &nameFun_M_H_Data_s1, &step_M_H_Data_s1};
-
-int step_M_H_Data_s1(Sink sink__V11, Term term__V12)
-{
-  int term__V12_count = LINK_COUNT(term__V12); permitUnusedInt(term__V12_count);
-  do {
-    /* Contraction rule HEADER-H-Data-1. */
-    ASSERT(sink__V11->context, !strcmp(SYMBOL(term__V12),  "H-Data$1" ));
-    Term sub__V13 = LINK(sink__V11->context, SUB(term__V12, 0)); int sub__V13_count = term__V12_count*LINK_COUNT(sub__V13); permitUnusedInt(sub__V13_count);
-    /* sub__V13 = &#11 */
-    Term sub__V14 = SUB(term__V12, 1); permitUnusedTerm(sub__V14); int sub__V14_count = term__V12_count*LINK_COUNT(sub__V14); permitUnusedInt(sub__V14_count);
-    /* sub__V14 = &#12 */
-    Term sub__V15 = LINK(sink__V11->context, SUB(term__V12, 2)); int sub__V15_count = term__V12_count*LINK_COUNT(sub__V15); permitUnusedInt(sub__V15_count);
-    /* sub__V15 = &#2 */
-    
-    NamedPropertyLink namedP__V16 = LINK_NamedPropertyLink(sink__V11->context, NAMED_PROPERTIES(term__V12));
-    VariablePropertyLink varP__V17 = LINK_VariablePropertyLink(sink__V11->context, VARIABLE_PROPERTIES(term__V12));
-    Hashset namedFV__V18 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->properties->namedFreeVars);
-    Hashset varFV__V19 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->properties->variableFreeVars);
-    UNLINK(sink__V11->context, term__V12);
-    { START(sink__V11, _M__sTextCons);
-      { START(sink__V11, _M__sTextBreak);
-        LITERAL(sink__V11,  "\n" ); END(sink__V11, _M__sTextBreak); }
-      { START(sink__V11, _M__sTextCons);
-        { START(sink__V11, _M__sTextChars);
-          LITERAL(sink__V11,  "/* DATA SORT " ); END(sink__V11, _M__sTextChars); }
-        { START(sink__V11, _M__sTextCons);
-          { START(sink__V11, _M__sTextEmbed);
-            { START(sink__V11, _M_AsText);
-              { START(sink__V11, _M_COMMENT_xTOKEN);
-                COPY(sink__V11, LINK(sink__V11->context, sub__V13));END(sink__V11, _M_COMMENT_xTOKEN); }
-              END(sink__V11, _M_AsText); }
-            END(sink__V11, _M__sTextEmbed); }
-          { START(sink__V11, _M__sTextCons);
-            { START(sink__V11, _M__sTextChars);
-              LITERAL(sink__V11,  " HEADER DECLARATIONS. */" ); END(sink__V11, _M__sTextChars); }
-            { START(sink__V11, _M__sTextCons);
-              { START(sink__V11, _M__sTextBreak);
-                LITERAL(sink__V11,  "\n" ); END(sink__V11, _M__sTextBreak); }
-              { START(sink__V11, _M__sTextCons);
-                { START(sink__V11, _M__sTextChars);
-                  LITERAL(sink__V11,  "typedef enum {" ); END(sink__V11, _M__sTextChars); }
-                { START(sink__V11, _M__sTextCons);
-                  { START(sink__V11, _M__sTextEmbed);
-                    { START(sink__V11, _M_AsText);
-                      { START(sink__V11, _M_EnumFun);
-                        COPY(sink__V11, LINK(sink__V11->context, sub__V13));END(sink__V11, _M_EnumFun); }
-                      END(sink__V11, _M_AsText); }
-                    END(sink__V11, _M__sTextEmbed); }
-                  { START(sink__V11, _M__sTextCons);
-                    { START(sink__V11, _M__sTextChars);
-                      LITERAL(sink__V11,  " = 0, " ); END(sink__V11, _M__sTextChars); }
-                    { START(sink__V11, _M__sTextCons);
-                      { START(sink__V11, _M__sTextEmbed);
-                        { START(sink__V11, _M_AsText);
-                          { START(sink__V11, _M_EnumVar);
-                            COPY(sink__V11, LINK(sink__V11->context, sub__V13));END(sink__V11, _M_EnumVar); }
-                          END(sink__V11, _M_AsText); }
-                        END(sink__V11, _M__sTextEmbed); }
-                      { START(sink__V11, _M__sTextCons);
-                        { START(sink__V11, _M__sTextChars);
-                          LITERAL(sink__V11,  " = 1" ); END(sink__V11, _M__sTextChars); }
-                        { START(sink__V11, _M__sTextCons);
-                          { START(sink__V11, _M__sTextEmbed);
-                            { START(sink__V11, _M_AsText);
-                              { START(sink__V11, _M_DelayMapText_s1);
-                                { START(sink__V11, _M_Forms_Constructors);
-                                  COPY(sink__V11, LINK(sink__V11->context, sub__V15));END(sink__V11, _M_Forms_Constructors); }
-                                { Variable x__V20 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V11->context,"x__V20");
-                                  Variable x__V21 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V11->context,"x__V21");
-                                  Variable binds__V22[2] = {x__V20,x__V21}; BINDS(sink__V11, 2, binds__V22);
-                                  { START(sink__V11, _M__sTextCons);
-                                    { START(sink__V11, _M__sTextChars);
-                                      LITERAL(sink__V11,  ", " ); END(sink__V11, _M__sTextChars); }
-                                    { START(sink__V11, _M__sTextCons);
-                                      { START(sink__V11, _M__sTextEmbed);
-                                        { START(sink__V11, _M_AsText);
-                                          { START(sink__V11, _M_DEnumTag);
-                                            USE(sink__V11, x__V20); USE(sink__V11, x__V21); END(sink__V11, _M_DEnumTag); }
-                                          END(sink__V11, _M_AsText); }
-                                        END(sink__V11, _M__sTextEmbed); }
-                                      { START(sink__V11, _M__sTextNil);
-                                        END(sink__V11, _M__sTextNil); }
-                                      END(sink__V11, _M__sTextCons); }
-                                    END(sink__V11, _M__sTextCons); }
-                                   }
-                                END(sink__V11, _M_DelayMapText_s1); }
-                              END(sink__V11, _M_AsText); }
-                            END(sink__V11, _M__sTextEmbed); }
-                          { START(sink__V11, _M__sTextCons);
-                            { START(sink__V11, _M__sTextChars);
-                              LITERAL(sink__V11,  "} " ); END(sink__V11, _M__sTextChars); }
-                            { START(sink__V11, _M__sTextCons);
-                              { START(sink__V11, _M__sTextEmbed);
-                                { START(sink__V11, _M_AsText);
-                                  { START(sink__V11, _M_Enum);
-                                    COPY(sink__V11, LINK(sink__V11->context, sub__V13));END(sink__V11, _M_Enum); }
-                                  END(sink__V11, _M_AsText); }
-                                END(sink__V11, _M__sTextEmbed); }
-                              { START(sink__V11, _M__sTextCons);
-                                { START(sink__V11, _M__sTextChars);
-                                  LITERAL(sink__V11,  ";" ); END(sink__V11, _M__sTextChars); }
-                                { START(sink__V11, _M__sTextCons);
-                                  { START(sink__V11, _M__sTextBreak);
-                                    LITERAL(sink__V11,  "\n" ); END(sink__V11, _M__sTextBreak); }
-                                  { START(sink__V11, _M__sTextCons);
-                                    { START(sink__V11, _M__sTextEmbed);
-                                      { START(sink__V11, _M_AsText);
-                                        { START(sink__V11, _M_MapText_s1);
-                                          COPY(sink__V11, sub__V15);{ Variable x__V23 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V11->context,"x__V23");
-                                            Variable binds__V24[1] = {x__V23}; BINDS(sink__V11, 1, binds__V24);
-                                            { START(sink__V11, _M_H_Form);
-                                              USE(sink__V11, x__V23); END(sink__V11, _M_H_Form); }
-                                             }
-                                          END(sink__V11, _M_MapText_s1); }
-                                        END(sink__V11, _M_AsText); }
-                                      END(sink__V11, _M__sTextEmbed); }
-                                    { START(sink__V11, _M__sTextCons);
-                                      { START(sink__V11, _M__sTextChars);
-                                        LITERAL(sink__V11,  "extern struct _SortDescriptor " );
-                                        END(sink__V11, _M__sTextChars); }
-                                      { START(sink__V11, _M__sTextCons);
-                                        { START(sink__V11, _M__sTextEmbed);
-                                          { START(sink__V11, _M_AsText);
-                                            { START(sink__V11, _M_Sort);
-                                              COPY(sink__V11, sub__V13);END(sink__V11, _M_Sort); }
-                                            END(sink__V11, _M_AsText); }
-                                          END(sink__V11, _M__sTextEmbed); }
-                                        { START(sink__V11, _M__sTextCons);
-                                          { START(sink__V11, _M__sTextChars);
-                                            LITERAL(sink__V11,  ";" ); END(sink__V11, _M__sTextChars); }
-                                          { START(sink__V11, _M__sTextCons);
-                                            { START(sink__V11, _M__sTextBreak);
-                                              LITERAL(sink__V11,  "\n" );
-                                              END(sink__V11, _M__sTextBreak); }
-                                            { START(sink__V11, _M__sTextNil);
-                                              END(sink__V11, _M__sTextNil); }
-                                            END(sink__V11, _M__sTextCons); }
-                                          END(sink__V11, _M__sTextCons); }
-                                        END(sink__V11, _M__sTextCons); }
-                                      END(sink__V11, _M__sTextCons); }
-                                    END(sink__V11, _M__sTextCons); }
-                                  END(sink__V11, _M__sTextCons); }
-                                END(sink__V11, _M__sTextCons); }
-                              END(sink__V11, _M__sTextCons); }
-                            END(sink__V11, _M__sTextCons); }
-                          END(sink__V11, _M__sTextCons); }
-                        END(sink__V11, _M__sTextCons); }
-                      END(sink__V11, _M__sTextCons); }
-                    END(sink__V11, _M__sTextCons); }
-                  END(sink__V11, _M__sTextCons); }
-                END(sink__V11, _M__sTextCons); }
-              END(sink__V11, _M__sTextCons); }
-            END(sink__V11, _M__sTextCons); }
-          END(sink__V11, _M__sTextCons); }
-        END(sink__V11, _M__sTextCons); }
-      END(sink__V11, _M__sTextCons); }
-    UNLINK_VARIABLESET(sink__V11->context, namedFV__V18); UNLINK_VARIABLESET(sink__V11->context, varFV__V19);
-    UNLINK_NamedPropertyLink(sink__V11->context, namedP__V16); UNLINK_VariablePropertyLink(sink__V11->context, varP__V17);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Form$2. */
-int conBindOffs_M_H_Form_s2[] = {0 , 0 , 0};
-char *nameFun_M_H_Form_s2(Term term) { return  "H-Form$2" ; }
-struct _ConstructionDescriptor descriptor_M_H_Form_s2 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_H_Form_s2), conBindOffs_M_H_Form_s2, &nameFun_M_H_Form_s2, &step_M_H_Form_s2};
-
-int step_M_H_Form_s2(Sink sink__V25, Term term__V26)
-{
-  int term__V26_count = LINK_COUNT(term__V26); permitUnusedInt(term__V26_count);
-  Term sub__V27 = FORCE(sink__V25->context, SUB(term__V26, 0));
-  EnumOf_M__sList choice__V28 = (IS_VARIABLE_USE(sub__V27) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V27));
-  switch (choice__V28)
-  {
-    case Data_M__sNil: { /* Function HEADER-H-Form-3$H-Form$2$$Nil case $Nil */
-      ASSERT(sink__V25->context, !strcmp(SYMBOL(term__V26),  "H-Form$2" ));
-      Term sub__V29 = SUB(term__V26, 0); permitUnusedTerm(sub__V29); int sub__V29_count = term__V26_count*LINK_COUNT(sub__V29); permitUnusedInt(sub__V29_count);
-      ASSERT(sink__V25->context, !strcmp(SYMBOL(sub__V29),  "$Nil" ));
-      Term sub__V30 = LINK(sink__V25->context, SUB(term__V26, 1)); int sub__V30_count = term__V26_count*LINK_COUNT(sub__V30); permitUnusedInt(sub__V30_count);
-      /* sub__V30 = &#0 */
-      
-      NamedPropertyLink namedP__V31 = LINK_NamedPropertyLink(sink__V25->context, NAMED_PROPERTIES(term__V26));
-      VariablePropertyLink varP__V32 = LINK_VariablePropertyLink(sink__V25->context, VARIABLE_PROPERTIES(term__V26));
-      Hashset namedFV__V33 = LINK_VARIABLESET(sink__V25->context, asConstruction(term__V26)->properties->namedFreeVars);
-      Hashset varFV__V34 = LINK_VARIABLESET(sink__V25->context, asConstruction(term__V26)->properties->variableFreeVars);
-      UNLINK(sink__V25->context, term__V26);
-      ADD_PROPERTIES(sink__V25, LINK_VARIABLESET(sink__V25->context, namedFV__V33), LINK_VARIABLESET(sink__V25->context, varFV__V34), LINK_NamedPropertyLink(sink__V25->context, namedP__V31), LINK_VariablePropertyLink(sink__V25->context, varP__V32));
-      { START(sink__V25, _M_H_Form_s4);
-        COPY(sink__V25, sub__V30);END(sink__V25, _M_H_Form_s4); }
-      UNLINK_VARIABLESET(sink__V25->context, namedFV__V33); UNLINK_VARIABLESET(sink__V25->context, varFV__V34);
-      UNLINK_NamedPropertyLink(sink__V25->context, namedP__V31); UNLINK_VariablePropertyLink(sink__V25->context, varP__V32);
-      
-      return 1;
-    break; } case Data_M__sCons: { /* Function HEADER-H-Form-4$H-Form$2$$Cons case $Cons */
-      ASSERT(sink__V25->context, !strcmp(SYMBOL(term__V26),  "H-Form$2" ));
-      Term sub__V35 = SUB(term__V26, 0); permitUnusedTerm(sub__V35); int sub__V35_count = term__V26_count*LINK_COUNT(sub__V35); permitUnusedInt(sub__V35_count);
-      ASSERT(sink__V25->context, !strcmp(SYMBOL(sub__V35),  "$Cons" ));
-      Term sub__V36 = LINK(sink__V25->context, SUB(sub__V35, 0)); int sub__V36_count = sub__V35_count*LINK_COUNT(sub__V36); permitUnusedInt(sub__V36_count);
-      /* sub__V36 = &#0-0 */
-      Term sub__V37 = LINK(sink__V25->context, SUB(sub__V35, 1)); int sub__V37_count = sub__V35_count*LINK_COUNT(sub__V37); permitUnusedInt(sub__V37_count);
-      /* sub__V37 = &#0-1 */
-      Term sub__V38 = LINK(sink__V25->context, SUB(term__V26, 1)); int sub__V38_count = term__V26_count*LINK_COUNT(sub__V38); permitUnusedInt(sub__V38_count);
-      /* sub__V38 = &#2 */
-      
-      NamedPropertyLink namedP__V39 = LINK_NamedPropertyLink(sink__V25->context, NAMED_PROPERTIES(term__V26));
-      VariablePropertyLink varP__V40 = LINK_VariablePropertyLink(sink__V25->context, VARIABLE_PROPERTIES(term__V26));
-      Hashset namedFV__V41 = LINK_VARIABLESET(sink__V25->context, asConstruction(term__V26)->properties->namedFreeVars);
-      Hashset varFV__V42 = LINK_VARIABLESET(sink__V25->context, asConstruction(term__V26)->properties->variableFreeVars);
-      UNLINK(sink__V25->context, term__V26);
-      ADD_PROPERTIES(sink__V25, LINK_VARIABLESET(sink__V25->context, namedFV__V41), LINK_VARIABLESET(sink__V25->context, varFV__V42), LINK_NamedPropertyLink(sink__V25->context, namedP__V39), LINK_VariablePropertyLink(sink__V25->context, varP__V40));
-      { START(sink__V25, _M_H_Form_s3);
-        COPY(sink__V25, sub__V36);COPY(sink__V25, sub__V37);COPY(sink__V25, sub__V38);END(sink__V25, _M_H_Form_s3); }
-      UNLINK_VARIABLESET(sink__V25->context, namedFV__V41); UNLINK_VARIABLESET(sink__V25->context, varFV__V42);
-      UNLINK_NamedPropertyLink(sink__V25->context, namedP__V39); UNLINK_VariablePropertyLink(sink__V25->context, varP__V40);
-      
-      return 1;
-    } default: break;
-  }
-  return 0;
-}
-
-/* FUNCTION ComputeHeader$1. */
-int conBindOffs_M_ComputeHeader_s1[] = {0 , 0 , 0};
-char *nameFun_M_ComputeHeader_s1(Term term) { return  "ComputeHeader$1" ; }
-struct _ConstructionDescriptor descriptor_M_ComputeHeader_s1 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_ComputeHeader_s1), conBindOffs_M_ComputeHeader_s1, &nameFun_M_ComputeHeader_s1, &step_M_ComputeHeader_s1};
-
-int step_M_ComputeHeader_s1(Sink sink__V43, Term term__V44)
-{
-  int term__V44_count = LINK_COUNT(term__V44); permitUnusedInt(term__V44_count);
-  do {
-    /* Contraction rule HEADER-ComputeHeader-1. */
-    ASSERT(sink__V43->context, !strcmp(SYMBOL(term__V44),  "ComputeHeader$1" ));
-    Term sub__V45 = LINK(sink__V43->context, SUB(term__V44, 0)); int sub__V45_count = term__V44_count*LINK_COUNT(sub__V45); permitUnusedInt(sub__V45_count);
-    /* sub__V45 = &#11 */
-    Term sub__V46 = LINK(sink__V43->context, SUB(term__V44, 1)); int sub__V46_count = term__V44_count*LINK_COUNT(sub__V46); permitUnusedInt(sub__V46_count);
-    /* sub__V46 = &#12 */
-    
-    NamedPropertyLink namedP__V47 = LINK_NamedPropertyLink(sink__V43->context, NAMED_PROPERTIES(term__V44));
-    VariablePropertyLink varP__V48 = LINK_VariablePropertyLink(sink__V43->context, VARIABLE_PROPERTIES(term__V44));
-    Hashset namedFV__V49 = LINK_VARIABLESET(sink__V43->context, asConstruction(term__V44)->properties->namedFreeVars);
-    Hashset varFV__V50 = LINK_VARIABLESET(sink__V43->context, asConstruction(term__V44)->properties->variableFreeVars);
-    UNLINK(sink__V43->context, term__V44);
-    { START(sink__V43, _M_ComputeHeader2);
-      COPY(sink__V43, sub__V45);COPY(sink__V43, sub__V46);{ Term term__V51;
-        { char *value__V52 = getenv( "MODULE" );
-          if (value__V52) term__V51 = makeStringLiteral(sink__V43->context, value__V52);
-          else {term__V51 = makeStringLiteral(sink__V43->context,  "" ); }
-        }
-        COPY(sink__V43, term__V51); /*CONSERVATIVE*/ }
-      END(sink__V43, _M_ComputeHeader2); }
-    UNLINK_VARIABLESET(sink__V43->context, namedFV__V49); UNLINK_VARIABLESET(sink__V43->context, varFV__V50);
-    UNLINK_NamedPropertyLink(sink__V43->context, namedP__V47); UNLINK_VariablePropertyLink(sink__V43->context, varP__V48);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Form$6. */
-int conBindOffs_M_H_Form_s6[] = {0 , 0 , 0 , 0};
-char *nameFun_M_H_Form_s6(Term term) { return  "H-Form$6" ; }
-struct _ConstructionDescriptor descriptor_M_H_Form_s6 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_H_Form_s6), conBindOffs_M_H_Form_s6, &nameFun_M_H_Form_s6, &step_M_H_Form_s6};
-
-int step_M_H_Form_s6(Sink sink__V53, Term term__V54)
-{
-  int term__V54_count = LINK_COUNT(term__V54); permitUnusedInt(term__V54_count);
-  do {
-    /* Contraction rule HEADER-H-Form-1. */
-    ASSERT(sink__V53->context, !strcmp(SYMBOL(term__V54),  "H-Form$6" ));
-    Term sub__V55 = SUB(term__V54, 0); permitUnusedTerm(sub__V55); int sub__V55_count = term__V54_count*LINK_COUNT(sub__V55); permitUnusedInt(sub__V55_count);
-    CRSX_CHECK_SORT(sink__V53->context, sub__V55, &sort_M_Reified_xSort); /* sub__V55 = &#11 */
-    Term sub__V56 = SUB(term__V54, 1); permitUnusedTerm(sub__V56); int sub__V56_count = term__V54_count*LINK_COUNT(sub__V56); permitUnusedInt(sub__V56_count);
-    CRSX_CHECK_SORT(sink__V53->context, sub__V56, &sort_M_Reified_xSort); /* sub__V56 = &#12 */
-    Term sub__V57 = LINK(sink__V53->context, SUB(term__V54, 2)); int sub__V57_count = term__V54_count*LINK_COUNT(sub__V57); permitUnusedInt(sub__V57_count);
-    CRSX_CHECK_SORT(sink__V53->context, sub__V57, &sort_M_Reified_xForm); /* sub__V57 = &#13 */
-    
-    NamedPropertyLink namedP__V58 = LINK_NamedPropertyLink(sink__V53->context, NAMED_PROPERTIES(term__V54));
-    VariablePropertyLink varP__V59 = LINK_VariablePropertyLink(sink__V53->context, VARIABLE_PROPERTIES(term__V54));
-    Hashset namedFV__V60 = LINK_VARIABLESET(sink__V53->context, asConstruction(term__V54)->properties->namedFreeVars);
-    Hashset varFV__V61 = LINK_VARIABLESET(sink__V53->context, asConstruction(term__V54)->properties->variableFreeVars);
-    UNLINK(sink__V53->context, term__V54);
-    { START(sink__V53, _M_H_Form);
-      COPY(sink__V53, sub__V57);END(sink__V53, _M_H_Form); }
-    UNLINK_VARIABLESET(sink__V53->context, namedFV__V60); UNLINK_VARIABLESET(sink__V53->context, varFV__V61);
-    UNLINK_NamedPropertyLink(sink__V53->context, namedP__V58); UNLINK_VariablePropertyLink(sink__V53->context, varP__V59);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Form$5. */
-int conBindOffs_M_H_Form_s5[] = {0};
-char *nameFun_M_H_Form_s5(Term term) { return  "H-Form$5" ; }
-struct _ConstructionDescriptor descriptor_M_H_Form_s5 = {&sort_M_Reified_xVariable, 0, 0, sizeof(STRUCT_Con_M_H_Form_s5), conBindOffs_M_H_Form_s5, &nameFun_M_H_Form_s5, &step_M_H_Form_s5};
-
-int step_M_H_Form_s5(Sink sink__V62, Term term__V63)
-{
-  int term__V63_count = LINK_COUNT(term__V63); permitUnusedInt(term__V63_count);
-  do {
-    /* Contraction rule HEADER-H-Form-2. */
-    ASSERT(sink__V62->context, !strcmp(SYMBOL(term__V63),  "H-Form$5" ));
-    
-    NamedPropertyLink namedP__V64 = LINK_NamedPropertyLink(sink__V62->context, NAMED_PROPERTIES(term__V63));
-    VariablePropertyLink varP__V65 = LINK_VariablePropertyLink(sink__V62->context, VARIABLE_PROPERTIES(term__V63));
-    Hashset namedFV__V66 = LINK_VARIABLESET(sink__V62->context, asConstruction(term__V63)->properties->namedFreeVars);
-    Hashset varFV__V67 = LINK_VARIABLESET(sink__V62->context, asConstruction(term__V63)->properties->variableFreeVars);
-    UNLINK(sink__V62->context, term__V63);
-    { START(sink__V62, _M__sTextNil); END(sink__V62, _M__sTextNil); } UNLINK_VARIABLESET(sink__V62->context, namedFV__V66); UNLINK_VARIABLESET(sink__V62->context, varFV__V67);
-    UNLINK_NamedPropertyLink(sink__V62->context, namedP__V64); UNLINK_VariablePropertyLink(sink__V62->context, varP__V65);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Form$4. */
-int conBindOffs_M_H_Form_s4[] = {0 , 0};
-char *nameFun_M_H_Form_s4(Term term) { return  "H-Form$4" ; }
-struct _ConstructionDescriptor descriptor_M_H_Form_s4 = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Form_s4), conBindOffs_M_H_Form_s4, &nameFun_M_H_Form_s4, &step_M_H_Form_s4};
-
-int step_M_H_Form_s4(Sink sink__V68, Term term__V69)
-{
-  int term__V69_count = LINK_COUNT(term__V69); permitUnusedInt(term__V69_count);
-  do {
-    /* Contraction rule HEADER-H-Form-3. */
-    ASSERT(sink__V68->context, !strcmp(SYMBOL(term__V69),  "H-Form$4" ));
-    Term sub__V70 = LINK(sink__V68->context, SUB(term__V69, 0)); int sub__V70_count = term__V69_count*LINK_COUNT(sub__V70); permitUnusedInt(sub__V70_count);
-    /* sub__V70 = &#11 */
-    
-    NamedPropertyLink namedP__V71 = LINK_NamedPropertyLink(sink__V68->context, NAMED_PROPERTIES(term__V69));
-    VariablePropertyLink varP__V72 = LINK_VariablePropertyLink(sink__V68->context, VARIABLE_PROPERTIES(term__V69));
-    Hashset namedFV__V73 = LINK_VARIABLESET(sink__V68->context, asConstruction(term__V69)->properties->namedFreeVars);
-    Hashset varFV__V74 = LINK_VARIABLESET(sink__V68->context, asConstruction(term__V69)->properties->variableFreeVars);
-    UNLINK(sink__V68->context, term__V69);
-    { START(sink__V68, _M__sTextCons);
-      { START(sink__V68, _M__sTextChars);
-        LITERAL(sink__V68,  "#define STRUCT" ); END(sink__V68, _M__sTextChars); }
-      { START(sink__V68, _M__sTextCons);
-        { START(sink__V68, _M__sTextEmbed);
-          { START(sink__V68, _M_AsText);
-            { START(sink__V68, _M_Struct);
-              COPY(sink__V68, LINK(sink__V68->context, sub__V70));END(sink__V68, _M_Struct); }
-            END(sink__V68, _M_AsText); }
-          END(sink__V68, _M__sTextEmbed); }
-        { START(sink__V68, _M__sTextCons);
-          { START(sink__V68, _M__sTextChars);
-            LITERAL(sink__V68,  " struct _ConstantConstruction" ); END(sink__V68, _M__sTextChars); }
-          { START(sink__V68, _M__sTextCons);
-            { START(sink__V68, _M__sTextBreak);
-              LITERAL(sink__V68,  "\n" ); END(sink__V68, _M__sTextBreak); }
-            { START(sink__V68, _M__sTextCons);
-              { START(sink__V68, _M__sTextChars);
-                LITERAL(sink__V68,  "extern struct _ConstructionDescriptor " );
-                END(sink__V68, _M__sTextChars); }
-              { START(sink__V68, _M__sTextCons);
-                { START(sink__V68, _M__sTextEmbed);
-                  { START(sink__V68, _M_AsText);
-                    { START(sink__V68, _M_Descriptor);
-                      COPY(sink__V68, sub__V70);END(sink__V68, _M_Descriptor); }
-                    END(sink__V68, _M_AsText); }
-                  END(sink__V68, _M__sTextEmbed); }
-                { START(sink__V68, _M__sTextCons);
-                  { START(sink__V68, _M__sTextChars);
-                    LITERAL(sink__V68,  ";" ); END(sink__V68, _M__sTextChars); }
-                  { START(sink__V68, _M__sTextCons);
-                    { START(sink__V68, _M__sTextBreak);
-                      LITERAL(sink__V68,  "\n" ); END(sink__V68, _M__sTextBreak); }
-                    { START(sink__V68, _M__sTextNil);
-                      END(sink__V68, _M__sTextNil); }
-                    END(sink__V68, _M__sTextCons); }
-                  END(sink__V68, _M__sTextCons); }
-                END(sink__V68, _M__sTextCons); }
-              END(sink__V68, _M__sTextCons); }
-            END(sink__V68, _M__sTextCons); }
-          END(sink__V68, _M__sTextCons); }
-        END(sink__V68, _M__sTextCons); }
-      END(sink__V68, _M__sTextCons); }
-    UNLINK_VARIABLESET(sink__V68->context, namedFV__V73); UNLINK_VARIABLESET(sink__V68->context, varFV__V74);
-    UNLINK_NamedPropertyLink(sink__V68->context, namedP__V71); UNLINK_VariablePropertyLink(sink__V68->context, varP__V72);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Form$3. */
-int conBindOffs_M_H_Form_s3[] = {0 , 0 , 0 , 0};
-char *nameFun_M_H_Form_s3(Term term) { return  "H-Form$3" ; }
-struct _ConstructionDescriptor descriptor_M_H_Form_s3 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_H_Form_s3), conBindOffs_M_H_Form_s3, &nameFun_M_H_Form_s3, &step_M_H_Form_s3};
-
-int step_M_H_Form_s3(Sink sink__V75, Term term__V76)
-{
-  int term__V76_count = LINK_COUNT(term__V76); permitUnusedInt(term__V76_count);
-  do {
-    /* Contraction rule HEADER-H-Form-4. */
-    ASSERT(sink__V75->context, !strcmp(SYMBOL(term__V76),  "H-Form$3" ));
-    Term sub__V77 = LINK(sink__V75->context, SUB(term__V76, 0)); int sub__V77_count = term__V76_count*LINK_COUNT(sub__V77); permitUnusedInt(sub__V77_count);
-    /* sub__V77 = &#121 */
-    Term sub__V78 = LINK(sink__V75->context, SUB(term__V76, 1)); int sub__V78_count = term__V76_count*LINK_COUNT(sub__V78); permitUnusedInt(sub__V78_count);
-    /* sub__V78 = &#122 */
-    Term sub__V79 = LINK(sink__V75->context, SUB(term__V76, 2)); int sub__V79_count = term__V76_count*LINK_COUNT(sub__V79); permitUnusedInt(sub__V79_count);
-    /* sub__V79 = &#11 */
-    
-    NamedPropertyLink namedP__V80 = LINK_NamedPropertyLink(sink__V75->context, NAMED_PROPERTIES(term__V76));
-    VariablePropertyLink varP__V81 = LINK_VariablePropertyLink(sink__V75->context, VARIABLE_PROPERTIES(term__V76));
-    Hashset namedFV__V82 = LINK_VARIABLESET(sink__V75->context, asConstruction(term__V76)->properties->namedFreeVars);
-    Hashset varFV__V83 = LINK_VARIABLESET(sink__V75->context, asConstruction(term__V76)->properties->variableFreeVars);
-    UNLINK(sink__V75->context, term__V76);
-    { START(sink__V75, _M__sTextCons);
-      { START(sink__V75, _M__sTextChars);
-        LITERAL(sink__V75,  "#define STRUCT" ); END(sink__V75, _M__sTextChars); }
-      { START(sink__V75, _M__sTextCons);
-        { START(sink__V75, _M__sTextEmbed);
-          { START(sink__V75, _M_AsText);
-            { START(sink__V75, _M_Struct);
-              COPY(sink__V75, LINK(sink__V75->context, sub__V79));END(sink__V75, _M_Struct); }
-            END(sink__V75, _M_AsText); }
-          END(sink__V75, _M__sTextEmbed); }
-        { START(sink__V75, _M__sTextCons);
-          { START(sink__V75, _M__sTextChars);
-            LITERAL(sink__V75,  " struct " ); END(sink__V75, _M__sTextChars); }
-          { START(sink__V75, _M__sTextCons);
-            { START(sink__V75, _M__sTextEmbed);
-              { START(sink__V75, _M_AsText);
-                { START(sink__V75, _M_Struct);
-                  COPY(sink__V75, LINK(sink__V75->context, sub__V79));END(sink__V75, _M_Struct); }
-                END(sink__V75, _M_AsText); }
-              END(sink__V75, _M__sTextEmbed); }
-            { START(sink__V75, _M__sTextCons);
-              { START(sink__V75, _M__sTextBreak);
-                LITERAL(sink__V75,  "\n" ); END(sink__V75, _M__sTextBreak); }
-              { START(sink__V75, _M__sTextCons);
-                { START(sink__V75, _M__sTextChars);
-                  LITERAL(sink__V75,  "struct " ); END(sink__V75, _M__sTextChars); }
-                { START(sink__V75, _M__sTextCons);
-                  { START(sink__V75, _M__sTextEmbed);
-                    { START(sink__V75, _M_AsText);
-                      { START(sink__V75, _M_Struct);
-                        COPY(sink__V75, LINK(sink__V75->context, sub__V79));END(sink__V75, _M_Struct); }
-                      END(sink__V75, _M_AsText); }
-                    END(sink__V75, _M__sTextEmbed); }
-                  { START(sink__V75, _M__sTextCons);
-                    { START(sink__V75, _M__sTextChars);
-                      LITERAL(sink__V75,  " {struct _Construction construction; Term sub[" );
-                      END(sink__V75, _M__sTextChars); }
-                    { START(sink__V75, _M__sTextCons);
-                      { START(sink__V75, _M__sTextEmbed);
-                        { START(sink__V75, _M_AsText);
-                          { START(sink__V75, _M_INTEGER);
-                            { START(sink__V75, _M_Length);
-                              COPY(sink__V75, LINK(sink__V75->context, sub__V78));LITERAL(sink__V75,  "1" ); END(sink__V75, _M_Length); }
-                            END(sink__V75, _M_INTEGER); }
-                          END(sink__V75, _M_AsText); }
-                        END(sink__V75, _M__sTextEmbed); }
-                      { START(sink__V75, _M__sTextCons);
-                        { START(sink__V75, _M__sTextChars);
-                          LITERAL(sink__V75,  "]; Variable binder[" ); END(sink__V75, _M__sTextChars); }
-                        { START(sink__V75, _M__sTextCons);
-                          { START(sink__V75, _M__sTextEmbed);
-                            { START(sink__V75, _M_AsText);
-                              { START(sink__V75, _M_INTEGER);
-                                { START(sink__V75, _M_FormArguments__binder__count);
-                                  { START(sink__V75, _M__sCons);
-                                    COPY(sink__V75, sub__V77);COPY(sink__V75, sub__V78);END(sink__V75, _M__sCons); }
-                                  LITERAL(sink__V75,  "0" ); END(sink__V75, _M_FormArguments__binder__count); }
-                                END(sink__V75, _M_INTEGER); }
-                              END(sink__V75, _M_AsText); }
-                            END(sink__V75, _M__sTextEmbed); }
-                          { START(sink__V75, _M__sTextCons);
-                            { START(sink__V75, _M__sTextChars);
-                              LITERAL(sink__V75,  "];};" ); END(sink__V75, _M__sTextChars); }
-                            { START(sink__V75, _M__sTextCons);
-                              { START(sink__V75, _M__sTextBreak);
-                                LITERAL(sink__V75,  "\n" ); END(sink__V75, _M__sTextBreak); }
-                              { START(sink__V75, _M__sTextCons);
-                                { START(sink__V75, _M__sTextChars);
-                                  LITERAL(sink__V75,  "extern struct _ConstructionDescriptor " );
-                                  END(sink__V75, _M__sTextChars); }
-                                { START(sink__V75, _M__sTextCons);
-                                  { START(sink__V75, _M__sTextEmbed);
-                                    { START(sink__V75, _M_AsText);
-                                      { START(sink__V75, _M_Descriptor);
-                                        COPY(sink__V75, sub__V79);END(sink__V75, _M_Descriptor); }
-                                      END(sink__V75, _M_AsText); }
-                                    END(sink__V75, _M__sTextEmbed); }
-                                  { START(sink__V75, _M__sTextCons);
-                                    { START(sink__V75, _M__sTextChars);
-                                      LITERAL(sink__V75,  ";" ); END(sink__V75, _M__sTextChars); }
-                                    { START(sink__V75, _M__sTextCons);
-                                      { START(sink__V75, _M__sTextBreak);
-                                        LITERAL(sink__V75,  "\n" ); END(sink__V75, _M__sTextBreak); }
-                                      { START(sink__V75, _M__sTextNil);
-                                        END(sink__V75, _M__sTextNil); }
-                                      END(sink__V75, _M__sTextCons); }
-                                    END(sink__V75, _M__sTextCons); }
-                                  END(sink__V75, _M__sTextCons); }
-                                END(sink__V75, _M__sTextCons); }
-                              END(sink__V75, _M__sTextCons); }
-                            END(sink__V75, _M__sTextCons); }
-                          END(sink__V75, _M__sTextCons); }
-                        END(sink__V75, _M__sTextCons); }
-                      END(sink__V75, _M__sTextCons); }
-                    END(sink__V75, _M__sTextCons); }
-                  END(sink__V75, _M__sTextCons); }
-                END(sink__V75, _M__sTextCons); }
-              END(sink__V75, _M__sTextCons); }
-            END(sink__V75, _M__sTextCons); }
-          END(sink__V75, _M__sTextCons); }
-        END(sink__V75, _M__sTextCons); }
-      END(sink__V75, _M__sTextCons); }
-    UNLINK_VARIABLESET(sink__V75->context, namedFV__V82); UNLINK_VARIABLESET(sink__V75->context, varFV__V83);
-    UNLINK_NamedPropertyLink(sink__V75->context, namedP__V80); UNLINK_VariablePropertyLink(sink__V75->context, varP__V81);
-    return 1;
-  } while (0);
-  return 0;
-}
-
-/* FUNCTION H-Form. */
-int conBindOffs_M_H_Form[] = {0 , 0};
-char *nameFun_M_H_Form(Term term) { return  "H-Form" ; }
-struct _ConstructionDescriptor descriptor_M_H_Form = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Form), conBindOffs_M_H_Form, &nameFun_M_H_Form, &step_M_H_Form};
-
-int step_M_H_Form(Sink sink__V84, Term term__V85)
-{
-  int term__V85_count = LINK_COUNT(term__V85); permitUnusedInt(term__V85_count);
-  Term sub__V86 = FORCE(sink__V84->context, SUB(term__V85, 0));
-  EnumOf_M_Reified_xForm choice__V87 = (IS_VARIABLE_USE(sub__V86) ? VarOf_M_Reified_xForm : (EnumOf_M_Reified_xForm) TAG(sub__V86));
-  switch (choice__V87)
-  {
-    case Data_M_SORT_SET: { /* Function HEADER-H-Form-1$H-Form$SORT-SET case SORT-SET */
-      ASSERT(sink__V84->context, !strcmp(SYMBOL(term__V85),  "H-Form" ));
-      Term sub__V88 = SUB(term__V85, 0); permitUnusedTerm(sub__V88); int sub__V88_count = term__V85_count*LINK_COUNT(sub__V88); permitUnusedInt(sub__V88_count);
-      CRSX_CHECK_SORT(sink__V84->context, sub__V88, &sort_M_Reified_xForm); ASSERT(sink__V84->context, !strcmp(SYMBOL(sub__V88),  "SORT-SET" ));
-      Term sub__V89 = LINK(sink__V84->context, SUB(sub__V88, 0)); int sub__V89_count = sub__V88_count*LINK_COUNT(sub__V89); permitUnusedInt(sub__V89_count);
-      CRSX_CHECK_SORT(sink__V84->context, sub__V89, &sort_M_Reified_xSort); /* sub__V89 = &#0-0 */
-      Term sub__V90 = LINK(sink__V84->context, SUB(sub__V88, 1)); int sub__V90_count = sub__V88_count*LINK_COUNT(sub__V90); permitUnusedInt(sub__V90_count);
-      CRSX_CHECK_SORT(sink__V84->context, sub__V90, &sort_M_Reified_xSort); /* sub__V90 = &#0-1 */
-      Term sub__V91 = LINK(sink__V84->context, SUB(sub__V88, 2)); int sub__V91_count = sub__V88_count*LINK_COUNT(sub__V91); permitUnusedInt(sub__V91_count);
-      CRSX_CHECK_SORT(sink__V84->context, sub__V91, &sort_M_Reified_xForm); /* sub__V91 = &#0-2 */
-      
-      NamedPropertyLink namedP__V92 = LINK_NamedPropertyLink(sink__V84->context, NAMED_PROPERTIES(term__V85));
-      VariablePropertyLink varP__V93 = LINK_VariablePropertyLink(sink__V84->context, VARIABLE_PROPERTIES(term__V85));
-      Hashset namedFV__V94 = LINK_VARIABLESET(sink__V84->context, asConstruction(term__V85)->properties->namedFreeVars);
-      Hashset varFV__V95 = LINK_VARIABLESET(sink__V84->context, asConstruction(term__V85)->properties->variableFreeVars);
-      UNLINK(sink__V84->context, term__V85);
-      ADD_PROPERTIES(sink__V84, LINK_VARIABLESET(sink__V84->context, namedFV__V94), LINK_VARIABLESET(sink__V84->context, varFV__V95), LINK_NamedPropertyLink(sink__V84->context, namedP__V92), LINK_VariablePropertyLink(sink__V84->context, varP__V93));
-      { START(sink__V84, _M_H_Form_s6);
-        COPY(sink__V84, sub__V89);COPY(sink__V84, sub__V90);COPY(sink__V84, sub__V91);END(sink__V84, _M_H_Form_s6); }
-      UNLINK_VARIABLESET(sink__V84->context, namedFV__V94); UNLINK_VARIABLESET(sink__V84->context, varFV__V95);
-      UNLINK_NamedPropertyLink(sink__V84->context, namedP__V92); UNLINK_VariablePropertyLink(sink__V84->context, varP__V93);
-      
-      return 1;
-    break; } case Data_M_SORT_ALLOWS_VARIABLES: { /* Function HEADER-H-Form-2$H-Form$SORT-ALLOWS-VARIABLES case SORT-ALLOWS-VARIABLES */
-      ASSERT(sink__V84->context, !strcmp(SYMBOL(term__V85),  "H-Form" ));
-      Term sub__V96 = SUB(term__V85, 0); permitUnusedTerm(sub__V96); int sub__V96_count = term__V85_count*LINK_COUNT(sub__V96); permitUnusedInt(sub__V96_count);
-      CRSX_CHECK_SORT(sink__V84->context, sub__V96, &sort_M_Reified_xForm); ASSERT(sink__V84->context, !strcmp(SYMBOL(sub__V96),  "SORT-ALLOWS-VARIABLES" ));
-      
-      NamedPropertyLink namedP__V97 = LINK_NamedPropertyLink(sink__V84->context, NAMED_PROPERTIES(term__V85));
-      VariablePropertyLink varP__V98 = LINK_VariablePropertyLink(sink__V84->context, VARIABLE_PROPERTIES(term__V85));
-      Hashset namedFV__V99 = LINK_VARIABLESET(sink__V84->context, asConstruction(term__V85)->properties->namedFreeVars);
-      Hashset varFV__V100 = LINK_VARIABLESET(sink__V84->context, asConstruction(term__V85)->properties->variableFreeVars);
-      UNLINK(sink__V84->context, term__V85);
-      ADD_PROPERTIES(sink__V84, LINK_VARIABLESET(sink__V84->context, namedFV__V99), LINK_VARIABLESET(sink__V84->context, varFV__V100), LINK_NamedPropertyLink(sink__V84->context, namedP__V97), LINK_VariablePropertyLink(sink__V84->context, varP__V98));
-      { START(sink__V84, _M_H_Form_s5); END(sink__V84, _M_H_Form_s5); }
-      UNLINK_VARIABLESET(sink__V84->context, namedFV__V99); UNLINK_VARIABLESET(sink__V84->context, varFV__V100);
-      UNLINK_NamedPropertyLink(sink__V84->context, namedP__V97); UNLINK_VariablePropertyLink(sink__V84->context, varP__V98);
-      
-      return 1;
-    break; } case Data_M_FORM: { /* Function HEADER-H-Form-4$H-Form$FORM case FORM */
-      ASSERT(sink__V84->context, !strcmp(SYMBOL(term__V85),  "H-Form" ));
-      Term sub__V101 = SUB(term__V85, 0); permitUnusedTerm(sub__V101); int sub__V101_count = term__V85_count*LINK_COUNT(sub__V101); permitUnusedInt(sub__V101_count);
-      CRSX_CHECK_SORT(sink__V84->context, sub__V101, &sort_M_Reified_xForm); ASSERT(sink__V84->context, !strcmp(SYMBOL(sub__V101),  "FORM" ));
-      Term sub__V102 = LINK(sink__V84->context, SUB(sub__V101, 0)); int sub__V102_count = sub__V101_count*LINK_COUNT(sub__V102); permitUnusedInt(sub__V102_count);
-      /* sub__V102 = &#0-0 */
-      Term sub__V103 = LINK(sink__V84->context, SUB(sub__V101, 1)); int sub__V103_count = sub__V101_count*LINK_COUNT(sub__V103); permitUnusedInt(sub__V103_count);
-      /* sub__V103 = &#0-1 */
-      
-      NamedPropertyLink namedP__V104 = LINK_NamedPropertyLink(sink__V84->context, NAMED_PROPERTIES(term__V85));
-      VariablePropertyLink varP__V105 = LINK_VariablePropertyLink(sink__V84->context, VARIABLE_PROPERTIES(term__V85));
-      Hashset namedFV__V106 = LINK_VARIABLESET(sink__V84->context, asConstruction(term__V85)->properties->namedFreeVars);
-      Hashset varFV__V107 = LINK_VARIABLESET(sink__V84->context, asConstruction(term__V85)->properties->variableFreeVars);
-      UNLINK(sink__V84->context, term__V85);
-      ADD_PROPERTIES(sink__V84, LINK_VARIABLESET(sink__V84->context, namedFV__V106), LINK_VARIABLESET(sink__V84->context, varFV__V107), LINK_NamedPropertyLink(sink__V84->context, namedP__V104), LINK_VariablePropertyLink(sink__V84->context, varP__V105));
-      { START(sink__V84, _M_H_Form_s2);
-        COPY(sink__V84, sub__V103);COPY(sink__V84, sub__V102);END(sink__V84, _M_H_Form_s2); }
-      UNLINK_VARIABLESET(sink__V84->context, namedFV__V106); UNLINK_VARIABLESET(sink__V84->context, varFV__V107);
-      UNLINK_NamedPropertyLink(sink__V84->context, namedP__V104); UNLINK_VariablePropertyLink(sink__V84->context, varP__V105);
-      
-      return 1;
-    } default: break;
-  }
-  return 0;
-}
-
 /* FUNCTION ComputeHeader. */
 int conBindOffs_M_ComputeHeader[] = {0 , 0};
 char *nameFun_M_ComputeHeader(Term term) { return  "ComputeHeader" ; }
 struct _ConstructionDescriptor descriptor_M_ComputeHeader = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_ComputeHeader), conBindOffs_M_ComputeHeader, &nameFun_M_ComputeHeader, &step_M_ComputeHeader};
 
-int step_M_ComputeHeader(Sink sink__V108, Term term__V109)
+int step_M_ComputeHeader(Sink sink__V1, Term term__V2)
 {
-  int term__V109_count = LINK_COUNT(term__V109); permitUnusedInt(term__V109_count);
-  Term sub__V110 = FORCE(sink__V108->context, SUB(term__V109, 0));
-  EnumOf_M_Reify_xCRSX choice__V111 = (IS_VARIABLE_USE(sub__V110) ? VarOf_M_Reify_xCRSX : (EnumOf_M_Reify_xCRSX) TAG(sub__V110));
-  switch (choice__V111)
+  int term__V2_count = LINK_COUNT(term__V2); permitUnusedInt(term__V2_count);
+  Term sub__V3 = FORCE(sink__V1->context, SUB(term__V2, 0));
+  EnumOf_M_Reify_xCRSX choice__V4 = (IS_VARIABLE_USE(sub__V3) ? VarOf_M_Reify_xCRSX : (EnumOf_M_Reify_xCRSX) TAG(sub__V3));
+  switch (choice__V4)
   {
     case Data_M_CRSX: { /* Function HEADER-ComputeHeader-1$ComputeHeader$CRSX case CRSX */
-      ASSERT(sink__V108->context, !strcmp(SYMBOL(term__V109),  "ComputeHeader" ));
-      Term sub__V112 = SUB(term__V109, 0); permitUnusedTerm(sub__V112); int sub__V112_count = term__V109_count*LINK_COUNT(sub__V112); permitUnusedInt(sub__V112_count);
-      CRSX_CHECK_SORT(sink__V108->context, sub__V112, &sort_M_Reify_xCRSX); ASSERT(sink__V108->context, !strcmp(SYMBOL(sub__V112),  "CRSX" ));
-      Term sub__V113 = LINK(sink__V108->context, SUB(sub__V112, 0)); int sub__V113_count = sub__V112_count*LINK_COUNT(sub__V113); permitUnusedInt(sub__V113_count);
-      /* sub__V113 = &#0-0 */
-      Term sub__V114 = LINK(sink__V108->context, SUB(sub__V112, 1)); int sub__V114_count = sub__V112_count*LINK_COUNT(sub__V114); permitUnusedInt(sub__V114_count);
-      /* sub__V114 = &#0-1 */
+      ASSERT(sink__V1->context, !strcmp(SYMBOL(term__V2),  "ComputeHeader" ));
+      Term sub__V5 = SUB(term__V2, 0); permitUnusedTerm(sub__V5); int sub__V5_count = term__V2_count*LINK_COUNT(sub__V5); permitUnusedInt(sub__V5_count);
+      CRSX_CHECK_SORT(sink__V1->context, sub__V5, &sort_M_Reify_xCRSX); ASSERT(sink__V1->context, !strcmp(SYMBOL(sub__V5),  "CRSX" ));
+      Term sub__V6 = LINK(sink__V1->context, SUB(sub__V5, 0)); int sub__V6_count = sub__V5_count*LINK_COUNT(sub__V6); permitUnusedInt(sub__V6_count);
+      /* sub__V6 = &#0-0 */
+      Term sub__V7 = LINK(sink__V1->context, SUB(sub__V5, 1)); int sub__V7_count = sub__V5_count*LINK_COUNT(sub__V7); permitUnusedInt(sub__V7_count);
+      /* sub__V7 = &#0-1 */
       
-      NamedPropertyLink namedP__V115 = LINK_NamedPropertyLink(sink__V108->context, NAMED_PROPERTIES(term__V109));
-      VariablePropertyLink varP__V116 = LINK_VariablePropertyLink(sink__V108->context, VARIABLE_PROPERTIES(term__V109));
-      Hashset namedFV__V117 = LINK_VARIABLESET(sink__V108->context, asConstruction(term__V109)->properties->namedFreeVars);
-      Hashset varFV__V118 = LINK_VARIABLESET(sink__V108->context, asConstruction(term__V109)->properties->variableFreeVars);
-      UNLINK(sink__V108->context, term__V109);
-      ADD_PROPERTIES(sink__V108, LINK_VARIABLESET(sink__V108->context, namedFV__V117), LINK_VARIABLESET(sink__V108->context, varFV__V118), LINK_NamedPropertyLink(sink__V108->context, namedP__V115), LINK_VariablePropertyLink(sink__V108->context, varP__V116));
-      { START(sink__V108, _M_ComputeHeader_s1);
-        COPY(sink__V108, sub__V113);COPY(sink__V108, sub__V114);END(sink__V108, _M_ComputeHeader_s1); }
-      UNLINK_VARIABLESET(sink__V108->context, namedFV__V117); UNLINK_VARIABLESET(sink__V108->context, varFV__V118);
-      UNLINK_NamedPropertyLink(sink__V108->context, namedP__V115); UNLINK_VariablePropertyLink(sink__V108->context, varP__V116);
+      NamedPropertyLink namedP__V8 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
+      VariablePropertyLink varP__V9 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
+      Hashset namedFV__V10 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->properties->namedFreeVars);
+      Hashset varFV__V11 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->properties->variableFreeVars);
+      UNLINK(sink__V1->context, term__V2);
+      ADD_PROPERTIES(sink__V1, LINK_VARIABLESET(sink__V1->context, namedFV__V10), LINK_VARIABLESET(sink__V1->context, varFV__V11), LINK_NamedPropertyLink(sink__V1->context, namedP__V8), LINK_VariablePropertyLink(sink__V1->context, varP__V9));
+      { START(sink__V1, _M_ComputeHeader_s1);
+        COPY(sink__V1, sub__V6);COPY(sink__V1, sub__V7);END(sink__V1, _M_ComputeHeader_s1); }
+      UNLINK_VARIABLESET(sink__V1->context, namedFV__V10); UNLINK_VARIABLESET(sink__V1->context, varFV__V11);
+      UNLINK_NamedPropertyLink(sink__V1->context, namedP__V8); UNLINK_VariablePropertyLink(sink__V1->context, varP__V9);
+      
+      return 1;
+    } default: break;
+  }
+  return 0;
+}
+
+/* FUNCTION H-Data. */
+int conBindOffs_M_H_Data[] = {0 , 0 , 0};
+char *nameFun_M_H_Data(Term term) { return  "H-Data" ; }
+struct _ConstructionDescriptor descriptor_M_H_Data = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_H_Data), conBindOffs_M_H_Data, &nameFun_M_H_Data, &step_M_H_Data};
+
+int step_M_H_Data(Sink sink__V12, Term term__V13)
+{
+  int term__V13_count = LINK_COUNT(term__V13); permitUnusedInt(term__V13_count);
+  Term sub__V14 = FORCE(sink__V12->context, SUB(term__V13, 0));
+  EnumOf_M_Reified_xSort choice__V15 = (IS_VARIABLE_USE(sub__V14) ? VarOf_M_Reified_xSort : (EnumOf_M_Reified_xSort) TAG(sub__V14));
+  switch (choice__V15)
+  {
+    case Data_M_SORT: { /* Function HEADER-H-Data-1$H-Data$SORT case SORT */
+      ASSERT(sink__V12->context, !strcmp(SYMBOL(term__V13),  "H-Data" ));
+      Term sub__V16 = SUB(term__V13, 0); permitUnusedTerm(sub__V16); int sub__V16_count = term__V13_count*LINK_COUNT(sub__V16); permitUnusedInt(sub__V16_count);
+      CRSX_CHECK_SORT(sink__V12->context, sub__V16, &sort_M_Reified_xSort); ASSERT(sink__V12->context, !strcmp(SYMBOL(sub__V16),  "SORT" ));
+      Term sub__V17 = LINK(sink__V12->context, SUB(sub__V16, 0)); int sub__V17_count = sub__V16_count*LINK_COUNT(sub__V17); permitUnusedInt(sub__V17_count);
+      /* sub__V17 = &#0-0 */
+      Term sub__V18 = LINK(sink__V12->context, SUB(sub__V16, 1)); int sub__V18_count = sub__V16_count*LINK_COUNT(sub__V18); permitUnusedInt(sub__V18_count);
+      /* sub__V18 = &#0-1 */
+      Term sub__V19 = LINK(sink__V12->context, SUB(term__V13, 1)); int sub__V19_count = term__V13_count*LINK_COUNT(sub__V19); permitUnusedInt(sub__V19_count);
+      /* sub__V19 = &#2 */
+      
+      NamedPropertyLink namedP__V20 = LINK_NamedPropertyLink(sink__V12->context, NAMED_PROPERTIES(term__V13));
+      VariablePropertyLink varP__V21 = LINK_VariablePropertyLink(sink__V12->context, VARIABLE_PROPERTIES(term__V13));
+      Hashset namedFV__V22 = LINK_VARIABLESET(sink__V12->context, asConstruction(term__V13)->properties->namedFreeVars);
+      Hashset varFV__V23 = LINK_VARIABLESET(sink__V12->context, asConstruction(term__V13)->properties->variableFreeVars);
+      UNLINK(sink__V12->context, term__V13);
+      ADD_PROPERTIES(sink__V12, LINK_VARIABLESET(sink__V12->context, namedFV__V22), LINK_VARIABLESET(sink__V12->context, varFV__V23), LINK_NamedPropertyLink(sink__V12->context, namedP__V20), LINK_VariablePropertyLink(sink__V12->context, varP__V21));
+      { START(sink__V12, _M_H_Data_s1);
+        COPY(sink__V12, sub__V17);COPY(sink__V12, sub__V18);COPY(sink__V12, sub__V19);END(sink__V12, _M_H_Data_s1); }
+      UNLINK_VARIABLESET(sink__V12->context, namedFV__V22); UNLINK_VARIABLESET(sink__V12->context, varFV__V23);
+      UNLINK_NamedPropertyLink(sink__V12->context, namedP__V20); UNLINK_VariablePropertyLink(sink__V12->context, varP__V21);
+      
+      return 1;
+    break; } case Data_M_SORT_PROPERTY: { /* Function HEADER-H-Data-2$H-Data$SORT-PROPERTY case SORT-PROPERTY */
+      ASSERT(sink__V12->context, !strcmp(SYMBOL(term__V13),  "H-Data" ));
+      Term sub__V24 = SUB(term__V13, 0); permitUnusedTerm(sub__V24); int sub__V24_count = term__V13_count*LINK_COUNT(sub__V24); permitUnusedInt(sub__V24_count);
+      CRSX_CHECK_SORT(sink__V12->context, sub__V24, &sort_M_Reified_xSort); ASSERT(sink__V12->context, !strcmp(SYMBOL(sub__V24),  "SORT-PROPERTY" ));
+      Term sub__V25 = LINK(sink__V12->context, SUB(sub__V24, 0)); int sub__V25_count = sub__V24_count*LINK_COUNT(sub__V25); permitUnusedInt(sub__V25_count);
+      CRSX_CHECK_SORT(sink__V12->context, sub__V25, &sort_M_Reified_xSort); /* sub__V25 = &#0-0 */
+      Term sub__V26 = LINK(sink__V12->context, SUB(sub__V24, 1)); int sub__V26_count = sub__V24_count*LINK_COUNT(sub__V26); permitUnusedInt(sub__V26_count);
+      CRSX_CHECK_SORT(sink__V12->context, sub__V26, &sort_M_Reified_xSort); /* sub__V26 = &#0-1 */
+      Term sub__V27 = LINK(sink__V12->context, SUB(sub__V24, 2)); int sub__V27_count = sub__V24_count*LINK_COUNT(sub__V27); permitUnusedInt(sub__V27_count);
+      CRSX_CHECK_SORT(sink__V12->context, sub__V27, &sort_M_Reified_xSort); /* sub__V27 = &#0-2 */
+      Term sub__V28 = LINK(sink__V12->context, SUB(term__V13, 1)); int sub__V28_count = term__V13_count*LINK_COUNT(sub__V28); permitUnusedInt(sub__V28_count);
+      /* sub__V28 = &#3 */
+      
+      NamedPropertyLink namedP__V29 = LINK_NamedPropertyLink(sink__V12->context, NAMED_PROPERTIES(term__V13));
+      VariablePropertyLink varP__V30 = LINK_VariablePropertyLink(sink__V12->context, VARIABLE_PROPERTIES(term__V13));
+      Hashset namedFV__V31 = LINK_VARIABLESET(sink__V12->context, asConstruction(term__V13)->properties->namedFreeVars);
+      Hashset varFV__V32 = LINK_VARIABLESET(sink__V12->context, asConstruction(term__V13)->properties->variableFreeVars);
+      UNLINK(sink__V12->context, term__V13);
+      ADD_PROPERTIES(sink__V12, LINK_VARIABLESET(sink__V12->context, namedFV__V31), LINK_VARIABLESET(sink__V12->context, varFV__V32), LINK_NamedPropertyLink(sink__V12->context, namedP__V29), LINK_VariablePropertyLink(sink__V12->context, varP__V30));
+      { START(sink__V12, _M_H_Data_s2);
+        COPY(sink__V12, sub__V25);COPY(sink__V12, sub__V26);COPY(sink__V12, sub__V27);COPY(sink__V12, sub__V28);END(sink__V12, _M_H_Data_s2); }
+      UNLINK_VARIABLESET(sink__V12->context, namedFV__V31); UNLINK_VARIABLESET(sink__V12->context, varFV__V32);
+      UNLINK_NamedPropertyLink(sink__V12->context, namedP__V29); UNLINK_VariablePropertyLink(sink__V12->context, varP__V30);
       
       return 1;
     } default: break;
@@ -677,182 +112,102 @@ int conBindOffs_M_H_Declaration[] = {0 , 0};
 char *nameFun_M_H_Declaration(Term term) { return  "H-Declaration" ; }
 struct _ConstructionDescriptor descriptor_M_H_Declaration = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Declaration), conBindOffs_M_H_Declaration, &nameFun_M_H_Declaration, &step_M_H_Declaration};
 
-int step_M_H_Declaration(Sink sink__V119, Term term__V120)
+int step_M_H_Declaration(Sink sink__V33, Term term__V34)
 {
-  int term__V120_count = LINK_COUNT(term__V120); permitUnusedInt(term__V120_count);
-  Term sub__V121 = FORCE(sink__V119->context, SUB(term__V120, 0));
-  EnumOf_M_Reified_xDeclaration choice__V122 = (IS_VARIABLE_USE(sub__V121) ? VarOf_M_Reified_xDeclaration : (EnumOf_M_Reified_xDeclaration) TAG(sub__V121));
-  switch (choice__V122)
+  int term__V34_count = LINK_COUNT(term__V34); permitUnusedInt(term__V34_count);
+  Term sub__V35 = FORCE(sink__V33->context, SUB(term__V34, 0));
+  EnumOf_M_Reified_xDeclaration choice__V36 = (IS_VARIABLE_USE(sub__V35) ? VarOf_M_Reified_xDeclaration : (EnumOf_M_Reified_xDeclaration) TAG(sub__V35));
+  switch (choice__V36)
   {
     case Data_M_DATA: { /* Function HEADER-Data$H-Declaration$DATA case DATA */
-      ASSERT(sink__V119->context, !strcmp(SYMBOL(term__V120),  "H-Declaration" ));
-      Term sub__V123 = SUB(term__V120, 0); permitUnusedTerm(sub__V123); int sub__V123_count = term__V120_count*LINK_COUNT(sub__V123); permitUnusedInt(sub__V123_count);
-      CRSX_CHECK_SORT(sink__V119->context, sub__V123, &sort_M_Reified_xDeclaration); ASSERT(sink__V119->context, !strcmp(SYMBOL(sub__V123),  "DATA" ));
-      Term sub__V124 = LINK(sink__V119->context, SUB(sub__V123, 0)); int sub__V124_count = sub__V123_count*LINK_COUNT(sub__V124); permitUnusedInt(sub__V124_count);
-      CRSX_CHECK_SORT(sink__V119->context, sub__V124, &sort_M_Reified_xSort); /* sub__V124 = &#0-0 */
-      Term sub__V125 = LINK(sink__V119->context, SUB(sub__V123, 1)); int sub__V125_count = sub__V123_count*LINK_COUNT(sub__V125); permitUnusedInt(sub__V125_count);
-      /* sub__V125 = &#0-1 */
+      ASSERT(sink__V33->context, !strcmp(SYMBOL(term__V34),  "H-Declaration" ));
+      Term sub__V37 = SUB(term__V34, 0); permitUnusedTerm(sub__V37); int sub__V37_count = term__V34_count*LINK_COUNT(sub__V37); permitUnusedInt(sub__V37_count);
+      CRSX_CHECK_SORT(sink__V33->context, sub__V37, &sort_M_Reified_xDeclaration); ASSERT(sink__V33->context, !strcmp(SYMBOL(sub__V37),  "DATA" ));
+      Term sub__V38 = LINK(sink__V33->context, SUB(sub__V37, 0)); int sub__V38_count = sub__V37_count*LINK_COUNT(sub__V38); permitUnusedInt(sub__V38_count);
+      CRSX_CHECK_SORT(sink__V33->context, sub__V38, &sort_M_Reified_xSort); /* sub__V38 = &#0-0 */
+      Term sub__V39 = LINK(sink__V33->context, SUB(sub__V37, 1)); int sub__V39_count = sub__V37_count*LINK_COUNT(sub__V39); permitUnusedInt(sub__V39_count);
+      /* sub__V39 = &#0-1 */
       
-      NamedPropertyLink namedP__V126 = LINK_NamedPropertyLink(sink__V119->context, NAMED_PROPERTIES(term__V120));
-      VariablePropertyLink varP__V127 = LINK_VariablePropertyLink(sink__V119->context, VARIABLE_PROPERTIES(term__V120));
-      Hashset namedFV__V128 = LINK_VARIABLESET(sink__V119->context, asConstruction(term__V120)->properties->namedFreeVars);
-      Hashset varFV__V129 = LINK_VARIABLESET(sink__V119->context, asConstruction(term__V120)->properties->variableFreeVars);
-      UNLINK(sink__V119->context, term__V120);
-      ADD_PROPERTIES(sink__V119, LINK_VARIABLESET(sink__V119->context, namedFV__V128), LINK_VARIABLESET(sink__V119->context, varFV__V129), LINK_NamedPropertyLink(sink__V119->context, namedP__V126), LINK_VariablePropertyLink(sink__V119->context, varP__V127));
-      { START(sink__V119, _M_H_Declaration_s1);
-        COPY(sink__V119, sub__V124);COPY(sink__V119, sub__V125);END(sink__V119, _M_H_Declaration_s1); }
-      UNLINK_VARIABLESET(sink__V119->context, namedFV__V128); UNLINK_VARIABLESET(sink__V119->context, varFV__V129);
-      UNLINK_NamedPropertyLink(sink__V119->context, namedP__V126); UNLINK_VariablePropertyLink(sink__V119->context, varP__V127);
+      NamedPropertyLink namedP__V40 = LINK_NamedPropertyLink(sink__V33->context, NAMED_PROPERTIES(term__V34));
+      VariablePropertyLink varP__V41 = LINK_VariablePropertyLink(sink__V33->context, VARIABLE_PROPERTIES(term__V34));
+      Hashset namedFV__V42 = LINK_VARIABLESET(sink__V33->context, asConstruction(term__V34)->properties->namedFreeVars);
+      Hashset varFV__V43 = LINK_VARIABLESET(sink__V33->context, asConstruction(term__V34)->properties->variableFreeVars);
+      UNLINK(sink__V33->context, term__V34);
+      ADD_PROPERTIES(sink__V33, LINK_VARIABLESET(sink__V33->context, namedFV__V42), LINK_VARIABLESET(sink__V33->context, varFV__V43), LINK_NamedPropertyLink(sink__V33->context, namedP__V40), LINK_VariablePropertyLink(sink__V33->context, varP__V41));
+      { START(sink__V33, _M_H_Declaration_s1);
+        COPY(sink__V33, sub__V38);COPY(sink__V33, sub__V39);END(sink__V33, _M_H_Declaration_s1); }
+      UNLINK_VARIABLESET(sink__V33->context, namedFV__V42); UNLINK_VARIABLESET(sink__V33->context, varFV__V43);
+      UNLINK_NamedPropertyLink(sink__V33->context, namedP__V40); UNLINK_VariablePropertyLink(sink__V33->context, varP__V41);
       
       return 1;
     break; } case Data_M_FUNCTION: { /* Function HEADER-Function$H-Declaration$FUNCTION case FUNCTION */
-      ASSERT(sink__V119->context, !strcmp(SYMBOL(term__V120),  "H-Declaration" ));
-      Term sub__V130 = SUB(term__V120, 0); permitUnusedTerm(sub__V130); int sub__V130_count = term__V120_count*LINK_COUNT(sub__V130); permitUnusedInt(sub__V130_count);
-      CRSX_CHECK_SORT(sink__V119->context, sub__V130, &sort_M_Reified_xDeclaration); ASSERT(sink__V119->context, !strcmp(SYMBOL(sub__V130),  "FUNCTION" ));
-      Term sub__V131 = LINK(sink__V119->context, SUB(sub__V130, 0)); int sub__V131_count = sub__V130_count*LINK_COUNT(sub__V131); permitUnusedInt(sub__V131_count);
-      /* sub__V131 = &#0-0 */
-      Term sub__V132 = LINK(sink__V119->context, SUB(sub__V130, 1)); int sub__V132_count = sub__V130_count*LINK_COUNT(sub__V132); permitUnusedInt(sub__V132_count);
-      /* sub__V132 = &#0-1 */
-      Term sub__V133 = LINK(sink__V119->context, SUB(sub__V130, 2)); int sub__V133_count = sub__V130_count*LINK_COUNT(sub__V133); permitUnusedInt(sub__V133_count);
-      /* sub__V133 = &#0-2 */
-      Term sub__V134 = LINK(sink__V119->context, SUB(sub__V130, 3)); int sub__V134_count = sub__V130_count*LINK_COUNT(sub__V134); permitUnusedInt(sub__V134_count);
-      /* sub__V134 = &#0-3 */
-      Term sub__V135 = LINK(sink__V119->context, SUB(sub__V130, 4)); int sub__V135_count = sub__V130_count*LINK_COUNT(sub__V135); permitUnusedInt(sub__V135_count);
-      /* sub__V135 = &#0-4 */
-      Term sub__V136 = LINK(sink__V119->context, SUB(sub__V130, 5)); int sub__V136_count = sub__V130_count*LINK_COUNT(sub__V136); permitUnusedInt(sub__V136_count);
-      CRSX_CHECK_SORT(sink__V119->context, sub__V136, &sort_M_Reified_xSort); /* sub__V136 = &#0-5 */
-      Term sub__V137 = LINK(sink__V119->context, SUB(sub__V130, 6)); int sub__V137_count = sub__V130_count*LINK_COUNT(sub__V137); permitUnusedInt(sub__V137_count);
-      /* sub__V137 = &#0-6 */
+      ASSERT(sink__V33->context, !strcmp(SYMBOL(term__V34),  "H-Declaration" ));
+      Term sub__V44 = SUB(term__V34, 0); permitUnusedTerm(sub__V44); int sub__V44_count = term__V34_count*LINK_COUNT(sub__V44); permitUnusedInt(sub__V44_count);
+      CRSX_CHECK_SORT(sink__V33->context, sub__V44, &sort_M_Reified_xDeclaration); ASSERT(sink__V33->context, !strcmp(SYMBOL(sub__V44),  "FUNCTION" ));
+      Term sub__V45 = LINK(sink__V33->context, SUB(sub__V44, 0)); int sub__V45_count = sub__V44_count*LINK_COUNT(sub__V45); permitUnusedInt(sub__V45_count);
+      /* sub__V45 = &#0-0 */
+      Term sub__V46 = LINK(sink__V33->context, SUB(sub__V44, 1)); int sub__V46_count = sub__V44_count*LINK_COUNT(sub__V46); permitUnusedInt(sub__V46_count);
+      /* sub__V46 = &#0-1 */
+      Term sub__V47 = LINK(sink__V33->context, SUB(sub__V44, 2)); int sub__V47_count = sub__V44_count*LINK_COUNT(sub__V47); permitUnusedInt(sub__V47_count);
+      /* sub__V47 = &#0-2 */
+      Term sub__V48 = LINK(sink__V33->context, SUB(sub__V44, 3)); int sub__V48_count = sub__V44_count*LINK_COUNT(sub__V48); permitUnusedInt(sub__V48_count);
+      /* sub__V48 = &#0-3 */
+      Term sub__V49 = LINK(sink__V33->context, SUB(sub__V44, 4)); int sub__V49_count = sub__V44_count*LINK_COUNT(sub__V49); permitUnusedInt(sub__V49_count);
+      /* sub__V49 = &#0-4 */
+      Term sub__V50 = LINK(sink__V33->context, SUB(sub__V44, 5)); int sub__V50_count = sub__V44_count*LINK_COUNT(sub__V50); permitUnusedInt(sub__V50_count);
+      CRSX_CHECK_SORT(sink__V33->context, sub__V50, &sort_M_Reified_xSort); /* sub__V50 = &#0-5 */
+      Term sub__V51 = LINK(sink__V33->context, SUB(sub__V44, 6)); int sub__V51_count = sub__V44_count*LINK_COUNT(sub__V51); permitUnusedInt(sub__V51_count);
+      /* sub__V51 = &#0-6 */
       
-      NamedPropertyLink namedP__V138 = LINK_NamedPropertyLink(sink__V119->context, NAMED_PROPERTIES(term__V120));
-      VariablePropertyLink varP__V139 = LINK_VariablePropertyLink(sink__V119->context, VARIABLE_PROPERTIES(term__V120));
-      Hashset namedFV__V140 = LINK_VARIABLESET(sink__V119->context, asConstruction(term__V120)->properties->namedFreeVars);
-      Hashset varFV__V141 = LINK_VARIABLESET(sink__V119->context, asConstruction(term__V120)->properties->variableFreeVars);
-      UNLINK(sink__V119->context, term__V120);
-      ADD_PROPERTIES(sink__V119, LINK_VARIABLESET(sink__V119->context, namedFV__V140), LINK_VARIABLESET(sink__V119->context, varFV__V141), LINK_NamedPropertyLink(sink__V119->context, namedP__V138), LINK_VariablePropertyLink(sink__V119->context, varP__V139));
-      { START(sink__V119, _M_H_Declaration_s2);
-        COPY(sink__V119, sub__V131);COPY(sink__V119, sub__V132);COPY(sink__V119, sub__V133);COPY(sink__V119, sub__V134);COPY(sink__V119, sub__V135);COPY(sink__V119, sub__V136);COPY(sink__V119, sub__V137);END(sink__V119, _M_H_Declaration_s2); }
-      UNLINK_VARIABLESET(sink__V119->context, namedFV__V140); UNLINK_VARIABLESET(sink__V119->context, varFV__V141);
-      UNLINK_NamedPropertyLink(sink__V119->context, namedP__V138); UNLINK_VariablePropertyLink(sink__V119->context, varP__V139);
+      NamedPropertyLink namedP__V52 = LINK_NamedPropertyLink(sink__V33->context, NAMED_PROPERTIES(term__V34));
+      VariablePropertyLink varP__V53 = LINK_VariablePropertyLink(sink__V33->context, VARIABLE_PROPERTIES(term__V34));
+      Hashset namedFV__V54 = LINK_VARIABLESET(sink__V33->context, asConstruction(term__V34)->properties->namedFreeVars);
+      Hashset varFV__V55 = LINK_VARIABLESET(sink__V33->context, asConstruction(term__V34)->properties->variableFreeVars);
+      UNLINK(sink__V33->context, term__V34);
+      ADD_PROPERTIES(sink__V33, LINK_VARIABLESET(sink__V33->context, namedFV__V54), LINK_VARIABLESET(sink__V33->context, varFV__V55), LINK_NamedPropertyLink(sink__V33->context, namedP__V52), LINK_VariablePropertyLink(sink__V33->context, varP__V53));
+      { START(sink__V33, _M_H_Declaration_s2);
+        COPY(sink__V33, sub__V45);COPY(sink__V33, sub__V46);COPY(sink__V33, sub__V47);COPY(sink__V33, sub__V48);COPY(sink__V33, sub__V49);COPY(sink__V33, sub__V50);COPY(sink__V33, sub__V51);END(sink__V33, _M_H_Declaration_s2); }
+      UNLINK_VARIABLESET(sink__V33->context, namedFV__V54); UNLINK_VARIABLESET(sink__V33->context, varFV__V55);
+      UNLINK_NamedPropertyLink(sink__V33->context, namedP__V52); UNLINK_VariablePropertyLink(sink__V33->context, varP__V53);
       
       return 1;
     break; } case Data_M_POLYMORPHIC: { /* Function HEADER-Polymorphic$H-Declaration$POLYMORPHIC case POLYMORPHIC */
-      ASSERT(sink__V119->context, !strcmp(SYMBOL(term__V120),  "H-Declaration" ));
-      Term sub__V142 = SUB(term__V120, 0); permitUnusedTerm(sub__V142); int sub__V142_count = term__V120_count*LINK_COUNT(sub__V142); permitUnusedInt(sub__V142_count);
-      CRSX_CHECK_SORT(sink__V119->context, sub__V142, &sort_M_Reified_xDeclaration); ASSERT(sink__V119->context, !strcmp(SYMBOL(sub__V142),  "POLYMORPHIC" ));
-      Variable y__V143 = BINDER(sub__V142,0,0); if (sub__V142_count <= 1) UNBIND(y__V143);
-      Term sub__V144 = LINK(sink__V119->context, SUB(sub__V142, 0)); int sub__V144_count = sub__V142_count*LINK_COUNT(sub__V144); permitUnusedInt(sub__V144_count);
-      CRSX_CHECK_SORT(sink__V119->context, sub__V144, &sort_M_Reified_xDeclaration); /* sub__V144 = &#0-0 */
+      ASSERT(sink__V33->context, !strcmp(SYMBOL(term__V34),  "H-Declaration" ));
+      Term sub__V56 = SUB(term__V34, 0); permitUnusedTerm(sub__V56); int sub__V56_count = term__V34_count*LINK_COUNT(sub__V56); permitUnusedInt(sub__V56_count);
+      CRSX_CHECK_SORT(sink__V33->context, sub__V56, &sort_M_Reified_xDeclaration); ASSERT(sink__V33->context, !strcmp(SYMBOL(sub__V56),  "POLYMORPHIC" ));
+      Variable y__V57 = BINDER(sub__V56,0,0); if (sub__V56_count <= 1) UNBIND(y__V57);
+      Term sub__V58 = LINK(sink__V33->context, SUB(sub__V56, 0)); int sub__V58_count = sub__V56_count*LINK_COUNT(sub__V58); permitUnusedInt(sub__V58_count);
+      CRSX_CHECK_SORT(sink__V33->context, sub__V58, &sort_M_Reified_xDeclaration); /* sub__V58 = &#0-0 */
       
-      NamedPropertyLink namedP__V145 = LINK_NamedPropertyLink(sink__V119->context, NAMED_PROPERTIES(term__V120));
-      VariablePropertyLink varP__V146 = LINK_VariablePropertyLink(sink__V119->context, VARIABLE_PROPERTIES(term__V120));
-      Hashset namedFV__V147 = LINK_VARIABLESET(sink__V119->context, asConstruction(term__V120)->properties->namedFreeVars);
-      Hashset varFV__V148 = LINK_VARIABLESET(sink__V119->context, asConstruction(term__V120)->properties->variableFreeVars);
-      UNLINK(sink__V119->context, term__V120);
-      ADD_PROPERTIES(sink__V119, LINK_VARIABLESET(sink__V119->context, namedFV__V147), LINK_VARIABLESET(sink__V119->context, varFV__V148), LINK_NamedPropertyLink(sink__V119->context, namedP__V145), LINK_VariablePropertyLink(sink__V119->context, varP__V146));
-      { START(sink__V119, _M_H_Declaration_s3);
-        { if (!IS_BOUND(y__V143)) { REBIND(y__V143);
-            Variable binds__V149[1] = {y__V143}; BINDS(sink__V119, 1, binds__V149);
-            COPY(sink__V119, sub__V144); /* REUSED SUBSTITUTION */  }
-          else { Variable b__V150 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V119->context,"b__V150");
-            Variable binds__V151[1] = {b__V150}; BINDS(sink__V119, 1, binds__V151);
+      NamedPropertyLink namedP__V59 = LINK_NamedPropertyLink(sink__V33->context, NAMED_PROPERTIES(term__V34));
+      VariablePropertyLink varP__V60 = LINK_VariablePropertyLink(sink__V33->context, VARIABLE_PROPERTIES(term__V34));
+      Hashset namedFV__V61 = LINK_VARIABLESET(sink__V33->context, asConstruction(term__V34)->properties->namedFreeVars);
+      Hashset varFV__V62 = LINK_VARIABLESET(sink__V33->context, asConstruction(term__V34)->properties->variableFreeVars);
+      UNLINK(sink__V33->context, term__V34);
+      ADD_PROPERTIES(sink__V33, LINK_VARIABLESET(sink__V33->context, namedFV__V61), LINK_VARIABLESET(sink__V33->context, varFV__V62), LINK_NamedPropertyLink(sink__V33->context, namedP__V59), LINK_VariablePropertyLink(sink__V33->context, varP__V60));
+      { START(sink__V33, _M_H_Declaration_s3);
+        { if (!IS_BOUND(y__V57)) { REBIND(y__V57);
+            Variable binds__V63[1] = {y__V57}; BINDS(sink__V33, 1, binds__V63);
+            COPY(sink__V33, sub__V58); /* REUSED SUBSTITUTION */  }
+          else { Variable b__V64 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V33->context,"b__V64");
+            Variable binds__V65[1] = {b__V64}; BINDS(sink__V33, 1, binds__V65);
             {
-              Term arg__V152;
-              { Sink buf__V153 = ALLOCA_BUFFER(sink__V119->context);
-                USE(buf__V153, b__V150); arg__V152 = BUFFER_TERM(buf__V153); FREE_BUFFER(buf__V153); }
-              Variable vars__V154[1] = {y__V143};
-              Term args__V155[1] = {arg__V152};
-              struct _SubstitutionFrame substitution__V156 = {NULL, 0, 1, vars__V154, args__V155, NULL};
-              SUBSTITUTE(sink__V119, sub__V144, &substitution__V156); }
+              Term arg__V66;
+              { Sink buf__V67 = ALLOCA_BUFFER(sink__V33->context);
+                USE(buf__V67, b__V64); arg__V66 = BUFFER_TERM(buf__V67); FREE_BUFFER(buf__V67); }
+              Variable vars__V68[1] = {y__V57};
+              Term args__V69[1] = {arg__V66};
+              struct _SubstitutionFrame substitution__V70 = {NULL, 0, 1, vars__V68, args__V69, NULL};
+              SUBSTITUTE(sink__V33, sub__V58, &substitution__V70); }
                 }
            }
-        END(sink__V119, _M_H_Declaration_s3); }
-      UNLINK_VARIABLESET(sink__V119->context, namedFV__V147); UNLINK_VARIABLESET(sink__V119->context, varFV__V148);
-      UNLINK_NamedPropertyLink(sink__V119->context, namedP__V145); UNLINK_VariablePropertyLink(sink__V119->context, varP__V146);
+        END(sink__V33, _M_H_Declaration_s3); }
+      UNLINK_VARIABLESET(sink__V33->context, namedFV__V61); UNLINK_VARIABLESET(sink__V33->context, varFV__V62);
+      UNLINK_NamedPropertyLink(sink__V33->context, namedP__V59); UNLINK_VariablePropertyLink(sink__V33->context, varP__V60);
       
       return 1;
     } default: break;
   }
-  return 0;
-}
-
-/* FUNCTION H-Declarations. */
-int conBindOffs_M_H_Declarations[] = {0 , 0};
-char *nameFun_M_H_Declarations(Term term) { return  "H-Declarations" ; }
-struct _ConstructionDescriptor descriptor_M_H_Declarations = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Declarations), conBindOffs_M_H_Declarations, &nameFun_M_H_Declarations, &step_M_H_Declarations};
-
-int step_M_H_Declarations(Sink sink__V157, Term term__V158)
-{
-  int term__V158_count = LINK_COUNT(term__V158); permitUnusedInt(term__V158_count);
-  Term sub__V159 = FORCE(sink__V157->context, SUB(term__V158, 0));
-  EnumOf_M__sList choice__V160 = (IS_VARIABLE_USE(sub__V159) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V159));
-  switch (choice__V160)
-  {
-    case Data_M__sCons: { /* Function HEADER-H-Declarations-1$H-Declarations$$Cons case $Cons */
-      ASSERT(sink__V157->context, !strcmp(SYMBOL(term__V158),  "H-Declarations" ));
-      Term sub__V161 = SUB(term__V158, 0); permitUnusedTerm(sub__V161); int sub__V161_count = term__V158_count*LINK_COUNT(sub__V161); permitUnusedInt(sub__V161_count);
-      ASSERT(sink__V157->context, !strcmp(SYMBOL(sub__V161),  "$Cons" ));
-      Term sub__V162 = LINK(sink__V157->context, SUB(sub__V161, 0)); int sub__V162_count = sub__V161_count*LINK_COUNT(sub__V162); permitUnusedInt(sub__V162_count);
-      /* sub__V162 = &#0-0 */
-      Term sub__V163 = LINK(sink__V157->context, SUB(sub__V161, 1)); int sub__V163_count = sub__V161_count*LINK_COUNT(sub__V163); permitUnusedInt(sub__V163_count);
-      /* sub__V163 = &#0-1 */
-      
-      NamedPropertyLink namedP__V164 = LINK_NamedPropertyLink(sink__V157->context, NAMED_PROPERTIES(term__V158));
-      VariablePropertyLink varP__V165 = LINK_VariablePropertyLink(sink__V157->context, VARIABLE_PROPERTIES(term__V158));
-      Hashset namedFV__V166 = LINK_VARIABLESET(sink__V157->context, asConstruction(term__V158)->properties->namedFreeVars);
-      Hashset varFV__V167 = LINK_VARIABLESET(sink__V157->context, asConstruction(term__V158)->properties->variableFreeVars);
-      UNLINK(sink__V157->context, term__V158);
-      ADD_PROPERTIES(sink__V157, LINK_VARIABLESET(sink__V157->context, namedFV__V166), LINK_VARIABLESET(sink__V157->context, varFV__V167), LINK_NamedPropertyLink(sink__V157->context, namedP__V164), LINK_VariablePropertyLink(sink__V157->context, varP__V165));
-      { START(sink__V157, _M_H_Declarations_s1);
-        COPY(sink__V157, sub__V162);COPY(sink__V157, sub__V163);END(sink__V157, _M_H_Declarations_s1); }
-      UNLINK_VARIABLESET(sink__V157->context, namedFV__V166); UNLINK_VARIABLESET(sink__V157->context, varFV__V167);
-      UNLINK_NamedPropertyLink(sink__V157->context, namedP__V164); UNLINK_VariablePropertyLink(sink__V157->context, varP__V165);
-      
-      return 1;
-    break; } case Data_M__sNil: { /* Function HEADER-H-Declarations-2$H-Declarations$$Nil case $Nil */
-      ASSERT(sink__V157->context, !strcmp(SYMBOL(term__V158),  "H-Declarations" ));
-      Term sub__V168 = SUB(term__V158, 0); permitUnusedTerm(sub__V168); int sub__V168_count = term__V158_count*LINK_COUNT(sub__V168); permitUnusedInt(sub__V168_count);
-      ASSERT(sink__V157->context, !strcmp(SYMBOL(sub__V168),  "$Nil" ));
-      
-      NamedPropertyLink namedP__V169 = LINK_NamedPropertyLink(sink__V157->context, NAMED_PROPERTIES(term__V158));
-      VariablePropertyLink varP__V170 = LINK_VariablePropertyLink(sink__V157->context, VARIABLE_PROPERTIES(term__V158));
-      Hashset namedFV__V171 = LINK_VARIABLESET(sink__V157->context, asConstruction(term__V158)->properties->namedFreeVars);
-      Hashset varFV__V172 = LINK_VARIABLESET(sink__V157->context, asConstruction(term__V158)->properties->variableFreeVars);
-      UNLINK(sink__V157->context, term__V158);
-      ADD_PROPERTIES(sink__V157, LINK_VARIABLESET(sink__V157->context, namedFV__V171), LINK_VARIABLESET(sink__V157->context, varFV__V172), LINK_NamedPropertyLink(sink__V157->context, namedP__V169), LINK_VariablePropertyLink(sink__V157->context, varP__V170));
-      { START(sink__V157, _M_H_Declarations_s2);
-        END(sink__V157, _M_H_Declarations_s2); }
-      UNLINK_VARIABLESET(sink__V157->context, namedFV__V171); UNLINK_VARIABLESET(sink__V157->context, varFV__V172);
-      UNLINK_NamedPropertyLink(sink__V157->context, namedP__V169); UNLINK_VariablePropertyLink(sink__V157->context, varP__V170);
-      
-      return 1;
-    } default: break;
-  }
-  return 0;
-}
-
-/* FUNCTION H-Declarations$2. */
-int conBindOffs_M_H_Declarations_s2[] = {0};
-char *nameFun_M_H_Declarations_s2(Term term) { return  "H-Declarations$2" ; }
-struct _ConstructionDescriptor descriptor_M_H_Declarations_s2 = {&sort_M_Reified_xVariable, 0, 0, sizeof(STRUCT_Con_M_H_Declarations_s2), conBindOffs_M_H_Declarations_s2, &nameFun_M_H_Declarations_s2, &step_M_H_Declarations_s2};
-
-int step_M_H_Declarations_s2(Sink sink__V173, Term term__V174)
-{
-  int term__V174_count = LINK_COUNT(term__V174); permitUnusedInt(term__V174_count);
-  do {
-    /* Contraction rule HEADER-H-Declarations-2. */
-    ASSERT(sink__V173->context, !strcmp(SYMBOL(term__V174),  "H-Declarations$2" ));
-    
-    NamedPropertyLink namedP__V175 = LINK_NamedPropertyLink(sink__V173->context, NAMED_PROPERTIES(term__V174));
-    VariablePropertyLink varP__V176 = LINK_VariablePropertyLink(sink__V173->context, VARIABLE_PROPERTIES(term__V174));
-    Hashset namedFV__V177 = LINK_VARIABLESET(sink__V173->context, asConstruction(term__V174)->properties->namedFreeVars);
-    Hashset varFV__V178 = LINK_VARIABLESET(sink__V173->context, asConstruction(term__V174)->properties->variableFreeVars);
-    UNLINK(sink__V173->context, term__V174);
-    { START(sink__V173, _M__sTextNil); END(sink__V173, _M__sTextNil); }
-    UNLINK_VARIABLESET(sink__V173->context, namedFV__V177); UNLINK_VARIABLESET(sink__V173->context, varFV__V178);
-    UNLINK_NamedPropertyLink(sink__V173->context, namedP__V175); UNLINK_VariablePropertyLink(sink__V173->context, varP__V176);
-    return 1;
-  } while (0);
   return 0;
 }
 
@@ -861,105 +216,159 @@ int conBindOffs_M_H_Declarations_s1[] = {0 , 0 , 0};
 char *nameFun_M_H_Declarations_s1(Term term) { return  "H-Declarations$1" ; }
 struct _ConstructionDescriptor descriptor_M_H_Declarations_s1 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_H_Declarations_s1), conBindOffs_M_H_Declarations_s1, &nameFun_M_H_Declarations_s1, &step_M_H_Declarations_s1};
 
-int step_M_H_Declarations_s1(Sink sink__V179, Term term__V180)
+int step_M_H_Declarations_s1(Sink sink__V71, Term term__V72)
 {
-  int term__V180_count = LINK_COUNT(term__V180); permitUnusedInt(term__V180_count);
+  int term__V72_count = LINK_COUNT(term__V72); permitUnusedInt(term__V72_count);
   do {
     /* Contraction rule HEADER-H-Declarations-1. */
-    ASSERT(sink__V179->context, !strcmp(SYMBOL(term__V180),  "H-Declarations$1" ));
-    Term sub__V181 = LINK(sink__V179->context, SUB(term__V180, 0)); int sub__V181_count = term__V180_count*LINK_COUNT(sub__V181); permitUnusedInt(sub__V181_count);
-    /* sub__V181 = &#11 */
-    Term sub__V182 = LINK(sink__V179->context, SUB(term__V180, 1)); int sub__V182_count = term__V180_count*LINK_COUNT(sub__V182); permitUnusedInt(sub__V182_count);
-    /* sub__V182 = &#12 */
+    ASSERT(sink__V71->context, !strcmp(SYMBOL(term__V72),  "H-Declarations$1" ));
+    Term sub__V73 = LINK(sink__V71->context, SUB(term__V72, 0)); int sub__V73_count = term__V72_count*LINK_COUNT(sub__V73); permitUnusedInt(sub__V73_count);
+    /* sub__V73 = &#11 */
+    Term sub__V74 = LINK(sink__V71->context, SUB(term__V72, 1)); int sub__V74_count = term__V72_count*LINK_COUNT(sub__V74); permitUnusedInt(sub__V74_count);
+    /* sub__V74 = &#12 */
     
-    NamedPropertyLink namedP__V183 = LINK_NamedPropertyLink(sink__V179->context, NAMED_PROPERTIES(term__V180));
-    VariablePropertyLink varP__V184 = LINK_VariablePropertyLink(sink__V179->context, VARIABLE_PROPERTIES(term__V180));
-    Hashset namedFV__V185 = LINK_VARIABLESET(sink__V179->context, asConstruction(term__V180)->properties->namedFreeVars);
-    Hashset varFV__V186 = LINK_VARIABLESET(sink__V179->context, asConstruction(term__V180)->properties->variableFreeVars);
-    UNLINK(sink__V179->context, term__V180);
-    { START(sink__V179, _M__sTextCons);
-      { START(sink__V179, _M__sTextEmbed);
-        { START(sink__V179, _M_AsText);
-          { START(sink__V179, _M_H_Declaration);
-            COPY(sink__V179, sub__V181);END(sink__V179, _M_H_Declaration); }
-          END(sink__V179, _M_AsText); }
-        END(sink__V179, _M__sTextEmbed); }
-      { START(sink__V179, _M__sTextCons);
-        { START(sink__V179, _M__sTextEmbed);
-          { START(sink__V179, _M_AsText);
-            { START(sink__V179, _M_H_Declarations);
-              COPY(sink__V179, sub__V182);END(sink__V179, _M_H_Declarations); }
-            END(sink__V179, _M_AsText); }
-          END(sink__V179, _M__sTextEmbed); }
-        { START(sink__V179, _M__sTextNil);
-          END(sink__V179, _M__sTextNil); }
-        END(sink__V179, _M__sTextCons); }
-      END(sink__V179, _M__sTextCons); }
-    UNLINK_VARIABLESET(sink__V179->context, namedFV__V185); UNLINK_VARIABLESET(sink__V179->context, varFV__V186);
-    UNLINK_NamedPropertyLink(sink__V179->context, namedP__V183); UNLINK_VariablePropertyLink(sink__V179->context, varP__V184);
+    NamedPropertyLink namedP__V75 = LINK_NamedPropertyLink(sink__V71->context, NAMED_PROPERTIES(term__V72));
+    VariablePropertyLink varP__V76 = LINK_VariablePropertyLink(sink__V71->context, VARIABLE_PROPERTIES(term__V72));
+    Hashset namedFV__V77 = LINK_VARIABLESET(sink__V71->context, asConstruction(term__V72)->properties->namedFreeVars);
+    Hashset varFV__V78 = LINK_VARIABLESET(sink__V71->context, asConstruction(term__V72)->properties->variableFreeVars);
+    UNLINK(sink__V71->context, term__V72);
+    { START(sink__V71, _M__sTextCons);
+      { START(sink__V71, _M__sTextEmbed);
+        { START(sink__V71, _M_AsText);
+          { START(sink__V71, _M_H_Declaration);
+            COPY(sink__V71, sub__V73);END(sink__V71, _M_H_Declaration); }
+          END(sink__V71, _M_AsText); }
+        END(sink__V71, _M__sTextEmbed); }
+      { START(sink__V71, _M__sTextCons);
+        { START(sink__V71, _M__sTextEmbed);
+          { START(sink__V71, _M_AsText);
+            { START(sink__V71, _M_H_Declarations);
+              COPY(sink__V71, sub__V74);END(sink__V71, _M_H_Declarations); }
+            END(sink__V71, _M_AsText); }
+          END(sink__V71, _M__sTextEmbed); }
+        { START(sink__V71, _M__sTextNil);
+          END(sink__V71, _M__sTextNil); }
+        END(sink__V71, _M__sTextCons); }
+      END(sink__V71, _M__sTextCons); }
+    UNLINK_VARIABLESET(sink__V71->context, namedFV__V77); UNLINK_VARIABLESET(sink__V71->context, varFV__V78);
+    UNLINK_NamedPropertyLink(sink__V71->context, namedP__V75); UNLINK_VariablePropertyLink(sink__V71->context, varP__V76);
     return 1;
   } while (0);
   return 0;
 }
 
-/* FUNCTION H-Data. */
-int conBindOffs_M_H_Data[] = {0 , 0 , 0};
-char *nameFun_M_H_Data(Term term) { return  "H-Data" ; }
-struct _ConstructionDescriptor descriptor_M_H_Data = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_H_Data), conBindOffs_M_H_Data, &nameFun_M_H_Data, &step_M_H_Data};
+/* FUNCTION H-Declarations$2. */
+int conBindOffs_M_H_Declarations_s2[] = {0};
+char *nameFun_M_H_Declarations_s2(Term term) { return  "H-Declarations$2" ; }
+struct _ConstructionDescriptor descriptor_M_H_Declarations_s2 = {&sort_M_Reified_xVariable, 0, 0, sizeof(STRUCT_Con_M_H_Declarations_s2), conBindOffs_M_H_Declarations_s2, &nameFun_M_H_Declarations_s2, &step_M_H_Declarations_s2};
 
-int step_M_H_Data(Sink sink__V187, Term term__V188)
+int step_M_H_Declarations_s2(Sink sink__V79, Term term__V80)
 {
-  int term__V188_count = LINK_COUNT(term__V188); permitUnusedInt(term__V188_count);
-  Term sub__V189 = FORCE(sink__V187->context, SUB(term__V188, 0));
-  EnumOf_M_Reified_xSort choice__V190 = (IS_VARIABLE_USE(sub__V189) ? VarOf_M_Reified_xSort : (EnumOf_M_Reified_xSort) TAG(sub__V189));
-  switch (choice__V190)
+  int term__V80_count = LINK_COUNT(term__V80); permitUnusedInt(term__V80_count);
+  do {
+    /* Contraction rule HEADER-H-Declarations-2. */
+    ASSERT(sink__V79->context, !strcmp(SYMBOL(term__V80),  "H-Declarations$2" ));
+    
+    NamedPropertyLink namedP__V81 = LINK_NamedPropertyLink(sink__V79->context, NAMED_PROPERTIES(term__V80));
+    VariablePropertyLink varP__V82 = LINK_VariablePropertyLink(sink__V79->context, VARIABLE_PROPERTIES(term__V80));
+    Hashset namedFV__V83 = LINK_VARIABLESET(sink__V79->context, asConstruction(term__V80)->properties->namedFreeVars);
+    Hashset varFV__V84 = LINK_VARIABLESET(sink__V79->context, asConstruction(term__V80)->properties->variableFreeVars);
+    UNLINK(sink__V79->context, term__V80);
+    { START(sink__V79, _M__sTextNil); END(sink__V79, _M__sTextNil); } UNLINK_VARIABLESET(sink__V79->context, namedFV__V83); UNLINK_VARIABLESET(sink__V79->context, varFV__V84);
+    UNLINK_NamedPropertyLink(sink__V79->context, namedP__V81); UNLINK_VariablePropertyLink(sink__V79->context, varP__V82);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION ComputeHeader$1. */
+int conBindOffs_M_ComputeHeader_s1[] = {0 , 0 , 0};
+char *nameFun_M_ComputeHeader_s1(Term term) { return  "ComputeHeader$1" ; }
+struct _ConstructionDescriptor descriptor_M_ComputeHeader_s1 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_ComputeHeader_s1), conBindOffs_M_ComputeHeader_s1, &nameFun_M_ComputeHeader_s1, &step_M_ComputeHeader_s1};
+
+int step_M_ComputeHeader_s1(Sink sink__V85, Term term__V86)
+{
+  int term__V86_count = LINK_COUNT(term__V86); permitUnusedInt(term__V86_count);
+  do {
+    /* Contraction rule HEADER-ComputeHeader-1. */
+    ASSERT(sink__V85->context, !strcmp(SYMBOL(term__V86),  "ComputeHeader$1" ));
+    Term sub__V87 = LINK(sink__V85->context, SUB(term__V86, 0)); int sub__V87_count = term__V86_count*LINK_COUNT(sub__V87); permitUnusedInt(sub__V87_count);
+    /* sub__V87 = &#11 */
+    Term sub__V88 = LINK(sink__V85->context, SUB(term__V86, 1)); int sub__V88_count = term__V86_count*LINK_COUNT(sub__V88); permitUnusedInt(sub__V88_count);
+    /* sub__V88 = &#12 */
+    
+    NamedPropertyLink namedP__V89 = LINK_NamedPropertyLink(sink__V85->context, NAMED_PROPERTIES(term__V86));
+    VariablePropertyLink varP__V90 = LINK_VariablePropertyLink(sink__V85->context, VARIABLE_PROPERTIES(term__V86));
+    Hashset namedFV__V91 = LINK_VARIABLESET(sink__V85->context, asConstruction(term__V86)->properties->namedFreeVars);
+    Hashset varFV__V92 = LINK_VARIABLESET(sink__V85->context, asConstruction(term__V86)->properties->variableFreeVars);
+    UNLINK(sink__V85->context, term__V86);
+    { START(sink__V85, _M_ComputeHeader2);
+      COPY(sink__V85, sub__V87);COPY(sink__V85, sub__V88);{ Term term__V93;
+        { char *value__V94 = getenv( "MODULE" );
+          if (value__V94) term__V93 = makeStringLiteral(sink__V85->context, value__V94);
+          else {term__V93 = makeStringLiteral(sink__V85->context,  "" ); }
+        }
+        COPY(sink__V85, term__V93); /*CONSERVATIVE*/ }
+      END(sink__V85, _M_ComputeHeader2); }
+    UNLINK_VARIABLESET(sink__V85->context, namedFV__V91); UNLINK_VARIABLESET(sink__V85->context, varFV__V92);
+    UNLINK_NamedPropertyLink(sink__V85->context, namedP__V89); UNLINK_VariablePropertyLink(sink__V85->context, varP__V90);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Form$2. */
+int conBindOffs_M_H_Form_s2[] = {0 , 0 , 0};
+char *nameFun_M_H_Form_s2(Term term) { return  "H-Form$2" ; }
+struct _ConstructionDescriptor descriptor_M_H_Form_s2 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_H_Form_s2), conBindOffs_M_H_Form_s2, &nameFun_M_H_Form_s2, &step_M_H_Form_s2};
+
+int step_M_H_Form_s2(Sink sink__V95, Term term__V96)
+{
+  int term__V96_count = LINK_COUNT(term__V96); permitUnusedInt(term__V96_count);
+  Term sub__V97 = FORCE(sink__V95->context, SUB(term__V96, 0));
+  EnumOf_M__sList choice__V98 = (IS_VARIABLE_USE(sub__V97) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V97));
+  switch (choice__V98)
   {
-    case Data_M_SORT: { /* Function HEADER-H-Data-1$H-Data$SORT case SORT */
-      ASSERT(sink__V187->context, !strcmp(SYMBOL(term__V188),  "H-Data" ));
-      Term sub__V191 = SUB(term__V188, 0); permitUnusedTerm(sub__V191); int sub__V191_count = term__V188_count*LINK_COUNT(sub__V191); permitUnusedInt(sub__V191_count);
-      CRSX_CHECK_SORT(sink__V187->context, sub__V191, &sort_M_Reified_xSort); ASSERT(sink__V187->context, !strcmp(SYMBOL(sub__V191),  "SORT" ));
-      Term sub__V192 = LINK(sink__V187->context, SUB(sub__V191, 0)); int sub__V192_count = sub__V191_count*LINK_COUNT(sub__V192); permitUnusedInt(sub__V192_count);
-      /* sub__V192 = &#0-0 */
-      Term sub__V193 = LINK(sink__V187->context, SUB(sub__V191, 1)); int sub__V193_count = sub__V191_count*LINK_COUNT(sub__V193); permitUnusedInt(sub__V193_count);
-      /* sub__V193 = &#0-1 */
-      Term sub__V194 = LINK(sink__V187->context, SUB(term__V188, 1)); int sub__V194_count = term__V188_count*LINK_COUNT(sub__V194); permitUnusedInt(sub__V194_count);
-      /* sub__V194 = &#2 */
+    case Data_M__sNil: { /* Function HEADER-H-Form-3$H-Form$2$$Nil case $Nil */
+      ASSERT(sink__V95->context, !strcmp(SYMBOL(term__V96),  "H-Form$2" ));
+      Term sub__V99 = SUB(term__V96, 0); permitUnusedTerm(sub__V99); int sub__V99_count = term__V96_count*LINK_COUNT(sub__V99); permitUnusedInt(sub__V99_count);
+      ASSERT(sink__V95->context, !strcmp(SYMBOL(sub__V99),  "$Nil" ));
+      Term sub__V100 = LINK(sink__V95->context, SUB(term__V96, 1)); int sub__V100_count = term__V96_count*LINK_COUNT(sub__V100); permitUnusedInt(sub__V100_count);
+      /* sub__V100 = &#0 */
       
-      NamedPropertyLink namedP__V195 = LINK_NamedPropertyLink(sink__V187->context, NAMED_PROPERTIES(term__V188));
-      VariablePropertyLink varP__V196 = LINK_VariablePropertyLink(sink__V187->context, VARIABLE_PROPERTIES(term__V188));
-      Hashset namedFV__V197 = LINK_VARIABLESET(sink__V187->context, asConstruction(term__V188)->properties->namedFreeVars);
-      Hashset varFV__V198 = LINK_VARIABLESET(sink__V187->context, asConstruction(term__V188)->properties->variableFreeVars);
-      UNLINK(sink__V187->context, term__V188);
-      ADD_PROPERTIES(sink__V187, LINK_VARIABLESET(sink__V187->context, namedFV__V197), LINK_VARIABLESET(sink__V187->context, varFV__V198), LINK_NamedPropertyLink(sink__V187->context, namedP__V195), LINK_VariablePropertyLink(sink__V187->context, varP__V196));
-      { START(sink__V187, _M_H_Data_s1);
-        COPY(sink__V187, sub__V192);COPY(sink__V187, sub__V193);COPY(sink__V187, sub__V194);END(sink__V187, _M_H_Data_s1); }
-      UNLINK_VARIABLESET(sink__V187->context, namedFV__V197); UNLINK_VARIABLESET(sink__V187->context, varFV__V198);
-      UNLINK_NamedPropertyLink(sink__V187->context, namedP__V195); UNLINK_VariablePropertyLink(sink__V187->context, varP__V196);
+      NamedPropertyLink namedP__V101 = LINK_NamedPropertyLink(sink__V95->context, NAMED_PROPERTIES(term__V96));
+      VariablePropertyLink varP__V102 = LINK_VariablePropertyLink(sink__V95->context, VARIABLE_PROPERTIES(term__V96));
+      Hashset namedFV__V103 = LINK_VARIABLESET(sink__V95->context, asConstruction(term__V96)->properties->namedFreeVars);
+      Hashset varFV__V104 = LINK_VARIABLESET(sink__V95->context, asConstruction(term__V96)->properties->variableFreeVars);
+      UNLINK(sink__V95->context, term__V96);
+      ADD_PROPERTIES(sink__V95, LINK_VARIABLESET(sink__V95->context, namedFV__V103), LINK_VARIABLESET(sink__V95->context, varFV__V104), LINK_NamedPropertyLink(sink__V95->context, namedP__V101), LINK_VariablePropertyLink(sink__V95->context, varP__V102));
+      { START(sink__V95, _M_H_Form_s4);
+        COPY(sink__V95, sub__V100);END(sink__V95, _M_H_Form_s4); }
+      UNLINK_VARIABLESET(sink__V95->context, namedFV__V103); UNLINK_VARIABLESET(sink__V95->context, varFV__V104);
+      UNLINK_NamedPropertyLink(sink__V95->context, namedP__V101); UNLINK_VariablePropertyLink(sink__V95->context, varP__V102);
       
       return 1;
-    break; } case Data_M_SORT_PROPERTY: { /* Function HEADER-H-Data-2$H-Data$SORT-PROPERTY case SORT-PROPERTY */
-      ASSERT(sink__V187->context, !strcmp(SYMBOL(term__V188),  "H-Data" ));
-      Term sub__V199 = SUB(term__V188, 0); permitUnusedTerm(sub__V199); int sub__V199_count = term__V188_count*LINK_COUNT(sub__V199); permitUnusedInt(sub__V199_count);
-      CRSX_CHECK_SORT(sink__V187->context, sub__V199, &sort_M_Reified_xSort); ASSERT(sink__V187->context, !strcmp(SYMBOL(sub__V199),  "SORT-PROPERTY" ));
-      Term sub__V200 = LINK(sink__V187->context, SUB(sub__V199, 0)); int sub__V200_count = sub__V199_count*LINK_COUNT(sub__V200); permitUnusedInt(sub__V200_count);
-      CRSX_CHECK_SORT(sink__V187->context, sub__V200, &sort_M_Reified_xSort); /* sub__V200 = &#0-0 */
-      Term sub__V201 = LINK(sink__V187->context, SUB(sub__V199, 1)); int sub__V201_count = sub__V199_count*LINK_COUNT(sub__V201); permitUnusedInt(sub__V201_count);
-      CRSX_CHECK_SORT(sink__V187->context, sub__V201, &sort_M_Reified_xSort); /* sub__V201 = &#0-1 */
-      Term sub__V202 = LINK(sink__V187->context, SUB(sub__V199, 2)); int sub__V202_count = sub__V199_count*LINK_COUNT(sub__V202); permitUnusedInt(sub__V202_count);
-      CRSX_CHECK_SORT(sink__V187->context, sub__V202, &sort_M_Reified_xSort); /* sub__V202 = &#0-2 */
-      Term sub__V203 = LINK(sink__V187->context, SUB(term__V188, 1)); int sub__V203_count = term__V188_count*LINK_COUNT(sub__V203); permitUnusedInt(sub__V203_count);
-      /* sub__V203 = &#3 */
+    break; } case Data_M__sCons: { /* Function HEADER-H-Form-4$H-Form$2$$Cons case $Cons */
+      ASSERT(sink__V95->context, !strcmp(SYMBOL(term__V96),  "H-Form$2" ));
+      Term sub__V105 = SUB(term__V96, 0); permitUnusedTerm(sub__V105); int sub__V105_count = term__V96_count*LINK_COUNT(sub__V105); permitUnusedInt(sub__V105_count);
+      ASSERT(sink__V95->context, !strcmp(SYMBOL(sub__V105),  "$Cons" ));
+      Term sub__V106 = LINK(sink__V95->context, SUB(sub__V105, 0)); int sub__V106_count = sub__V105_count*LINK_COUNT(sub__V106); permitUnusedInt(sub__V106_count);
+      /* sub__V106 = &#0-0 */
+      Term sub__V107 = LINK(sink__V95->context, SUB(sub__V105, 1)); int sub__V107_count = sub__V105_count*LINK_COUNT(sub__V107); permitUnusedInt(sub__V107_count);
+      /* sub__V107 = &#0-1 */
+      Term sub__V108 = LINK(sink__V95->context, SUB(term__V96, 1)); int sub__V108_count = term__V96_count*LINK_COUNT(sub__V108); permitUnusedInt(sub__V108_count);
+      /* sub__V108 = &#2 */
       
-      NamedPropertyLink namedP__V204 = LINK_NamedPropertyLink(sink__V187->context, NAMED_PROPERTIES(term__V188));
-      VariablePropertyLink varP__V205 = LINK_VariablePropertyLink(sink__V187->context, VARIABLE_PROPERTIES(term__V188));
-      Hashset namedFV__V206 = LINK_VARIABLESET(sink__V187->context, asConstruction(term__V188)->properties->namedFreeVars);
-      Hashset varFV__V207 = LINK_VARIABLESET(sink__V187->context, asConstruction(term__V188)->properties->variableFreeVars);
-      UNLINK(sink__V187->context, term__V188);
-      ADD_PROPERTIES(sink__V187, LINK_VARIABLESET(sink__V187->context, namedFV__V206), LINK_VARIABLESET(sink__V187->context, varFV__V207), LINK_NamedPropertyLink(sink__V187->context, namedP__V204), LINK_VariablePropertyLink(sink__V187->context, varP__V205));
-      { START(sink__V187, _M_H_Data_s2);
-        COPY(sink__V187, sub__V200);COPY(sink__V187, sub__V201);COPY(sink__V187, sub__V202);COPY(sink__V187, sub__V203);END(sink__V187, _M_H_Data_s2); }
-      UNLINK_VARIABLESET(sink__V187->context, namedFV__V206); UNLINK_VARIABLESET(sink__V187->context, varFV__V207);
-      UNLINK_NamedPropertyLink(sink__V187->context, namedP__V204); UNLINK_VariablePropertyLink(sink__V187->context, varP__V205);
+      NamedPropertyLink namedP__V109 = LINK_NamedPropertyLink(sink__V95->context, NAMED_PROPERTIES(term__V96));
+      VariablePropertyLink varP__V110 = LINK_VariablePropertyLink(sink__V95->context, VARIABLE_PROPERTIES(term__V96));
+      Hashset namedFV__V111 = LINK_VARIABLESET(sink__V95->context, asConstruction(term__V96)->properties->namedFreeVars);
+      Hashset varFV__V112 = LINK_VARIABLESET(sink__V95->context, asConstruction(term__V96)->properties->variableFreeVars);
+      UNLINK(sink__V95->context, term__V96);
+      ADD_PROPERTIES(sink__V95, LINK_VARIABLESET(sink__V95->context, namedFV__V111), LINK_VARIABLESET(sink__V95->context, varFV__V112), LINK_NamedPropertyLink(sink__V95->context, namedP__V109), LINK_VariablePropertyLink(sink__V95->context, varP__V110));
+      { START(sink__V95, _M_H_Form_s3);
+        COPY(sink__V95, sub__V106);COPY(sink__V95, sub__V107);COPY(sink__V95, sub__V108);END(sink__V95, _M_H_Form_s3); }
+      UNLINK_VARIABLESET(sink__V95->context, namedFV__V111); UNLINK_VARIABLESET(sink__V95->context, varFV__V112);
+      UNLINK_NamedPropertyLink(sink__V95->context, namedP__V109); UNLINK_VariablePropertyLink(sink__V95->context, varP__V110);
       
       return 1;
     } default: break;
@@ -967,71 +376,260 @@ int step_M_H_Data(Sink sink__V187, Term term__V188)
   return 0;
 }
 
-/* FUNCTION H-Declaration$3. */
-int conBindOffs_M_H_Declaration_s3[] = {0 , 1};
-char *nameFun_M_H_Declaration_s3(Term term) { return  "H-Declaration$3" ; }
-struct _ConstructionDescriptor descriptor_M_H_Declaration_s3 = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Declaration_s3), conBindOffs_M_H_Declaration_s3, &nameFun_M_H_Declaration_s3, &step_M_H_Declaration_s3};
+/* FUNCTION H-Form$3. */
+int conBindOffs_M_H_Form_s3[] = {0 , 0 , 0 , 0};
+char *nameFun_M_H_Form_s3(Term term) { return  "H-Form$3" ; }
+struct _ConstructionDescriptor descriptor_M_H_Form_s3 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_H_Form_s3), conBindOffs_M_H_Form_s3, &nameFun_M_H_Form_s3, &step_M_H_Form_s3};
 
-int step_M_H_Declaration_s3(Sink sink__V208, Term term__V209)
+int step_M_H_Form_s3(Sink sink__V113, Term term__V114)
 {
-  int term__V209_count = LINK_COUNT(term__V209); permitUnusedInt(term__V209_count);
+  int term__V114_count = LINK_COUNT(term__V114); permitUnusedInt(term__V114_count);
   do {
-    /* Contraction rule HEADER-Polymorphic. */
-    ASSERT(sink__V208->context, !strcmp(SYMBOL(term__V209),  "H-Declaration$3" ));
-    Variable x__V210 = BINDER(term__V209,0,0); if (term__V209_count <= 1) UNBIND(x__V210);
-    Term sub__V211 = LINK(sink__V208->context, SUB(term__V209, 0)); int sub__V211_count = term__V209_count*LINK_COUNT(sub__V211); permitUnusedInt(sub__V211_count);
-    CRSX_CHECK_SORT(sink__V208->context, sub__V211, &sort_M_Reified_xDeclaration); /* sub__V211 = &#11 */
-    Variable y__V212 = x__V210; permitUnusedVariable(y__V212);
+    /* Contraction rule HEADER-H-Form-4. */
+    ASSERT(sink__V113->context, !strcmp(SYMBOL(term__V114),  "H-Form$3" ));
+    Term sub__V115 = LINK(sink__V113->context, SUB(term__V114, 0)); int sub__V115_count = term__V114_count*LINK_COUNT(sub__V115); permitUnusedInt(sub__V115_count);
+    /* sub__V115 = &#121 */
+    Term sub__V116 = LINK(sink__V113->context, SUB(term__V114, 1)); int sub__V116_count = term__V114_count*LINK_COUNT(sub__V116); permitUnusedInt(sub__V116_count);
+    /* sub__V116 = &#122 */
+    Term sub__V117 = LINK(sink__V113->context, SUB(term__V114, 2)); int sub__V117_count = term__V114_count*LINK_COUNT(sub__V117); permitUnusedInt(sub__V117_count);
+    /* sub__V117 = &#11 */
     
-    NamedPropertyLink namedP__V213 = LINK_NamedPropertyLink(sink__V208->context, NAMED_PROPERTIES(term__V209));
-    VariablePropertyLink varP__V214 = LINK_VariablePropertyLink(sink__V208->context, VARIABLE_PROPERTIES(term__V209));
-    Hashset namedFV__V215 = LINK_VARIABLESET(sink__V208->context, asConstruction(term__V209)->properties->namedFreeVars);
-    Hashset varFV__V216 = LINK_VARIABLESET(sink__V208->context, asConstruction(term__V209)->properties->variableFreeVars);
-    UNLINK(sink__V208->context, term__V209);
-    { START(sink__V208, _M_H_Declaration);
-      COPY(sink__V208, sub__V211); /* REUSED SUBSTITUTION */ END(sink__V208, _M_H_Declaration); }
-    UNLINK_VARIABLESET(sink__V208->context, namedFV__V215); UNLINK_VARIABLESET(sink__V208->context, varFV__V216);
-    UNLINK_NamedPropertyLink(sink__V208->context, namedP__V213); UNLINK_VariablePropertyLink(sink__V208->context, varP__V214);
+    NamedPropertyLink namedP__V118 = LINK_NamedPropertyLink(sink__V113->context, NAMED_PROPERTIES(term__V114));
+    VariablePropertyLink varP__V119 = LINK_VariablePropertyLink(sink__V113->context, VARIABLE_PROPERTIES(term__V114));
+    Hashset namedFV__V120 = LINK_VARIABLESET(sink__V113->context, asConstruction(term__V114)->properties->namedFreeVars);
+    Hashset varFV__V121 = LINK_VARIABLESET(sink__V113->context, asConstruction(term__V114)->properties->variableFreeVars);
+    UNLINK(sink__V113->context, term__V114);
+    { START(sink__V113, _M__sTextCons);
+      { START(sink__V113, _M__sTextChars);
+        LITERAL(sink__V113,  "#define STRUCT" ); END(sink__V113, _M__sTextChars); }
+      { START(sink__V113, _M__sTextCons);
+        { START(sink__V113, _M__sTextEmbed);
+          { START(sink__V113, _M_AsText);
+            { START(sink__V113, _M_Struct);
+              COPY(sink__V113, LINK(sink__V113->context, sub__V117));END(sink__V113, _M_Struct); }
+            END(sink__V113, _M_AsText); }
+          END(sink__V113, _M__sTextEmbed); }
+        { START(sink__V113, _M__sTextCons);
+          { START(sink__V113, _M__sTextChars);
+            LITERAL(sink__V113,  " struct " ); END(sink__V113, _M__sTextChars); }
+          { START(sink__V113, _M__sTextCons);
+            { START(sink__V113, _M__sTextEmbed);
+              { START(sink__V113, _M_AsText);
+                { START(sink__V113, _M_Struct);
+                  COPY(sink__V113, LINK(sink__V113->context, sub__V117));END(sink__V113, _M_Struct); }
+                END(sink__V113, _M_AsText); }
+              END(sink__V113, _M__sTextEmbed); }
+            { START(sink__V113, _M__sTextCons);
+              { START(sink__V113, _M__sTextBreak);
+                LITERAL(sink__V113,  "\n" ); END(sink__V113, _M__sTextBreak); }
+              { START(sink__V113, _M__sTextCons);
+                { START(sink__V113, _M__sTextChars);
+                  LITERAL(sink__V113,  "struct " ); END(sink__V113, _M__sTextChars); }
+                { START(sink__V113, _M__sTextCons);
+                  { START(sink__V113, _M__sTextEmbed);
+                    { START(sink__V113, _M_AsText);
+                      { START(sink__V113, _M_Struct);
+                        COPY(sink__V113, LINK(sink__V113->context, sub__V117));END(sink__V113, _M_Struct); }
+                      END(sink__V113, _M_AsText); }
+                    END(sink__V113, _M__sTextEmbed); }
+                  { START(sink__V113, _M__sTextCons);
+                    { START(sink__V113, _M__sTextChars);
+                      LITERAL(sink__V113,  " {struct _Construction construction; Term sub[" );
+                      END(sink__V113, _M__sTextChars); }
+                    { START(sink__V113, _M__sTextCons);
+                      { START(sink__V113, _M__sTextEmbed);
+                        { START(sink__V113, _M_AsText);
+                          { START(sink__V113, _M_INTEGER);
+                            { START(sink__V113, _M_Length);
+                              COPY(sink__V113, LINK(sink__V113->context, sub__V116));LITERAL(sink__V113,  "1" ); END(sink__V113, _M_Length); }
+                            END(sink__V113, _M_INTEGER); }
+                          END(sink__V113, _M_AsText); }
+                        END(sink__V113, _M__sTextEmbed); }
+                      { START(sink__V113, _M__sTextCons);
+                        { START(sink__V113, _M__sTextChars);
+                          LITERAL(sink__V113,  "]; Variable binder[" );
+                          END(sink__V113, _M__sTextChars); }
+                        { START(sink__V113, _M__sTextCons);
+                          { START(sink__V113, _M__sTextEmbed);
+                            { START(sink__V113, _M_AsText);
+                              { START(sink__V113, _M_INTEGER);
+                                { START(sink__V113, _M_FormArguments__binder__count);
+                                  { START(sink__V113, _M__sCons);
+                                    COPY(sink__V113, sub__V115);COPY(sink__V113, sub__V116);END(sink__V113, _M__sCons); }
+                                  LITERAL(sink__V113,  "0" ); END(sink__V113, _M_FormArguments__binder__count); }
+                                END(sink__V113, _M_INTEGER); }
+                              END(sink__V113, _M_AsText); }
+                            END(sink__V113, _M__sTextEmbed); }
+                          { START(sink__V113, _M__sTextCons);
+                            { START(sink__V113, _M__sTextChars);
+                              LITERAL(sink__V113,  "];};" ); END(sink__V113, _M__sTextChars); }
+                            { START(sink__V113, _M__sTextCons);
+                              { START(sink__V113, _M__sTextBreak);
+                                LITERAL(sink__V113,  "\n" ); END(sink__V113, _M__sTextBreak); }
+                              { START(sink__V113, _M__sTextCons);
+                                { START(sink__V113, _M__sTextChars);
+                                  LITERAL(sink__V113,  "extern struct _ConstructionDescriptor " );
+                                  END(sink__V113, _M__sTextChars); }
+                                { START(sink__V113, _M__sTextCons);
+                                  { START(sink__V113, _M__sTextEmbed);
+                                    { START(sink__V113, _M_AsText);
+                                      { START(sink__V113, _M_Descriptor);
+                                        COPY(sink__V113, sub__V117);END(sink__V113, _M_Descriptor); }
+                                      END(sink__V113, _M_AsText); }
+                                    END(sink__V113, _M__sTextEmbed); }
+                                  { START(sink__V113, _M__sTextCons);
+                                    { START(sink__V113, _M__sTextChars);
+                                      LITERAL(sink__V113,  ";" ); END(sink__V113, _M__sTextChars); }
+                                    { START(sink__V113, _M__sTextCons);
+                                      { START(sink__V113, _M__sTextBreak);
+                                        LITERAL(sink__V113,  "\n" ); END(sink__V113, _M__sTextBreak); }
+                                      { START(sink__V113, _M__sTextNil);
+                                        END(sink__V113, _M__sTextNil); }
+                                      END(sink__V113, _M__sTextCons); }
+                                    END(sink__V113, _M__sTextCons); }
+                                  END(sink__V113, _M__sTextCons); }
+                                END(sink__V113, _M__sTextCons); }
+                              END(sink__V113, _M__sTextCons); }
+                            END(sink__V113, _M__sTextCons); }
+                          END(sink__V113, _M__sTextCons); }
+                        END(sink__V113, _M__sTextCons); }
+                      END(sink__V113, _M__sTextCons); }
+                    END(sink__V113, _M__sTextCons); }
+                  END(sink__V113, _M__sTextCons); }
+                END(sink__V113, _M__sTextCons); }
+              END(sink__V113, _M__sTextCons); }
+            END(sink__V113, _M__sTextCons); }
+          END(sink__V113, _M__sTextCons); }
+        END(sink__V113, _M__sTextCons); }
+      END(sink__V113, _M__sTextCons); }
+    UNLINK_VARIABLESET(sink__V113->context, namedFV__V120); UNLINK_VARIABLESET(sink__V113->context, varFV__V121);
+    UNLINK_NamedPropertyLink(sink__V113->context, namedP__V118); UNLINK_VariablePropertyLink(sink__V113->context, varP__V119);
     return 1;
   } while (0);
   return 0;
 }
 
-/* FUNCTION H-Declaration$2. */
-int conBindOffs_M_H_Declaration_s2[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0};
-char *nameFun_M_H_Declaration_s2(Term term) { return  "H-Declaration$2" ; }
-struct _ConstructionDescriptor descriptor_M_H_Declaration_s2 = {&sort_M_Reified_xVariable, 0, 7, sizeof(STRUCT_Con_M_H_Declaration_s2), conBindOffs_M_H_Declaration_s2, &nameFun_M_H_Declaration_s2, &step_M_H_Declaration_s2};
+/* FUNCTION H-Form$4. */
+int conBindOffs_M_H_Form_s4[] = {0 , 0};
+char *nameFun_M_H_Form_s4(Term term) { return  "H-Form$4" ; }
+struct _ConstructionDescriptor descriptor_M_H_Form_s4 = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Form_s4), conBindOffs_M_H_Form_s4, &nameFun_M_H_Form_s4, &step_M_H_Form_s4};
 
-int step_M_H_Declaration_s2(Sink sink__V217, Term term__V218)
+int step_M_H_Form_s4(Sink sink__V122, Term term__V123)
 {
-  int term__V218_count = LINK_COUNT(term__V218); permitUnusedInt(term__V218_count);
+  int term__V123_count = LINK_COUNT(term__V123); permitUnusedInt(term__V123_count);
   do {
-    /* Contraction rule HEADER-Function. */
-    ASSERT(sink__V217->context, !strcmp(SYMBOL(term__V218),  "H-Declaration$2" ));
-    Term sub__V219 = LINK(sink__V217->context, SUB(term__V218, 0)); int sub__V219_count = term__V218_count*LINK_COUNT(sub__V219); permitUnusedInt(sub__V219_count);
-    /* sub__V219 = &#11 */
-    Term sub__V220 = LINK(sink__V217->context, SUB(term__V218, 1)); int sub__V220_count = term__V218_count*LINK_COUNT(sub__V220); permitUnusedInt(sub__V220_count);
-    /* sub__V220 = &#12 */
-    Term sub__V221 = LINK(sink__V217->context, SUB(term__V218, 2)); int sub__V221_count = term__V218_count*LINK_COUNT(sub__V221); permitUnusedInt(sub__V221_count);
-    /* sub__V221 = &#13 */
-    Term sub__V222 = LINK(sink__V217->context, SUB(term__V218, 3)); int sub__V222_count = term__V218_count*LINK_COUNT(sub__V222); permitUnusedInt(sub__V222_count);
-    /* sub__V222 = &#14 */
-    Term sub__V223 = LINK(sink__V217->context, SUB(term__V218, 4)); int sub__V223_count = term__V218_count*LINK_COUNT(sub__V223); permitUnusedInt(sub__V223_count);
-    /* sub__V223 = &#15 */
-    Term sub__V224 = LINK(sink__V217->context, SUB(term__V218, 5)); int sub__V224_count = term__V218_count*LINK_COUNT(sub__V224); permitUnusedInt(sub__V224_count);
-    CRSX_CHECK_SORT(sink__V217->context, sub__V224, &sort_M_Reified_xSort); /* sub__V224 = &#16 */
-    Term sub__V225 = LINK(sink__V217->context, SUB(term__V218, 6)); int sub__V225_count = term__V218_count*LINK_COUNT(sub__V225); permitUnusedInt(sub__V225_count);
-    /* sub__V225 = &#17 */
+    /* Contraction rule HEADER-H-Form-3. */
+    ASSERT(sink__V122->context, !strcmp(SYMBOL(term__V123),  "H-Form$4" ));
+    Term sub__V124 = LINK(sink__V122->context, SUB(term__V123, 0)); int sub__V124_count = term__V123_count*LINK_COUNT(sub__V124); permitUnusedInt(sub__V124_count);
+    /* sub__V124 = &#11 */
     
-    NamedPropertyLink namedP__V226 = LINK_NamedPropertyLink(sink__V217->context, NAMED_PROPERTIES(term__V218));
-    VariablePropertyLink varP__V227 = LINK_VariablePropertyLink(sink__V217->context, VARIABLE_PROPERTIES(term__V218));
-    Hashset namedFV__V228 = LINK_VARIABLESET(sink__V217->context, asConstruction(term__V218)->properties->namedFreeVars);
-    Hashset varFV__V229 = LINK_VARIABLESET(sink__V217->context, asConstruction(term__V218)->properties->variableFreeVars);
-    UNLINK(sink__V217->context, term__V218);
-    { START(sink__V217, _M_H_Function);
-      COPY(sink__V217, sub__V219);COPY(sink__V217, sub__V220);COPY(sink__V217, sub__V221);COPY(sink__V217, sub__V222);COPY(sink__V217, sub__V223);COPY(sink__V217, sub__V224);COPY(sink__V217, sub__V225);END(sink__V217, _M_H_Function); }
-    UNLINK_VARIABLESET(sink__V217->context, namedFV__V228); UNLINK_VARIABLESET(sink__V217->context, varFV__V229);
-    UNLINK_NamedPropertyLink(sink__V217->context, namedP__V226); UNLINK_VariablePropertyLink(sink__V217->context, varP__V227);
+    NamedPropertyLink namedP__V125 = LINK_NamedPropertyLink(sink__V122->context, NAMED_PROPERTIES(term__V123));
+    VariablePropertyLink varP__V126 = LINK_VariablePropertyLink(sink__V122->context, VARIABLE_PROPERTIES(term__V123));
+    Hashset namedFV__V127 = LINK_VARIABLESET(sink__V122->context, asConstruction(term__V123)->properties->namedFreeVars);
+    Hashset varFV__V128 = LINK_VARIABLESET(sink__V122->context, asConstruction(term__V123)->properties->variableFreeVars);
+    UNLINK(sink__V122->context, term__V123);
+    { START(sink__V122, _M__sTextCons);
+      { START(sink__V122, _M__sTextChars);
+        LITERAL(sink__V122,  "#define STRUCT" ); END(sink__V122, _M__sTextChars); }
+      { START(sink__V122, _M__sTextCons);
+        { START(sink__V122, _M__sTextEmbed);
+          { START(sink__V122, _M_AsText);
+            { START(sink__V122, _M_Struct);
+              COPY(sink__V122, LINK(sink__V122->context, sub__V124));END(sink__V122, _M_Struct); }
+            END(sink__V122, _M_AsText); }
+          END(sink__V122, _M__sTextEmbed); }
+        { START(sink__V122, _M__sTextCons);
+          { START(sink__V122, _M__sTextChars);
+            LITERAL(sink__V122,  " struct _ConstantConstruction" ); END(sink__V122, _M__sTextChars); }
+          { START(sink__V122, _M__sTextCons);
+            { START(sink__V122, _M__sTextBreak);
+              LITERAL(sink__V122,  "\n" ); END(sink__V122, _M__sTextBreak); }
+            { START(sink__V122, _M__sTextCons);
+              { START(sink__V122, _M__sTextChars);
+                LITERAL(sink__V122,  "extern struct _ConstructionDescriptor " );
+                END(sink__V122, _M__sTextChars); }
+              { START(sink__V122, _M__sTextCons);
+                { START(sink__V122, _M__sTextEmbed);
+                  { START(sink__V122, _M_AsText);
+                    { START(sink__V122, _M_Descriptor);
+                      COPY(sink__V122, sub__V124);END(sink__V122, _M_Descriptor); }
+                    END(sink__V122, _M_AsText); }
+                  END(sink__V122, _M__sTextEmbed); }
+                { START(sink__V122, _M__sTextCons);
+                  { START(sink__V122, _M__sTextChars);
+                    LITERAL(sink__V122,  ";" ); END(sink__V122, _M__sTextChars); }
+                  { START(sink__V122, _M__sTextCons);
+                    { START(sink__V122, _M__sTextBreak);
+                      LITERAL(sink__V122,  "\n" ); END(sink__V122, _M__sTextBreak); }
+                    { START(sink__V122, _M__sTextNil);
+                      END(sink__V122, _M__sTextNil); }
+                    END(sink__V122, _M__sTextCons); }
+                  END(sink__V122, _M__sTextCons); }
+                END(sink__V122, _M__sTextCons); }
+              END(sink__V122, _M__sTextCons); }
+            END(sink__V122, _M__sTextCons); }
+          END(sink__V122, _M__sTextCons); }
+        END(sink__V122, _M__sTextCons); }
+      END(sink__V122, _M__sTextCons); }
+    UNLINK_VARIABLESET(sink__V122->context, namedFV__V127); UNLINK_VARIABLESET(sink__V122->context, varFV__V128);
+    UNLINK_NamedPropertyLink(sink__V122->context, namedP__V125); UNLINK_VariablePropertyLink(sink__V122->context, varP__V126);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Form$5. */
+int conBindOffs_M_H_Form_s5[] = {0};
+char *nameFun_M_H_Form_s5(Term term) { return  "H-Form$5" ; }
+struct _ConstructionDescriptor descriptor_M_H_Form_s5 = {&sort_M_Reified_xVariable, 0, 0, sizeof(STRUCT_Con_M_H_Form_s5), conBindOffs_M_H_Form_s5, &nameFun_M_H_Form_s5, &step_M_H_Form_s5};
+
+int step_M_H_Form_s5(Sink sink__V129, Term term__V130)
+{
+  int term__V130_count = LINK_COUNT(term__V130); permitUnusedInt(term__V130_count);
+  do {
+    /* Contraction rule HEADER-H-Form-2. */
+    ASSERT(sink__V129->context, !strcmp(SYMBOL(term__V130),  "H-Form$5" ));
+    
+    NamedPropertyLink namedP__V131 = LINK_NamedPropertyLink(sink__V129->context, NAMED_PROPERTIES(term__V130));
+    VariablePropertyLink varP__V132 = LINK_VariablePropertyLink(sink__V129->context, VARIABLE_PROPERTIES(term__V130));
+    Hashset namedFV__V133 = LINK_VARIABLESET(sink__V129->context, asConstruction(term__V130)->properties->namedFreeVars);
+    Hashset varFV__V134 = LINK_VARIABLESET(sink__V129->context, asConstruction(term__V130)->properties->variableFreeVars);
+    UNLINK(sink__V129->context, term__V130);
+    { START(sink__V129, _M__sTextNil); END(sink__V129, _M__sTextNil); }
+    UNLINK_VARIABLESET(sink__V129->context, namedFV__V133); UNLINK_VARIABLESET(sink__V129->context, varFV__V134);
+    UNLINK_NamedPropertyLink(sink__V129->context, namedP__V131); UNLINK_VariablePropertyLink(sink__V129->context, varP__V132);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Form$6. */
+int conBindOffs_M_H_Form_s6[] = {0 , 0 , 0 , 0};
+char *nameFun_M_H_Form_s6(Term term) { return  "H-Form$6" ; }
+struct _ConstructionDescriptor descriptor_M_H_Form_s6 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_H_Form_s6), conBindOffs_M_H_Form_s6, &nameFun_M_H_Form_s6, &step_M_H_Form_s6};
+
+int step_M_H_Form_s6(Sink sink__V135, Term term__V136)
+{
+  int term__V136_count = LINK_COUNT(term__V136); permitUnusedInt(term__V136_count);
+  do {
+    /* Contraction rule HEADER-H-Form-1. */
+    ASSERT(sink__V135->context, !strcmp(SYMBOL(term__V136),  "H-Form$6" ));
+    Term sub__V137 = SUB(term__V136, 0); permitUnusedTerm(sub__V137); int sub__V137_count = term__V136_count*LINK_COUNT(sub__V137); permitUnusedInt(sub__V137_count);
+    CRSX_CHECK_SORT(sink__V135->context, sub__V137, &sort_M_Reified_xSort); /* sub__V137 = &#11 */
+    Term sub__V138 = SUB(term__V136, 1); permitUnusedTerm(sub__V138); int sub__V138_count = term__V136_count*LINK_COUNT(sub__V138); permitUnusedInt(sub__V138_count);
+    CRSX_CHECK_SORT(sink__V135->context, sub__V138, &sort_M_Reified_xSort); /* sub__V138 = &#12 */
+    Term sub__V139 = LINK(sink__V135->context, SUB(term__V136, 2)); int sub__V139_count = term__V136_count*LINK_COUNT(sub__V139); permitUnusedInt(sub__V139_count);
+    CRSX_CHECK_SORT(sink__V135->context, sub__V139, &sort_M_Reified_xForm); /* sub__V139 = &#13 */
+    
+    NamedPropertyLink namedP__V140 = LINK_NamedPropertyLink(sink__V135->context, NAMED_PROPERTIES(term__V136));
+    VariablePropertyLink varP__V141 = LINK_VariablePropertyLink(sink__V135->context, VARIABLE_PROPERTIES(term__V136));
+    Hashset namedFV__V142 = LINK_VARIABLESET(sink__V135->context, asConstruction(term__V136)->properties->namedFreeVars);
+    Hashset varFV__V143 = LINK_VARIABLESET(sink__V135->context, asConstruction(term__V136)->properties->variableFreeVars);
+    UNLINK(sink__V135->context, term__V136);
+    { START(sink__V135, _M_H_Form);
+      COPY(sink__V135, sub__V139);END(sink__V135, _M_H_Form); }
+    UNLINK_VARIABLESET(sink__V135->context, namedFV__V142); UNLINK_VARIABLESET(sink__V135->context, varFV__V143);
+    UNLINK_NamedPropertyLink(sink__V135->context, namedP__V140); UNLINK_VariablePropertyLink(sink__V135->context, varP__V141);
     return 1;
   } while (0);
   return 0;
@@ -1042,28 +640,356 @@ int conBindOffs_M_H_Declaration_s1[] = {0 , 0 , 0};
 char *nameFun_M_H_Declaration_s1(Term term) { return  "H-Declaration$1" ; }
 struct _ConstructionDescriptor descriptor_M_H_Declaration_s1 = {&sort_M_Reified_xVariable, 0, 2, sizeof(STRUCT_Con_M_H_Declaration_s1), conBindOffs_M_H_Declaration_s1, &nameFun_M_H_Declaration_s1, &step_M_H_Declaration_s1};
 
-int step_M_H_Declaration_s1(Sink sink__V230, Term term__V231)
+int step_M_H_Declaration_s1(Sink sink__V144, Term term__V145)
 {
-  int term__V231_count = LINK_COUNT(term__V231); permitUnusedInt(term__V231_count);
+  int term__V145_count = LINK_COUNT(term__V145); permitUnusedInt(term__V145_count);
   do {
     /* Contraction rule HEADER-Data. */
-    ASSERT(sink__V230->context, !strcmp(SYMBOL(term__V231),  "H-Declaration$1" ));
-    Term sub__V232 = LINK(sink__V230->context, SUB(term__V231, 0)); int sub__V232_count = term__V231_count*LINK_COUNT(sub__V232); permitUnusedInt(sub__V232_count);
-    CRSX_CHECK_SORT(sink__V230->context, sub__V232, &sort_M_Reified_xSort); /* sub__V232 = &#11 */
-    Term sub__V233 = LINK(sink__V230->context, SUB(term__V231, 1)); int sub__V233_count = term__V231_count*LINK_COUNT(sub__V233); permitUnusedInt(sub__V233_count);
-    /* sub__V233 = &#12 */
+    ASSERT(sink__V144->context, !strcmp(SYMBOL(term__V145),  "H-Declaration$1" ));
+    Term sub__V146 = LINK(sink__V144->context, SUB(term__V145, 0)); int sub__V146_count = term__V145_count*LINK_COUNT(sub__V146); permitUnusedInt(sub__V146_count);
+    CRSX_CHECK_SORT(sink__V144->context, sub__V146, &sort_M_Reified_xSort); /* sub__V146 = &#11 */
+    Term sub__V147 = LINK(sink__V144->context, SUB(term__V145, 1)); int sub__V147_count = term__V145_count*LINK_COUNT(sub__V147); permitUnusedInt(sub__V147_count);
+    /* sub__V147 = &#12 */
     
-    NamedPropertyLink namedP__V234 = LINK_NamedPropertyLink(sink__V230->context, NAMED_PROPERTIES(term__V231));
-    VariablePropertyLink varP__V235 = LINK_VariablePropertyLink(sink__V230->context, VARIABLE_PROPERTIES(term__V231));
-    Hashset namedFV__V236 = LINK_VARIABLESET(sink__V230->context, asConstruction(term__V231)->properties->namedFreeVars);
-    Hashset varFV__V237 = LINK_VARIABLESET(sink__V230->context, asConstruction(term__V231)->properties->variableFreeVars);
-    UNLINK(sink__V230->context, term__V231);
-    { START(sink__V230, _M_H_Data);
-      COPY(sink__V230, sub__V232);COPY(sink__V230, sub__V233);END(sink__V230, _M_H_Data); }
-    UNLINK_VARIABLESET(sink__V230->context, namedFV__V236); UNLINK_VARIABLESET(sink__V230->context, varFV__V237);
-    UNLINK_NamedPropertyLink(sink__V230->context, namedP__V234); UNLINK_VariablePropertyLink(sink__V230->context, varP__V235);
+    NamedPropertyLink namedP__V148 = LINK_NamedPropertyLink(sink__V144->context, NAMED_PROPERTIES(term__V145));
+    VariablePropertyLink varP__V149 = LINK_VariablePropertyLink(sink__V144->context, VARIABLE_PROPERTIES(term__V145));
+    Hashset namedFV__V150 = LINK_VARIABLESET(sink__V144->context, asConstruction(term__V145)->properties->namedFreeVars);
+    Hashset varFV__V151 = LINK_VARIABLESET(sink__V144->context, asConstruction(term__V145)->properties->variableFreeVars);
+    UNLINK(sink__V144->context, term__V145);
+    { START(sink__V144, _M_H_Data);
+      COPY(sink__V144, sub__V146);COPY(sink__V144, sub__V147);END(sink__V144, _M_H_Data); }
+    UNLINK_VARIABLESET(sink__V144->context, namedFV__V150); UNLINK_VARIABLESET(sink__V144->context, varFV__V151);
+    UNLINK_NamedPropertyLink(sink__V144->context, namedP__V148); UNLINK_VariablePropertyLink(sink__V144->context, varP__V149);
     return 1;
   } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Declaration$2. */
+int conBindOffs_M_H_Declaration_s2[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0};
+char *nameFun_M_H_Declaration_s2(Term term) { return  "H-Declaration$2" ; }
+struct _ConstructionDescriptor descriptor_M_H_Declaration_s2 = {&sort_M_Reified_xVariable, 0, 7, sizeof(STRUCT_Con_M_H_Declaration_s2), conBindOffs_M_H_Declaration_s2, &nameFun_M_H_Declaration_s2, &step_M_H_Declaration_s2};
+
+int step_M_H_Declaration_s2(Sink sink__V152, Term term__V153)
+{
+  int term__V153_count = LINK_COUNT(term__V153); permitUnusedInt(term__V153_count);
+  do {
+    /* Contraction rule HEADER-Function. */
+    ASSERT(sink__V152->context, !strcmp(SYMBOL(term__V153),  "H-Declaration$2" ));
+    Term sub__V154 = LINK(sink__V152->context, SUB(term__V153, 0)); int sub__V154_count = term__V153_count*LINK_COUNT(sub__V154); permitUnusedInt(sub__V154_count);
+    /* sub__V154 = &#11 */
+    Term sub__V155 = LINK(sink__V152->context, SUB(term__V153, 1)); int sub__V155_count = term__V153_count*LINK_COUNT(sub__V155); permitUnusedInt(sub__V155_count);
+    /* sub__V155 = &#12 */
+    Term sub__V156 = LINK(sink__V152->context, SUB(term__V153, 2)); int sub__V156_count = term__V153_count*LINK_COUNT(sub__V156); permitUnusedInt(sub__V156_count);
+    /* sub__V156 = &#13 */
+    Term sub__V157 = LINK(sink__V152->context, SUB(term__V153, 3)); int sub__V157_count = term__V153_count*LINK_COUNT(sub__V157); permitUnusedInt(sub__V157_count);
+    /* sub__V157 = &#14 */
+    Term sub__V158 = LINK(sink__V152->context, SUB(term__V153, 4)); int sub__V158_count = term__V153_count*LINK_COUNT(sub__V158); permitUnusedInt(sub__V158_count);
+    /* sub__V158 = &#15 */
+    Term sub__V159 = LINK(sink__V152->context, SUB(term__V153, 5)); int sub__V159_count = term__V153_count*LINK_COUNT(sub__V159); permitUnusedInt(sub__V159_count);
+    CRSX_CHECK_SORT(sink__V152->context, sub__V159, &sort_M_Reified_xSort); /* sub__V159 = &#16 */
+    Term sub__V160 = LINK(sink__V152->context, SUB(term__V153, 6)); int sub__V160_count = term__V153_count*LINK_COUNT(sub__V160); permitUnusedInt(sub__V160_count);
+    /* sub__V160 = &#17 */
+    
+    NamedPropertyLink namedP__V161 = LINK_NamedPropertyLink(sink__V152->context, NAMED_PROPERTIES(term__V153));
+    VariablePropertyLink varP__V162 = LINK_VariablePropertyLink(sink__V152->context, VARIABLE_PROPERTIES(term__V153));
+    Hashset namedFV__V163 = LINK_VARIABLESET(sink__V152->context, asConstruction(term__V153)->properties->namedFreeVars);
+    Hashset varFV__V164 = LINK_VARIABLESET(sink__V152->context, asConstruction(term__V153)->properties->variableFreeVars);
+    UNLINK(sink__V152->context, term__V153);
+    { START(sink__V152, _M_H_Function);
+      COPY(sink__V152, sub__V154);COPY(sink__V152, sub__V155);COPY(sink__V152, sub__V156);COPY(sink__V152, sub__V157);COPY(sink__V152, sub__V158);COPY(sink__V152, sub__V159);COPY(sink__V152, sub__V160);END(sink__V152, _M_H_Function); }
+    UNLINK_VARIABLESET(sink__V152->context, namedFV__V163); UNLINK_VARIABLESET(sink__V152->context, varFV__V164);
+    UNLINK_NamedPropertyLink(sink__V152->context, namedP__V161); UNLINK_VariablePropertyLink(sink__V152->context, varP__V162);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Declaration$3. */
+int conBindOffs_M_H_Declaration_s3[] = {0 , 1};
+char *nameFun_M_H_Declaration_s3(Term term) { return  "H-Declaration$3" ; }
+struct _ConstructionDescriptor descriptor_M_H_Declaration_s3 = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Declaration_s3), conBindOffs_M_H_Declaration_s3, &nameFun_M_H_Declaration_s3, &step_M_H_Declaration_s3};
+
+int step_M_H_Declaration_s3(Sink sink__V165, Term term__V166)
+{
+  int term__V166_count = LINK_COUNT(term__V166); permitUnusedInt(term__V166_count);
+  do {
+    /* Contraction rule HEADER-Polymorphic. */
+    ASSERT(sink__V165->context, !strcmp(SYMBOL(term__V166),  "H-Declaration$3" ));
+    Variable x__V167 = BINDER(term__V166,0,0); if (term__V166_count <= 1) UNBIND(x__V167);
+    Term sub__V168 = LINK(sink__V165->context, SUB(term__V166, 0)); int sub__V168_count = term__V166_count*LINK_COUNT(sub__V168); permitUnusedInt(sub__V168_count);
+    CRSX_CHECK_SORT(sink__V165->context, sub__V168, &sort_M_Reified_xDeclaration); /* sub__V168 = &#11 */
+    Variable y__V169 = x__V167; permitUnusedVariable(y__V169);
+    
+    NamedPropertyLink namedP__V170 = LINK_NamedPropertyLink(sink__V165->context, NAMED_PROPERTIES(term__V166));
+    VariablePropertyLink varP__V171 = LINK_VariablePropertyLink(sink__V165->context, VARIABLE_PROPERTIES(term__V166));
+    Hashset namedFV__V172 = LINK_VARIABLESET(sink__V165->context, asConstruction(term__V166)->properties->namedFreeVars);
+    Hashset varFV__V173 = LINK_VARIABLESET(sink__V165->context, asConstruction(term__V166)->properties->variableFreeVars);
+    UNLINK(sink__V165->context, term__V166);
+    { START(sink__V165, _M_H_Declaration);
+      COPY(sink__V165, sub__V168); /* REUSED SUBSTITUTION */ END(sink__V165, _M_H_Declaration); }
+    UNLINK_VARIABLESET(sink__V165->context, namedFV__V172); UNLINK_VARIABLESET(sink__V165->context, varFV__V173);
+    UNLINK_NamedPropertyLink(sink__V165->context, namedP__V170); UNLINK_VariablePropertyLink(sink__V165->context, varP__V171);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Data$1. */
+int conBindOffs_M_H_Data_s1[] = {0 , 0 , 0 , 0};
+char *nameFun_M_H_Data_s1(Term term) { return  "H-Data$1" ; }
+struct _ConstructionDescriptor descriptor_M_H_Data_s1 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_H_Data_s1), conBindOffs_M_H_Data_s1, &nameFun_M_H_Data_s1, &step_M_H_Data_s1};
+
+int step_M_H_Data_s1(Sink sink__V174, Term term__V175)
+{
+  int term__V175_count = LINK_COUNT(term__V175); permitUnusedInt(term__V175_count);
+  do {
+    /* Contraction rule HEADER-H-Data-1. */
+    ASSERT(sink__V174->context, !strcmp(SYMBOL(term__V175),  "H-Data$1" ));
+    Term sub__V176 = LINK(sink__V174->context, SUB(term__V175, 0)); int sub__V176_count = term__V175_count*LINK_COUNT(sub__V176); permitUnusedInt(sub__V176_count);
+    /* sub__V176 = &#11 */
+    Term sub__V177 = SUB(term__V175, 1); permitUnusedTerm(sub__V177); int sub__V177_count = term__V175_count*LINK_COUNT(sub__V177); permitUnusedInt(sub__V177_count);
+    /* sub__V177 = &#12 */
+    Term sub__V178 = LINK(sink__V174->context, SUB(term__V175, 2)); int sub__V178_count = term__V175_count*LINK_COUNT(sub__V178); permitUnusedInt(sub__V178_count);
+    /* sub__V178 = &#2 */
+    
+    NamedPropertyLink namedP__V179 = LINK_NamedPropertyLink(sink__V174->context, NAMED_PROPERTIES(term__V175));
+    VariablePropertyLink varP__V180 = LINK_VariablePropertyLink(sink__V174->context, VARIABLE_PROPERTIES(term__V175));
+    Hashset namedFV__V181 = LINK_VARIABLESET(sink__V174->context, asConstruction(term__V175)->properties->namedFreeVars);
+    Hashset varFV__V182 = LINK_VARIABLESET(sink__V174->context, asConstruction(term__V175)->properties->variableFreeVars);
+    UNLINK(sink__V174->context, term__V175);
+    { START(sink__V174, _M__sTextCons);
+      { START(sink__V174, _M__sTextBreak);
+        LITERAL(sink__V174,  "\n" ); END(sink__V174, _M__sTextBreak); }
+      { START(sink__V174, _M__sTextCons);
+        { START(sink__V174, _M__sTextChars);
+          LITERAL(sink__V174,  "/* DATA SORT " ); END(sink__V174, _M__sTextChars); }
+        { START(sink__V174, _M__sTextCons);
+          { START(sink__V174, _M__sTextEmbed);
+            { START(sink__V174, _M_AsText);
+              { START(sink__V174, _M_COMMENT_xTOKEN);
+                COPY(sink__V174, LINK(sink__V174->context, sub__V176));END(sink__V174, _M_COMMENT_xTOKEN); }
+              END(sink__V174, _M_AsText); }
+            END(sink__V174, _M__sTextEmbed); }
+          { START(sink__V174, _M__sTextCons);
+            { START(sink__V174, _M__sTextChars);
+              LITERAL(sink__V174,  " HEADER DECLARATIONS. */" ); END(sink__V174, _M__sTextChars); }
+            { START(sink__V174, _M__sTextCons);
+              { START(sink__V174, _M__sTextBreak);
+                LITERAL(sink__V174,  "\n" ); END(sink__V174, _M__sTextBreak); }
+              { START(sink__V174, _M__sTextCons);
+                { START(sink__V174, _M__sTextChars);
+                  LITERAL(sink__V174,  "typedef enum {" ); END(sink__V174, _M__sTextChars); }
+                { START(sink__V174, _M__sTextCons);
+                  { START(sink__V174, _M__sTextEmbed);
+                    { START(sink__V174, _M_AsText);
+                      { START(sink__V174, _M_EnumFun);
+                        COPY(sink__V174, LINK(sink__V174->context, sub__V176));END(sink__V174, _M_EnumFun); }
+                      END(sink__V174, _M_AsText); }
+                    END(sink__V174, _M__sTextEmbed); }
+                  { START(sink__V174, _M__sTextCons);
+                    { START(sink__V174, _M__sTextChars);
+                      LITERAL(sink__V174,  " = 0, " ); END(sink__V174, _M__sTextChars); }
+                    { START(sink__V174, _M__sTextCons);
+                      { START(sink__V174, _M__sTextEmbed);
+                        { START(sink__V174, _M_AsText);
+                          { START(sink__V174, _M_EnumVar);
+                            COPY(sink__V174, LINK(sink__V174->context, sub__V176));END(sink__V174, _M_EnumVar); }
+                          END(sink__V174, _M_AsText); }
+                        END(sink__V174, _M__sTextEmbed); }
+                      { START(sink__V174, _M__sTextCons);
+                        { START(sink__V174, _M__sTextChars);
+                          LITERAL(sink__V174,  " = 1" ); END(sink__V174, _M__sTextChars); }
+                        { START(sink__V174, _M__sTextCons);
+                          { START(sink__V174, _M__sTextEmbed);
+                            { START(sink__V174, _M_AsText);
+                              { START(sink__V174, _M_DelayMapText_s1);
+                                { START(sink__V174, _M_Forms_Constructors);
+                                  COPY(sink__V174, LINK(sink__V174->context, sub__V178));END(sink__V174, _M_Forms_Constructors); }
+                                { Variable x__V183 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V174->context,"x__V183");
+                                  Variable x__V184 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V174->context,"x__V184");
+                                  Variable binds__V185[2] = {x__V183,x__V184}; BINDS(sink__V174, 2, binds__V185);
+                                  { START(sink__V174, _M__sTextCons);
+                                    { START(sink__V174, _M__sTextChars);
+                                      LITERAL(sink__V174,  ", " ); END(sink__V174, _M__sTextChars); }
+                                    { START(sink__V174, _M__sTextCons);
+                                      { START(sink__V174, _M__sTextEmbed);
+                                        { START(sink__V174, _M_AsText);
+                                          { START(sink__V174, _M_DEnumTag);
+                                            USE(sink__V174, x__V183); USE(sink__V174, x__V184); END(sink__V174, _M_DEnumTag); }
+                                          END(sink__V174, _M_AsText); }
+                                        END(sink__V174, _M__sTextEmbed); }
+                                      { START(sink__V174, _M__sTextNil);
+                                        END(sink__V174, _M__sTextNil); }
+                                      END(sink__V174, _M__sTextCons); }
+                                    END(sink__V174, _M__sTextCons); }
+                                   }
+                                END(sink__V174, _M_DelayMapText_s1); }
+                              END(sink__V174, _M_AsText); }
+                            END(sink__V174, _M__sTextEmbed); }
+                          { START(sink__V174, _M__sTextCons);
+                            { START(sink__V174, _M__sTextChars);
+                              LITERAL(sink__V174,  "} " ); END(sink__V174, _M__sTextChars); }
+                            { START(sink__V174, _M__sTextCons);
+                              { START(sink__V174, _M__sTextEmbed);
+                                { START(sink__V174, _M_AsText);
+                                  { START(sink__V174, _M_Enum);
+                                    COPY(sink__V174, LINK(sink__V174->context, sub__V176));END(sink__V174, _M_Enum); }
+                                  END(sink__V174, _M_AsText); }
+                                END(sink__V174, _M__sTextEmbed); }
+                              { START(sink__V174, _M__sTextCons);
+                                { START(sink__V174, _M__sTextChars);
+                                  LITERAL(sink__V174,  ";" ); END(sink__V174, _M__sTextChars); }
+                                { START(sink__V174, _M__sTextCons);
+                                  { START(sink__V174, _M__sTextBreak);
+                                    LITERAL(sink__V174,  "\n" ); END(sink__V174, _M__sTextBreak); }
+                                  { START(sink__V174, _M__sTextCons);
+                                    { START(sink__V174, _M__sTextEmbed);
+                                      { START(sink__V174, _M_AsText);
+                                        { START(sink__V174, _M_MapText_s1);
+                                          COPY(sink__V174, sub__V178);{ Variable x__V186 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V174->context,"x__V186");
+                                            Variable binds__V187[1] = {x__V186}; BINDS(sink__V174, 1, binds__V187);
+                                            { START(sink__V174, _M_H_Form);
+                                              USE(sink__V174, x__V186);
+                                              END(sink__V174, _M_H_Form); }
+                                             }
+                                          END(sink__V174, _M_MapText_s1); }
+                                        END(sink__V174, _M_AsText); }
+                                      END(sink__V174, _M__sTextEmbed); }
+                                    { START(sink__V174, _M__sTextCons);
+                                      { START(sink__V174, _M__sTextChars);
+                                        LITERAL(sink__V174,  "extern struct _SortDescriptor " );
+                                        END(sink__V174, _M__sTextChars); }
+                                      { START(sink__V174, _M__sTextCons);
+                                        { START(sink__V174, _M__sTextEmbed);
+                                          { START(sink__V174, _M_AsText);
+                                            { START(sink__V174, _M_Sort);
+                                              COPY(sink__V174, sub__V176);END(sink__V174, _M_Sort); }
+                                            END(sink__V174, _M_AsText); }
+                                          END(sink__V174, _M__sTextEmbed); }
+                                        { START(sink__V174, _M__sTextCons);
+                                          { START(sink__V174, _M__sTextChars);
+                                            LITERAL(sink__V174,  ";" );
+                                            END(sink__V174, _M__sTextChars); }
+                                          { START(sink__V174, _M__sTextCons);
+                                            { START(sink__V174, _M__sTextBreak);
+                                              LITERAL(sink__V174,  "\n" );
+                                              END(sink__V174, _M__sTextBreak); }
+                                            { START(sink__V174, _M__sTextNil);
+                                              END(sink__V174, _M__sTextNil); }
+                                            END(sink__V174, _M__sTextCons); }
+                                          END(sink__V174, _M__sTextCons); }
+                                        END(sink__V174, _M__sTextCons); }
+                                      END(sink__V174, _M__sTextCons); }
+                                    END(sink__V174, _M__sTextCons); }
+                                  END(sink__V174, _M__sTextCons); }
+                                END(sink__V174, _M__sTextCons); }
+                              END(sink__V174, _M__sTextCons); }
+                            END(sink__V174, _M__sTextCons); }
+                          END(sink__V174, _M__sTextCons); }
+                        END(sink__V174, _M__sTextCons); }
+                      END(sink__V174, _M__sTextCons); }
+                    END(sink__V174, _M__sTextCons); }
+                  END(sink__V174, _M__sTextCons); }
+                END(sink__V174, _M__sTextCons); }
+              END(sink__V174, _M__sTextCons); }
+            END(sink__V174, _M__sTextCons); }
+          END(sink__V174, _M__sTextCons); }
+        END(sink__V174, _M__sTextCons); }
+      END(sink__V174, _M__sTextCons); }
+    UNLINK_VARIABLESET(sink__V174->context, namedFV__V181); UNLINK_VARIABLESET(sink__V174->context, varFV__V182);
+    UNLINK_NamedPropertyLink(sink__V174->context, namedP__V179); UNLINK_VariablePropertyLink(sink__V174->context, varP__V180);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Data$2. */
+int conBindOffs_M_H_Data_s2[] = {0 , 0 , 0 , 0 , 0};
+char *nameFun_M_H_Data_s2(Term term) { return  "H-Data$2" ; }
+struct _ConstructionDescriptor descriptor_M_H_Data_s2 = {&sort_M_Reified_xVariable, 0, 4, sizeof(STRUCT_Con_M_H_Data_s2), conBindOffs_M_H_Data_s2, &nameFun_M_H_Data_s2, &step_M_H_Data_s2};
+
+int step_M_H_Data_s2(Sink sink__V188, Term term__V189)
+{
+  int term__V189_count = LINK_COUNT(term__V189); permitUnusedInt(term__V189_count);
+  do {
+    /* Contraction rule HEADER-H-Data-2. */
+    ASSERT(sink__V188->context, !strcmp(SYMBOL(term__V189),  "H-Data$2" ));
+    Term sub__V190 = SUB(term__V189, 0); permitUnusedTerm(sub__V190); int sub__V190_count = term__V189_count*LINK_COUNT(sub__V190); permitUnusedInt(sub__V190_count);
+    CRSX_CHECK_SORT(sink__V188->context, sub__V190, &sort_M_Reified_xSort); /* sub__V190 = &#11 */
+    Term sub__V191 = SUB(term__V189, 1); permitUnusedTerm(sub__V191); int sub__V191_count = term__V189_count*LINK_COUNT(sub__V191); permitUnusedInt(sub__V191_count);
+    CRSX_CHECK_SORT(sink__V188->context, sub__V191, &sort_M_Reified_xSort); /* sub__V191 = &#12 */
+    Term sub__V192 = LINK(sink__V188->context, SUB(term__V189, 2)); int sub__V192_count = term__V189_count*LINK_COUNT(sub__V192); permitUnusedInt(sub__V192_count);
+    CRSX_CHECK_SORT(sink__V188->context, sub__V192, &sort_M_Reified_xSort); /* sub__V192 = &#13 */
+    Term sub__V193 = LINK(sink__V188->context, SUB(term__V189, 3)); int sub__V193_count = term__V189_count*LINK_COUNT(sub__V193); permitUnusedInt(sub__V193_count);
+    /* sub__V193 = &#2 */
+    
+    NamedPropertyLink namedP__V194 = LINK_NamedPropertyLink(sink__V188->context, NAMED_PROPERTIES(term__V189));
+    VariablePropertyLink varP__V195 = LINK_VariablePropertyLink(sink__V188->context, VARIABLE_PROPERTIES(term__V189));
+    Hashset namedFV__V196 = LINK_VARIABLESET(sink__V188->context, asConstruction(term__V189)->properties->namedFreeVars);
+    Hashset varFV__V197 = LINK_VARIABLESET(sink__V188->context, asConstruction(term__V189)->properties->variableFreeVars);
+    UNLINK(sink__V188->context, term__V189);
+    { START(sink__V188, _M_H_Data);
+      COPY(sink__V188, sub__V192);COPY(sink__V188, sub__V193);END(sink__V188, _M_H_Data); }
+    UNLINK_VARIABLESET(sink__V188->context, namedFV__V196); UNLINK_VARIABLESET(sink__V188->context, varFV__V197);
+    UNLINK_NamedPropertyLink(sink__V188->context, namedP__V194); UNLINK_VariablePropertyLink(sink__V188->context, varP__V195);
+    return 1;
+  } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Declarations. */
+int conBindOffs_M_H_Declarations[] = {0 , 0};
+char *nameFun_M_H_Declarations(Term term) { return  "H-Declarations" ; }
+struct _ConstructionDescriptor descriptor_M_H_Declarations = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Declarations), conBindOffs_M_H_Declarations, &nameFun_M_H_Declarations, &step_M_H_Declarations};
+
+int step_M_H_Declarations(Sink sink__V198, Term term__V199)
+{
+  int term__V199_count = LINK_COUNT(term__V199); permitUnusedInt(term__V199_count);
+  Term sub__V200 = FORCE(sink__V198->context, SUB(term__V199, 0));
+  EnumOf_M__sList choice__V201 = (IS_VARIABLE_USE(sub__V200) ? VarOf_M__sList : (EnumOf_M__sList) TAG(sub__V200));
+  switch (choice__V201)
+  {
+    case Data_M__sCons: { /* Function HEADER-H-Declarations-1$H-Declarations$$Cons case $Cons */
+      ASSERT(sink__V198->context, !strcmp(SYMBOL(term__V199),  "H-Declarations" ));
+      Term sub__V202 = SUB(term__V199, 0); permitUnusedTerm(sub__V202); int sub__V202_count = term__V199_count*LINK_COUNT(sub__V202); permitUnusedInt(sub__V202_count);
+      ASSERT(sink__V198->context, !strcmp(SYMBOL(sub__V202),  "$Cons" ));
+      Term sub__V203 = LINK(sink__V198->context, SUB(sub__V202, 0)); int sub__V203_count = sub__V202_count*LINK_COUNT(sub__V203); permitUnusedInt(sub__V203_count);
+      /* sub__V203 = &#0-0 */
+      Term sub__V204 = LINK(sink__V198->context, SUB(sub__V202, 1)); int sub__V204_count = sub__V202_count*LINK_COUNT(sub__V204); permitUnusedInt(sub__V204_count);
+      /* sub__V204 = &#0-1 */
+      
+      NamedPropertyLink namedP__V205 = LINK_NamedPropertyLink(sink__V198->context, NAMED_PROPERTIES(term__V199));
+      VariablePropertyLink varP__V206 = LINK_VariablePropertyLink(sink__V198->context, VARIABLE_PROPERTIES(term__V199));
+      Hashset namedFV__V207 = LINK_VARIABLESET(sink__V198->context, asConstruction(term__V199)->properties->namedFreeVars);
+      Hashset varFV__V208 = LINK_VARIABLESET(sink__V198->context, asConstruction(term__V199)->properties->variableFreeVars);
+      UNLINK(sink__V198->context, term__V199);
+      ADD_PROPERTIES(sink__V198, LINK_VARIABLESET(sink__V198->context, namedFV__V207), LINK_VARIABLESET(sink__V198->context, varFV__V208), LINK_NamedPropertyLink(sink__V198->context, namedP__V205), LINK_VariablePropertyLink(sink__V198->context, varP__V206));
+      { START(sink__V198, _M_H_Declarations_s1);
+        COPY(sink__V198, sub__V203);COPY(sink__V198, sub__V204);END(sink__V198, _M_H_Declarations_s1); }
+      UNLINK_VARIABLESET(sink__V198->context, namedFV__V207); UNLINK_VARIABLESET(sink__V198->context, varFV__V208);
+      UNLINK_NamedPropertyLink(sink__V198->context, namedP__V205); UNLINK_VariablePropertyLink(sink__V198->context, varP__V206);
+      
+      return 1;
+    break; } case Data_M__sNil: { /* Function HEADER-H-Declarations-2$H-Declarations$$Nil case $Nil */
+      ASSERT(sink__V198->context, !strcmp(SYMBOL(term__V199),  "H-Declarations" ));
+      Term sub__V209 = SUB(term__V199, 0); permitUnusedTerm(sub__V209); int sub__V209_count = term__V199_count*LINK_COUNT(sub__V209); permitUnusedInt(sub__V209_count);
+      ASSERT(sink__V198->context, !strcmp(SYMBOL(sub__V209),  "$Nil" ));
+      
+      NamedPropertyLink namedP__V210 = LINK_NamedPropertyLink(sink__V198->context, NAMED_PROPERTIES(term__V199));
+      VariablePropertyLink varP__V211 = LINK_VariablePropertyLink(sink__V198->context, VARIABLE_PROPERTIES(term__V199));
+      Hashset namedFV__V212 = LINK_VARIABLESET(sink__V198->context, asConstruction(term__V199)->properties->namedFreeVars);
+      Hashset varFV__V213 = LINK_VARIABLESET(sink__V198->context, asConstruction(term__V199)->properties->variableFreeVars);
+      UNLINK(sink__V198->context, term__V199);
+      ADD_PROPERTIES(sink__V198, LINK_VARIABLESET(sink__V198->context, namedFV__V212), LINK_VARIABLESET(sink__V198->context, varFV__V213), LINK_NamedPropertyLink(sink__V198->context, namedP__V210), LINK_VariablePropertyLink(sink__V198->context, varP__V211));
+      { START(sink__V198, _M_H_Declarations_s2);
+        END(sink__V198, _M_H_Declarations_s2); }
+      UNLINK_VARIABLESET(sink__V198->context, namedFV__V212); UNLINK_VARIABLESET(sink__V198->context, varFV__V213);
+      UNLINK_NamedPropertyLink(sink__V198->context, namedP__V210); UNLINK_VariablePropertyLink(sink__V198->context, varP__V211);
+      
+      return 1;
+    } default: break;
+  }
   return 0;
 }
 
@@ -1072,93 +998,93 @@ int conBindOffs_M_H_Function[] = {0 , 0 , 0 , 0 , 0 , 0 , 0 , 0};
 char *nameFun_M_H_Function(Term term) { return  "H-Function" ; }
 struct _ConstructionDescriptor descriptor_M_H_Function = {&sort_M_Reified_xVariable, 0, 7, sizeof(STRUCT_Con_M_H_Function), conBindOffs_M_H_Function, &nameFun_M_H_Function, &step_M_H_Function};
 
-int step_M_H_Function(Sink sink__V238, Term term__V239)
+int step_M_H_Function(Sink sink__V214, Term term__V215)
 {
-  int term__V239_count = LINK_COUNT(term__V239); permitUnusedInt(term__V239_count);
+  int term__V215_count = LINK_COUNT(term__V215); permitUnusedInt(term__V215_count);
   do {
     /* Contraction rule HEADER-H-Function-1. */
-    ASSERT(sink__V238->context, !strcmp(SYMBOL(term__V239),  "H-Function" ));
-    Term sub__V240 = LINK(sink__V238->context, SUB(term__V239, 0)); int sub__V240_count = term__V239_count*LINK_COUNT(sub__V240); permitUnusedInt(sub__V240_count);
-    /* sub__V240 = &#1 */
-    Term sub__V241 = SUB(term__V239, 1); permitUnusedTerm(sub__V241); int sub__V241_count = term__V239_count*LINK_COUNT(sub__V241); permitUnusedInt(sub__V241_count);
-    /* sub__V241 = &#2 */
-    Term sub__V242 = SUB(term__V239, 2); permitUnusedTerm(sub__V242); int sub__V242_count = term__V239_count*LINK_COUNT(sub__V242); permitUnusedInt(sub__V242_count);
-    /* sub__V242 = &#3 */
-    Term sub__V243 = LINK(sink__V238->context, SUB(term__V239, 3)); int sub__V243_count = term__V239_count*LINK_COUNT(sub__V243); permitUnusedInt(sub__V243_count);
-    /* sub__V243 = &#4 */
-    Term sub__V244 = LINK(sink__V238->context, SUB(term__V239, 4)); int sub__V244_count = term__V239_count*LINK_COUNT(sub__V244); permitUnusedInt(sub__V244_count);
-    /* sub__V244 = &#5 */
-    Term sub__V245 = SUB(term__V239, 5); permitUnusedTerm(sub__V245); int sub__V245_count = term__V239_count*LINK_COUNT(sub__V245); permitUnusedInt(sub__V245_count);
-    CRSX_CHECK_SORT(sink__V238->context, sub__V245, &sort_M_Reified_xSort); /* sub__V245 = &#6 */
-    Term sub__V246 = SUB(term__V239, 6); permitUnusedTerm(sub__V246); int sub__V246_count = term__V239_count*LINK_COUNT(sub__V246); permitUnusedInt(sub__V246_count);
-    /* sub__V246 = &#7 */
+    ASSERT(sink__V214->context, !strcmp(SYMBOL(term__V215),  "H-Function" ));
+    Term sub__V216 = LINK(sink__V214->context, SUB(term__V215, 0)); int sub__V216_count = term__V215_count*LINK_COUNT(sub__V216); permitUnusedInt(sub__V216_count);
+    /* sub__V216 = &#1 */
+    Term sub__V217 = SUB(term__V215, 1); permitUnusedTerm(sub__V217); int sub__V217_count = term__V215_count*LINK_COUNT(sub__V217); permitUnusedInt(sub__V217_count);
+    /* sub__V217 = &#2 */
+    Term sub__V218 = SUB(term__V215, 2); permitUnusedTerm(sub__V218); int sub__V218_count = term__V215_count*LINK_COUNT(sub__V218); permitUnusedInt(sub__V218_count);
+    /* sub__V218 = &#3 */
+    Term sub__V219 = LINK(sink__V214->context, SUB(term__V215, 3)); int sub__V219_count = term__V215_count*LINK_COUNT(sub__V219); permitUnusedInt(sub__V219_count);
+    /* sub__V219 = &#4 */
+    Term sub__V220 = LINK(sink__V214->context, SUB(term__V215, 4)); int sub__V220_count = term__V215_count*LINK_COUNT(sub__V220); permitUnusedInt(sub__V220_count);
+    /* sub__V220 = &#5 */
+    Term sub__V221 = SUB(term__V215, 5); permitUnusedTerm(sub__V221); int sub__V221_count = term__V215_count*LINK_COUNT(sub__V221); permitUnusedInt(sub__V221_count);
+    CRSX_CHECK_SORT(sink__V214->context, sub__V221, &sort_M_Reified_xSort); /* sub__V221 = &#6 */
+    Term sub__V222 = SUB(term__V215, 6); permitUnusedTerm(sub__V222); int sub__V222_count = term__V215_count*LINK_COUNT(sub__V222); permitUnusedInt(sub__V222_count);
+    /* sub__V222 = &#7 */
     
-    NamedPropertyLink namedP__V247 = LINK_NamedPropertyLink(sink__V238->context, NAMED_PROPERTIES(term__V239));
-    VariablePropertyLink varP__V248 = LINK_VariablePropertyLink(sink__V238->context, VARIABLE_PROPERTIES(term__V239));
-    Hashset namedFV__V249 = LINK_VARIABLESET(sink__V238->context, asConstruction(term__V239)->properties->namedFreeVars);
-    Hashset varFV__V250 = LINK_VARIABLESET(sink__V238->context, asConstruction(term__V239)->properties->variableFreeVars);
-    UNLINK(sink__V238->context, term__V239);
-    { START(sink__V238, _M__sTextCons);
-      { START(sink__V238, _M__sTextBreak);
-        LITERAL(sink__V238,  "\n" ); END(sink__V238, _M__sTextBreak); }
-      { START(sink__V238, _M__sTextCons);
-        { START(sink__V238, _M__sTextChars);
-          LITERAL(sink__V238,  "/* FUNCTION " ); END(sink__V238, _M__sTextChars); }
-        { START(sink__V238, _M__sTextCons);
-          { START(sink__V238, _M__sTextEmbed);
-            { START(sink__V238, _M_AsText);
-              { START(sink__V238, _M_COMMENT_xTOKEN);
-                COPY(sink__V238, sub__V240);END(sink__V238, _M_COMMENT_xTOKEN); }
-              END(sink__V238, _M_AsText); }
-            END(sink__V238, _M__sTextEmbed); }
-          { START(sink__V238, _M__sTextCons);
-            { START(sink__V238, _M__sTextChars);
-              LITERAL(sink__V238,  " HEADER DECLARATIONS. */" ); END(sink__V238, _M__sTextChars); }
-            { START(sink__V238, _M__sTextCons);
-              { START(sink__V238, _M__sTextBreak);
-                LITERAL(sink__V238,  "\n" ); END(sink__V238, _M__sTextBreak); }
-              { START(sink__V238, _M__sTextCons);
-                { START(sink__V238, _M__sTextEmbed);
-                  { START(sink__V238, _M_AsText);
-                    { START(sink__V238, _M_MapText_s1);
-                      COPY(sink__V238, sub__V244);{ Variable x__V251 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V238->context,"x__V251");
-                        Variable binds__V252[1] = {x__V251}; BINDS(sink__V238, 1, binds__V252);
-                        { START(sink__V238, _M_H_Form);
-                          USE(sink__V238, x__V251); END(sink__V238, _M_H_Form); }
+    NamedPropertyLink namedP__V223 = LINK_NamedPropertyLink(sink__V214->context, NAMED_PROPERTIES(term__V215));
+    VariablePropertyLink varP__V224 = LINK_VariablePropertyLink(sink__V214->context, VARIABLE_PROPERTIES(term__V215));
+    Hashset namedFV__V225 = LINK_VARIABLESET(sink__V214->context, asConstruction(term__V215)->properties->namedFreeVars);
+    Hashset varFV__V226 = LINK_VARIABLESET(sink__V214->context, asConstruction(term__V215)->properties->variableFreeVars);
+    UNLINK(sink__V214->context, term__V215);
+    { START(sink__V214, _M__sTextCons);
+      { START(sink__V214, _M__sTextBreak);
+        LITERAL(sink__V214,  "\n" ); END(sink__V214, _M__sTextBreak); }
+      { START(sink__V214, _M__sTextCons);
+        { START(sink__V214, _M__sTextChars);
+          LITERAL(sink__V214,  "/* FUNCTION " ); END(sink__V214, _M__sTextChars); }
+        { START(sink__V214, _M__sTextCons);
+          { START(sink__V214, _M__sTextEmbed);
+            { START(sink__V214, _M_AsText);
+              { START(sink__V214, _M_COMMENT_xTOKEN);
+                COPY(sink__V214, sub__V216);END(sink__V214, _M_COMMENT_xTOKEN); }
+              END(sink__V214, _M_AsText); }
+            END(sink__V214, _M__sTextEmbed); }
+          { START(sink__V214, _M__sTextCons);
+            { START(sink__V214, _M__sTextChars);
+              LITERAL(sink__V214,  " HEADER DECLARATIONS. */" ); END(sink__V214, _M__sTextChars); }
+            { START(sink__V214, _M__sTextCons);
+              { START(sink__V214, _M__sTextBreak);
+                LITERAL(sink__V214,  "\n" ); END(sink__V214, _M__sTextBreak); }
+              { START(sink__V214, _M__sTextCons);
+                { START(sink__V214, _M__sTextEmbed);
+                  { START(sink__V214, _M_AsText);
+                    { START(sink__V214, _M_MapText_s1);
+                      COPY(sink__V214, sub__V220);{ Variable x__V227 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V214->context,"x__V227");
+                        Variable binds__V228[1] = {x__V227}; BINDS(sink__V214, 1, binds__V228);
+                        { START(sink__V214, _M_H_Form);
+                          USE(sink__V214, x__V227); END(sink__V214, _M_H_Form); }
                          }
-                      END(sink__V238, _M_MapText_s1); }
-                    END(sink__V238, _M_AsText); }
-                  END(sink__V238, _M__sTextEmbed); }
-                { START(sink__V238, _M__sTextCons);
-                  { START(sink__V238, _M__sTextChars);
-                    LITERAL(sink__V238,  "extern int " ); END(sink__V238, _M__sTextChars); }
-                  { START(sink__V238, _M__sTextCons);
-                    { START(sink__V238, _M__sTextEmbed);
-                      { START(sink__V238, _M_AsText);
-                        { START(sink__V238, _M_Step);
-                          COPY(sink__V238, sub__V243);END(sink__V238, _M_Step); }
-                        END(sink__V238, _M_AsText); }
-                      END(sink__V238, _M__sTextEmbed); }
-                    { START(sink__V238, _M__sTextCons);
-                      { START(sink__V238, _M__sTextChars);
-                        LITERAL(sink__V238,  "(Sink,Term);" ); END(sink__V238, _M__sTextChars); }
-                      { START(sink__V238, _M__sTextCons);
-                        { START(sink__V238, _M__sTextBreak);
-                          LITERAL(sink__V238,  "\n" ); END(sink__V238, _M__sTextBreak); }
-                        { START(sink__V238, _M__sTextNil);
-                          END(sink__V238, _M__sTextNil); }
-                        END(sink__V238, _M__sTextCons); }
-                      END(sink__V238, _M__sTextCons); }
-                    END(sink__V238, _M__sTextCons); }
-                  END(sink__V238, _M__sTextCons); }
-                END(sink__V238, _M__sTextCons); }
-              END(sink__V238, _M__sTextCons); }
-            END(sink__V238, _M__sTextCons); }
-          END(sink__V238, _M__sTextCons); }
-        END(sink__V238, _M__sTextCons); }
-      END(sink__V238, _M__sTextCons); }
-    UNLINK_VARIABLESET(sink__V238->context, namedFV__V249); UNLINK_VARIABLESET(sink__V238->context, varFV__V250);
-    UNLINK_NamedPropertyLink(sink__V238->context, namedP__V247); UNLINK_VariablePropertyLink(sink__V238->context, varP__V248);
+                      END(sink__V214, _M_MapText_s1); }
+                    END(sink__V214, _M_AsText); }
+                  END(sink__V214, _M__sTextEmbed); }
+                { START(sink__V214, _M__sTextCons);
+                  { START(sink__V214, _M__sTextChars);
+                    LITERAL(sink__V214,  "extern int " ); END(sink__V214, _M__sTextChars); }
+                  { START(sink__V214, _M__sTextCons);
+                    { START(sink__V214, _M__sTextEmbed);
+                      { START(sink__V214, _M_AsText);
+                        { START(sink__V214, _M_Step);
+                          COPY(sink__V214, sub__V219);END(sink__V214, _M_Step); }
+                        END(sink__V214, _M_AsText); }
+                      END(sink__V214, _M__sTextEmbed); }
+                    { START(sink__V214, _M__sTextCons);
+                      { START(sink__V214, _M__sTextChars);
+                        LITERAL(sink__V214,  "(Sink,Term);" ); END(sink__V214, _M__sTextChars); }
+                      { START(sink__V214, _M__sTextCons);
+                        { START(sink__V214, _M__sTextBreak);
+                          LITERAL(sink__V214,  "\n" ); END(sink__V214, _M__sTextBreak); }
+                        { START(sink__V214, _M__sTextNil);
+                          END(sink__V214, _M__sTextNil); }
+                        END(sink__V214, _M__sTextCons); }
+                      END(sink__V214, _M__sTextCons); }
+                    END(sink__V214, _M__sTextCons); }
+                  END(sink__V214, _M__sTextCons); }
+                END(sink__V214, _M__sTextCons); }
+              END(sink__V214, _M__sTextCons); }
+            END(sink__V214, _M__sTextCons); }
+          END(sink__V214, _M__sTextCons); }
+        END(sink__V214, _M__sTextCons); }
+      END(sink__V214, _M__sTextCons); }
+    UNLINK_VARIABLESET(sink__V214->context, namedFV__V225); UNLINK_VARIABLESET(sink__V214->context, varFV__V226);
+    UNLINK_NamedPropertyLink(sink__V214->context, namedP__V223); UNLINK_VariablePropertyLink(sink__V214->context, varP__V224);
     return 1;
   } while (0);
   return 0;
@@ -1169,294 +1095,372 @@ int conBindOffs_M_ComputeHeader2[] = {0 , 0 , 0 , 0};
 char *nameFun_M_ComputeHeader2(Term term) { return  "ComputeHeader2" ; }
 struct _ConstructionDescriptor descriptor_M_ComputeHeader2 = {&sort_M_Reified_xVariable, 0, 3, sizeof(STRUCT_Con_M_ComputeHeader2), conBindOffs_M_ComputeHeader2, &nameFun_M_ComputeHeader2, &step_M_ComputeHeader2};
 
-int step_M_ComputeHeader2(Sink sink__V253, Term term__V254)
+int step_M_ComputeHeader2(Sink sink__V229, Term term__V230)
 {
-  int term__V254_count = LINK_COUNT(term__V254); permitUnusedInt(term__V254_count);
+  int term__V230_count = LINK_COUNT(term__V230); permitUnusedInt(term__V230_count);
   do {
     /* Contraction rule HEADER-ComputeHeader2-1. */
-    ASSERT(sink__V253->context, !strcmp(SYMBOL(term__V254),  "ComputeHeader2" ));
-    Term sub__V255 = LINK(sink__V253->context, SUB(term__V254, 0)); int sub__V255_count = term__V254_count*LINK_COUNT(sub__V255); permitUnusedInt(sub__V255_count);
-    /* sub__V255 = &#1 */
-    Term sub__V256 = LINK(sink__V253->context, SUB(term__V254, 1)); int sub__V256_count = term__V254_count*LINK_COUNT(sub__V256); permitUnusedInt(sub__V256_count);
-    /* sub__V256 = &#2 */
-    Term sub__V257 = LINK(sink__V253->context, SUB(term__V254, 2)); int sub__V257_count = term__V254_count*LINK_COUNT(sub__V257); permitUnusedInt(sub__V257_count);
-    UNLINK_SUB(sink__V253->context, term__V254,  2); NORMALIZE(sink__V253->context, sub__V257); SUB(term__V254,  2) = LINK(sink__V253->context, sub__V257);
-    /* sub__V257 = &#3 */
+    ASSERT(sink__V229->context, !strcmp(SYMBOL(term__V230),  "ComputeHeader2" ));
+    Term sub__V231 = LINK(sink__V229->context, SUB(term__V230, 0)); int sub__V231_count = term__V230_count*LINK_COUNT(sub__V231); permitUnusedInt(sub__V231_count);
+    /* sub__V231 = &#1 */
+    Term sub__V232 = LINK(sink__V229->context, SUB(term__V230, 1)); int sub__V232_count = term__V230_count*LINK_COUNT(sub__V232); permitUnusedInt(sub__V232_count);
+    /* sub__V232 = &#2 */
+    Term sub__V233 = LINK(sink__V229->context, SUB(term__V230, 2)); int sub__V233_count = term__V230_count*LINK_COUNT(sub__V233); permitUnusedInt(sub__V233_count);
+    UNLINK_SUB(sink__V229->context, term__V230,  2); NORMALIZE(sink__V229->context, sub__V233); SUB(term__V230,  2) = LINK(sink__V229->context, sub__V233);
+    /* sub__V233 = &#3 */
     
-    NamedPropertyLink namedP__V258 = LINK_NamedPropertyLink(sink__V253->context, NAMED_PROPERTIES(term__V254));
-    VariablePropertyLink varP__V259 = LINK_VariablePropertyLink(sink__V253->context, VARIABLE_PROPERTIES(term__V254));
-    Hashset namedFV__V260 = LINK_VARIABLESET(sink__V253->context, asConstruction(term__V254)->properties->namedFreeVars);
-    Hashset varFV__V261 = LINK_VARIABLESET(sink__V253->context, asConstruction(term__V254)->properties->variableFreeVars);
-    UNLINK(sink__V253->context, term__V254);
-    { START(sink__V253, _M__sTextCons);
-      { START(sink__V253, _M__sTextChars);
-        LITERAL(sink__V253,  "/* C HEADER FOR CRSX " ); END(sink__V253, _M__sTextChars); }
-      { START(sink__V253, _M__sTextCons);
-        { START(sink__V253, _M__sTextEmbed);
-          { START(sink__V253, _M_AsText);
-            { START(sink__V253, _M_COMMENT_xTOKEN);
-              COPY(sink__V253, LINK(sink__V253->context, sub__V255));END(sink__V253, _M_COMMENT_xTOKEN); }
-            END(sink__V253, _M_AsText); }
-          END(sink__V253, _M__sTextEmbed); }
-        { START(sink__V253, _M__sTextCons);
-          { START(sink__V253, _M__sTextChars);
-            LITERAL(sink__V253,  " MODULE " ); END(sink__V253, _M__sTextChars); }
-          { START(sink__V253, _M__sTextCons);
-            { START(sink__V253, _M__sTextEmbed);
-              { START(sink__V253, _M_AsText);
-                { START(sink__V253, _M_COMMENT_xTOKEN);
-                  COPY(sink__V253, LINK(sink__V253->context, sub__V257));END(sink__V253, _M_COMMENT_xTOKEN); }
-                END(sink__V253, _M_AsText); }
-              END(sink__V253, _M__sTextEmbed); }
-            { START(sink__V253, _M__sTextCons);
-              { START(sink__V253, _M__sTextChars);
-                LITERAL(sink__V253,  ". */" ); END(sink__V253, _M__sTextChars); }
-              { START(sink__V253, _M__sTextCons);
-                { START(sink__V253, _M__sTextBreak);
-                  LITERAL(sink__V253,  "\n" ); END(sink__V253, _M__sTextBreak); }
-                { START(sink__V253, _M__sTextCons);
-                  { START(sink__V253, _M__sTextChars);
-                    LITERAL(sink__V253,  "#ifndef CRSX_" ); END(sink__V253, _M__sTextChars); }
-                  { START(sink__V253, _M__sTextCons);
-                    { START(sink__V253, _M__sTextEmbed);
-                      { START(sink__V253, _M_AsText);
-                        { START(sink__V253, _M_MANGLE);
-                          COPY(sink__V253, LINK(sink__V253->context, sub__V255));END(sink__V253, _M_MANGLE); }
-                        END(sink__V253, _M_AsText); }
-                      END(sink__V253, _M__sTextEmbed); }
-                    { START(sink__V253, _M__sTextCons);
-                      { START(sink__V253, _M__sTextEmbed);
-                        { START(sink__V253, _M_AsText);
-                          { START(sink__V253, _M_MANGLE);
-                            COPY(sink__V253, LINK(sink__V253->context, sub__V257));END(sink__V253, _M_MANGLE); }
-                          END(sink__V253, _M_AsText); }
-                        END(sink__V253, _M__sTextEmbed); }
-                      { START(sink__V253, _M__sTextCons);
-                        { START(sink__V253, _M__sTextChars);
-                          LITERAL(sink__V253,  "_H" ); END(sink__V253, _M__sTextChars); }
-                        { START(sink__V253, _M__sTextCons);
-                          { START(sink__V253, _M__sTextBreak);
-                            LITERAL(sink__V253,  "\n" ); END(sink__V253, _M__sTextBreak); }
-                          { START(sink__V253, _M__sTextCons);
-                            { START(sink__V253, _M__sTextChars);
-                              LITERAL(sink__V253,  "#define CRSX_" ); END(sink__V253, _M__sTextChars); }
-                            { START(sink__V253, _M__sTextCons);
-                              { START(sink__V253, _M__sTextEmbed);
-                                { START(sink__V253, _M_AsText);
-                                  { START(sink__V253, _M_MANGLE);
-                                    COPY(sink__V253, LINK(sink__V253->context, sub__V255));END(sink__V253, _M_MANGLE); }
-                                  END(sink__V253, _M_AsText); }
-                                END(sink__V253, _M__sTextEmbed); }
-                              { START(sink__V253, _M__sTextCons);
-                                { START(sink__V253, _M__sTextEmbed);
-                                  { START(sink__V253, _M_AsText);
-                                    { START(sink__V253, _M_MANGLE);
-                                      COPY(sink__V253, LINK(sink__V253->context, sub__V257));END(sink__V253, _M_MANGLE); }
-                                    END(sink__V253, _M_AsText); }
-                                  END(sink__V253, _M__sTextEmbed); }
-                                { START(sink__V253, _M__sTextCons);
-                                  { START(sink__V253, _M__sTextChars);
-                                    LITERAL(sink__V253,  "_H" ); END(sink__V253, _M__sTextChars); }
-                                  { START(sink__V253, _M__sTextCons);
-                                    { START(sink__V253, _M__sTextBreak);
-                                      LITERAL(sink__V253,  "\n" ); END(sink__V253, _M__sTextBreak); }
-                                    { START(sink__V253, _M__sTextCons);
-                                      { START(sink__V253, _M__sTextEmbed);
-                                        { START(sink__V253, _M_AsText);
-                                          { START(sink__V253, _M_DelayMapText_s1);
-                                            {char* str__V262;{ Term term__V263;
-                                                { char *value__V264 = getenv( "HEADERS" );
-                                                  if (value__V264) term__V263 = makeStringLiteral(sink__V253->context, value__V264);
-                                                  else {term__V263 = makeStringLiteral(sink__V253->context,  "" );
+    NamedPropertyLink namedP__V234 = LINK_NamedPropertyLink(sink__V229->context, NAMED_PROPERTIES(term__V230));
+    VariablePropertyLink varP__V235 = LINK_VariablePropertyLink(sink__V229->context, VARIABLE_PROPERTIES(term__V230));
+    Hashset namedFV__V236 = LINK_VARIABLESET(sink__V229->context, asConstruction(term__V230)->properties->namedFreeVars);
+    Hashset varFV__V237 = LINK_VARIABLESET(sink__V229->context, asConstruction(term__V230)->properties->variableFreeVars);
+    UNLINK(sink__V229->context, term__V230);
+    { START(sink__V229, _M__sTextCons);
+      { START(sink__V229, _M__sTextChars);
+        LITERAL(sink__V229,  "/* C HEADER FOR CRSX " ); END(sink__V229, _M__sTextChars); }
+      { START(sink__V229, _M__sTextCons);
+        { START(sink__V229, _M__sTextEmbed);
+          { START(sink__V229, _M_AsText);
+            { START(sink__V229, _M_COMMENT_xTOKEN);
+              COPY(sink__V229, LINK(sink__V229->context, sub__V231));END(sink__V229, _M_COMMENT_xTOKEN); }
+            END(sink__V229, _M_AsText); }
+          END(sink__V229, _M__sTextEmbed); }
+        { START(sink__V229, _M__sTextCons);
+          { START(sink__V229, _M__sTextChars);
+            LITERAL(sink__V229,  " MODULE " ); END(sink__V229, _M__sTextChars); }
+          { START(sink__V229, _M__sTextCons);
+            { START(sink__V229, _M__sTextEmbed);
+              { START(sink__V229, _M_AsText);
+                { START(sink__V229, _M_COMMENT_xTOKEN);
+                  COPY(sink__V229, LINK(sink__V229->context, sub__V233));END(sink__V229, _M_COMMENT_xTOKEN); }
+                END(sink__V229, _M_AsText); }
+              END(sink__V229, _M__sTextEmbed); }
+            { START(sink__V229, _M__sTextCons);
+              { START(sink__V229, _M__sTextChars);
+                LITERAL(sink__V229,  ". */" ); END(sink__V229, _M__sTextChars); }
+              { START(sink__V229, _M__sTextCons);
+                { START(sink__V229, _M__sTextBreak);
+                  LITERAL(sink__V229,  "\n" ); END(sink__V229, _M__sTextBreak); }
+                { START(sink__V229, _M__sTextCons);
+                  { START(sink__V229, _M__sTextChars);
+                    LITERAL(sink__V229,  "#ifndef CRSX_" ); END(sink__V229, _M__sTextChars); }
+                  { START(sink__V229, _M__sTextCons);
+                    { START(sink__V229, _M__sTextEmbed);
+                      { START(sink__V229, _M_AsText);
+                        { START(sink__V229, _M_MANGLE);
+                          COPY(sink__V229, LINK(sink__V229->context, sub__V231));END(sink__V229, _M_MANGLE); }
+                        END(sink__V229, _M_AsText); }
+                      END(sink__V229, _M__sTextEmbed); }
+                    { START(sink__V229, _M__sTextCons);
+                      { START(sink__V229, _M__sTextEmbed);
+                        { START(sink__V229, _M_AsText);
+                          { START(sink__V229, _M_MANGLE);
+                            COPY(sink__V229, LINK(sink__V229->context, sub__V233));END(sink__V229, _M_MANGLE); }
+                          END(sink__V229, _M_AsText); }
+                        END(sink__V229, _M__sTextEmbed); }
+                      { START(sink__V229, _M__sTextCons);
+                        { START(sink__V229, _M__sTextChars);
+                          LITERAL(sink__V229,  "_H" ); END(sink__V229, _M__sTextChars); }
+                        { START(sink__V229, _M__sTextCons);
+                          { START(sink__V229, _M__sTextBreak);
+                            LITERAL(sink__V229,  "\n" ); END(sink__V229, _M__sTextBreak); }
+                          { START(sink__V229, _M__sTextCons);
+                            { START(sink__V229, _M__sTextChars);
+                              LITERAL(sink__V229,  "#define CRSX_" ); END(sink__V229, _M__sTextChars); }
+                            { START(sink__V229, _M__sTextCons);
+                              { START(sink__V229, _M__sTextEmbed);
+                                { START(sink__V229, _M_AsText);
+                                  { START(sink__V229, _M_MANGLE);
+                                    COPY(sink__V229, LINK(sink__V229->context, sub__V231));END(sink__V229, _M_MANGLE); }
+                                  END(sink__V229, _M_AsText); }
+                                END(sink__V229, _M__sTextEmbed); }
+                              { START(sink__V229, _M__sTextCons);
+                                { START(sink__V229, _M__sTextEmbed);
+                                  { START(sink__V229, _M_AsText);
+                                    { START(sink__V229, _M_MANGLE);
+                                      COPY(sink__V229, LINK(sink__V229->context, sub__V233));END(sink__V229, _M_MANGLE); }
+                                    END(sink__V229, _M_AsText); }
+                                  END(sink__V229, _M__sTextEmbed); }
+                                { START(sink__V229, _M__sTextCons);
+                                  { START(sink__V229, _M__sTextChars);
+                                    LITERAL(sink__V229,  "_H" ); END(sink__V229, _M__sTextChars); }
+                                  { START(sink__V229, _M__sTextCons);
+                                    { START(sink__V229, _M__sTextBreak);
+                                      LITERAL(sink__V229,  "\n" ); END(sink__V229, _M__sTextBreak); }
+                                    { START(sink__V229, _M__sTextCons);
+                                      { START(sink__V229, _M__sTextEmbed);
+                                        { START(sink__V229, _M_AsText);
+                                          { START(sink__V229, _M_DelayMapText_s1);
+                                            {char* str__V238;{ Term term__V239;
+                                                { char *value__V240 = getenv( "HEADERS" );
+                                                  if (value__V240) term__V239 = makeStringLiteral(sink__V229->context, value__V240);
+                                                  else {term__V239 = makeStringLiteral(sink__V229->context,  "" );
                                                     }
                                                 }
-                                                str__V262 = SYMBOL(term__V263);
-                                                UNLINK(sink__V253->context, term__V263);
+                                                str__V238 = SYMBOL(term__V239);
+                                                UNLINK(sink__V229->context, term__V239);
                                                 }
                                               
-                                              char* regex__V265;
-                                              regex__V265 =  ";" ; SEND_SPLIT(str__V262, regex__V265, sink__V253);
+                                              char* regex__V241;
+                                              regex__V241 =  ";" ; SEND_SPLIT(str__V238, regex__V241, sink__V229);
                                             }
-                                            { Variable x__V266 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V253->context,"x__V266");
-                                              Variable x__V267 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V253->context,"x__V267");
-                                              Variable binds__V268[2] = {x__V266,x__V267}; BINDS(sink__V253, 2, binds__V268);
-                                              { START(sink__V253, _M__sTextCons);
-                                                { START(sink__V253, _M__sTextChars);
-                                                  LITERAL(sink__V253,  "#include \"" );
-                                                  END(sink__V253, _M__sTextChars); }
-                                                { START(sink__V253, _M__sTextCons);
-                                                  { START(sink__V253, _M__sTextEmbed);
-                                                    { START(sink__V253, _M_AsText);
-                                                      { START(sink__V253, _M_DTOKEN);
-                                                        USE(sink__V253, x__V266);
-                                                        USE(sink__V253, x__V267);
-                                                        END(sink__V253, _M_DTOKEN); }
-                                                      END(sink__V253, _M_AsText); }
-                                                    END(sink__V253, _M__sTextEmbed); }
-                                                  { START(sink__V253, _M__sTextCons);
-                                                    { START(sink__V253, _M__sTextChars);
-                                                      LITERAL(sink__V253,  "\"" );
-                                                      END(sink__V253, _M__sTextChars); }
-                                                    { START(sink__V253, _M__sTextCons);
-                                                      { START(sink__V253, _M__sTextBreak);
-                                                        LITERAL(sink__V253,  "\n" );
-                                                        END(sink__V253, _M__sTextBreak); }
-                                                      { START(sink__V253, _M__sTextNil);
-                                                        END(sink__V253, _M__sTextNil); }
-                                                      END(sink__V253, _M__sTextCons); }
-                                                    END(sink__V253, _M__sTextCons); }
-                                                  END(sink__V253, _M__sTextCons); }
-                                                END(sink__V253, _M__sTextCons); }
+                                            { Variable x__V242 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V229->context,"x__V242");
+                                              Variable x__V243 = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink__V229->context,"x__V243");
+                                              Variable binds__V244[2] = {x__V242,x__V243}; BINDS(sink__V229, 2, binds__V244);
+                                              { START(sink__V229, _M__sTextCons);
+                                                { START(sink__V229, _M__sTextChars);
+                                                  LITERAL(sink__V229,  "#include \"" );
+                                                  END(sink__V229, _M__sTextChars); }
+                                                { START(sink__V229, _M__sTextCons);
+                                                  { START(sink__V229, _M__sTextEmbed);
+                                                    { START(sink__V229, _M_AsText);
+                                                      { START(sink__V229, _M_DTOKEN);
+                                                        USE(sink__V229, x__V242);
+                                                        USE(sink__V229, x__V243);
+                                                        END(sink__V229, _M_DTOKEN); }
+                                                      END(sink__V229, _M_AsText); }
+                                                    END(sink__V229, _M__sTextEmbed); }
+                                                  { START(sink__V229, _M__sTextCons);
+                                                    { START(sink__V229, _M__sTextChars);
+                                                      LITERAL(sink__V229,  "\"" );
+                                                      END(sink__V229, _M__sTextChars); }
+                                                    { START(sink__V229, _M__sTextCons);
+                                                      { START(sink__V229, _M__sTextBreak);
+                                                        LITERAL(sink__V229,  "\n" );
+                                                        END(sink__V229, _M__sTextBreak); }
+                                                      { START(sink__V229, _M__sTextNil);
+                                                        END(sink__V229, _M__sTextNil); }
+                                                      END(sink__V229, _M__sTextCons); }
+                                                    END(sink__V229, _M__sTextCons); }
+                                                  END(sink__V229, _M__sTextCons); }
+                                                END(sink__V229, _M__sTextCons); }
                                                }
-                                            END(sink__V253, _M_DelayMapText_s1); }
-                                          END(sink__V253, _M_AsText); }
-                                        END(sink__V253, _M__sTextEmbed); }
-                                      { START(sink__V253, _M__sTextCons);
-                                        { START(sink__V253, _M__sTextBreak);
-                                          LITERAL(sink__V253,  "\n" ); END(sink__V253, _M__sTextBreak); }
-                                        { START(sink__V253, _M__sTextCons);
-                                          { START(sink__V253, _M__sTextChars);
-                                            LITERAL(sink__V253,  "#ifdef __cplusplus" );
-                                            END(sink__V253, _M__sTextChars); }
-                                          { START(sink__V253, _M__sTextCons);
-                                            { START(sink__V253, _M__sTextBreak);
-                                              LITERAL(sink__V253,  "\n" );
-                                              END(sink__V253, _M__sTextBreak); }
-                                            { START(sink__V253, _M__sTextCons);
-                                              { START(sink__V253, _M__sTextChars);
-                                                LITERAL(sink__V253,  "extern \"C\" {" );
-                                                END(sink__V253, _M__sTextChars); }
-                                              { START(sink__V253, _M__sTextCons);
-                                                { START(sink__V253, _M__sTextBreak);
-                                                  LITERAL(sink__V253,  "\n" );
-                                                  END(sink__V253, _M__sTextBreak); }
-                                                { START(sink__V253, _M__sTextCons);
-                                                  { START(sink__V253, _M__sTextChars);
-                                                    LITERAL(sink__V253,  "#endif" );
-                                                    END(sink__V253, _M__sTextChars); }
-                                                  { START(sink__V253, _M__sTextCons);
-                                                    { START(sink__V253, _M__sTextBreak);
-                                                      LITERAL(sink__V253,  "\n" );
-                                                      END(sink__V253, _M__sTextBreak); }
-                                                    { START(sink__V253, _M__sTextCons);
-                                                      { START(sink__V253, _M__sTextEmbed);
-                                                        { START(sink__V253, _M_AsText);
-                                                          { START(sink__V253, _M_H_Declarations);
-                                                            COPY(sink__V253, sub__V256);END(sink__V253, _M_H_Declarations); }
-                                                          END(sink__V253, _M_AsText); }
-                                                        END(sink__V253, _M__sTextEmbed); }
-                                                      { START(sink__V253, _M__sTextCons);
-                                                        { START(sink__V253, _M__sTextBreak);
-                                                          LITERAL(sink__V253,  "\n" );
-                                                          END(sink__V253, _M__sTextBreak); }
-                                                        { START(sink__V253, _M__sTextCons);
-                                                          { START(sink__V253, _M__sTextChars);
-                                                            LITERAL(sink__V253,  "#ifdef __cplusplus" );
-                                                            END(sink__V253, _M__sTextChars); }
-                                                          { START(sink__V253, _M__sTextCons);
-                                                            { START(sink__V253, _M__sTextBreak);
-                                                              LITERAL(sink__V253,  "\n" );
-                                                              END(sink__V253, _M__sTextBreak); }
-                                                            { START(sink__V253, _M__sTextCons);
-                                                              { START(sink__V253, _M__sTextChars);
-                                                                LITERAL(sink__V253,  "}" );
-                                                                END(sink__V253, _M__sTextChars); }
-                                                              { START(sink__V253, _M__sTextCons);
-                                                                { START(sink__V253, _M__sTextBreak);
-                                                                  LITERAL(sink__V253,  "\n" );
-                                                                  END(sink__V253, _M__sTextBreak); }
-                                                                { START(sink__V253, _M__sTextCons);
-                                                                  { START(sink__V253, _M__sTextChars);
-                                                                    LITERAL(sink__V253,  "#endif" );
-                                                                    END(sink__V253, _M__sTextChars); }
-                                                                  { START(sink__V253, _M__sTextCons);
-                                                                    { START(sink__V253, _M__sTextBreak);
-                                                                      LITERAL(sink__V253,  "\n" );
-                                                                      END(sink__V253, _M__sTextBreak); }
-                                                                    { START(sink__V253, _M__sTextCons);
-                                                                      { START(sink__V253, _M__sTextChars);
-                                                                        LITERAL(sink__V253,  "/* END OF C HEADER FOR CRSX " );
-                                                                        END(sink__V253, _M__sTextChars); }
-                                                                      { START(sink__V253, _M__sTextCons);
-                                                                        { START(sink__V253, _M__sTextEmbed);
-                                                                          { START(sink__V253, _M_AsText);
-                                                                            { START(sink__V253, _M_COMMENT_xTOKEN);
-                                                                              COPY(sink__V253, sub__V255);END(sink__V253, _M_COMMENT_xTOKEN); }
-                                                                            END(sink__V253, _M_AsText); }
-                                                                          END(sink__V253, _M__sTextEmbed); }
-                                                                        { START(sink__V253, _M__sTextCons);
-                                                                          { START(sink__V253, _M__sTextChars);
-                                                                            LITERAL(sink__V253,  " MODULE " );
-                                                                            END(sink__V253, _M__sTextChars); }
-                                                                          { START(sink__V253, _M__sTextCons);
-                                                                            { START(sink__V253, _M__sTextEmbed);
-                                                                              { START(sink__V253, _M_AsText);
-                                                                                { START(sink__V253, _M_COMMENT_xTOKEN);
-                                                                                  COPY(sink__V253, sub__V257);END(sink__V253, _M_COMMENT_xTOKEN); }
-                                                                                END(sink__V253, _M_AsText); }
-                                                                              END(sink__V253, _M__sTextEmbed); }
-                                                                            { START(sink__V253, _M__sTextCons);
-                                                                              { START(sink__V253, _M__sTextChars);
-                                                                                LITERAL(sink__V253,  ". */" );
-                                                                                END(sink__V253, _M__sTextChars); }
-                                                                              { START(sink__V253, _M__sTextCons);
-                                                                                { START(sink__V253, _M__sTextBreak);
-                                                                                  LITERAL(sink__V253,  "\n" );
-                                                                                  END(sink__V253, _M__sTextBreak); }
-                                                                                { START(sink__V253, _M__sTextCons);
-                                                                                  { START(sink__V253, _M__sTextChars);
-                                                                                    LITERAL(sink__V253,  "#endif" );
-                                                                                    END(sink__V253, _M__sTextChars); }
-                                                                                  { START(sink__V253, _M__sTextCons);
-                                                                                    { START(sink__V253, _M__sTextBreak);
-                                                                                      LITERAL(sink__V253,  "\n" );
-                                                                                      END(sink__V253, _M__sTextBreak); }
-                                                                                    { START(sink__V253, _M__sTextNil);
-                                                                                      END(sink__V253, _M__sTextNil); }
-                                                                                    END(sink__V253, _M__sTextCons); }
-                                                                                  END(sink__V253, _M__sTextCons); }
-                                                                                END(sink__V253, _M__sTextCons); }
-                                                                              END(sink__V253, _M__sTextCons); }
-                                                                            END(sink__V253, _M__sTextCons); }
-                                                                          END(sink__V253, _M__sTextCons); }
-                                                                        END(sink__V253, _M__sTextCons); }
-                                                                      END(sink__V253, _M__sTextCons); }
-                                                                    END(sink__V253, _M__sTextCons); }
-                                                                  END(sink__V253, _M__sTextCons); }
-                                                                END(sink__V253, _M__sTextCons); }
-                                                              END(sink__V253, _M__sTextCons); }
-                                                            END(sink__V253, _M__sTextCons); }
-                                                          END(sink__V253, _M__sTextCons); }
-                                                        END(sink__V253, _M__sTextCons); }
-                                                      END(sink__V253, _M__sTextCons); }
-                                                    END(sink__V253, _M__sTextCons); }
-                                                  END(sink__V253, _M__sTextCons); }
-                                                END(sink__V253, _M__sTextCons); }
-                                              END(sink__V253, _M__sTextCons); }
-                                            END(sink__V253, _M__sTextCons); }
-                                          END(sink__V253, _M__sTextCons); }
-                                        END(sink__V253, _M__sTextCons); }
-                                      END(sink__V253, _M__sTextCons); }
-                                    END(sink__V253, _M__sTextCons); }
-                                  END(sink__V253, _M__sTextCons); }
-                                END(sink__V253, _M__sTextCons); }
-                              END(sink__V253, _M__sTextCons); }
-                            END(sink__V253, _M__sTextCons); }
-                          END(sink__V253, _M__sTextCons); }
-                        END(sink__V253, _M__sTextCons); }
-                      END(sink__V253, _M__sTextCons); }
-                    END(sink__V253, _M__sTextCons); }
-                  END(sink__V253, _M__sTextCons); }
-                END(sink__V253, _M__sTextCons); }
-              END(sink__V253, _M__sTextCons); }
-            END(sink__V253, _M__sTextCons); }
-          END(sink__V253, _M__sTextCons); }
-        END(sink__V253, _M__sTextCons); }
-      END(sink__V253, _M__sTextCons); }
-    UNLINK_VARIABLESET(sink__V253->context, namedFV__V260); UNLINK_VARIABLESET(sink__V253->context, varFV__V261);
-    UNLINK_NamedPropertyLink(sink__V253->context, namedP__V258); UNLINK_VariablePropertyLink(sink__V253->context, varP__V259);
+                                            END(sink__V229, _M_DelayMapText_s1); }
+                                          END(sink__V229, _M_AsText); }
+                                        END(sink__V229, _M__sTextEmbed); }
+                                      { START(sink__V229, _M__sTextCons);
+                                        { START(sink__V229, _M__sTextBreak);
+                                          LITERAL(sink__V229,  "\n" ); END(sink__V229, _M__sTextBreak); }
+                                        { START(sink__V229, _M__sTextCons);
+                                          { START(sink__V229, _M__sTextChars);
+                                            LITERAL(sink__V229,  "#ifdef __cplusplus" );
+                                            END(sink__V229, _M__sTextChars); }
+                                          { START(sink__V229, _M__sTextCons);
+                                            { START(sink__V229, _M__sTextBreak);
+                                              LITERAL(sink__V229,  "\n" );
+                                              END(sink__V229, _M__sTextBreak); }
+                                            { START(sink__V229, _M__sTextCons);
+                                              { START(sink__V229, _M__sTextChars);
+                                                LITERAL(sink__V229,  "extern \"C\" {" );
+                                                END(sink__V229, _M__sTextChars); }
+                                              { START(sink__V229, _M__sTextCons);
+                                                { START(sink__V229, _M__sTextBreak);
+                                                  LITERAL(sink__V229,  "\n" );
+                                                  END(sink__V229, _M__sTextBreak); }
+                                                { START(sink__V229, _M__sTextCons);
+                                                  { START(sink__V229, _M__sTextChars);
+                                                    LITERAL(sink__V229,  "#endif" );
+                                                    END(sink__V229, _M__sTextChars); }
+                                                  { START(sink__V229, _M__sTextCons);
+                                                    { START(sink__V229, _M__sTextBreak);
+                                                      LITERAL(sink__V229,  "\n" );
+                                                      END(sink__V229, _M__sTextBreak); }
+                                                    { START(sink__V229, _M__sTextCons);
+                                                      { START(sink__V229, _M__sTextEmbed);
+                                                        { START(sink__V229, _M_AsText);
+                                                          { START(sink__V229, _M_H_Declarations);
+                                                            COPY(sink__V229, sub__V232);END(sink__V229, _M_H_Declarations); }
+                                                          END(sink__V229, _M_AsText); }
+                                                        END(sink__V229, _M__sTextEmbed); }
+                                                      { START(sink__V229, _M__sTextCons);
+                                                        { START(sink__V229, _M__sTextBreak);
+                                                          LITERAL(sink__V229,  "\n" );
+                                                          END(sink__V229, _M__sTextBreak); }
+                                                        { START(sink__V229, _M__sTextCons);
+                                                          { START(sink__V229, _M__sTextChars);
+                                                            LITERAL(sink__V229,  "#ifdef __cplusplus" );
+                                                            END(sink__V229, _M__sTextChars); }
+                                                          { START(sink__V229, _M__sTextCons);
+                                                            { START(sink__V229, _M__sTextBreak);
+                                                              LITERAL(sink__V229,  "\n" );
+                                                              END(sink__V229, _M__sTextBreak); }
+                                                            { START(sink__V229, _M__sTextCons);
+                                                              { START(sink__V229, _M__sTextChars);
+                                                                LITERAL(sink__V229,  "}" );
+                                                                END(sink__V229, _M__sTextChars); }
+                                                              { START(sink__V229, _M__sTextCons);
+                                                                { START(sink__V229, _M__sTextBreak);
+                                                                  LITERAL(sink__V229,  "\n" );
+                                                                  END(sink__V229, _M__sTextBreak); }
+                                                                { START(sink__V229, _M__sTextCons);
+                                                                  { START(sink__V229, _M__sTextChars);
+                                                                    LITERAL(sink__V229,  "#endif" );
+                                                                    END(sink__V229, _M__sTextChars); }
+                                                                  { START(sink__V229, _M__sTextCons);
+                                                                    { START(sink__V229, _M__sTextBreak);
+                                                                      LITERAL(sink__V229,  "\n" );
+                                                                      END(sink__V229, _M__sTextBreak); }
+                                                                    { START(sink__V229, _M__sTextCons);
+                                                                      { START(sink__V229, _M__sTextChars);
+                                                                        LITERAL(sink__V229,  "/* END OF C HEADER FOR CRSX " );
+                                                                        END(sink__V229, _M__sTextChars); }
+                                                                      { START(sink__V229, _M__sTextCons);
+                                                                        { START(sink__V229, _M__sTextEmbed);
+                                                                          { START(sink__V229, _M_AsText);
+                                                                            { START(sink__V229, _M_COMMENT_xTOKEN);
+                                                                              COPY(sink__V229, sub__V231);END(sink__V229, _M_COMMENT_xTOKEN); }
+                                                                            END(sink__V229, _M_AsText); }
+                                                                          END(sink__V229, _M__sTextEmbed); }
+                                                                        { START(sink__V229, _M__sTextCons);
+                                                                          { START(sink__V229, _M__sTextChars);
+                                                                            LITERAL(sink__V229,  " MODULE " );
+                                                                            END(sink__V229, _M__sTextChars); }
+                                                                          { START(sink__V229, _M__sTextCons);
+                                                                            { START(sink__V229, _M__sTextEmbed);
+                                                                              { START(sink__V229, _M_AsText);
+                                                                                { START(sink__V229, _M_COMMENT_xTOKEN);
+                                                                                  COPY(sink__V229, sub__V233);END(sink__V229, _M_COMMENT_xTOKEN); }
+                                                                                END(sink__V229, _M_AsText); }
+                                                                              END(sink__V229, _M__sTextEmbed); }
+                                                                            { START(sink__V229, _M__sTextCons);
+                                                                              { START(sink__V229, _M__sTextChars);
+                                                                                LITERAL(sink__V229,  ". */" );
+                                                                                END(sink__V229, _M__sTextChars); }
+                                                                              { START(sink__V229, _M__sTextCons);
+                                                                                { START(sink__V229, _M__sTextBreak);
+                                                                                  LITERAL(sink__V229,  "\n" );
+                                                                                  END(sink__V229, _M__sTextBreak); }
+                                                                                { START(sink__V229, _M__sTextCons);
+                                                                                  { START(sink__V229, _M__sTextChars);
+                                                                                    LITERAL(sink__V229,  "#endif" );
+                                                                                    END(sink__V229, _M__sTextChars); }
+                                                                                  { START(sink__V229, _M__sTextCons);
+                                                                                    { START(sink__V229, _M__sTextBreak);
+                                                                                      LITERAL(sink__V229,  "\n" );
+                                                                                      END(sink__V229, _M__sTextBreak); }
+                                                                                    { START(sink__V229, _M__sTextNil);
+                                                                                      END(sink__V229, _M__sTextNil); }
+                                                                                    END(sink__V229, _M__sTextCons); }
+                                                                                  END(sink__V229, _M__sTextCons); }
+                                                                                END(sink__V229, _M__sTextCons); }
+                                                                              END(sink__V229, _M__sTextCons); }
+                                                                            END(sink__V229, _M__sTextCons); }
+                                                                          END(sink__V229, _M__sTextCons); }
+                                                                        END(sink__V229, _M__sTextCons); }
+                                                                      END(sink__V229, _M__sTextCons); }
+                                                                    END(sink__V229, _M__sTextCons); }
+                                                                  END(sink__V229, _M__sTextCons); }
+                                                                END(sink__V229, _M__sTextCons); }
+                                                              END(sink__V229, _M__sTextCons); }
+                                                            END(sink__V229, _M__sTextCons); }
+                                                          END(sink__V229, _M__sTextCons); }
+                                                        END(sink__V229, _M__sTextCons); }
+                                                      END(sink__V229, _M__sTextCons); }
+                                                    END(sink__V229, _M__sTextCons); }
+                                                  END(sink__V229, _M__sTextCons); }
+                                                END(sink__V229, _M__sTextCons); }
+                                              END(sink__V229, _M__sTextCons); }
+                                            END(sink__V229, _M__sTextCons); }
+                                          END(sink__V229, _M__sTextCons); }
+                                        END(sink__V229, _M__sTextCons); }
+                                      END(sink__V229, _M__sTextCons); }
+                                    END(sink__V229, _M__sTextCons); }
+                                  END(sink__V229, _M__sTextCons); }
+                                END(sink__V229, _M__sTextCons); }
+                              END(sink__V229, _M__sTextCons); }
+                            END(sink__V229, _M__sTextCons); }
+                          END(sink__V229, _M__sTextCons); }
+                        END(sink__V229, _M__sTextCons); }
+                      END(sink__V229, _M__sTextCons); }
+                    END(sink__V229, _M__sTextCons); }
+                  END(sink__V229, _M__sTextCons); }
+                END(sink__V229, _M__sTextCons); }
+              END(sink__V229, _M__sTextCons); }
+            END(sink__V229, _M__sTextCons); }
+          END(sink__V229, _M__sTextCons); }
+        END(sink__V229, _M__sTextCons); }
+      END(sink__V229, _M__sTextCons); }
+    UNLINK_VARIABLESET(sink__V229->context, namedFV__V236); UNLINK_VARIABLESET(sink__V229->context, varFV__V237);
+    UNLINK_NamedPropertyLink(sink__V229->context, namedP__V234); UNLINK_VariablePropertyLink(sink__V229->context, varP__V235);
     return 1;
   } while (0);
+  return 0;
+}
+
+/* FUNCTION H-Form. */
+int conBindOffs_M_H_Form[] = {0 , 0};
+char *nameFun_M_H_Form(Term term) { return  "H-Form" ; }
+struct _ConstructionDescriptor descriptor_M_H_Form = {&sort_M_Reified_xVariable, 0, 1, sizeof(STRUCT_Con_M_H_Form), conBindOffs_M_H_Form, &nameFun_M_H_Form, &step_M_H_Form};
+
+int step_M_H_Form(Sink sink__V245, Term term__V246)
+{
+  int term__V246_count = LINK_COUNT(term__V246); permitUnusedInt(term__V246_count);
+  Term sub__V247 = FORCE(sink__V245->context, SUB(term__V246, 0));
+  EnumOf_M_Reified_xForm choice__V248 = (IS_VARIABLE_USE(sub__V247) ? VarOf_M_Reified_xForm : (EnumOf_M_Reified_xForm) TAG(sub__V247));
+  switch (choice__V248)
+  {
+    case Data_M_SORT_SET: { /* Function HEADER-H-Form-1$H-Form$SORT-SET case SORT-SET */
+      ASSERT(sink__V245->context, !strcmp(SYMBOL(term__V246),  "H-Form" ));
+      Term sub__V249 = SUB(term__V246, 0); permitUnusedTerm(sub__V249); int sub__V249_count = term__V246_count*LINK_COUNT(sub__V249); permitUnusedInt(sub__V249_count);
+      CRSX_CHECK_SORT(sink__V245->context, sub__V249, &sort_M_Reified_xForm); ASSERT(sink__V245->context, !strcmp(SYMBOL(sub__V249),  "SORT-SET" ));
+      Term sub__V250 = LINK(sink__V245->context, SUB(sub__V249, 0)); int sub__V250_count = sub__V249_count*LINK_COUNT(sub__V250); permitUnusedInt(sub__V250_count);
+      CRSX_CHECK_SORT(sink__V245->context, sub__V250, &sort_M_Reified_xSort); /* sub__V250 = &#0-0 */
+      Term sub__V251 = LINK(sink__V245->context, SUB(sub__V249, 1)); int sub__V251_count = sub__V249_count*LINK_COUNT(sub__V251); permitUnusedInt(sub__V251_count);
+      CRSX_CHECK_SORT(sink__V245->context, sub__V251, &sort_M_Reified_xSort); /* sub__V251 = &#0-1 */
+      Term sub__V252 = LINK(sink__V245->context, SUB(sub__V249, 2)); int sub__V252_count = sub__V249_count*LINK_COUNT(sub__V252); permitUnusedInt(sub__V252_count);
+      CRSX_CHECK_SORT(sink__V245->context, sub__V252, &sort_M_Reified_xForm); /* sub__V252 = &#0-2 */
+      
+      NamedPropertyLink namedP__V253 = LINK_NamedPropertyLink(sink__V245->context, NAMED_PROPERTIES(term__V246));
+      VariablePropertyLink varP__V254 = LINK_VariablePropertyLink(sink__V245->context, VARIABLE_PROPERTIES(term__V246));
+      Hashset namedFV__V255 = LINK_VARIABLESET(sink__V245->context, asConstruction(term__V246)->properties->namedFreeVars);
+      Hashset varFV__V256 = LINK_VARIABLESET(sink__V245->context, asConstruction(term__V246)->properties->variableFreeVars);
+      UNLINK(sink__V245->context, term__V246);
+      ADD_PROPERTIES(sink__V245, LINK_VARIABLESET(sink__V245->context, namedFV__V255), LINK_VARIABLESET(sink__V245->context, varFV__V256), LINK_NamedPropertyLink(sink__V245->context, namedP__V253), LINK_VariablePropertyLink(sink__V245->context, varP__V254));
+      { START(sink__V245, _M_H_Form_s6);
+        COPY(sink__V245, sub__V250);COPY(sink__V245, sub__V251);COPY(sink__V245, sub__V252);END(sink__V245, _M_H_Form_s6); }
+      UNLINK_VARIABLESET(sink__V245->context, namedFV__V255); UNLINK_VARIABLESET(sink__V245->context, varFV__V256);
+      UNLINK_NamedPropertyLink(sink__V245->context, namedP__V253); UNLINK_VariablePropertyLink(sink__V245->context, varP__V254);
+      
+      return 1;
+    break; } case Data_M_SORT_ALLOWS_VARIABLES: { /* Function HEADER-H-Form-2$H-Form$SORT-ALLOWS-VARIABLES case SORT-ALLOWS-VARIABLES */
+      ASSERT(sink__V245->context, !strcmp(SYMBOL(term__V246),  "H-Form" ));
+      Term sub__V257 = SUB(term__V246, 0); permitUnusedTerm(sub__V257); int sub__V257_count = term__V246_count*LINK_COUNT(sub__V257); permitUnusedInt(sub__V257_count);
+      CRSX_CHECK_SORT(sink__V245->context, sub__V257, &sort_M_Reified_xForm); ASSERT(sink__V245->context, !strcmp(SYMBOL(sub__V257),  "SORT-ALLOWS-VARIABLES" ));
+      
+      NamedPropertyLink namedP__V258 = LINK_NamedPropertyLink(sink__V245->context, NAMED_PROPERTIES(term__V246));
+      VariablePropertyLink varP__V259 = LINK_VariablePropertyLink(sink__V245->context, VARIABLE_PROPERTIES(term__V246));
+      Hashset namedFV__V260 = LINK_VARIABLESET(sink__V245->context, asConstruction(term__V246)->properties->namedFreeVars);
+      Hashset varFV__V261 = LINK_VARIABLESET(sink__V245->context, asConstruction(term__V246)->properties->variableFreeVars);
+      UNLINK(sink__V245->context, term__V246);
+      ADD_PROPERTIES(sink__V245, LINK_VARIABLESET(sink__V245->context, namedFV__V260), LINK_VARIABLESET(sink__V245->context, varFV__V261), LINK_NamedPropertyLink(sink__V245->context, namedP__V258), LINK_VariablePropertyLink(sink__V245->context, varP__V259));
+      { START(sink__V245, _M_H_Form_s5);
+        END(sink__V245, _M_H_Form_s5); }
+      UNLINK_VARIABLESET(sink__V245->context, namedFV__V260); UNLINK_VARIABLESET(sink__V245->context, varFV__V261);
+      UNLINK_NamedPropertyLink(sink__V245->context, namedP__V258); UNLINK_VariablePropertyLink(sink__V245->context, varP__V259);
+      
+      return 1;
+    break; } case Data_M_FORM: { /* Function HEADER-H-Form-3$H-Form$FORM case FORM */
+      ASSERT(sink__V245->context, !strcmp(SYMBOL(term__V246),  "H-Form" ));
+      Term sub__V262 = SUB(term__V246, 0); permitUnusedTerm(sub__V262); int sub__V262_count = term__V246_count*LINK_COUNT(sub__V262); permitUnusedInt(sub__V262_count);
+      CRSX_CHECK_SORT(sink__V245->context, sub__V262, &sort_M_Reified_xForm); ASSERT(sink__V245->context, !strcmp(SYMBOL(sub__V262),  "FORM" ));
+      Term sub__V263 = LINK(sink__V245->context, SUB(sub__V262, 0)); int sub__V263_count = sub__V262_count*LINK_COUNT(sub__V263); permitUnusedInt(sub__V263_count);
+      /* sub__V263 = &#0-0 */
+      Term sub__V264 = LINK(sink__V245->context, SUB(sub__V262, 1)); int sub__V264_count = sub__V262_count*LINK_COUNT(sub__V264); permitUnusedInt(sub__V264_count);
+      /* sub__V264 = &#0-1 */
+      
+      NamedPropertyLink namedP__V265 = LINK_NamedPropertyLink(sink__V245->context, NAMED_PROPERTIES(term__V246));
+      VariablePropertyLink varP__V266 = LINK_VariablePropertyLink(sink__V245->context, VARIABLE_PROPERTIES(term__V246));
+      Hashset namedFV__V267 = LINK_VARIABLESET(sink__V245->context, asConstruction(term__V246)->properties->namedFreeVars);
+      Hashset varFV__V268 = LINK_VARIABLESET(sink__V245->context, asConstruction(term__V246)->properties->variableFreeVars);
+      UNLINK(sink__V245->context, term__V246);
+      ADD_PROPERTIES(sink__V245, LINK_VARIABLESET(sink__V245->context, namedFV__V267), LINK_VARIABLESET(sink__V245->context, varFV__V268), LINK_NamedPropertyLink(sink__V245->context, namedP__V265), LINK_VariablePropertyLink(sink__V245->context, varP__V266));
+      { START(sink__V245, _M_H_Form_s2);
+        COPY(sink__V245, sub__V264);COPY(sink__V245, sub__V263);END(sink__V245, _M_H_Form_s2); }
+      UNLINK_VARIABLESET(sink__V245->context, namedFV__V267); UNLINK_VARIABLESET(sink__V245->context, varFV__V268);
+      UNLINK_NamedPropertyLink(sink__V245->context, namedP__V265); UNLINK_VariablePropertyLink(sink__V245->context, varP__V266);
+      
+      return 1;
+    } default: break;
+  }
   return 0;
 }
 

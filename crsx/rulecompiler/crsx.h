@@ -50,6 +50,7 @@ typedef struct _VariableNameMapLink *VariableNameMapLink;
 typedef struct _Hashset* Hashset;
 typedef struct _Hashset2* Hashset2;
 typedef struct _Pair* Pair;
+typedef struct _TermLink *TermLink;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -876,7 +877,7 @@ struct _NamedPropertyLink
     const char* name;
     union {
         Term term; // when name != NULL
-        Variable weakening; // when name == NULL - indicates context-bound variable known to not occur
+        Hashset2 propset; // when name == NULL - hash set of many links at once
     } u;
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
@@ -901,7 +902,7 @@ struct _VariablePropertyLink
     Variable variable;
     union {
         Term term; // when variable != NULL
-        Variable weakening; // when variable == NULL - indicates context-bound variable known to not occur
+        Hashset2 propset; // when name == NULL - hash set of many links at once
     } u;
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
@@ -1059,6 +1060,9 @@ extern Hashset2 removeAllHS2(Context context, Hashset2 set, void** vars, ssize_t
 extern Hashset2 clearHS2(Context context, Hashset2 set);
 // Enumerate set as old-fashioned VariableSet
 extern void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int constrained, VariablePropertyLink props);
+// Return memory used
+extern long memoryUsedHS2(Hashset2 set);
+extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
 
 
 static inline Hashset LINK_Hashset(Context context, Hashset set) { if (set && set != AllFreeVariables) ++(set->nr); return set; };
@@ -1086,6 +1090,13 @@ extern Hashset clearHS(Context context, Hashset set);
 extern void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constrained, VariablePropertyLink props);
 // Print out set
 extern void printfHS(Context context, FILE* out, Hashset set);
+
+
+struct _TermLink {
+    void* p;
+    unsigned count;
+    TermLink link;
+};
 
 
 struct _VariableSet2

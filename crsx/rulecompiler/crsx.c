@@ -92,6 +92,7 @@ static void pEndMetaSubstitute(Context context, struct rusage ubefore);
 static void pTermSize(Term term);
 static void termSize(Term term, long* size, long* memuse, int sharing);
 
+
 size_t pMarker = 0;
 
 #endif
@@ -104,14 +105,6 @@ int stepNesting = 0;
 #endif
 
 // Checking terms.
-
-typedef struct _TermLink *TermLink;
-
-struct _TermLink {
-    void* p;
-    unsigned count;
-    TermLink link;
-};
 
 #ifdef CHECKREF
 static TermLink occurLink(TermLink link, void* p)
@@ -977,7 +970,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (newLink->name) // Always the case as pending free variables are not yet been linked.
                     (void) LINK(context, newLink->u.term);
                 else
-                    LINK_VARIABLESET(context, (VARIABLESET) newLink->u.weakening);
+                    linkHS2(newLink->u.propset);
 
                 if (newTop)
                     newLast->link = LINK_NamedPropertyLink(context, newLink);
@@ -1047,7 +1040,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (newLink->variable)
                     (void) LINK(context, newLink->u.term);
                 else
-                    LINK_VARIABLESET(context, (VARIABLESET) newLink->u.weakening);
+                    linkHS2(newLink->u.propset);
 
                 if (newTop)
                     newLast->link = LINK_VariablePropertyLink(context, newLink);
@@ -2460,6 +2453,47 @@ void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int cons
     }
 }
 
+long memoryUsedHS2(Hashset2 set)
+{
+    long ans = (4 + set->nslots) * sizeof(size_t);
+    ans += set->size * sizeof(struct _Term);
+    return ans;
+}
+
+int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp)
+{
+    int i;
+    int size = 0;
+    for (i = 0 ; i < set->nslots ; i++)
+    {
+        LinkedList2 slot = set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = (Term) pair->value;
+            size += checkTerm4(context, NULL, 0, term, nf, 0, envsize, memuse, usedp);
+        }
+    }
+    return size;
+}
+
+static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, const void *key, Term term, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max);
+
+char * fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+{
+    int i;
+    for (i = 0 ; i < set->nslots ; i++)
+    {
+        LinkedList2 slot = set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = (Term) pair->value;
+            sep = fprintProperty(context, out, isNamed, set->nr, (const void *) pair->key, term, sep, depth, encountered, used, indent, posp, debug, max);
+        }
+    }
+    return sep;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Map from variables to variables.
@@ -4388,7 +4422,8 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, NamedPropertyLink 
             }
             else
             {
-                LINK_VARIABLESET(context, (VARIABLESET) link[i].u.weakening);
+                ASSERT(context, 0);
+                // LINK_VARIABLESET(context, (VARIABLESET) link[i].u.weakening);
             }
 
             // move on
@@ -4448,8 +4483,8 @@ NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink li
             }
             else
             {
-                UNLINK_VARIABLESET(context, (VARIABLESET) link->u.weakening);
-                link->u.weakening = NULL;
+                unlinkHS2(context, link->u.propset);
+                link->u.propset = NULL;
             }
 
             UNLINK_NamedPropertyLink(context, link->link);
@@ -4481,8 +4516,8 @@ VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariableProper
             }
             else
             {
-                UNLINK_VARIABLESET(context, (VARIABLESET) link->u.weakening);
-                link->u.weakening = NULL;
+                unlinkHS2(context, link->u.propset);
+                link->u.propset = NULL;
             }
 
             UNLINK_VariablePropertyLink(context, link->link);
@@ -4619,9 +4654,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
                 }
                 else
                 {
-                    //ASSERT(context, IS_BOUND(link->u.weakening)); // not true with nested steps.
-                    ++propertiesSize;
-                    (*memuse) += sizeof(struct _Variable);
+                    propertiesSize += checkPropsHS2(context, link->u.propset, nf, envsize, memuse, usedp);
                 }
 
                 (*envsize) ++;
@@ -4658,8 +4691,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
                 }
                 else
                 {
-                    //ASSERT(context, IS_BOUND(link->u.weakening)); // not true with nested steps.
-                    ++propertiesSize;
+                    propertiesSize += checkPropsHS2(context, link->u.propset, nf, envsize, memuse, usedp);
                 }
 
                 (*envsize) ++;
@@ -5606,6 +5638,32 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
     }
 }
 
+/** Print a single named or variable property (and return sep on empty, "; " otherwise).
+ * Use isNamed=true for named properties, isNamed=false for variable properties. */
+static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, const void *key, Term term, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+{
+    *posp += FPRINTF(context, out, "%s", sep);
+    char *nl = strrchr(sep, '\n');
+    if (nl) *posp = ((sep + strlen(sep) - 1) - nl);
+    if (indent && *posp < indent+2 && depth > 1)
+      *posp += FPRINTF(context, out, "%.*s", indent + 2 - *posp, SPACES);
+    if (debug)
+      FPRINTF(context, out, "{%zd}", nr);
+    if (isNamed)
+    {
+        *posp += fprintLiteral(context, out, (char *) key);
+    }
+    else
+    {
+        *posp += fprintSafeVariableName(context, out, (Variable) key, used);
+    }
+    *posp += FPRINTF(context, out, " : ");
+    fprintTermTop(context, out, term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
+    sep = ";\n";
+    return sep;
+}
+
+
 /** Print named properties (and return sep on empty, "; " otherwise). */
 char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
 {
@@ -5614,23 +5672,11 @@ char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedP
     {
         if (link->name)
         {
-            *posp += FPRINTF(context, out, "%s", sep);
-            char *nl = strrchr(sep, '\n');
-            if (nl) *posp = ((sep + strlen(sep) - 1) - nl);
-            if (indent && *posp < indent+2 && depth > 1)
-                *posp += FPRINTF(context, out, "%.*s", indent + 2 - *posp, SPACES);
-            if (debug)
-                FPRINTF(context, out, "{%d}", link->nr);
-            *posp += fprintLiteral(context, out, link->name);
-            *posp += FPRINTF(context, out, " : ");
-            fprintTermTop(context, out, link->u.term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
-            sep = ";\n";
+            sep = fprintProperty(context, out, 1, link->nr, link->name, link->u.term, sep, depth, encountered, used, indent, posp, debug, max);
         }
-        else if (debug)
+        else
         {
-            FPRINTF(context, out, "%s", sep);
-            fprintFreeVars(context, out, (VARIABLESET) link->u.weakening);
-            sep = ";\n";
+            sep = fprintPropsHS2(context, out, 1, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
         if (max-- <=0)
             break;
@@ -5646,27 +5692,14 @@ char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink 
     {
         if (link->variable)
         {
-            *posp += FPRINTF(context, out, "%s", sep);
-            char *nl = strrchr(sep, '\n');
-            if (nl) *posp = ((sep + strlen(sep) - 1) - nl);
-            if (indent && *posp < indent+2 && depth > 1)
-                *posp += FPRINTF(context, out, "%.*s", indent + 2 - *posp, SPACES);
-            if (debug)
-                   FPRINTF(context, out, "{%d}", link->nr);
-            *posp += fprintSafeVariableName(context, out, link->variable, used);
-            *posp += FPRINTF(context, out, " : ");
-            fprintTermTop(context, out, link->u.term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
-            sep = ";\n";
+            sep = fprintProperty(context, out, 0, link->nr, link->variable, link->u.term, sep, depth, encountered, used, indent, posp, debug, max);
         }
-        else if (debug)
+        else
         {
-            FPRINTF(context, out, "%s", sep);
-            fprintFreeVars(context, out, (VARIABLESET) link->u.weakening);
-            sep = ";\n";
+            sep = fprintPropsHS2(context, out, 0, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
-
         if (max-- <=0)
-               break;
+            break;
     }
     return sep;
 }
@@ -5878,10 +5911,7 @@ static void termSize2(Term term, long* size, long* memuse, int sharing)
                 }
                 else
                 {
-    #ifdef HSFREEVARS
-                    if (link->u.weakening)
-                        (*memuse) += ((Hashset) link->u.weakening)->capacity * sizeof(size_t);
-    #endif
+                    (*memuse) += memoryUsedHS2(link->u.propset);
                 }
 
                 (*memuse) += sizeof(struct _NamedPropertyLink);
@@ -5903,10 +5933,7 @@ static void termSize2(Term term, long* size, long* memuse, int sharing)
                 }
                 else
                 {
-        #ifdef HSFREEVARS
-                    if (link->u.weakening)
-                        (*memuse) += ((Hashset) link->u.weakening)->capacity * sizeof(size_t);
-        #endif
+                    (*memuse) += memoryUsedHS2(link->u.propset);
                 }
 
                 (*memuse) += sizeof(struct _VariablePropertyLink);
