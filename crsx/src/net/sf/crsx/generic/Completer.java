@@ -1295,7 +1295,7 @@ public class Completer
 					GenericTerm[] args = new GenericTerm[term.arity()];
 					for (int i = 0; i < args.length; i++)
 						args[i] = changePosition(term.sub(i), position, varChange, varName, retSorts, originalSorts);
-					if (name.charAt(1) == 'Γ')
+					if (name.charAt(1) == '\u0393')
 						ret = standardPatternMetaApplication("#Γ" + position + name.substring(2), args);
 					else
 						ret = standardPatternMetaApplication("#" + position + name.substring(1), args);
