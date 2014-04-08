@@ -886,7 +886,7 @@ struct _NamedPropertyLink
     int nr;
 };
 
-extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, NamedPropertyLink nlink);
+extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, NamedPropertyLink nlink);
 
 extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
