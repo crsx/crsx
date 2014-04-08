@@ -295,22 +295,6 @@ Term makeStringLiteral(Context context, const char *text)
     return (Term) literal;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-// Property link allocation.
-
-///**
-// * Make a new named property link.
-// * @param name link name. Consumed.
-// * @param term link term. Consumed.
-// */
-//static NamedPropertyLink makeNamedPropertyLinkTerm(Context context, const char* name, Term term)
-//{
-//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, name, NULL);
-//    link->u.term = term; // Transfer ref
-//
-//    return link;
-//}
-//
 
 /////////////////////////////////////////////////////////////////////////////////
 // Buffer manipulation.
@@ -796,8 +780,7 @@ Sink bufferPropertyNamed(Sink sink, const char *name, Term term)
     Buffer buffer = (Buffer) sink;
     //DEBUGF(sink->context, "//ADD_PROPERTY_NAMED(%d,%s)\n", buffer->lastTop, name);
 
-    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, GLOBAL(sink->context, name), buffer->pendingNamedProperties); // transfer ref
-    link->u.term = term; // Transfer ref
+    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, GLOBAL(sink->context, name), term, buffer->pendingNamedProperties); // transfer refs for term and old link
     buffer->pendingNamedProperties = link;
 
     buffer->pendingNamedPropertiesFreeVars = VARIABLESET_MERGEALL(sink->context, buffer->pendingNamedPropertiesFreeVars, freeVars(sink->context, term));
@@ -948,7 +931,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (link == construction->properties->namedProperties) // guard above ensures false on first iteration
                     break; // avoid deep duplication of lists
 
-                NamedPropertyLink newLink = memcpy(ALLOCATE_NamedPropertyLink(context, NULL, NULL), link, sizeof(struct _NamedPropertyLink));
+                NamedPropertyLink newLink = memcpy(ALLOCATE_NamedPropertyLink(context, NULL, NULL, NULL), link, sizeof(struct _NamedPropertyLink));
 
                 newLink->link = NULL;
                 newLink->nr = 0;
@@ -3866,13 +3849,15 @@ static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction,
             if (key)
             {
                 // - Regular key-value link is always inserted into prefix after substitution of value.
-                NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, key, NULL);
                 Sink propertysink = ALLOCA_BUFFER(sink->context);
 
                 BitSet localUnweakenedC; COPY_LBITS(sink->context, &localUnweakenedC, substitutionCount, &localUnweakened);
                 metaSubstituteTerm(propertysink, LINK(sink->context, namedLink->u.term), substitution, substitutionCount, unexhausted, &localUnweakenedC, metaSubstituteSizep);
-                newLink->u.term = BUFFER_TERM(propertysink); // Transfer reference
+                Term term = BUFFER_TERM(propertysink); // Transfer reference
                 FREE_BUFFER(propertysink);
+
+                NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, key, term, NULL);
+
                 pushNamedPropertyLink(namedStack, newLink);
                 ++(*metaSubstituteSizep);
             }
@@ -4305,9 +4290,8 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                     VARIABLESET fvs = construction->properties->namedFreeVars;
 
                     // Location has been changed...update.
-                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), construction->properties->namedProperties);
+                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), LINK(context, locvalue), construction->properties->namedProperties);
 
-                    link->u.term = LINK(context, locvalue);
                     construction->properties->namedProperties = link;
 
                     if (fvs)
@@ -4376,7 +4360,7 @@ void freeTerm(Context context, Term term)
     }
 }
 
-NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, NamedPropertyLink nlink)
+NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink)
 {
     int count = nlink ? nlink->count + 1 : 1;
     if (count >= 100)
@@ -4386,6 +4370,7 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
 
         // Initialize 0th element
         link[0].name = name;
+        link[0].u.term = term; // Transfer ref
 #ifdef CRSXPROF
         link[0].marker = 0;
 #endif
@@ -4436,6 +4421,7 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
         link->link = nlink;
         link->name = name;
+        link->u.term = term; // Transfer ref
 #ifdef CRSXPROF
         link->marker = 0;
 #endif
@@ -5555,7 +5541,15 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                    cons += sz;
                    (*cons) = '\0';
                 }
-                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, name, printCookieNameList);
+                // This really should never have been using NamedPropertyLink
+                // as a generic string list.  We should fix that, but given
+                // that it is like this, link it after the allocate to
+                // prevent the allocate from turning our string list into
+                // a hashtable in the future.  (NamedPropertyLink stores
+                // a set, not a list (ie. unordered), whereas cookie lists
+                // are an ordered list of strings).
+                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, name, NULL, NULL);
+                newCookie->link = printCookieNameList;
 
                 printCookieNameList = newCookie;
             }
