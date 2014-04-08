@@ -384,22 +384,18 @@ typedef struct _BitSet* BitSetP;
 #define BINDERS(T,I) c_binders(asConstruction(T),I)
 #define BINDER(T,I,BI) BINDERS(T,I)[BI]
 
-#define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
-#define PROPERTY_P(C,T,P) DPROPERTY(C, asConstruction(T)->properties->namedProperties, asConstruction(T)->properties->variableProperties, P)
-#define NAMED_PROPERTY_P(T,N) c_namedProperty(asConstruction(T)->properties->namedProperties, N)
-#define VARIABLE_PROPERTY_P(T,V) c_variableProperty(asConstruction(T)->properties->variableProperties, V)
-#define NAMED_PROPERTIES(T) (asConstruction(T)->properties->namedProperties)
-#define VARIABLE_PROPERTIES(T) (asConstruction(T)->properties->variableProperties)
-
 #define SYMBOL(T) (IS_VARIABLE_USE(T) ? VARIABLE(T)->name : c_name(asConstruction(T)))
 #define TEXT(T) c_name(asConstruction(T))
 #define LONGLONG(T) atoll(c_name(asConstruction(T)))
 #define DOUBLE(T) atof(c_name(asConstruction(T)))
 #define LENGTH(T) strlen(TEXT(T))
 
-#define PROPERTY(C,T,P) c_deref(PROPERTY_P(C,T,P))
-#define NAMED_PROPERTY(C,T,N)  c_deref(NAMED_PROPERTY_P(T,GLOBAL(C,N)))
-#define VARIABLE_PROPERTY(T,V)  c_deref(VARIABLE_PROPERTY_P(T,V))
+#define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
+#define PROPERTY(C,T,P) DPROPERTY(C, asConstruction(T)->properties->namedProperties, asConstruction(T)->properties->variableProperties, P)
+#define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->properties->namedProperties, GLOBAL(C,N))
+#define VARIABLE_PROPERTY(T,V)  c_variableProperty(asConstruction(T)->properties->variableProperties, V)
+#define NAMED_PROPERTIES(T) (asConstruction(T)->properties->namedProperties)
+#define VARIABLE_PROPERTIES(T) (asConstruction(T)->properties->variableProperties)
 
 static inline Term c_deref(Term *p) { return (p ? *p : (Term)0); }
 
@@ -852,9 +848,9 @@ extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 // PROPERTIES
 
 
-extern Term *c_namedProperty(NamedPropertyLink link, char *name);
-extern Term *c_variableProperty(VariablePropertyLink link, Variable variable);
-static inline Term *c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
+extern Term c_namedProperty(NamedPropertyLink link, char *name);
+extern Term c_variableProperty(VariablePropertyLink link, Variable variable);
+static inline Term c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }

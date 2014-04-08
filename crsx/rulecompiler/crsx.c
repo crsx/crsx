@@ -2566,25 +2566,25 @@ void freeVariableNameMapLinks(Context context, VariableNameMapLink link)
 // Return the named property or NULL if none.
 // The reference is *NOT* transferred
 // The name must have already been interned into the Context's keyPool
-Term *c_namedProperty(NamedPropertyLink link, char *name)
+Term c_namedProperty(NamedPropertyLink link, char *name)
 {
     for (; link; link = link->link)
     {
         //if (link->name && (!strcmp(name, link->name)) && (name != link->name))
         //  printf("Missed Equality! name=%s link->name=%s\n", name, link->name);
         if (name == link->name)
-            return &(link->u.term);
+            return link->u.term;
     }
     return NULL;
 }
 
 // Return the variable property or NULL if none.
 // The reference is *NOT* transferred
-Term *c_variableProperty(VariablePropertyLink link, Variable variable)
+Term c_variableProperty(VariablePropertyLink link, Variable variable)
 {
     for (; link; link = link->link)
         if (variable == link->variable)
-            return &(link->u.term);
+            return link->u.term;
     return NULL;
 }
 

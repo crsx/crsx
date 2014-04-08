@@ -2706,8 +2706,8 @@ int step_M_T__send_s40(Sink sink__V385, Term term__V386)
               { Term term__V400;
                 { Term key__V401;
                   key__V401 = makeStringLiteral(sink__V385->context,  "$Binders" );
-                  Term *pp__V402 = DPROPERTY(sink__V385->context, namedP__V390, varP__V391, key__V401);UNLINK(sink__V385->context, key__V401); 
-                  if (pp__V402) term__V400 = LINK(sink__V385->context, *pp__V402);
+                  Term pp__V402 = DPROPERTY(sink__V385->context, namedP__V390, varP__V391, key__V401);UNLINK(sink__V385->context, key__V401); 
+                  if (pp__V402) term__V400 = LINK(sink__V385->context, pp__V402);
                   else {{ Sink buf__V403 = ALLOCA_BUFFER(sink__V385->context);
                       { START(buf__V403, _M_LIST_xVARIABLE);
                         { START(buf__V403, _M__sNil);
@@ -3521,8 +3521,8 @@ int step_M_T_CheckReuse_s10(Sink sink__V598, Term term__V599)
     { START(sink__V598, _M_T_CheckReuse_Variable);
       { Term term__V605;
         { Term key__V606;
-          key__V606 = sub__V600; Term *pp__V607 = DPROPERTY(sink__V598->context, namedP__V601, varP__V602, key__V606);UNLINK(sink__V598->context, key__V606); 
-          if (pp__V607) term__V605 = LINK(sink__V598->context, *pp__V607);
+          key__V606 = sub__V600; Term pp__V607 = DPROPERTY(sink__V598->context, namedP__V601, varP__V602, key__V606);UNLINK(sink__V598->context, key__V606); 
+          if (pp__V607) term__V605 = LINK(sink__V598->context, pp__V607);
           else {{ Sink buf__V608 = ALLOCA_BUFFER(sink__V598->context);
               { START(buf__V608, _M_FREE); END(buf__V608, _M_FREE); } term__V605 = BUFFER_TERM(buf__V608); FREE_BUFFER(buf__V608); }
             }
@@ -4791,7 +4791,7 @@ int step_M_T__send_Binder2_s4(Sink sink__V974, Term term__V975)
         *p__V996 = '\0';
         ASSERT(sink__V974->context, strlen(str__V995) == length__V994);
         key__V991 = makeStringLiteral(sink__V974->context, str__V995); }
-      Term* value__V997 = DPROPERTY(sink__V974->context, namedP__V987, varP__V988, key__V991);
+      Term value__V997 = DPROPERTY(sink__V974->context, namedP__V987, varP__V988, key__V991);
       if (value__V997) {  UNLINK(sink__V974->context, sub__V976);  UNLINK(sink__V974->context, sub__V978);  UNLINK(sink__V974->context, sub__V977); ADD_PROPERTIES(sink__V974, LINK_VARIABLESET(sink__V974->context, namedFV__V989), LINK_VARIABLESET(sink__V974->context, varFV__V990), LINK_NamedPropertyLink(sink__V974->context, namedP__V987), LINK_VariablePropertyLink(sink__V974->context, varP__V988));
         { START(sink__V974, _M_T__send_Binder3);
           { START(sink__V974, _M_NOTHING);
@@ -6187,8 +6187,8 @@ int step_M_T__send_s8(Sink sink__V1361, Term term__V1362)
       { Term term__V1371;
         { Term key__V1372;
           key__V1372 = makeStringLiteral(sink__V1361->context,  "$Binders" );
-          Term *pp__V1373 = DPROPERTY(sink__V1361->context, namedP__V1367, varP__V1368, key__V1372);UNLINK(sink__V1361->context, key__V1372); 
-          if (pp__V1373) term__V1371 = LINK(sink__V1361->context, *pp__V1373);
+          Term pp__V1373 = DPROPERTY(sink__V1361->context, namedP__V1367, varP__V1368, key__V1372);UNLINK(sink__V1361->context, key__V1372); 
+          if (pp__V1373) term__V1371 = LINK(sink__V1361->context, pp__V1373);
           else {{ Sink buf__V1374 = ALLOCA_BUFFER(sink__V1361->context);
               { START(buf__V1374, _M_LIST_xVARIABLE);
                 { START(buf__V1374, _M__sNil);
@@ -9313,13 +9313,13 @@ int step_M_T__send_Binder3_s4(Sink sink__V2261, Term term__V2262)
     { Term key__V2276;
       { Sink buf__V2277 = ALLOCA_BUFFER(sink__V2261->context);
         COPY(buf__V2277, LINK(buf__V2277->context, sub__V2263));key__V2276 = BUFFER_TERM(buf__V2277); FREE_BUFFER(buf__V2277); }
-      Term* value__V2278 = DPROPERTY(sink__V2261->context, namedP__V2272, varP__V2273, key__V2276);
+      Term value__V2278 = DPROPERTY(sink__V2261->context, namedP__V2272, varP__V2273, key__V2276);
       if (value__V2278) { ADD_PROPERTIES(sink__V2261, LINK_VARIABLESET(sink__V2261->context, namedFV__V2274), LINK_VARIABLESET(sink__V2261->context, varFV__V2275), LINK_NamedPropertyLink(sink__V2261->context, namedP__V2272), LINK_VariablePropertyLink(sink__V2261->context, varP__V2273));
         { START(sink__V2261, _M_T__send_Binder4);
           { Term term__V2279;
             { Term key__V2280;
-              key__V2280 = sub__V2263; Term *pp__V2281 = DPROPERTY(sink__V2261->context, namedP__V2272, varP__V2273, key__V2280);UNLINK(sink__V2261->context, key__V2280); 
-              if (pp__V2281) term__V2279 = LINK(sink__V2261->context, *pp__V2281);
+              key__V2280 = sub__V2263; Term pp__V2281 = DPROPERTY(sink__V2261->context, namedP__V2272, varP__V2273, key__V2280);UNLINK(sink__V2261->context, key__V2280); 
+              if (pp__V2281) term__V2279 = LINK(sink__V2261->context, pp__V2281);
               else {{ Sink buf__V2282 = ALLOCA_BUFFER(sink__V2261->context);
                   term__V2279 = BUFFER_TERM(buf__V2282);
                   FREE_BUFFER(buf__V2282); }
@@ -14513,8 +14513,8 @@ int step_M_T__send__property__ref(Sink sink__V3850, Term term__V3851)
     { START(sink__V3850, _M_T__send__property__ref__helper);
       { Term term__V3858;
         { Term key__V3859;
-          key__V3859 = sub__V3852; Term *pp__V3860 = DPROPERTY(sink__V3850->context, namedP__V3854, varP__V3855, key__V3859);UNLINK(sink__V3850->context, key__V3859); 
-          if (pp__V3860) term__V3858 = LINK(sink__V3850->context, *pp__V3860);
+          key__V3859 = sub__V3852; Term pp__V3860 = DPROPERTY(sink__V3850->context, namedP__V3854, varP__V3855, key__V3859);UNLINK(sink__V3850->context, key__V3859); 
+          if (pp__V3860) term__V3858 = LINK(sink__V3850->context, pp__V3860);
           else {{ Sink buf__V3861 = ALLOCA_BUFFER(sink__V3850->context);
               term__V3858 = BUFFER_TERM(buf__V3861);
               FREE_BUFFER(buf__V3861); }
@@ -16497,8 +16497,8 @@ int step_M_T__substitute3_s3(Sink sink__V4467, Term term__V4468)
     { START(sink__V4467, _M_T__substitute4);
       { Term term__V4486;
         { Term key__V4487;
-          key__V4487 = LINK(sink__V4467->context, sub__V4471); Term *pp__V4488 = DPROPERTY(sink__V4467->context, namedP__V4482, varP__V4483, key__V4487);UNLINK(sink__V4467->context, key__V4487); 
-          if (pp__V4488) term__V4486 = LINK(sink__V4467->context, *pp__V4488);
+          key__V4487 = LINK(sink__V4467->context, sub__V4471); Term pp__V4488 = DPROPERTY(sink__V4467->context, namedP__V4482, varP__V4483, key__V4487);UNLINK(sink__V4467->context, key__V4487); 
+          if (pp__V4488) term__V4486 = LINK(sink__V4467->context, pp__V4488);
           else {{ Sink buf__V4489 = ALLOCA_BUFFER(sink__V4467->context);
               term__V4486 = BUFFER_TERM(buf__V4489);
               FREE_BUFFER(buf__V4489); }

@@ -1343,8 +1343,8 @@ int step_M_MetaVar(Sink sink__V336, Term term__V337)
             ASSERT(sink__V336->context, strlen(str__V348) == length__V347);
             key__V344 = makeStringLiteral(sink__V336->context, str__V348);
             }
-          Term *pp__V350 = DPROPERTY(sink__V336->context, namedP__V339, varP__V340, key__V344);UNLINK(sink__V336->context, key__V344); 
-          if (pp__V350) term__V343 = LINK(sink__V336->context, *pp__V350);
+          Term pp__V350 = DPROPERTY(sink__V336->context, namedP__V339, varP__V340, key__V344);UNLINK(sink__V336->context, key__V344); 
+          if (pp__V350) term__V343 = LINK(sink__V336->context, pp__V350);
           else {{ Sink buf__V351 = ALLOCA_BUFFER(sink__V336->context);
               { START(buf__V351, _M_STRING_xVALUE);
                 { char *str__V352;
