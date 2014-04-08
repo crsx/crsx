@@ -864,10 +864,10 @@ T-local-string[LITERAL[#Literal, #Sort], #sink, s p.#[s,p]]
 ;
 
 {#env}
-T-local-string[META-APPLICATION[#MetaVar, #Args, USE[#Use]], sink, s p.#[s,p]] 
-→
-{#env}
-T-local-string1[$[Equal, #Use, 1], #MetaVar, sink, s p.#[s,p]]
+T-local-string[META-APPLICATION[#MetaVar, #Args, #Use], sink, s p.#[s,p]] 
+→ 
+%n⟪FORCE(«sink»->context, « {#env}MetaVar[#MetaVar] »);
+« #[%n⟨SYMBOL(‹ {#env}MetaVar[#MetaVar] ›)⟩, {#env}T-UnlinkLastMetaUse[#MetaVar, #Use, sink]] »⟫
 ;
 
 {#env}
@@ -887,27 +887,6 @@ E-local-string[Primitive[#Primitive], #Args, #Options, #sink, s p.#[s,p]]
 {#env}T-local-string[PROPERTY-REF[#Ref, #Term],       #sink, s p.#[s,p]] → {#env}T-local-string2[PROPERTY-REF[#Ref, #Term],       #sink, s p.#[s,p]] ;
 {#env}T-local-string[PROPERTY[#Key, #Value, #Term],   #sink, s p.#[s,p]] → {#env}T-local-string2[PROPERTY[#Key, #Value, #Term],   #sink, s p.#[s,p]] ;
 {#env}T-local-string[PROPERTY-NOT[#Key, #Term],       #sink, s p.#[s,p]] → {#env}T-local-string2[PROPERTY-NOT[#Key, #Term],       #sink, s p.#[s,p]] ;
-
-
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-local-string1[$Boolean, $String, Text, s::Text p::Text.Text] :: Text;
-
-{#env}
-T-local-string1[$True, #MetaVar, sink, s p.#[s,p]]
-→ 
-%n⟪FORCE(«sink»->context, « {#env}MetaVar[#MetaVar] »);
-«#[%n⟨SYMBOL(‹ {#env}MetaVar[#MetaVar] ›)⟩, %n⟨UNLINK(‹sink›->context, ‹ {#env}MetaVar[#MetaVar] ›);⟩]»⟫
-;
-
--[Fresh[str::text,length::Text]] :
-{#env}
-T-local-string1[$False, #MetaVar, sink, s p.#[s,p]]
-→ 
-%n⟪FORCE(«sink»->context, « {#env}MetaVar[#MetaVar] »);
-char* «str»;
-long long «length» = (long long)strlen(SYMBOL(« {#env}MetaVar[#MetaVar] »));
-memcpy(«str»=ALLOCA(«sink»->context, «length»+1), SYMBOL(« {#env}MetaVar[#MetaVar] »), «length»+1);
-«#[%n⟨‹str›⟩, %n⟨⟩]»⟫
-;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-local-string2[Reified_Term, Text, s::Text p::Text.Text] :: Text;
 
