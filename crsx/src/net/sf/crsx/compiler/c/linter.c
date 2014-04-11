@@ -30,7 +30,7 @@ LinterReport lint(Context context, Term term, int flags)
     lcontext->context = context;
 
     if (flags & CHECK_CLOSED)
-        lcontext->bound = makeHS2(context, 9);
+        lcontext->bound = makeHS2(context, 9, NULL);
 
     lintTerm(lcontext, NULL, 0, term, flags, report);
 

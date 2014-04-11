@@ -1006,7 +1006,7 @@ struct _LinkedList2 {
 };
 
 struct _Pair {
-    void* key;
+    const void* key;
     void* value;
 };
 
@@ -1019,6 +1019,7 @@ struct _Hashset2
     size_t size;             // Number of entries
 
     LinkedList2 *entries;    // Array of entries. Size of array = nslots
+    void (*unlinkEntry)(Context, void*); // function to unlink entries
 };
 
 // Increment reference count
@@ -1029,7 +1030,7 @@ static inline Hashset2 linkHS2(Hashset2 set)
 // Decrement reference count
 extern Hashset2 unlinkHS2(Context context, Hashset2 set);
 // Allocate set
-extern Hashset2 makeHS2(Context context, int numbits);
+extern Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void*));
 // Copy set.
 extern Hashset2 copyHS2(Context context, Hashset2 set);
 // Add entry to set. Create new set if needed.
@@ -1039,7 +1040,7 @@ extern Hashset2 addValueHS2(Context context, Hashset2 set, const char* key, void
 // Get value for given string key
 extern void* getValuePtrHS2(Hashset2 set, const char* key);
 // Add value of given pointer key to set. Create new set if needed.
-extern Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, void* key, void* value);
+extern Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, const void* key, void* value);
 // Get value for given pointer key
 extern void* getKeyPtrValuePtrHS2(Hashset2 set, void* key);
 // Remove entry to set.
