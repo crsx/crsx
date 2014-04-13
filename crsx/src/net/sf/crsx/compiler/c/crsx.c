@@ -4504,6 +4504,7 @@ Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIA
                                  NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
 {
     Properties env = ALLOCATE(context, sizeof(struct _Properties));
+    env->nr = 1;
     env->namedFreeVars = namedFreeVars;
     env->variableFreeVars = variableFreeVars;
     env->namedProperties = namedProperties;
@@ -4512,6 +4513,40 @@ Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIA
     return env;
 }
 
+Properties LINK_Properties(Context context, Properties env)
+{
+    if (env)
+        env->nr++;
+
+    return env;
+}
+
+Properties UNLINK_Properties(Context context, Properties env)
+{
+    if (env)
+    {
+        ASSERT(context, env->nr > 0);
+
+        if (--env->nr == 0)
+        {
+            UNLINK_VARIABLESET(context, env->namedFreeVars);
+            env->namedFreeVars = NULL;
+
+            UNLINK_VARIABLESET(context, env->variableFreeVars);
+            env->variableFreeVars = NULL;
+
+            UNLINK_NamedPropertyLink(context, env->namedProperties);
+            env->namedProperties = NULL;
+
+            UNLINK_VariablePropertyLink(context, env->variableProperties);
+            env->variableProperties = NULL;
+
+            FREE(context, env);
+            return NULL;
+        }
+    }
+    return env;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Check that term is fully formed and return size.

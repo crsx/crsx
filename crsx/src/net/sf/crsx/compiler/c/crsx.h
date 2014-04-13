@@ -862,10 +862,13 @@ struct _Properties
     VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
     NamedPropertyLink namedProperties; // named properties.
     VariablePropertyLink variableProperties; // variable properties.
+    int nr;
 };
 
 Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
                                NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
+Properties LINK_Properties(Context context, Properties env);
+Properties UNLINK_Properties(Context context, Properties env);
 
 struct _NamedPropertyLink
 {
