@@ -1956,11 +1956,12 @@ static LinkedList2 copyLL2(Context context, LinkedList2 head)
     return newhead;
 }
 
-static void freeLL2(Context context, LinkedList2 head)
+static void freeLL2(Context context, LinkedList2 head, void (*unlinkEntry)(Context, void*))
 {
     while (head)
     {
         LinkedList2 next = head->next;
+        if (unlinkEntry) unlinkEntry(context, head->entry);
         FREE(context, head);
         head = next;
     }
@@ -1987,7 +1988,7 @@ static size_t hashChars(const char* data)
     return h;
 }
 
-static size_t hashPtr(void* entry)
+static size_t hashPtr(const void* entry)
 {
     size_t key = (size_t) entry;
 
@@ -2002,18 +2003,18 @@ static size_t hashPtr(void* entry)
     return key;
 }
 
-static size_t hashStringPair(void* pair)
+static size_t hashStringPair(const void* pair)
 {
-    const char* data = (char*) ((Pair) pair)->key;
+    const char* data = (const char *) ((Pair) pair)->key;
     return hashChars(data);
 }
 
-static size_t hashPtrPair(void* pair)
+static size_t hashPtrPair(const void* pair)
 {
-    return hashPtr(((Pair) pair)->key);
+    return hashPtr(((const Pair) pair)->key);
 }
 
-static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(void*))
+static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(const void*))
 {
     ASSERT(context, set->nr > 0);
 
@@ -2050,7 +2051,7 @@ static void freeHS2(Context context, Hashset2 set)
 {
     size_t i;
     for (i = 0; i < set->nslots; i++)
-        freeLL2(context, set->entries[i]);
+      freeLL2(context, set->entries[i], set->unlinkEntry);
 
     FREE(context, set->entries);
     FREE(context, set);
@@ -2070,7 +2071,7 @@ Hashset2 unlinkHS2(Context context, Hashset2 set)
     return set;
 }
 
-Hashset2 makeHS2(Context context, int numbits)
+Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void*))
 {
     Hashset2 set = ALLOCATE(context, sizeof(struct _Hashset2));
     set->nr = 1;
@@ -2081,6 +2082,8 @@ Hashset2 makeHS2(Context context, int numbits)
     // TODO: use calloc
     set->entries = ALLOCATE(context, set->nslots * sizeof(LinkedList2));
     memset(set->entries, 0, set->nslots * sizeof(LinkedList2));
+
+    set->unlinkEntry = unlinkEntry;
 
     return set;
 }
@@ -2103,12 +2106,12 @@ Hashset2 copyHS2(Context context, Hashset2 set)
     return newset;
 }
 
-static Hashset2 addInternalHS2(Context context, Hashset2 set, void* entry, int (*equals)(void*, void*), size_t (*hash)(void*), void (*freeEntry)(Context, void*))
+static Hashset2 addInternalHS2(Context context, Hashset2 set, void* entry, int (*equals)(void*, void*), size_t (*hash)(const void*), void (*freeEntry)(Context, void*))
 {
     if (entry)
     {
         if (!set)
-            set = makeHS2(context, 4);
+            set = makeHS2(context, 4, NULL);
         else if (set->nr > 1)
         {
             set->nr --;
@@ -2164,7 +2167,7 @@ Hashset2 addValueHS2(Context context, Hashset2 set, const char* key, void* value
     return addInternalHS2(context, set, (void*) pair, &equalsStringPairEntry, &hashStringPair, &freePairEntry);
 }
 
-Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, void* key, void* value)
+Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, const void* key, void* value)
 {
     Pair pair = ALLOCATE(context, sizeof(struct _Pair));
     pair->key = key;
@@ -2391,7 +2394,7 @@ Hashset2 clearHS2(Context context, Hashset2 set)
         size_t i;
         for (i = 0; i < set->nslots; i++)
         {
-            freeLL2(context, set->entries[i]);
+            freeLL2(context, set->entries[i], set->unlinkEntry);
             set->entries[i] = NULL;
         }
     }
@@ -2458,6 +2461,7 @@ char * fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, cha
             Pair pair = (Pair) slot->entry;
             Term term = (Term) pair->value;
             sep = fprintProperty(context, out, isNamed, set->nr, (const void *) pair->key, term, sep, depth, encountered, used, indent, posp, debug, max);
+            slot = slot->next;
         }
     }
     return sep;
@@ -2570,10 +2574,15 @@ Term c_namedProperty(NamedPropertyLink link, char *name)
 {
     for (; link; link = link->link)
     {
-        //if (link->name && (!strcmp(name, link->name)) && (name != link->name))
-        //  printf("Missed Equality! name=%s link->name=%s\n", name, link->name);
-        if (name == link->name)
+        if (! link->name) // hashset
+        {
+            Term term = (Term) getKeyPtrValuePtrHS2(link->u.propset, name);
+            if (term) return term;
+        }
+        else if (name == link->name)
+        {
             return link->u.term;
+        }
     }
     return NULL;
 }
@@ -2648,8 +2657,8 @@ void crsxAddPools(Context context)
 {
     if (! context->poolRefCount)
     {
-        context->stringPool = makeHS2(context, 16);
-        context->keyPool = makeHS2(context, 16);
+        context->stringPool = makeHS2(context, 16, NULL);
+        context->keyPool = makeHS2(context, 16, NULL);
     }
     ++context->poolRefCount;
 }
@@ -4360,41 +4369,48 @@ void freeTerm(Context context, Term term)
     }
 }
 
+void unlinkValueTerm(Context context, void *entry)
+{
+    Pair pair = (Pair) entry;
+    Term term = (Term) pair->value;
+    //if (term)
+    unlinkTerm(context, term);
+}
+
+void debugPropsHS2(Context context, Hashset2 set)
+{
+    VariableSet encountered = makeVariableSet(context);
+    Hashset2 used = makeHS2(context, 10, NULL);
+    int pos = 0;
+
+    fprintPropsHS2(context, STDOUT, 1 /* names, not variables */,
+                   set, ";\n", -1, encountered, used, 1, &pos, 0, 0);
+}
+
+
 NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink)
 {
     int count = nlink ? nlink->count + 1 : 1;
     if (count >= 100)
     {
-        struct _NamedPropertyLink * link = ALLOCATE(context, count * sizeof(struct _NamedPropertyLink));
-        // 0th = new, 1st = nlink, 2nd..count-1 = older
+        ASSERT(context, term);
 
-        // Initialize 0th element
-        link[0].name = name;
-        link[0].u.term = term; // Transfer ref
-#ifdef CRSXPROF
-        link[0].marker = 0;
-#endif
-        link[0].count = 0; // count==0 means front of group-allocation
-        link[0].nr = 1;
+        // Make a hashset
+        Hashset2 set = makeHS2(context, 8, unlinkValueTerm);
+        
+        // 0th = new, 1st = nlink, 2nd..count-1 = older
+        addKeyPtrValueHS2(context, set, name, LINK(context, term));
 
         // Copy initialize old elements
         NamedPropertyLink old_link = nlink;
         int i;
         for (i = 1 ; i <= (count-1) ; ++i)
         {
-            memcpy(&link[i], old_link, sizeof(struct _NamedPropertyLink));
-            link[i].count = -1; // count==-1 means part of group-allocation
-            link[i].nr = 1;
-            if (link[i].name)
-            {
-                LINK(context, link[i].u.term);
-            }
-            else
-            {
-                ASSERT(context, 0);
-                // LINK_VARIABLESET(context, (VARIABLESET) link[i].u.weakening);
-            }
-
+            ASSERT(context, old_link->name);
+            Term term = LINK(context, old_link->u.term);
+            ASSERT(context, term);
+            addKeyPtrValueHS2(context, set, old_link->name, term);
+            
             // move on
             old_link = old_link->link;
         }
@@ -4406,14 +4422,20 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         LINK_NamedPropertyLink(context, old_link);
         UNLINK_NamedPropertyLink(context, nlink);
 
-        // Link new elements together, last one does not change
-        for (i = 0 ; i <= (count-2) ; ++i)
-        {
-            link[i].link = &link[i+1];
-        }
+        //printf("Just constructed this prop set %p:\n", set);
+        //debugPropsHS2(context, set);
 
-        // Return the first one
-        return &link[0];
+        // Just allocate one link for the whole hashset
+        NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+        link->link = old_link; // skip all the properties included in the set
+        link->name = NULL; // NULL means it is a hashset
+        link->u.propset = set;
+#ifdef CRSXPROF
+        link->marker = 0;
+#endif
+        link->count = 0; // count==0 means group-allocation (hashset)
+        link->nr = 1;
+        return link;
     }
     else
     {
@@ -4461,13 +4483,7 @@ NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink li
             UNLINK_NamedPropertyLink(context, link->link);
             link->link = NULL;
 
-            // For now, don't free group-allocations
-            // Eventually should be checking if they are all ready to free
-            // (if all nr==0) then free the whole group.
-            if (link->count >= 1)
-            {
-                FREE(context, link);
-            }
+            FREE(context, link);
             return NULL;
         }
     }
@@ -5107,7 +5123,7 @@ void fprintTerm(Context context, FILE* out, Term term)
 {
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10);
+        used = makeHS2(context, 10, NULL);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5165,7 +5181,7 @@ void fprintTermWithIndent(Context context, FILE* out, Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10);
+        used = makeHS2(context, 10, NULL);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
