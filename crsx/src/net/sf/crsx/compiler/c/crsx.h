@@ -858,10 +858,10 @@ static inline Term c_property(Context context, NamedPropertyLink namedProperties
 
 struct _Properties
 {
-	VARIABLESET namedFreeVars; // set of free variables in named properties (unless all properties are closed)
-	VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
-	NamedPropertyLink namedProperties; // named properties.
-	VariablePropertyLink variableProperties; // variable properties.
+    VARIABLESET namedFreeVars; // set of free variables in named properties (unless all properties are closed)
+    VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
+    NamedPropertyLink namedProperties; // named properties.
+    VariablePropertyLink variableProperties; // variable properties.
 };
 
 Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
