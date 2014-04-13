@@ -436,8 +436,8 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
       ALLOCATE_Properties(sink->context,
                           LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars),
                           LINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars),
-                          buffer->pendingNamedProperties,
-                          buffer->pendingVariableProperties);
+                          LINK_NamedPropertyLink(sink->context, buffer->pendingNamedProperties),
+                          LINK_VariablePropertyLink(sink->context, buffer->pendingVariableProperties));
 
     construction->fvs = NULL;
     construction->nfvs = LINK_VARIABLESET(sink->context, construction->properties->namedFreeVars);
@@ -4337,10 +4337,8 @@ void freeTerm(Context context, Term term)
     {
         Construction construction = asConstruction(term);
 
-        UNLINK_NamedPropertyLink(context, construction->properties->namedProperties);
-        //construction->properties->namedProperties = NULL;
-        UNLINK_VariablePropertyLink(context, construction->properties->variableProperties);
-        //construction->properties->variableProperties = NULL;
+        UNLINK_Properties(context, construction->properties);
+        //construction->properties = NULL;
 
         UNLINK_VARIABLESET(context, construction->fvs);
         construction->fvs = NULL;
