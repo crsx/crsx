@@ -1062,6 +1062,7 @@ extern Hashset2 clearHS2(Context context, Hashset2 set);
 extern void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int constrained, VariablePropertyLink props);
 // Return memory used
 extern long memoryUsedHS2(Hashset2 set);
+extern void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set);
 extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
 
 

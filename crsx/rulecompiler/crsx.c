@@ -2431,6 +2431,23 @@ long memoryUsedHS2(Hashset2 set)
     return ans;
 }
 
+void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set)
+{
+    int i;
+    for (i = 0 ; i < from_set->nslots ; i++)
+    {
+        LinkedList2 slot = from_set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = LINK(context, (Term) pair->value);
+            ASSERT(context, term);
+            addKeyPtrValueHS2(context, to_set, pair->key, term);
+            slot = slot->next;
+        }
+    }
+}
+
 int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp)
 {
     int i;
@@ -2443,6 +2460,7 @@ int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long
             Pair pair = (Pair) slot->entry;
             Term term = (Term) pair->value;
             size += checkTerm4(context, NULL, 0, term, nf, 0, envsize, memuse, usedp);
+            slot = slot->next;
         }
     }
     return size;
@@ -4401,23 +4419,24 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
 
         // Copy initialize old elements
         NamedPropertyLink old_link = nlink;
-        int i;
-        for (i = 1 ; i <= (count-1) ; ++i)
+        while (old_link)
         {
-            ASSERT(context, old_link->name);
-            Term term = LINK(context, old_link->u.term);
-            ASSERT(context, term);
-            addKeyPtrValueHS2(context, set, old_link->name, term);
-            
+            if (old_link->name)
+            {
+                Term term = LINK(context, old_link->u.term);
+                ASSERT(context, term);
+                addKeyPtrValueHS2(context, set, old_link->name, term);
+            }
+            else
+            {
+                Hashset2 old_set = old_link->u.propset;
+                addSetToPropsSetHS2(context, set, old_set);
+            }
+
             // move on
             old_link = old_link->link;
         }
 
-        // Unlinking nlink will remove one reference down the line.
-        // We need to keep that reference for the ones we're not
-        // consuming, so increase the refcount for first non-consumed
-        // one first, before we decrease the ref count on the others.
-        LINK_NamedPropertyLink(context, old_link);
         UNLINK_NamedPropertyLink(context, nlink);
 
         //printf("Just constructed this prop set %p:\n", set);
@@ -4425,7 +4444,7 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
 
         // Just allocate one link for the whole hashset
         NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
-        link->link = old_link; // skip all the properties included in the set
+        link->link = NULL; // sets always include everything else
         link->name = NULL; // NULL means it is a hashset
         link->u.propset = set;
 #ifdef CRSXPROF
