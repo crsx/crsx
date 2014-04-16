@@ -4321,7 +4321,7 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                     NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->namedProperties);
                     link->name = GLOBAL(context, key);
 
-                    link->u.term = LINK(context, locvalue);
+                    link->u.term = LINK(context, value);
                     construction->namedProperties = link;
 
                     if (fvs)
