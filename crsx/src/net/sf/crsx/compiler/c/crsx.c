@@ -4999,6 +4999,10 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
     }
     if (IS_LITERAL(term2)) return 0;
     // Both are proper constructions.
+
+    if (strcmp(SYMBOL(term1), SYMBOL(term2)))
+        return 0;
+
     const int arity = ARITY(term1);
     if (arity != ARITY(term2)) return 0;
     int i;
