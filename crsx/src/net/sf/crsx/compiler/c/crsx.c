@@ -3139,17 +3139,17 @@ long long termHashCode(Context context, Term term, VariableLink deBruijn)
 int matchRegex(char* pat, char* str)
 {
     // utf8 -> utf16
-    int str_len = u_strlen((UChar*)str);
+    int str_len = strlen(str);
     int strU16_cap = U16_MAX_LENGTH * (2 * str_len) + 1;
     UChar strU16[strU16_cap];
     int strU16_len;
     UErrorCode status = U_ZERO_ERROR;
-    u_strFromUTF8(strU16, strU16_cap, &strU16_len, (char*)str, -1, &status);
+    u_strFromUTF8(strU16, strU16_cap, &strU16_len, str, -1, &status);
 
     if (U_FAILURE(status))
         return 0; // TODO: error
 
-    int pat_len = u_strlen((UChar*)pat);
+    int pat_len = strlen(pat);
     int patU16_cap = U16_MAX_LENGTH * (2 * pat_len) + 1;
     UChar patU16[patU16_cap];
     int patU16_len;
