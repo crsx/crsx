@@ -3129,17 +3129,17 @@ long long termHashCode(Context context, Term term, VariableLink deBruijn)
 int matchRegex(char* pat, char* str)
 {
     // utf8 -> utf16
-    int str_len = u_strlen((UChar*)str);
+    int str_len = strlen(str);
     int strU16_cap = U16_MAX_LENGTH * (2 * str_len) + 1;
     UChar strU16[strU16_cap];
     int strU16_len;
     UErrorCode status = U_ZERO_ERROR;
-    u_strFromUTF8(strU16, strU16_cap, &strU16_len, (char*)str, -1, &status);
+    u_strFromUTF8(strU16, strU16_cap, &strU16_len, str, -1, &status);
 
     if (U_FAILURE(status))
         return 0; // TODO: error
 
-    int pat_len = u_strlen((UChar*)pat);
+    int pat_len = strlen(pat);
     int patU16_cap = U16_MAX_LENGTH * (2 * pat_len) + 1;
     UChar patU16[patU16_cap];
     int patU16_len;
@@ -5049,6 +5049,10 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
     }
     if (IS_LITERAL(term2)) return 0;
     // Both are proper constructions.
+
+    if (strcmp(SYMBOL(term1), SYMBOL(term2)))
+        return 0;
+
     const int arity = ARITY(term1);
     if (arity != ARITY(term2)) return 0;
     int i;
