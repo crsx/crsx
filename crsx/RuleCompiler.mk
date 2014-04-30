@@ -16,7 +16,7 @@ CACHE=rulecompiler
 .SECONDARY:
 
 .PHONY: prereq bin 
-bin: bin/crsx
+bin: lib/javacc.jar lib/antlr-runtime-3.1.3.jar bin/crsx
 
 clean::
 	@rm -f $(CACHE)/*.*

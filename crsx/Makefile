@@ -17,7 +17,7 @@ INCLUDES = /usr/include
 
 .PHONY: all upload clean
 
-all: crsx.jar
+all: lib/javacc.jar lib/antlr-runtime-3.1.3.jar crsx.jar
 
 crsx.jar:
 	$(ANT) jar
@@ -25,6 +25,11 @@ crsx.jar:
 upload:
 	$(RSYNC) -au index.html "$$USER,crsx@web.sourceforge.net:/home/project-web/crsx/htdocs/index.html"
 
+lib/javacc.jar:
+	$(error No javacc.jar found.  Get http://java.net/projects/javacc/downloads/download/oldversions%252Fjavacc-4.2.zip (or any later version), extract javacc-4.2/bin/lib/javacc.jar, and store it in lib/ as javacc.jar.)
+
+lib/antlr-runtime-3.1.3.jar:
+	$(error No lib/antlr-runtime-3.1.3.jar found.  Get http://www.antlr.org/download/antlr-runtime-3.1.3.jar and store it in lib/ as antlr-runtime-3.1.3.jar.)
 
 COMPILERSRC = src/net/sf/crsx/compiler
 FLEX = flex
