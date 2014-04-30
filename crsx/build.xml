@@ -53,6 +53,8 @@
 				<exclude name="**/README"/>
 			</fileset>
 		</copy>
+		<copy file="src/net/sf/crsx/run/default"
+		      tofile="build/net/sf/crsx/run/default"/>
 	</target>
 
 	<!-- Simple zip with all sources. -->
