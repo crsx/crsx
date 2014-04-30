@@ -16,7 +16,7 @@ CACHE=rulecompiler
 .SECONDARY:
 
 .PHONY: prereq bin 
-bin: bin/crsx
+bin: compile bin/crsx
 
 clean::
 	@rm -f $(CACHE)/*.*
