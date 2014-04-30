@@ -24,16 +24,25 @@ RawDeclaration ::=(
  %rawDeclaration⟪ %EmbeddedModule«RawEmbeddedModule» ; ⟫;
  %rawDeclaration⟪ import %ModuleName«$String» ( %SortNames«$List[$String]» ) ; ⟫;
  %rawDeclaration⟪ space %RegExp«RawRegExp» ; ⟫;
- %rawDeclaration⟪ token %SortName«$String» | %RegExp«RawRegExp» ; ⟫;
+ %rawDeclaration⟪ token %SortName«$String» | %RegExp«RawRegExp» %LexerState«RawLexerState» ; ⟫;
  %rawDeclaration⟪ fragment %FragmentName«$String» | %RegExp«RawRegExp» ; ⟫;
  %rawDeclaration⟪ attribute %AttributeKind«RawAttributeKind» %AttributeName«$String» %AttributeForm«RawAttributeForm» %AttributeOptions«$List[RawAttributeOption]» ; ⟫;
  %rawDeclaration⟪ sort %SortName«$String» %Repeat«RawRepeat» %SortAbstraction«RawSortAbstraction» ; ⟫;
  %rawDeclaration⟪ %SortAlternatives«$List[RawSortAlternative]» ; ⟫;
  %rawDeclaration⟪ rule %Rule«RawRule» ; ⟫;
  %rawDeclaration⟪ { %Declarations«RawDeclarations» } ⟫;
+ %rawDeclaration⟪ lexer %SortName«$String» ; ⟫;
 );
 
 //// SYNTAX.
+
+
+{$String : $StringEntrySort}
+RawLexerState ::=(
+ %rawLexerState⟪ → %SortName«$String» ⟫;
+ %rawLexerState⟪ ⟫;
+);
+
 
 {$String : $StringEntrySort}
 RawRegExp ::=(

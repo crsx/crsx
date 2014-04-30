@@ -65,9 +65,9 @@ N-resolve[{#LOC}%rawDeclarations⟪ space #RegExp# ; #Declarations# ⟫]
 ;
 
 Resolve-Token:
-N-resolve[{#LOC}%rawDeclarations⟪ token #SortName# | #RegExp# ; #Declarations# ⟫]
+N-resolve[{#LOC}%rawDeclarations⟪ token #SortName# | #RegExp# #LexerState# ; #Declarations# ⟫]
 →
-{#LOC}%rawDeclarations⟪ token #SortName# | #RegExp# ; %Declarations« N-resolve[#Declarations#] » ⟫
+{#LOC}%rawDeclarations⟪ token #SortName# | #RegExp# #LexerState#  ; %Declarations« N-resolve[#Declarations#] » ⟫
 ;
 
 Resolve-Fragment:
@@ -104,6 +104,14 @@ ResolveNesting:
 N-resolve[{#LOC}%rawDeclarations⟪ { #Declarations1# } #Declarations2# ⟫]
 →
 {#LOC}%rawDeclarations⟪ { %Declarations« N-resolve[#Declarations1#] » } %Declarations« N-resolve[#Declarations2#] » ⟫
+;
+
+
+
+ResolveLexer:
+N-resolve[{#LOC}%rawDeclarations⟪ lexer #SortName# ; #Declarations# ⟫]
+→
+{#LOC}%rawDeclarations⟪ lexer #SortName# ; %Declarations« N-resolve[#Declarations#] » ⟫
 ;
 
 ResolveDone:
@@ -152,7 +160,7 @@ N-Declarations1[#Declarations#, #ModuleName, "", #Names, ok¹ s ss.#[ok¹,s,ss]]
 
 Declarations-token[Data[#SortName]]:
 {#ND}
-N-Declarations1[%rawDeclarations⟪ token #SortName# | #RegExp# ; #Declarations# ⟫, #ModuleName, #LastSortName, #SortNames, ok¹ s ss.#[ok¹,s,ss]]
+N-Declarations1[%rawDeclarations⟪ token #SortName# | #RegExp# #LexerState# ; #Declarations# ⟫, #ModuleName, #LastSortName, #SortNames, ok¹ s ss.#[ok¹,s,ss]]
 →
 {#ND; #SortName# : SE_TOKEN[#SortName#]}
 N-Declarations1[#Declarations#, #ModuleName, "", AddName[#SortNames, #SortName#], ok¹ s ss.#[ok¹,s,ss]]
@@ -205,6 +213,15 @@ N-Declarations1[%rawDeclarations⟪ { #Declarations2# } #Declarations# ⟫, #Mod
 {#ND}
 N-Declarations1[#Declarations2# , #ModuleName, #LastSortName, #Names, ok¹ s ss.N-then-Declarations1[ok¹, #Declarations#, #ModuleName, #LastSortName, ss, ok2¹ s2 ss2.#[ok2¹,s2,ss2]]]
 ;
+
+Declarations-lexer:
+{#ND}
+N-Declarations1[%rawDeclarations⟪ lexer #SortName# ; #Declarations# ⟫, #ModuleName, #LastSortName, #Names, ok¹ s ss.#[ok¹,s,ss]]
+→
+{#ND}
+N-Declarations1[#Declarations# , #ModuleName, #LastSortName, #Names, ok¹ s ss.#[ok¹,s,ss]]
+;
+
 
 Declarations-none:
 {#ND}

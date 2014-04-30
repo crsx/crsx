@@ -813,69 +813,75 @@ SingletonTextMap[TextToString[#name], %n⟪
 // TEXT LIST OF LEXICAL DECLARATIONS.
 
 PG-Lexical[RawDeclarations] :: Text ;
-PG-Lexical[#Declarations] → PG-Lexical2[#Declarations, B_FALSE, hasskip.PG-Lexical2Tail[hasskip]] ;
+PG-Lexical[#Declarations] → PG-Lexical2[#Declarations, B_FALSE, "DEFAULT", hasskip.PG-Lexical2Tail[hasskip]] ;
 
-PG-Lexical2[RawDeclarations, Boolean, ha::Boolean.Text] :: Text ;
+PG-Lexical2[RawDeclarations, Boolean, $String, ha::Boolean.Text] :: Text ;
 
 Lexical-module:
-PG-Lexical2[%rawDeclarations⟪ module #ModuleName2# { #Declarations2# } ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ module #ModuleName2# { #Declarations2# } ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations2#, #hasSkip, hasskip.PG-Lexical2[#Declarations#, hasskip, hasskip2.#[hasskip2]]]
+PG-Lexical2[#Declarations2#, #hasSkip, #lexer, hasskip.PG-Lexical2[#Declarations#, hasskip, #lexer, hasskip2.#[hasskip2]]]
 ;
 
 Lexical-space:
-PG-Lexical2[%rawDeclarations⟪ space #RegExp# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ space #RegExp# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-%n⟪skip ::= ' ' | ⟦« PG-InlineRegExp[#RegExp#, "space$"] »⟧ .
-« PG-DeclareRegExp[#RegExp#, "space$"] »« PG-Lexical2[#Declarations#, B_TRUE, hasskip.#[hasskip]] »⟫
+%n⟪skip («StringToText[#lexer]») ::= ' ' | ⟦« PG-InlineRegExp[#RegExp#, "space$"] »⟧ .
+« PG-DeclareRegExp[#RegExp#, "space$"] »« PG-Lexical2[#Declarations#, B_TRUE, #lexer, hasskip.#[hasskip]] »⟫
 ;
 
 Lexical-token:
-PG-Lexical2[%rawDeclarations⟪ token #SortName# | #RegExp# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ token #SortName# | #RegExp# #LexerState# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-%n⟪token «TokenName[#SortName#]» ::= ⟦« PG-InlineRegExp[#RegExp#, #SortName#] »⟧ .
-« PG-DeclareRegExp[#RegExp#, #SortName#] »« PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]] »⟫
+%n⟪token «TokenName[#SortName#]» («StringToText[#lexer]»«PG-ToLexerState[#LexerState#]») ::= ⟦« PG-InlineRegExp[#RegExp#, #SortName#] »⟧ .
+« PG-DeclareRegExp[#RegExp#, #SortName#] »« PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]] »⟫
 ;
 
 Lexical-fragment:
-PG-Lexical2[%rawDeclarations⟪ fragment #FragmentName# | #RegExp# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ fragment #FragmentName# | #RegExp# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
 %n⟪token fragment «TokenName[#FragmentName#]» ::= ⟦« PG-InlineRegExp[#RegExp#, #FragmentName#] »⟧ . 
-« PG-DeclareRegExp[#RegExp#, #FragmentName#] »« PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]] »⟫
+« PG-DeclareRegExp[#RegExp#, #FragmentName#] »« PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]] »⟫
 ;
 
 Lexical-attribute:
-PG-Lexical2[%rawDeclarations⟪ attribute #AttributeKind# #AttributeName# #AttributeForm# #AttributeOptions# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ attribute #AttributeKind# #AttributeName# #AttributeForm# #AttributeOptions# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]]
 ;
 
 Lexical-sort:
-PG-Lexical2[%rawDeclarations⟪ sort #SortName# #Repeat# #SortAbstraction# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ sort #SortName# #Repeat# #SortAbstraction# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]]
 ;
 
 Lexical-alternatives:
-PG-Lexical2[%rawDeclarations⟪ #SortAlternatives# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ #SortAlternatives# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]]
 ;
 
 Lexical-rule:
-PG-Lexical2[%rawDeclarations⟪ rule #Rule# ; #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ rule #Rule# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations#, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]]
 ;
 
 Lexical-nest:
-PG-Lexical2[%rawDeclarations⟪ { #Declarations2# } #Declarations# ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ { #Declarations2# } #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations2#, #hasSkip, hasskip.PG-Lexical2[#Declarations#, hasskip, hasskip2.#[hasskip2]]]
+PG-Lexical2[#Declarations2#, #hasSkip, #lexer, hasskip.PG-Lexical2[#Declarations#, hasskip, #lexer, hasskip2.#[hasskip2]]]
+;
+
+Lexical-lexer:
+PG-Lexical2[%rawDeclarations⟪ lexer #SortName# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
+→
+PG-Lexical2[#Declarations#, #hasSkip, UpCase[#SortName#], hasskip.#[hasskip]]
 ;
 
 Lexcial-done:
-PG-Lexical2[%rawDeclarations⟪ ⟫, #hasSkip, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
 #[#hasSkip]
 ;
@@ -885,6 +891,18 @@ PG-Lexical2Tail[B_TRUE] → %n⟪⟫ ;
 PG-Lexical2Tail[B_FALSE] → %n⟪skip ::= " " .
 ⟫ ;
 
+
+PG-ToLexerState[RawLexerState] :: Text ;
+
+PG-ToLexerState[%rawLexerState⟪ → #SortName# ⟫] 
+→
+%n⟪:«StringToText[UpCase[#SortName#]]»⟫ 
+;
+
+PG-ToLexerState[%rawLexerState⟪ ⟫] 
+→
+%n⟪ ⟫ 
+;
 
 /////////////////////////////////////////////////////////////////////
 // INLINE TEXT OF REGULAR EXPRESSION.

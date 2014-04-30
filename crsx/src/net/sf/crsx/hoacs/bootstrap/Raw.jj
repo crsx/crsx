@@ -70,11 +70,11 @@ public class Raw implements net.sf.crsx.Parser
 		categoryCall.put("rawFormPrec", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_FormPrec$WithEOF(sink, bound);} });
 		categoryCall.put("rawInheritedRefs", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_InheritedRefs$WithEOF(sink, bound);} });
 		categoryCall.put("rawInheritedRef", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_InheritedRef$WithEOF(sink, bound);} });
-		categoryCall.put("rawSynthesizedRef", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_SynthesizedRef$WithEOF(sink, bound);} });
 		categoryCall.put("rawAttributeKind", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_AttributeKind$WithEOF(sink, bound);} });
 		categoryCall.put("rawAttributeForm", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_AttributeForm$WithEOF(sink, bound);} });
 		categoryCall.put("rawAttributeOptions", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_AttributeOptions$WithEOF(sink, bound);} });
 		categoryCall.put("rawAttributeOption", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_AttributeOption$WithEOF(sink, bound);} });
+		categoryCall.put("rawLexerState", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_LexerState$WithEOF(sink, bound);} });
 		categoryCall.put("rawScopeSorts", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_ScopeSorts$WithEOF(sink, bound);} });
 		categoryCall.put("rawScopeSort", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_ScopeSort$WithEOF(sink, bound);} });
 		categoryCall.put("rawParsedForm", new CategoryCall(){ net.sf.crsx.Sink call(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> bound) throws ParseException {return N_ParsedForm$WithEOF(sink, bound);} });
@@ -393,13 +393,14 @@ TOKEN : {<IT_Declaration : "%Declaration">}
  * <em>Declaration</em> ::=  <font color="red">{embedded-module}</font><font color="red">:raw</font>   <a href="#N_EmbeddedModule">&lang;EmbeddedModule&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |   <a href="#T_IMPORT">IMPORT</a><font color="red">:raw</font>   <a href="#N_ModuleName">&lang;ModuleName&rang;</a>    (   <a href="#T_LPAREN">LPAREN</a>   (  <a href="#N_SortNames">&lang;SortNames&rang;</a>   |  <font color="red">{$Nil}</font>  )    <a href="#T_RPAREN">RPAREN</a>  |  <font color="red">{$Nil}</font>  )    <a href="#T_SEMI">SEMI</a>  <br>
  *  |   <a href="#T_SPACE">SPACE</a><font color="red">:raw</font>   <a href="#N_RegExp">&lang;RegExp&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
- *  |   <a href="#T_TOKEN">TOKEN</a>   (  <font color="red">{'token'}</font><font color="red">:raw</font>   <a href="#N_SortName">&lang;SortName&rang;</a>     <a href="#T_BAR">BAR</a>   <a href="#N_RegExp">&lang;RegExp&rang;</a>     <a href="#T_SEMI">SEMI</a>  |   <a href="#T_FRAGMENT">FRAGMENT</a><font color="red">:raw</font>   <a href="#N_FragmentName">&lang;FragmentName&rang;</a>     <a href="#T_BAR">BAR</a>   <a href="#N_RegExp">&lang;RegExp&rang;</a>     <a href="#T_SEMI">SEMI</a>  )  <br>
+ *  |   <a href="#T_TOKEN">TOKEN</a>   (  <font color="red">{'token'}</font><font color="red">:raw</font>   <a href="#N_SortName">&lang;SortName&rang;</a>     <a href="#T_BAR">BAR</a>   <a href="#N_RegExp">&lang;RegExp&rang;</a>    <a href="#N_LexerState">&lang;LexerState&rang;</a>     <a href="#T_SEMI">SEMI</a>  |   <a href="#T_FRAGMENT">FRAGMENT</a><font color="red">:raw</font>   <a href="#N_FragmentName">&lang;FragmentName&rang;</a>     <a href="#T_BAR">BAR</a>   <a href="#N_RegExp">&lang;RegExp&rang;</a>     <a href="#T_SEMI">SEMI</a>  )  <br>
  *  |   <a href="#T_FRAGMENT">FRAGMENT</a><font color="red">:raw</font>   <a href="#N_FragmentName">&lang;FragmentName&rang;</a>     <a href="#T_BAR">BAR</a>   <a href="#N_RegExp">&lang;RegExp&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |   <a href="#T_ATTRIBUTE">ATTRIBUTE</a><font color="red">:raw</font>   <a href="#N_AttributeKind">&lang;AttributeKind&rang;</a>    <a href="#N_AttributeName">&lang;AttributeName&rang;</a>    <a href="#N_AttributeForm">&lang;AttributeForm&rang;</a>    <a href="#N_AttributeOptions">&lang;AttributeOptions&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |   <a href="#T_SORT">SORT</a><font color="red">:raw</font>   <a href="#N_SortName">&lang;SortName&rang;</a>    <a href="#N_Repeat">&lang;Repeat&rang;</a>    <a href="#N_SortAbstraction">&lang;SortAbstraction&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  <font color="red">{anonymous}</font><font color="red">:raw</font>   <a href="#N_SortAlternatives">&lang;SortAlternatives&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  (   <a href="#T_RULE">RULE</a>  )?   <font color="red">{rule}</font><font color="red">:raw</font>   <a href="#N_Rule">&lang;Rule&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
- *  |  <font color="red">{nestedDeclarations}</font><font color="red">:raw</font>    <a href="#T_LBRACE">LBRACE</a>   <a href="#N_Declarations">&lang;Declarations&rang;</a>     <a href="#T_RBRACE">RBRACE</a> 
+ *  |  <font color="red">{nestedDeclarations}</font><font color="red">:raw</font>    <a href="#T_LBRACE">LBRACE</a>   <a href="#N_Declarations">&lang;Declarations&rang;</a>     <a href="#T_RBRACE">RBRACE</a>  <br>
+ *  |   <a href="#T_LEXER">LEXER</a><font color="red">:raw</font>   <a href="#N_SortName">&lang;SortName&rang;</a>     <a href="#T_SEMI">SEMI</a> 
  */
 net.sf.crsx.Sink N_Declaration(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
 {
@@ -505,6 +506,9 @@ net.sf.crsx.Sink N_Declaration(net.sf.crsx.Sink sink, net.sf.crsx.util.Extensibl
 		 ) 
 		 ( 
 		sink=N_RegExp(sink, env)
+		 ) 
+		 ( 
+		sink=N_LexerState(sink, env)
 		 ) 
 		 ( 
 		 <T_SEMI>
@@ -654,6 +658,71 @@ net.sf.crsx.Sink N_Declaration(net.sf.crsx.Sink sink, net.sf.crsx.util.Extensibl
 	 ) 
 	 ( 
 	 <T_RBRACE>
+	 ) 
+	{
+		return sink .end() ;
+	}
+ |
+	 ( 
+	t=<T_LEXER>
+	{
+		sink = sink .start(makeTConstructor(sink, t, raw(t.toString()), null)) ;
+	}
+	 ) 
+	 ( 
+	sink=N_SortName(sink, env)
+	 ) 
+	 ( 
+	 <T_SEMI>
+	 ) 
+	{
+		return sink .end() ;
+	}
+}
+
+/** <em>LexerState$WithEOF</em> ::= <em>LexerState</em> EOF . */
+net.sf.crsx.Sink N_LexerState$WithEOF(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
+{}
+{ {token_source.SwitchTo(RE);} sink=N_LexerState(sink, env) <EOF> {return sink;} }
+
+/** Special meta-variable for LexerState production. */
+<RE, DEFAULT> TOKEN : {<MT_LexerState : "#LexerState" ((<T_DIGIT>)* | "_" (<T_DIGIT> | <T_UPPER> | <T_LOWER>)*) "#">}
+
+/** Special inject token LexerState production. */
+<RE, DEFAULT> TOKEN : {<IT_LexerState : "%LexerState">}
+
+/**
+ * <em>LexerState</em> ::=  <font color="red">{ChangeState}</font><font color="red">:raw</font>    <a href="#T_ARROW">ARROW</a>   <a href="#N_SortName">&lang;SortName&rang;</a>   <br>
+ *  |  <font color="red">{$Nil}</font> 
+ */
+net.sf.crsx.Sink N_LexerState(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
+{
+	Token t = null;
+}
+{
+	t=<MT_LexerState> {sink = sink .startMetaApplication(t.toString());} [ "\u2983" sink=N_SortParam(sink, env)( "\u2225" sink=N_SortParam(sink, env))* "\u2984" ] {return sink.endMetaApplication();}
+|
+	<IT_LexerState>  {sink=N_Embedded(sink, env);}  {return sink;}
+|
+	 ( 
+	{
+		sink = sink .start(makeTConstructor(sink, t, raw("ChangeState"), null)) ;
+	}
+	 ) 
+	 ( 
+	 <T_ARROW>
+	 ) 
+	 ( 
+	sink=N_SortName(sink, env)
+	 ) 
+	{
+		return sink .end() ;
+	}
+ |
+	 ( 
+	{
+		sink = sink .start(makeTConstructor(sink, t, "LexerState$Nil", null)) ;
+	}
 	 ) 
 	{
 		return sink .end() ;
@@ -4388,7 +4457,7 @@ TOKEN : {<MT_Variable : "#Variable" ((<T_DIGIT>)* | "_" (<T_DIGIT> | <T_UPPER> |
 TOKEN : {<IT_Variable : "%Variable">}
 
 /**
- * <em>Variable</em> ::=  (   <a href="#T_LOWER">LOWER</a><font color="red">$</font>  |   <a href="#T_VAR">VAR</a><font color="red">$</font>  |   <a href="#T_MODULE">MODULE</a><font color="red">$</font>  |   <a href="#T_SORT">SORT</a><font color="red">$</font>  |   <a href="#T_DATA">DATA</a><font color="red">$</font>  |   <a href="#T_STATIC">STATIC</a><font color="red">$</font>  |   <a href="#T_SYMBOL">SYMBOL</a><font color="red">$</font>  |   <a href="#T_SCHEME">SCHEME</a><font color="red">$</font>  |   <a href="#T_AUTOMATIC">AUTOMATIC</a><font color="red">$</font>  |   <a href="#T_ATTRIBUTE">ATTRIBUTE</a><font color="red">$</font>  |   <a href="#T_COMPOSE">COMPOSE</a><font color="red">$</font>  |   <a href="#T_SUGAR">SUGAR</a><font color="red">$</font>  |   <a href="#T_RULE">RULE</a><font color="red">$</font>  |   <a href="#T_PRIORITY">PRIORITY</a><font color="red">$</font>  |   <a href="#T_DEFAULT">DEFAULT</a><font color="red">$</font>  |   <a href="#T_SPACE">SPACE</a><font color="red">$</font>  |   <a href="#T_IMPORT">IMPORT</a><font color="red">$</font>  |   <a href="#T_TOKEN">TOKEN</a><font color="red">$</font>  |   <a href="#T_FRAGMENT">FRAGMENT</a><font color="red">$</font>  |   <a href="#T_NESTED">NESTED</a><font color="red">$</font>  |   <a href="#T_TAG">TAG</a><font color="red">$</font>  ) 
+ * <em>Variable</em> ::=  (   <a href="#T_LOWER">LOWER</a><font color="red">$</font>  |   <a href="#T_VAR">VAR</a><font color="red">$</font>  |   <a href="#T_MODULE">MODULE</a><font color="red">$</font>  |   <a href="#T_SORT">SORT</a><font color="red">$</font>  |   <a href="#T_DATA">DATA</a><font color="red">$</font>  |   <a href="#T_STATIC">STATIC</a><font color="red">$</font>  |   <a href="#T_SYMBOL">SYMBOL</a><font color="red">$</font>  |   <a href="#T_SCHEME">SCHEME</a><font color="red">$</font>  |   <a href="#T_AUTOMATIC">AUTOMATIC</a><font color="red">$</font>  |   <a href="#T_ATTRIBUTE">ATTRIBUTE</a><font color="red">$</font>  |   <a href="#T_COMPOSE">COMPOSE</a><font color="red">$</font>  |   <a href="#T_SUGAR">SUGAR</a><font color="red">$</font>  |   <a href="#T_RULE">RULE</a><font color="red">$</font>  |   <a href="#T_PRIORITY">PRIORITY</a><font color="red">$</font>  |   <a href="#T_DEFAULT">DEFAULT</a><font color="red">$</font>  |   <a href="#T_SPACE">SPACE</a><font color="red">$</font>  |   <a href="#T_IMPORT">IMPORT</a><font color="red">$</font>  |   <a href="#T_TOKEN">TOKEN</a><font color="red">$</font>  |   <a href="#T_LEXER">LEXER</a><font color="red">$</font>  |   <a href="#T_FRAGMENT">FRAGMENT</a><font color="red">$</font>  |   <a href="#T_NESTED">NESTED</a><font color="red">$</font>  |   <a href="#T_TAG">TAG</a><font color="red">$</font>  ) 
  */
 net.sf.crsx.Sink N_Variable(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
 {
@@ -4572,6 +4641,16 @@ net.sf.crsx.Sink N_Variable(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMa
 	|
 		 ( 
 		t=<T_TOKEN>
+		{
+			sink = sink .start(makeTConstructor(sink, t, t.toString(), net.sf.crsx.CRS.STRING_SORT)) ;
+		}
+		 ) 
+		{
+			sink = sink .end() ;
+		}
+	|
+		 ( 
+		t=<T_LEXER>
 		{
 			sink = sink .start(makeTConstructor(sink, t, t.toString(), net.sf.crsx.CRS.STRING_SORT)) ;
 		}
@@ -5538,7 +5617,7 @@ TOKEN : {<T_FORALL : "\u2200" >}
 /**
  * ARROW ::= <code>&#92;u2192</code>
  */
-TOKEN : {<T_ARROW : "\u2192" >}
+<DEFAULT, RE> TOKEN : {<T_ARROW : "\u2192" >: DEFAULT}
 
 /**
  * UP ::= <code>&#92;u2191</code>
@@ -5654,6 +5733,11 @@ TOKEN : {<T_IMPORT : "import" >}
  * TAG ::=  "<code>tag</code>"
  */
 TOKEN : {<T_TAG : "tag" >}
+
+/**
+ * LEXER ::=  "<code>lexer</code>"
+ */
+TOKEN : {<T_LEXER : "lexer" >}
 
 /**
  * SPACE ::=  "<code>space</code>"

@@ -3,8 +3,8 @@
 # Standard programs.
 
 CC = gcc
-CCPLUS = g++
-CCFLAGS=-g -Wall 
+CCPLUS = g++ $(CFLAGS)
+CCFLAGS=-g -Wall $(CFLAGS) 
 #-O3
 
 ICU4CLIB=-licui18n -licuuc -licudata
@@ -46,7 +46,7 @@ $(foreach family, $(CRSXCFAMILIES), $(eval $(call TARGETS,$(family))))
 # bin
 
 crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
-	$(CCPLUS) $^ $(ICU4CLIB) $(ICU4CDIR) -o $@
+	$(CCPLUS) $^ $(ICU4CLIB) $(LDFLAGS) $(ICU4CDIR) -o $@
 
 # Default C compilation
 %.o: %.c

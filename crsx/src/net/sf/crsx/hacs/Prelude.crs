@@ -143,6 +143,8 @@ SameString[$String, $String] :: Boolean ;
 Trim[$String] :: $String ;
 -[Data[#]]: Trim[#] → $[Trim, #] ;
 
+UpCase[$String] :: $String ;
+-[Data[#]]: UpCase[#] → $[UpCase, #] ;
 
 /////////////////////////////////////////////////////////////////////
 // 6. SET OF NAMES

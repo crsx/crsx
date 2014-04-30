@@ -8,7 +8,7 @@
 
 class net.sf.crsx.hoacs.bootstrap.Raw : <Module>, <ModuleName>, <EmbeddedModule>,
 <Declaration>, <Declarations>, <SortAbstraction>, <Rule>, <Sort>, <SortParam>, <SortName>, <SortNames>, <SimpleSort>, <SimpleSorts>, <SubstituteSorts>, <SubstituteSort>, <Tagging>,
-<SortAlternative>, <SortAlternatives>, <Form>, <FormPrec>, <InheritedRefs>, <InheritedRef>, <SynthesizedRef>, <AttributeKind>, <AttributeForm>, <AttributeOptions>, <AttributeOption>,
+<SortAlternative>, <SortAlternatives>, <Form>, <FormPrec>, <InheritedRefs>, <InheritedRef>, <AttributeKind>, <AttributeForm>, <AttributeOptions>, <AttributeOption>, <LexerState>,
 <ScopeSorts>, <ScopeSort>, <ParsedForm>, <Repeat>, <Priority>,
 <FragmentName>, <FragmentRef>, <RegExp>, <RegExpChoice>, <RegExpUnits>, <RegExpUnit>, <RegExpSimple>, <RegExpLeaf>, <Word>,
 <Term>, <NotVariableTerm>, <Attributes>, <Attribute>, <AttributeValue>, <Scopes>, <Scope>, <Terms>, <Parsed>,
@@ -44,7 +44,7 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 | IMPORT:raw <ModuleName> ( LPAREN (<SortNames> | {$Nil}) RPAREN | {$Nil} ) SEMI
 
 | SPACE:raw <RegExp> SEMI
-| TOKEN ( {'token'}:raw <SortName> BAR <RegExp> SEMI | FRAGMENT:raw <FragmentName> BAR <RegExp> SEMI )
+| TOKEN ( {'token'}:raw <SortName> BAR <RegExp> <LexerState> SEMI | FRAGMENT:raw <FragmentName> BAR <RegExp> SEMI )
 | FRAGMENT:raw <FragmentName> BAR <RegExp> SEMI
 
 | ATTRIBUTE:raw <AttributeKind> <AttributeName> <AttributeForm> <AttributeOptions> SEMI
@@ -53,9 +53,12 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 | {anonymous}:raw <SortAlternatives> SEMI
 | (RULE)? {rule}:raw <Rule> SEMI
 | {nestedDeclarations}:raw LBRACE <Declarations> RBRACE
+| LEXER:raw <SortName> SEMI
 .
 
 //// SYNTAX.
+
+<LexerState> (RE,DEFAULT) ::= {ChangeState}:raw ARROW <SortName> | {LexerState$Nil}.
 
 <RegExp> (RE) ::= {RegExp$Cons} <RegExpChoice> ( BAR <RegExp> | {RegExp$Nil} ) .
 
@@ -281,7 +284,7 @@ TOKEN_MGR_DECLS : { int commentNesting ; int commentState; }
 <FragmentRef> (DEFAULT,RE) ::= FRAGMENT_REF$:unembed .
 <AttributeName> ::= <Literal> | <Variable> | <Constructor> .
 <Constructor> ::= ( UPPER$ | DASH$ | CON$ ).
-<Variable> ::= ( LOWER$ | VAR$ | MODULE$ | SORT$ | DATA$ | STATIC$ | SYMBOL$ | SCHEME$ | AUTOMATIC$ | ATTRIBUTE$ | COMPOSE$ | SUGAR$ | RULE$ | PRIORITY$ | DEFAULT$ | SPACE$ | IMPORT$ | TOKEN$ | FRAGMENT$ | NESTED$ | TAG$ ).
+<Variable> ::= ( LOWER$ | VAR$ | MODULE$ | SORT$ | DATA$ | STATIC$ | SYMBOL$ | SCHEME$ | AUTOMATIC$ | ATTRIBUTE$ | COMPOSE$ | SUGAR$ | RULE$ | PRIORITY$ | DEFAULT$ | SPACE$ | IMPORT$ | TOKEN$ | LEXER$ | FRAGMENT$ | NESTED$ | TAG$ ).
 <MetaVariable> ::= ( META$ | HASH$ ).
 <Separator> ::= ( BAR$ | SEMI$ | COMMA$ | COLON$ | STAR$ | DOT$ ).
 
@@ -307,7 +310,7 @@ token LBRACKET ::= "[" .
 token RBRACKET ::= "]" .
 token COMMA ::= "," .
 token FORALL ::= \u2200 . // ∀
-token ARROW ::= \u2192 . // →
+token ARROW (DEFAULT,RE : DEFAULT) ::= \u2192 . // →
 token UP ::= \u2191 . // ↑
 token DOWN ::= \u2193 . // ↓
 token NOT ::= \u00ac . // ¬
@@ -336,6 +339,7 @@ token PRIORITY ::= "priority" .
 token DEFAULT ::= "default" .
 token IMPORT ::= "import" .
 token TAG ::= "tag" .
+token LEXER ::= "lexer" .
 
 // Regular Expression introduction keywords.
 token SPACE (DEFAULT : RE) ::= "space" .
