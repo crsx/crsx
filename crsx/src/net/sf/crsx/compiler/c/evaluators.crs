@@ -767,13 +767,29 @@ Set-Pick[Fresh[index::Text,t::Text]]
 %n⟪{
 Term «t»;
 long long «index»;
-«{#env} T-set-int[#Index, #sink, index]»
-«{#env} T-set[#List, #sink, t]»
+«{#env} T-set-int[#Index, #sink, index]»«{#env} T-set-ref[#List, #sink, t]»
 while («index»--) «t» = SUB(«t»,1);
 «#result» = LINK(«#sink»->context, SUB(«t»,0));
 }⟫
 ;
 
+// $[ReversePick, #index, #list] with constant #index evaluates as the index'th member of the reverse of list (starting from 0). 
+//
+SET_REF_PRIMITIVE[E_ReversePick];
+
+Set-ReversePick[Fresh[index::Text,t::Text,p::Text,index::Text]]
+:
+{#env}E-set-ref[E_ReversePick, (#Name; #Index; #List;), #Options, #sink, #result]
+→
+%n⟪{
+Term «t»,«p»;
+long long «index»;
+«{#env} T-set-int[#Index, #sink, index]»«{#env} T-set-ref[#List, #sink, t]»
+for («p»=«t»; TAG(«p»)!=Data_M__sNil; «index»--) «p» = SUB(«p»,1);
+while («index»++) «t» = SUB(«t»,1);
+«#result» = LINK(«#sink»->context, SUB(«t»,0));
+}⟫
+;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // BOOLEAN PRIMITIVES
@@ -1256,6 +1272,18 @@ Set-Int-HashCode[Fresh[term::Text]]
 %n⟪{⟦ Term «term»;
 « {#env}T-set[#Term, #sink, term] »«#int» = HASH_CODE(«#sink»->context, «term»);
 UNLINK(«#sink»->context, «term»); ⟧}
+⟫
+;
+
+// $[ListLength, #list] returns length of list
+//
+INT_PRIMITIVE[E_ListLength];
+
+Set-ListLength[Fresh[t::Text]]
+:
+{#env}E-set-int[E_ListLength, (#Name; #List;), #Options, #sink, #int]
+→
+%n⟪{ Term «t»; « {#env}T-set-ref[#List, #sink, t] »«#int»=0; while (TAG(«t»)!=Data_M__sNil) { «t» = SUB(«t»,1); «#int»++; }}
 ⟫
 ;
 

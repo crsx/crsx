@@ -232,6 +232,10 @@ public enum Primitive
 	IF("If", 2, 3),
 	/** $[Pick, #index, #list] with constant #index evaluates as the index'th member of list (starting from 0). */
 	PICK("Pick", 2, 2),
+	/** $[ReversePick, #index, #list] with constant #index evaluates as the index'th member of the reverse of list. */
+	REVERSE_PICK("ReversePick", 2, 2),
+	/** $[ListLegnth, #list] returns the length of list. */
+	LIST_LENGTH("ListLength", 1, 1),
 	/** $[IfZero, #i, #true[, #false]] with constant integer #i evaluates as either #true or #false depending on whether #i is zero. */
 	IF_ZERO("IfZero", 2, 3),
 	/** $[IfEmpty, #s, #true[, #false]] with constant string #s evaluates as either #true or #false depending on whether #s is the empty string. */
