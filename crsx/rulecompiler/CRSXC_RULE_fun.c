@@ -2015,9 +2015,9 @@ int step_M_F_Pattern_MetaArgs_Copy_s4(Sink sink__V783, Term term__V784)
       COPY(sink__V783, sub__V785);COPY(sink__V783, LINK(sink__V783->context, sub__V787));COPY(sink__V783, sub__V786);COPY(sink__V783, sub__V788);{ char *str__V795;
         { char *sub__V796[2]; size_t sublength__V797[2]; size_t length__V798 = 0;
           length__V798 += (sublength__V797[0] = strlen(sub__V796[0] =  "MetaVar$" ));
-          FORCE(sink__V783->context, sub__V787);
+          FORCE(sink__V783->context, sub__V787); LINK(sink__V783->context, sub__V787);
           length__V798 += (sublength__V797[1] = strlen(sub__V796[1] = SYMBOL(sub__V787)));
-          UNLINK(sink__V783->context, sub__V787);{ char *str__V799 = ALLOCATE(sink__V783->context, length__V798+1), *p__V800 = str__V799;
+           UNLINK(sink__V783->context, sub__V787);  UNLINK(sink__V783->context, sub__V787); { char *str__V799 = ALLOCATE(sink__V783->context, length__V798+1), *p__V800 = str__V799;
             int i; for (i = 0; i < 2; ++i) { memcpy(p__V800, sub__V796[i], sublength__V797[i]); p__V800 += sublength__V797[i]; }
             *p__V800 = '\0';
             ASSERT(sink__V783->context, strlen(str__V799) == length__V798);
@@ -3582,10 +3582,10 @@ int step_M_F_Declaration_s2(Sink sink__V1339, Term term__V1340)
     Hashset varFV__V1352 = LINK_VARIABLESET(sink__V1339->context, variablePropertyFreeVars(varP__V1350));
     UNLINK(sink__V1339->context, term__V1340);
     { int test__V1353;
-      FORCE(sink__V1339->context, sub__V1341);
-      FORCE(sink__V1339->context, sub__V1348);
+      FORCE(sink__V1339->context, sub__V1341); LINK(sink__V1339->context, sub__V1341);
+      FORCE(sink__V1339->context, sub__V1348); LINK(sink__V1339->context, sub__V1348);
       test__V1353 = (int) !strncmp(SYMBOL(sub__V1341), SYMBOL(sub__V1348), strlen(SYMBOL(sub__V1348)));
-      UNLINK(sink__V1339->context, sub__V1341); UNLINK(sink__V1339->context, sub__V1348);if (test__V1353) { { START(sink__V1339, _M_F_Function_s1);
+       UNLINK(sink__V1339->context, sub__V1341);  UNLINK(sink__V1339->context, sub__V1341);  UNLINK(sink__V1339->context, sub__V1348);  UNLINK(sink__V1339->context, sub__V1348); if (test__V1353) { { START(sink__V1339, _M_F_Function_s1);
           COPY(sink__V1339, sub__V1345);COPY(sink__V1339, sub__V1343);COPY(sink__V1339, sub__V1344);COPY(sink__V1339, sub__V1342);COPY(sink__V1339, sub__V1346);COPY(sink__V1339, sub__V1347);END(sink__V1339, _M_F_Function_s1); }
          }
       else { { START(sink__V1339, _M__sTextNil);
@@ -4317,9 +4317,9 @@ int step_M_F_Function_s5(Sink sink__V1562, Term term__V1563)
                                               { START(sink__V1562, _M__sTextEmbed);
                                                 { START(sink__V1562, _M_AsText);
                                                   { int test__V1582;
-                                                    FORCE(sink__V1562->context, sub__V1566);
+                                                    FORCE(sink__V1562->context, sub__V1566); LINK(sink__V1562->context, sub__V1566);
                                                     test__V1582 = (int) (strstr(SYMBOL(sub__V1566), "$" ) != NULL);
-                                                    if (test__V1582) { { START(sink__V1562, _M__sTextCons);
+                                                     UNLINK(sink__V1562->context, sub__V1566);  if (test__V1582) { { START(sink__V1562, _M__sTextCons);
                                                         { START(sink__V1562, _M__sTextChars);
                                                           LITERAL(sink__V1562,  "NULL" );
                                                           END(sink__V1562, _M__sTextChars); }
@@ -6011,9 +6011,9 @@ int step_M_F_PatternBinder1_s4(Sink sink__V1996, Term term__V1997)
         { char *str__V2018;
           { char *sub__V2019[6]; size_t sublength__V2020[6]; size_t length__V2021 = 0;
             length__V2021 += (sublength__V2020[0] = strlen(sub__V2019[0] =  "BinderUnique$" ));
-            FORCE(sink__V1996->context, sub__V2000);
+            FORCE(sink__V1996->context, sub__V2000); LINK(sink__V1996->context, sub__V2000);
             length__V2021 += (sublength__V2020[1] = strlen(sub__V2019[1] = SYMBOL(sub__V2000)));
-            UNLINK(sink__V1996->context, sub__V2000);length__V2021 += (sublength__V2020[2] = strlen(sub__V2019[2] =  "$" ));
+             UNLINK(sink__V1996->context, sub__V2000);  UNLINK(sink__V1996->context, sub__V2000); length__V2021 += (sublength__V2020[2] = strlen(sub__V2019[2] =  "$" ));
             {double num__V2022; char *str__V2023;
               num__V2022 = DOUBLE(sub__V1998); snprintf(str__V2023 = ALLOCA(sink__V1996->context, (size_t) 32), (size_t) 31, "%G", num__V2022);
               length__V2021 += (sublength__V2020[3] = strlen(sub__V2019[3] = str__V2023));
@@ -6729,8 +6729,9 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
     Hashset varFV__V2321 = LINK_VARIABLESET(sink__V2312->context, variablePropertyFreeVars(varP__V2319));
     UNLINK(sink__V2312->context, term__V2313);
     { int test__V2322;
-      FORCE(sink__V2312->context, sub__V2314);
-      test__V2322 = (int) !strcmp(SYMBOL(sub__V2314), "Free" ); if (test__V2322) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+      FORCE(sink__V2312->context, sub__V2314); LINK(sink__V2312->context, sub__V2314);
+      test__V2322 = (int) !strcmp(SYMBOL(sub__V2314), "Free" );
+      UNLINK(sink__V2312->context, sub__V2314);  if (test__V2322) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
         { START(sink__V2312, _M_F__variableOption_s1);
           COPY(sink__V2312, sub__V2315);{ START(sink__V2312, _M_FREE); END(sink__V2312, _M_FREE); } { if (!IS_BOUND(x__V2316)) { REBIND(x__V2316);
               Variable binds__V2323[1] = {x__V2316}; BINDS(sink__V2312, 1, binds__V2323);
@@ -6750,8 +6751,9 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
           END(sink__V2312, _M_F__variableOption_s1); }
          }
       else { { int test__V2331;
-          FORCE(sink__V2312->context, sub__V2314);
-          test__V2331 = (int) !strcmp(SYMBOL(sub__V2314), "Fresh" ); if (test__V2331) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+          FORCE(sink__V2312->context, sub__V2314); LINK(sink__V2312->context, sub__V2314);
+          test__V2331 = (int) !strcmp(SYMBOL(sub__V2314), "Fresh" );
+          UNLINK(sink__V2312->context, sub__V2314);  if (test__V2331) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
             { START(sink__V2312, _M_F__variableOption_s1);
               COPY(sink__V2312, sub__V2315);{ START(sink__V2312, _M_FRESH);
                 END(sink__V2312, _M_FRESH); }
@@ -6773,9 +6775,9 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
               END(sink__V2312, _M_F__variableOption_s1); }
              }
           else { { int test__V2340;
-              FORCE(sink__V2312->context, sub__V2314);
+              FORCE(sink__V2312->context, sub__V2314); LINK(sink__V2312->context, sub__V2314);
               test__V2340 = (int) !strcmp(SYMBOL(sub__V2314), "FreshReuse" );
-              if (test__V2340) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+              UNLINK(sink__V2312->context, sub__V2314);  if (test__V2340) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
                 { START(sink__V2312, _M_F__variableOption_s1);
                   COPY(sink__V2312, sub__V2315);{ START(sink__V2312, _M_FRESHREUSE);
                     END(sink__V2312, _M_FRESHREUSE); }
@@ -6797,9 +6799,9 @@ int step_M_F_Option(Sink sink__V2312, Term term__V2313)
                   END(sink__V2312, _M_F__variableOption_s1); }
                  }
               else { { int test__V2349;
-                  FORCE(sink__V2312->context, sub__V2314);
+                  FORCE(sink__V2312->context, sub__V2314); LINK(sink__V2312->context, sub__V2314);
                   test__V2349 = (int) !strcmp(SYMBOL(sub__V2314), "FreshReuseOrigin" );
-                  if (test__V2349) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
+                  UNLINK(sink__V2312->context, sub__V2314);  if (test__V2349) {  UNLINK(sink__V2312->context, sub__V2314); ADD_PROPERTIES(sink__V2312, LINK_VARIABLESET(sink__V2312->context, namedFV__V2320), LINK_VARIABLESET(sink__V2312->context, varFV__V2321), LINK_NamedPropertyLink(sink__V2312->context, namedP__V2318), LINK_VariablePropertyLink(sink__V2312->context, varP__V2319));
                     { START(sink__V2312, _M_F__variableFreshReuseOriginOption_s1);
                       COPY(sink__V2312, sub__V2315);LITERAL(sink__V2312,  "FreshReuseOrigin" ); { if (!IS_BOUND(x__V2316)) { REBIND(x__V2316);
                           Variable binds__V2350[1] = {x__V2316}; BINDS(sink__V2312, 1, binds__V2350);
@@ -9079,7 +9081,7 @@ int step_M_F_Fresh2_s5(Sink sink__V2836, Term term__V2837)
                     { START(sink__V2836, _M_STRING);
                       { char *str__V2844;
                         {
-                          FORCE(sink__V2836->context, sub__V2838);
+                          FORCE(sink__V2836->context, sub__V2838); LINK(sink__V2836->context, sub__V2838);
                           {char *substring__V2845;
                             if (! "_" [0]) substring__V2845 = "";
                             else {char *p__V2846 = strstr(SYMBOL(sub__V2838),  "_" );
@@ -9088,7 +9090,7 @@ int step_M_F_Fresh2_s5(Sink sink__V2836, Term term__V2837)
                               else {size_t z__V2847 = (size_t)(p__V2846 - SYMBOL(sub__V2838));
                                 memcpy(substring__V2845 = ALLOCA(sink__V2836->context, z__V2847+1), SYMBOL(sub__V2838), z__V2847);
                                 substring__V2845[z__V2847] = '\0';}}
-                             UNLINK(sink__V2836->context, sub__V2838);{ size_t z__V2848 = strlen(substring__V2845) + 1; memcpy(str__V2844 = ALLOCATE(sink__V2836->context, z__V2848), substring__V2845, z__V2848); }
+                             UNLINK(sink__V2836->context, sub__V2838);  UNLINK(sink__V2836->context, sub__V2838); { size_t z__V2848 = strlen(substring__V2845) + 1; memcpy(str__V2844 = ALLOCATE(sink__V2836->context, z__V2848), substring__V2845, z__V2848); }
                             }
                           }
                         LITERALU(sink__V2836, str__V2844); }
@@ -14482,9 +14484,9 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
     { Term key__V4612;
       char *sub__V4613[2]; size_t sublength__V4614[2]; size_t length__V4615 = 0;
       length__V4615 += (sublength__V4614[0] = strlen(sub__V4613[0] =  "Discard$" ));
-      FORCE(sink__V4595->context, sub__V4601);
+      FORCE(sink__V4595->context, sub__V4601); LINK(sink__V4595->context, sub__V4601);
       length__V4615 += (sublength__V4614[1] = strlen(sub__V4613[1] = SYMBOL(sub__V4601)));
-      { char *str__V4616 = ALLOCA(sink__V4595->context, length__V4615+1), *p__V4617 = str__V4616;
+      UNLINK(sink__V4595->context, sub__V4601);  { char *str__V4616 = ALLOCA(sink__V4595->context, length__V4615+1), *p__V4617 = str__V4616;
         int i; for (i = 0; i < 2; ++i) { memcpy(p__V4617, sub__V4613[i], sublength__V4614[i]); p__V4617 += sublength__V4614[i]; }
         *p__V4617 = '\0';
         ASSERT(sink__V4595->context, strlen(str__V4616) == length__V4615);
@@ -14494,9 +14496,9 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
       if (value__V4618) { { Term key__V4619;
           char *sub__V4620[2]; size_t sublength__V4621[2]; size_t length__V4622 = 0;
           length__V4622 += (sublength__V4621[0] = strlen(sub__V4620[0] =  "Comparable$" ));
-          FORCE(sink__V4595->context, sub__V4601);
+          FORCE(sink__V4595->context, sub__V4601); LINK(sink__V4595->context, sub__V4601);
           length__V4622 += (sublength__V4621[1] = strlen(sub__V4620[1] = SYMBOL(sub__V4601)));
-          { char *str__V4623 = ALLOCA(sink__V4595->context, length__V4622+1), *p__V4624 = str__V4623;
+          UNLINK(sink__V4595->context, sub__V4601);  { char *str__V4623 = ALLOCA(sink__V4595->context, length__V4622+1), *p__V4624 = str__V4623;
             int i; for (i = 0; i < 2; ++i) { memcpy(p__V4624, sub__V4620[i], sublength__V4621[i]); p__V4624 += sublength__V4621[i]; }
             *p__V4624 = '\0';
             ASSERT(sink__V4595->context, strlen(str__V4623) == length__V4622);
@@ -14513,9 +14515,9 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
                   USE(sink__V4595, x__V4626); { char *str__V4628;
                     { char *sub__V4629[2]; size_t sublength__V4630[2]; size_t length__V4631 = 0;
                       length__V4631 += (sublength__V4630[0] = strlen(sub__V4629[0] =  "MetaVar$" ));
-                      FORCE(sink__V4595->context, sub__V4601);
+                      FORCE(sink__V4595->context, sub__V4601); LINK(sink__V4595->context, sub__V4601);
                       length__V4631 += (sublength__V4630[1] = strlen(sub__V4629[1] = SYMBOL(sub__V4601)));
-                      UNLINK(sink__V4595->context, sub__V4601);{ char *str__V4632 = ALLOCATE(sink__V4595->context, length__V4631+1), *p__V4633 = str__V4632;
+                       UNLINK(sink__V4595->context, sub__V4601);  UNLINK(sink__V4595->context, sub__V4601); { char *str__V4632 = ALLOCATE(sink__V4595->context, length__V4631+1), *p__V4633 = str__V4632;
                         int i; for (i = 0; i < 2; ++i) { memcpy(p__V4633, sub__V4629[i], sublength__V4630[i]); p__V4633 += sublength__V4630[i]; }
                         *p__V4633 = '\0';
                         ASSERT(sink__V4595->context, strlen(str__V4632) == length__V4631);
@@ -14572,9 +14574,9 @@ int step_M_F_Pattern_s62(Sink sink__V4595, Term term__V4596)
               USE(sink__V4595, x__V4650); { char *str__V4652;
                 { char *sub__V4653[2]; size_t sublength__V4654[2]; size_t length__V4655 = 0;
                   length__V4655 += (sublength__V4654[0] = strlen(sub__V4653[0] =  "MetaVar$" ));
-                  FORCE(sink__V4595->context, sub__V4601);
+                  FORCE(sink__V4595->context, sub__V4601); LINK(sink__V4595->context, sub__V4601);
                   length__V4655 += (sublength__V4654[1] = strlen(sub__V4653[1] = SYMBOL(sub__V4601)));
-                  UNLINK(sink__V4595->context, sub__V4601);{ char *str__V4656 = ALLOCATE(sink__V4595->context, length__V4655+1), *p__V4657 = str__V4656;
+                   UNLINK(sink__V4595->context, sub__V4601);  UNLINK(sink__V4595->context, sub__V4601); { char *str__V4656 = ALLOCATE(sink__V4595->context, length__V4655+1), *p__V4657 = str__V4656;
                     int i; for (i = 0; i < 2; ++i) { memcpy(p__V4657, sub__V4653[i], sublength__V4654[i]); p__V4657 += sublength__V4654[i]; }
                     *p__V4657 = '\0';
                     ASSERT(sink__V4595->context, strlen(str__V4656) == length__V4655);
@@ -17142,9 +17144,9 @@ int step_M_F_Pattern_MetaArgs_s10(Sink sink__V5439, Term term__V5440)
       COPY(sink__V5439, sub__V5446);{ char *str__V5454;
         { char *sub__V5455[4]; size_t sublength__V5456[4]; size_t length__V5457 = 0;
           length__V5457 += (sublength__V5456[0] = strlen(sub__V5455[0] =  "Reuse$" ));
-          FORCE(sink__V5439->context, sub__V5444);
+          FORCE(sink__V5439->context, sub__V5444); LINK(sink__V5439->context, sub__V5444);
           length__V5457 += (sublength__V5456[1] = strlen(sub__V5455[1] = SYMBOL(sub__V5444)));
-          length__V5457 += (sublength__V5456[2] = strlen(sub__V5455[2] =  "$" ));
+          UNLINK(sink__V5439->context, sub__V5444);  length__V5457 += (sublength__V5456[2] = strlen(sub__V5455[2] =  "$" ));
           {double num__V5458; char *str__V5459;
             num__V5458 = DOUBLE(sub__V5445); snprintf(str__V5459 = ALLOCA(sink__V5439->context, (size_t) 32), (size_t) 31, "%G", num__V5458);
             length__V5457 += (sublength__V5456[3] = strlen(sub__V5455[3] = str__V5459));
@@ -17158,9 +17160,9 @@ int step_M_F_Pattern_MetaArgs_s10(Sink sink__V5439, Term term__V5440)
         LITERALU(sink__V5439, str__V5454); }
       { char *str__V5462;
         { char *sub__V5463[3]; size_t sublength__V5464[3]; size_t length__V5465 = 0;
-          FORCE(sink__V5439->context, sub__V5444);
+          FORCE(sink__V5439->context, sub__V5444); LINK(sink__V5439->context, sub__V5444);
           length__V5465 += (sublength__V5464[0] = strlen(sub__V5463[0] = SYMBOL(sub__V5444)));
-          length__V5465 += (sublength__V5464[1] = strlen(sub__V5463[1] =  "$" ));
+          UNLINK(sink__V5439->context, sub__V5444);  length__V5465 += (sublength__V5464[1] = strlen(sub__V5463[1] =  "$" ));
           {double num__V5466; char *str__V5467;
             num__V5466 = DOUBLE(sub__V5445); snprintf(str__V5467 = ALLOCA(sink__V5439->context, (size_t) 32), (size_t) 31, "%G", num__V5466);
             length__V5465 += (sublength__V5464[2] = strlen(sub__V5463[2] = str__V5467));
@@ -17227,9 +17229,9 @@ int step_M_F_Pattern_MetaArgs_s11(Sink sink__V5478, Term term__V5479)
     { START(sink__V5478, _M_F_Pattern_MetaArgs__arity);
       { char *str__V5490;
         { char *sub__V5491[2]; size_t sublength__V5492[2]; size_t length__V5493 = 0;
-          FORCE(sink__V5478->context, sub__V5480);
+          FORCE(sink__V5478->context, sub__V5480); LINK(sink__V5478->context, sub__V5480);
           length__V5493 += (sublength__V5492[0] = strlen(sub__V5491[0] = SYMBOL(sub__V5480)));
-          UNLINK(sink__V5478->context, sub__V5480);length__V5493 += (sublength__V5492[1] = strlen(sub__V5491[1] =  "$arity" ));
+           UNLINK(sink__V5478->context, sub__V5480);  UNLINK(sink__V5478->context, sub__V5480); length__V5493 += (sublength__V5492[1] = strlen(sub__V5491[1] =  "$arity" ));
           { char *str__V5494 = ALLOCATE(sink__V5478->context, length__V5493+1), *p__V5495 = str__V5494;
             int i; for (i = 0; i < 2; ++i) { memcpy(p__V5495, sub__V5491[i], sublength__V5492[i]); p__V5495 += sublength__V5492[i]; }
             *p__V5495 = '\0';
@@ -17865,28 +17867,28 @@ int step_M_F_Body(Sink sink__V5684, Term term__V5685)
                       { START(sink__V5684, _M__sTextEmbed);
                         { START(sink__V5684, _M_AsText);
                           { int test__V5698;
-                            FORCE(sink__V5684->context, sub__V5686);
+                            FORCE(sink__V5684->context, sub__V5686); LINK(sink__V5684->context, sub__V5686);
                             test__V5698 = (int) !strcmp(SYMBOL(sub__V5686), "Contract" );
-                            if (test__V5698) {  UNLINK(sink__V5684->context, sub__V5687);  UNLINK(sink__V5684->context, sub__V5686);  UNLINK(sink__V5684->context, sub__V5692);  UNLINK(sink__V5684->context, sub__V5691); { START(sink__V5684, _M_F_Contract_s1);
+                             UNLINK(sink__V5684->context, sub__V5686);  if (test__V5698) {  UNLINK(sink__V5684->context, sub__V5687);  UNLINK(sink__V5684->context, sub__V5686);  UNLINK(sink__V5684->context, sub__V5692);  UNLINK(sink__V5684->context, sub__V5691); { START(sink__V5684, _M_F_Contract_s1);
                                 COPY(sink__V5684, sub__V5693);COPY(sink__V5684, sub__V5689);COPY(sink__V5684, sub__V5690);COPY(sink__V5684, sub__V5688);END(sink__V5684, _M_F_Contract_s1); }
                                }
                             else { { int test__V5699;
-                                FORCE(sink__V5684->context, sub__V5686);
+                                FORCE(sink__V5684->context, sub__V5686); LINK(sink__V5684->context, sub__V5686);
                                 test__V5699 = (int) !strcmp(SYMBOL(sub__V5686), "BinderDispatch" );
-                                if (test__V5699) {  UNLINK(sink__V5684->context, sub__V5687);  UNLINK(sink__V5684->context, sub__V5686);  UNLINK(sink__V5684->context, sub__V5692);  UNLINK(sink__V5684->context, sub__V5691); { START(sink__V5684, _M_F_Contract_s1);
+                                 UNLINK(sink__V5684->context, sub__V5686);  if (test__V5699) {  UNLINK(sink__V5684->context, sub__V5687);  UNLINK(sink__V5684->context, sub__V5686);  UNLINK(sink__V5684->context, sub__V5692);  UNLINK(sink__V5684->context, sub__V5691); { START(sink__V5684, _M_F_Contract_s1);
                                     COPY(sink__V5684, sub__V5693);COPY(sink__V5684, sub__V5689);COPY(sink__V5684, sub__V5690);COPY(sink__V5684, sub__V5688);END(sink__V5684, _M_F_Contract_s1); }
                                    }
                                 else { { int test__V5700;
-                                    FORCE(sink__V5684->context, sub__V5686);
+                                    FORCE(sink__V5684->context, sub__V5686); LINK(sink__V5684->context, sub__V5686);
                                     test__V5700 = (int) !strcmp(SYMBOL(sub__V5686), "Dispatch" );
-                                    if (test__V5700) {  UNLINK(sink__V5684->context, sub__V5686); { START(sink__V5684, _M_F_Dispatch_s1);
+                                     UNLINK(sink__V5684->context, sub__V5686);  if (test__V5700) {  UNLINK(sink__V5684->context, sub__V5686); { START(sink__V5684, _M_F_Dispatch_s1);
                                         COPY(sink__V5684, sub__V5691);COPY(sink__V5684, sub__V5689);COPY(sink__V5684, sub__V5687);COPY(sink__V5684, sub__V5690);COPY(sink__V5684, sub__V5688);COPY(sink__V5684, sub__V5692);COPY(sink__V5684, sub__V5693);END(sink__V5684, _M_F_Dispatch_s1); }
                                        }
                                     else { { int test__V5701;
-                                        FORCE(sink__V5684->context, sub__V5686);
+                                        FORCE(sink__V5684->context, sub__V5686); LINK(sink__V5684->context, sub__V5686);
                                         test__V5701 = (int) !strcmp(SYMBOL(sub__V5686), "Shuffle" );
-                                        
-                                        UNLINK(sink__V5684->context, sub__V5686);if (test__V5701) { { START(sink__V5684, _M_F_Contract_s1);
+                                         UNLINK(sink__V5684->context, sub__V5686); 
+                                        UNLINK(sink__V5684->context, sub__V5686); if (test__V5701) { { START(sink__V5684, _M_F_Contract_s1);
                                             COPY(sink__V5684, sub__V5693);COPY(sink__V5684, sub__V5689);COPY(sink__V5684, sub__V5690);COPY(sink__V5684, sub__V5688);END(sink__V5684, _M_F_Contract_s1); }
                                            }
                                         else { { START(sink__V5684, _M__sTextNil);
@@ -18950,9 +18952,9 @@ int step_M_F__variableFreshReuseOriginOption_s2(Sink sink__V6065, Term term__V60
       COPY(sink__V6065, sub__V6070);{ char *str__V6077;
         { char *sub__V6078[4]; size_t sublength__V6079[4]; size_t length__V6080 = 0;
           length__V6080 += (sublength__V6079[0] = strlen(sub__V6078[0] =  "Reuse$" ));
-          FORCE(sink__V6065->context, sub__V6068);
+          FORCE(sink__V6065->context, sub__V6068); LINK(sink__V6065->context, sub__V6068);
           length__V6080 += (sublength__V6079[1] = strlen(sub__V6078[1] = SYMBOL(sub__V6068)));
-          UNLINK(sink__V6065->context, sub__V6068);length__V6080 += (sublength__V6079[2] = strlen(sub__V6078[2] =  "$" ));
+           UNLINK(sink__V6065->context, sub__V6068);  UNLINK(sink__V6065->context, sub__V6068); length__V6080 += (sublength__V6079[2] = strlen(sub__V6078[2] =  "$" ));
           {double num__V6081; char *str__V6082;
             num__V6081 = DOUBLE(sub__V6069); snprintf(str__V6082 = ALLOCA(sink__V6065->context, (size_t) 32), (size_t) 31, "%G", num__V6081);
             length__V6080 += (sublength__V6079[3] = strlen(sub__V6078[3] = str__V6082));
@@ -19249,9 +19251,9 @@ int step_M_F_Pattern_MetaArgs_Norm_s5(Sink sink__V6175, Term term__V6176)
               COPY(sink__V6175, sub__V6177);COPY(sink__V6175, LINK(sink__V6175->context, sub__V6179));COPY(sink__V6175, sub__V6178);COPY(sink__V6175, sub__V6181);{ char *str__V6188;
                 { char *sub__V6189[2]; size_t sublength__V6190[2]; size_t length__V6191 = 0;
                   length__V6191 += (sublength__V6190[0] = strlen(sub__V6189[0] =  "MetaVar$" ));
-                  FORCE(sink__V6175->context, sub__V6179);
+                  FORCE(sink__V6175->context, sub__V6179); LINK(sink__V6175->context, sub__V6179);
                   length__V6191 += (sublength__V6190[1] = strlen(sub__V6189[1] = SYMBOL(sub__V6179)));
-                  UNLINK(sink__V6175->context, sub__V6179);{ char *str__V6192 = ALLOCATE(sink__V6175->context, length__V6191+1), *p__V6193 = str__V6192;
+                   UNLINK(sink__V6175->context, sub__V6179);  UNLINK(sink__V6175->context, sub__V6179); { char *str__V6192 = ALLOCATE(sink__V6175->context, length__V6191+1), *p__V6193 = str__V6192;
                     int i; for (i = 0; i < 2; ++i) { memcpy(p__V6193, sub__V6189[i], sublength__V6190[i]); p__V6193 += sublength__V6190[i]; }
                     *p__V6193 = '\0';
                     ASSERT(sink__V6175->context, strlen(str__V6192) == length__V6191);
@@ -20390,9 +20392,9 @@ int step_M_F_Pattern_NeedNorm_s3(Sink sink__V6495, Term term__V6496)
     { Term key__V6503;
       char *sub__V6504[2]; size_t sublength__V6505[2]; size_t length__V6506 = 0;
       length__V6506 += (sublength__V6505[0] = strlen(sub__V6504[0] =  "Copy$" ));
-      FORCE(sink__V6495->context, sub__V6498);
+      FORCE(sink__V6495->context, sub__V6498); LINK(sink__V6495->context, sub__V6498);
       length__V6506 += (sublength__V6505[1] = strlen(sub__V6504[1] = SYMBOL(sub__V6498)));
-      { char *str__V6507 = ALLOCA(sink__V6495->context, length__V6506+1), *p__V6508 = str__V6507;
+      UNLINK(sink__V6495->context, sub__V6498);  { char *str__V6507 = ALLOCA(sink__V6495->context, length__V6506+1), *p__V6508 = str__V6507;
         int i; for (i = 0; i < 2; ++i) { memcpy(p__V6508, sub__V6504[i], sublength__V6505[i]); p__V6508 += sublength__V6505[i]; }
         *p__V6508 = '\0';
         ASSERT(sink__V6495->context, strlen(str__V6507) == length__V6506);
@@ -20404,9 +20406,9 @@ int step_M_F_Pattern_NeedNorm_s3(Sink sink__V6495, Term term__V6496)
       else { { Term key__V6510;
           char *sub__V6511[2]; size_t sublength__V6512[2]; size_t length__V6513 = 0;
           length__V6513 += (sublength__V6512[0] = strlen(sub__V6511[0] =  "Data$" ));
-          FORCE(sink__V6495->context, sub__V6498);
+          FORCE(sink__V6495->context, sub__V6498); LINK(sink__V6495->context, sub__V6498);
           length__V6513 += (sublength__V6512[1] = strlen(sub__V6511[1] = SYMBOL(sub__V6498)));
-          UNLINK(sink__V6495->context, sub__V6498);{ char *str__V6514 = ALLOCA(sink__V6495->context, length__V6513+1), *p__V6515 = str__V6514;
+           UNLINK(sink__V6495->context, sub__V6498);  UNLINK(sink__V6495->context, sub__V6498); { char *str__V6514 = ALLOCA(sink__V6495->context, length__V6513+1), *p__V6515 = str__V6514;
             int i; for (i = 0; i < 2; ++i) { memcpy(p__V6515, sub__V6511[i], sublength__V6512[i]); p__V6515 += sublength__V6512[i]; }
             *p__V6515 = '\0';
             ASSERT(sink__V6495->context, strlen(str__V6514) == length__V6513);
@@ -22266,12 +22268,12 @@ int step_M_F__metaOption_s2(Sink sink__V7156, Term term__V7157)
     { START(sink__V7156, _M_F__metaOption2);
       { char *str__V7167;
         { char *sub__V7168[3]; size_t sublength__V7169[3]; size_t length__V7170 = 0;
-          FORCE(sink__V7156->context, sub__V7160);
+          FORCE(sink__V7156->context, sub__V7160); LINK(sink__V7156->context, sub__V7160);
           length__V7170 += (sublength__V7169[0] = strlen(sub__V7168[0] = SYMBOL(sub__V7160)));
-          UNLINK(sink__V7156->context, sub__V7160);length__V7170 += (sublength__V7169[1] = strlen(sub__V7168[1] =  "$" ));
-          FORCE(sink__V7156->context, sub__V7158);
+           UNLINK(sink__V7156->context, sub__V7160);  UNLINK(sink__V7156->context, sub__V7160); length__V7170 += (sublength__V7169[1] = strlen(sub__V7168[1] =  "$" ));
+          FORCE(sink__V7156->context, sub__V7158); LINK(sink__V7156->context, sub__V7158);
           length__V7170 += (sublength__V7169[2] = strlen(sub__V7168[2] = SYMBOL(sub__V7158)));
-          UNLINK(sink__V7156->context, sub__V7158);{ char *str__V7171 = ALLOCATE(sink__V7156->context, length__V7170+1), *p__V7172 = str__V7171;
+           UNLINK(sink__V7156->context, sub__V7158);  UNLINK(sink__V7156->context, sub__V7158); { char *str__V7171 = ALLOCATE(sink__V7156->context, length__V7170+1), *p__V7172 = str__V7171;
             int i; for (i = 0; i < 3; ++i) { memcpy(p__V7172, sub__V7168[i], sublength__V7169[i]); p__V7172 += sublength__V7169[i]; }
             *p__V7172 = '\0';
             ASSERT(sink__V7156->context, strlen(str__V7171) == length__V7170);
@@ -22331,12 +22333,12 @@ int step_M_F__metaOption_s3(Sink sink__V7181, Term term__V7182)
     { START(sink__V7181, _M_F__metaOption2);
       { char *str__V7192;
         { char *sub__V7193[3]; size_t sublength__V7194[3]; size_t length__V7195 = 0;
-          FORCE(sink__V7181->context, sub__V7185);
+          FORCE(sink__V7181->context, sub__V7185); LINK(sink__V7181->context, sub__V7185);
           length__V7195 += (sublength__V7194[0] = strlen(sub__V7193[0] = SYMBOL(sub__V7185)));
-          UNLINK(sink__V7181->context, sub__V7185);length__V7195 += (sublength__V7194[1] = strlen(sub__V7193[1] =  "$" ));
-          FORCE(sink__V7181->context, sub__V7183);
+           UNLINK(sink__V7181->context, sub__V7185);  UNLINK(sink__V7181->context, sub__V7185); length__V7195 += (sublength__V7194[1] = strlen(sub__V7193[1] =  "$" ));
+          FORCE(sink__V7181->context, sub__V7183); LINK(sink__V7181->context, sub__V7183);
           length__V7195 += (sublength__V7194[2] = strlen(sub__V7193[2] = SYMBOL(sub__V7183)));
-          UNLINK(sink__V7181->context, sub__V7183);{ char *str__V7196 = ALLOCATE(sink__V7181->context, length__V7195+1), *p__V7197 = str__V7196;
+           UNLINK(sink__V7181->context, sub__V7183);  UNLINK(sink__V7181->context, sub__V7183); { char *str__V7196 = ALLOCATE(sink__V7181->context, length__V7195+1), *p__V7197 = str__V7196;
             int i; for (i = 0; i < 3; ++i) { memcpy(p__V7197, sub__V7193[i], sublength__V7194[i]); p__V7197 += sublength__V7194[i]; }
             *p__V7197 = '\0';
             ASSERT(sink__V7181->context, strlen(str__V7196) == length__V7195);
@@ -22398,12 +22400,12 @@ int step_M_F__metaOption_s4(Sink sink__V7206, Term term__V7207)
     { START(sink__V7206, _M_F__metaOption2);
       { char *str__V7218;
         { char *sub__V7219[3]; size_t sublength__V7220[3]; size_t length__V7221 = 0;
-          FORCE(sink__V7206->context, sub__V7211);
+          FORCE(sink__V7206->context, sub__V7211); LINK(sink__V7206->context, sub__V7211);
           length__V7221 += (sublength__V7220[0] = strlen(sub__V7219[0] = SYMBOL(sub__V7211)));
-          UNLINK(sink__V7206->context, sub__V7211);length__V7221 += (sublength__V7220[1] = strlen(sub__V7219[1] =  "$" ));
-          FORCE(sink__V7206->context, sub__V7208);
+           UNLINK(sink__V7206->context, sub__V7211);  UNLINK(sink__V7206->context, sub__V7211); length__V7221 += (sublength__V7220[1] = strlen(sub__V7219[1] =  "$" ));
+          FORCE(sink__V7206->context, sub__V7208); LINK(sink__V7206->context, sub__V7208);
           length__V7221 += (sublength__V7220[2] = strlen(sub__V7219[2] = SYMBOL(sub__V7208)));
-          UNLINK(sink__V7206->context, sub__V7208);{ char *str__V7222 = ALLOCATE(sink__V7206->context, length__V7221+1), *p__V7223 = str__V7222;
+           UNLINK(sink__V7206->context, sub__V7208);  UNLINK(sink__V7206->context, sub__V7208); { char *str__V7222 = ALLOCATE(sink__V7206->context, length__V7221+1), *p__V7223 = str__V7222;
             int i; for (i = 0; i < 3; ++i) { memcpy(p__V7223, sub__V7219[i], sublength__V7220[i]); p__V7223 += sublength__V7220[i]; }
             *p__V7223 = '\0';
             ASSERT(sink__V7206->context, strlen(str__V7222) == length__V7221);
@@ -23535,9 +23537,9 @@ int step_M_F_Fresh_s1(Sink sink__V7630, Term term__V7631)
     Hashset varFV__V7638 = LINK_VARIABLESET(sink__V7630->context, variablePropertyFreeVars(varP__V7636));
     UNLINK(sink__V7630->context, term__V7631);
     { int test__V7639;
-      FORCE(sink__V7630->context, sub__V7633);
+      FORCE(sink__V7630->context, sub__V7633); LINK(sink__V7630->context, sub__V7633);
       test__V7639 = (int) !strcmp(SYMBOL(sub__V7633), "Fresh" );
-      UNLINK(sink__V7630->context, sub__V7633);if (test__V7639) { { START(sink__V7630, _M_F_Fresh2);
+       UNLINK(sink__V7630->context, sub__V7633);  UNLINK(sink__V7630->context, sub__V7633); if (test__V7639) { { START(sink__V7630, _M_F_Fresh2);
           COPY(sink__V7630, sub__V7632);COPY(sink__V7630, sub__V7634);END(sink__V7630, _M_F_Fresh2); }
          }
       else { { START(sink__V7630, _M__sTextNil);
