@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright (c) 2006, 2011 IBM Corporation. -->
-<project default="jar">
+<project default="compile">
 	
 	<property name="version" value="401"/>
 	
@@ -29,13 +29,32 @@
 		</jar>
 	</target>
 	
-	<target name="compile" depends="src,setup">
+	<target name="compile" depends="src,setup,crs">
 		<javac srcdir="src" destdir="build" classpath="">
 			<classpath>
 				<pathelement path="${classpath}"/>
 				<pathelement location="lib/antlr-runtime-3.1.3.jar"/>
 			</classpath>
 		</javac>
+	</target>
+
+	<target name="crs">
+		<copy todir="build/net">
+			<fileset dir="src/net">
+				<include name="**/*.crs"/>
+				<include name="**/*.pg"/>
+				<include name="**/*.c"/>
+				<include name="**/*.h"/>
+				<include name="**/*.l"/>
+				<include name="**/*.flex"/>
+				<include name="**/*.html"/>
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.patch"/>
+				<exclude name="**/README"/>
+			</fileset>
+		</copy>
+		<copy file="src/net/sf/crsx/run/default"
+		      tofile="build/net/sf/crsx/run/default"/>
 	</target>
 
 	<!-- Simple zip with all sources. -->
