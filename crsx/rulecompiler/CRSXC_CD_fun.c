@@ -122,8 +122,9 @@ int step_M_D__check__sort_s2(Sink sink__V32, Term term__V33)
     Hashset varFV__V41 = LINK_VARIABLESET(sink__V32->context, variablePropertyFreeVars(varP__V39));
     UNLINK(sink__V32->context, term__V33);
     { int test__V42;
-      FORCE(sink__V32->context, sub__V34);
-      test__V42 = (int) (strstr(SYMBOL(sub__V34), "$" ) != NULL); if (test__V42) {  UNLINK(sink__V32->context, sub__V36);  UNLINK(sink__V32->context, sub__V37);  UNLINK(sink__V32->context, sub__V34); { START(sink__V32, _M__sTextNil);
+      FORCE(sink__V32->context, sub__V34); LINK(sink__V32->context, sub__V34);
+      test__V42 = (int) (strstr(SYMBOL(sub__V34), "$" ) != NULL);
+      UNLINK(sink__V32->context, sub__V34);  if (test__V42) {  UNLINK(sink__V32->context, sub__V36);  UNLINK(sink__V32->context, sub__V37);  UNLINK(sink__V32->context, sub__V34); { START(sink__V32, _M__sTextNil);
           END(sink__V32, _M__sTextNil); }
          }
       else { { START(sink__V32, _M__sTextCons);

@@ -2686,9 +2686,9 @@ int step_M_T__send_s40(Sink sink__V385, Term term__V386)
             { char *str__V394;
               { char *sub__V395[2]; size_t sublength__V396[2]; size_t length__V397 = 0;
                 length__V397 += (sublength__V396[0] = strlen(sub__V395[0] =  "MetaVar$" ));
-                FORCE(sink__V385->context, sub__V389);
+                FORCE(sink__V385->context, sub__V389); LINK(sink__V385->context, sub__V389);
                 length__V397 += (sublength__V396[1] = strlen(sub__V395[1] = SYMBOL(sub__V389)));
-                UNLINK(sink__V385->context, sub__V389);{ char *str__V398 = ALLOCATE(sink__V385->context, length__V397+1), *p__V399 = str__V398;
+                 UNLINK(sink__V385->context, sub__V389);  UNLINK(sink__V385->context, sub__V389); { char *str__V398 = ALLOCATE(sink__V385->context, length__V397+1), *p__V399 = str__V398;
                   int i; for (i = 0; i < 2; ++i) { memcpy(p__V399, sub__V395[i], sublength__V396[i]); p__V399 += sublength__V396[i]; }
                   *p__V399 = '\0';
                   ASSERT(sink__V385->context, strlen(str__V398) == length__V397);
@@ -2933,9 +2933,9 @@ int step_M_T_UnlinkLastMetaUse_s2(Sink sink__V444, Term term__V445)
     Hashset varFV__V452 = LINK_VARIABLESET(sink__V444->context, variablePropertyFreeVars(varP__V450));
     UNLINK(sink__V444->context, term__V445);
     { int test__V453;
-      FORCE(sink__V444->context, sub__V446);
+      FORCE(sink__V444->context, sub__V446); LINK(sink__V444->context, sub__V446);
       test__V453 = (int) !strcmp(SYMBOL(sub__V446), "1" );
-      UNLINK(sink__V444->context, sub__V446);if (test__V453) { { START(sink__V444, _M__sTextCons);
+       UNLINK(sink__V444->context, sub__V446);  UNLINK(sink__V444->context, sub__V446); if (test__V453) { { START(sink__V444, _M__sTextCons);
           { START(sink__V444, _M__sTextBreak);
             LITERAL(sink__V444,  "\n" ); END(sink__V444, _M__sTextBreak); }
           { START(sink__V444, _M__sTextCons);
@@ -4784,9 +4784,9 @@ int step_M_T__send_Binder2_s4(Sink sink__V974, Term term__V975)
     { Term key__V991;
       char *sub__V992[2]; size_t sublength__V993[2]; size_t length__V994 = 0;
       length__V994 += (sublength__V993[0] = strlen(sub__V992[0] =  "Copy$" ));
-      FORCE(sink__V974->context, sub__V978);
+      FORCE(sink__V974->context, sub__V978); LINK(sink__V974->context, sub__V978);
       length__V994 += (sublength__V993[1] = strlen(sub__V992[1] = SYMBOL(sub__V978)));
-      { char *str__V995 = ALLOCA(sink__V974->context, length__V994+1), *p__V996 = str__V995;
+      UNLINK(sink__V974->context, sub__V978);  { char *str__V995 = ALLOCA(sink__V974->context, length__V994+1), *p__V996 = str__V995;
         int i; for (i = 0; i < 2; ++i) { memcpy(p__V996, sub__V992[i], sublength__V993[i]); p__V996 += sublength__V993[i]; }
         *p__V996 = '\0';
         ASSERT(sink__V974->context, strlen(str__V995) == length__V994);
@@ -4814,7 +4814,7 @@ int step_M_T__send_Binder2_s4(Sink sink__V974, Term term__V975)
           COPY(sink__V974, sub__V982);COPY(sink__V974, sub__V983);COPY(sink__V974, sub__V984);COPY(sink__V974, sub__V985);COPY(sink__V974, sub__V986);END(sink__V974, _M_T__send_Binder3); }
          }
       else { { int test__V1006;
-          FORCE(sink__V974->context, sub__V986);
+          FORCE(sink__V974->context, sub__V986); LINK(sink__V974->context, sub__V986);
           { Term t__V1007;
             { Sink buf__V1008 = ALLOCA_BUFFER(sink__V974->context);
               { START(buf__V1008, _M_NO_xREUSE);
@@ -4822,7 +4822,7 @@ int step_M_T__send_Binder2_s4(Sink sink__V974, Term term__V975)
               t__V1007 = BUFFER_TERM(buf__V1008); FREE_BUFFER(buf__V1008); }
             FORCE(sink__V974->context, t__V1007);
             test__V1006 = (int) !strcmp(SYMBOL(sub__V986),SYMBOL(t__V1007));
-            UNLINK(sink__V974->context, t__V1007); 
+            UNLINK(sink__V974->context, sub__V986);  UNLINK(sink__V974->context, t__V1007); 
           }if (test__V1006) {  UNLINK(sink__V974->context, sub__V976);  UNLINK(sink__V974->context, sub__V978);  UNLINK(sink__V974->context, sub__V977); ADD_PROPERTIES(sink__V974, LINK_VARIABLESET(sink__V974->context, namedFV__V989), LINK_VARIABLESET(sink__V974->context, varFV__V990), LINK_NamedPropertyLink(sink__V974->context, namedP__V987), LINK_VariablePropertyLink(sink__V974->context, varP__V988));
             { START(sink__V974, _M_T__send_Binder3);
               { START(sink__V974, _M_NOTHING);
@@ -4850,9 +4850,9 @@ int step_M_T__send_Binder2_s4(Sink sink__V974, Term term__V975)
                 { char *str__V1017;
                   { char *sub__V1018[6]; size_t sublength__V1019[6]; size_t length__V1020 = 0;
                     length__V1020 += (sublength__V1019[0] = strlen(sub__V1018[0] =  "BinderUnique$" ));
-                    FORCE(sink__V974->context, sub__V978);
+                    FORCE(sink__V974->context, sub__V978); LINK(sink__V974->context, sub__V978);
                     length__V1020 += (sublength__V1019[1] = strlen(sub__V1018[1] = SYMBOL(sub__V978)));
-                    UNLINK(sink__V974->context, sub__V978);length__V1020 += (sublength__V1019[2] = strlen(sub__V1018[2] =  "$" ));
+                     UNLINK(sink__V974->context, sub__V978);  UNLINK(sink__V974->context, sub__V978); length__V1020 += (sublength__V1019[2] = strlen(sub__V1018[2] =  "$" ));
                     {double num__V1021; char *str__V1022;
                       num__V1021 = DOUBLE(sub__V976); snprintf(str__V1022 = ALLOCA(sink__V974->context, (size_t) 32), (size_t) 31, "%G", num__V1021);
                       length__V1020 += (sublength__V1019[3] = strlen(sub__V1018[3] = str__V1022));
@@ -7858,9 +7858,9 @@ int step_M_T__substitute_s7(Sink sink__V1848, Term term__V1849)
     Hashset varFV__V1856 = LINK_VARIABLESET(sink__V1848->context, variablePropertyFreeVars(varP__V1854));
     UNLINK(sink__V1848->context, term__V1849);
     { int test__V1857;
-      FORCE(sink__V1848->context, sub__V1852);
+      FORCE(sink__V1848->context, sub__V1852); LINK(sink__V1848->context, sub__V1852);
       test__V1857 = (int) !strcmp(SYMBOL(sub__V1852), "1" );
-      UNLINK(sink__V1848->context, sub__V1852);if (test__V1857) { { START(sink__V1848, _M__sTextCons);
+       UNLINK(sink__V1848->context, sub__V1852);  UNLINK(sink__V1848->context, sub__V1852); if (test__V1857) { { START(sink__V1848, _M__sTextCons);
           { START(sink__V1848, _M__sTextChars);
             LITERAL(sink__V1848,  "COPY(" ); END(sink__V1848, _M__sTextChars); }
           { START(sink__V1848, _M__sTextCons);
@@ -10941,9 +10941,9 @@ int step_M_T__substitute2_s10(Sink sink__V2736, Term term__V2737)
                                                                           { START(sink__V2736, _M__sTextEmbed);
                                                                             { START(sink__V2736, _M_AsText);
                                                                               { int test__V2753;
-                                                                                FORCE(sink__V2736->context, sub__V2741);
+                                                                                FORCE(sink__V2736->context, sub__V2741); LINK(sink__V2736->context, sub__V2741);
                                                                                 test__V2753 = (int) !strcmp(SYMBOL(sub__V2741), "1" );
-                                                                                if (test__V2753) {  UNLINK(sink__V2736->context, sub__V2747); { START(sink__V2736, _M__sTextNil);
+                                                                                 UNLINK(sink__V2736->context, sub__V2741);  if (test__V2753) {  UNLINK(sink__V2736->context, sub__V2747); { START(sink__V2736, _M__sTextNil);
                                                                                     END(sink__V2736, _M__sTextNil); }
                                                                                    }
                                                                                 else { { START(sink__V2736, _M_T__link__prefix);
@@ -10964,10 +10964,10 @@ int step_M_T__substitute2_s10(Sink sink__V2736, Term term__V2737)
                                                                               { START(sink__V2736, _M__sTextEmbed);
                                                                                 { START(sink__V2736, _M_AsText);
                                                                                   { int test__V2754;
-                                                                                    FORCE(sink__V2736->context, sub__V2741);
+                                                                                    FORCE(sink__V2736->context, sub__V2741); LINK(sink__V2736->context, sub__V2741);
                                                                                     test__V2754 = (int) !strcmp(SYMBOL(sub__V2741), "1" );
-                                                                                    
-                                                                                    UNLINK(sink__V2736->context, sub__V2741);if (test__V2754) { { START(sink__V2736, _M__sTextNil);
+                                                                                     UNLINK(sink__V2736->context, sub__V2741); 
+                                                                                    UNLINK(sink__V2736->context, sub__V2741); if (test__V2754) { { START(sink__V2736, _M__sTextNil);
                                                                                         END(sink__V2736, _M__sTextNil); }
                                                                                        }
                                                                                     else { { START(sink__V2736, _M__sTextCons);
@@ -11091,9 +11091,9 @@ int step_M_T__substitute2_s11(Sink sink__V2755, Term term__V2756)
     Hashset varFV__V2769 = LINK_VARIABLESET(sink__V2755->context, variablePropertyFreeVars(varP__V2767));
     UNLINK(sink__V2755->context, term__V2756);
     { int test__V2770;
-      FORCE(sink__V2755->context, sub__V2758);
+      FORCE(sink__V2755->context, sub__V2758); LINK(sink__V2755->context, sub__V2758);
       test__V2770 = (int) !strcmp(SYMBOL(sub__V2758), "1" );
-      UNLINK(sink__V2755->context, sub__V2758);if (test__V2770) { { START(sink__V2755, _M__sTextCons);
+       UNLINK(sink__V2755->context, sub__V2758);  UNLINK(sink__V2755->context, sub__V2758); if (test__V2770) { { START(sink__V2755, _M__sTextCons);
           { START(sink__V2755, _M__sTextChars);
             LITERAL(sink__V2755,  "COPY(" ); END(sink__V2755, _M__sTextChars); }
           { START(sink__V2755, _M__sTextCons);
@@ -11808,50 +11808,117 @@ int step_M_T__local__string_s6(Sink sink__V2970, Term term__V2971)
               END(sink__V2970, _M__sTextEmbed); }
             { START(sink__V2970, _M__sTextCons);
               { START(sink__V2970, _M__sTextChars);
-                LITERAL(sink__V2970,  ");" ); END(sink__V2970, _M__sTextChars); }
+                LITERAL(sink__V2970,  "); LINK(" ); END(sink__V2970, _M__sTextChars); }
               { START(sink__V2970, _M__sTextCons);
-                { START(sink__V2970, _M__sTextBreak);
-                  LITERAL(sink__V2970,  "\n" ); END(sink__V2970, _M__sTextBreak); }
+                { START(sink__V2970, _M__sTextEmbed);
+                  { START(sink__V2970, _M_AsText);
+                    COPY(sink__V2970, LINK(sink__V2970->context, sub__V2972));END(sink__V2970, _M_AsText); }
+                  END(sink__V2970, _M__sTextEmbed); }
                 { START(sink__V2970, _M__sTextCons);
-                  { START(sink__V2970, _M__sTextEmbed);
-                    { START(sink__V2970, _M_AsText);
-                      {
-                        Term arg__V2983;
-                        { Sink buf__V2984 = ALLOCA_BUFFER(sink__V2970->context);
-                          { START(buf__V2984, _M__sTextCons);
-                            { START(buf__V2984, _M__sTextChars);
-                              LITERAL(buf__V2984,  "SYMBOL(" ); END(buf__V2984, _M__sTextChars); }
-                            { START(buf__V2984, _M__sTextCons);
-                              { START(buf__V2984, _M__sTextEmbed);
-                                { START(buf__V2984, _M_AsText);
-                                  ADD_PROPERTIES(buf__V2984, LINK_VARIABLESET(buf__V2984->context, namedFV__V2981), LINK_VARIABLESET(buf__V2984->context, varFV__V2982), LINK_NamedPropertyLink(buf__V2984->context, namedP__V2979), LINK_VariablePropertyLink(buf__V2984->context, varP__V2980));
-                                  { START(buf__V2984, _M_MetaVar);
-                                    COPY(buf__V2984, LINK(buf__V2984->context, sub__V2975));END(buf__V2984, _M_MetaVar); }
-                                  END(buf__V2984, _M_AsText); }
-                                END(buf__V2984, _M__sTextEmbed); }
-                              { START(buf__V2984, _M__sTextCons);
-                                { START(buf__V2984, _M__sTextChars);
-                                  LITERAL(buf__V2984,  ")" ); END(buf__V2984, _M__sTextChars); }
-                                { START(buf__V2984, _M__sTextNil);
-                                  END(buf__V2984, _M__sTextNil); }
-                                END(buf__V2984, _M__sTextCons); }
-                              END(buf__V2984, _M__sTextCons); }
-                            END(buf__V2984, _M__sTextCons); }
-                          arg__V2983 = BUFFER_TERM(buf__V2984); FREE_BUFFER(buf__V2984); }
-                        Term arg__V2985;
-                        { Sink buf__V2986 = ALLOCA_BUFFER(sink__V2970->context);
-                          ADD_PROPERTIES(buf__V2986, LINK_VARIABLESET(buf__V2986->context, namedFV__V2981), LINK_VARIABLESET(buf__V2986->context, varFV__V2982), LINK_NamedPropertyLink(buf__V2986->context, namedP__V2979), LINK_VariablePropertyLink(buf__V2986->context, varP__V2980));
-                          { START(buf__V2986, _M_T_UnlinkLastMetaUse_s1);
-                            COPY(buf__V2986, sub__V2974);COPY(buf__V2986, sub__V2975);COPY(buf__V2986, sub__V2972);END(buf__V2986, _M_T_UnlinkLastMetaUse_s1); }
-                          arg__V2985 = BUFFER_TERM(buf__V2986); FREE_BUFFER(buf__V2986); }
-                        Variable vars__V2987[2] = {x__V2976,x__V2977};
-                        Term args__V2988[2] = {arg__V2983,arg__V2985};
-                        struct _SubstitutionFrame substitution__V2989 = {NULL, 0, 2, vars__V2987, args__V2988, NULL};
-                        SUBSTITUTE(sink__V2970, sub__V2978, &substitution__V2989); }
-                      END(sink__V2970, _M_AsText); }
-                    END(sink__V2970, _M__sTextEmbed); }
-                  { START(sink__V2970, _M__sTextNil);
-                    END(sink__V2970, _M__sTextNil); }
+                  { START(sink__V2970, _M__sTextChars);
+                    LITERAL(sink__V2970,  "->context, " ); END(sink__V2970, _M__sTextChars); }
+                  { START(sink__V2970, _M__sTextCons);
+                    { START(sink__V2970, _M__sTextEmbed);
+                      { START(sink__V2970, _M_AsText);
+                        ADD_PROPERTIES(sink__V2970, LINK_VARIABLESET(sink__V2970->context, namedFV__V2981), LINK_VARIABLESET(sink__V2970->context, varFV__V2982), LINK_NamedPropertyLink(sink__V2970->context, namedP__V2979), LINK_VariablePropertyLink(sink__V2970->context, varP__V2980));
+                        { START(sink__V2970, _M_MetaVar);
+                          COPY(sink__V2970, LINK(sink__V2970->context, sub__V2975));END(sink__V2970, _M_MetaVar); }
+                        END(sink__V2970, _M_AsText); }
+                      END(sink__V2970, _M__sTextEmbed); }
+                    { START(sink__V2970, _M__sTextCons);
+                      { START(sink__V2970, _M__sTextChars);
+                        LITERAL(sink__V2970,  ");" ); END(sink__V2970, _M__sTextChars); }
+                      { START(sink__V2970, _M__sTextCons);
+                        { START(sink__V2970, _M__sTextBreak);
+                          LITERAL(sink__V2970,  "\n" ); END(sink__V2970, _M__sTextBreak); }
+                        { START(sink__V2970, _M__sTextCons);
+                          { START(sink__V2970, _M__sTextEmbed);
+                            { START(sink__V2970, _M_AsText);
+                              {
+                                Term arg__V2983;
+                                { Sink buf__V2984 = ALLOCA_BUFFER(sink__V2970->context);
+                                  { START(buf__V2984, _M__sTextCons);
+                                    { START(buf__V2984, _M__sTextChars);
+                                      LITERAL(buf__V2984,  "SYMBOL(" );
+                                      END(buf__V2984, _M__sTextChars); }
+                                    { START(buf__V2984, _M__sTextCons);
+                                      { START(buf__V2984, _M__sTextEmbed);
+                                        { START(buf__V2984, _M_AsText);
+                                          ADD_PROPERTIES(buf__V2984, LINK_VARIABLESET(buf__V2984->context, namedFV__V2981), LINK_VARIABLESET(buf__V2984->context, varFV__V2982), LINK_NamedPropertyLink(buf__V2984->context, namedP__V2979), LINK_VariablePropertyLink(buf__V2984->context, varP__V2980));
+                                          { START(buf__V2984, _M_MetaVar);
+                                            COPY(buf__V2984, LINK(buf__V2984->context, sub__V2975));END(buf__V2984, _M_MetaVar); }
+                                          END(buf__V2984, _M_AsText); }
+                                        END(buf__V2984, _M__sTextEmbed); }
+                                      { START(buf__V2984, _M__sTextCons);
+                                        { START(buf__V2984, _M__sTextChars);
+                                          LITERAL(buf__V2984,  ")" ); END(buf__V2984, _M__sTextChars); }
+                                        { START(buf__V2984, _M__sTextNil);
+                                          END(buf__V2984, _M__sTextNil); }
+                                        END(buf__V2984, _M__sTextCons); }
+                                      END(buf__V2984, _M__sTextCons); }
+                                    END(buf__V2984, _M__sTextCons); }
+                                  arg__V2983 = BUFFER_TERM(buf__V2984); FREE_BUFFER(buf__V2984); }
+                                Term arg__V2985;
+                                { Sink buf__V2986 = ALLOCA_BUFFER(sink__V2970->context);
+                                  { START(buf__V2986, _M__sTextCons);
+                                    { START(buf__V2986, _M__sTextChars);
+                                      LITERAL(buf__V2986,  " UNLINK(" );
+                                      END(buf__V2986, _M__sTextChars); }
+                                    { START(buf__V2986, _M__sTextCons);
+                                      { START(buf__V2986, _M__sTextEmbed);
+                                        { START(buf__V2986, _M_AsText);
+                                          COPY(buf__V2986, LINK(buf__V2986->context, sub__V2972));END(buf__V2986, _M_AsText); }
+                                        END(buf__V2986, _M__sTextEmbed); }
+                                      { START(buf__V2986, _M__sTextCons);
+                                        { START(buf__V2986, _M__sTextChars);
+                                          LITERAL(buf__V2986,  "->context, " );
+                                          END(buf__V2986, _M__sTextChars); }
+                                        { START(buf__V2986, _M__sTextCons);
+                                          { START(buf__V2986, _M__sTextEmbed);
+                                            { START(buf__V2986, _M_AsText);
+                                              ADD_PROPERTIES(buf__V2986, LINK_VARIABLESET(buf__V2986->context, namedFV__V2981), LINK_VARIABLESET(buf__V2986->context, varFV__V2982), LINK_NamedPropertyLink(buf__V2986->context, namedP__V2979), LINK_VariablePropertyLink(buf__V2986->context, varP__V2980));
+                                              { START(buf__V2986, _M_MetaVar);
+                                                COPY(buf__V2986, LINK(buf__V2986->context, sub__V2975));END(buf__V2986, _M_MetaVar); }
+                                              END(buf__V2986, _M_AsText); }
+                                            END(buf__V2986, _M__sTextEmbed); }
+                                          { START(buf__V2986, _M__sTextCons);
+                                            { START(buf__V2986, _M__sTextChars);
+                                              LITERAL(buf__V2986,  "); " );
+                                              END(buf__V2986, _M__sTextChars); }
+                                            { START(buf__V2986, _M__sTextCons);
+                                              { START(buf__V2986, _M__sTextEmbed);
+                                                { START(buf__V2986, _M_AsText);
+                                                  ADD_PROPERTIES(buf__V2986, LINK_VARIABLESET(buf__V2986->context, namedFV__V2981), LINK_VARIABLESET(buf__V2986->context, varFV__V2982), LINK_NamedPropertyLink(buf__V2986->context, namedP__V2979), LINK_VariablePropertyLink(buf__V2986->context, varP__V2980));
+                                                  { START(buf__V2986, _M_T_UnlinkLastMetaUse_s1);
+                                                    COPY(buf__V2986, sub__V2974);COPY(buf__V2986, sub__V2975);COPY(buf__V2986, sub__V2972);END(buf__V2986, _M_T_UnlinkLastMetaUse_s1); }
+                                                  END(buf__V2986, _M_AsText); }
+                                                END(buf__V2986, _M__sTextEmbed); }
+                                              { START(buf__V2986, _M__sTextCons);
+                                                { START(buf__V2986, _M__sTextChars);
+                                                  LITERAL(buf__V2986,  " " );
+                                                  END(buf__V2986, _M__sTextChars); }
+                                                { START(buf__V2986, _M__sTextNil);
+                                                  END(buf__V2986, _M__sTextNil); }
+                                                END(buf__V2986, _M__sTextCons); }
+                                              END(buf__V2986, _M__sTextCons); }
+                                            END(buf__V2986, _M__sTextCons); }
+                                          END(buf__V2986, _M__sTextCons); }
+                                        END(buf__V2986, _M__sTextCons); }
+                                      END(buf__V2986, _M__sTextCons); }
+                                    END(buf__V2986, _M__sTextCons); }
+                                  arg__V2985 = BUFFER_TERM(buf__V2986); FREE_BUFFER(buf__V2986); }
+                                Variable vars__V2987[2] = {x__V2976,x__V2977};
+                                Term args__V2988[2] = {arg__V2983,arg__V2985};
+                                struct _SubstitutionFrame substitution__V2989 = {NULL, 0, 2, vars__V2987, args__V2988, NULL};
+                                SUBSTITUTE(sink__V2970, sub__V2978, &substitution__V2989); }
+                              END(sink__V2970, _M_AsText); }
+                            END(sink__V2970, _M__sTextEmbed); }
+                          { START(sink__V2970, _M__sTextNil);
+                            END(sink__V2970, _M__sTextNil); }
+                          END(sink__V2970, _M__sTextCons); }
+                        END(sink__V2970, _M__sTextCons); }
+                      END(sink__V2970, _M__sTextCons); }
+                    END(sink__V2970, _M__sTextCons); }
                   END(sink__V2970, _M__sTextCons); }
                 END(sink__V2970, _M__sTextCons); }
               END(sink__V2970, _M__sTextCons); }
@@ -12522,9 +12589,9 @@ int step_M_T__substitute2_s3(Sink sink__V3202, Term term__V3203)
         COPY(sink__V3202, LINK(sink__V3202->context, sub__V3205));END(sink__V3202, _M_T_CheckReuse); }
       COPY(sink__V3202, LINK(sink__V3202->context, sub__V3207));COPY(sink__V3202, sub__V3205);{ char *str__V3221;
         { char *sub__V3222[3]; size_t sublength__V3223[3]; size_t length__V3224 = 0;
-          FORCE(sink__V3202->context, sub__V3207);
+          FORCE(sink__V3202->context, sub__V3207); LINK(sink__V3202->context, sub__V3207);
           length__V3224 += (sublength__V3223[0] = strlen(sub__V3222[0] = SYMBOL(sub__V3207)));
-          UNLINK(sink__V3202->context, sub__V3207);length__V3224 += (sublength__V3223[1] = strlen(sub__V3222[1] =  "$" ));
+           UNLINK(sink__V3202->context, sub__V3207);  UNLINK(sink__V3202->context, sub__V3207); length__V3224 += (sublength__V3223[1] = strlen(sub__V3222[1] =  "$" ));
           {double num__V3225; char *str__V3226;
             num__V3225 = DOUBLE(sub__V3210); snprintf(str__V3226 = ALLOCA(sink__V3202->context, (size_t) 32), (size_t) 31, "%G", num__V3225);
             length__V3224 += (sublength__V3223[2] = strlen(sub__V3222[2] = str__V3226));
@@ -13360,9 +13427,9 @@ int step_M_T__set__ref_s6(Sink sink__V3494, Term term__V3495)
     Hashset varFV__V3504 = LINK_VARIABLESET(sink__V3494->context, variablePropertyFreeVars(varP__V3502));
     UNLINK(sink__V3494->context, term__V3495);
     { int test__V3505;
-      FORCE(sink__V3494->context, sub__V3496);
+      FORCE(sink__V3494->context, sub__V3496); LINK(sink__V3494->context, sub__V3496);
       test__V3505 = (int) !strcmp(SYMBOL(sub__V3496), "1" );
-      UNLINK(sink__V3494->context, sub__V3496);if (test__V3505) {  UNLINK(sink__V3494->context, sub__V3499); { START(sink__V3494, _M__sTextCons);
+       UNLINK(sink__V3494->context, sub__V3496);  UNLINK(sink__V3494->context, sub__V3496); if (test__V3505) {  UNLINK(sink__V3494->context, sub__V3499); { START(sink__V3494, _M__sTextCons);
           { START(sink__V3494, _M__sTextEmbed);
             { START(sink__V3494, _M_AsText);
               COPY(sink__V3494, sub__V3500);END(sink__V3494, _M_AsText); }
