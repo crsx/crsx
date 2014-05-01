@@ -201,7 +201,8 @@ $(foreach tgt, $(TARGETS), $(eval $(call TARGETED_FAMILY_DEPENDENCIES,$(tgt))))
 
 bin/crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
 	@mkdir -p bin
-	$(CC) $^ $(ICU4CLIB) -L$(ICU4CDIR)/ -o $@
+	$(CC) $^ $(ICU4CLIB) -o $@
+#	$(CC) $^ $(ICU4CLIB) -L$(ICU4CDIR)/ -o $@
 
 # Default C compilation
 %.o: %.c
