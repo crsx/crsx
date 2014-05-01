@@ -16,7 +16,7 @@ CC = gcc
 
 INCLUDES = /usr/include
 
-.PHONY: all upload clean
+.PHONY: all compile upload clean
 
 all: lib/javacc.jar lib/antlr-runtime-3.1.3.jar compile bin crsx.jar
 
