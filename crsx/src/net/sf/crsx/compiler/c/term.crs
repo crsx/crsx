@@ -866,8 +866,8 @@ T-local-string[LITERAL[#Literal, #Sort], #sink, s p.#[s,p]]
 {#env}
 T-local-string[META-APPLICATION[#MetaVar, #Args, #Use], sink, s p.#[s,p]] 
 → 
-%n⟪FORCE(«sink»->context, « {#env}MetaVar[#MetaVar] »);
-« #[%n⟨SYMBOL(‹ {#env}MetaVar[#MetaVar] ›)⟩, {#env}T-UnlinkLastMetaUse[#MetaVar, #Use, sink]] »⟫
+%n⟪FORCE(«sink»->context, « {#env}MetaVar[#MetaVar] »); LINK(«sink»->context, « {#env}MetaVar[#MetaVar] »);
+« #[%n⟨SYMBOL(‹ {#env}MetaVar[#MetaVar] ›)⟩, %n⟨ UNLINK(‹sink›->context, ‹ {#env}MetaVar[#MetaVar] ›); ‹{#env}T-UnlinkLastMetaUse[#MetaVar, #Use, sink]› ⟩]»⟫
 ;
 
 {#env}
