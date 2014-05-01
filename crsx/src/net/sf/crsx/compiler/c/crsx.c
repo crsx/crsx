@@ -2887,6 +2887,7 @@ static void escape(char **sourcep, char **targetp, char *endsource, char *endtar
     	switch (c)
     	{
     	case '\"' : *(t++) = '\\'; *(t++) = '\"'; break;
+    	case '\\' : *(t++) = '\\'; *(t++) = '\\'; break;
     	case '\n' : *(t++) = '\\'; *(t++) = 'n'; break;
     	case '\r' : *(t++) = '\\'; *(t++) = 'r'; break;
     	case '\f' : *(t++) = '\\'; *(t++) = 'f'; break;
