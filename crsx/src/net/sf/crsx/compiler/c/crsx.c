@@ -3860,7 +3860,8 @@ static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction,
             BitSet bitset; COPY_LBITS(sink->context, &bitset, substitutionCount, unexhausted);
             MASK_LBITS(&bitset, &localUnweakened);
 
-            if (IS_PROPERTY_CLOSED(namedLink) || (!ANY_LBITS(&bitset) && !mergeNamedProperties))
+            // if (IS_PROPERTY_CLOSED(namedLink) || (!ANY_LBITS(&bitset) && !mergeNamedProperties))
+	    if (1) // namedLink isn't where we store free variable info anymore
             {
                 // No more variables to metaSubstitute...the prefix is done!
                 break;
