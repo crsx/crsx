@@ -145,13 +145,13 @@ sort Term
 
 sort NotVariableTerm
     | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨LL⟩ ⟨Parsed⟩ ⟨RR⟩ ⟧                    // Sorted Syntax
-    | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨MetaVariable⟩ [ ⟨Terms⟩ ] ⟧            // Sorted MetaApplication
-    | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨Constructor⟩ [ ⟨Scopes⟩ ] ⟧            // Sorted Construction
+    //| ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨MetaVariable⟩ [ ⟨Terms⟩ ] ⟧          // Sorted MetaApplication
+    //| ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨Constructor⟩ [ ⟨Scopes⟩ ] ⟧          // Sorted Construction
     | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨Variables⟩ ⟧                           // Sorted Variable
-    | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ [ ⟨Scopes⟩ ] ⟧
+    //| ⟦ ⟨Constructor⟩ ⟨Repeat⟩ [ ⟨Scopes⟩ ] ⟧
     | ⟦ ⟨Literal⟩ ⟧
     | ⟦ ⟨LL⟩ ⟨Parsed⟩ ⟨RR⟩ ⟧
-    | ⟦ ⟨MetaVariable⟩ [ ⟨Terms⟩ ] ⟧
+    //| ⟦ ⟨MetaVariable⟩ [ ⟨Terms⟩ ] ⟧
     ; 
   
 sort Parsed 
@@ -196,7 +196,7 @@ sort CommaScopes
 sort Scope
     | ⟦ ⟨NotVariableTerm⟩ ⟧
     | ⟦ ⟨Variables⟩ . ⟨Term⟩ ⟧
-    | ⟦ [ ⟨VariableList?⟩ ] ⟧
+    //| ⟦ [ ⟨VariableList?⟩ ] ⟧
     ;  
 
 sort Literal

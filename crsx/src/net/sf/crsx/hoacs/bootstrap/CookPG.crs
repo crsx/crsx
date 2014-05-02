@@ -336,8 +336,8 @@ PG-MetaTail[B_FALSE, #SortName, #Name] → %n⟪⟫ ;
 
 -[Data[#SortName]]: PG-MetaTail[B_TRUE, #SortName, #Name] → %n⟪
 %{
-TOKEN : { < T_meta1_«TokenName[#Name]» : ("\u27e8" (" ")* †« Stringify[#SortName] » (" ")* "\u27e9") > }
-MORE : { < "\u27e8" (" ")* †« Stringify[#SortName] » (" ")* ~["\u27e9"] > { nested_counter = 0; } : IN_META_«TokenName[#Name]»}
+TOKEN : { < T_meta1_«TokenName[#Name]» : ("\u27e8" †« Stringify[#SortName] » "\u27e9") > }
+MORE : { < "\u27e8" †« Stringify[#SortName] »  ~["\u27e9"] > { nested_counter = 0; } : IN_META_«TokenName[#Name]»}
 <IN_META_«TokenName[#Name]»,IN_NESTED_META_«TokenName[#Name]»> MORE : { "\u27e8" { nested_counter++; } : IN_NESTED_META_«TokenName[#Name]» }
 <IN_NESTED_META_«TokenName[#Name]»> MORE : { "\u27e9" { if (--nested_counter <= 0) SwitchTo(IN_META_«TokenName[#Name]»); } }
 <IN_META_«TokenName[#Name]»> TOKEN : { < T_meta2_«TokenName[#Name]» : "\u27e9" > : DEFAULT }
