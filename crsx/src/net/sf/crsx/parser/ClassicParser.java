@@ -611,7 +611,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
   }
 
 /**
- * Simple  ::=	"(" Sequence? ")"  |  v[Â¹]  |	[PropPrefix] C ["[" BindingList "]"]  |	 [PropPrefix] # ["[" List "]"]	|  "{{"..."}}"	|  "%" C "{{"..."}}"
+ * Simple  ::=	"(" Sequence? ")"  |  v[????]  |	[PropPrefix] C ["[" BindingList "]"]  |	 [PropPrefix] # ["[" List "]"]	|  "{{"..."}}"	|  "%" C "{{"..."}}"
  * PropPrefix  ::=  "{" [# ";"] [PropertyList] "}" 
  */
   final public Sink Simple(Sink sink, ExtensibleMap<String, Variable> bound, Map<String, Term> properties, Map<Variable, Term> varProperties, HashMap<String,Term> metaProperties, Set<String> refs) throws ParseException {
@@ -992,7 +992,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
   }
 
 /**
- * Property  ::=  ¬C  |	 C  |	C ":" Simple  |	 v  |  Â¬v  |  v ":" Simple | # | Â¬# | #name ":" Simple.
+ * Property  ::=  ??C  |	 C  |	C ":" Simple  |	 v  |  ????v  |  v ":" Simple | # | ????# | #name ":" Simple.
  */
   final public void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Term> properties, Map<Variable, Term> varProperties, HashMap<String,Term> metaProperties, Set<String> refs) throws ParseException {
     trace_call("Property");
@@ -1078,7 +1078,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                         metaProperties.put(s, null);
           break;
         case PERCENT_NAME:
-          // ¬ %category{{text}}
+          // ?? %category{{text}}
                           t = jj_consume_token(PERCENT_NAME);
                                   category = t.toString().substring(1).trim();
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {

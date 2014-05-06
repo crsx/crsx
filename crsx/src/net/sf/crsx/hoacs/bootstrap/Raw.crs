@@ -31,7 +31,7 @@ RawDeclaration ::=(
  %rawDeclaration⟪ %SortAlternatives«$List[RawSortAlternative]» ; ⟫;
  %rawDeclaration⟪ rule %Rule«RawRule» ; ⟫;
  %rawDeclaration⟪ { %Declarations«RawDeclarations» } ⟫;
- %rawDeclaration⟪ lexer %SortName«$String» ; ⟫;
+ %rawDeclaration⟪ lexer %SortNames«$List[$String]» ; ⟫;
 );
 
 //// SYNTAX.

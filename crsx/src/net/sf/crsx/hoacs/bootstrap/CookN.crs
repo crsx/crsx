@@ -109,9 +109,9 @@ N-resolve[{#LOC}%rawDeclarations⟪ { #Declarations1# } #Declarations2# ⟫]
 
 
 ResolveLexer:
-N-resolve[{#LOC}%rawDeclarations⟪ lexer #SortName# ; #Declarations# ⟫]
+N-resolve[{#LOC}%rawDeclarations⟪ lexer #SortNames# ; #Declarations# ⟫]
 →
-{#LOC}%rawDeclarations⟪ lexer #SortName# ; %Declarations« N-resolve[#Declarations#] » ⟫
+{#LOC}%rawDeclarations⟪ lexer #SortNames# ; %Declarations« N-resolve[#Declarations#] » ⟫
 ;
 
 ResolveDone:
@@ -216,7 +216,7 @@ N-Declarations1[#Declarations2# , #ModuleName, #LastSortName, #Names, ok¹ s ss.
 
 Declarations-lexer:
 {#ND}
-N-Declarations1[%rawDeclarations⟪ lexer #SortName# ; #Declarations# ⟫, #ModuleName, #LastSortName, #Names, ok¹ s ss.#[ok¹,s,ss]]
+N-Declarations1[%rawDeclarations⟪ lexer #SortNames# ; #Declarations# ⟫, #ModuleName, #LastSortName, #Names, ok¹ s ss.#[ok¹,s,ss]]
 →
 {#ND}
 N-Declarations1[#Declarations# , #ModuleName, #LastSortName, #Names, ok¹ s ss.#[ok¹,s,ss]]

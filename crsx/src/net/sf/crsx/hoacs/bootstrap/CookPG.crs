@@ -63,6 +63,22 @@ prefix †«#ParsePrefix»
 declarations
 %{
 static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-1).trim(); return (inner.length() > i ? inner.substring(i) : inner).trim();}
+
+public String readMeta(String first)
+{
+	StringBuilder builder = new StringBuilder();
+	builder.append(first);
+	while (true)
+	{
+		Token token = getNextToken(); // TODO: handle error
+		builder.append(token.image);
+		
+		if (token_source.nested_counter == 0)
+			break;
+		
+	}
+	return builder.toString();
+}
 %}
 
 /* GRAMMAR. */
@@ -74,6 +90,11 @@ static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-
 
 %{
 TOKEN_MGR_DECLS : { int nested_counter; } /* Used by all nesting constructs. */
+
+<IN_META> TOKEN : { < T_T_M_LESCAPE : "\u27e8"  > { nested_counter ++; } }  
+<IN_META> TOKEN : { < T_T_M_RESCAPE : "\u27e9"  > { if (--nested_counter == 0) SwitchTo(DEFAULT); } }  
+<IN_META> TOKEN : { < T_T_M_ANY : ~[] > } 
+
 %}
 
 « PG-Lexical[#Declarations] »
@@ -321,7 +342,8 @@ PG-MetaHead[B_FALSE, #SortName, #Name, #isLeftRecursive, #Prec] → %n⟪⟫ ;
 
 -[Data[#SortName],Discard[#Prec]]:
 PG-MetaHead[B_TRUE, #SortName, #Name, B_FALSE, #Prec] →
- %n⟪ meta1_«TokenName[#Name] »$$:%{unmeta(#,0)%} | meta2_«TokenName[#Name]»$$:%{unmeta(#,†«$[FormatNumber,$[Length,#SortName]]»)%}
+ %n⟪ meta1_«TokenName[#Name] »$$:%{unmeta(#,0)%} | meta2_«TokenName[#Name]»$$:%{unmeta(readMeta(#),†«$[FormatNumber,$[Length,#SortName]]»)%}
+ 
 | ⟫ ;
 
 -[Data[#SortName]]:
@@ -336,14 +358,17 @@ PG-MetaTail[B_FALSE, #SortName, #Name] → %n⟪⟫ ;
 
 -[Data[#SortName]]: PG-MetaTail[B_TRUE, #SortName, #Name] → %n⟪
 %{
-TOKEN : { < T_meta1_«TokenName[#Name]» : ("\u27e8" †« Stringify[#SortName] » "\u27e9") > }
-MORE : { < "\u27e8" †« Stringify[#SortName] »  ~["\u27e9"] > { nested_counter = 0; } : IN_META_«TokenName[#Name]»}
-<IN_META_«TokenName[#Name]»,IN_NESTED_META_«TokenName[#Name]»> MORE : { "\u27e8" { nested_counter++; } : IN_NESTED_META_«TokenName[#Name]» }
-<IN_NESTED_META_«TokenName[#Name]»> MORE : { "\u27e9" { if (--nested_counter <= 0) SwitchTo(IN_META_«TokenName[#Name]»); } }
-<IN_META_«TokenName[#Name]»> TOKEN : { < T_meta2_«TokenName[#Name]» : "\u27e9" > : DEFAULT }
-<IN_META_«TokenName[#Name]»,IN_NESTED_META_«TokenName[#Name]»> MORE : { < ~[] > }
+TOKEN : { < T_meta1_«TokenName[#Name]» : ("\u27e8" †« Stringify[#SortName] » "\u27e9")  > }
+TOKEN : { < T_meta2_«TokenName[#Name]» : ("\u27e8" †« Stringify[#SortName] »)  > { nested_counter = 1; } : IN_META } 
+
 %}
 ⟫ ;
+
+//MORE : { < "\u27e8" †« Stringify[#SortName] »  ~["\u27e9"] > { nested_counter = 0; } : IN_META_«TokenName[#Name]»}
+//<IN_META_«TokenName[#Name]»,IN_NESTED_META_«TokenName[#Name]»> MORE : { "\u27e8" { nested_counter++; } : IN_NESTED_META_«TokenName[#Name]» }
+//<IN_NESTED_META_«TokenName[#Name]»> MORE : { "\u27e9" { if (--nested_counter <= 0) SwitchTo(IN_META_«TokenName[#Name]»); } }
+//<IN_META_«TokenName[#Name]»> TOKEN : { < T_meta2_«TokenName[#Name]» : "\u27e9" > : DEFAULT }
+//<IN_META_«TokenName[#Name]»,IN_NESTED_META_«TokenName[#Name]»> MORE : { < ~[] > }
 
 {$String<!--SortName--> : SortEntry} PG-ProduceBody[$List[PFK_SORT], $Numeric, $List[Text], $List[Text], CONSUMPTION_SORT, in::Text after::TextMapSort.Text] :: Text;
 
@@ -813,9 +838,9 @@ SingletonTextMap[TextToString[#name], %n⟪
 // TEXT LIST OF LEXICAL DECLARATIONS.
 
 PG-Lexical[RawDeclarations] :: Text ;
-PG-Lexical[#Declarations] → PG-Lexical2[#Declarations, B_FALSE, "DEFAULT", hasskip.PG-Lexical2Tail[hasskip]] ;
+PG-Lexical[#Declarations] → PG-Lexical2[#Declarations, B_FALSE, %n⟪ DEFAULT ⟫, hasskip.PG-Lexical2Tail[hasskip]] ;
 
-PG-Lexical2[RawDeclarations, Boolean, $String, ha::Boolean.Text] :: Text ;
+PG-Lexical2[RawDeclarations, Boolean, Text, ha::Boolean.Text] :: Text ;
 
 Lexical-module:
 PG-Lexical2[%rawDeclarations⟪ module #ModuleName2# { #Declarations2# } ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
@@ -826,14 +851,14 @@ PG-Lexical2[#Declarations2#, #hasSkip, #lexer, hasskip.PG-Lexical2[#Declarations
 Lexical-space:
 PG-Lexical2[%rawDeclarations⟪ space #RegExp# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-%n⟪skip («StringToText[#lexer]») ::= ' ' | ⟦« PG-InlineRegExp[#RegExp#, "space$"] »⟧ .
+%n⟪skip («#lexer») ::= ' ' | ⟦« PG-InlineRegExp[#RegExp#, "space$"] »⟧ .
 « PG-DeclareRegExp[#RegExp#, "space$"] »« PG-Lexical2[#Declarations#, B_TRUE, #lexer, hasskip.#[hasskip]] »⟫
 ;
 
 Lexical-token:
 PG-Lexical2[%rawDeclarations⟪ token #SortName# | #RegExp# #LexerState# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-%n⟪token «TokenName[#SortName#]» («StringToText[#lexer]»«PG-ToLexerState[#LexerState#]») ::= ⟦« PG-InlineRegExp[#RegExp#, #SortName#] »⟧ .
+%n⟪token «TokenName[#SortName#]» («#lexer»«PG-ToLexerState[#LexerState#]») ::= ⟦« PG-InlineRegExp[#RegExp#, #SortName#] »⟧ .
 « PG-DeclareRegExp[#RegExp#, #SortName#] »« PG-Lexical2[#Declarations#, #hasSkip, #lexer, hasskip.#[hasskip]] »⟫
 ;
 
@@ -875,9 +900,9 @@ PG-Lexical2[#Declarations2#, #hasSkip, #lexer, hasskip.PG-Lexical2[#Declarations
 ;
 
 Lexical-lexer:
-PG-Lexical2[%rawDeclarations⟪ lexer #SortName# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
+PG-Lexical2[%rawDeclarations⟪ lexer #SortNames# ; #Declarations# ⟫, #hasSkip, #lexer, hasskip.#[hasskip]]
 →
-PG-Lexical2[#Declarations#, #hasSkip, UpCase[#SortName#], hasskip.#[hasskip]]
+PG-Lexical2[#Declarations#, #hasSkip, TextFold[Map[x.StringToText[UpCase[x]], #SortNames#], %n⟪,⟫], hasskip.#[hasskip]]
 ;
 
 Lexcial-done:

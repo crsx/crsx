@@ -400,7 +400,7 @@ TOKEN : {<IT_Declaration : "%Declaration">}
  *  |  <font color="red">{anonymous}</font><font color="red">:raw</font>   <a href="#N_SortAlternatives">&lang;SortAlternatives&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  (   <a href="#T_RULE">RULE</a>  )?   <font color="red">{rule}</font><font color="red">:raw</font>   <a href="#N_Rule">&lang;Rule&rang;</a>     <a href="#T_SEMI">SEMI</a>  <br>
  *  |  <font color="red">{nestedDeclarations}</font><font color="red">:raw</font>    <a href="#T_LBRACE">LBRACE</a>   <a href="#N_Declarations">&lang;Declarations&rang;</a>     <a href="#T_RBRACE">RBRACE</a>  <br>
- *  |   <a href="#T_LEXER">LEXER</a><font color="red">:raw</font>   <a href="#N_SortName">&lang;SortName&rang;</a>     <a href="#T_SEMI">SEMI</a> 
+ *  |   <a href="#T_LEXER">LEXER</a><font color="red">:raw</font>   <a href="#N_SortNames">&lang;SortNames&rang;</a>     <a href="#T_SEMI">SEMI</a> 
  */
 net.sf.crsx.Sink N_Declaration(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) :
 {
@@ -670,7 +670,7 @@ net.sf.crsx.Sink N_Declaration(net.sf.crsx.Sink sink, net.sf.crsx.util.Extensibl
 	}
 	 ) 
 	 ( 
-	sink=N_SortName(sink, env)
+	sink=N_SortNames(sink, env)
 	 ) 
 	 ( 
 	 <T_SEMI>

@@ -2,3 +2,4 @@
 *.crs
 *.pg
 *-installed
+/bin

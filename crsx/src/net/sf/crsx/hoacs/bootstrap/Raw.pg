@@ -53,7 +53,7 @@ inject[<Embedded>]  ::=  '%<PRODUCTION_NAME>', '', '' .
 | {anonymous}:raw <SortAlternatives> SEMI
 | (RULE)? {rule}:raw <Rule> SEMI
 | {nestedDeclarations}:raw LBRACE <Declarations> RBRACE
-| LEXER:raw <SortName> SEMI
+| LEXER:raw <SortNames> SEMI
 .
 
 //// SYNTAX.

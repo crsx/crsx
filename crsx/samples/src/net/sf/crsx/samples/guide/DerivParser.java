@@ -184,7 +184,7 @@ static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-
 /* Productions for B with precedence 1. */
 
 /**
- * <em>B1</em> ::=  <a href="#N_B2">&lang;B2&rang;</a> <font color="red">:#1</font>   (   "<code>∨</code>"   (  <font color="red">{'B1_B__M__u2228_inline'}</font>   <font color="red">{{#1}}</font>   <a href="#N_B1">&lang;B1&rang;</a>   )  |  <font color="red">{{#1}}</font>  ) 
+ * <em>B1</em> ::=  <a href="#N_B2">&lang;B2&rang;</a> <font color="red">:#1</font>   (   "<code>???</code>"   (  <font color="red">{'B1_B__M__u2228_inline'}</font>   <font color="red">{{#1}}</font>   <a href="#N_B1">&lang;B1&rang;</a>   )  |  <font color="red">{{#1}}</font>  ) 
  */
   final public net.sf.crsx.Sink N_B1(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) throws ParseException {
     trace_call("N_B1");
@@ -214,7 +214,7 @@ static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-
 /* Productions for B with precedence 2. */
 
 /**
- * <em>B2</em> ::=  <a href="#N_B3">&lang;B3&rang;</a> <font color="red">:#1</font>   (   "<code>∧</code>"   (  <font color="red">{'B2_B__M__u2227_inline'}</font>   <font color="red">{{#1}}</font>   <a href="#N_B2">&lang;B2&rang;</a>   )  |  <font color="red">{{#1}}</font>  ) 
+ * <em>B2</em> ::=  <a href="#N_B3">&lang;B3&rang;</a> <font color="red">:#1</font>   (   "<code>???</code>"   (  <font color="red">{'B2_B__M__u2227_inline'}</font>   <font color="red">{{#1}}</font>   <a href="#N_B2">&lang;B2&rang;</a>   )  |  <font color="red">{{#1}}</font>  ) 
  */
   final public net.sf.crsx.Sink N_B2(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) throws ParseException {
     trace_call("N_B2");
@@ -244,7 +244,7 @@ static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-
 /* Productions for B with precedence 3. */
 
 /**
- * <em>B3</em> ::=   "<code>¬</code>"   (  <font color="red">{'B3__M__u00ac_inline'}</font>   <a href="#N_B3">&lang;B3&rang;</a>   )  <br>
+ * <em>B3</em> ::=   "<code>??</code>"   (  <font color="red">{'B3__M__u00ac_inline'}</font>   <a href="#N_B3">&lang;B3&rang;</a>   )  <br>
  *  |  <a href="#N_B4">&lang;B4&rang;</a>  
  */
   final public net.sf.crsx.Sink N_B3(net.sf.crsx.Sink sink, net.sf.crsx.util.ExtensibleMap<String, net.sf.crsx.Variable> env) throws ParseException {
@@ -543,7 +543,7 @@ static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-
 /* Productions for Exp with precedence 3. */
 
 /**
- * <em>Exp3</em> ::=   "<code>D</code>"   (  <font color="red">{'Exp3__M_D_inline'}</font>   <a href="#N_Exp">&lang;Exp&rang;</a>     "<code>[</code>"   (  <a href="#N_Var">&lang;Var&rang;</a> <font color="red">^vVar1</font>   (   "<code>↦</code>"   (  <a href="#N_Exp">&lang;Exp&rang;</a> <font color="red">[vVar1]</font>    "<code>]</code>"   (  )  )  )  )  )  <br>
+ * <em>Exp3</em> ::=   "<code>D</code>"   (  <font color="red">{'Exp3__M_D_inline'}</font>   <a href="#N_Exp">&lang;Exp&rang;</a>     "<code>[</code>"   (  <a href="#N_Var">&lang;Var&rang;</a> <font color="red">^vVar1</font>   (   "<code>???</code>"   (  <a href="#N_Exp">&lang;Exp&rang;</a> <font color="red">[vVar1]</font>    "<code>]</code>"   (  )  )  )  )  )  <br>
  *  |  <a href="#N_Fun">&lang;Fun&rang;</a> <font color="red">:#1</font>   (  <font color="red">{'Exp3_Fun_inline'}</font>   <font color="red">{{#1}}</font>   <a href="#N_Exp4">&lang;Exp4&rang;</a>   )  <br>
  *  |  <a href="#N_Exp4">&lang;Exp4&rang;</a>  
  */
@@ -780,7 +780,7 @@ static String unmeta(String s, int i) {String inner = s.substring(1, s.length()-
 /**
  * <em>Fun2</em> ::=   <a href="#T_meta1_T_M_FUN">meta1_T_M_FUN</a><font color="red">$$:%{unmeta(#,0)%}</font>  <br>
  *  |   <a href="#T_meta2_T_M_FUN">meta2_T_M_FUN</a><font color="red">$$:%{unmeta(#,3)%}</font>  <br>
- *  |   "<code>[</code>"   (  <font color="red">{'Fun2__M__5b_inline'}</font>   <a href="#N_Var">&lang;Var&rang;</a> <font color="red">^vVar1</font>   (   "<code>↦</code>"   (  <a href="#N_Exp">&lang;Exp&rang;</a> <font color="red">[vVar1]</font>    "<code>]</code>"   (  )  )  )  )  <br>
+ *  |   "<code>[</code>"   (  <font color="red">{'Fun2__M__5b_inline'}</font>   <a href="#N_Var">&lang;Var&rang;</a> <font color="red">^vVar1</font>   (   "<code>???</code>"   (  <a href="#N_Exp">&lang;Exp&rang;</a> <font color="red">[vVar1]</font>    "<code>]</code>"   (  )  )  )  )  <br>
  *  |   "<code>cos</code>"   (  <font color="red">{'Fun2__M_cos_inline'}</font>  )  <br>
  *  |   "<code>exp</code>"   (  <font color="red">{'Fun2__M_exp_inline'}</font>  )  <br>
  *  |   "<code>ln</code>"   (  <font color="red">{'Fun2__M_ln_inline'}</font>  )  <br>

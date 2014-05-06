@@ -18,47 +18,47 @@ sort ModuleName
     ;
 
 sort Declaration 
-    | ⟦ ⟨Module⟩ ; ⟧ 
-    | ⟦ ⟨LexicalDeclaration⟩ ; ⟧
-    | ⟦ ⟨SortDeclaration⟩ ; ⟧
-    | ⟦ ⟨RuleDeclaration⟩ ; ⟧ 
+    | ⟦ ⟨Module⟩ ⟨Semi⟩ ⟧ 
+    | ⟦ ⟨LexicalDeclaration⟩ ⟨Semi⟩ ⟧
+    | ⟦ ⟨SortDeclaration⟩ ⟨Semi⟩ ⟧
+    | ⟦ ⟨RuleDeclaration⟩ ⟨Semi⟩ ⟧
     ;
 
 // LEXICAL DECLARATIONS.
 
 sort LexicalDeclaration
-    | ⟦ space ⟨RegExp⟩ ⟧
-    | ⟦ token ⟨SortName⟩ | ⟨RegExp⟩ ⟧
-    | ⟦ fragment ⟨SortName⟩ | ⟨RegExp⟩ ⟧
-    | sugar ⟦ token fragment ⟨SortName#1⟩ | ⟨RegExp#2⟩ ⟧ → ⟦ fragment ⟨SortName#1⟩ | ⟨RegExp#2⟩ ⟧
+    | ⟦ ⟨Space⟩ ⟨RegExp⟩ ⟧
+    | ⟦ ⟨Token⟩ ⟨SortName⟩ ⟨Bar⟩ ⟨RegExp⟩ ⟧
+    | ⟦ ⟨Fragment⟩ ⟨SortName⟩ ⟨Bar⟩ ⟨RegExp⟩ ⟧
+    | sugar ⟦ ⟨Token⟩ ⟨Fragment#⟩ ⟨SortName#1⟩ ⟨Bar#⟩ ⟨RegExp#2⟩ ⟧ → ⟦ ⟨Fragment#⟩ ⟨SortName#1⟩ ⟨Bar#⟩ ⟨RegExp#2⟩ ⟧
+    ;
+
+sort SortName
+    | ⟦ ⟨Constructor⟩ ⟧
     ;
 
 sort RegExp
-    | ⟦ ⟨RegExp@1⟩ | ⟨RegExp@2⟩ ⟧@1   // Alternative
-    | ⟦ ⟨RegExp@2⟩ ⟨RegExp@3⟩ ⟧@2     // Concatenation
-    | ⟦ ⟨RegExp@4⟩ ⟨Repeat⟩ ⟧@3       // Repeat
-    | ⟦ ⟨String⟩ ⟧@4                  // Keyword
-    | ⟦ ⟨CharClass⟩ ⟧@4               // Character Class
-    | ⟦ . ⟧@4                         // Any
-    | ⟦ ⟨SortName⟩ ⟧@4                // Token/Fragment Reference NOTE: NOT COMPATIBLE WITH RAW.PG
-    | ⟦ ( ⟨RegExp⟩ ) ⟧@4              // Nesting
+    | ⟦ ⟨RegExp@1⟩ ⟨Bar⟩ ⟨RegExp@2⟩ ⟧@1   // Alternative
+    | ⟦ ⟨RegExp@2⟩ ⟨RegExp@3⟩ ⟧@2         // Concatenation
+    | ⟦ ⟨RegExp@4⟩ ⟨Repeat⟩ ⟧@3           // Repeat
+    | ⟦ ⟨String⟩ ⟧@4                      // Keyword
+    | ⟦ ⟨CharClass⟩ ⟧@4                   // Character Class
+    | ⟦ . ⟧@4                             // Any
+    | ⟦ ⟨SortName⟩ ⟧@4                    // Token/Fragment Reference NOTE: NOT COMPATIBLE WITH RAW.PG
+    | ⟦ ⟨LParen⟩ ⟨RegExp⟩ ⟨RParen⟩ ⟧@4                  // Nesting
     ;
 
 sort Repeat 
-    | ⟦*⟧ 
-    | ⟦+⟧ 
-    | ⟦?⟧
+    | ⟦⟨Star⟩⟧ 
+    | ⟦⟨Plus⟩⟧ 
+    | ⟦⟨Quest⟩⟧
     | ⟦⟧
     ;
 
 // SORT DECLARATION.
 
 sort SortDeclaration
-    | ⟦ sort ⟨SortName⟩ ⟨SortAlternatives⟩ ⟧
-    ;
-
-sort SortAlternatives
-    | ⟦ | ⟨SortAlternative⟩ ⟧
+    | ⟦ sort ⟨SortName⟩ ⟨Bar⟩ ⟨SortAlternative⟩ ⟧         // Sort declarations
     ;
 
 sort SortAlternative
@@ -66,8 +66,14 @@ sort SortAlternative
     | ⟦ scheme ⟨Form⟩ ⟧         // Function sort
     ;
 
+sort Forms
+    | ⟦ ⟨Form⟩ ⟨Semi⟩ ⟧
+    | ⟦ ⟧
+    ;
+
 sort Form
-    | ⟦ ⟨LL⟩ ⟨ParsedForm⟩ ⟨RR⟩ ⟨Precedence⟩ ⟧
+    | ⟦ ⟨LL⟩ ⟨ParsedForm⟩ ⟨RR⟩ ⟨Precedence⟩ ⟧                  // Parsed unsorted form
+    | ⟦ ⟨Constructor⟩ ⟨LSquare⟩ ⟨ScopeSorts⟩ ⟨RSquare⟩ ⟧       // Form construction
     ;
 
 sort ParsedForm
@@ -82,6 +88,16 @@ sort Precedence
     | ⟦ ⟧
     ;
  
+sort ScopeSorts
+    | ⟦ ⟨ScopeSort⟩ ⟨CommaScopeSorts⟩ ⟧
+    | ⟦ ⟧
+    ;
+
+sort CommaScopeSorts
+    | ⟦ ⟨Comma⟩ ⟨ScopeSort⟩⟧
+    | ⟦ ⟧
+    ;
+
 sort ScopeSort
     | ⟦ ⟨Sort⟩ ⟨Repeat⟩ ⟧
     ;
@@ -98,7 +114,7 @@ sort SimpleSorts
 sort SimpleSort
     | ⟦ ⟨SortName⟩ ⟨MetaVariables⟩ ⟧
     | ⟦ ⟨SortParam⟩ ⟧
-    | ⟦ ( ⟨Sort⟩ ) ⟧
+    | ⟦ ⟨LParen⟩ ⟨Sort⟩ ⟨RParen⟩ ⟧
     ;
 
 sort MetaVariables
@@ -110,11 +126,17 @@ sort SortParam
     | ⟦ ⟨Variable⟩ ⟧
     ;
 
-
 // RULE DECLARATION.
 
 sort RuleDeclaration
-    | ⟦ ⟨Rule?⟩ ⟨Priority⟩ ⟨Header⟩ ⟨Pattern⟩ ⟨Contractum⟩ ⟧
+    | ⟦ ⟨Rule?⟩ ⟨Priority⟩ ⟨Header⟩ ⟨Term⟩ ⟨RuleSuffix⟩ ⟧
+    ;
+
+sort RuleSuffix
+    | ⟦ → ⟨NotVariableTerm⟩ ⟧
+    | ⟦ ⟨ColonColon⟩ ⟨Constructor⟩ ⟧
+    | ⟦ ⟨ColonColonEqual⟩ ⟨List⟩ ⟧
+    | ⟦ ⟧
     ;
 
 sort Priority
@@ -127,33 +149,28 @@ sort Header
     | ⟦ ⟧
     ;
 
-sort Pattern
-    | ⟦ ⟨Term⟩ ⟧
-    ;
-
-sort Contractum
-    | ⟦ → ⟨Term⟩ ⟧
-    | ⟦ ⟧
-    ;
-
 // TERM DECLARATION.
 
 sort Term 
-    | ⟦ ⟨Variable⟩ ⟨Term⟩ ⟧
-    | ⟦ ⟨NotVariableTerm⟩ ⟧
+    | ⟦ ⟨Binders?⟩ ⟨NotVariableTerm⟩⟧
+    ;
+
+sort Binders
+    | ⟦ ⟨Variables⟩ . ⟧
     ;
 
 sort NotVariableTerm
-    | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨LL⟩ ⟨Parsed⟩ ⟨RR⟩ ⟧                    // Sorted Syntax
-    //| ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨MetaVariable⟩ [ ⟨Terms⟩ ] ⟧          // Sorted MetaApplication
-    //| ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨Constructor⟩ [ ⟨Scopes⟩ ] ⟧          // Sorted Construction
-    | ⟦ ⟨Constructor⟩ ⟨Repeat⟩ ⟨Variables⟩ ⟧                           // Sorted Variable
-    //| ⟦ ⟨Constructor⟩ ⟨Repeat⟩ [ ⟨Scopes⟩ ] ⟧
+    | ⟦ ⟨Constructor⟩ ⟨Arguments⟩ ⟧
     | ⟦ ⟨Literal⟩ ⟧
     | ⟦ ⟨LL⟩ ⟨Parsed⟩ ⟨RR⟩ ⟧
-    //| ⟦ ⟨MetaVariable⟩ [ ⟨Terms⟩ ] ⟧
+    | ⟦ ⟨MetaVariable⟩ ⟨Arguments?⟩ ⟧
     ; 
   
+sort Arguments
+    | ⟦ ⟨LSquare⟩ ⟨TermList⟩ ⟨RSquare⟩ ⟧
+    | ⟦ ⟧
+    ;
+
 sort Parsed 
     | ⟦ ⟨ConcreteSpace⟩ ⟨Parsed⟩ ⟧
     | ⟦ ⟨ConcreteWord⟩ ⟨Parsed⟩ ⟧
@@ -161,12 +178,12 @@ sort Parsed
     | ⟦ ⟧
     ; 
 
-sort Terms
-    | ⟦ ⟨Term⟩ ⟨CommaTerms⟩ ⟧
+sort TermList
+    | ⟦ ⟨Term⟩ ⟨CommaTermList⟩ ⟧
     ;
 
-sort CommaTerms
-    | ⟦ ⟨Comma⟩ ⟨Terms⟩ ⟧
+sort CommaTermList
+    | ⟦ ⟨Comma⟩⟨TermList⟩ ⟧
     | ⟦ ⟧
     ; 
 
@@ -196,7 +213,7 @@ sort CommaScopes
 sort Scope
     | ⟦ ⟨NotVariableTerm⟩ ⟧
     | ⟦ ⟨Variables⟩ . ⟨Term⟩ ⟧
-    //| ⟦ [ ⟨VariableList?⟩ ] ⟧
+    | ⟦ ⟨LSquare⟩ ⟨VariableList?⟩ ⟨RSquare⟩ ⟧
     ;  
 
 sort Literal
@@ -209,25 +226,47 @@ sort MetaVariable
     | ⟦ ⟨Hash⟩ ⟧
     ;
 
+sort List 
+    | ⟦ ⟨LParen⟩ ⟨SemiTermList⟩ ⟨RParen⟩ ⟧
+    ;
+
+sort SemiTermList
+    | ⟦ ⟨Term⟩ ⟨Semi⟩ ⟨SemiTermList⟩ ⟧
+    | ⟦ ⟧
+    ;
+
 // TOKENS.
 
-// Default lexer
+//lexer Default;
 
-token Hash  | '#'; 
-token Comma | ','; 
-token LL    | '⟦' → Concrete; 
-token ERAng | '⟩' → Concrete; 
-token Data  | "data";
-token Rule  | "rule";
+token LSquare           | '[';
+token RSquare           | ']'; 
+token LL                | '⟦'      → Concrete; 
+
+token Data              | "data";
+token Rule              | "rule";
+token Token             | "token"       → Regex;
+token Fragment          | "fragment"    → Regex;
+token Space             | "space"       → Regex;
 
 // Numbers.
-token Number    | ⟨Natural⟩;
-token Natural   | ⟨Digits⟩;
+token Number            | ⟨Natural⟩;
+token Natural           | ⟨Digits⟩;
 
+lexer Default, Regex;
 
-token SortName
-    | ⟨Constructor⟩
-    ;
+token LParen            | '(';
+token RParen            | ')';
+token Hash              | '#'; 
+token Star              | '*';
+token Plus              | '+';
+token Quest             | '?'; 
+token Comma             | ',';
+token Bar               | '|';
+token Semi              | ';'      → Default; 
+token ERAng             | '⟩'      → Concrete; 
+token ColonColonEqual   | "::=";
+token ColonColon        | "::";
 
 token String 
     | '"' [^"]* '"' 
@@ -257,7 +296,9 @@ fragment AlphaNum  | [A-Za-z0-9] ;
 fragment Suffix    | "_" ⟨Name⟩? | "_"? ⟨Digits⟩;
 fragment Name      | (⟨Lower⟩ | ⟨Upper⟩ | [$])+;
 
-space [\n\t ]+ | "//" .* | nested "/*" "*/" ;
+space [\n\t ]+ | "//" [^\n\r\f]* | nested "/*" "*/" ;
+
+lexer Regex;
 
 token CharClass 
     | "[" "^"? ([^]\n] | ⟨Escape⟩)* "]"
@@ -271,11 +312,10 @@ fragment Escape // TODO: octal/hex/unicode
     | "\\t"
     ;
 
-
 lexer Concrete;
 
-token RR     | '⟧' → Default; 
-token ELAng  | '⟨' → Default; 
+token RR     | '⟧'    → Default; 
+token ELAng  | '⟨'    → Default; 
 
 token ConcreteSpace 
     | [\n\t ]+ 
