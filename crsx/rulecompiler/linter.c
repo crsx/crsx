@@ -30,7 +30,7 @@ LinterReport lint(Context context, Term term, int flags)
     lcontext->context = context;
 
     if (flags & CHECK_CLOSED)
-        lcontext->bound = makeHS2(context, 9);
+        lcontext->bound = makeHS2(context, 9, NULL);
 
     lintTerm(lcontext, NULL, 0, term, flags, report);
 
@@ -101,7 +101,7 @@ static int lintTerm(LintContext context, Term parent, unsigned index, Term term,
         // Check properties
         {
             NamedPropertyLink link;
-            for (link = construction->namedProperties; link; link = link->link)
+            for (link = construction->properties->namedProperties; link; link = link->link)
             {
                 if (link->nr <= 0)
                     return error(parent, index, term, ERROR_NO_REFERENCE, report); // TODO: improve
@@ -123,7 +123,7 @@ static int lintTerm(LintContext context, Term parent, unsigned index, Term term,
 
         {
             VariablePropertyLink link;
-            for (link = construction->variableProperties; link; link = link->link)
+            for (link = construction->properties->variableProperties; link; link = link->link)
             {
                 if (link->nr <= 0)
                     return error(parent, index, term, ERROR_NO_REFERENCE, report); // TODO: improve

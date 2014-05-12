@@ -25,8 +25,8 @@ int step_M_DSTRING(Sink sink__V1, Term term__V2)
       
       NamedPropertyLink namedP__V7 = LINK_NamedPropertyLink(sink__V1->context, NAMED_PROPERTIES(term__V2));
       VariablePropertyLink varP__V8 = LINK_VariablePropertyLink(sink__V1->context, VARIABLE_PROPERTIES(term__V2));
-      Hashset namedFV__V9 = LINK_VARIABLESET(sink__V1->context, namedPropertyFreeVars(namedP__V7));
-      Hashset varFV__V10 = LINK_VARIABLESET(sink__V1->context, variablePropertyFreeVars(varP__V8));
+      Hashset namedFV__V9 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->properties->namedFreeVars);
+      Hashset varFV__V10 = LINK_VARIABLESET(sink__V1->context, asConstruction(term__V2)->properties->variableFreeVars);
       UNLINK(sink__V1->context, term__V2);
       ADD_PROPERTIES(sink__V1, LINK_VARIABLESET(sink__V1->context, namedFV__V9), LINK_VARIABLESET(sink__V1->context, varFV__V10), LINK_NamedPropertyLink(sink__V1->context, namedP__V7), LINK_VariablePropertyLink(sink__V1->context, varP__V8));
       { START(sink__V1, _M_DSTRING_s1);
@@ -61,8 +61,8 @@ int step_M_MetaVar2(Sink sink__V11, Term term__V12)
       
       NamedPropertyLink namedP__V17 = LINK_NamedPropertyLink(sink__V11->context, NAMED_PROPERTIES(term__V12));
       VariablePropertyLink varP__V18 = LINK_VariablePropertyLink(sink__V11->context, VARIABLE_PROPERTIES(term__V12));
-      Hashset namedFV__V19 = LINK_VARIABLESET(sink__V11->context, namedPropertyFreeVars(namedP__V17));
-      Hashset varFV__V20 = LINK_VARIABLESET(sink__V11->context, variablePropertyFreeVars(varP__V18));
+      Hashset namedFV__V19 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->properties->namedFreeVars);
+      Hashset varFV__V20 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->properties->variableFreeVars);
       UNLINK(sink__V11->context, term__V12);
       ADD_PROPERTIES(sink__V11, LINK_VARIABLESET(sink__V11->context, namedFV__V19), LINK_VARIABLESET(sink__V11->context, varFV__V20), LINK_NamedPropertyLink(sink__V11->context, namedP__V17), LINK_VariablePropertyLink(sink__V11->context, varP__V18));
       { START(sink__V11, _M_MetaVar2_s2);
@@ -80,8 +80,8 @@ int step_M_MetaVar2(Sink sink__V11, Term term__V12)
       
       NamedPropertyLink namedP__V23 = LINK_NamedPropertyLink(sink__V11->context, NAMED_PROPERTIES(term__V12));
       VariablePropertyLink varP__V24 = LINK_VariablePropertyLink(sink__V11->context, VARIABLE_PROPERTIES(term__V12));
-      Hashset namedFV__V25 = LINK_VARIABLESET(sink__V11->context, namedPropertyFreeVars(namedP__V23));
-      Hashset varFV__V26 = LINK_VARIABLESET(sink__V11->context, variablePropertyFreeVars(varP__V24));
+      Hashset namedFV__V25 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->properties->namedFreeVars);
+      Hashset varFV__V26 = LINK_VARIABLESET(sink__V11->context, asConstruction(term__V12)->properties->variableFreeVars);
       UNLINK(sink__V11->context, term__V12);
       ADD_PROPERTIES(sink__V11, LINK_VARIABLESET(sink__V11->context, namedFV__V25), LINK_VARIABLESET(sink__V11->context, varFV__V26), LINK_NamedPropertyLink(sink__V11->context, namedP__V23), LINK_VariablePropertyLink(sink__V11->context, varP__V24));
       { START(sink__V11, _M_MetaVar2_s1);
@@ -112,8 +112,8 @@ int step_M_TOKEN(Sink sink__V27, Term term__V28)
     
     NamedPropertyLink namedP__V30 = LINK_NamedPropertyLink(sink__V27->context, NAMED_PROPERTIES(term__V28));
     VariablePropertyLink varP__V31 = LINK_VariablePropertyLink(sink__V27->context, VARIABLE_PROPERTIES(term__V28));
-    Hashset namedFV__V32 = LINK_VARIABLESET(sink__V27->context, namedPropertyFreeVars(namedP__V30));
-    Hashset varFV__V33 = LINK_VARIABLESET(sink__V27->context, variablePropertyFreeVars(varP__V31));
+    Hashset namedFV__V32 = LINK_VARIABLESET(sink__V27->context, asConstruction(term__V28)->properties->namedFreeVars);
+    Hashset varFV__V33 = LINK_VARIABLESET(sink__V27->context, asConstruction(term__V28)->properties->variableFreeVars);
     UNLINK(sink__V27->context, term__V28);
     { START(sink__V27, _M__sTextCons);
       { START(sink__V27, _M__sTextChars);
@@ -196,8 +196,8 @@ int step_M_DCOMMENT_xTOKEN(Sink sink__V44, Term term__V45)
       
       NamedPropertyLink namedP__V50 = LINK_NamedPropertyLink(sink__V44->context, NAMED_PROPERTIES(term__V45));
       VariablePropertyLink varP__V51 = LINK_VariablePropertyLink(sink__V44->context, VARIABLE_PROPERTIES(term__V45));
-      Hashset namedFV__V52 = LINK_VARIABLESET(sink__V44->context, namedPropertyFreeVars(namedP__V50));
-      Hashset varFV__V53 = LINK_VARIABLESET(sink__V44->context, variablePropertyFreeVars(varP__V51));
+      Hashset namedFV__V52 = LINK_VARIABLESET(sink__V44->context, asConstruction(term__V45)->properties->namedFreeVars);
+      Hashset varFV__V53 = LINK_VARIABLESET(sink__V44->context, asConstruction(term__V45)->properties->variableFreeVars);
       UNLINK(sink__V44->context, term__V45);
       ADD_PROPERTIES(sink__V44, LINK_VARIABLESET(sink__V44->context, namedFV__V52), LINK_VARIABLESET(sink__V44->context, varFV__V53), LINK_NamedPropertyLink(sink__V44->context, namedP__V50), LINK_VariablePropertyLink(sink__V44->context, varP__V51));
       { START(sink__V44, _M_DCOMMENT_xTOKEN_s1);
@@ -227,9 +227,9 @@ int step_M_MissingPrimitive(Sink sink__V54, Term term__V55)
     UNLINK(sink__V54->context, term__V55);
     char *sub__V57[3]; size_t sublength__V58[3]; size_t length__V59 = 0;
     length__V59 += (sublength__V58[0] = strlen(sub__V57[0] =  "$[" ));
-    FORCE(sink__V54->context, sub__V56);
+    FORCE(sink__V54->context, sub__V56); LINK(sink__V54->context, sub__V56);
     length__V59 += (sublength__V58[1] = strlen(sub__V57[1] = SYMBOL(sub__V56)));
-    UNLINK(sink__V54->context, sub__V56);length__V59 += (sublength__V58[2] = strlen(sub__V57[2] =  "] not supported" ));
+     UNLINK(sink__V54->context, sub__V56);  UNLINK(sink__V54->context, sub__V56); length__V59 += (sublength__V58[2] = strlen(sub__V57[2] =  "] not supported" ));
     { char *str__V60 = ALLOCA(sink__V54->context, length__V59+1), *p__V61 = str__V60;
       int i; for (i = 0; i < 3; ++i) { memcpy(p__V61, sub__V57[i], sublength__V58[i]); p__V61 += sublength__V58[i]; }
       *p__V61 = '\0';
@@ -297,8 +297,8 @@ int step_M_NameFun(Sink sink__V70, Term term__V71)
     
     NamedPropertyLink namedP__V73 = LINK_NamedPropertyLink(sink__V70->context, NAMED_PROPERTIES(term__V71));
     VariablePropertyLink varP__V74 = LINK_VariablePropertyLink(sink__V70->context, VARIABLE_PROPERTIES(term__V71));
-    Hashset namedFV__V75 = LINK_VARIABLESET(sink__V70->context, namedPropertyFreeVars(namedP__V73));
-    Hashset varFV__V76 = LINK_VARIABLESET(sink__V70->context, variablePropertyFreeVars(varP__V74));
+    Hashset namedFV__V75 = LINK_VARIABLESET(sink__V70->context, asConstruction(term__V71)->properties->namedFreeVars);
+    Hashset varFV__V76 = LINK_VARIABLESET(sink__V70->context, asConstruction(term__V71)->properties->variableFreeVars);
     UNLINK(sink__V70->context, term__V71);
     { START(sink__V70, _M__sTextCons);
       { START(sink__V70, _M__sTextChars);
@@ -347,8 +347,8 @@ int step_M_FormArguments__binder__count_s1(Sink sink__V77, Term term__V78)
     
     NamedPropertyLink namedP__V85 = LINK_NamedPropertyLink(sink__V77->context, NAMED_PROPERTIES(term__V78));
     VariablePropertyLink varP__V86 = LINK_VariablePropertyLink(sink__V77->context, VARIABLE_PROPERTIES(term__V78));
-    Hashset namedFV__V87 = LINK_VARIABLESET(sink__V77->context, namedPropertyFreeVars(namedP__V85));
-    Hashset varFV__V88 = LINK_VARIABLESET(sink__V77->context, variablePropertyFreeVars(varP__V86));
+    Hashset namedFV__V87 = LINK_VARIABLESET(sink__V77->context, asConstruction(term__V78)->properties->namedFreeVars);
+    Hashset varFV__V88 = LINK_VARIABLESET(sink__V77->context, asConstruction(term__V78)->properties->variableFreeVars);
     UNLINK(sink__V77->context, term__V78);
     ADD_PROPERTIES(sink__V77, LINK_VARIABLESET(sink__V77->context, namedFV__V87), LINK_VARIABLESET(sink__V77->context, varFV__V88), LINK_NamedPropertyLink(sink__V77->context, namedP__V85), LINK_VariablePropertyLink(sink__V77->context, varP__V86));
     { START(sink__V77, _M_FormArguments__binder__count_s3);
@@ -388,8 +388,8 @@ int step_M_FormArguments__binder__count_s1(Sink sink__V77, Term term__V78)
     
     NamedPropertyLink namedP__V101 = LINK_NamedPropertyLink(sink__V77->context, NAMED_PROPERTIES(term__V78));
     VariablePropertyLink varP__V102 = LINK_VariablePropertyLink(sink__V77->context, VARIABLE_PROPERTIES(term__V78));
-    Hashset namedFV__V103 = LINK_VARIABLESET(sink__V77->context, namedPropertyFreeVars(namedP__V101));
-    Hashset varFV__V104 = LINK_VARIABLESET(sink__V77->context, variablePropertyFreeVars(varP__V102));
+    Hashset namedFV__V103 = LINK_VARIABLESET(sink__V77->context, asConstruction(term__V78)->properties->namedFreeVars);
+    Hashset varFV__V104 = LINK_VARIABLESET(sink__V77->context, asConstruction(term__V78)->properties->variableFreeVars);
     UNLINK(sink__V77->context, term__V78);
     ADD_PROPERTIES(sink__V77, LINK_VARIABLESET(sink__V77->context, namedFV__V103), LINK_VARIABLESET(sink__V77->context, varFV__V104), LINK_NamedPropertyLink(sink__V77->context, namedP__V101), LINK_VariablePropertyLink(sink__V77->context, varP__V102));
     { START(sink__V77, _M_FormArguments__binder__count_s2);
@@ -509,8 +509,8 @@ int step_M_FormArguments__binder__offsets(Sink sink__V123, Term term__V124)
       
       NamedPropertyLink namedP__V131 = LINK_NamedPropertyLink(sink__V123->context, NAMED_PROPERTIES(term__V124));
       VariablePropertyLink varP__V132 = LINK_VariablePropertyLink(sink__V123->context, VARIABLE_PROPERTIES(term__V124));
-      Hashset namedFV__V133 = LINK_VARIABLESET(sink__V123->context, namedPropertyFreeVars(namedP__V131));
-      Hashset varFV__V134 = LINK_VARIABLESET(sink__V123->context, variablePropertyFreeVars(varP__V132));
+      Hashset namedFV__V133 = LINK_VARIABLESET(sink__V123->context, asConstruction(term__V124)->properties->namedFreeVars);
+      Hashset varFV__V134 = LINK_VARIABLESET(sink__V123->context, asConstruction(term__V124)->properties->variableFreeVars);
       UNLINK(sink__V123->context, term__V124);
       ADD_PROPERTIES(sink__V123, LINK_VARIABLESET(sink__V123->context, namedFV__V133), LINK_VARIABLESET(sink__V123->context, varFV__V134), LINK_NamedPropertyLink(sink__V123->context, namedP__V131), LINK_VariablePropertyLink(sink__V123->context, varP__V132));
       { START(sink__V123, _M_FormArguments__binder__offsets_s1);
@@ -528,8 +528,8 @@ int step_M_FormArguments__binder__offsets(Sink sink__V123, Term term__V124)
       
       NamedPropertyLink namedP__V137 = LINK_NamedPropertyLink(sink__V123->context, NAMED_PROPERTIES(term__V124));
       VariablePropertyLink varP__V138 = LINK_VariablePropertyLink(sink__V123->context, VARIABLE_PROPERTIES(term__V124));
-      Hashset namedFV__V139 = LINK_VARIABLESET(sink__V123->context, namedPropertyFreeVars(namedP__V137));
-      Hashset varFV__V140 = LINK_VARIABLESET(sink__V123->context, variablePropertyFreeVars(varP__V138));
+      Hashset namedFV__V139 = LINK_VARIABLESET(sink__V123->context, asConstruction(term__V124)->properties->namedFreeVars);
+      Hashset varFV__V140 = LINK_VARIABLESET(sink__V123->context, asConstruction(term__V124)->properties->variableFreeVars);
       UNLINK(sink__V123->context, term__V124);
       ADD_PROPERTIES(sink__V123, LINK_VARIABLESET(sink__V123->context, namedFV__V139), LINK_VARIABLESET(sink__V123->context, varFV__V140), LINK_NamedPropertyLink(sink__V123->context, namedP__V137), LINK_VariablePropertyLink(sink__V123->context, varP__V138));
       { START(sink__V123, _M_FormArguments__binder__offsets_s4);
@@ -560,13 +560,13 @@ int step_M_COMMENT_xTOKEN(Sink sink__V141, Term term__V142)
     
     NamedPropertyLink namedP__V144 = LINK_NamedPropertyLink(sink__V141->context, NAMED_PROPERTIES(term__V142));
     VariablePropertyLink varP__V145 = LINK_VariablePropertyLink(sink__V141->context, VARIABLE_PROPERTIES(term__V142));
-    Hashset namedFV__V146 = LINK_VARIABLESET(sink__V141->context, namedPropertyFreeVars(namedP__V144));
-    Hashset varFV__V147 = LINK_VARIABLESET(sink__V141->context, variablePropertyFreeVars(varP__V145));
+    Hashset namedFV__V146 = LINK_VARIABLESET(sink__V141->context, asConstruction(term__V142)->properties->namedFreeVars);
+    Hashset varFV__V147 = LINK_VARIABLESET(sink__V141->context, asConstruction(term__V142)->properties->variableFreeVars);
     UNLINK(sink__V141->context, term__V142);
     { START(sink__V141, _M__sTextCons);
       { START(sink__V141, _M__sTextChars);
         { char *str__V148;
-          FORCE(sink__V141->context, sub__V143);
+          FORCE(sink__V141->context, sub__V143); LINK(sink__V141->context, sub__V143);
           { char *replaced__V149;
             const size_t z = strlen(SYMBOL(sub__V143));
             if (* "*/" ) {
@@ -587,7 +587,7 @@ int step_M_COMMENT_xTOKEN(Sink sink__V141, Term term__V142)
                 *r = '\0';}
               }
             else { replaced__V149 = memcpy(ALLOCA(sink__V141->context, z+1), SYMBOL(sub__V143), z+1); }
-             UNLINK(sink__V141->context, sub__V143);{ size_t z__V150 = strlen(replaced__V149) + 1; memcpy(str__V148 = ALLOCATE(sink__V141->context, z__V150), replaced__V149, z__V150); }
+             UNLINK(sink__V141->context, sub__V143);  UNLINK(sink__V141->context, sub__V143); { size_t z__V150 = strlen(replaced__V149) + 1; memcpy(str__V148 = ALLOCATE(sink__V141->context, z__V150), replaced__V149, z__V150); }
             
           }LITERALU(sink__V141, str__V148); }
         END(sink__V141, _M__sTextChars); }
@@ -618,8 +618,8 @@ int step_M_STRING(Sink sink__V151, Term term__V152)
     
     NamedPropertyLink namedP__V154 = LINK_NamedPropertyLink(sink__V151->context, NAMED_PROPERTIES(term__V152));
     VariablePropertyLink varP__V155 = LINK_VariablePropertyLink(sink__V151->context, VARIABLE_PROPERTIES(term__V152));
-    Hashset namedFV__V156 = LINK_VARIABLESET(sink__V151->context, namedPropertyFreeVars(namedP__V154));
-    Hashset varFV__V157 = LINK_VARIABLESET(sink__V151->context, variablePropertyFreeVars(varP__V155));
+    Hashset namedFV__V156 = LINK_VARIABLESET(sink__V151->context, asConstruction(term__V152)->properties->namedFreeVars);
+    Hashset varFV__V157 = LINK_VARIABLESET(sink__V151->context, asConstruction(term__V152)->properties->variableFreeVars);
     UNLINK(sink__V151->context, term__V152);
     { START(sink__V151, _M__sTextCons);
       { START(sink__V151, _M__sTextChars);
@@ -629,9 +629,9 @@ int step_M_STRING(Sink sink__V151, Term term__V152)
           { START(sink__V151, _M__sTextCons);
             { START(sink__V151, _M__sTextChars);
               { char *str__V158;
-                FORCE(sink__V151->context, sub__V153);
+                FORCE(sink__V151->context, sub__V153); LINK(sink__V151->context, sub__V153);
                 {str__V158 = makeEscaped(sink__V151->context, SYMBOL(sub__V153));
-                  UNLINK(sink__V151->context, sub__V153);}
+                   UNLINK(sink__V151->context, sub__V153);  UNLINK(sink__V151->context, sub__V153); }
                 LITERALU(sink__V151, str__V158); }
               END(sink__V151, _M__sTextChars); }
             { START(sink__V151, _M__sTextNil);
@@ -669,8 +669,8 @@ int step_M_SortNames(Sink sink__V159, Term term__V160)
     
     NamedPropertyLink namedP__V162 = LINK_NamedPropertyLink(sink__V159->context, NAMED_PROPERTIES(term__V160));
     VariablePropertyLink varP__V163 = LINK_VariablePropertyLink(sink__V159->context, VARIABLE_PROPERTIES(term__V160));
-    Hashset namedFV__V164 = LINK_VARIABLESET(sink__V159->context, namedPropertyFreeVars(namedP__V162));
-    Hashset varFV__V165 = LINK_VARIABLESET(sink__V159->context, variablePropertyFreeVars(varP__V163));
+    Hashset namedFV__V164 = LINK_VARIABLESET(sink__V159->context, asConstruction(term__V160)->properties->namedFreeVars);
+    Hashset varFV__V165 = LINK_VARIABLESET(sink__V159->context, asConstruction(term__V160)->properties->variableFreeVars);
     UNLINK(sink__V159->context, term__V160);
     { START(sink__V159, _M__sTextCons);
       { START(sink__V159, _M__sTextChars);
@@ -718,8 +718,8 @@ int step_M_FormArguments__binder__count(Sink sink__V166, Term term__V167)
       
       NamedPropertyLink namedP__V174 = LINK_NamedPropertyLink(sink__V166->context, NAMED_PROPERTIES(term__V167));
       VariablePropertyLink varP__V175 = LINK_VariablePropertyLink(sink__V166->context, VARIABLE_PROPERTIES(term__V167));
-      Hashset namedFV__V176 = LINK_VARIABLESET(sink__V166->context, namedPropertyFreeVars(namedP__V174));
-      Hashset varFV__V177 = LINK_VARIABLESET(sink__V166->context, variablePropertyFreeVars(varP__V175));
+      Hashset namedFV__V176 = LINK_VARIABLESET(sink__V166->context, asConstruction(term__V167)->properties->namedFreeVars);
+      Hashset varFV__V177 = LINK_VARIABLESET(sink__V166->context, asConstruction(term__V167)->properties->variableFreeVars);
       UNLINK(sink__V166->context, term__V167);
       ADD_PROPERTIES(sink__V166, LINK_VARIABLESET(sink__V166->context, namedFV__V176), LINK_VARIABLESET(sink__V166->context, varFV__V177), LINK_NamedPropertyLink(sink__V166->context, namedP__V174), LINK_VariablePropertyLink(sink__V166->context, varP__V175));
       { START(sink__V166, _M_FormArguments__binder__count_s1);
@@ -737,8 +737,8 @@ int step_M_FormArguments__binder__count(Sink sink__V166, Term term__V167)
       
       NamedPropertyLink namedP__V180 = LINK_NamedPropertyLink(sink__V166->context, NAMED_PROPERTIES(term__V167));
       VariablePropertyLink varP__V181 = LINK_VariablePropertyLink(sink__V166->context, VARIABLE_PROPERTIES(term__V167));
-      Hashset namedFV__V182 = LINK_VARIABLESET(sink__V166->context, namedPropertyFreeVars(namedP__V180));
-      Hashset varFV__V183 = LINK_VARIABLESET(sink__V166->context, variablePropertyFreeVars(varP__V181));
+      Hashset namedFV__V182 = LINK_VARIABLESET(sink__V166->context, asConstruction(term__V167)->properties->namedFreeVars);
+      Hashset varFV__V183 = LINK_VARIABLESET(sink__V166->context, asConstruction(term__V167)->properties->variableFreeVars);
       UNLINK(sink__V166->context, term__V167);
       ADD_PROPERTIES(sink__V166, LINK_VARIABLESET(sink__V166->context, namedFV__V182), LINK_VARIABLESET(sink__V166->context, varFV__V183), LINK_NamedPropertyLink(sink__V166->context, namedP__V180), LINK_VariablePropertyLink(sink__V166->context, varP__V181));
       { START(sink__V166, _M_FormArguments__binder__count_s4);
@@ -769,8 +769,8 @@ int step_M_DSTRING_s1(Sink sink__V184, Term term__V185)
     
     NamedPropertyLink namedP__V187 = LINK_NamedPropertyLink(sink__V184->context, NAMED_PROPERTIES(term__V185));
     VariablePropertyLink varP__V188 = LINK_VariablePropertyLink(sink__V184->context, VARIABLE_PROPERTIES(term__V185));
-    Hashset namedFV__V189 = LINK_VARIABLESET(sink__V184->context, namedPropertyFreeVars(namedP__V187));
-    Hashset varFV__V190 = LINK_VARIABLESET(sink__V184->context, variablePropertyFreeVars(varP__V188));
+    Hashset namedFV__V189 = LINK_VARIABLESET(sink__V184->context, asConstruction(term__V185)->properties->namedFreeVars);
+    Hashset varFV__V190 = LINK_VARIABLESET(sink__V184->context, asConstruction(term__V185)->properties->variableFreeVars);
     UNLINK(sink__V184->context, term__V185);
     { START(sink__V184, _M__sTextCons);
       { START(sink__V184, _M__sTextChars);
@@ -780,9 +780,9 @@ int step_M_DSTRING_s1(Sink sink__V184, Term term__V185)
           { START(sink__V184, _M__sTextCons);
             { START(sink__V184, _M__sTextChars);
               { char *str__V191;
-                FORCE(sink__V184->context, sub__V186);
+                FORCE(sink__V184->context, sub__V186); LINK(sink__V184->context, sub__V186);
                 {str__V191 = makeEscaped(sink__V184->context, SYMBOL(sub__V186));
-                  UNLINK(sink__V184->context, sub__V186);}
+                   UNLINK(sink__V184->context, sub__V186);  UNLINK(sink__V184->context, sub__V186); }
                 LITERALU(sink__V184, str__V191); }
               END(sink__V184, _M__sTextChars); }
             { START(sink__V184, _M__sTextNil);
@@ -831,8 +831,8 @@ int step_M_DelayMapText_s1(Sink sink__V192, Term term__V193)
       
       NamedPropertyLink namedP__V202 = LINK_NamedPropertyLink(sink__V192->context, NAMED_PROPERTIES(term__V193));
       VariablePropertyLink varP__V203 = LINK_VariablePropertyLink(sink__V192->context, VARIABLE_PROPERTIES(term__V193));
-      Hashset namedFV__V204 = LINK_VARIABLESET(sink__V192->context, namedPropertyFreeVars(namedP__V202));
-      Hashset varFV__V205 = LINK_VARIABLESET(sink__V192->context, variablePropertyFreeVars(varP__V203));
+      Hashset namedFV__V204 = LINK_VARIABLESET(sink__V192->context, asConstruction(term__V193)->properties->namedFreeVars);
+      Hashset varFV__V205 = LINK_VARIABLESET(sink__V192->context, asConstruction(term__V193)->properties->variableFreeVars);
       UNLINK(sink__V192->context, term__V193);
       ADD_PROPERTIES(sink__V192, LINK_VARIABLESET(sink__V192->context, namedFV__V204), LINK_VARIABLESET(sink__V192->context, varFV__V205), LINK_NamedPropertyLink(sink__V192->context, namedP__V202), LINK_VariablePropertyLink(sink__V192->context, varP__V203));
       { START(sink__V192, _M_DelayMapText_s2);
@@ -872,8 +872,8 @@ int step_M_DelayMapText_s1(Sink sink__V192, Term term__V193)
       
       NamedPropertyLink namedP__V221 = LINK_NamedPropertyLink(sink__V192->context, NAMED_PROPERTIES(term__V193));
       VariablePropertyLink varP__V222 = LINK_VariablePropertyLink(sink__V192->context, VARIABLE_PROPERTIES(term__V193));
-      Hashset namedFV__V223 = LINK_VARIABLESET(sink__V192->context, namedPropertyFreeVars(namedP__V221));
-      Hashset varFV__V224 = LINK_VARIABLESET(sink__V192->context, variablePropertyFreeVars(varP__V222));
+      Hashset namedFV__V223 = LINK_VARIABLESET(sink__V192->context, asConstruction(term__V193)->properties->namedFreeVars);
+      Hashset varFV__V224 = LINK_VARIABLESET(sink__V192->context, asConstruction(term__V193)->properties->variableFreeVars);
       UNLINK(sink__V192->context, term__V193);
       ADD_PROPERTIES(sink__V192, LINK_VARIABLESET(sink__V192->context, namedFV__V223), LINK_VARIABLESET(sink__V192->context, varFV__V224), LINK_NamedPropertyLink(sink__V192->context, namedP__V221), LINK_VariablePropertyLink(sink__V192->context, varP__V222));
       { START(sink__V192, _M_DelayMapText_s3);
@@ -930,8 +930,8 @@ int step_M_DelayMapText_s2(Sink sink__V236, Term term__V237)
     
     NamedPropertyLink namedP__V243 = LINK_NamedPropertyLink(sink__V236->context, NAMED_PROPERTIES(term__V237));
     VariablePropertyLink varP__V244 = LINK_VariablePropertyLink(sink__V236->context, VARIABLE_PROPERTIES(term__V237));
-    Hashset namedFV__V245 = LINK_VARIABLESET(sink__V236->context, namedPropertyFreeVars(namedP__V243));
-    Hashset varFV__V246 = LINK_VARIABLESET(sink__V236->context, variablePropertyFreeVars(varP__V244));
+    Hashset namedFV__V245 = LINK_VARIABLESET(sink__V236->context, asConstruction(term__V237)->properties->namedFreeVars);
+    Hashset varFV__V246 = LINK_VARIABLESET(sink__V236->context, asConstruction(term__V237)->properties->variableFreeVars);
     UNLINK(sink__V236->context, term__V237);
     { START(sink__V236, _M__sTextCons);
       { START(sink__V236, _M__sTextEmbed);
@@ -1000,8 +1000,8 @@ int step_M_DelayMapText_s3(Sink sink__V264, Term term__V265)
     
     NamedPropertyLink namedP__V269 = LINK_NamedPropertyLink(sink__V264->context, NAMED_PROPERTIES(term__V265));
     VariablePropertyLink varP__V270 = LINK_VariablePropertyLink(sink__V264->context, VARIABLE_PROPERTIES(term__V265));
-    Hashset namedFV__V271 = LINK_VARIABLESET(sink__V264->context, namedPropertyFreeVars(namedP__V269));
-    Hashset varFV__V272 = LINK_VARIABLESET(sink__V264->context, variablePropertyFreeVars(varP__V270));
+    Hashset namedFV__V271 = LINK_VARIABLESET(sink__V264->context, asConstruction(term__V265)->properties->namedFreeVars);
+    Hashset varFV__V272 = LINK_VARIABLESET(sink__V264->context, asConstruction(term__V265)->properties->variableFreeVars);
     UNLINK(sink__V264->context, term__V265);
     { START(sink__V264, _M__sTextNil); END(sink__V264, _M__sTextNil); }
     UNLINK_VARIABLESET(sink__V264->context, namedFV__V271); UNLINK_VARIABLESET(sink__V264->context, varFV__V272);
@@ -1034,8 +1034,8 @@ int step_M_Forms_Constructors(Sink sink__V273, Term term__V274)
       
       NamedPropertyLink namedP__V280 = LINK_NamedPropertyLink(sink__V273->context, NAMED_PROPERTIES(term__V274));
       VariablePropertyLink varP__V281 = LINK_VariablePropertyLink(sink__V273->context, VARIABLE_PROPERTIES(term__V274));
-      Hashset namedFV__V282 = LINK_VARIABLESET(sink__V273->context, namedPropertyFreeVars(namedP__V280));
-      Hashset varFV__V283 = LINK_VARIABLESET(sink__V273->context, variablePropertyFreeVars(varP__V281));
+      Hashset namedFV__V282 = LINK_VARIABLESET(sink__V273->context, asConstruction(term__V274)->properties->namedFreeVars);
+      Hashset varFV__V283 = LINK_VARIABLESET(sink__V273->context, asConstruction(term__V274)->properties->variableFreeVars);
       UNLINK(sink__V273->context, term__V274);
       ADD_PROPERTIES(sink__V273, LINK_VARIABLESET(sink__V273->context, namedFV__V282), LINK_VARIABLESET(sink__V273->context, varFV__V283), LINK_NamedPropertyLink(sink__V273->context, namedP__V280), LINK_VariablePropertyLink(sink__V273->context, varP__V281));
       { START(sink__V273, _M_Forms_Constructors_s1);
@@ -1051,8 +1051,8 @@ int step_M_Forms_Constructors(Sink sink__V273, Term term__V274)
       
       NamedPropertyLink namedP__V285 = LINK_NamedPropertyLink(sink__V273->context, NAMED_PROPERTIES(term__V274));
       VariablePropertyLink varP__V286 = LINK_VariablePropertyLink(sink__V273->context, VARIABLE_PROPERTIES(term__V274));
-      Hashset namedFV__V287 = LINK_VARIABLESET(sink__V273->context, namedPropertyFreeVars(namedP__V285));
-      Hashset varFV__V288 = LINK_VARIABLESET(sink__V273->context, variablePropertyFreeVars(varP__V286));
+      Hashset namedFV__V287 = LINK_VARIABLESET(sink__V273->context, asConstruction(term__V274)->properties->namedFreeVars);
+      Hashset varFV__V288 = LINK_VARIABLESET(sink__V273->context, asConstruction(term__V274)->properties->variableFreeVars);
       UNLINK(sink__V273->context, term__V274);
       ADD_PROPERTIES(sink__V273, LINK_VARIABLESET(sink__V273->context, namedFV__V287), LINK_VARIABLESET(sink__V273->context, varFV__V288), LINK_NamedPropertyLink(sink__V273->context, namedP__V285), LINK_VariablePropertyLink(sink__V273->context, varP__V286));
       { START(sink__V273, _M_Forms_Constructors_s5);
@@ -1082,8 +1082,8 @@ int step_M_DEnumTag_s1(Sink sink__V289, Term term__V290)
     
     NamedPropertyLink namedP__V292 = LINK_NamedPropertyLink(sink__V289->context, NAMED_PROPERTIES(term__V290));
     VariablePropertyLink varP__V293 = LINK_VariablePropertyLink(sink__V289->context, VARIABLE_PROPERTIES(term__V290));
-    Hashset namedFV__V294 = LINK_VARIABLESET(sink__V289->context, namedPropertyFreeVars(namedP__V292));
-    Hashset varFV__V295 = LINK_VARIABLESET(sink__V289->context, variablePropertyFreeVars(varP__V293));
+    Hashset namedFV__V294 = LINK_VARIABLESET(sink__V289->context, asConstruction(term__V290)->properties->namedFreeVars);
+    Hashset varFV__V295 = LINK_VARIABLESET(sink__V289->context, asConstruction(term__V290)->properties->variableFreeVars);
     UNLINK(sink__V289->context, term__V290);
     { START(sink__V289, _M__sTextCons);
       { START(sink__V289, _M__sTextChars);
@@ -1123,13 +1123,13 @@ int step_M_DCOMMENT_xTOKEN_s1(Sink sink__V296, Term term__V297)
     
     NamedPropertyLink namedP__V299 = LINK_NamedPropertyLink(sink__V296->context, NAMED_PROPERTIES(term__V297));
     VariablePropertyLink varP__V300 = LINK_VariablePropertyLink(sink__V296->context, VARIABLE_PROPERTIES(term__V297));
-    Hashset namedFV__V301 = LINK_VARIABLESET(sink__V296->context, namedPropertyFreeVars(namedP__V299));
-    Hashset varFV__V302 = LINK_VARIABLESET(sink__V296->context, variablePropertyFreeVars(varP__V300));
+    Hashset namedFV__V301 = LINK_VARIABLESET(sink__V296->context, asConstruction(term__V297)->properties->namedFreeVars);
+    Hashset varFV__V302 = LINK_VARIABLESET(sink__V296->context, asConstruction(term__V297)->properties->variableFreeVars);
     UNLINK(sink__V296->context, term__V297);
     { START(sink__V296, _M__sTextCons);
       { START(sink__V296, _M__sTextChars);
         { char *str__V303;
-          FORCE(sink__V296->context, sub__V298);
+          FORCE(sink__V296->context, sub__V298); LINK(sink__V296->context, sub__V298);
           { char *replaced__V304;
             const size_t z = strlen(SYMBOL(sub__V298));
             if (* "*/" ) {
@@ -1150,7 +1150,7 @@ int step_M_DCOMMENT_xTOKEN_s1(Sink sink__V296, Term term__V297)
                 *r = '\0';}
               }
             else { replaced__V304 = memcpy(ALLOCA(sink__V296->context, z+1), SYMBOL(sub__V298), z+1); }
-             UNLINK(sink__V296->context, sub__V298);{ size_t z__V305 = strlen(replaced__V304) + 1; memcpy(str__V303 = ALLOCATE(sink__V296->context, z__V305), replaced__V304, z__V305); }
+             UNLINK(sink__V296->context, sub__V298);  UNLINK(sink__V296->context, sub__V298); { size_t z__V305 = strlen(replaced__V304) + 1; memcpy(str__V303 = ALLOCATE(sink__V296->context, z__V305), replaced__V304, z__V305); }
             
           }LITERALU(sink__V296, str__V303); }
         END(sink__V296, _M__sTextChars); }
@@ -1214,8 +1214,8 @@ int step_M_DMANGLE(Sink sink__V312, Term term__V313)
       
       NamedPropertyLink namedP__V318 = LINK_NamedPropertyLink(sink__V312->context, NAMED_PROPERTIES(term__V313));
       VariablePropertyLink varP__V319 = LINK_VariablePropertyLink(sink__V312->context, VARIABLE_PROPERTIES(term__V313));
-      Hashset namedFV__V320 = LINK_VARIABLESET(sink__V312->context, namedPropertyFreeVars(namedP__V318));
-      Hashset varFV__V321 = LINK_VARIABLESET(sink__V312->context, variablePropertyFreeVars(varP__V319));
+      Hashset namedFV__V320 = LINK_VARIABLESET(sink__V312->context, asConstruction(term__V313)->properties->namedFreeVars);
+      Hashset varFV__V321 = LINK_VARIABLESET(sink__V312->context, asConstruction(term__V313)->properties->variableFreeVars);
       UNLINK(sink__V312->context, term__V313);
       ADD_PROPERTIES(sink__V312, LINK_VARIABLESET(sink__V312->context, namedFV__V320), LINK_VARIABLESET(sink__V312->context, varFV__V321), LINK_NamedPropertyLink(sink__V312->context, namedP__V318), LINK_VariablePropertyLink(sink__V312->context, varP__V319));
       { START(sink__V312, _M_DMANGLE_s1);
@@ -1245,8 +1245,8 @@ int step_M_EnumVar(Sink sink__V322, Term term__V323)
     
     NamedPropertyLink namedP__V325 = LINK_NamedPropertyLink(sink__V322->context, NAMED_PROPERTIES(term__V323));
     VariablePropertyLink varP__V326 = LINK_VariablePropertyLink(sink__V322->context, VARIABLE_PROPERTIES(term__V323));
-    Hashset namedFV__V327 = LINK_VARIABLESET(sink__V322->context, namedPropertyFreeVars(namedP__V325));
-    Hashset varFV__V328 = LINK_VARIABLESET(sink__V322->context, variablePropertyFreeVars(varP__V326));
+    Hashset namedFV__V327 = LINK_VARIABLESET(sink__V322->context, asConstruction(term__V323)->properties->namedFreeVars);
+    Hashset varFV__V328 = LINK_VARIABLESET(sink__V322->context, asConstruction(term__V323)->properties->variableFreeVars);
     UNLINK(sink__V322->context, term__V323);
     { START(sink__V322, _M__sTextCons);
       { START(sink__V322, _M__sTextChars);
@@ -1285,8 +1285,8 @@ int step_M_DDescriptor_s1(Sink sink__V329, Term term__V330)
     
     NamedPropertyLink namedP__V332 = LINK_NamedPropertyLink(sink__V329->context, NAMED_PROPERTIES(term__V330));
     VariablePropertyLink varP__V333 = LINK_VariablePropertyLink(sink__V329->context, VARIABLE_PROPERTIES(term__V330));
-    Hashset namedFV__V334 = LINK_VARIABLESET(sink__V329->context, namedPropertyFreeVars(namedP__V332));
-    Hashset varFV__V335 = LINK_VARIABLESET(sink__V329->context, variablePropertyFreeVars(varP__V333));
+    Hashset namedFV__V334 = LINK_VARIABLESET(sink__V329->context, asConstruction(term__V330)->properties->namedFreeVars);
+    Hashset varFV__V335 = LINK_VARIABLESET(sink__V329->context, asConstruction(term__V330)->properties->variableFreeVars);
     UNLINK(sink__V329->context, term__V330);
     { START(sink__V329, _M__sTextCons);
       { START(sink__V329, _M__sTextChars);
@@ -1326,8 +1326,8 @@ int step_M_MetaVar(Sink sink__V336, Term term__V337)
     
     NamedPropertyLink namedP__V339 = LINK_NamedPropertyLink(sink__V336->context, NAMED_PROPERTIES(term__V337));
     VariablePropertyLink varP__V340 = LINK_VariablePropertyLink(sink__V336->context, VARIABLE_PROPERTIES(term__V337));
-    Hashset namedFV__V341 = LINK_VARIABLESET(sink__V336->context, namedPropertyFreeVars(namedP__V339));
-    Hashset varFV__V342 = LINK_VARIABLESET(sink__V336->context, variablePropertyFreeVars(varP__V340));
+    Hashset namedFV__V341 = LINK_VARIABLESET(sink__V336->context, asConstruction(term__V337)->properties->namedFreeVars);
+    Hashset varFV__V342 = LINK_VARIABLESET(sink__V336->context, asConstruction(term__V337)->properties->variableFreeVars);
     UNLINK(sink__V336->context, term__V337);
     ADD_PROPERTIES(sink__V336, LINK_VARIABLESET(sink__V336->context, namedFV__V341), LINK_VARIABLESET(sink__V336->context, varFV__V342), LINK_NamedPropertyLink(sink__V336->context, namedP__V339), LINK_VariablePropertyLink(sink__V336->context, varP__V340));
     { START(sink__V336, _M_MetaVar2);
@@ -1335,25 +1335,25 @@ int step_M_MetaVar(Sink sink__V336, Term term__V337)
         { Term key__V344;
           char *sub__V345[2]; size_t sublength__V346[2]; size_t length__V347 = 0;
           length__V347 += (sublength__V346[0] = strlen(sub__V345[0] =  "MetaVar$" ));
-          FORCE(sink__V336->context, sub__V338);
+          FORCE(sink__V336->context, sub__V338); LINK(sink__V336->context, sub__V338);
           length__V347 += (sublength__V346[1] = strlen(sub__V345[1] = SYMBOL(sub__V338)));
-          { char *str__V348 = ALLOCA(sink__V336->context, length__V347+1), *p__V349 = str__V348;
+          UNLINK(sink__V336->context, sub__V338);  { char *str__V348 = ALLOCA(sink__V336->context, length__V347+1), *p__V349 = str__V348;
             int i; for (i = 0; i < 2; ++i) { memcpy(p__V349, sub__V345[i], sublength__V346[i]); p__V349 += sublength__V346[i]; }
             *p__V349 = '\0';
             ASSERT(sink__V336->context, strlen(str__V348) == length__V347);
             key__V344 = makeStringLiteral(sink__V336->context, str__V348);
             }
-          Term *pp__V350 = DPROPERTY(sink__V336->context, namedP__V339, varP__V340, key__V344);UNLINK(sink__V336->context, key__V344); 
-          if (pp__V350) term__V343 = LINK(sink__V336->context, *pp__V350);
+          Term pp__V350 = DPROPERTY(sink__V336->context, namedP__V339, varP__V340, key__V344);UNLINK(sink__V336->context, key__V344); 
+          if (pp__V350) term__V343 = LINK(sink__V336->context, pp__V350);
           else {{ Sink buf__V351 = ALLOCA_BUFFER(sink__V336->context);
               { START(buf__V351, _M_STRING_xVALUE);
                 { char *str__V352;
                   { char *sub__V353[2]; size_t sublength__V354[2]; size_t length__V355 = 0;
                     length__V355 += (sublength__V354[0] = strlen(sub__V353[0] =  "m" ));
-                    FORCE(buf__V351->context, sub__V338);
+                    FORCE(buf__V351->context, sub__V338); LINK(buf__V351->context, sub__V338);
                     { char *s__V356 = makeMangled(buf__V351->context, SYMBOL(sub__V338));
                       length__V355 += (sublength__V354[1] = strlen(sub__V353[1] = s__V356));
-                      UNLINK(buf__V351->context, sub__V338);{ char *str__V357 = ALLOCATE(buf__V351->context, length__V355+1), *p__V358 = str__V357;
+                       UNLINK(buf__V351->context, sub__V338);  UNLINK(buf__V351->context, sub__V338); { char *str__V357 = ALLOCATE(buf__V351->context, length__V355+1), *p__V358 = str__V357;
                         int i; for (i = 0; i < 2; ++i) { memcpy(p__V358, sub__V353[i], sublength__V354[i]); p__V358 += sublength__V354[i]; }
                         *p__V358 = '\0';
                         ASSERT(buf__V351->context, strlen(str__V357) == length__V355);
@@ -1395,8 +1395,8 @@ int step_M_Length(Sink sink__V359, Term term__V360)
       
       NamedPropertyLink namedP__V365 = LINK_NamedPropertyLink(sink__V359->context, NAMED_PROPERTIES(term__V360));
       VariablePropertyLink varP__V366 = LINK_VariablePropertyLink(sink__V359->context, VARIABLE_PROPERTIES(term__V360));
-      Hashset namedFV__V367 = LINK_VARIABLESET(sink__V359->context, namedPropertyFreeVars(namedP__V365));
-      Hashset varFV__V368 = LINK_VARIABLESET(sink__V359->context, variablePropertyFreeVars(varP__V366));
+      Hashset namedFV__V367 = LINK_VARIABLESET(sink__V359->context, asConstruction(term__V360)->properties->namedFreeVars);
+      Hashset varFV__V368 = LINK_VARIABLESET(sink__V359->context, asConstruction(term__V360)->properties->variableFreeVars);
       UNLINK(sink__V359->context, term__V360);
       ADD_PROPERTIES(sink__V359, LINK_VARIABLESET(sink__V359->context, namedFV__V367), LINK_VARIABLESET(sink__V359->context, varFV__V368), LINK_NamedPropertyLink(sink__V359->context, namedP__V365), LINK_VariablePropertyLink(sink__V359->context, varP__V366));
       { START(sink__V359, _M_Length_s2);
@@ -1418,8 +1418,8 @@ int step_M_Length(Sink sink__V359, Term term__V360)
       
       NamedPropertyLink namedP__V373 = LINK_NamedPropertyLink(sink__V359->context, NAMED_PROPERTIES(term__V360));
       VariablePropertyLink varP__V374 = LINK_VariablePropertyLink(sink__V359->context, VARIABLE_PROPERTIES(term__V360));
-      Hashset namedFV__V375 = LINK_VARIABLESET(sink__V359->context, namedPropertyFreeVars(namedP__V373));
-      Hashset varFV__V376 = LINK_VARIABLESET(sink__V359->context, variablePropertyFreeVars(varP__V374));
+      Hashset namedFV__V375 = LINK_VARIABLESET(sink__V359->context, asConstruction(term__V360)->properties->namedFreeVars);
+      Hashset varFV__V376 = LINK_VARIABLESET(sink__V359->context, asConstruction(term__V360)->properties->variableFreeVars);
       UNLINK(sink__V359->context, term__V360);
       ADD_PROPERTIES(sink__V359, LINK_VARIABLESET(sink__V359->context, namedFV__V375), LINK_VARIABLESET(sink__V359->context, varFV__V376), LINK_NamedPropertyLink(sink__V359->context, namedP__V373), LINK_VariablePropertyLink(sink__V359->context, varP__V374));
       { START(sink__V359, _M_Length_s1);
@@ -1451,8 +1451,8 @@ int step_M_Sort__name_s1(Sink sink__V377, Term term__V378)
     
     NamedPropertyLink namedP__V381 = LINK_NamedPropertyLink(sink__V377->context, NAMED_PROPERTIES(term__V378));
     VariablePropertyLink varP__V382 = LINK_VariablePropertyLink(sink__V377->context, VARIABLE_PROPERTIES(term__V378));
-    Hashset namedFV__V383 = LINK_VARIABLESET(sink__V377->context, namedPropertyFreeVars(namedP__V381));
-    Hashset varFV__V384 = LINK_VARIABLESET(sink__V377->context, variablePropertyFreeVars(varP__V382));
+    Hashset namedFV__V383 = LINK_VARIABLESET(sink__V377->context, asConstruction(term__V378)->properties->namedFreeVars);
+    Hashset varFV__V384 = LINK_VARIABLESET(sink__V377->context, asConstruction(term__V378)->properties->variableFreeVars);
     UNLINK(sink__V377->context, term__V378);
     { START(sink__V377, _M_TOKEN);
       COPY(sink__V377, sub__V379);END(sink__V377, _M_TOKEN); }
@@ -1479,8 +1479,8 @@ int step_M_Struct(Sink sink__V385, Term term__V386)
     
     NamedPropertyLink namedP__V388 = LINK_NamedPropertyLink(sink__V385->context, NAMED_PROPERTIES(term__V386));
     VariablePropertyLink varP__V389 = LINK_VariablePropertyLink(sink__V385->context, VARIABLE_PROPERTIES(term__V386));
-    Hashset namedFV__V390 = LINK_VARIABLESET(sink__V385->context, namedPropertyFreeVars(namedP__V388));
-    Hashset varFV__V391 = LINK_VARIABLESET(sink__V385->context, variablePropertyFreeVars(varP__V389));
+    Hashset namedFV__V390 = LINK_VARIABLESET(sink__V385->context, asConstruction(term__V386)->properties->namedFreeVars);
+    Hashset varFV__V391 = LINK_VARIABLESET(sink__V385->context, asConstruction(term__V386)->properties->variableFreeVars);
     UNLINK(sink__V385->context, term__V386);
     { START(sink__V385, _M__sTextCons);
       { START(sink__V385, _M__sTextChars);
@@ -1524,8 +1524,8 @@ int step_M_UnString(Sink sink__V392, Term term__V393)
       
       NamedPropertyLink namedP__V398 = LINK_NamedPropertyLink(sink__V392->context, NAMED_PROPERTIES(term__V393));
       VariablePropertyLink varP__V399 = LINK_VariablePropertyLink(sink__V392->context, VARIABLE_PROPERTIES(term__V393));
-      Hashset namedFV__V400 = LINK_VARIABLESET(sink__V392->context, namedPropertyFreeVars(namedP__V398));
-      Hashset varFV__V401 = LINK_VARIABLESET(sink__V392->context, variablePropertyFreeVars(varP__V399));
+      Hashset namedFV__V400 = LINK_VARIABLESET(sink__V392->context, asConstruction(term__V393)->properties->namedFreeVars);
+      Hashset varFV__V401 = LINK_VARIABLESET(sink__V392->context, asConstruction(term__V393)->properties->variableFreeVars);
       UNLINK(sink__V392->context, term__V393);
       ADD_PROPERTIES(sink__V392, LINK_VARIABLESET(sink__V392->context, namedFV__V400), LINK_VARIABLESET(sink__V392->context, varFV__V401), LINK_NamedPropertyLink(sink__V392->context, namedP__V398), LINK_VariablePropertyLink(sink__V392->context, varP__V399));
       { START(sink__V392, _M_UnString_s1);
@@ -1560,8 +1560,8 @@ int step_M_UnVariable(Sink sink__V402, Term term__V403)
       
       NamedPropertyLink namedP__V408 = LINK_NamedPropertyLink(sink__V402->context, NAMED_PROPERTIES(term__V403));
       VariablePropertyLink varP__V409 = LINK_VariablePropertyLink(sink__V402->context, VARIABLE_PROPERTIES(term__V403));
-      Hashset namedFV__V410 = LINK_VARIABLESET(sink__V402->context, namedPropertyFreeVars(namedP__V408));
-      Hashset varFV__V411 = LINK_VARIABLESET(sink__V402->context, variablePropertyFreeVars(varP__V409));
+      Hashset namedFV__V410 = LINK_VARIABLESET(sink__V402->context, asConstruction(term__V403)->properties->namedFreeVars);
+      Hashset varFV__V411 = LINK_VARIABLESET(sink__V402->context, asConstruction(term__V403)->properties->variableFreeVars);
       UNLINK(sink__V402->context, term__V403);
       ADD_PROPERTIES(sink__V402, LINK_VARIABLESET(sink__V402->context, namedFV__V410), LINK_VARIABLESET(sink__V402->context, varFV__V411), LINK_NamedPropertyLink(sink__V402->context, namedP__V408), LINK_VariablePropertyLink(sink__V402->context, varP__V409));
       { START(sink__V402, _M_UnVariable_s1);
@@ -1596,8 +1596,8 @@ int step_M_DINTEGER(Sink sink__V412, Term term__V413)
       
       NamedPropertyLink namedP__V418 = LINK_NamedPropertyLink(sink__V412->context, NAMED_PROPERTIES(term__V413));
       VariablePropertyLink varP__V419 = LINK_VariablePropertyLink(sink__V412->context, VARIABLE_PROPERTIES(term__V413));
-      Hashset namedFV__V420 = LINK_VARIABLESET(sink__V412->context, namedPropertyFreeVars(namedP__V418));
-      Hashset varFV__V421 = LINK_VARIABLESET(sink__V412->context, variablePropertyFreeVars(varP__V419));
+      Hashset namedFV__V420 = LINK_VARIABLESET(sink__V412->context, asConstruction(term__V413)->properties->namedFreeVars);
+      Hashset varFV__V421 = LINK_VARIABLESET(sink__V412->context, asConstruction(term__V413)->properties->variableFreeVars);
       UNLINK(sink__V412->context, term__V413);
       ADD_PROPERTIES(sink__V412, LINK_VARIABLESET(sink__V412->context, namedFV__V420), LINK_VARIABLESET(sink__V412->context, varFV__V421), LINK_NamedPropertyLink(sink__V412->context, namedP__V418), LINK_VariablePropertyLink(sink__V412->context, varP__V419));
       { START(sink__V412, _M_DINTEGER_s1);
@@ -1628,15 +1628,15 @@ int step_M_MANGLE(Sink sink__V422, Term term__V423)
     
     NamedPropertyLink namedP__V425 = LINK_NamedPropertyLink(sink__V422->context, NAMED_PROPERTIES(term__V423));
     VariablePropertyLink varP__V426 = LINK_VariablePropertyLink(sink__V422->context, VARIABLE_PROPERTIES(term__V423));
-    Hashset namedFV__V427 = LINK_VARIABLESET(sink__V422->context, namedPropertyFreeVars(namedP__V425));
-    Hashset varFV__V428 = LINK_VARIABLESET(sink__V422->context, variablePropertyFreeVars(varP__V426));
+    Hashset namedFV__V427 = LINK_VARIABLESET(sink__V422->context, asConstruction(term__V423)->properties->namedFreeVars);
+    Hashset varFV__V428 = LINK_VARIABLESET(sink__V422->context, asConstruction(term__V423)->properties->variableFreeVars);
     UNLINK(sink__V422->context, term__V423);
     { START(sink__V422, _M__sTextCons);
       { START(sink__V422, _M__sTextChars);
         { char *str__V429;
-          FORCE(sink__V422->context, sub__V424);
+          FORCE(sink__V422->context, sub__V424); LINK(sink__V422->context, sub__V424);
           { char *s__V430 = makeMangled(sink__V422->context, SYMBOL(sub__V424));
-            { size_t z__V431 = strlen(s__V430) + 1; memcpy(str__V429 = ALLOCATE(sink__V422->context, z__V431), s__V430, z__V431);  UNLINK(sink__V422->context, sub__V424);}
+            { size_t z__V431 = strlen(s__V430) + 1; memcpy(str__V429 = ALLOCATE(sink__V422->context, z__V431), s__V430, z__V431);  UNLINK(sink__V422->context, sub__V424);  UNLINK(sink__V422->context, sub__V424); }
             }
           LITERALU(sink__V422, str__V429); }
         END(sink__V422, _M__sTextChars); }
@@ -1666,8 +1666,8 @@ int step_M_Enum(Sink sink__V432, Term term__V433)
     
     NamedPropertyLink namedP__V435 = LINK_NamedPropertyLink(sink__V432->context, NAMED_PROPERTIES(term__V433));
     VariablePropertyLink varP__V436 = LINK_VariablePropertyLink(sink__V432->context, VARIABLE_PROPERTIES(term__V433));
-    Hashset namedFV__V437 = LINK_VARIABLESET(sink__V432->context, namedPropertyFreeVars(namedP__V435));
-    Hashset varFV__V438 = LINK_VARIABLESET(sink__V432->context, variablePropertyFreeVars(varP__V436));
+    Hashset namedFV__V437 = LINK_VARIABLESET(sink__V432->context, asConstruction(term__V433)->properties->namedFreeVars);
+    Hashset varFV__V438 = LINK_VARIABLESET(sink__V432->context, asConstruction(term__V433)->properties->variableFreeVars);
     UNLINK(sink__V432->context, term__V433);
     { START(sink__V432, _M__sTextCons);
       { START(sink__V432, _M__sTextChars);
@@ -1713,8 +1713,8 @@ int step_M_Sort__name(Sink sink__V439, Term term__V440)
       
       NamedPropertyLink namedP__V446 = LINK_NamedPropertyLink(sink__V439->context, NAMED_PROPERTIES(term__V440));
       VariablePropertyLink varP__V447 = LINK_VariablePropertyLink(sink__V439->context, VARIABLE_PROPERTIES(term__V440));
-      Hashset namedFV__V448 = LINK_VARIABLESET(sink__V439->context, namedPropertyFreeVars(namedP__V446));
-      Hashset varFV__V449 = LINK_VARIABLESET(sink__V439->context, variablePropertyFreeVars(varP__V447));
+      Hashset namedFV__V448 = LINK_VARIABLESET(sink__V439->context, asConstruction(term__V440)->properties->namedFreeVars);
+      Hashset varFV__V449 = LINK_VARIABLESET(sink__V439->context, asConstruction(term__V440)->properties->variableFreeVars);
       UNLINK(sink__V439->context, term__V440);
       ADD_PROPERTIES(sink__V439, LINK_VARIABLESET(sink__V439->context, namedFV__V448), LINK_VARIABLESET(sink__V439->context, varFV__V449), LINK_NamedPropertyLink(sink__V439->context, namedP__V446), LINK_VariablePropertyLink(sink__V439->context, varP__V447));
       { START(sink__V439, _M_Sort__name_s1);
@@ -1751,8 +1751,8 @@ int step_M_If(Sink sink__V450, Term term__V451)
       
       NamedPropertyLink namedP__V457 = LINK_NamedPropertyLink(sink__V450->context, NAMED_PROPERTIES(term__V451));
       VariablePropertyLink varP__V458 = LINK_VariablePropertyLink(sink__V450->context, VARIABLE_PROPERTIES(term__V451));
-      Hashset namedFV__V459 = LINK_VARIABLESET(sink__V450->context, namedPropertyFreeVars(namedP__V457));
-      Hashset varFV__V460 = LINK_VARIABLESET(sink__V450->context, variablePropertyFreeVars(varP__V458));
+      Hashset namedFV__V459 = LINK_VARIABLESET(sink__V450->context, asConstruction(term__V451)->properties->namedFreeVars);
+      Hashset varFV__V460 = LINK_VARIABLESET(sink__V450->context, asConstruction(term__V451)->properties->variableFreeVars);
       UNLINK(sink__V450->context, term__V451);
       ADD_PROPERTIES(sink__V450, LINK_VARIABLESET(sink__V450->context, namedFV__V459), LINK_VARIABLESET(sink__V450->context, varFV__V460), LINK_NamedPropertyLink(sink__V450->context, namedP__V457), LINK_VariablePropertyLink(sink__V450->context, varP__V458));
       { START(sink__V450, _M_If_s2);
@@ -1772,8 +1772,8 @@ int step_M_If(Sink sink__V450, Term term__V451)
       
       NamedPropertyLink namedP__V464 = LINK_NamedPropertyLink(sink__V450->context, NAMED_PROPERTIES(term__V451));
       VariablePropertyLink varP__V465 = LINK_VariablePropertyLink(sink__V450->context, VARIABLE_PROPERTIES(term__V451));
-      Hashset namedFV__V466 = LINK_VARIABLESET(sink__V450->context, namedPropertyFreeVars(namedP__V464));
-      Hashset varFV__V467 = LINK_VARIABLESET(sink__V450->context, variablePropertyFreeVars(varP__V465));
+      Hashset namedFV__V466 = LINK_VARIABLESET(sink__V450->context, asConstruction(term__V451)->properties->namedFreeVars);
+      Hashset varFV__V467 = LINK_VARIABLESET(sink__V450->context, asConstruction(term__V451)->properties->variableFreeVars);
       UNLINK(sink__V450->context, term__V451);
       ADD_PROPERTIES(sink__V450, LINK_VARIABLESET(sink__V450->context, namedFV__V466), LINK_VARIABLESET(sink__V450->context, varFV__V467), LINK_NamedPropertyLink(sink__V450->context, namedP__V464), LINK_VariablePropertyLink(sink__V450->context, varP__V465));
       { START(sink__V450, _M_If_s1);
@@ -1803,8 +1803,8 @@ int step_M_Sort(Sink sink__V468, Term term__V469)
     
     NamedPropertyLink namedP__V471 = LINK_NamedPropertyLink(sink__V468->context, NAMED_PROPERTIES(term__V469));
     VariablePropertyLink varP__V472 = LINK_VariablePropertyLink(sink__V468->context, VARIABLE_PROPERTIES(term__V469));
-    Hashset namedFV__V473 = LINK_VARIABLESET(sink__V468->context, namedPropertyFreeVars(namedP__V471));
-    Hashset varFV__V474 = LINK_VARIABLESET(sink__V468->context, variablePropertyFreeVars(varP__V472));
+    Hashset namedFV__V473 = LINK_VARIABLESET(sink__V468->context, asConstruction(term__V469)->properties->namedFreeVars);
+    Hashset varFV__V474 = LINK_VARIABLESET(sink__V468->context, asConstruction(term__V469)->properties->variableFreeVars);
     UNLINK(sink__V468->context, term__V469);
     { START(sink__V468, _M__sTextCons);
       { START(sink__V468, _M__sTextChars);
@@ -1848,8 +1848,8 @@ int step_M_DEnumTag(Sink sink__V475, Term term__V476)
       
       NamedPropertyLink namedP__V481 = LINK_NamedPropertyLink(sink__V475->context, NAMED_PROPERTIES(term__V476));
       VariablePropertyLink varP__V482 = LINK_VariablePropertyLink(sink__V475->context, VARIABLE_PROPERTIES(term__V476));
-      Hashset namedFV__V483 = LINK_VARIABLESET(sink__V475->context, namedPropertyFreeVars(namedP__V481));
-      Hashset varFV__V484 = LINK_VARIABLESET(sink__V475->context, variablePropertyFreeVars(varP__V482));
+      Hashset namedFV__V483 = LINK_VARIABLESET(sink__V475->context, asConstruction(term__V476)->properties->namedFreeVars);
+      Hashset varFV__V484 = LINK_VARIABLESET(sink__V475->context, asConstruction(term__V476)->properties->variableFreeVars);
       UNLINK(sink__V475->context, term__V476);
       ADD_PROPERTIES(sink__V475, LINK_VARIABLESET(sink__V475->context, namedFV__V483), LINK_VARIABLESET(sink__V475->context, varFV__V484), LINK_NamedPropertyLink(sink__V475->context, namedP__V481), LINK_VariablePropertyLink(sink__V475->context, varP__V482));
       { START(sink__V475, _M_DEnumTag_s1);
@@ -1889,8 +1889,8 @@ int step_M_FormArguments__binder__offsets_s1(Sink sink__V485, Term term__V486)
     
     NamedPropertyLink namedP__V493 = LINK_NamedPropertyLink(sink__V485->context, NAMED_PROPERTIES(term__V486));
     VariablePropertyLink varP__V494 = LINK_VariablePropertyLink(sink__V485->context, VARIABLE_PROPERTIES(term__V486));
-    Hashset namedFV__V495 = LINK_VARIABLESET(sink__V485->context, namedPropertyFreeVars(namedP__V493));
-    Hashset varFV__V496 = LINK_VARIABLESET(sink__V485->context, variablePropertyFreeVars(varP__V494));
+    Hashset namedFV__V495 = LINK_VARIABLESET(sink__V485->context, asConstruction(term__V486)->properties->namedFreeVars);
+    Hashset varFV__V496 = LINK_VARIABLESET(sink__V485->context, asConstruction(term__V486)->properties->variableFreeVars);
     UNLINK(sink__V485->context, term__V486);
     ADD_PROPERTIES(sink__V485, LINK_VARIABLESET(sink__V485->context, namedFV__V495), LINK_VARIABLESET(sink__V485->context, varFV__V496), LINK_NamedPropertyLink(sink__V485->context, namedP__V493), LINK_VariablePropertyLink(sink__V485->context, varP__V494));
     { START(sink__V485, _M_FormArguments__binder__offsets_s3);
@@ -1930,8 +1930,8 @@ int step_M_FormArguments__binder__offsets_s1(Sink sink__V485, Term term__V486)
     
     NamedPropertyLink namedP__V509 = LINK_NamedPropertyLink(sink__V485->context, NAMED_PROPERTIES(term__V486));
     VariablePropertyLink varP__V510 = LINK_VariablePropertyLink(sink__V485->context, VARIABLE_PROPERTIES(term__V486));
-    Hashset namedFV__V511 = LINK_VARIABLESET(sink__V485->context, namedPropertyFreeVars(namedP__V509));
-    Hashset varFV__V512 = LINK_VARIABLESET(sink__V485->context, variablePropertyFreeVars(varP__V510));
+    Hashset namedFV__V511 = LINK_VARIABLESET(sink__V485->context, asConstruction(term__V486)->properties->namedFreeVars);
+    Hashset varFV__V512 = LINK_VARIABLESET(sink__V485->context, asConstruction(term__V486)->properties->variableFreeVars);
     UNLINK(sink__V485->context, term__V486);
     ADD_PROPERTIES(sink__V485, LINK_VARIABLESET(sink__V485->context, namedFV__V511), LINK_VARIABLESET(sink__V485->context, varFV__V512), LINK_NamedPropertyLink(sink__V485->context, namedP__V509), LINK_VariablePropertyLink(sink__V485->context, varP__V510));
     { START(sink__V485, _M_FormArguments__binder__offsets_s2);
@@ -2064,8 +2064,8 @@ int step_M_MetaVar2_s1(Sink sink__V533, Term term__V534)
     
     NamedPropertyLink namedP__V536 = LINK_NamedPropertyLink(sink__V533->context, NAMED_PROPERTIES(term__V534));
     VariablePropertyLink varP__V537 = LINK_VariablePropertyLink(sink__V533->context, VARIABLE_PROPERTIES(term__V534));
-    Hashset namedFV__V538 = LINK_VARIABLESET(sink__V533->context, namedPropertyFreeVars(namedP__V536));
-    Hashset varFV__V539 = LINK_VARIABLESET(sink__V533->context, variablePropertyFreeVars(varP__V537));
+    Hashset namedFV__V538 = LINK_VARIABLESET(sink__V533->context, asConstruction(term__V534)->properties->namedFreeVars);
+    Hashset varFV__V539 = LINK_VARIABLESET(sink__V533->context, asConstruction(term__V534)->properties->variableFreeVars);
     UNLINK(sink__V533->context, term__V534);
     { START(sink__V533, _M_TOKEN);
       COPY(sink__V533, sub__V535);END(sink__V533, _M_TOKEN); }
@@ -2097,8 +2097,8 @@ int step_M_MetaVar2_s2(Sink sink__V540, Term term__V541)
         
         NamedPropertyLink namedP__V546 = LINK_NamedPropertyLink(sink__V540->context, NAMED_PROPERTIES(term__V541));
         VariablePropertyLink varP__V547 = LINK_VariablePropertyLink(sink__V540->context, VARIABLE_PROPERTIES(term__V541));
-        Hashset namedFV__V548 = LINK_VARIABLESET(sink__V540->context, namedPropertyFreeVars(namedP__V546));
-        Hashset varFV__V549 = LINK_VARIABLESET(sink__V540->context, variablePropertyFreeVars(varP__V547));
+        Hashset namedFV__V548 = LINK_VARIABLESET(sink__V540->context, asConstruction(term__V541)->properties->namedFreeVars);
+        Hashset varFV__V549 = LINK_VARIABLESET(sink__V540->context, asConstruction(term__V541)->properties->variableFreeVars);
         UNLINK(sink__V540->context, term__V541);
         ADD_PROPERTIES(sink__V540, LINK_VARIABLESET(sink__V540->context, namedFV__V548), LINK_VARIABLESET(sink__V540->context, varFV__V549), LINK_NamedPropertyLink(sink__V540->context, namedP__V546), LINK_VariablePropertyLink(sink__V540->context, varP__V547));
         { START(sink__V540, _M_MetaVar2_s3);
@@ -2130,8 +2130,8 @@ int step_M_MetaVar2_s3(Sink sink__V550, Term term__V551)
     
     NamedPropertyLink namedP__V553 = LINK_NamedPropertyLink(sink__V550->context, NAMED_PROPERTIES(term__V551));
     VariablePropertyLink varP__V554 = LINK_VariablePropertyLink(sink__V550->context, VARIABLE_PROPERTIES(term__V551));
-    Hashset namedFV__V555 = LINK_VARIABLESET(sink__V550->context, namedPropertyFreeVars(namedP__V553));
-    Hashset varFV__V556 = LINK_VARIABLESET(sink__V550->context, variablePropertyFreeVars(varP__V554));
+    Hashset namedFV__V555 = LINK_VARIABLESET(sink__V550->context, asConstruction(term__V551)->properties->namedFreeVars);
+    Hashset varFV__V556 = LINK_VARIABLESET(sink__V550->context, asConstruction(term__V551)->properties->variableFreeVars);
     UNLINK(sink__V550->context, term__V551);
     { START(sink__V550, _M__sTextCons);
       { START(sink__V550, _M__sTextEmbed);
@@ -2169,8 +2169,8 @@ int step_M_DDescriptor(Sink sink__V557, Term term__V558)
       
       NamedPropertyLink namedP__V563 = LINK_NamedPropertyLink(sink__V557->context, NAMED_PROPERTIES(term__V558));
       VariablePropertyLink varP__V564 = LINK_VariablePropertyLink(sink__V557->context, VARIABLE_PROPERTIES(term__V558));
-      Hashset namedFV__V565 = LINK_VARIABLESET(sink__V557->context, namedPropertyFreeVars(namedP__V563));
-      Hashset varFV__V566 = LINK_VARIABLESET(sink__V557->context, variablePropertyFreeVars(varP__V564));
+      Hashset namedFV__V565 = LINK_VARIABLESET(sink__V557->context, asConstruction(term__V558)->properties->namedFreeVars);
+      Hashset varFV__V566 = LINK_VARIABLESET(sink__V557->context, asConstruction(term__V558)->properties->variableFreeVars);
       UNLINK(sink__V557->context, term__V558);
       ADD_PROPERTIES(sink__V557, LINK_VARIABLESET(sink__V557->context, namedFV__V565), LINK_VARIABLESET(sink__V557->context, varFV__V566), LINK_NamedPropertyLink(sink__V557->context, namedP__V563), LINK_VariablePropertyLink(sink__V557->context, varP__V564));
       { START(sink__V557, _M_DDescriptor_s1);
@@ -2200,8 +2200,8 @@ int step_M_Step(Sink sink__V567, Term term__V568)
     
     NamedPropertyLink namedP__V570 = LINK_NamedPropertyLink(sink__V567->context, NAMED_PROPERTIES(term__V568));
     VariablePropertyLink varP__V571 = LINK_VariablePropertyLink(sink__V567->context, VARIABLE_PROPERTIES(term__V568));
-    Hashset namedFV__V572 = LINK_VARIABLESET(sink__V567->context, namedPropertyFreeVars(namedP__V570));
-    Hashset varFV__V573 = LINK_VARIABLESET(sink__V567->context, variablePropertyFreeVars(varP__V571));
+    Hashset namedFV__V572 = LINK_VARIABLESET(sink__V567->context, asConstruction(term__V568)->properties->namedFreeVars);
+    Hashset varFV__V573 = LINK_VARIABLESET(sink__V567->context, asConstruction(term__V568)->properties->variableFreeVars);
     UNLINK(sink__V567->context, term__V568);
     { START(sink__V567, _M__sTextCons);
       { START(sink__V567, _M__sTextChars);
@@ -2279,8 +2279,8 @@ int step_M_PromiscuityString(Sink sink__V578, Term term__V579)
       
       NamedPropertyLink namedP__V583 = LINK_NamedPropertyLink(sink__V578->context, NAMED_PROPERTIES(term__V579));
       VariablePropertyLink varP__V584 = LINK_VariablePropertyLink(sink__V578->context, VARIABLE_PROPERTIES(term__V579));
-      Hashset namedFV__V585 = LINK_VARIABLESET(sink__V578->context, namedPropertyFreeVars(namedP__V583));
-      Hashset varFV__V586 = LINK_VARIABLESET(sink__V578->context, variablePropertyFreeVars(varP__V584));
+      Hashset namedFV__V585 = LINK_VARIABLESET(sink__V578->context, asConstruction(term__V579)->properties->namedFreeVars);
+      Hashset varFV__V586 = LINK_VARIABLESET(sink__V578->context, asConstruction(term__V579)->properties->variableFreeVars);
       UNLINK(sink__V578->context, term__V579);
       ADD_PROPERTIES(sink__V578, LINK_VARIABLESET(sink__V578->context, namedFV__V585), LINK_VARIABLESET(sink__V578->context, varFV__V586), LINK_NamedPropertyLink(sink__V578->context, namedP__V583), LINK_VariablePropertyLink(sink__V578->context, varP__V584));
       { START(sink__V578, _M_PromiscuityString_s1);
@@ -2296,8 +2296,8 @@ int step_M_PromiscuityString(Sink sink__V578, Term term__V579)
       
       NamedPropertyLink namedP__V588 = LINK_NamedPropertyLink(sink__V578->context, NAMED_PROPERTIES(term__V579));
       VariablePropertyLink varP__V589 = LINK_VariablePropertyLink(sink__V578->context, VARIABLE_PROPERTIES(term__V579));
-      Hashset namedFV__V590 = LINK_VARIABLESET(sink__V578->context, namedPropertyFreeVars(namedP__V588));
-      Hashset varFV__V591 = LINK_VARIABLESET(sink__V578->context, variablePropertyFreeVars(varP__V589));
+      Hashset namedFV__V590 = LINK_VARIABLESET(sink__V578->context, asConstruction(term__V579)->properties->namedFreeVars);
+      Hashset varFV__V591 = LINK_VARIABLESET(sink__V578->context, asConstruction(term__V579)->properties->variableFreeVars);
       UNLINK(sink__V578->context, term__V579);
       ADD_PROPERTIES(sink__V578, LINK_VARIABLESET(sink__V578->context, namedFV__V590), LINK_VARIABLESET(sink__V578->context, varFV__V591), LINK_NamedPropertyLink(sink__V578->context, namedP__V588), LINK_VariablePropertyLink(sink__V578->context, varP__V589));
       { START(sink__V578, _M_PromiscuityString_s2);
@@ -2340,8 +2340,8 @@ int step_M_MapText1_s1(Sink sink__V592, Term term__V593)
       
       NamedPropertyLink namedP__V603 = LINK_NamedPropertyLink(sink__V592->context, NAMED_PROPERTIES(term__V593));
       VariablePropertyLink varP__V604 = LINK_VariablePropertyLink(sink__V592->context, VARIABLE_PROPERTIES(term__V593));
-      Hashset namedFV__V605 = LINK_VARIABLESET(sink__V592->context, namedPropertyFreeVars(namedP__V603));
-      Hashset varFV__V606 = LINK_VARIABLESET(sink__V592->context, variablePropertyFreeVars(varP__V604));
+      Hashset namedFV__V605 = LINK_VARIABLESET(sink__V592->context, asConstruction(term__V593)->properties->namedFreeVars);
+      Hashset varFV__V606 = LINK_VARIABLESET(sink__V592->context, asConstruction(term__V593)->properties->variableFreeVars);
       UNLINK(sink__V592->context, term__V593);
       ADD_PROPERTIES(sink__V592, LINK_VARIABLESET(sink__V592->context, namedFV__V605), LINK_VARIABLESET(sink__V592->context, varFV__V606), LINK_NamedPropertyLink(sink__V592->context, namedP__V603), LINK_VariablePropertyLink(sink__V592->context, varP__V604));
       { START(sink__V592, _M_MapText1_s2);
@@ -2393,8 +2393,8 @@ int step_M_MapText1_s1(Sink sink__V592, Term term__V593)
       
       NamedPropertyLink namedP__V628 = LINK_NamedPropertyLink(sink__V592->context, NAMED_PROPERTIES(term__V593));
       VariablePropertyLink varP__V629 = LINK_VariablePropertyLink(sink__V592->context, VARIABLE_PROPERTIES(term__V593));
-      Hashset namedFV__V630 = LINK_VARIABLESET(sink__V592->context, namedPropertyFreeVars(namedP__V628));
-      Hashset varFV__V631 = LINK_VARIABLESET(sink__V592->context, variablePropertyFreeVars(varP__V629));
+      Hashset namedFV__V630 = LINK_VARIABLESET(sink__V592->context, asConstruction(term__V593)->properties->namedFreeVars);
+      Hashset varFV__V631 = LINK_VARIABLESET(sink__V592->context, asConstruction(term__V593)->properties->variableFreeVars);
       UNLINK(sink__V592->context, term__V593);
       ADD_PROPERTIES(sink__V592, LINK_VARIABLESET(sink__V592->context, namedFV__V630), LINK_VARIABLESET(sink__V592->context, varFV__V631), LINK_NamedPropertyLink(sink__V592->context, namedP__V628), LINK_VariablePropertyLink(sink__V592->context, varP__V629));
       { START(sink__V592, _M_MapText1_s3);
@@ -2462,8 +2462,8 @@ int step_M_MapText1_s2(Sink sink__V648, Term term__V649)
     
     NamedPropertyLink namedP__V656 = LINK_NamedPropertyLink(sink__V648->context, NAMED_PROPERTIES(term__V649));
     VariablePropertyLink varP__V657 = LINK_VariablePropertyLink(sink__V648->context, VARIABLE_PROPERTIES(term__V649));
-    Hashset namedFV__V658 = LINK_VARIABLESET(sink__V648->context, namedPropertyFreeVars(namedP__V656));
-    Hashset varFV__V659 = LINK_VARIABLESET(sink__V648->context, variablePropertyFreeVars(varP__V657));
+    Hashset namedFV__V658 = LINK_VARIABLESET(sink__V648->context, asConstruction(term__V649)->properties->namedFreeVars);
+    Hashset varFV__V659 = LINK_VARIABLESET(sink__V648->context, asConstruction(term__V649)->properties->variableFreeVars);
     UNLINK(sink__V648->context, term__V649);
     { START(sink__V648, _M__sTextCons);
       { START(sink__V648, _M__sTextEmbed);
@@ -2531,8 +2531,8 @@ int step_M_MapText1_s3(Sink sink__V673, Term term__V674)
     
     NamedPropertyLink namedP__V679 = LINK_NamedPropertyLink(sink__V673->context, NAMED_PROPERTIES(term__V674));
     VariablePropertyLink varP__V680 = LINK_VariablePropertyLink(sink__V673->context, VARIABLE_PROPERTIES(term__V674));
-    Hashset namedFV__V681 = LINK_VARIABLESET(sink__V673->context, namedPropertyFreeVars(namedP__V679));
-    Hashset varFV__V682 = LINK_VARIABLESET(sink__V673->context, variablePropertyFreeVars(varP__V680));
+    Hashset namedFV__V681 = LINK_VARIABLESET(sink__V673->context, asConstruction(term__V674)->properties->namedFreeVars);
+    Hashset varFV__V682 = LINK_VARIABLESET(sink__V673->context, asConstruction(term__V674)->properties->variableFreeVars);
     UNLINK(sink__V673->context, term__V674);
     { START(sink__V673, _M__sTextNil); END(sink__V673, _M__sTextNil); }
     UNLINK_VARIABLESET(sink__V673->context, namedFV__V681); UNLINK_VARIABLESET(sink__V673->context, varFV__V682);
@@ -2558,8 +2558,8 @@ int step_M_UnVariable_s1(Sink sink__V683, Term term__V684)
     
     NamedPropertyLink namedP__V686 = LINK_NamedPropertyLink(sink__V683->context, NAMED_PROPERTIES(term__V684));
     VariablePropertyLink varP__V687 = LINK_VariablePropertyLink(sink__V683->context, VARIABLE_PROPERTIES(term__V684));
-    Hashset namedFV__V688 = LINK_VARIABLESET(sink__V683->context, namedPropertyFreeVars(namedP__V686));
-    Hashset varFV__V689 = LINK_VARIABLESET(sink__V683->context, variablePropertyFreeVars(varP__V687));
+    Hashset namedFV__V688 = LINK_VARIABLESET(sink__V683->context, asConstruction(term__V684)->properties->namedFreeVars);
+    Hashset varFV__V689 = LINK_VARIABLESET(sink__V683->context, asConstruction(term__V684)->properties->variableFreeVars);
     UNLINK(sink__V683->context, term__V684);
     COPY(sink__V683, sub__V685);UNLINK_VARIABLESET(sink__V683->context, namedFV__V688); UNLINK_VARIABLESET(sink__V683->context, varFV__V689);
     UNLINK_NamedPropertyLink(sink__V683->context, namedP__V686); UNLINK_VariablePropertyLink(sink__V683->context, varP__V687);
@@ -2589,8 +2589,8 @@ int step_M_DTOKEN(Sink sink__V690, Term term__V691)
       
       NamedPropertyLink namedP__V696 = LINK_NamedPropertyLink(sink__V690->context, NAMED_PROPERTIES(term__V691));
       VariablePropertyLink varP__V697 = LINK_VariablePropertyLink(sink__V690->context, VARIABLE_PROPERTIES(term__V691));
-      Hashset namedFV__V698 = LINK_VARIABLESET(sink__V690->context, namedPropertyFreeVars(namedP__V696));
-      Hashset varFV__V699 = LINK_VARIABLESET(sink__V690->context, variablePropertyFreeVars(varP__V697));
+      Hashset namedFV__V698 = LINK_VARIABLESET(sink__V690->context, asConstruction(term__V691)->properties->namedFreeVars);
+      Hashset varFV__V699 = LINK_VARIABLESET(sink__V690->context, asConstruction(term__V691)->properties->variableFreeVars);
       UNLINK(sink__V690->context, term__V691);
       ADD_PROPERTIES(sink__V690, LINK_VARIABLESET(sink__V690->context, namedFV__V698), LINK_VARIABLESET(sink__V690->context, varFV__V699), LINK_NamedPropertyLink(sink__V690->context, namedP__V696), LINK_VariablePropertyLink(sink__V690->context, varP__V697));
       { START(sink__V690, _M_DTOKEN_s1);
@@ -2620,8 +2620,8 @@ int step_M_EnumFun(Sink sink__V700, Term term__V701)
     
     NamedPropertyLink namedP__V703 = LINK_NamedPropertyLink(sink__V700->context, NAMED_PROPERTIES(term__V701));
     VariablePropertyLink varP__V704 = LINK_VariablePropertyLink(sink__V700->context, VARIABLE_PROPERTIES(term__V701));
-    Hashset namedFV__V705 = LINK_VARIABLESET(sink__V700->context, namedPropertyFreeVars(namedP__V703));
-    Hashset varFV__V706 = LINK_VARIABLESET(sink__V700->context, variablePropertyFreeVars(varP__V704));
+    Hashset namedFV__V705 = LINK_VARIABLESET(sink__V700->context, asConstruction(term__V701)->properties->namedFreeVars);
+    Hashset varFV__V706 = LINK_VARIABLESET(sink__V700->context, asConstruction(term__V701)->properties->variableFreeVars);
     UNLINK(sink__V700->context, term__V701);
     { START(sink__V700, _M__sTextCons);
       { START(sink__V700, _M__sTextChars);
@@ -2659,456 +2659,457 @@ int step_M_Primitive(Sink sink__V707, Term term__V708)
     /* sub__V709 = &#1 */
     UNLINK(sink__V707->context, term__V708);
     { int test__V710;
-      FORCE(sink__V707->context, sub__V709);
-      test__V710 = (int) !strcmp(SYMBOL(sub__V709), "C" ); if (test__V710) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xC); END(sink__V707, _M_E_xC); }  }
+      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
+      test__V710 = (int) !strcmp(SYMBOL(sub__V709), "C" );
+      UNLINK(sink__V707->context, sub__V709);  if (test__V710) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xC); END(sink__V707, _M_E_xC); }  }
       else { { int test__V711;
-          FORCE(sink__V707->context, sub__V709);
+          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
           test__V711 = (int) !strcmp(SYMBOL(sub__V709), "NumericEqual" );
-          if (test__V711) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNumericEqual);
+          UNLINK(sink__V707->context, sub__V709);  if (test__V711) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNumericEqual);
               END(sink__V707, _M_E_xNumericEqual); }
              }
           else { { int test__V712;
-              FORCE(sink__V707->context, sub__V709);
+              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
               test__V712 = (int) !strcmp(SYMBOL(sub__V709), "StringLessThan" );
-              if (test__V712) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xStringLessThan);
+              UNLINK(sink__V707->context, sub__V709);  if (test__V712) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xStringLessThan);
                   END(sink__V707, _M_E_xStringLessThan); }
                  }
               else { { int test__V713;
-                  FORCE(sink__V707->context, sub__V709);
+                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                   test__V713 = (int) !strcmp(SYMBOL(sub__V709), "LessThan" );
-                  if (test__V713) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLessThan);
+                  UNLINK(sink__V707->context, sub__V709);  if (test__V713) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLessThan);
                       END(sink__V707, _M_E_xLessThan); }
                      }
                   else { { int test__V714;
-                      FORCE(sink__V707->context, sub__V709);
+                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                       test__V714 = (int) !strcmp(SYMBOL(sub__V709), "GreaterThan" );
-                      if (test__V714) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGreaterThan);
+                      UNLINK(sink__V707->context, sub__V709);  if (test__V714) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGreaterThan);
                           END(sink__V707, _M_E_xGreaterThan); }
                          }
                       else { { int test__V715;
-                          FORCE(sink__V707->context, sub__V709);
+                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                           test__V715 = (int) !strcmp(SYMBOL(sub__V709), "LessThanOrEqual" );
-                          if (test__V715) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLessThanOrEqual);
+                          UNLINK(sink__V707->context, sub__V709);  if (test__V715) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLessThanOrEqual);
                               END(sink__V707, _M_E_xLessThanOrEqual); }
                              }
                           else { { int test__V716;
-                              FORCE(sink__V707->context, sub__V709);
+                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                               test__V716 = (int) !strcmp(SYMBOL(sub__V709), "GreaterThanOrEqual" );
-                              if (test__V716) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGreaterThanOrEqual);
+                               UNLINK(sink__V707->context, sub__V709);  if (test__V716) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGreaterThanOrEqual);
                                   END(sink__V707, _M_E_xGreaterThanOrEqual); }
                                  }
                               else { { int test__V717;
-                                  FORCE(sink__V707->context, sub__V709);
+                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                   test__V717 = (int) !strcmp(SYMBOL(sub__V709), "NotEqual" );
-                                  if (test__V717) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNotEqual);
+                                   UNLINK(sink__V707->context, sub__V709);  if (test__V717) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNotEqual);
                                       END(sink__V707, _M_E_xNotEqual); }
                                      }
                                   else { { int test__V718;
-                                      FORCE(sink__V707->context, sub__V709);
+                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                       test__V718 = (int) !strcmp(SYMBOL(sub__V709), ":" );
-                                      if (test__V718) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xConcat);
+                                       UNLINK(sink__V707->context, sub__V709);  if (test__V718) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xConcat);
                                           END(sink__V707, _M_E_xConcat); }
                                          }
                                       else { { int test__V719;
-                                          FORCE(sink__V707->context, sub__V709);
+                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                           test__V719 = (int) !strcmp(SYMBOL(sub__V709), "SameVariable" );
-                                          if (test__V719) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSameVariable);
+                                           UNLINK(sink__V707->context, sub__V709);  if (test__V719) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSameVariable);
                                               END(sink__V707, _M_E_xSameVariable); }
                                              }
                                           else { { int test__V720;
-                                              FORCE(sink__V707->context, sub__V709);
+                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                               test__V720 = (int) !strcmp(SYMBOL(sub__V709), "LesserVariable" );
-                                              if (test__V720) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLesserVariable);
+                                               UNLINK(sink__V707->context, sub__V709);  if (test__V720) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLesserVariable);
                                                   END(sink__V707, _M_E_xLesserVariable); }
                                                  }
                                               else { { int test__V721;
-                                                  FORCE(sink__V707->context, sub__V709);
+                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                   test__V721 = (int) !strcmp(SYMBOL(sub__V709), "Equal" );
-                                                  if (test__V721) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEqual);
+                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V721) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEqual);
                                                       END(sink__V707, _M_E_xEqual); }
                                                      }
                                                   else { { int test__V722;
-                                                      FORCE(sink__V707->context, sub__V709);
+                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                       test__V722 = (int) !strcmp(SYMBOL(sub__V709), "Contains" );
-                                                      if (test__V722) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xContains);
+                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V722) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xContains);
                                                           END(sink__V707, _M_E_xContains); }
                                                          }
                                                       else { { int test__V723;
-                                                          FORCE(sink__V707->context, sub__V709);
+                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                           test__V723 = (int) !strcmp(SYMBOL(sub__V709), "StartsWith" );
-                                                          if (test__V723) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xStartsWith);
+                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V723) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xStartsWith);
                                                               END(sink__V707, _M_E_xStartsWith); }
                                                              }
                                                           else { { int test__V724;
-                                                              FORCE(sink__V707->context, sub__V709);
+                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                               test__V724 = (int) !strcmp(SYMBOL(sub__V709), "EndsWith" );
-                                                              if (test__V724) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEndsWith);
+                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V724) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEndsWith);
                                                                   END(sink__V707, _M_E_xEndsWith); }
                                                                  }
                                                               else { { int test__V725;
-                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                   test__V725 = (int) !strcmp(SYMBOL(sub__V709), "Split" );
-                                                                  if (test__V725) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSplit);
+                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V725) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSplit);
                                                                       END(sink__V707, _M_E_xSplit); }
                                                                      }
                                                                   else { { int test__V726;
-                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                       test__V726 = (int) !strcmp(SYMBOL(sub__V709), "MatchRegex" );
-                                                                      if (test__V726) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMatchRegex);
+                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V726) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMatchRegex);
                                                                           END(sink__V707, _M_E_xMatchRegex); }
                                                                          }
                                                                       else { { int test__V727;
-                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                           test__V727 = (int) !strcmp(SYMBOL(sub__V709), "Length" );
-                                                                          if (test__V727) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLength);
+                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V727) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLength);
                                                                               END(sink__V707, _M_E_xLength); }
                                                                              }
                                                                           else { { int test__V728;
-                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                               test__V728 = (int) !strcmp(SYMBOL(sub__V709), "Substring" );
-                                                                              if (test__V728) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSubstring);
+                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V728) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSubstring);
                                                                                   END(sink__V707, _M_E_xSubstring); }
                                                                                  }
                                                                               else { { int test__V729;
-                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                   test__V729 = (int) !strcmp(SYMBOL(sub__V709), "Escape" );
-                                                                                  if (test__V729) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEscape);
+                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V729) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEscape);
                                                                                       END(sink__V707, _M_E_xEscape); }
                                                                                      }
                                                                                   else { { int test__V730;
-                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                       test__V730 = (int) !strcmp(SYMBOL(sub__V709), "Mangle" );
-                                                                                      if (test__V730) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMangle);
+                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V730) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMangle);
                                                                                           END(sink__V707, _M_E_xMangle); }
                                                                                          }
                                                                                       else { { int test__V731;
-                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                           test__V731 = (int) !strcmp(SYMBOL(sub__V709), "BeforeFirst" );
-                                                                                          if (test__V731) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBeforeFirst);
+                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V731) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBeforeFirst);
                                                                                               END(sink__V707, _M_E_xBeforeFirst); }
                                                                                              }
                                                                                           else { { int test__V732;
-                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                               test__V732 = (int) !strcmp(SYMBOL(sub__V709), "AfterFirst" );
-                                                                                              if (test__V732) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xAfterFirst);
+                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V732) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xAfterFirst);
                                                                                                   END(sink__V707, _M_E_xAfterFirst); }
                                                                                                  }
                                                                                               else { { int test__V733;
-                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                   test__V733 = (int) !strcmp(SYMBOL(sub__V709), "FromFirst" );
-                                                                                                  if (test__V733) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFromFirst);
+                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V733) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFromFirst);
                                                                                                       END(sink__V707, _M_E_xFromFirst); }
                                                                                                      }
                                                                                                   else { { int test__V734;
-                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                       test__V734 = (int) !strcmp(SYMBOL(sub__V709), "ToFirst" );
-                                                                                                      if (test__V734) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xToFirst);
+                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V734) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xToFirst);
                                                                                                           END(sink__V707, _M_E_xToFirst); }
                                                                                                          }
                                                                                                       else { { int test__V735;
-                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                           test__V735 = (int) !strcmp(SYMBOL(sub__V709), "FormatNumber" );
-                                                                                                          if (test__V735) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFormatNumber);
+                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V735) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFormatNumber);
                                                                                                               END(sink__V707, _M_E_xFormatNumber); }
                                                                                                              }
                                                                                                           else { { int test__V736;
-                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                               test__V736 = (int) !strcmp(SYMBOL(sub__V709), "Format" );
-                                                                                                              if (test__V736) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFormat);
+                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V736) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFormat);
                                                                                                                   END(sink__V707, _M_E_xFormat); }
                                                                                                                  }
                                                                                                               else { { int test__V737;
-                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                   test__V737 = (int) !strcmp(SYMBOL(sub__V709), "Show" );
-                                                                                                                  if (test__V737) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xShow);
+                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V737) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xShow);
                                                                                                                       END(sink__V707, _M_E_xShow); }
                                                                                                                      }
                                                                                                                   else { { int test__V738;
-                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                       test__V738 = (int) !strcmp(SYMBOL(sub__V709), "PassLocationProperties" );
-                                                                                                                      if (test__V738) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xPassLocationProperties);
+                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V738) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xPassLocationProperties);
                                                                                                                           END(sink__V707, _M_E_xPassLocationProperties); }
                                                                                                                          }
                                                                                                                       else { { int test__V739;
-                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                           test__V739 = (int) !strcmp(SYMBOL(sub__V709), "Plus" );
-                                                                                                                          if (test__V739) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xPlus);
+                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V739) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xPlus);
                                                                                                                               END(sink__V707, _M_E_xPlus); }
                                                                                                                              }
                                                                                                                           else { { int test__V740;
-                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                               test__V740 = (int) !strcmp(SYMBOL(sub__V709), "Minus" );
-                                                                                                                              if (test__V740) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMinus);
+                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V740) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMinus);
                                                                                                                                   END(sink__V707, _M_E_xMinus); }
                                                                                                                                  }
                                                                                                                               else { { int test__V741;
-                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                   test__V741 = (int) !strcmp(SYMBOL(sub__V709), "Times" );
-                                                                                                                                  if (test__V741) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTimes);
+                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V741) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTimes);
                                                                                                                                       END(sink__V707, _M_E_xTimes); }
                                                                                                                                      }
                                                                                                                                   else { { int test__V742;
-                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                       test__V742 = (int) !strcmp(SYMBOL(sub__V709), "Divide" );
-                                                                                                                                      if (test__V742) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDiv);
+                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V742) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDiv);
                                                                                                                                           END(sink__V707, _M_E_xDiv); }
                                                                                                                                          }
                                                                                                                                       else { { int test__V743;
-                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                           test__V743 = (int) !strcmp(SYMBOL(sub__V709), "Modulo" );
-                                                                                                                                          if (test__V743) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMod);
+                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V743) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMod);
                                                                                                                                               END(sink__V707, _M_E_xMod); }
                                                                                                                                              }
                                                                                                                                           else { { int test__V744;
-                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                               test__V744 = (int) !strcmp(SYMBOL(sub__V709), "Absolute" );
-                                                                                                                                              if (test__V744) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xAbsolute);
+                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V744) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xAbsolute);
                                                                                                                                                   END(sink__V707, _M_E_xAbsolute); }
                                                                                                                                                  }
                                                                                                                                               else { { int test__V745;
-                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                   test__V745 = (int) !strcmp(SYMBOL(sub__V709), "Decimal" );
-                                                                                                                                                  if (test__V745) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDecimal);
+                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V745) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDecimal);
                                                                                                                                                       END(sink__V707, _M_E_xDecimal); }
                                                                                                                                                      }
                                                                                                                                                   else { { int test__V746;
-                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                       test__V746 = (int) !strcmp(SYMBOL(sub__V709), "Hex" );
-                                                                                                                                                      if (test__V746) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xHex);
+                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V746) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xHex);
                                                                                                                                                           END(sink__V707, _M_E_xHex); }
                                                                                                                                                          }
                                                                                                                                                       else { { int test__V747;
-                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                           test__V747 = (int) !strcmp(SYMBOL(sub__V709), "BitAnd" );
-                                                                                                                                                          if (test__V747) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitAnd);
+                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V747) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitAnd);
                                                                                                                                                               END(sink__V707, _M_E_xBitAnd); }
                                                                                                                                                              }
                                                                                                                                                           else { { int test__V748;
-                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                               test__V748 = (int) !strcmp(SYMBOL(sub__V709), "BitOr" );
-                                                                                                                                                              if (test__V748) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitOr);
+                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V748) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitOr);
                                                                                                                                                                   END(sink__V707, _M_E_xBitOr); }
                                                                                                                                                                  }
                                                                                                                                                               else { { int test__V749;
-                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                   test__V749 = (int) !strcmp(SYMBOL(sub__V709), "BitXor" );
-                                                                                                                                                                  if (test__V749) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitXOr);
+                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V749) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitXOr);
                                                                                                                                                                       END(sink__V707, _M_E_xBitXOr); }
                                                                                                                                                                      }
                                                                                                                                                                   else { { int test__V750;
-                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                       test__V750 = (int) !strcmp(SYMBOL(sub__V709), "BitNot" );
-                                                                                                                                                                      if (test__V750) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitNot);
+                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V750) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitNot);
                                                                                                                                                                           END(sink__V707, _M_E_xBitNot); }
                                                                                                                                                                          }
                                                                                                                                                                       else { { int test__V751;
-                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                           test__V751 = (int) !strcmp(SYMBOL(sub__V709), "BitMinus" );
-                                                                                                                                                                          if (test__V751) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitMinus);
+                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V751) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitMinus);
                                                                                                                                                                               END(sink__V707, _M_E_xBitMinus); }
                                                                                                                                                                              }
                                                                                                                                                                           else { { int test__V752;
-                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                               test__V752 = (int) !strcmp(SYMBOL(sub__V709), "BitSubSetEq" );
-                                                                                                                                                                              if (test__V752) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitSubSetEq);
+                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V752) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xBitSubSetEq);
                                                                                                                                                                                   END(sink__V707, _M_E_xBitSubSetEq); }
                                                                                                                                                                                  }
                                                                                                                                                                               else { { int test__V753;
-                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                   test__V753 = (int) !strcmp(SYMBOL(sub__V709), "Get" );
-                                                                                                                                                                                  if (test__V753) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGet);
+                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V753) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGet);
                                                                                                                                                                                       END(sink__V707, _M_E_xGet); }
                                                                                                                                                                                      }
                                                                                                                                                                                   else { { int test__V754;
-                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                       test__V754 = (int) !strcmp(SYMBOL(sub__V709), "GetRef" );
-                                                                                                                                                                                      if (test__V754) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGetRef);
+                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V754) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xGetRef);
                                                                                                                                                                                           END(sink__V707, _M_E_xGetRef); }
                                                                                                                                                                                          }
                                                                                                                                                                                       else { { int test__V755;
-                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                           test__V755 = (int) !strcmp(SYMBOL(sub__V709), "IfDef" );
-                                                                                                                                                                                          if (test__V755) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIfDef);
+                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V755) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIfDef);
                                                                                                                                                                                               END(sink__V707, _M_E_xIfDef); }
                                                                                                                                                                                              }
                                                                                                                                                                                           else { { int test__V756;
-                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                               test__V756 = (int) !strcmp(SYMBOL(sub__V709), "Error" );
-                                                                                                                                                                                              if (test__V756) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xError);
+                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V756) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xError);
                                                                                                                                                                                                   END(sink__V707, _M_E_xError); }
                                                                                                                                                                                                  }
                                                                                                                                                                                               else { { int test__V757;
-                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                   test__V757 = (int) !strcmp(SYMBOL(sub__V709), "ForgivableError" );
-                                                                                                                                                                                                  if (test__V757) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xForgivableError);
+                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V757) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xForgivableError);
                                                                                                                                                                                                       END(sink__V707, _M_E_xForgivableError); }
                                                                                                                                                                                                      }
                                                                                                                                                                                                   else { { int test__V758;
-                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                       test__V758 = (int) !strcmp(SYMBOL(sub__V709), "Trace" );
-                                                                                                                                                                                                      if (test__V758) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTrace);
+                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V758) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTrace);
                                                                                                                                                                                                           END(sink__V707, _M_E_xTrace); }
                                                                                                                                                                                                          }
                                                                                                                                                                                                       else { { int test__V759;
-                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                           test__V759 = (int) !strcmp(SYMBOL(sub__V709), "LoadTerm" );
-                                                                                                                                                                                                          if (test__V759) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLoadTerm);
+                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V759) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xLoadTerm);
                                                                                                                                                                                                               END(sink__V707, _M_E_xLoadTerm); }
                                                                                                                                                                                                              }
                                                                                                                                                                                                           else { { int test__V760;
-                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                               test__V760 = (int) !strcmp(SYMBOL(sub__V709), "SaveTerm" );
-                                                                                                                                                                                                              if (test__V760) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSaveTerm);
+                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V760) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSaveTerm);
                                                                                                                                                                                                                   END(sink__V707, _M_E_xSaveTerm); }
                                                                                                                                                                                                                  }
                                                                                                                                                                                                               else { { int test__V761;
-                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                   test__V761 = (int) !strcmp(SYMBOL(sub__V709), "If" );
-                                                                                                                                                                                                                  if (test__V761) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIf);
+                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V761) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIf);
                                                                                                                                                                                                                       END(sink__V707, _M_E_xIf); }
                                                                                                                                                                                                                      }
                                                                                                                                                                                                                   else { { int test__V762;
-                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                       test__V762 = (int) !strcmp(SYMBOL(sub__V709), "IfZero" );
-                                                                                                                                                                                                                      if (test__V762) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIfZero);
+                                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V762) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIfZero);
                                                                                                                                                                                                                           END(sink__V707, _M_E_xIfZero); }
                                                                                                                                                                                                                          }
                                                                                                                                                                                                                       else { { int test__V763;
-                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                           test__V763 = (int) !strcmp(SYMBOL(sub__V709), "IfEmpty" );
-                                                                                                                                                                                                                          if (test__V763) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIfEmpty);
+                                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V763) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIfEmpty);
                                                                                                                                                                                                                               END(sink__V707, _M_E_xIfEmpty); }
                                                                                                                                                                                                                              }
                                                                                                                                                                                                                           else { { int test__V764;
-                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                               test__V764 = (int) !strcmp(SYMBOL(sub__V709), "FreeVariables" );
-                                                                                                                                                                                                                              if (test__V764) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFreeVariables);
+                                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V764) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xFreeVariables);
                                                                                                                                                                                                                                   END(sink__V707, _M_E_xFreeVariables); }
                                                                                                                                                                                                                                  }
                                                                                                                                                                                                                               else { { int test__V765;
-                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                   test__V765 = (int) !strcmp(SYMBOL(sub__V709), "IntersectVariables" );
-                                                                                                                                                                                                                                  if (test__V765) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIntersectVariables);
+                                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V765) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xIntersectVariables);
                                                                                                                                                                                                                                       END(sink__V707, _M_E_xIntersectVariables); }
                                                                                                                                                                                                                                      }
                                                                                                                                                                                                                                   else { { int test__V766;
-                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                       test__V766 = (int) !strcmp(SYMBOL(sub__V709), "UnionVariables" );
-                                                                                                                                                                                                                                      if (test__V766) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xUnionVariables);
+                                                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V766) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xUnionVariables);
                                                                                                                                                                                                                                           END(sink__V707, _M_E_xUnionVariables); }
                                                                                                                                                                                                                                          }
                                                                                                                                                                                                                                       else { { int test__V767;
-                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                           test__V767 = (int) !strcmp(SYMBOL(sub__V709), "ExceptVariables" );
-                                                                                                                                                                                                                                          if (test__V767) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xExceptVariables);
+                                                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V767) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xExceptVariables);
                                                                                                                                                                                                                                               END(sink__V707, _M_E_xExceptVariables); }
                                                                                                                                                                                                                                              }
                                                                                                                                                                                                                                           else { { int test__V768;
-                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                               test__V768 = (int) !strcmp(SYMBOL(sub__V709), "VariableNameIs" );
-                                                                                                                                                                                                                                              if (test__V768) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xVariableNameIs);
+                                                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V768) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xVariableNameIs);
                                                                                                                                                                                                                                                   END(sink__V707, _M_E_xVariableNameIs); }
                                                                                                                                                                                                                                                  }
                                                                                                                                                                                                                                               else { { int test__V769;
-                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                   test__V769 = (int) !strcmp(SYMBOL(sub__V709), "Match" );
-                                                                                                                                                                                                                                                  if (test__V769) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMatch);
+                                                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V769) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xMatch);
                                                                                                                                                                                                                                                       END(sink__V707, _M_E_xMatch); }
                                                                                                                                                                                                                                                      }
                                                                                                                                                                                                                                                   else { { int test__V770;
-                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                       test__V770 = (int) !strcmp(SYMBOL(sub__V709), "TryCall" );
-                                                                                                                                                                                                                                                      if (test__V770) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTryCall);
+                                                                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V770) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTryCall);
                                                                                                                                                                                                                                                           END(sink__V707, _M_E_xTryCall); }
                                                                                                                                                                                                                                                          }
                                                                                                                                                                                                                                                       else { { int test__V771;
-                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                           test__V771 = (int) !strcmp(SYMBOL(sub__V709), "Call" );
-                                                                                                                                                                                                                                                          if (test__V771) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xCall);
+                                                                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V771) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xCall);
                                                                                                                                                                                                                                                               END(sink__V707, _M_E_xCall); }
                                                                                                                                                                                                                                                              }
                                                                                                                                                                                                                                                           else { { int test__V772;
-                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                               test__V772 = (int) !strcmp(SYMBOL(sub__V709), "Cast" );
-                                                                                                                                                                                                                                                              if (test__V772) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xCast);
+                                                                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V772) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xCast);
                                                                                                                                                                                                                                                                   END(sink__V707, _M_E_xCast); }
                                                                                                                                                                                                                                                                  }
                                                                                                                                                                                                                                                               else { { int test__V773;
-                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                   test__V773 = (int) !strcmp(SYMBOL(sub__V709), "Null" );
-                                                                                                                                                                                                                                                                  if (test__V773) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNull);
+                                                                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V773) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNull);
                                                                                                                                                                                                                                                                       END(sink__V707, _M_E_xNull); }
                                                                                                                                                                                                                                                                      }
                                                                                                                                                                                                                                                                   else { { int test__V774;
-                                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                       test__V774 = (int) !strcmp(SYMBOL(sub__V709), "Nil" );
-                                                                                                                                                                                                                                                                      if (test__V774) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNil);
+                                                                                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V774) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xNil);
                                                                                                                                                                                                                                                                           END(sink__V707, _M_E_xNil); }
                                                                                                                                                                                                                                                                          }
                                                                                                                                                                                                                                                                       else { { int test__V775;
-                                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                           test__V775 = (int) !strcmp(SYMBOL(sub__V709), "UpCase" );
-                                                                                                                                                                                                                                                                          if (test__V775) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xUpCase);
+                                                                                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V775) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xUpCase);
                                                                                                                                                                                                                                                                               END(sink__V707, _M_E_xUpCase); }
                                                                                                                                                                                                                                                                              }
                                                                                                                                                                                                                                                                           else { { int test__V776;
-                                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                               test__V776 = (int) !strcmp(SYMBOL(sub__V709), "DownCase" );
-                                                                                                                                                                                                                                                                              if (test__V776) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDownCase);
+                                                                                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V776) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDownCase);
                                                                                                                                                                                                                                                                                   END(sink__V707, _M_E_xDownCase); }
                                                                                                                                                                                                                                                                                  }
                                                                                                                                                                                                                                                                               else { { int test__V777;
-                                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                   test__V777 = (int) !strcmp(SYMBOL(sub__V709), "Replace" );
-                                                                                                                                                                                                                                                                                  if (test__V777) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xReplace);
+                                                                                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V777) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xReplace);
                                                                                                                                                                                                                                                                                       END(sink__V707, _M_E_xReplace); }
                                                                                                                                                                                                                                                                                      }
                                                                                                                                                                                                                                                                                   else { { int test__V778;
-                                                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                       test__V778 = (int) !strcmp(SYMBOL(sub__V709), "Trim" );
-                                                                                                                                                                                                                                                                                      if (test__V778) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTrim);
+                                                                                                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V778) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xTrim);
                                                                                                                                                                                                                                                                                           END(sink__V707, _M_E_xTrim); }
                                                                                                                                                                                                                                                                                          }
                                                                                                                                                                                                                                                                                       else { { int test__V779;
-                                                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                           test__V779 = (int) !strcmp(SYMBOL(sub__V709), "Split" );
-                                                                                                                                                                                                                                                                                          if (test__V779) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSplit);
+                                                                                                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V779) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xSplit);
                                                                                                                                                                                                                                                                                               END(sink__V707, _M_E_xSplit); }
                                                                                                                                                                                                                                                                                              }
                                                                                                                                                                                                                                                                                           else { { int test__V780;
-                                                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                               test__V780 = (int) !strcmp(SYMBOL(sub__V709), "Rescape" );
-                                                                                                                                                                                                                                                                                              if (test__V780) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xRescape);
+                                                                                                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V780) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xRescape);
                                                                                                                                                                                                                                                                                                   END(sink__V707, _M_E_xRescape); }
                                                                                                                                                                                                                                                                                                  }
                                                                                                                                                                                                                                                                                               else { { int test__V781;
-                                                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                                   test__V781 = (int) !strcmp(SYMBOL(sub__V709), "Keys" );
-                                                                                                                                                                                                                                                                                                  if (test__V781) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xKeys);
+                                                                                                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V781) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xKeys);
                                                                                                                                                                                                                                                                                                       END(sink__V707, _M_E_xKeys); }
                                                                                                                                                                                                                                                                                                      }
                                                                                                                                                                                                                                                                                                   else { { int test__V782;
-                                                                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                                      FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                                       test__V782 = (int) !strcmp(SYMBOL(sub__V709), "ParseURL" );
-                                                                                                                                                                                                                                                                                                      if (test__V782) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xParseURL);
+                                                                                                                                                                                                                                                                                                       UNLINK(sink__V707->context, sub__V709);  if (test__V782) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xParseURL);
                                                                                                                                                                                                                                                                                                           END(sink__V707, _M_E_xParseURL); }
                                                                                                                                                                                                                                                                                                          }
                                                                                                                                                                                                                                                                                                       else { { int test__V783;
-                                                                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                                          FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                                           test__V783 = (int) !strcmp(SYMBOL(sub__V709), "Echo" );
-                                                                                                                                                                                                                                                                                                          if (test__V783) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEcho);
+                                                                                                                                                                                                                                                                                                           UNLINK(sink__V707->context, sub__V709);  if (test__V783) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xEcho);
                                                                                                                                                                                                                                                                                                               END(sink__V707, _M_E_xEcho); }
                                                                                                                                                                                                                                                                                                              }
                                                                                                                                                                                                                                                                                                           else { { int test__V784;
-                                                                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                                              FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                                               test__V784 = (int) !strcmp(SYMBOL(sub__V709), "DeepEqual" );
-                                                                                                                                                                                                                                                                                                              if (test__V784) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDeepEqual);
+                                                                                                                                                                                                                                                                                                               UNLINK(sink__V707->context, sub__V709);  if (test__V784) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xDeepEqual);
                                                                                                                                                                                                                                                                                                                   END(sink__V707, _M_E_xDeepEqual); }
                                                                                                                                                                                                                                                                                                                  }
                                                                                                                                                                                                                                                                                                               else { { int test__V785;
-                                                                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709);
+                                                                                                                                                                                                                                                                                                                  FORCE(sink__V707->context, sub__V709); LINK(sink__V707->context, sub__V709);
                                                                                                                                                                                                                                                                                                                   test__V785 = (int) !strcmp(SYMBOL(sub__V709), "HashCode" );
-                                                                                                                                                                                                                                                                                                                  if (test__V785) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xHashCode);
+                                                                                                                                                                                                                                                                                                                   UNLINK(sink__V707->context, sub__V709);  if (test__V785) {  UNLINK(sink__V707->context, sub__V709); { START(sink__V707, _M_E_xHashCode);
                                                                                                                                                                                                                                                                                                                       END(sink__V707, _M_E_xHashCode); }
                                                                                                                                                                                                                                                                                                                      }
                                                                                                                                                                                                                                                                                                                   else { { START(sink__V707, _M_MissingPrimitive);
@@ -3287,8 +3288,8 @@ int step_M_BinderOffsets(Sink sink__V786, Term term__V787)
     
     NamedPropertyLink namedP__V789 = LINK_NamedPropertyLink(sink__V786->context, NAMED_PROPERTIES(term__V787));
     VariablePropertyLink varP__V790 = LINK_VariablePropertyLink(sink__V786->context, VARIABLE_PROPERTIES(term__V787));
-    Hashset namedFV__V791 = LINK_VARIABLESET(sink__V786->context, namedPropertyFreeVars(namedP__V789));
-    Hashset varFV__V792 = LINK_VARIABLESET(sink__V786->context, variablePropertyFreeVars(varP__V790));
+    Hashset namedFV__V791 = LINK_VARIABLESET(sink__V786->context, asConstruction(term__V787)->properties->namedFreeVars);
+    Hashset varFV__V792 = LINK_VARIABLESET(sink__V786->context, asConstruction(term__V787)->properties->variableFreeVars);
     UNLINK(sink__V786->context, term__V787);
     { START(sink__V786, _M__sTextCons);
       { START(sink__V786, _M__sTextChars);
@@ -3349,8 +3350,8 @@ int step_M_SplitMapText_s1(Sink sink__V793, Term term__V794)
       
       NamedPropertyLink namedP__V809 = LINK_NamedPropertyLink(sink__V793->context, NAMED_PROPERTIES(term__V794));
       VariablePropertyLink varP__V810 = LINK_VariablePropertyLink(sink__V793->context, VARIABLE_PROPERTIES(term__V794));
-      Hashset namedFV__V811 = LINK_VARIABLESET(sink__V793->context, namedPropertyFreeVars(namedP__V809));
-      Hashset varFV__V812 = LINK_VARIABLESET(sink__V793->context, variablePropertyFreeVars(varP__V810));
+      Hashset namedFV__V811 = LINK_VARIABLESET(sink__V793->context, asConstruction(term__V794)->properties->namedFreeVars);
+      Hashset varFV__V812 = LINK_VARIABLESET(sink__V793->context, asConstruction(term__V794)->properties->variableFreeVars);
       UNLINK(sink__V793->context, term__V794);
       ADD_PROPERTIES(sink__V793, LINK_VARIABLESET(sink__V793->context, namedFV__V811), LINK_VARIABLESET(sink__V793->context, varFV__V812), LINK_NamedPropertyLink(sink__V793->context, namedP__V809), LINK_VariablePropertyLink(sink__V793->context, varP__V810));
       { START(sink__V793, _M_SplitMapText_s2);
@@ -3426,8 +3427,8 @@ int step_M_SplitMapText_s1(Sink sink__V793, Term term__V794)
       
       NamedPropertyLink namedP__V847 = LINK_NamedPropertyLink(sink__V793->context, NAMED_PROPERTIES(term__V794));
       VariablePropertyLink varP__V848 = LINK_VariablePropertyLink(sink__V793->context, VARIABLE_PROPERTIES(term__V794));
-      Hashset namedFV__V849 = LINK_VARIABLESET(sink__V793->context, namedPropertyFreeVars(namedP__V847));
-      Hashset varFV__V850 = LINK_VARIABLESET(sink__V793->context, variablePropertyFreeVars(varP__V848));
+      Hashset namedFV__V849 = LINK_VARIABLESET(sink__V793->context, asConstruction(term__V794)->properties->namedFreeVars);
+      Hashset varFV__V850 = LINK_VARIABLESET(sink__V793->context, asConstruction(term__V794)->properties->variableFreeVars);
       UNLINK(sink__V793->context, term__V794);
       ADD_PROPERTIES(sink__V793, LINK_VARIABLESET(sink__V793->context, namedFV__V849), LINK_VARIABLESET(sink__V793->context, varFV__V850), LINK_NamedPropertyLink(sink__V793->context, namedP__V847), LINK_VariablePropertyLink(sink__V793->context, varP__V848));
       { START(sink__V793, _M_SplitMapText_s3);
@@ -3525,12 +3526,13 @@ int step_M_SplitMapText_s2(Sink sink__V875, Term term__V876)
     
     NamedPropertyLink namedP__V888 = LINK_NamedPropertyLink(sink__V875->context, NAMED_PROPERTIES(term__V876));
     VariablePropertyLink varP__V889 = LINK_VariablePropertyLink(sink__V875->context, VARIABLE_PROPERTIES(term__V876));
-    Hashset namedFV__V890 = LINK_VARIABLESET(sink__V875->context, namedPropertyFreeVars(namedP__V888));
-    Hashset varFV__V891 = LINK_VARIABLESET(sink__V875->context, variablePropertyFreeVars(varP__V889));
+    Hashset namedFV__V890 = LINK_VARIABLESET(sink__V875->context, asConstruction(term__V876)->properties->namedFreeVars);
+    Hashset varFV__V891 = LINK_VARIABLESET(sink__V875->context, asConstruction(term__V876)->properties->variableFreeVars);
     UNLINK(sink__V875->context, term__V876);
     { int test__V892;
-      FORCE(sink__V875->context, sub__V881);
-      test__V892 = (int) !strcmp(SYMBOL(sub__V881), "0" ); if (test__V892) {  UNLINK(sink__V875->context, sub__V881); { START(sink__V875, _M__sTextCons);
+      FORCE(sink__V875->context, sub__V881); LINK(sink__V875->context, sub__V881);
+      test__V892 = (int) !strcmp(SYMBOL(sub__V881), "0" );
+      UNLINK(sink__V875->context, sub__V881);  if (test__V892) {  UNLINK(sink__V875->context, sub__V881); { START(sink__V875, _M__sTextCons);
           { START(sink__V875, _M__sTextEmbed);
             { START(sink__V875, _M_AsText);
               {
@@ -3603,10 +3605,10 @@ int step_M_SplitMapText_s2(Sink sink__V875, Term term__V876)
           END(sink__V875, _M__sTextCons); }
          }
       else { { int test__V924;
-          FORCE(sink__V875->context, sub__V881);
-          FORCE(sink__V875->context, sub__V883);
+          FORCE(sink__V875->context, sub__V881); LINK(sink__V875->context, sub__V881);
+          FORCE(sink__V875->context, sub__V883); LINK(sink__V875->context, sub__V883);
           test__V924 = (int) !strcmp(SYMBOL(sub__V881),SYMBOL(sub__V883));
-          if (test__V924) {  UNLINK(sink__V875->context, sub__V881); { START(sink__V875, _M__sTextCons);
+          UNLINK(sink__V875->context, sub__V881);   UNLINK(sink__V875->context, sub__V883);  if (test__V924) {  UNLINK(sink__V875->context, sub__V881); { START(sink__V875, _M__sTextCons);
               { START(sink__V875, _M__sTextEmbed);
                 { START(sink__V875, _M_AsText);
                   {
@@ -3772,8 +3774,8 @@ int step_M_SplitMapText_s3(Sink sink__V981, Term term__V982)
     
     NamedPropertyLink namedP__V992 = LINK_NamedPropertyLink(sink__V981->context, NAMED_PROPERTIES(term__V982));
     VariablePropertyLink varP__V993 = LINK_VariablePropertyLink(sink__V981->context, VARIABLE_PROPERTIES(term__V982));
-    Hashset namedFV__V994 = LINK_VARIABLESET(sink__V981->context, namedPropertyFreeVars(namedP__V992));
-    Hashset varFV__V995 = LINK_VARIABLESET(sink__V981->context, variablePropertyFreeVars(varP__V993));
+    Hashset namedFV__V994 = LINK_VARIABLESET(sink__V981->context, asConstruction(term__V982)->properties->namedFreeVars);
+    Hashset varFV__V995 = LINK_VARIABLESET(sink__V981->context, asConstruction(term__V982)->properties->variableFreeVars);
     UNLINK(sink__V981->context, term__V982);
     {
       Term arg__V996;
@@ -3807,8 +3809,8 @@ int step_M_INTEGER(Sink sink__V1001, Term term__V1002)
     
     NamedPropertyLink namedP__V1004 = LINK_NamedPropertyLink(sink__V1001->context, NAMED_PROPERTIES(term__V1002));
     VariablePropertyLink varP__V1005 = LINK_VariablePropertyLink(sink__V1001->context, VARIABLE_PROPERTIES(term__V1002));
-    Hashset namedFV__V1006 = LINK_VARIABLESET(sink__V1001->context, namedPropertyFreeVars(namedP__V1004));
-    Hashset varFV__V1007 = LINK_VARIABLESET(sink__V1001->context, variablePropertyFreeVars(varP__V1005));
+    Hashset namedFV__V1006 = LINK_VARIABLESET(sink__V1001->context, asConstruction(term__V1002)->properties->namedFreeVars);
+    Hashset varFV__V1007 = LINK_VARIABLESET(sink__V1001->context, asConstruction(term__V1002)->properties->variableFreeVars);
     UNLINK(sink__V1001->context, term__V1002);
     { START(sink__V1001, _M__sTextCons);
       { START(sink__V1001, _M__sTextChars);
@@ -3845,8 +3847,8 @@ int step_M_EventConstructor(Sink sink__V1012, Term term__V1013)
     
     NamedPropertyLink namedP__V1015 = LINK_NamedPropertyLink(sink__V1012->context, NAMED_PROPERTIES(term__V1013));
     VariablePropertyLink varP__V1016 = LINK_VariablePropertyLink(sink__V1012->context, VARIABLE_PROPERTIES(term__V1013));
-    Hashset namedFV__V1017 = LINK_VARIABLESET(sink__V1012->context, namedPropertyFreeVars(namedP__V1015));
-    Hashset varFV__V1018 = LINK_VARIABLESET(sink__V1012->context, variablePropertyFreeVars(varP__V1016));
+    Hashset namedFV__V1017 = LINK_VARIABLESET(sink__V1012->context, asConstruction(term__V1013)->properties->namedFreeVars);
+    Hashset varFV__V1018 = LINK_VARIABLESET(sink__V1012->context, asConstruction(term__V1013)->properties->variableFreeVars);
     UNLINK(sink__V1012->context, term__V1013);
     { START(sink__V1012, _M_MANGLE);
       COPY(sink__V1012, sub__V1014);END(sink__V1012, _M_MANGLE); }
@@ -3873,8 +3875,8 @@ int step_M_SortInternals(Sink sink__V1019, Term term__V1020)
     
     NamedPropertyLink namedP__V1022 = LINK_NamedPropertyLink(sink__V1019->context, NAMED_PROPERTIES(term__V1020));
     VariablePropertyLink varP__V1023 = LINK_VariablePropertyLink(sink__V1019->context, VARIABLE_PROPERTIES(term__V1020));
-    Hashset namedFV__V1024 = LINK_VARIABLESET(sink__V1019->context, namedPropertyFreeVars(namedP__V1022));
-    Hashset varFV__V1025 = LINK_VARIABLESET(sink__V1019->context, variablePropertyFreeVars(varP__V1023));
+    Hashset namedFV__V1024 = LINK_VARIABLESET(sink__V1019->context, asConstruction(term__V1020)->properties->namedFreeVars);
+    Hashset varFV__V1025 = LINK_VARIABLESET(sink__V1019->context, asConstruction(term__V1020)->properties->variableFreeVars);
     UNLINK(sink__V1019->context, term__V1020);
     { START(sink__V1019, _M__sTextCons);
       { START(sink__V1019, _M__sTextChars);
@@ -3913,8 +3915,8 @@ int step_M_SortCons(Sink sink__V1026, Term term__V1027)
     
     NamedPropertyLink namedP__V1029 = LINK_NamedPropertyLink(sink__V1026->context, NAMED_PROPERTIES(term__V1027));
     VariablePropertyLink varP__V1030 = LINK_VariablePropertyLink(sink__V1026->context, VARIABLE_PROPERTIES(term__V1027));
-    Hashset namedFV__V1031 = LINK_VARIABLESET(sink__V1026->context, namedPropertyFreeVars(namedP__V1029));
-    Hashset varFV__V1032 = LINK_VARIABLESET(sink__V1026->context, variablePropertyFreeVars(varP__V1030));
+    Hashset namedFV__V1031 = LINK_VARIABLESET(sink__V1026->context, asConstruction(term__V1027)->properties->namedFreeVars);
+    Hashset varFV__V1032 = LINK_VARIABLESET(sink__V1026->context, asConstruction(term__V1027)->properties->variableFreeVars);
     UNLINK(sink__V1026->context, term__V1027);
     { START(sink__V1026, _M__sTextCons);
       { START(sink__V1026, _M__sTextChars);
@@ -3954,8 +3956,8 @@ int step_M_DINTEGER_s1(Sink sink__V1033, Term term__V1034)
     
     NamedPropertyLink namedP__V1036 = LINK_NamedPropertyLink(sink__V1033->context, NAMED_PROPERTIES(term__V1034));
     VariablePropertyLink varP__V1037 = LINK_VariablePropertyLink(sink__V1033->context, VARIABLE_PROPERTIES(term__V1034));
-    Hashset namedFV__V1038 = LINK_VARIABLESET(sink__V1033->context, namedPropertyFreeVars(namedP__V1036));
-    Hashset varFV__V1039 = LINK_VARIABLESET(sink__V1033->context, variablePropertyFreeVars(varP__V1037));
+    Hashset namedFV__V1038 = LINK_VARIABLESET(sink__V1033->context, asConstruction(term__V1034)->properties->namedFreeVars);
+    Hashset varFV__V1039 = LINK_VARIABLESET(sink__V1033->context, asConstruction(term__V1034)->properties->variableFreeVars);
     UNLINK(sink__V1033->context, term__V1034);
     { START(sink__V1033, _M__sTextCons);
       { START(sink__V1033, _M__sTextChars);
@@ -3992,8 +3994,8 @@ int step_M_Name(Sink sink__V1044, Term term__V1045)
     
     NamedPropertyLink namedP__V1047 = LINK_NamedPropertyLink(sink__V1044->context, NAMED_PROPERTIES(term__V1045));
     VariablePropertyLink varP__V1048 = LINK_VariablePropertyLink(sink__V1044->context, VARIABLE_PROPERTIES(term__V1045));
-    Hashset namedFV__V1049 = LINK_VARIABLESET(sink__V1044->context, namedPropertyFreeVars(namedP__V1047));
-    Hashset varFV__V1050 = LINK_VARIABLESET(sink__V1044->context, variablePropertyFreeVars(varP__V1048));
+    Hashset namedFV__V1049 = LINK_VARIABLESET(sink__V1044->context, asConstruction(term__V1045)->properties->namedFreeVars);
+    Hashset varFV__V1050 = LINK_VARIABLESET(sink__V1044->context, asConstruction(term__V1045)->properties->variableFreeVars);
     UNLINK(sink__V1044->context, term__V1045);
     { START(sink__V1044, _M__sTextCons);
       { START(sink__V1044, _M__sTextChars);
@@ -4032,8 +4034,8 @@ int step_M_EnumTag(Sink sink__V1051, Term term__V1052)
     
     NamedPropertyLink namedP__V1054 = LINK_NamedPropertyLink(sink__V1051->context, NAMED_PROPERTIES(term__V1052));
     VariablePropertyLink varP__V1055 = LINK_VariablePropertyLink(sink__V1051->context, VARIABLE_PROPERTIES(term__V1052));
-    Hashset namedFV__V1056 = LINK_VARIABLESET(sink__V1051->context, namedPropertyFreeVars(namedP__V1054));
-    Hashset varFV__V1057 = LINK_VARIABLESET(sink__V1051->context, variablePropertyFreeVars(varP__V1055));
+    Hashset namedFV__V1056 = LINK_VARIABLESET(sink__V1051->context, asConstruction(term__V1052)->properties->namedFreeVars);
+    Hashset varFV__V1057 = LINK_VARIABLESET(sink__V1051->context, asConstruction(term__V1052)->properties->variableFreeVars);
     UNLINK(sink__V1051->context, term__V1052);
     { START(sink__V1051, _M__sTextCons);
       { START(sink__V1051, _M__sTextChars);
@@ -4082,8 +4084,8 @@ int step_M_MapText_s1(Sink sink__V1058, Term term__V1059)
       
       NamedPropertyLink namedP__V1067 = LINK_NamedPropertyLink(sink__V1058->context, NAMED_PROPERTIES(term__V1059));
       VariablePropertyLink varP__V1068 = LINK_VariablePropertyLink(sink__V1058->context, VARIABLE_PROPERTIES(term__V1059));
-      Hashset namedFV__V1069 = LINK_VARIABLESET(sink__V1058->context, namedPropertyFreeVars(namedP__V1067));
-      Hashset varFV__V1070 = LINK_VARIABLESET(sink__V1058->context, variablePropertyFreeVars(varP__V1068));
+      Hashset namedFV__V1069 = LINK_VARIABLESET(sink__V1058->context, asConstruction(term__V1059)->properties->namedFreeVars);
+      Hashset varFV__V1070 = LINK_VARIABLESET(sink__V1058->context, asConstruction(term__V1059)->properties->variableFreeVars);
       UNLINK(sink__V1058->context, term__V1059);
       ADD_PROPERTIES(sink__V1058, LINK_VARIABLESET(sink__V1058->context, namedFV__V1069), LINK_VARIABLESET(sink__V1058->context, varFV__V1070), LINK_NamedPropertyLink(sink__V1058->context, namedP__V1067), LINK_VariablePropertyLink(sink__V1058->context, varP__V1068));
       { START(sink__V1058, _M_MapText_s2);
@@ -4117,8 +4119,8 @@ int step_M_MapText_s1(Sink sink__V1058, Term term__V1059)
       
       NamedPropertyLink namedP__V1082 = LINK_NamedPropertyLink(sink__V1058->context, NAMED_PROPERTIES(term__V1059));
       VariablePropertyLink varP__V1083 = LINK_VariablePropertyLink(sink__V1058->context, VARIABLE_PROPERTIES(term__V1059));
-      Hashset namedFV__V1084 = LINK_VARIABLESET(sink__V1058->context, namedPropertyFreeVars(namedP__V1082));
-      Hashset varFV__V1085 = LINK_VARIABLESET(sink__V1058->context, variablePropertyFreeVars(varP__V1083));
+      Hashset namedFV__V1084 = LINK_VARIABLESET(sink__V1058->context, asConstruction(term__V1059)->properties->namedFreeVars);
+      Hashset varFV__V1085 = LINK_VARIABLESET(sink__V1058->context, asConstruction(term__V1059)->properties->variableFreeVars);
       UNLINK(sink__V1058->context, term__V1059);
       ADD_PROPERTIES(sink__V1058, LINK_VARIABLESET(sink__V1058->context, namedFV__V1084), LINK_VARIABLESET(sink__V1058->context, varFV__V1085), LINK_NamedPropertyLink(sink__V1058->context, namedP__V1082), LINK_VariablePropertyLink(sink__V1058->context, varP__V1083));
       { START(sink__V1058, _M_MapText_s3);
@@ -4169,8 +4171,8 @@ int step_M_MapText_s2(Sink sink__V1094, Term term__V1095)
     
     NamedPropertyLink namedP__V1100 = LINK_NamedPropertyLink(sink__V1094->context, NAMED_PROPERTIES(term__V1095));
     VariablePropertyLink varP__V1101 = LINK_VariablePropertyLink(sink__V1094->context, VARIABLE_PROPERTIES(term__V1095));
-    Hashset namedFV__V1102 = LINK_VARIABLESET(sink__V1094->context, namedPropertyFreeVars(namedP__V1100));
-    Hashset varFV__V1103 = LINK_VARIABLESET(sink__V1094->context, variablePropertyFreeVars(varP__V1101));
+    Hashset namedFV__V1102 = LINK_VARIABLESET(sink__V1094->context, asConstruction(term__V1095)->properties->namedFreeVars);
+    Hashset varFV__V1103 = LINK_VARIABLESET(sink__V1094->context, asConstruction(term__V1095)->properties->variableFreeVars);
     UNLINK(sink__V1094->context, term__V1095);
     { START(sink__V1094, _M__sTextCons);
       { START(sink__V1094, _M__sTextEmbed);
@@ -4231,8 +4233,8 @@ int step_M_MapText_s3(Sink sink__V1116, Term term__V1117)
     
     NamedPropertyLink namedP__V1120 = LINK_NamedPropertyLink(sink__V1116->context, NAMED_PROPERTIES(term__V1117));
     VariablePropertyLink varP__V1121 = LINK_VariablePropertyLink(sink__V1116->context, VARIABLE_PROPERTIES(term__V1117));
-    Hashset namedFV__V1122 = LINK_VARIABLESET(sink__V1116->context, namedPropertyFreeVars(namedP__V1120));
-    Hashset varFV__V1123 = LINK_VARIABLESET(sink__V1116->context, variablePropertyFreeVars(varP__V1121));
+    Hashset namedFV__V1122 = LINK_VARIABLESET(sink__V1116->context, asConstruction(term__V1117)->properties->namedFreeVars);
+    Hashset varFV__V1123 = LINK_VARIABLESET(sink__V1116->context, asConstruction(term__V1117)->properties->variableFreeVars);
     UNLINK(sink__V1116->context, term__V1117);
     { START(sink__V1116, _M__sTextNil);
       END(sink__V1116, _M__sTextNil); }
@@ -4259,8 +4261,8 @@ int step_M_Var(Sink sink__V1124, Term term__V1125)
     
     NamedPropertyLink namedP__V1127 = LINK_NamedPropertyLink(sink__V1124->context, NAMED_PROPERTIES(term__V1125));
     VariablePropertyLink varP__V1128 = LINK_VariablePropertyLink(sink__V1124->context, VARIABLE_PROPERTIES(term__V1125));
-    Hashset namedFV__V1129 = LINK_VARIABLESET(sink__V1124->context, namedPropertyFreeVars(namedP__V1127));
-    Hashset varFV__V1130 = LINK_VARIABLESET(sink__V1124->context, variablePropertyFreeVars(varP__V1128));
+    Hashset namedFV__V1129 = LINK_VARIABLESET(sink__V1124->context, asConstruction(term__V1125)->properties->namedFreeVars);
+    Hashset varFV__V1130 = LINK_VARIABLESET(sink__V1124->context, asConstruction(term__V1125)->properties->variableFreeVars);
     UNLINK(sink__V1124->context, term__V1125);
     { START(sink__V1124, _M__sTextCons);
       { START(sink__V1124, _M__sTextChars);
@@ -4312,8 +4314,8 @@ int step_M_MapIndexText_s1(Sink sink__V1131, Term term__V1132)
       
       NamedPropertyLink namedP__V1142 = LINK_NamedPropertyLink(sink__V1131->context, NAMED_PROPERTIES(term__V1132));
       VariablePropertyLink varP__V1143 = LINK_VariablePropertyLink(sink__V1131->context, VARIABLE_PROPERTIES(term__V1132));
-      Hashset namedFV__V1144 = LINK_VARIABLESET(sink__V1131->context, namedPropertyFreeVars(namedP__V1142));
-      Hashset varFV__V1145 = LINK_VARIABLESET(sink__V1131->context, variablePropertyFreeVars(varP__V1143));
+      Hashset namedFV__V1144 = LINK_VARIABLESET(sink__V1131->context, asConstruction(term__V1132)->properties->namedFreeVars);
+      Hashset varFV__V1145 = LINK_VARIABLESET(sink__V1131->context, asConstruction(term__V1132)->properties->variableFreeVars);
       UNLINK(sink__V1131->context, term__V1132);
       ADD_PROPERTIES(sink__V1131, LINK_VARIABLESET(sink__V1131->context, namedFV__V1144), LINK_VARIABLESET(sink__V1131->context, varFV__V1145), LINK_NamedPropertyLink(sink__V1131->context, namedP__V1142), LINK_VariablePropertyLink(sink__V1131->context, varP__V1143));
       { START(sink__V1131, _M_MapIndexText_s2);
@@ -4355,8 +4357,8 @@ int step_M_MapIndexText_s1(Sink sink__V1131, Term term__V1132)
       
       NamedPropertyLink namedP__V1162 = LINK_NamedPropertyLink(sink__V1131->context, NAMED_PROPERTIES(term__V1132));
       VariablePropertyLink varP__V1163 = LINK_VariablePropertyLink(sink__V1131->context, VARIABLE_PROPERTIES(term__V1132));
-      Hashset namedFV__V1164 = LINK_VARIABLESET(sink__V1131->context, namedPropertyFreeVars(namedP__V1162));
-      Hashset varFV__V1165 = LINK_VARIABLESET(sink__V1131->context, variablePropertyFreeVars(varP__V1163));
+      Hashset namedFV__V1164 = LINK_VARIABLESET(sink__V1131->context, asConstruction(term__V1132)->properties->namedFreeVars);
+      Hashset varFV__V1165 = LINK_VARIABLESET(sink__V1131->context, asConstruction(term__V1132)->properties->variableFreeVars);
       UNLINK(sink__V1131->context, term__V1132);
       ADD_PROPERTIES(sink__V1131, LINK_VARIABLESET(sink__V1131->context, namedFV__V1164), LINK_VARIABLESET(sink__V1131->context, varFV__V1165), LINK_NamedPropertyLink(sink__V1131->context, namedP__V1162), LINK_VariablePropertyLink(sink__V1131->context, varP__V1163));
       { START(sink__V1131, _M_MapIndexText_s3);
@@ -4416,8 +4418,8 @@ int step_M_MapIndexText_s2(Sink sink__V1177, Term term__V1178)
     
     NamedPropertyLink namedP__V1185 = LINK_NamedPropertyLink(sink__V1177->context, NAMED_PROPERTIES(term__V1178));
     VariablePropertyLink varP__V1186 = LINK_VariablePropertyLink(sink__V1177->context, VARIABLE_PROPERTIES(term__V1178));
-    Hashset namedFV__V1187 = LINK_VARIABLESET(sink__V1177->context, namedPropertyFreeVars(namedP__V1185));
-    Hashset varFV__V1188 = LINK_VARIABLESET(sink__V1177->context, variablePropertyFreeVars(varP__V1186));
+    Hashset namedFV__V1187 = LINK_VARIABLESET(sink__V1177->context, asConstruction(term__V1178)->properties->namedFreeVars);
+    Hashset varFV__V1188 = LINK_VARIABLESET(sink__V1177->context, asConstruction(term__V1178)->properties->variableFreeVars);
     UNLINK(sink__V1177->context, term__V1178);
     { START(sink__V1177, _M__sTextCons);
       { START(sink__V1177, _M__sTextEmbed);
@@ -4492,8 +4494,8 @@ int step_M_MapIndexText_s3(Sink sink__V1208, Term term__V1209)
     
     NamedPropertyLink namedP__V1214 = LINK_NamedPropertyLink(sink__V1208->context, NAMED_PROPERTIES(term__V1209));
     VariablePropertyLink varP__V1215 = LINK_VariablePropertyLink(sink__V1208->context, VARIABLE_PROPERTIES(term__V1209));
-    Hashset namedFV__V1216 = LINK_VARIABLESET(sink__V1208->context, namedPropertyFreeVars(namedP__V1214));
-    Hashset varFV__V1217 = LINK_VARIABLESET(sink__V1208->context, variablePropertyFreeVars(varP__V1215));
+    Hashset namedFV__V1216 = LINK_VARIABLESET(sink__V1208->context, asConstruction(term__V1209)->properties->namedFreeVars);
+    Hashset varFV__V1217 = LINK_VARIABLESET(sink__V1208->context, asConstruction(term__V1209)->properties->variableFreeVars);
     UNLINK(sink__V1208->context, term__V1209);
     { START(sink__V1208, _M__sTextNil);
       END(sink__V1208, _M__sTextNil); }
@@ -4521,8 +4523,8 @@ int step_M_DTOKEN_s1(Sink sink__V1218, Term term__V1219)
     
     NamedPropertyLink namedP__V1221 = LINK_NamedPropertyLink(sink__V1218->context, NAMED_PROPERTIES(term__V1219));
     VariablePropertyLink varP__V1222 = LINK_VariablePropertyLink(sink__V1218->context, VARIABLE_PROPERTIES(term__V1219));
-    Hashset namedFV__V1223 = LINK_VARIABLESET(sink__V1218->context, namedPropertyFreeVars(namedP__V1221));
-    Hashset varFV__V1224 = LINK_VARIABLESET(sink__V1218->context, variablePropertyFreeVars(varP__V1222));
+    Hashset namedFV__V1223 = LINK_VARIABLESET(sink__V1218->context, asConstruction(term__V1219)->properties->namedFreeVars);
+    Hashset varFV__V1224 = LINK_VARIABLESET(sink__V1218->context, asConstruction(term__V1219)->properties->variableFreeVars);
     UNLINK(sink__V1218->context, term__V1219);
     { START(sink__V1218, _M__sTextCons);
       { START(sink__V1218, _M__sTextChars);
@@ -4553,8 +4555,8 @@ int step_M_Descriptor(Sink sink__V1225, Term term__V1226)
     
     NamedPropertyLink namedP__V1228 = LINK_NamedPropertyLink(sink__V1225->context, NAMED_PROPERTIES(term__V1226));
     VariablePropertyLink varP__V1229 = LINK_VariablePropertyLink(sink__V1225->context, VARIABLE_PROPERTIES(term__V1226));
-    Hashset namedFV__V1230 = LINK_VARIABLESET(sink__V1225->context, namedPropertyFreeVars(namedP__V1228));
-    Hashset varFV__V1231 = LINK_VARIABLESET(sink__V1225->context, variablePropertyFreeVars(varP__V1229));
+    Hashset namedFV__V1230 = LINK_VARIABLESET(sink__V1225->context, asConstruction(term__V1226)->properties->namedFreeVars);
+    Hashset varFV__V1231 = LINK_VARIABLESET(sink__V1225->context, asConstruction(term__V1226)->properties->variableFreeVars);
     UNLINK(sink__V1225->context, term__V1226);
     { START(sink__V1225, _M__sTextCons);
       { START(sink__V1225, _M__sTextChars);
@@ -4596,8 +4598,8 @@ int step_M_Forms_Constructors_s1(Sink sink__V1232, Term term__V1233)
     
     NamedPropertyLink namedP__V1236 = LINK_NamedPropertyLink(sink__V1232->context, NAMED_PROPERTIES(term__V1233));
     VariablePropertyLink varP__V1237 = LINK_VariablePropertyLink(sink__V1232->context, VARIABLE_PROPERTIES(term__V1233));
-    Hashset namedFV__V1238 = LINK_VARIABLESET(sink__V1232->context, namedPropertyFreeVars(namedP__V1236));
-    Hashset varFV__V1239 = LINK_VARIABLESET(sink__V1232->context, variablePropertyFreeVars(varP__V1237));
+    Hashset namedFV__V1238 = LINK_VARIABLESET(sink__V1232->context, asConstruction(term__V1233)->properties->namedFreeVars);
+    Hashset varFV__V1239 = LINK_VARIABLESET(sink__V1232->context, asConstruction(term__V1233)->properties->variableFreeVars);
     UNLINK(sink__V1232->context, term__V1233);
     ADD_PROPERTIES(sink__V1232, LINK_VARIABLESET(sink__V1232->context, namedFV__V1238), LINK_VARIABLESET(sink__V1232->context, varFV__V1239), LINK_NamedPropertyLink(sink__V1232->context, namedP__V1236), LINK_VariablePropertyLink(sink__V1232->context, varP__V1237));
     { START(sink__V1232, _M_Forms_Constructors_s3);
@@ -4624,8 +4626,8 @@ int step_M_Forms_Constructors_s1(Sink sink__V1232, Term term__V1233)
     
     NamedPropertyLink namedP__V1245 = LINK_NamedPropertyLink(sink__V1232->context, NAMED_PROPERTIES(term__V1233));
     VariablePropertyLink varP__V1246 = LINK_VariablePropertyLink(sink__V1232->context, VARIABLE_PROPERTIES(term__V1233));
-    Hashset namedFV__V1247 = LINK_VARIABLESET(sink__V1232->context, namedPropertyFreeVars(namedP__V1245));
-    Hashset varFV__V1248 = LINK_VARIABLESET(sink__V1232->context, variablePropertyFreeVars(varP__V1246));
+    Hashset namedFV__V1247 = LINK_VARIABLESET(sink__V1232->context, asConstruction(term__V1233)->properties->namedFreeVars);
+    Hashset varFV__V1248 = LINK_VARIABLESET(sink__V1232->context, asConstruction(term__V1233)->properties->variableFreeVars);
     UNLINK(sink__V1232->context, term__V1233);
     ADD_PROPERTIES(sink__V1232, LINK_VARIABLESET(sink__V1232->context, namedFV__V1247), LINK_VARIABLESET(sink__V1232->context, varFV__V1248), LINK_NamedPropertyLink(sink__V1232->context, namedP__V1245), LINK_VariablePropertyLink(sink__V1232->context, varP__V1246));
     { START(sink__V1232, _M_Forms_Constructors_s4);
@@ -4650,8 +4652,8 @@ int step_M_Forms_Constructors_s1(Sink sink__V1232, Term term__V1233)
     
     NamedPropertyLink namedP__V1253 = LINK_NamedPropertyLink(sink__V1232->context, NAMED_PROPERTIES(term__V1233));
     VariablePropertyLink varP__V1254 = LINK_VariablePropertyLink(sink__V1232->context, VARIABLE_PROPERTIES(term__V1233));
-    Hashset namedFV__V1255 = LINK_VARIABLESET(sink__V1232->context, namedPropertyFreeVars(namedP__V1253));
-    Hashset varFV__V1256 = LINK_VARIABLESET(sink__V1232->context, variablePropertyFreeVars(varP__V1254));
+    Hashset namedFV__V1255 = LINK_VARIABLESET(sink__V1232->context, asConstruction(term__V1233)->properties->namedFreeVars);
+    Hashset varFV__V1256 = LINK_VARIABLESET(sink__V1232->context, asConstruction(term__V1233)->properties->variableFreeVars);
     UNLINK(sink__V1232->context, term__V1233);
     ADD_PROPERTIES(sink__V1232, LINK_VARIABLESET(sink__V1232->context, namedFV__V1255), LINK_VARIABLESET(sink__V1232->context, varFV__V1256), LINK_NamedPropertyLink(sink__V1232->context, namedP__V1253), LINK_VariablePropertyLink(sink__V1232->context, varP__V1254));
     { START(sink__V1232, _M_Forms_Constructors_s2);
@@ -4779,15 +4781,15 @@ int step_M_DMANGLE_s1(Sink sink__V1273, Term term__V1274)
     
     NamedPropertyLink namedP__V1276 = LINK_NamedPropertyLink(sink__V1273->context, NAMED_PROPERTIES(term__V1274));
     VariablePropertyLink varP__V1277 = LINK_VariablePropertyLink(sink__V1273->context, VARIABLE_PROPERTIES(term__V1274));
-    Hashset namedFV__V1278 = LINK_VARIABLESET(sink__V1273->context, namedPropertyFreeVars(namedP__V1276));
-    Hashset varFV__V1279 = LINK_VARIABLESET(sink__V1273->context, variablePropertyFreeVars(varP__V1277));
+    Hashset namedFV__V1278 = LINK_VARIABLESET(sink__V1273->context, asConstruction(term__V1274)->properties->namedFreeVars);
+    Hashset varFV__V1279 = LINK_VARIABLESET(sink__V1273->context, asConstruction(term__V1274)->properties->variableFreeVars);
     UNLINK(sink__V1273->context, term__V1274);
     { START(sink__V1273, _M__sTextCons);
       { START(sink__V1273, _M__sTextChars);
         { char *str__V1280;
-          FORCE(sink__V1273->context, sub__V1275);
+          FORCE(sink__V1273->context, sub__V1275); LINK(sink__V1273->context, sub__V1275);
           { char *s__V1281 = makeMangled(sink__V1273->context, SYMBOL(sub__V1275));
-            { size_t z__V1282 = strlen(s__V1281) + 1; memcpy(str__V1280 = ALLOCATE(sink__V1273->context, z__V1282), s__V1281, z__V1282);  UNLINK(sink__V1273->context, sub__V1275);}
+            { size_t z__V1282 = strlen(s__V1281) + 1; memcpy(str__V1280 = ALLOCATE(sink__V1273->context, z__V1282), s__V1281, z__V1282);  UNLINK(sink__V1273->context, sub__V1275);  UNLINK(sink__V1273->context, sub__V1275); }
             }
           LITERALU(sink__V1273, str__V1280); }
         END(sink__V1273, _M__sTextChars); }

@@ -92,6 +92,7 @@ static void pEndMetaSubstitute(Context context, struct rusage ubefore);
 static void pTermSize(Term term);
 static void termSize(Term term, long* size, long* memuse, int sharing);
 
+
 size_t pMarker = 0;
 
 #endif
@@ -104,14 +105,6 @@ int stepNesting = 0;
 #endif
 
 // Checking terms.
-
-typedef struct _TermLink *TermLink;
-
-struct _TermLink {
-    void* p;
-    unsigned count;
-    TermLink link;
-};
 
 #ifdef CHECKREF
 static TermLink occurLink(TermLink link, void* p)
@@ -289,8 +282,8 @@ Term makeStringLiteral(Context context, const char *text)
 #endif
     literal->construction.nf = 1;
     literal->construction.nostep = 1;
-    literal->construction.namedProperties = (NamedPropertyLink) 0;
-    literal->construction.variableProperties = (VariablePropertyLink) 0 ;
+    literal->construction.properties =
+      ALLOCATE_Properties(context, NULL, NULL, NULL, NULL);
 
     literal->construction.fvs = NULL;
     literal->construction.nfvs = NULL;
@@ -302,36 +295,6 @@ Term makeStringLiteral(Context context, const char *text)
     return (Term) literal;
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-// Property link allocation.
-
-///**
-// * Make a new named property link.
-// * @param name link name. Consumed.
-// * @param term link term. Consumed.
-// */
-//static NamedPropertyLink makeNamedPropertyLinkTerm(Context context, const char* name, Term term)
-//{
-//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, NULL);
-//    link->name = name;
-//    link->u.term = term; // Transfer ref
-//
-//    return link;
-//}
-//
-///**
-// * Make a new named property link.
-// * @param name link name. Consumed.
-// * @param term link term. Consumed.
-// */
-//static NamedPropertyLink makeNamedPropertyLinkVariable(Context context, Variable variable)
-//{
-//    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, NULL);
-//    link->name = NULL;
-//    link->u.weakening = variable; // Transfer ref
-//
-//    return link;
-//}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Buffer manipulation.
@@ -460,41 +423,6 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
 
-    // Make sure the first property link is a free variable set
-
-    if (buffer->pendingNamedProperties && buffer->pendingNamedPropertiesFreeVars
-            && namedPropertyFreeVars(buffer->pendingNamedProperties) != buffer->pendingNamedPropertiesFreeVars)
-    {
-        // Insert free variables
-        NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, buffer->pendingNamedProperties); // transfer ref
-        link->name = NULL;
-        link->u.weakening = (Variable)  buffer->pendingNamedPropertiesFreeVars; // Transfer ref
-        buffer->pendingNamedProperties = link;
-    }
-    else
-    {
-        UNLINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars);
-    }
-
-    if (buffer->pendingVariableProperties && buffer->pendingVariablePropertiesFreeVars
-            && variablePropertyFreeVars(buffer->pendingVariableProperties) != buffer->pendingVariablePropertiesFreeVars)
-    {
-        // Insert free variables
-        VariablePropertyLink link = ALLOCATE(sink->context, sizeof(struct _VariablePropertyLink));
-        link->nr = 1;
-#ifdef CRSXPROF
-        link->marker = 0;
-#endif
-        link->link = buffer->pendingVariableProperties; // transfer ref
-        link->variable = NULL;
-        link->u.weakening = (Variable)  buffer->pendingVariablePropertiesFreeVars; // Transfer ref
-        buffer->pendingVariableProperties = link;
-    }
-    else
-    {
-        UNLINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars);
-    }
-
     // Start construction
 
     Construction construction = ALLOCATE(sink->context, descriptor->size);
@@ -504,12 +432,16 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
 #ifdef CRSXPROF
     construction->term.marker = 0;
 #endif
-    construction->namedProperties = buffer->pendingNamedProperties;
-    construction->variableProperties = buffer->pendingVariableProperties;
+    construction->properties =
+      ALLOCATE_Properties(sink->context,
+                          LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars),
+                          LINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars),
+                          LINK_NamedPropertyLink(sink->context, buffer->pendingNamedProperties),
+                          LINK_VariablePropertyLink(sink->context, buffer->pendingVariableProperties));
 
     construction->fvs = NULL;
-    construction->nfvs = LINK_VARIABLESET(sink->context, namedPropertyFreeVars(buffer->pendingNamedProperties));
-    construction->vfvs = LINK_VARIABLESET(sink->context, variablePropertyFreeVars(buffer->pendingVariableProperties));
+    construction->nfvs = LINK_VARIABLESET(sink->context, construction->properties->namedFreeVars);
+    construction->vfvs = LINK_VARIABLESET(sink->context, construction->properties->variableFreeVars);
 
     construction->nf = 0;
     construction->nostep = 0;
@@ -656,8 +588,8 @@ Sink bufferCopy(Sink sink, Term term)
 
     // If no properties and weakenings, just share!
     if (IS_VARIABLE_USE(term)
-            || (buffer->pendingNamedProperties == asConstruction(term)->namedProperties
-                    && buffer->pendingVariableProperties == asConstruction(term)->variableProperties
+            || (buffer->pendingNamedProperties == asConstruction(term)->properties->namedProperties
+                    && buffer->pendingVariableProperties == asConstruction(term)->properties->variableProperties
                ))
     {
         UNLINK_NamedPropertyLink(sink->context, buffer->pendingNamedProperties);
@@ -710,14 +642,14 @@ Sink bufferCopy(Sink sink, Term term)
             else
             {
                 NamedPropertyLink namedLink = buffer->pendingNamedProperties;
-                buffer->pendingNamedProperties = LINK_NamedPropertyLink(sink->context, c->namedProperties);
+                buffer->pendingNamedProperties = LINK_NamedPropertyLink(sink->context, c->properties->namedProperties);
                 VariablePropertyLink variableLink = buffer->pendingVariableProperties;
-                buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, c->variableProperties);
+                buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, c->properties->variableProperties);
 
                 VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
-                buffer->pendingNamedPropertiesFreeVars = NULL;
+                buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->namedFreeVars);
                 VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
-                buffer->pendingVariablePropertiesFreeVars = NULL;
+                buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->variableFreeVars);
 
                 sink->start(sink, c->term.descriptor);
 
@@ -809,8 +741,8 @@ Sink bufferPropertyRef(Sink sink, Construction construction)
 
     // Must be first property event.
     ASSERT(sink->context, !buffer->pendingNamedProperties && !buffer->pendingVariableProperties);
-    buffer->pendingNamedProperties = LINK_NamedPropertyLink(sink->context, construction->namedProperties);
-    buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, construction->variableProperties);
+    buffer->pendingNamedProperties = LINK_NamedPropertyLink(sink->context, construction->properties->namedProperties);
+    buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, construction->properties->variableProperties);
     return sink;
 }
 
@@ -848,9 +780,7 @@ Sink bufferPropertyNamed(Sink sink, const char *name, Term term)
     Buffer buffer = (Buffer) sink;
     //DEBUGF(sink->context, "//ADD_PROPERTY_NAMED(%d,%s)\n", buffer->lastTop, name);
 
-    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, buffer->pendingNamedProperties); // transfer ref
-    link->name = GLOBAL(sink->context, name);
-    link->u.term = term; // Transfer ref
+    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(sink->context, GLOBAL(sink->context, name), term, buffer->pendingNamedProperties); // transfer refs for term and old link
     buffer->pendingNamedProperties = link;
 
     buffer->pendingNamedPropertiesFreeVars = VARIABLESET_MERGEALL(sink->context, buffer->pendingNamedPropertiesFreeVars, freeVars(sink->context, term));
@@ -980,13 +910,14 @@ void freeBuffer(Sink sink)
 static
 void bufferMergeProperties(Context context, Buffer buffer, Construction construction)
 {
-    if (buffer->pendingNamedProperties && construction->namedProperties != buffer->pendingNamedProperties)
+    if (buffer->pendingNamedProperties && construction->properties->namedProperties != buffer->pendingNamedProperties)
     {
         // There is new properties.
-        VARIABLESET freeVars = namedPropertyFreeVars(construction->namedProperties);
 
-        if (!construction->namedProperties) // no existing properties. Good.
-            construction->namedProperties = buffer->pendingNamedProperties; // transfer ref
+        VARIABLESET freeVars = construction->properties->namedFreeVars;
+
+        if (!construction->properties->namedProperties) // no existing properties. Good.
+            construction->properties->namedProperties = buffer->pendingNamedProperties; // transfer ref
         else
         {
             // New properties and existing properties... merge.
@@ -997,17 +928,17 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             NamedPropertyLink link = buffer->pendingNamedProperties, newTop = NULL, newLast = NULL;
             for (; link; link = link->link)
             {
-                if (link == construction->namedProperties) // guard above ensures false on first iteration
+                if (link == construction->properties->namedProperties) // guard above ensures false on first iteration
                     break; // avoid deep duplication of lists
 
-                NamedPropertyLink newLink = memcpy(ALLOCATE_NamedPropertyLink(context, NULL), link, sizeof(struct _NamedPropertyLink));
+                NamedPropertyLink newLink = memcpy(ALLOCATE_NamedPropertyLink(context, NULL, NULL, NULL), link, sizeof(struct _NamedPropertyLink));
 
                 newLink->link = NULL;
                 newLink->nr = 0;
                 if (newLink->name) // Always the case as pending free variables are not yet been linked.
                     (void) LINK(context, newLink->u.term);
                 else
-                    LINK_VARIABLESET(context, (VARIABLESET) newLink->u.weakening);
+                    linkHS2(newLink->u.propset);
 
                 if (newTop)
                     newLast->link = LINK_NamedPropertyLink(context, newLink);
@@ -1015,11 +946,11 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                     newTop = newLink;
                 newLast = newLink;
             }
-            newLast->link = construction->namedProperties; // transfer ref to old properties to tail of new.
+            newLast->link = construction->properties->namedProperties; // transfer ref to old properties to tail of new.
 
 
             // Set final links
-            construction->namedProperties = LINK_NamedPropertyLink(context, newTop);
+            construction->properties->namedProperties = LINK_NamedPropertyLink(context, newTop);
             UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
 
         }
@@ -1030,10 +961,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
         if (freeVars)
         {
-            NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->namedProperties); // transfer ref
-            link->name = NULL;
-            link->u.weakening = (Variable) freeVars;
-            construction->namedProperties = link;
+            construction->properties->namedFreeVars = freeVars;
 
             // And add the new pending free vars also to the construction itself
             construction->nfvs = VARIABLESET_MERGEALL(context, construction->nfvs, buffer->pendingNamedPropertiesFreeVars);
@@ -1052,12 +980,13 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
     // Do the same for variable properties
 
-    if (buffer->pendingVariableProperties && construction->variableProperties != buffer->pendingVariableProperties)
+    if (buffer->pendingVariableProperties && construction->properties->variableProperties != buffer->pendingVariableProperties)
     {
-        VARIABLESET freeVars = variablePropertyFreeVars(construction->variableProperties);
+        // TODO? : VARIABLESET freeVars = LINK_VARIABLESET(context, construction->properties->variableProperties);
+        VARIABLESET freeVars = construction->properties->variableFreeVars;
 
-        if (!construction->variableProperties)
-            construction->variableProperties = buffer->pendingVariableProperties;
+        if (!construction->properties->variableProperties)
+            construction->properties->variableProperties = buffer->pendingVariableProperties;
         else
         {
             // Merge property lists.
@@ -1066,7 +995,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             VariablePropertyLink link = buffer->pendingVariableProperties, newTop = NULL, newLast = NULL;
             for (; link; link = link->link)
             {
-                if (link == construction->variableProperties)
+                if (link == construction->properties->variableProperties)
                     break;
 
                 VariablePropertyLink newLink = memcpy(ALLOCATE(context, sizeof(struct _VariablePropertyLink)), link, sizeof(struct _VariablePropertyLink));
@@ -1079,7 +1008,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (newLink->variable)
                     (void) LINK(context, newLink->u.term);
                 else
-                    LINK_VARIABLESET(context, (VARIABLESET) newLink->u.weakening);
+                    linkHS2(newLink->u.propset);
 
                 if (newTop)
                     newLast->link = LINK_VariablePropertyLink(context, newLink);
@@ -1093,8 +1022,8 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             if (count > 30)
                             printf("Large merge: %d\n", count);
 
-            newLast->link = construction->variableProperties;
-            construction->variableProperties = LINK_VariablePropertyLink(context, newTop);
+            newLast->link = construction->properties->variableProperties;
+            construction->properties->variableProperties = LINK_VariablePropertyLink(context, newTop);
 
             UNLINK_VariablePropertyLink(context, buffer->pendingVariableProperties);
 
@@ -1106,15 +1035,8 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
         ASSERT(context, freeVars);
 
-        VariablePropertyLink link = ALLOCATE(context, sizeof(struct _VariablePropertyLink));
-        link->nr = 1;
-#ifdef CRSXPROF
-        link->marker = 0;
-#endif
-        link->link = construction->variableProperties; // transfer ref
-        link->variable = NULL;
-        link->u.weakening = (Variable) freeVars;
-        construction->variableProperties = link;
+        construction->properties->variableFreeVars = freeVars;
+        ASSERT_VARIABLE_PROPERTIES(context, construction->properties);
 
         // And add to the construction..
         construction->vfvs =  VARIABLESET_MERGEALL(context, construction->vfvs, buffer->pendingVariablePropertiesFreeVars);
@@ -2034,11 +1956,12 @@ static LinkedList2 copyLL2(Context context, LinkedList2 head)
     return newhead;
 }
 
-static void freeLL2(Context context, LinkedList2 head)
+static void freeLL2(Context context, LinkedList2 head, void (*unlinkEntry)(Context, void*))
 {
     while (head)
     {
         LinkedList2 next = head->next;
+        if (unlinkEntry) unlinkEntry(context, head->entry);
         FREE(context, head);
         head = next;
     }
@@ -2065,7 +1988,7 @@ static size_t hashChars(const char* data)
     return h;
 }
 
-static size_t hashPtr(void* entry)
+static size_t hashPtr(const void* entry)
 {
     size_t key = (size_t) entry;
 
@@ -2080,18 +2003,18 @@ static size_t hashPtr(void* entry)
     return key;
 }
 
-static size_t hashStringPair(void* pair)
+static size_t hashStringPair(const void* pair)
 {
-    const char* data = (char*) ((Pair) pair)->key;
+    const char* data = (const char *) ((Pair) pair)->key;
     return hashChars(data);
 }
 
-static size_t hashPtrPair(void* pair)
+static size_t hashPtrPair(const void* pair)
 {
-    return hashPtr(((Pair) pair)->key);
+    return hashPtr(((const Pair) pair)->key);
 }
 
-static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(void*))
+static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(const void*))
 {
     ASSERT(context, set->nr > 0);
 
@@ -2128,7 +2051,7 @@ static void freeHS2(Context context, Hashset2 set)
 {
     size_t i;
     for (i = 0; i < set->nslots; i++)
-        freeLL2(context, set->entries[i]);
+      freeLL2(context, set->entries[i], set->unlinkEntry);
 
     FREE(context, set->entries);
     FREE(context, set);
@@ -2148,7 +2071,7 @@ Hashset2 unlinkHS2(Context context, Hashset2 set)
     return set;
 }
 
-Hashset2 makeHS2(Context context, int numbits)
+Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void*))
 {
     Hashset2 set = ALLOCATE(context, sizeof(struct _Hashset2));
     set->nr = 1;
@@ -2159,6 +2082,8 @@ Hashset2 makeHS2(Context context, int numbits)
     // TODO: use calloc
     set->entries = ALLOCATE(context, set->nslots * sizeof(LinkedList2));
     memset(set->entries, 0, set->nslots * sizeof(LinkedList2));
+
+    set->unlinkEntry = unlinkEntry;
 
     return set;
 }
@@ -2181,12 +2106,12 @@ Hashset2 copyHS2(Context context, Hashset2 set)
     return newset;
 }
 
-static Hashset2 addInternalHS2(Context context, Hashset2 set, void* entry, int (*equals)(void*, void*), size_t (*hash)(void*), void (*freeEntry)(Context, void*))
+static Hashset2 addInternalHS2(Context context, Hashset2 set, void* entry, int (*equals)(void*, void*), size_t (*hash)(const void*), void (*freeEntry)(Context, void*))
 {
     if (entry)
     {
         if (!set)
-            set = makeHS2(context, 4);
+            set = makeHS2(context, 4, NULL);
         else if (set->nr > 1)
         {
             set->nr --;
@@ -2242,7 +2167,7 @@ Hashset2 addValueHS2(Context context, Hashset2 set, const char* key, void* value
     return addInternalHS2(context, set, (void*) pair, &equalsStringPairEntry, &hashStringPair, &freePairEntry);
 }
 
-Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, void* key, void* value)
+Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, const void* key, void* value)
 {
     Pair pair = ALLOCATE(context, sizeof(struct _Pair));
     pair->key = key;
@@ -2469,7 +2394,7 @@ Hashset2 clearHS2(Context context, Hashset2 set)
         size_t i;
         for (i = 0; i < set->nslots; i++)
         {
-            freeLL2(context, set->entries[i]);
+            freeLL2(context, set->entries[i], set->unlinkEntry);
             set->entries[i] = NULL;
         }
     }
@@ -2499,6 +2424,66 @@ void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int cons
     }
 }
 
+long memoryUsedHS2(Hashset2 set)
+{
+    long ans = (4 + set->nslots) * sizeof(size_t);
+    ans += set->size * sizeof(struct _Term);
+    return ans;
+}
+
+void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set)
+{
+    int i;
+    for (i = 0 ; i < from_set->nslots ; i++)
+    {
+        LinkedList2 slot = from_set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = LINK(context, (Term) pair->value);
+            ASSERT(context, term);
+            addKeyPtrValueHS2(context, to_set, pair->key, term);
+            slot = slot->next;
+        }
+    }
+}
+
+int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp)
+{
+    int i;
+    int size = 0;
+    for (i = 0 ; i < set->nslots ; i++)
+    {
+        LinkedList2 slot = set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = (Term) pair->value;
+            size += checkTerm4(context, NULL, 0, term, nf, 0, envsize, memuse, usedp);
+            slot = slot->next;
+        }
+    }
+    return size;
+}
+
+static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, const void *key, Term term, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max);
+
+char * fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+{
+    int i;
+    for (i = 0 ; i < set->nslots ; i++)
+    {
+        LinkedList2 slot = set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = (Term) pair->value;
+            sep = fprintProperty(context, out, isNamed, set->nr, (const void *) pair->key, term, sep, depth, encountered, used, indent, posp, debug, max);
+            slot = slot->next;
+        }
+    }
+    return sep;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Map from variables to variables.
@@ -2603,25 +2588,30 @@ void freeVariableNameMapLinks(Context context, VariableNameMapLink link)
 // Return the named property or NULL if none.
 // The reference is *NOT* transferred
 // The name must have already been interned into the Context's keyPool
-Term *c_namedProperty(NamedPropertyLink link, char *name)
+Term c_namedProperty(NamedPropertyLink link, char *name)
 {
     for (; link; link = link->link)
     {
-        //if (link->name && (!strcmp(name, link->name)) && (name != link->name))
-        //  printf("Missed Equality! name=%s link->name=%s\n", name, link->name);
-        if (name == link->name)
-            return &(link->u.term);
+        if (! link->name) // hashset
+        {
+            Term term = (Term) getKeyPtrValuePtrHS2(link->u.propset, name);
+            if (term) return term;
+        }
+        else if (name == link->name)
+        {
+            return link->u.term;
+        }
     }
     return NULL;
 }
 
 // Return the variable property or NULL if none.
 // The reference is *NOT* transferred
-Term *c_variableProperty(VariablePropertyLink link, Variable variable)
+Term c_variableProperty(VariablePropertyLink link, Variable variable)
 {
     for (; link; link = link->link)
         if (variable == link->variable)
-            return &(link->u.term);
+            return link->u.term;
     return NULL;
 }
 
@@ -2685,8 +2675,8 @@ void crsxAddPools(Context context)
 {
     if (! context->poolRefCount)
     {
-        context->stringPool = makeHS2(context, 16);
-        context->keyPool = makeHS2(context, 16);
+        context->stringPool = makeHS2(context, 16, NULL);
+        context->keyPool = makeHS2(context, 16, NULL);
     }
     ++context->poolRefCount;
 }
@@ -3865,12 +3855,13 @@ static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction,
     {
         // Collect prefix of named properties that need substitution.
         BitSet localUnweakened; COPY_LBITS(sink->context, &localUnweakened, substitutionCount, unweakened);
-        for (namedLink = construction->namedProperties; namedLink; namedLink = namedLink->link)
+        for (namedLink = construction->properties->namedProperties; namedLink; namedLink = namedLink->link)
         {
             BitSet bitset; COPY_LBITS(sink->context, &bitset, substitutionCount, unexhausted);
             MASK_LBITS(&bitset, &localUnweakened);
 
-            if (IS_PROPERTY_CLOSED(namedLink) || (!ANY_LBITS(&bitset) && !mergeNamedProperties))
+            // if (IS_PROPERTY_CLOSED(namedLink) || (!ANY_LBITS(&bitset) && !mergeNamedProperties))
+	    if (1) // namedLink isn't where we store free variable info anymore
             {
                 // No more variables to metaSubstitute...the prefix is done!
                 break;
@@ -3886,14 +3877,15 @@ static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction,
             if (key)
             {
                 // - Regular key-value link is always inserted into prefix after substitution of value.
-                NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, NULL);
-                newLink->name = key;
                 Sink propertysink = ALLOCA_BUFFER(sink->context);
 
                 BitSet localUnweakenedC; COPY_LBITS(sink->context, &localUnweakenedC, substitutionCount, &localUnweakened);
                 metaSubstituteTerm(propertysink, LINK(sink->context, namedLink->u.term), substitution, substitutionCount, unexhausted, &localUnweakenedC, metaSubstituteSizep);
-                newLink->u.term = BUFFER_TERM(propertysink); // Transfer reference
+                Term term = BUFFER_TERM(propertysink); // Transfer reference
                 FREE_BUFFER(propertysink);
+
+                NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, key, term, NULL);
+
                 pushNamedPropertyLink(namedStack, newLink);
                 ++(*metaSubstituteSizep);
             }
@@ -3910,7 +3902,7 @@ static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction,
     {
         // Collect prefix of variable properties that need substitution.
         BitSet localUnweakened; COPY_LBITS(sink->context, &localUnweakened, substitutionCount, unweakened);
-        for (variableLink = construction->variableProperties; variableLink; variableLink = variableLink->link)
+        for (variableLink = construction->properties->variableProperties; variableLink; variableLink = variableLink->link)
         {
             BitSet bitset; COPY_LBITS(sink->context, &bitset, substitutionCount, unexhausted);
             MASK_LBITS(&bitset, &localUnweakened);
@@ -4135,10 +4127,18 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
         metaSubstituteProperties(sink, construction, substitution, substitutionCount, unexhausted, &localUnweakenedC, metaSubstituteSizep);
 
         // - destroy property pointers in term itself (as they are now in the buffer pending list)
-        UNLINK_NamedPropertyLink(sink->context, construction->namedProperties);
-        construction->namedProperties = NULL;
-        UNLINK_VariablePropertyLink(sink->context, construction->variableProperties);
-        construction->variableProperties = NULL;
+        UNLINK_NamedPropertyLink(sink->context, construction->properties->namedProperties);
+        construction->properties->namedProperties = NULL;
+        UNLINK_VariablePropertyLink(sink->context, construction->properties->variableProperties);
+        construction->properties->variableProperties = NULL;
+
+        // TODO : Should some or all of these be unlinked?
+        // UNLINK_VARIABLESET(context, construction->fvs);
+        // construction->fvs = NULL;
+        // UNLINK_VARIABLESET(context, construction->nfvs);
+        // construction->nfvs = NULL;
+        // UNLINK_VARIABLESET(context, construction->vfvs);
+        // construction->nfvs = NULL;
 
         VariableSetLink localPendingWeakenings = NULL;
 
@@ -4218,15 +4218,15 @@ void propagateFreeVariables(Context context, Term term)
     Construction c = asConstruction(term);
     if (arity == 0)
     {
-        if (c->nfvs != namedPropertyFreeVars(c->namedProperties))
+        if (c->nfvs != c->properties->namedFreeVars)
         {
             UNLINK_VARIABLESET(context, c->nfvs);
-            c->nfvs = LINK_VARIABLESET(context, namedPropertyFreeVars(c->namedProperties));
+            c->nfvs = LINK_VARIABLESET(context, c->properties->namedFreeVars);
         }
-        if (c->vfvs != variablePropertyFreeVars(c->variableProperties))
+        if (c->vfvs != c->properties->variableFreeVars)
         {
             UNLINK_VARIABLESET(context, c->vfvs);
-            c->vfvs = LINK_VARIABLESET(context, variablePropertyFreeVars(c->variableProperties));
+            c->vfvs = LINK_VARIABLESET(context, c->properties->variableFreeVars);
         }
     }
     else
@@ -4239,8 +4239,8 @@ void propagateFreeVariables(Context context, Term term)
         UNLINK_VARIABLESET(context, c->vfvs);
 
         VARIABLESET fvs = NULL;
-        VARIABLESET nfvs = LINK_VARIABLESET(context, namedPropertyFreeVars(c->namedProperties));
-        VARIABLESET vfvs = LINK_VARIABLESET(context, variablePropertyFreeVars(c->variableProperties));
+        VARIABLESET nfvs = LINK_VARIABLESET(context, c->properties->namedFreeVars);
+        VARIABLESET vfvs = LINK_VARIABLESET(context, c->properties->variableFreeVars);
 
         int i = arity - 1;
         for (; i >= 0; --i)
@@ -4315,21 +4315,16 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                 Term locvalue = NAMED_PROPERTY(context, locConstruction, key);
                 if (locvalue && strcmp(SYMBOL(value), SYMBOL(locvalue)))
                 {
-                    VARIABLESET fvs = namedPropertyFreeVars(construction->namedProperties);
+                    VARIABLESET fvs = construction->properties->namedFreeVars;
 
                     // Location has been changed...update.
-                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, construction->namedProperties);
-                    link->name = GLOBAL(context, key);
+                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), LINK(context, locvalue), construction->properties->namedProperties);
 
-                    link->u.term = LINK(context, locvalue);
-                    construction->namedProperties = link;
+                    construction->properties->namedProperties = link;
 
                     if (fvs)
                     {
-                        NamedPropertyLink fvlink = ALLOCATE_NamedPropertyLink(context, link);
-                        fvlink->name = NULL;
-                        fvlink->u.weakening = (Variable) LINK_VARIABLESET(context, fvs);
-                        construction->namedProperties = fvlink;
+                        construction->properties->namedFreeVars = LINK_VARIABLESET(context, fvs);
                     }
                 }
             }
@@ -4361,10 +4356,8 @@ void freeTerm(Context context, Term term)
     {
         Construction construction = asConstruction(term);
 
-        UNLINK_NamedPropertyLink(context, construction->namedProperties);
-        //construction->namedProperties = NULL;
-        UNLINK_VariablePropertyLink(context, construction->variableProperties);
-        //construction->variableProperties = NULL;
+        UNLINK_Properties(context, construction->properties);
+        //construction->properties = NULL;
 
         UNLINK_VARIABLESET(context, construction->fvs);
         construction->fvs = NULL;
@@ -4393,63 +4386,82 @@ void freeTerm(Context context, Term term)
     }
 }
 
-NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, NamedPropertyLink nlink)
+void unlinkValueTerm(Context context, void *entry)
+{
+    Pair pair = (Pair) entry;
+    Term term = (Term) pair->value;
+    //if (term)
+    unlinkTerm(context, term);
+}
+
+void debugPropsHS2(Context context, Hashset2 set)
+{
+    VariableSet encountered = makeVariableSet(context);
+    Hashset2 used = makeHS2(context, 10, NULL);
+    int pos = 0;
+
+    fprintPropsHS2(context, STDOUT, 1 /* names, not variables */,
+                   set, ";\n", -1, encountered, used, 1, &pos, 0, 0);
+}
+
+
+NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink)
 {
     int count = nlink ? nlink->count + 1 : 1;
     if (count >= 100)
     {
-        struct _NamedPropertyLink * link = ALLOCATE(context, count * sizeof(struct _NamedPropertyLink));
-        // 0th = new, 1st = nlink, 2nd..count-1 = older
+        ASSERT(context, term);
 
-        // Initialize 0th element
-#ifdef CRSXPROF
-        link[0].marker = 0;
-#endif
-        link[0].count = 0; // count==0 means front of group-allocation
-        link[0].nr = 1;
+        // Make a hashset
+        Hashset2 set = makeHS2(context, 8, unlinkValueTerm);
+        
+        // 0th = new, 1st = nlink, 2nd..count-1 = older
+        addKeyPtrValueHS2(context, set, name, LINK(context, term));
 
         // Copy initialize old elements
         NamedPropertyLink old_link = nlink;
-        int i;
-        for (i = 1 ; i <= (count-1) ; ++i)
+        while (old_link)
         {
-            memcpy(&link[i], old_link, sizeof(struct _NamedPropertyLink));
-            link[i].count = -1; // count==-1 means part of group-allocation
-            link[i].nr = 1;
-            if (link[i].name)
+            if (old_link->name)
             {
-                LINK(context, link[i].u.term);
+                Term term = LINK(context, old_link->u.term);
+                ASSERT(context, term);
+                addKeyPtrValueHS2(context, set, old_link->name, term);
             }
             else
             {
-                LINK_VARIABLESET(context, (VARIABLESET) link[i].u.weakening);
+                Hashset2 old_set = old_link->u.propset;
+                addSetToPropsSetHS2(context, set, old_set);
             }
 
             // move on
             old_link = old_link->link;
         }
 
-        // Unlinking nlink will remove one reference down the line.
-        // We need to keep that reference for the ones we're not
-        // consuming, so increase the refcount for first non-consumed
-        // one first, before we decrease the ref count on the others.
-        LINK_NamedPropertyLink(context, old_link);
         UNLINK_NamedPropertyLink(context, nlink);
 
-        // Link new elements together, last one does not change
-        for (i = 0 ; i <= (count-2) ; ++i)
-        {
-            link[i].link = &link[i+1];
-        }
+        //printf("Just constructed this prop set %p:\n", set);
+        //debugPropsHS2(context, set);
 
-        // Return the first one
-        return &link[0];
+        // Just allocate one link for the whole hashset
+        NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+        link->link = NULL; // sets always include everything else
+        link->name = NULL; // NULL means it is a hashset
+        link->u.propset = set;
+#ifdef CRSXPROF
+        link->marker = 0;
+#endif
+        link->count = 0; // count==0 means group-allocation (hashset)
+        link->nr = 1;
+        return link;
     }
     else
     {
         // Just allocate one, link it, and return it
         NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
         link->link = nlink;
+        link->name = name;
+        link->u.term = term; // Transfer ref
 #ifdef CRSXPROF
         link->marker = 0;
 #endif
@@ -4482,20 +4494,14 @@ NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink li
             }
             else
             {
-                UNLINK_VARIABLESET(context, (VARIABLESET) link->u.weakening);
-                link->u.weakening = NULL;
+                unlinkHS2(context, link->u.propset);
+                link->u.propset = NULL;
             }
 
             UNLINK_NamedPropertyLink(context, link->link);
             link->link = NULL;
 
-            // For now, don't free group-allocations
-            // Eventually should be checking if they are all ready to free
-            // (if all nr==0) then free the whole group.
-            if (link->count >= 1)
-            {
-                FREE(context, link);
-            }
+            FREE(context, link);
             return NULL;
         }
     }
@@ -4515,8 +4521,8 @@ VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariableProper
             }
             else
             {
-                UNLINK_VARIABLESET(context, (VARIABLESET) link->u.weakening);
-                link->u.weakening = NULL;
+                unlinkHS2(context, link->u.propset);
+                link->u.propset = NULL;
             }
 
             UNLINK_VariablePropertyLink(context, link->link);
@@ -4526,6 +4532,54 @@ VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariableProper
         }
     }
     return link;
+}
+
+Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
+                                 NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
+{
+    Properties env = ALLOCATE(context, sizeof(struct _Properties));
+    env->nr = 1;
+    env->namedFreeVars = namedFreeVars;
+    env->variableFreeVars = variableFreeVars;
+    env->namedProperties = namedProperties;
+    env->variableProperties = variableProperties;
+    ASSERT_VARIABLE_PROPERTIES(context, env);
+    return env;
+}
+
+Properties LINK_Properties(Context context, Properties env)
+{
+    if (env)
+        env->nr++;
+
+    return env;
+}
+
+Properties UNLINK_Properties(Context context, Properties env)
+{
+    if (env)
+    {
+        ASSERT(context, env->nr > 0);
+
+        if (--env->nr == 0)
+        {
+            UNLINK_VARIABLESET(context, env->namedFreeVars);
+            env->namedFreeVars = NULL;
+
+            UNLINK_VARIABLESET(context, env->variableFreeVars);
+            env->variableFreeVars = NULL;
+
+            UNLINK_NamedPropertyLink(context, env->namedProperties);
+            env->namedProperties = NULL;
+
+            UNLINK_VariablePropertyLink(context, env->variableProperties);
+            env->variableProperties = NULL;
+
+            FREE(context, env);
+            return NULL;
+        }
+    }
+    return env;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -4616,7 +4670,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
         {
             //int c = 5; // Check only the first 10 properties (ref count won't be accurate)
             NamedPropertyLink link;
-            for (link = construction->namedProperties; link; link = link->link)
+            for (link = construction->properties->namedProperties; link; link = link->link)
             {
                 ASSERT(context, link->nr > 0);
 #ifdef CHECKREF
@@ -4640,9 +4694,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
                 }
                 else
                 {
-                    //ASSERT(context, IS_BOUND(link->u.weakening)); // not true with nested steps.
-                    ++propertiesSize;
-                    (*memuse) += sizeof(struct _Variable);
+                    propertiesSize += checkPropsHS2(context, link->u.propset, nf, envsize, memuse, usedp);
                 }
 
                 (*envsize) ++;
@@ -4655,7 +4707,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
 
         {
             VariablePropertyLink link;
-            for (link = construction->variableProperties; link; link = link->link)
+            for (link = construction->properties->variableProperties; link; link = link->link)
             {
                 ASSERT(context, link->nr > 0);
 
@@ -4679,8 +4731,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
                 }
                 else
                 {
-                    //ASSERT(context, IS_BOUND(link->u.weakening)); // not true with nested steps.
-                    ++propertiesSize;
+                    propertiesSize += checkPropsHS2(context, link->u.propset, nf, envsize, memuse, usedp);
                 }
 
                 (*envsize) ++;
@@ -4735,7 +4786,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
             }
 
             // Quick check properties free vars wrt to term fvs
-            VARIABLESET nps = LINK_VARIABLESET(context, namedPropertyFreeVars(asConstruction(term)->namedProperties));
+            VARIABLESET nps = LINK_VARIABLESET(context, asConstruction(term)->nfvs);
             if (!VARIABLESET_ISEMPTY(nps))
             {
                 nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
@@ -4750,7 +4801,7 @@ static int checkTerm4(Context context, Term parent, unsigned index, Term term, i
                 }
             }
 
-            nps = LINK_VARIABLESET(context, variablePropertyFreeVars(asConstruction(term)->variableProperties));
+            nps = LINK_VARIABLESET(context, asConstruction(term)->properties->variableFreeVars);
             if (!VARIABLESET_ISEMPTY(nps))
             {
                 nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
@@ -4805,13 +4856,13 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
             }
         }
         {
-            NamedPropertyLink nlink = asConstruction(term)->namedProperties;
+            NamedPropertyLink nlink = asConstruction(term)->properties->namedProperties;
             for (; nlink; nlink = nlink->link)
                 if (nlink->name)
                     computeFreeVariables2(freevars, nlink->u.term, boundLink);
         }
         {
-            VariablePropertyLink vlink = asConstruction(term)->variableProperties;
+            VariablePropertyLink vlink = asConstruction(term)->properties->variableProperties;
             for (; vlink; vlink = vlink->link)
                 if (vlink->variable)
                     computeFreeVariables2(freevars, vlink->u.term, boundLink);
@@ -4920,13 +4971,13 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
         Construction construction1 = asConstruction(term1), construction2 = asConstruction(term2);
         {
             NamedPropertyLink link1, link2;
-            for (link1 = construction1->namedProperties; link1; link1 = link1->link)
+            for (link1 = construction1->properties->namedProperties; link1; link1 = link1->link)
             {
                 const char *name = link1->name;
                 if (! name) continue; // skip free vars
                 Term value1 = link1->u.term;
                 Term value2 = NULL;
-                for (link2 = construction2->namedProperties; link2; link2 = link2->link)
+                for (link2 = construction2->properties->namedProperties; link2; link2 = link2->link)
                 {
                     if (! link2->name) continue; // skip free vars
                     if (!strcmp(name, link2->name))
@@ -4938,12 +4989,12 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
                 if (!value2) return 0;
                 if (!deepEqual2(context, value1, value2, compenv, map)) return 0;
             }
-            for (link2 = construction2->namedProperties; link2; link2 = link2->link)
+            for (link2 = construction2->properties->namedProperties; link2; link2 = link2->link)
             {
                 const char *name = link2->name;
                 if (! name) continue; // skip free vars
                 Term value1 = NULL;
-                for (link1 = construction1->namedProperties; link1; link1 = link1->link)
+                for (link1 = construction1->properties->namedProperties; link1; link1 = link1->link)
                 {
                     if (! link1->name) continue; // skip free vars
                     if (!strcmp(name, link1->name))
@@ -4957,14 +5008,14 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
         }
         {
             VariablePropertyLink link1, link2;
-            for (link1 = construction1->variableProperties; link1; link1 = link1->link)
+            for (link1 = construction1->properties->variableProperties; link1; link1 = link1->link)
             {
                 Variable variable = link1->variable; // variable to look for
                 Term value1 = link1->u.term;
                 Variable v = lookupVariable(map, variable);
                 if (v) variable = v;
                 Term value2 = NULL;
-                for (link2 = construction2->variableProperties; link2; link2 = link2->link)
+                for (link2 = construction2->properties->variableProperties; link2; link2 = link2->link)
                 {
                     if (variable == link2->variable)
                     {
@@ -4975,11 +5026,11 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
                 if (!value2) return 0;
                 if (!deepEqual2(context, value1, value2, compenv, map)) return 0;
             }
-            for (link2 = construction2->variableProperties; link2; link2 = link2->link)
+            for (link2 = construction2->properties->variableProperties; link2; link2 = link2->link)
             {
                 Variable variable = link2->variable;
                 Term value1 = NULL;
-                for (link1 = construction1->variableProperties; link1; link1 = link1->link)
+                for (link1 = construction1->properties->variableProperties; link1; link1 = link1->link)
                 {
                     Variable v1 = link1->variable;
                     Variable v = lookupVariable(map, v1);
@@ -5094,7 +5145,7 @@ void fprintTerm(Context context, FILE* out, Term term)
 {
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10);
+        used = makeHS2(context, 10, NULL);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5152,7 +5203,7 @@ void fprintTermWithIndent(Context context, FILE* out, Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10);
+        used = makeHS2(context, 10, NULL);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5521,12 +5572,12 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                 fprintFreeVars(context, out, construction->nfvs);
                 fprintFreeVars(context, out, construction->vfvs);
             }
-            if (construction->namedProperties || construction->variableProperties)
+            if (construction->properties->namedProperties || construction->properties->variableProperties)
             {
                 *posp += FPRINTF(context, out, "{");
                 char *sep = "";
-                sep = fprintNamedProperties(context, out, construction->namedProperties, sep, depth-10, encountered, used, indent, posp, debug, includeprops);
-                sep = fprintVariableProperties(context, out, construction->variableProperties, sep, depth-10, encountered, used, indent, posp, debug, includeprops);
+                sep = fprintNamedProperties(context, out, construction->properties->namedProperties, sep, depth-10, encountered, used, indent, posp, debug, includeprops);
+                sep = fprintVariableProperties(context, out, construction->properties->variableProperties, sep, depth-10, encountered, used, indent, posp, debug, includeprops);
                 if (indent && depth > 1) { FPRINTF(context, out, "\n%.*s", indent, SPACES); *posp = indent; }
                 *posp += FPRINTF(context, out, "}");
             }
@@ -5544,14 +5595,13 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
             if (isFunction)
             {
                 // Probably a cookie
-                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, printCookieNameList);
-
+                char *name;
                 if (arity == 0)
-                    newCookie->name = nm;
+                    name = nm;
                 else
                 {
                    char* cons = ALLOCATE(context, 500);
-                   newCookie->name = cons;
+                   name = cons;
 
                    int sz = strlen(nm);
                    memcpy(cons, nm, sz);
@@ -5564,6 +5614,16 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                    cons += sz;
                    (*cons) = '\0';
                 }
+                // This really should never have been using NamedPropertyLink
+                // as a generic string list.  We should fix that, but given
+                // that it is like this, link it after the allocate to
+                // prevent the allocate from turning our string list into
+                // a hashtable in the future.  (NamedPropertyLink stores
+                // a set, not a list (ie. unordered), whereas cookie lists
+                // are an ordered list of strings).
+                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, name, NULL, NULL);
+                newCookie->link = printCookieNameList;
+
                 printCookieNameList = newCookie;
             }
 
@@ -5631,6 +5691,32 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
     }
 }
 
+/** Print a single named or variable property (and return sep on empty, "; " otherwise).
+ * Use isNamed=true for named properties, isNamed=false for variable properties. */
+static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, const void *key, Term term, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+{
+    *posp += FPRINTF(context, out, "%s", sep);
+    char *nl = strrchr(sep, '\n');
+    if (nl) *posp = ((sep + strlen(sep) - 1) - nl);
+    if (indent && *posp < indent+2 && depth > 1)
+      *posp += FPRINTF(context, out, "%.*s", indent + 2 - *posp, SPACES);
+    if (debug)
+      FPRINTF(context, out, "{%zd}", nr);
+    if (isNamed)
+    {
+        *posp += fprintLiteral(context, out, (char *) key);
+    }
+    else
+    {
+        *posp += fprintSafeVariableName(context, out, (Variable) key, used);
+    }
+    *posp += FPRINTF(context, out, " : ");
+    fprintTermTop(context, out, term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
+    sep = ";\n";
+    return sep;
+}
+
+
 /** Print named properties (and return sep on empty, "; " otherwise). */
 char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
 {
@@ -5639,23 +5725,11 @@ char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedP
     {
         if (link->name)
         {
-            *posp += FPRINTF(context, out, "%s", sep);
-            char *nl = strrchr(sep, '\n');
-            if (nl) *posp = ((sep + strlen(sep) - 1) - nl);
-            if (indent && *posp < indent+2 && depth > 1)
-                *posp += FPRINTF(context, out, "%.*s", indent + 2 - *posp, SPACES);
-            if (debug)
-                FPRINTF(context, out, "{%d}", link->nr);
-            *posp += fprintLiteral(context, out, link->name);
-            *posp += FPRINTF(context, out, " : ");
-            fprintTermTop(context, out, link->u.term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
-            sep = ";\n";
+            sep = fprintProperty(context, out, 1, link->nr, link->name, link->u.term, sep, depth, encountered, used, indent, posp, debug, max);
         }
-        else if (debug)
+        else
         {
-            FPRINTF(context, out, "%s", sep);
-            fprintFreeVars(context, out, (VARIABLESET) link->u.weakening);
-            sep = ";\n";
+            sep = fprintPropsHS2(context, out, 1, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
         if (max-- <=0)
             break;
@@ -5671,27 +5745,14 @@ char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink 
     {
         if (link->variable)
         {
-            *posp += FPRINTF(context, out, "%s", sep);
-            char *nl = strrchr(sep, '\n');
-            if (nl) *posp = ((sep + strlen(sep) - 1) - nl);
-            if (indent && *posp < indent+2 && depth > 1)
-                *posp += FPRINTF(context, out, "%.*s", indent + 2 - *posp, SPACES);
-            if (debug)
-                   FPRINTF(context, out, "{%d}", link->nr);
-            *posp += fprintSafeVariableName(context, out, link->variable, used);
-            *posp += FPRINTF(context, out, " : ");
-            fprintTermTop(context, out, link->u.term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
-            sep = ";\n";
+            sep = fprintProperty(context, out, 0, link->nr, link->variable, link->u.term, sep, depth, encountered, used, indent, posp, debug, max);
         }
-        else if (debug)
+        else
         {
-            FPRINTF(context, out, "%s", sep);
-            fprintFreeVars(context, out, (VARIABLESET) link->u.weakening);
-            sep = ";\n";
+            sep = fprintPropsHS2(context, out, 0, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
-
         if (max-- <=0)
-               break;
+            break;
     }
     return sep;
 }
@@ -5745,11 +5806,11 @@ void printCTerm2(Context context, Term term, VariableSet allocated, char *sink, 
         // Properties, if any.
         {
             Construction construction = asConstruction(term);
-            if (construction->namedProperties || construction->variableProperties)
+            if (construction->properties->namedProperties || construction->properties->variableProperties)
             {
                 {
                     NamedPropertyLink link;
-                    for (link = construction->namedProperties; link; link = link->link)
+                    for (link = construction->properties->namedProperties; link; link = link->link)
                         if (link->name)
                         {
                             PRINTF(context, "%.*s{\n", indent, SPACES);
@@ -5764,7 +5825,7 @@ void printCTerm2(Context context, Term term, VariableSet allocated, char *sink, 
                 }
                 {
                     VariablePropertyLink link;
-                    for (link = construction->variableProperties; link; link = link->link)
+                    for (link = construction->properties->variableProperties; link; link = link->link)
                         if (link->variable)
                         {
                             PRINTF(context, "%.*s{\n", indent, SPACES);
@@ -5890,7 +5951,7 @@ static void termSize2(Term term, long* size, long* memuse, int sharing)
 #endif
         {
             NamedPropertyLink link;
-            for (link = construction->namedProperties; link; link = link->link)
+            for (link = construction->properties->namedProperties; link; link = link->link)
             {
                 if (!sharing && link->marker == pMarker)
                     break;
@@ -5903,10 +5964,7 @@ static void termSize2(Term term, long* size, long* memuse, int sharing)
                 }
                 else
                 {
-    #ifdef HSFREEVARS
-                    if (link->u.weakening)
-                        (*memuse) += ((Hashset) link->u.weakening)->capacity * sizeof(size_t);
-    #endif
+                    (*memuse) += memoryUsedHS2(link->u.propset);
                 }
 
                 (*memuse) += sizeof(struct _NamedPropertyLink);
@@ -5915,7 +5973,7 @@ static void termSize2(Term term, long* size, long* memuse, int sharing)
 
         {
             VariablePropertyLink link;
-            for (link = construction->variableProperties; link; link = link->link)
+            for (link = construction->properties->variableProperties; link; link = link->link)
             {
                 if (!sharing && link->marker == pMarker)
                     break;
@@ -5928,10 +5986,7 @@ static void termSize2(Term term, long* size, long* memuse, int sharing)
                 }
                 else
                 {
-        #ifdef HSFREEVARS
-                    if (link->u.weakening)
-                        (*memuse) += ((Hashset) link->u.weakening)->capacity * sizeof(size_t);
-        #endif
+                    (*memuse) += memoryUsedHS2(link->u.propset);
                 }
 
                 (*memuse) += sizeof(struct _VariablePropertyLink);

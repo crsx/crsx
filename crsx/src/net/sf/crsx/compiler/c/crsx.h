@@ -38,6 +38,7 @@ typedef struct _ConstructionDescriptor *ConstructionDescriptor;
 typedef struct _SortDescriptor *SortDescriptor;
 typedef struct _Sink *Sink;
 typedef struct _SubstitutionFrame *SubstitutionFrame;
+typedef struct _Properties *Properties;
 typedef struct _NamedPropertyLink *NamedPropertyLink;
 typedef struct _VariablePropertyLink *VariablePropertyLink;
 typedef struct _Variables *Variables;
@@ -49,6 +50,7 @@ typedef struct _VariableNameMapLink *VariableNameMapLink;
 typedef struct _Hashset* Hashset;
 typedef struct _Hashset2* Hashset2;
 typedef struct _Pair* Pair;
+typedef struct _TermLink *TermLink;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,22 +384,18 @@ typedef struct _BitSet* BitSetP;
 #define BINDERS(T,I) c_binders(asConstruction(T),I)
 #define BINDER(T,I,BI) BINDERS(T,I)[BI]
 
-#define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
-#define PROPERTY_P(C,T,P) DPROPERTY(C, asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
-#define NAMED_PROPERTY_P(T,N) c_namedProperty(asConstruction(T)->namedProperties, N)
-#define VARIABLE_PROPERTY_P(T,V) c_variableProperty(asConstruction(T)->variableProperties, V)
-#define NAMED_PROPERTIES(T) (asConstruction(T)->namedProperties)
-#define VARIABLE_PROPERTIES(T) (asConstruction(T)->variableProperties)
-
 #define SYMBOL(T) (IS_VARIABLE_USE(T) ? VARIABLE(T)->name : c_name(asConstruction(T)))
 #define TEXT(T) c_name(asConstruction(T))
 #define LONGLONG(T) atoll(c_name(asConstruction(T)))
 #define DOUBLE(T) atof(c_name(asConstruction(T)))
 #define LENGTH(T) strlen(TEXT(T))
 
-#define PROPERTY(C,T,P) c_deref(PROPERTY_P(C,T,P))
-#define NAMED_PROPERTY(C,T,N)  c_deref(NAMED_PROPERTY_P(T,GLOBAL(C,N)))
-#define VARIABLE_PROPERTY(T,V)  c_deref(VARIABLE_PROPERTY_P(T,V))
+#define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
+#define PROPERTY(C,T,P) DPROPERTY(C, asConstruction(T)->properties->namedProperties, asConstruction(T)->properties->variableProperties, P)
+#define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->properties->namedProperties, GLOBAL(C,N))
+#define VARIABLE_PROPERTY(T,V)  c_variableProperty(asConstruction(T)->properties->variableProperties, V)
+#define NAMED_PROPERTIES(T) (asConstruction(T)->properties->namedProperties)
+#define VARIABLE_PROPERTIES(T) (asConstruction(T)->properties->variableProperties)
 
 static inline Term c_deref(Term *p) { return (p ? *p : (Term)0); }
 
@@ -485,8 +483,7 @@ struct _Construction
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
 
-    NamedPropertyLink namedProperties;       // named properties. First link always contains set of free variables    (unless all properties are closed)
-    VariablePropertyLink variableProperties; // variable properties. First link always contains set of free variables (never closed)
+    Properties properties;
 
     VARIABLESET fvs;  // free variables known to occur in subterms only (excluding properties)
     VARIABLESET nfvs; // free variables known to occur in named properties (on this construction and subterms)   s
@@ -851,12 +848,27 @@ extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 // PROPERTIES
 
 
-extern Term *c_namedProperty(NamedPropertyLink link, char *name);
-extern Term *c_variableProperty(VariablePropertyLink link, Variable variable);
-static inline Term *c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
+extern Term c_namedProperty(NamedPropertyLink link, char *name);
+extern Term c_variableProperty(VariablePropertyLink link, Variable variable);
+static inline Term c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
+
+
+struct _Properties
+{
+    VARIABLESET namedFreeVars; // set of free variables in named properties (unless all properties are closed)
+    VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
+    NamedPropertyLink namedProperties; // named properties.
+    VariablePropertyLink variableProperties; // variable properties.
+    int nr;
+};
+
+Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
+                               NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
+Properties LINK_Properties(Context context, Properties env);
+Properties UNLINK_Properties(Context context, Properties env);
 
 struct _NamedPropertyLink
 {
@@ -864,7 +876,7 @@ struct _NamedPropertyLink
     const char* name;
     union {
         Term term; // when name != NULL
-        Variable weakening; // when name == NULL - indicates context-bound variable known to not occur
+        Hashset2 propset; // when name == NULL - hash set of many links at once
     } u;
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
@@ -873,21 +885,12 @@ struct _NamedPropertyLink
     int nr;
 };
 
-extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, NamedPropertyLink nlink);
+extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink);
 
 extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
 // Property list is not closed when the first element is a list of free variable
 #define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
-
-
-static inline VARIABLESET namedPropertyFreeVars(NamedPropertyLink link)
-{
-    if (link && !link->name)
-        return (VARIABLESET) link->u.weakening;
-
-    return NULL;
-}
 
 extern NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link);
 
@@ -898,26 +901,21 @@ struct _VariablePropertyLink
     Variable variable;
     union {
         Term term; // when variable != NULL
-        Variable weakening; // when variable == NULL - indicates context-bound variable known to not occur
+        Hashset2 propset; // when name == NULL - hash set of many links at once
     } u;
 #ifdef CRSXPROF
     size_t marker; // counter helper for graph traversal.
 #endif
 };
 
-static inline VARIABLESET variablePropertyFreeVars(VariablePropertyLink link)
-{
-    if (link && !link->variable)
-        return (VARIABLESET) link->u.weakening;
-
-    return NULL;
-}
-
-
 static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link) { if (link) ++(link->nr); return link; };
 #define UNLINKSET_VariablePropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
 
 extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link);
+
+#define ASSERT_VARIABLE_PROPERTIES(context, properties) \
+ASSERT(context, ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars)));
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERIC VARIABLE SETS AND MAPS
@@ -1011,7 +1009,7 @@ struct _LinkedList2 {
 };
 
 struct _Pair {
-    void* key;
+    const void* key;
     void* value;
 };
 
@@ -1024,6 +1022,7 @@ struct _Hashset2
     size_t size;             // Number of entries
 
     LinkedList2 *entries;    // Array of entries. Size of array = nslots
+    void (*unlinkEntry)(Context, void*); // function to unlink entries
 };
 
 // Increment reference count
@@ -1034,7 +1033,7 @@ static inline Hashset2 linkHS2(Hashset2 set)
 // Decrement reference count
 extern Hashset2 unlinkHS2(Context context, Hashset2 set);
 // Allocate set
-extern Hashset2 makeHS2(Context context, int numbits);
+extern Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void*));
 // Copy set.
 extern Hashset2 copyHS2(Context context, Hashset2 set);
 // Add entry to set. Create new set if needed.
@@ -1044,7 +1043,7 @@ extern Hashset2 addValueHS2(Context context, Hashset2 set, const char* key, void
 // Get value for given string key
 extern void* getValuePtrHS2(Hashset2 set, const char* key);
 // Add value of given pointer key to set. Create new set if needed.
-extern Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, void* key, void* value);
+extern Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, const void* key, void* value);
 // Get value for given pointer key
 extern void* getKeyPtrValuePtrHS2(Hashset2 set, void* key);
 // Remove entry to set.
@@ -1061,6 +1060,10 @@ extern Hashset2 removeAllHS2(Context context, Hashset2 set, void** vars, ssize_t
 extern Hashset2 clearHS2(Context context, Hashset2 set);
 // Enumerate set as old-fashioned VariableSet
 extern void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int constrained, VariablePropertyLink props);
+// Return memory used
+extern long memoryUsedHS2(Hashset2 set);
+extern void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set);
+extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
 
 
 static inline Hashset LINK_Hashset(Context context, Hashset set) { if (set && set != AllFreeVariables) ++(set->nr); return set; };
@@ -1088,6 +1091,13 @@ extern Hashset clearHS(Context context, Hashset set);
 extern void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constrained, VariablePropertyLink props);
 // Print out set
 extern void printfHS(Context context, FILE* out, Hashset set);
+
+
+struct _TermLink {
+    void* p;
+    unsigned count;
+    TermLink link;
+};
 
 
 struct _VariableSet2

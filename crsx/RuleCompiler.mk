@@ -6,9 +6,11 @@ CC = gcc
 CCFLAGS=-g -Wall 
 #-O3
 
+ifndef ICU4CDIR
 ICU4CDIR=
+endif
+
 ICU4CLIB=-licui18n -licuuc -licudata
-#INCLUDES = /usr/include
 
 CACHE=rulecompiler
 
@@ -16,7 +18,7 @@ CACHE=rulecompiler
 .SECONDARY:
 
 .PHONY: prereq bin 
-bin: bin/crsx
+bin: lib/javacc.jar lib/antlr-runtime-3.1.3.jar compile bin/crsx
 
 clean::
 	@rm -f $(CACHE)/*.*
@@ -44,7 +46,7 @@ $(CACHE)/crsx.c $(CACHE)/crsx.h $(CACHE)/crsx_scan.l $(CACHE)/main.c $(CACHE)/li
 
 #
 $(CACHE)/crsx.o: $(CACHE)/crsx.c $(CACHE)/crsx.h
-	$(CC) $(CCFLAGS) -I$(CACHE) -c $(CACHE)/crsx.c -o $@
+	$(CC) $(CCFLAGS) -I$(CACHE) -I$(ICU4CDIR)/../include -c $(CACHE)/crsx.c -o $@
 #
 $(CACHE)/crsx_scan.o: $(CACHE)/crsx_scan.c $(CACHE)/crsx.h 
 $(CACHE)/crsx_scan.c: $(CACHE)/crsx_scan.l
@@ -199,7 +201,8 @@ $(foreach tgt, $(TARGETS), $(eval $(call TARGETED_FAMILY_DEPENDENCIES,$(tgt))))
 
 bin/crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
 	@mkdir -p bin
-	$(CC) $^ $(ICU4CDIR) $(ICU4CLIB)  -o $@
+	$(CC) $^ $(ICU4CLIB) -o $@
+#	$(CC) $^ $(ICU4CLIB) -L$(ICU4CDIR)/ -o $@
 
 # Default C compilation
 %.o: %.c
