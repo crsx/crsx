@@ -6,8 +6,14 @@
 ANT = ant
 RSYNC = rsync
 
-CRSXBUILD = build 
+CRSXBUILD = build
+ 
+ifdef JAVA_HOME 
 JAVA = $(JAVA_HOME)/jre/bin/java
+else
+JAVA = java
+endif
+
 
 RUNCRSXRC = $(JAVA) -Dfile.encoding=UTF-8 -Xss20000K -Xmx2000m -cp $(CRSXBUILD) net.sf.crsx.run.Crsx allow-unnamed-rules allow-missing-cases
 COMPILERSRC = src/net/sf/crsx/compiler

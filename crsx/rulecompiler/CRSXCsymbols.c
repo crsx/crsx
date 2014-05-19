@@ -1,6 +1,6 @@
 /* Generated table of all CRSXC symbols. */
 #include "CRSXC.h"
-size_t symbolDescriptorCount = 2191;
+size_t symbolDescriptorCount =     2191;
 struct _SymbolDescriptor symbolDescriptorTable[] = {
 {"$Cons",&descriptor_M__sCons},
 {"$False",&descriptor_M__sFalse},

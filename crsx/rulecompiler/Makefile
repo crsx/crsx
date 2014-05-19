@@ -8,8 +8,13 @@
 #    CXX=g++
 include $(MAKEFILE_CC)
 
+UNAME_S=$(shell uname -s)
 CCFLAGS=-g -Wall 
 #-O3
+ifeq ($(UNAME_S),Darwin)
+CCFLAGS+=-Wno-gnu-variable-sized-type-not-at-end -std=c99
+endif
+
 
 ICU4CLIB=-licui18n -licuuc -licudata
 
@@ -28,7 +33,6 @@ crsx.o: crsx.c crsx.h
 crsx_scan.o: crsx_scan.c crsx.h
 linter.o: linter.c linter.h crsx.h 
 main.o: main.c linter.h crsx.h
-
 
 #===================================================================================================
 # Rules
@@ -49,7 +53,7 @@ $(foreach family, $(CRSXCFAMILIES), $(eval $(call TARGETS,$(family))))
 #===================================================================================================
 # bin
 
-crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
+crsxc: $(CRSXCO_FILES) $(CRSXO_FILES)
 	$(CXX) $^ $(ICU4CLIB) -L$(ICU4CDIR)/ -o $@
 
 # Default C compilation
@@ -57,4 +61,4 @@ crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
 	$(CC) $(CCFLAGS) -I$(ICU4CDIR)/../include -c $< -o $@
 
 clean:
-	rm -f crsx $(CRSXCO_FILES) $(CRSXO_FILES)
+	rm -f crsxc $(CRSXCO_FILES) $(CRSXO_FILES)

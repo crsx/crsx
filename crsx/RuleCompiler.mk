@@ -1,13 +1,21 @@
 # Makefile for CRSX rule compiler.
 
 # Standard programs.
-
+UNAME_S=$(shell uname -s)
 CC = gcc
 CCFLAGS=-g -Wall 
 #-O3
 
+ifeq ($(UNAME_S),Darwin)
+CCFLAGS+=-Wno-gnu-variable-sized-type-not-at-end -std=c99
+endif
+
+
 ifndef ICU4CDIR
 ICU4CDIR=
+ifeq ($(UNAME_S),Darwin)
+ICU4CDIR=/usr/local/opt/icu4c/lib
+endif
 endif
 
 ICU4CLIB=-licui18n -licuuc -licudata
@@ -18,14 +26,13 @@ CACHE=rulecompiler
 .SECONDARY:
 
 .PHONY: prereq bin 
-bin: lib/javacc.jar lib/antlr-runtime-3.1.3.jar compile bin/crsx
+bin: lib/javacc.jar lib/antlr-runtime-3.1.3.jar compile bin/crsxc
 
 clean::
 	@rm -f $(CACHE)/*.*
-	@rm -f bin/crsx
+	@rm -f bin/crsxc
 
 prereq:
-	@mkdir -p bin
 	@mkdir -p $(CACHE)
 
 #===================================================================================================
@@ -100,7 +107,7 @@ $(CACHE)/$(1)_%_fun.c: $(CACHE)/$(1)_%.dr
  # - symbol list for crsx_scan.
  $(CACHE)/$(1)_%.symlist: $(CACHE)/$(1)_%_header.dr
 	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=$(COMPILERSRC)/c/symbols.crs wrapper="ComputeSymbols" sink=net.sf.crsx.text.TextSink input="$$<" output="$$@.tmp"
-	@sed -e 's/}, */},\n/g' -e 's/ //g' $$@.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $$@
+	@sed -e 's/ {/\'$$$$'\n{/g' -e 's/ //g' $$@.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $$@
 	@rm -f $$@.tmp
 
  # specific targets for data symbols.
@@ -116,7 +123,7 @@ $(CACHE)/$(1)_%_fun.c: $(CACHE)/$(1)_%.dr
 
  $(CACHE)/$(1)_data.symlist: $(CACHE)/$(1)_data.dr  
 	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=$(COMPILERSRC)/c/symbols.crs wrapper="ComputeSymbols" sink=net.sf.crsx.text.TextSink input="$(CACHE)/$(1)_data.dr" output="$(CACHE)/$(1)_data.symlist.tmp"
-	sed -e 's/}, */},\n/g' -e 's/ //g' $(CACHE)/$(1)_data.symlist.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $(CACHE)/$(1)_data.symlist
+	sed -e 's/ {/\'$$$$'\n{/g' -e 's/ //g' $(CACHE)/$(1)_data.symlist.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $(CACHE)/$(1)_data.symlist
 	@rm $(CACHE)/$(1)_data.symlist.tmp
 
  $(1)DR_FILES += $(CACHE)/$(1)_data.dr
@@ -199,10 +206,9 @@ $(foreach tgt, $(TARGETS), $(eval $(call TARGETED_FAMILY_DEPENDENCIES,$(tgt))))
 #===================================================================================================
 # bin
 
-bin/crsx: $(CRSXCO_FILES) $(CRSXO_FILES)
+bin/crsxc: $(CRSXCO_FILES) $(CRSXO_FILES)
 	@mkdir -p bin
-	$(CC) $^ $(ICU4CLIB) -o $@
-#	$(CC) $^ $(ICU4CLIB) -L$(ICU4CDIR)/ -o $@
+	$(CC) $^ $(ICU4CLIB) -L$(ICU4CDIR) -o $@
 
 # Default C compilation
 %.o: %.c
