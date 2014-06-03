@@ -1241,6 +1241,52 @@ class GenericEvaluator extends FixedGenericConstruction
 				break;
 			}
 			
+			case REVERSE_PICK : {
+				// $[ReversePick, index, list]
+				computeArgument(1);
+///				contractArgument(2);
+                if (Util.isConstant(sub(1)))
+                {
+    				Term list = sub(2);
+                    int length=0;
+                    while (Util.isCons(list.constructor()))
+                    {
+                    	list = list.sub(1);
+                    	length++;
+                    }                	
+                	try
+                	{
+                		int index = length - Integer.decode(Util.symbol(sub(1)));
+                		list = sub(2);
+                		if (index < 0) break What;
+                		while (index-- > 0)
+                		{
+                			if (!Util.isCons(list.constructor())) break What;
+                			list = list.sub(1);
+                		}
+            			if (!Util.isCons(list.constructor())) break What;
+            			return rewrapWithProperties(list.sub(0));
+                	}
+                	catch (NumberFormatException e)
+                	{}
+                }
+				break;
+			}
+
+			case LIST_LENGTH : {
+				// $[ListLength, list]
+///				computeArgument(1);
+///				contractArgument(2);
+				Term list = sub(1);
+                int length=0;
+                while (Util.isCons(list.constructor()))
+                {
+                	list = list.sub(1);
+                	length++;
+                }
+                rewrapWithProperties(factory.literal(length));
+			}
+			
 			case IF_ZERO : {
 				// $[IfZero, maybe-zero-number, true-result, false-result]
 				computeArgument(1);

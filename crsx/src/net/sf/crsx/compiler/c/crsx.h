@@ -198,6 +198,7 @@ extern char *makeSubstring(Context context, const char *src, size_t first, size_
 extern char *makeEscaped(Context context, const char *src);
 extern char *makeRescaped(Context context, const char *src);
 extern char *makeMangled(Context context, const char *src);
+extern char *makeEncodePoint(Context context, unsigned int code);
 
 // Hash code for term.
 #define HASH_CODE(CONTEXT, TERM) termHashCode(CONTEXT, TERM, NULL)
@@ -290,7 +291,10 @@ extern int saveTerm(Context context, char *name, Term term);
 // Note: the (parse+)load functions are defined in crsx_scan.l
 //
 #ifndef LOAD_TERM
-# define LOAD_TERM(SINK,NAME) loadTerm(SINK, NAME)
+# define LOAD_TERM(SINK,CAT,NAME) loadTerm(SINK, NAME)
+#endif
+#ifndef SCAN_TERM
+# define SCAN_TERM(SINK,CAT,TEXT) scanTerm(SINK, TEXT)
 #endif
 extern int loadTerm(Sink sink, char *name);
 extern int readTerm(Sink sink, FILE *input);
@@ -1156,6 +1160,7 @@ extern void printTerm(Context context, Term term);
 extern void printTermWithIndent(Context context, Term term);
 extern void fprintTerm(Context context, FILE* out, Term term);
 extern void fprintTermWithIndent(Context context, FILE* out, Term term);
+extern void printTermFullWithIndent(Context context, Term term);
 extern void ppt(Context context, int nesting, Term term);
 extern void pt(Context context, Term term);
 

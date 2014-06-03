@@ -2825,6 +2825,7 @@ static void escape(char **sourcep, char **targetp, char *endsource, char *endtar
         switch (c)
         {
         case '\"' : *(t++) = '\\'; *(t++) = '\"'; break;
+    	case '\\' : *(t++) = '\\'; *(t++) = '\\'; break;
         case '\n' : *(t++) = '\\'; *(t++) = 'n'; break;
         case '\r' : *(t++) = '\\'; *(t++) = 'r'; break;
         case '\f' : *(t++) = '\\'; *(t++) = 'f'; break;
@@ -3050,6 +3051,38 @@ char *makeMangled(Context context, const char *src)
     memcpy(dst, tmp, dstz);
     return dst;
 }
+
+
+char * makeEncodePoint(Context context, unsigned int c)
+{
+  unsigned char *res;
+  if (c<0x80) {
+    res = ALLOCATE(context, 2);
+    res[0] = c>>0  & 0x7F | 0x00;
+    res[1] = 0;
+  } else if (c<0x0800) {
+    res = ALLOCATE(context, 3);
+    res[0] = c>>6  & 0x1F | 0xC0;
+    res[1] = c>>0  & 0x3F | 0x80;
+    res[2] = 0;
+  } else if (c<0x010000) {
+    res = ALLOCATE(context, 4);
+    res[0] = c>>12 & 0x0F | 0xE0;
+    res[1] = c>>6  & 0x3F | 0x80;
+    res[2] = c>>0  & 0x3F | 0x80;
+    res[3] = 0;
+  } else if (c<0x110000) {
+    res = ALLOCATE(context, 5);
+    res[0] = c>>18 & 0x07 | 0xF0;
+    res[1] = c>>12 & 0x3F | 0x80;
+    res[2] = c>>6  & 0x3F | 0x80;
+    res[3] = c>>0  & 0x3F | 0x80;
+    res[4] = 0;
+  }
+  return res;   
+}
+
+
 
 char *stringnf(Context context, size_t size, const char *format, ...)
 {
@@ -5221,6 +5254,27 @@ void printTermWithIndent(Context context, Term term)
     fprintTermWithIndent(context,STDOUT,term);
 }
 
+
+void printTermFullWithIndent(Context context,  Term term)
+{
+    printCookieNameList = NULL;
+
+    Hashset2 used = NULL;
+    if (getenv("CANONICAL_VARIABLES"))
+        used = makeHS2(context, 10);
+
+    VariableSet set = makeVariableSet(context);
+    int pos = 0;
+    fprintTermTop(context, STDOUT, term, INT32_MAX, set, used, 1, &pos, INT32_MAX, 0);
+    FPRINTF(context, STDOUT, "\n");
+    freeVariableSet(set);
+    fprintCookies(context);
+
+    if (getenv("CANONICAL_VARIABLES"))
+        unlinkHS2(context, used);
+}
+
+
 // Determines if the specified 8-bit character is an ISO control character. A character is considered to be an ISO
 // control character if its code is in the range '\u0000' through '\u001F' or in the range '\u007F' through '\u009F'.
 //
@@ -5576,8 +5630,8 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
             {
                 *posp += FPRINTF(context, out, "{");
                 char *sep = "";
-                sep = fprintNamedProperties(context, out, construction->properties->namedProperties, sep, depth-10, encountered, used, indent, posp, debug, includeprops);
-                sep = fprintVariableProperties(context, out, construction->properties->variableProperties, sep, depth-10, encountered, used, indent, posp, debug, includeprops);
+                sep = fprintNamedProperties(context, out, construction->properties->namedProperties, sep, depth==INT32_MAX?depth:depth-10, encountered, used, indent, posp, debug, includeprops);
+                sep = fprintVariableProperties(context, out, construction->properties->variableProperties, sep, depth==INT32_MAX?depth:depth-10, encountered, used, indent, posp, debug, includeprops);
                 if (indent && depth > 1) { FPRINTF(context, out, "\n%.*s", indent, SPACES); *posp = indent; }
                 *posp += FPRINTF(context, out, "}");
             }
@@ -5711,14 +5765,14 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
         *posp += fprintSafeVariableName(context, out, (Variable) key, used);
     }
     *posp += FPRINTF(context, out, " : ");
-    fprintTermTop(context, out, term, depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
+    fprintTermTop(context, out, term, depth==INT32_MAX?depth:depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
     sep = ";\n";
     return sep;
 }
 
 
 /** Print named properties (and return sep on empty, "; " otherwise). */
-char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max /*includeprops*/)
 {
     NamedPropertyLink link;
     for (link = namedProperties; link; link = link->link)
@@ -5731,14 +5785,14 @@ char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedP
         {
             sep = fprintPropsHS2(context, out, 1, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
-        if (max-- <=0)
-            break;
+        if ((max==INT32_MAX?max:max--) <=0)
+        	break;
     }
     return sep;
 }
 
 /** Print variable properties (and return sep on empty, "; " otherwise). */
-char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink variableProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink variableProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max/*includeprops*/)
 {
     VariablePropertyLink link;
     for (link = variableProperties; link; link = link->link)
@@ -5751,8 +5805,9 @@ char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink 
         {
             sep = fprintPropsHS2(context, out, 0, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
-        if (max-- <=0)
-            break;
+
+        if ((max==INT32_MAX?max:max--) <=0)
+           	break;
     }
     return sep;
 }
@@ -5887,6 +5942,8 @@ void printCTerm2(Context context, Term term, VariableSet allocated, char *sink, 
 }
 
 #ifdef CRSXPROF
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////////
