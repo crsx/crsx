@@ -556,10 +556,13 @@ class GenericEvaluator extends FixedGenericConstruction
             	// $[VariableNameIs, v, #name, #result]
                 computeArgument(1);
                 computeArgument(2);
-                if (sub(1).kind() != Kind.VARIABLE_USE || !Util.isConstant(sub(2))) break; // "Can only name variable with constant"
-                Variable v = sub(1).variable();
-                String n = Util.symbol(sub(2));
-                v.setName(n.replaceFirst("[a-z][a-zA-Z0-9]*", n));
+                if (sub(1).kind() == Kind.VARIABLE_USE && Util.isConstant(sub(2)))
+                {
+                    // "Can only name variable with constant"
+                    Variable v = sub(1).variable();
+                    String n = Util.symbol(sub(2));
+                    v.setName(n.replaceFirst("[a-z][a-zA-Z0-9]*", n));
+                }
                 return rewrapWithProperties(sub(3));
             }
             
