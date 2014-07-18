@@ -20,7 +20,7 @@ ICU4CLIB=-licui18n -licuuc -licudata
 
 CRSXCO_FILES=
 
-.DEFAULT_GOAL := crsx
+.DEFAULT_GOAL := crsxc
 
 #===================================================================================================
 # CRSX.
