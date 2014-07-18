@@ -28,13 +28,13 @@ Reified_Declaration ::=(
 	// Namen[ CompileType[Type], Option*n ] : TermLn → TermRn
 	// 
 	FUNCTION[
-		$String<!--Name (prefix + function)-->,
-		$String<!--CompileType-->,
-		$List[$Numeric]<!--discriminatorpath-->,
+		$String<!-- Qualified Name (prefix + function). Must be unique. Qualified names of the form Cons1.Cons2...Consn -->,
+		$String<!-- CompileType. Either 'dispatch', 'contract', 'shuffle' or 'full' -->,
+		$List[$Numeric]<!--discriminatorpath-->, // Unused.
 		$String<!--Function-->,
-		$List[Reified_Form],
-		Reified_Sort,
-		$List[Reified_Rule]
+		$List[Reified_Form],  // TODO: Should not be a list?
+		Reified_Sort,          <!-- Function Sort -->
+		$List[Reified_Rule]    <!-- List of rules -->
 	];
 
 );
