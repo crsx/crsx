@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# Script to dispatch CRSX source file
+
+function show_help {
+	echo "Usage : $0 dispatch help"
+  echo "        $0 dispatch [--cp <path>] [--p <parser>] [--o <file>] <input.crs>"
+	echo " where"
+	echo "   <path>    colon-separated class paths"
+	echo "   <parser>  colon-separated parser qualified name"	
+}
+
+function run_dispatch {
+	if [ $# -lt 1 ]
+	then
+    	show_help
+      exit 0
+	fi
+	
+	local classpath=$CRSXJAR
+	local grammar=
+	local input=
+	local output=
+	while :
+    do
+   		case $1 in
+        help)
+            show_help
+            exit 0
+            ;;
+   			--cp)
+   			    if [ -z "$2" ]
+   			    then
+   			        echo "error: missing path argument after --cp"
+   			    	show_help
+   			    	exit 0
+   			    fi
+   				classpath="$classpath:$2"
+   				shift 2
+   				;;
+   			--p)
+   			    if [ -z "$2" ]
+   			    then
+   			        echo "error: missing grammar argument after --p"
+   			    	show_help
+   			    	exit 0
+   			    fi
+   			    grammar=$2
+   			    shift 2
+   			    ;;
+   			--o)
+   			    if [ -z "$2" ]
+   			    then
+   			        echo "error: missing output argument after --o"
+   			    	show_help
+   			    	exit 0
+   			    fi
+   			    output=$2
+   			    shift 2
+   			    ;;
+   			-*)
+               	printf >&2 "warning: unknown option: %s\n" "$1"
+  	            shift
+  	            ;;
+  	         *) 
+	            break
+  	            ;;    
+		esac
+ 	done
+	
+	if [ ! -f $1 ]
+	then
+		echo "error: filename \"$1\" doesn't exist"
+		exit
+	fi
+	
+	local cmd="$JAVA -cp $classpath net.sf.crsx.run.Crsx allow-unnamed-rules"
+	
+	if [ -n "$grammar" ]
+	then
+		cmd="$cmd grammar=('$grammar';)" 
+	fi
+	
+	cmd="$cmd rules=$1 sortify dispatchify simple-terms omit-linear-variables canonical-variables"
+	
+	if [ -n "$output" ]
+	then
+		cmd="$cmd reify=$output" 
+	fi
+	
+	echo $pwd
+	echo $cmd
+	$cmd
+			
+}
+	

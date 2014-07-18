@@ -1,0 +1,32 @@
+# Directory configuration
+ROOT=$DIR/..
+LIB=$ROOT/lib
+BUILD=$ROOT/build
+
+# Java configuration
+JAVA=java
+JAVAC=javac
+
+
+# CRSX configuration
+
+CRSXJAR=$ROOT/crsx.jar
+CRSX="$JAVA -cp $CRSXJAR net.sf.crsx.run.Crsx allow-unnamed-rules"
+CRSXC="$DIR/crsxc"
+CRSXS="$DIR/crsx"
+
+CRSXC_FILES=$BUILD/crsx
+CRSXC_HEADER=$CRSXC_FILES/crsx.h
+
+# JavaCC configuration
+JAVACCJAR=$LIB/javacc.jar
+JAVACC="$JAVA -cp $JAVACCJAR javacc"
+
+
+# Bash-friendly Common.mk.in
+C99FLAG="-std=c99"
+CLANGFLAGS="-Wno-gnu-variable-sized-type-not-at-end"
+LDFLAGS="-L/usr/local/opt/icu4c/lib"
+CFLAGS="-I/usr/local/opt/icu4c/include $C99FLAG $CLANGFLAGS"
+CC="gcc"
+CXX="g++"

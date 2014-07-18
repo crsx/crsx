@@ -1,0 +1,41 @@
+#/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ 
+# Check at least argument is given 
+if [ $# -lt 1 ]
+then
+        echo "Usage : $0 <command> [options]"
+        echo "Where command is one of:"
+        echo "  compile, pg, dispatch"
+        echo "Type $0 <command> help to read about the command documentation." 
+        exit
+fi
+
+source $DIR/library/env
+
+case "$1" in
+
+pg) 
+		shift
+		source $DIR/library/crsx_pg
+		run_pg $*
+		;;	
+
+dispatch)
+		shift
+		source $DIR/library/crsx_dispatch
+		run_dispatch $*
+		;;
+
+compile)
+        shift
+		source $DIR/library/crsx_compile
+		run_compile $*
+		;;
+
+*)     echo "Invalid command \"$1\""
+
+esac
+
+
