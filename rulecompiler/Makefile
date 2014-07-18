@@ -61,4 +61,5 @@ crsxc: $(CRSXCO_FILES) $(CRSXO_FILES)
 	$(CC) $(CCFLAGS) -I$(ICU4CDIR)/../include -c $< -o $@
 
 clean:
-	rm -f crsxc $(CRSXCO_FILES) $(CRSXO_FILES)
+	rm -f crsxc $(CRSXCO_FILES) $(CRSXO_FILES) 
+	rm -f *.symlist *.dr *.tmp
