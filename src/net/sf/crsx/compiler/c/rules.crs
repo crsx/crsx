@@ -50,8 +50,6 @@ extern "C" {
 
 F-Declaration[Reified_Declaration, $String] :: Text;
 
-//Empty[Discard[#module]]             : F-Declaration[(), #module] → %n⟪⟫ ;
-
 Polymorphic[Fresh[argument::Reified_Variable]]  
 : 
 F-Declaration[POLYMORPHIC[a.#Declaration[a]], #module] 
@@ -70,22 +68,22 @@ Function
 :
 F-Declaration[FUNCTION[#prefix, #kind, #path, #function, #Forms, #Sort, #Rules], #module]
 →
-$[If, $[StartsWith,#prefix, #module], F-Function[#kind, #path, #function, #Forms, #Sort, #Rules], %n⟪⟫]
+$[If, $[StartsWith,#prefix, #module], F-Function[#kind, #function, #Forms, #Sort, #Rules], %n⟪⟫]
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // RULE FUNCTIONS.
 
-F-Function[$String, $List[$Numeric], $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+F-Function[$String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
 
-F-Function[#kind, #path, #function, (SORT-SET[#Sort1, #Sort2, #Form]; #Forms), #Sort, #Rules]
+F-Function[#kind, #function, (SORT-SET[#Sort1, #Sort2, #Form]; #Forms), #Sort, #Rules]
 →
-F-Function[#kind, #path, #function, (#Form; #Forms), #Sort, #Rules]
+F-Function[#kind, #function, (#Form; #Forms), #Sort, #Rules]
 ;
 
 -[Fresh[sink::Text, term::Text]]
 :
-F-Function[#kind, #path, #function, (FORM[#name, #FormArguments]; #Forms), SORT[#SortName,#SortArgs], #Rules]
+F-Function[#kind, #function, (FORM[#name, #FormArguments]; #Forms), SORT[#SortName,#SortArgs], #Rules]
 →
 %n⟪
 /* FUNCTION « COMMENT_TOKEN[#function] ». */
@@ -95,14 +93,14 @@ struct _ConstructionDescriptor « Descriptor[#function] » = {« $[If, $[Contain
 
 int «Step[#function]»(Sink «sink», Term «term»)
 {⟦
-« F-Body[#kind, #path, sink, term, #function, #FormArguments, SORT[#SortName,#SortArgs], #Rules] »return 0;⟧
+« F-Body[#kind, sink, term, #function, #FormArguments, SORT[#SortName,#SortArgs], #Rules] »return 0;⟧
 }
 ⟫
 ;
 
 -[Fresh[sink::Text, term::Text]]
 :
-F-Function[#kind, #path, #function, (FORM[#name, #FormArguments]; #Forms), SORT-VARIABLE[#SortVariable], #Rules]
+F-Function[#kind, #function, (FORM[#name, #FormArguments]; #Forms), SORT-VARIABLE[#SortVariable], #Rules]
 →
 %n⟪
 /* FUNCTION « COMMENT_TOKEN[#function] ». */
@@ -112,26 +110,26 @@ struct _ConstructionDescriptor « Descriptor[#function] » = {NULL, 0, « INTEGE
 
 int «Step[#function]»(Sink «sink», Term «term»)
 {⟦
-« F-Body[#kind, #path, sink, term, #function, #FormArguments, SORT-VARIABLE[#SortVariable], #Rules] »return 0;⟧
+« F-Body[#kind, sink, term, #function, #FormArguments, SORT-VARIABLE[#SortVariable], #Rules] »return 0;⟧
 }
 ⟫
 ;
 //TODO: check #Forms empty and #function = #name.
 
-F-Function[#kind, #path, #function, (), #Sort, #Rules]
+F-Function[#kind, #function, (), #Sort, #Rules]
 →
 %n⟪⟫
 ;
 
-F-Body[$String, $List[$Numeric], Text, Text, $String, $List[Reified_FormArgument], Reified_Sort, $List[Reified_Rule]] :: Text;
+F-Body[$String, Text, Text, $String, $List[Reified_FormArgument], Reified_Sort, $List[Reified_Rule]] :: Text;
 
-F-Body[#kind, #path, #sink, #term, #function, #FormArguments, #Sort, #Rules]
+F-Body[#kind, #sink, #term, #function, #FormArguments, #Sort, #Rules]
 → 
 %n⟪int « #term »_count = LINK_COUNT(« #term »); permitUnusedInt(« #term »_count);
 «
 $[If, $[Equal, #kind, "Contract"], F-Contract[#sink, #term, #function, #Rules],
 $[If, $[Equal, #kind, "BinderDispatch"], F-Contract[#sink, #term, #function, #Rules], //TODO: only works for single rule...
-$[If, $[Equal, #kind, "Dispatch"], F-Dispatch[#sink, #term, #path, #function, #FormArguments, #Sort, #Rules],
+$[If, $[Equal, #kind, "Dispatch"], F-Dispatch[#sink, #term, #function, #FormArguments, #Sort, #Rules],
 $[If, $[Equal, #kind, "Shuffle" ], F-Contract [#sink, #term, #function, #Rules],
 %n⟨⟩]]]]
 »⟫
@@ -244,36 +242,36 @@ F-Fresh2[sink, #term]
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Dispatch rule function: single rule that switches on an initial value before contracting the remainder.
 
-F-Dispatch[Text, Text, $List[$Numeric], $String, $List[Reified_FormArgument], Reified_Sort, $List[Reified_Rule]] :: Text;
+F-Dispatch[Text, Text, $String, $List[Reified_FormArgument], Reified_Sort, $List[Reified_Rule]] :: Text;
 
 // Generate function body for complete contraction rule set.
-F-Dispatch[#sink, #term, #path, #function, (#FormArgument1;#FormArguments), #ResultSort, #Rules]
+F-Dispatch[#sink, #term, #function, (#FormArgument1;#FormArguments), #ResultSort, #Rules]
 →
-F-Dispatch-choice[#function, #FormArgument1, #sink, #term, #path, #Rules]
+F-Dispatch-choice[#function, #FormArgument1, #sink, #term, #Rules]
 ;
 
 // Generate choice.
 
-F-Dispatch-choice[$String, Reified_FormArgument, Reified_Variable, Reified_Variable, $List[$Numeric], $List[Reified_Rule]] :: Text;
+F-Dispatch-choice[$String, Reified_FormArgument, Reified_Variable, Reified_Variable, $List[Reified_Rule]] :: Text;
 
 //// TODO: TEMPORARY RULE UNTIL FOUND OUT WHY BinderSort is missing
 //-[Fresh[dummy::Text]]
 //:
-//F-Dispatch-choice[#function, FORM-BINDER[v.#Form[v]], #sink, #term, #path, #Rules]
+//F-Dispatch-choice[#function, FORM-BINDER[v.#Form[v]], #sink, #term, #Rules]
 //→
-//F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #path, #Rules]
+//F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #Rules]
 //;
 
 -[Fresh[dummy::Text]]
 :
-F-Dispatch-choice[#function, FORM-BINDER[#BinderSort, v.#Form[v]], #sink, #term, #path, #Rules]
+F-Dispatch-choice[#function, FORM-BINDER[#BinderSort, v.#Form[v]], #sink, #term, #Rules]
 →
-F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #path, #Rules]
+F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #Rules]
 ;
 
 -[Fresh[sub::Text, choice::Text]]
 :
-F-Dispatch-choice[#function, FORM-ARGUMENT[SORT[#SortName, #SortParams]], #sink, #term, #path, #Rules]  
+F-Dispatch-choice[#function, FORM-ARGUMENT[SORT[#SortName, #SortParams]], #sink, #term, #Rules]  
 → 
 %n⟪Term «sub» = FORCE(«#sink»->context, SUB(«#term», 0));
 « Enum[#SortName] » «choice» = (IS_VARIABLE_USE(«sub») ? « EnumVar[#SortName] » : (« Enum[#SortName] ») TAG(«sub»));
@@ -286,7 +284,7 @@ switch («choice»)
 
 -[Free[alpha::Reified_Variable]]
 :
-F-Dispatch-choice[#function, FORM-ARGUMENT[SORT-VARIABLE[alpha]], #sink, #term, #path, #Rules]  
+F-Dispatch-choice[#function, FORM-ARGUMENT[SORT-VARIABLE[alpha]], #sink, #term, #Rules]  
 →
 F-Contract[#sink, #term, #function, #Rules] // dispatch on single polymorphic variable - just contract.
 ;

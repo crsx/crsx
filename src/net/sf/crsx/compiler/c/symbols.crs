@@ -47,7 +47,7 @@ X-Declaration[Reified_Declaration] :: Text;
 
 Polymorphic[Fresh[arg::Reified_Variable]] : X-Declaration[POLYMORPHIC[a.#Declaration[a]]                          ]        → X-Declaration[#Declaration[arg]] ;
 Data                                      : X-Declaration[DATA[#Sort, #Forms]                                     ]        → X-Data[#Sort, #Forms] ;
-Function                                  : X-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]] → X-Function[#name, #kind, #path, #function, #Forms, #Sort, #Rules] ;
+Function                                  : X-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]] → X-Function[#name, #kind, #function, #Forms, #Sort, #Rules] ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // DATA SORT HEADER DECLARATIONS.
@@ -72,11 +72,9 @@ X-Data[#Sort3, #Forms]
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // FUNCTION SORT HEADER DECLARATIONS.
 
-X-Function[$String, $String, $List[$Numeric], $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+X-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
 
--[Copy[#Forms],Discard[#name,#kind,#path,#function,#Sort,#Rules]]
-:
-X-Function[#name, #kind, #path, #function, #Forms, #Sort, #Rules]
+X-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 →
 %n⟪« MapText[f.X-Form[f], #Forms] »⟫
 ;
