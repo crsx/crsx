@@ -50,7 +50,6 @@ import net.sf.crsx.Unification;
 import net.sf.crsx.Valuation;
 import net.sf.crsx.Variable;
 import net.sf.crsx.Visitor;
-import net.sf.crsx.generator.AbstractGenerator;
 import net.sf.crsx.util.Buffer;
 import net.sf.crsx.util.ConstructorFilterSink;
 import net.sf.crsx.util.ContextStack;
@@ -947,22 +946,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						return sink;
 					}
 				}
-				else if (symbol.equals(Builder.COMPILE_SYMBOL))
-				{
-					evaluateArguments(arity, directive);
-
-					// $Compile[generator, dir, package-name, standalone]
-					if (arity == 4
-					        && Util.isConstant(directive.sub(0)) && Util.isConstant(directive.sub(1))
-					        && Util.isConstant(directive.sub(2)) && Util.isConstant(directive.sub(3)))
-					{
-						Class<AbstractGenerator> parserClass = (Class<AbstractGenerator>) Class.forName(Util.symbol(directive.sub(0)));
-						return compile(
-						        sink, parserClass, directive.sub(1).constructor().symbol(), Util.symbol(directive.sub(2)),
-						        !Util.isNull(directive.sub(3).constructor()));
-					}
-				}
-
 				else if (Util.isSequence(directive))
 				{
 					// ( Directive ;...; Directive ;)
@@ -1005,10 +988,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		catch (IOException e)
 		{
 			error("I/O error in " + directive + ": " + e.getMessage());
-		}
-		catch (ClassNotFoundException e)
-		{
-			error("Class instantiation error in " + directive + ": " + e.getMessage());
 		}
 		error("Unsupported directive: " + directive);
 		return sink;
@@ -1680,13 +1659,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 	//	    };
 	//	    term.visit(visitor, bound);
 	//	}
-
-	public Sink compile(Sink sink, Class<AbstractGenerator> generator, String srcRoot, String packageName, boolean standalone)
-	        throws CRSException
-	{
-		errorCheck("Errors prevent compilation.");
-		return new net.sf.crsx.generator.Compiler().compile(rulesByConstructor(), sink, generator, srcRoot, packageName, standalone);
-	}
 
 	// PropertiesHolder...
 
@@ -2844,7 +2816,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			}
 			sink = sink.start(sink.makeLiteral(ruleNamePrefix == null ? "" : ruleNamePrefix, CRS.STRING_SORT)).end(); // ruleNamePrefix
 			// - Rule type.
-			sink = sink.start(sink.makeLiteral(compileType == null ? "" : compileType, CRS.STRING_SORT)).end(); // compileType
+			sink = sink.start(sink.makeLiteral(compileType == null ? "default" : compileType, CRS.STRING_SORT)).end(); // compileType
 			// - Dispatch pattern.
 			if (discriminatorPath != null)
 				for (Integer n : discriminatorPath)

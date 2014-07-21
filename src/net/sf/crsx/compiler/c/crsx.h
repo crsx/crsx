@@ -24,9 +24,6 @@ extern "C" {
 #include <ctype.h>
 #include <math.h>
 
-//#define DEBUG
-//#define CRSXPROF
-
 // All the pointer types declared forward.
 typedef struct _Context *Context;
 typedef struct _Variable *Variable;
@@ -70,14 +67,17 @@ struct _Context
     char *str_filelocation;
     char *str_linelocation;
     char *str_columnlocation;
+
+
+#ifdef CRSX_ENABLE_PROFILING
+    int profiling;
+#endif
 };
 
 // Call this function before using a Context:
 extern void InitCRSXContext(Context context);
 
-//#define DEBUG
-
-// Debugging!
+// Debugging and profiling
 //
 #ifdef DEBUG
 # ifndef DEBUGENV
@@ -111,6 +111,9 @@ extern void InitCRSXContext(Context context);
 #ifndef DEBUGRULE
 # define DEBUGRULE(CONTEXT,RULE) DEBUGF(CONTEXT, "//%s\n", RULE)
 #endif
+
+// Turn on profiling.
+extern void enableProfiling(Context context);
 
 // Memory allocation.
 //
@@ -414,7 +417,7 @@ struct _Term
 {
     ConstructionDescriptor descriptor; // of the term or NULL for variables
     size_t nr;                         // number of references to this term (node)
-#ifdef CRSXPROF
+#ifdef CRSX_ENABLE_PROFILING
     size_t marker; // counter helper for graph traversal.
 #endif
 };
@@ -878,7 +881,7 @@ struct _NamedPropertyLink
         Term term; // when name != NULL
         Hashset2 propset; // when name == NULL - hash set of many links at once
     } u;
-#ifdef CRSXPROF
+#ifdef CRSX_ENABLE_PROFILING
     size_t marker; // counter helper for graph traversal.
 #endif
     int count;
@@ -903,7 +906,7 @@ struct _VariablePropertyLink
         Term term; // when variable != NULL
         Hashset2 propset; // when name == NULL - hash set of many links at once
     } u;
-#ifdef CRSXPROF
+#ifdef CRSX_ENABLE_PROFILING
     size_t marker; // counter helper for graph traversal.
 #endif
 };
@@ -990,7 +993,7 @@ extern void printfL(Context context, FILE* out, VariableSetLink set);
 
 struct _Hashset {
     unsigned nr;
-#ifdef CRSXPROF
+#ifdef CRSX_ENABLE_PROFILING
     size_t marker;
 #endif
     size_t nbits;

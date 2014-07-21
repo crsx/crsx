@@ -1,9 +1,9 @@
 // Copyright (c) 2013 IBM Corporation.
 // $$Id: main.c,v 3.3 2014/02/07 20:18:10 villardl Exp $$
 
-// CRSX C command line.
-// Usage:
-// crsx [command] [params]
+/**
+ * CRSXC command line.
+ */
 
 #include <assert.h>
 #include <alloca.h>
