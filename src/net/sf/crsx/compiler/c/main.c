@@ -93,8 +93,8 @@ int printUsage(char* errmsg)
 
     printf ("Usage: crsx <command> [<args>]\n\n");
     printf ("The commands are:\n");
-    printf ("  compile <header|rules|sorts|symbols> <rules.dr>    Compile reified rules to c code.\n");
-    printf ("  lint [-c] <input>                                  Check term lexical form.\n");
+    printf ("  compile <header|rules|sorts|symbols|opt1> <rules.dr>   Compile reified rules to c code.\n");
+    printf ("  lint [-c] <input>                                      Check term lexical form.\n");
     printf ("or:\n");
     printf ("  key=value...   Invoke raw rulecompiler with this environment setup.\n");
     exit(1);
@@ -164,6 +164,8 @@ int runCompile(int argp, int argc, char* argv[])
         wrapper = "ComputeSorts";
     else if (strcmp(kind, "symbols") == 0)
         wrapper = "ComputeSymbols";
+    else if (strcmp(kind, "opt1") == 0)
+            wrapper = "Optimize1";
     else
         return printUsage("Invalid compile mode.");
 

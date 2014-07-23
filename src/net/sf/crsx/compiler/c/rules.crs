@@ -9,6 +9,7 @@ RULES[(
 
 $Use["compiler/c/cdefs.crs"];
 $Use["compiler/c/term.crs"];
+$Use["compiler/opt.crs"];
 
 $Lax;
 
@@ -23,7 +24,17 @@ $Lax;
 
 ComputeRules[Reify_CRSX] :: Text;
 
-ComputeRules[CRSX[#name, #Declarations]]
+ComputeRules[#Crsx]
+→
+$[If, $[Equal, $[Get[$String], "OPTIMIZE", ""], "1"],
+    ComputeRules2[Optimize1[#Crsx]],
+    ComputeRules2[#Crsx]
+]
+;
+
+ComputeRules2[Reify_CRSX] :: Text;
+
+ComputeRules2[CRSX[#name, #Declarations]]
 →
 F-Declarations[#name, #Declarations, $[Get[$String], "MODULE", ""]]
 ;
@@ -806,10 +817,19 @@ F-PatternBinder1[(), #cookie, #pass, #stage, #promisc, b . #Binder[b], #sink, #c
 F-PatternBinder2[#cookie, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
 ;
 
+
+{#env}
+F-PatternBinder1[(META-USE[#mv,#k];#occs), UNIQUE[#cookie], #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+F-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+
 -[Fallback]
 :
 {#env}
-F-PatternBinder1[(#occ;#occs), UNIQUE[#cookie], #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+F-PatternBinder1[#occs, #cookie, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
 →
 {#env}
 F-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]

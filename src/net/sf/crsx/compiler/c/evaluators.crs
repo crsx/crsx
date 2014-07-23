@@ -354,7 +354,7 @@ freeVariableSet(«fvs»);⟧
 SEND_PRIMITIVE[E_UnionVariables];
 
 Send-UnionVariables[Fresh[list::Text,vs::Text,link::Text,v::Text,next::Text]]:
-{#env} E-send[E_UnionVariables, (LITERAL[#Name, SORT[#SortName, ()]]; #List1; #List2;), #Options, #sink]
+{#env} E-send[E_UnionVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); VariableSetLink «link»;
 « {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
@@ -387,7 +387,7 @@ freeVariableSet(«vs»);⟧
 SEND_PRIMITIVE[E_IntersectVariables];
 
 Send-IntersectVariables[Fresh[list::Text,vs::Text,size::Text,v::Text,next::Text]]:
-{#env} E-send[E_IntersectVariables, (CONSTRUCTION[#Name, (ARGUMENT[#Sort1, CONSTRUCTION[#SortName, ()]]; )]; #List1; #List2;), #Options, #sink]
+{#env} E-send[E_IntersectVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
 « {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 

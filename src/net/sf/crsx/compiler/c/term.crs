@@ -159,6 +159,8 @@ T-send[VARIABLE-USE[variable], sink]
 ⟫
 ;
 
+
+// TODO: this code does not do anything!!
 Send-MetaApplication
 :
 {#env}
@@ -487,78 +489,7 @@ T-link-prefix[#sink]
 →
 %n⟪LINK(«#sink»->context,⟫;
 
-// Helper to test variable reuse for (non-copied) meta-application argument in contraction.
-T_REUSE_SORT ::= ( T_REUSE; T_NO_REUSE; );
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-CheckReuse[Reified_Term] :: T_REUSE_SORT;
-
--[Free[y::Reified_Variable]]
-:
-{#env}
-T-CheckReuse[VARIABLE-USE[y]]
-→
-T-CheckReuse-Variable[$[{#env}Get[VARIABLE_ENTRY], y, FREE]] // FREE = T_NO_REUSE
-;
-
--[#Fallback]
-:
-{#env}
-T-CheckReuse[#]
-→
-T_NO_REUSE
-;
-
-
-T-CheckReuse-Variable[VARIABLE_ENTRY] :: T_REUSE_SORT;
-
-T-CheckReuse-Variable[FRESHREUSE] → T_REUSE;
-T-CheckReuse-Variable[BOUNDREUSE] → T_REUSE;
-T-CheckReuse-Variable[BOUND]      → T_NO_REUSE;
-T-CheckReuse-Variable[FREE]       → T_NO_REUSE;
-T-CheckReuse-Variable[FRESH]      → T_NO_REUSE;
-
-//
-//-[Free[y::Reified_Variable]]:
-//{y : FRESHREUSE}
-//T-CheckReuse[VARIABLE-USE[y]]
-//→
-//T_REUSE
-//;
-//
-//-[Free[y::Reified_Variable]]:
-//{y : BOUND}
-//T-CheckReuse[VARIABLE-USE[y]]
-//→
-//T_NO_REUSE
-//;
-//
-//-[Free[y::Reified_Variable]]:
-//{y : BOUNDREUSE}
-//T-CheckReuse[VARIABLE-USE[y]]
-//→
-//T_REUSE
-//;
-//
-//-[Free[y::Reified_Variable]]:
-//{y : FREE}
-//T-CheckReuse[VARIABLE-USE[y]]
-//→
-//T_NO_REUSE
-//;
-//
-//-[Free[y::Reified_Variable]]:
-//{¬y}
-//T-CheckReuse[VARIABLE-USE[y]]
-//→
-//T_NO_REUSE
-//;
-
-//-[Free[y::Reified_Variable]]:
-//{}
-//T-CheckReuse[$[NotMatch,VARIABLE-USE[y],#]]
-//→
-//T_NO_REUSE
-//;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-UnlinkLastMetaUse[$String, Reified_Use, Text] :: Text;
 

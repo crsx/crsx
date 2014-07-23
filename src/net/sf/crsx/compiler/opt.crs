@@ -1,0 +1,286 @@
+// Copyright © 2014 IBM Corporation
+
+<!--⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+  Optimization pass applied on Core CRSX.
+
+  It performs the following optimizations:
+
+  - Meta closure elimination
+   
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯-->
+
+OPT[(
+
+$Use["compiler/defs.crs"];
+
+$Lax;
+
+<!--⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+  Declarations   
+ 
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯-->
+
+Optimize1[Reify_CRSX] :: Reify_CRSX;
+
+Optimize1[CRSX[#Name, #Declarations]] →
+    CRSX[#Name, Concat[Map[x.O-Declaration[x], #Declarations]]]
+;
+
+O-Declaration[Reified_Declaration] :: $List[Reified_Declaration];
+
+O-Declaration[POLYMORPHIC[a.#Declaration[a]]] → 
+    (POLYMORPHIC[a.#Declaration[a]];)
+;
+
+O-Declaration[DATA[#Sort, #Forms]] → 
+    (DATA[#Sort, #Forms];) 
+;
+
+O-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]] → 
+    O-MakeFunction[#name, #kind, #path, #function, #Forms, #Sort, O-MCE[#name, #Rules]];
+;
+
+O-MakeFunction[$String, $String, $List[$Numeric], $String, $List[Reified_Form], Reified_Sort, 
+               PairSort[$List[Reified_Rule], $List[Reified_Declaration]]] ::  $List[Reified_Declaration];
+
+O-MakeFunction[#name, #kind, #path, #function, #Forms, #Sort, Pair[#Rules, #Decls]] →
+    Append[(FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules];), #Decls]
+; 
+
+<!--⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+   
+   Meta-closure elimination
+   
+   The main idea is to  contraction of the form
+          b1...bn. ... #[a1 ... an]
+
+   and to convert into
+          b1...bn.Anon0[b1 ... bn, captured variables, b1 ... bn.#[b1 ... bn]
+
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯-->
+
+O-MCE[$String, $List[Reified_Rule]] :: PairSort[$List[Reified_Rule], $List[Reified_Declaration]];
+
+O-MCE[#Name, #Rules] → 
+   PairUnzip1[Map[x.O-MCERule[#Name, x], #Rules]]
+;
+
+O-MCERule[$String, Reified_Rule] :: PairSort[Reified_Rule, $List[Reified_Declaration]];
+
+O-MCERule[#FunctionName, RULE[#Name, #Options, #Pattern, #Contraction]] →
+   PairSplit[IndexOptions[#Options, ok¹.O-ThenMCETerm[ok¹, #Contraction]], nt¹ decls¹.Pair[RULE[#Name, #Options, #Pattern, nt¹], decls¹]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-ThenMCETerm[OK_SORT, Reified_Term] :: PairSort[Reified_Term, $List[Reified_Declaration]];
+
+{#E}
+O-ThenMCETerm[OK, #Term] →
+    {#E; "$Binders":LIST_VARIABLE[()]}O-MCETerm[#Term]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MCETerm[Reified_Term] :: PairSort[Reified_Term, $List[Reified_Declaration]];
+
+{#E}
+O-MCETerm[PROPERTY-REF[#Reference, #Scope]] →
+    PairSplit[{#E}O-MCETerm[#Scope], nt¹ decls¹.Pair[PROPERTY-REF[#Reference, nt¹], decls¹]];
+
+{#E}
+O-MCETerm[PROPERTY[#Key, #Value, #Scope]] → // TODO: conversion in properties
+    PairSplit[{#E}O-MCETerm[#Scope], nt¹ decls¹.Pair[PROPERTY[#Key, #Value, nt¹], decls¹]]
+;
+
+// Should not occur in a contraction
+{#E}
+O-MCETerm[PROPERTY-NOT[#Key, #Scope]] → 
+    PairSplit[{#E}O-MCETerm[#Scope], nt¹ decls¹.Pair[PROPERTY-NOT[#Key, nt¹], decls¹]]
+;
+
+{#E}
+O-MCETerm[CONSTRUCTION[#Constructor, #Binders]] →
+    PairSplit[{#E}O-MCEBinders[#Binders], nbs¹ decls¹.Pair[CONSTRUCTION[#Constructor, nbs¹], decls¹]]
+;
+
+{#E}
+O-MCETerm[LITERAL[#Value, #Sort]] →
+    Pair[LITERAL[#Value, #Sort], ()] 
+;
+
+{#E}
+O-MCETerm[VARIABLE-USE[#Var]] →
+    Pair[VARIABLE-USE[#Var], ()]
+;
+
+{#E} 
+O-MCETerm[META-APPLICATION[#MetaVar, #Arguments, #Use]] → 
+    {#E}O-MCEMeta[{#E}O-GetUsedBoundVariables[#Arguments], {#E}O-AllReused[#Arguments], #MetaVar, #Arguments, #Use] 
+;
+
+{#E}
+O-MCETerm[EVALUATOR[#Name, #Args, #Options]] →
+    PairSplit[PairUnzip1[Map[x.{#E}O-MCETerm[x], #Args]], nargs¹ decls¹.Pair[EVALUATOR[#Name, nargs¹, #Options], decls¹]]
+;
+
+// Not needed. Only occur in Options
+{#E}
+O-MCETerm[FreshReuseOrigin[#Variable, #Name, #Index]] →
+    Pair[FreshReuseOrigin[#Variable, #Name, #Index], ()]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MCEMeta[$List[Reified_Variable], $Boolean, $String, $List[Reified_Binder], Reified_Use] :: PairSort[Reified_Term, $List[Reified_Declaration]];
+
+{#E}
+O-MCEMeta[(), #AllReused, #MetaVar, #Arguments, #Use] → // No bound variables. Don't delay substitution.
+   PairSplit[{#E}O-MCEBinders[#Arguments], nbs¹ decls¹.Pair[META-APPLICATION[#MetaVar, nbs¹, #Use], decls¹]]
+;
+
+{#E}
+O-MCEMeta[(v;#UsedBoundVariable), $True, #MetaVar, #Arguments, #Use] → // All arguments are reused bound variables. No need to substitute.
+    PairSplit[{#E}O-MCEBinders[#Arguments], nbs¹ decls¹.Pair[META-APPLICATION[#MetaVar, nbs¹, #Use], decls¹]]
+;
+
+{#E}
+O-MCEMeta[(v; #UsedBoundVariable), $False, #Meta, #Arguments, #Use] → // Interesting case: transform meta closure.
+    {#E}O-MakeClosure[Length[#Arguments, 0], (v; #UsedBoundVariable), #Meta, #Arguments, #Use]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MCEBinders[$List[Reified_Binder]] :: PairSort[$List[Reified_Binder], $List[Reified_Declaration]];
+
+{#E}
+O-MCEBinders[#Binders] → 
+    PairUnzip1[Map[x.{#E}O-MCEBinder[x], #Binders]]
+; 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MCEBinder[Reified_Binder] :: PairSort[Reified_Binder, $List[Reified_Declaration]];
+
+{#E}
+O-MCEBinder[#Binder] →
+    {#E}O-MCEBinderPassThru[#Binder]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MCEBinderPassThru[Reified_Binder] :: PairSort[Reified_Binder, $List[Reified_Declaration]];
+
+{#E; "$Binders": LIST_VARIABLE[#Binders]}
+O-MCEBinderPassThru[BINDER[#Promiscuity, #Sort, #Occs, binder.#Binder[binder]]] →
+    O-MakeBinder[#Promiscuity, #Sort, #Occs, binder.
+        {#E; "$Binders": LIST_VARIABLE[Append[(binder;), #Binders]]}O-MCEBinderPassThru[#Binder[binder]]]
+;
+
+{#E}
+O-MCEBinderPassThru[ARGUMENT[#Sort, #Term]] →
+    PairSplit[{#E; "$ArgSort": ARG_SORT[#Sort]}O-MCETerm[#Term], nt¹ decls¹.Pair[ARGUMENT[#Sort, nt¹], decls¹]]
+;
+
+{#E}
+O-MCEBinderPassThru[META-REQUIRED-VARIABLE[#Var]] →
+    Pair[META-REQUIRED-VARIABLE[#Var], ()]
+;
+
+O-MakeBinder[Reified_Promiscuity, Reified_Sort, $List[Reified_Occurrence], binder::Reified_Variable.PairSort[Reified_Binder, $List[Reified_Declaration]]] :: PairSort[Reified_Binder, $List[Reified_Declaration]];
+
+-[Weak[#Decls]]
+:
+O-MakeBinder[#Promiscuity, #Sort, #Occs, binder.Pair[#Binder[binder], #Decls]] →
+    Pair[BINDER[#Promiscuity, #Sort, #Occs, binder.#Binder[binder]], #Decls]
+;
+
+//⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Meta closure transformation
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MakeClosure[$Numeric, $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use] :: PairSort[Reified_Term, $List[Reified_Declaration]];
+
+-[Data[#Arity]]
+:
+{#E}
+O-MakeClosure[#Arity, #UsedBoundVariable, #Meta, #Arguments, #Use] →
+    {#E}O-MakeClosure2[#Arity, $[:, "U-Delay", $[FormatNumber, #Arity]], #UsedBoundVariable, #Meta, #Arguments, #Use];
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-MakeClosure2[$Numeric, $String, $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use] :: PairSort[Reified_Term, $List[Reified_Declaration]];
+
+{#E}
+O-MakeClosure2[#Arity, #FunctionName, #UsedBoundVariable, #Meta, #Arguments, #Use] →
+    PairSplit[{#E}O-MCEBinders[#Arguments], nbs¹ decls¹.Pair[CONSTRUCTION[#FunctionName, Append[nbs¹, ({#E}O-ClosureBinders[#Meta, #Arguments, #Use, ()];)]], decls¹]] 
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-ClosureBinders[$String, $List[Reified_Binder], Reified_Use, $List[Reified_Binder]] :: Reified_Binder; 
+
+{#E; "$ArgSort": ARG_SORT[#Sort]}
+O-ClosureBinders[#MetaVar, (), #Use, #NewArguments] →
+    ARGUMENT[#Sort, META-APPLICATION[#MetaVar, #NewArguments, #Use]]
+;
+
+{#E}
+O-ClosureBinders[#MetaVar, (ARGUMENT[#Sort, #Term]; #Arguments), #Use, #NewArguments] →
+    BINDER[PROMISCUOUS, #Sort, (META-USE[#MetaVar, 1];), binder.{#E}O-ClosureBinders[#MetaVar, #Arguments, #Use, Append[#NewArguments, (ARGUMENT[#Sort, VARIABLE-USE[binder]];)]]]
+;
+
+//⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Utilities
+
+// Gets the list of bound variables used in the meta.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+O-GetUsedBoundVariables[$List[Reified_Binder]] :: $List[Reified_Variable];
+
+{#E; "$Binders": LIST_VARIABLE[#BoundVariables]}
+O-GetUsedBoundVariables[#Arguments] →
+   $[IntersectVariables, #BoundVariables, $[FreeVariables, #Arguments]]
+;
+
+// Determine whether the given meta-application arguments are all reused. 
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+O-AllReused[$List[Reified_Binder]] :: $Boolean;
+
+{#E}
+O-AllReused[()] →
+    $True
+;
+
+{#E}
+O-AllReused[(ARGUMENT[#Sort, #Term]; #Arguments)] →
+    {#E}O-AllReused2[{#E}T-CheckReuse[#Term], #Arguments]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+O-AllReused2[T_REUSE_SORT, $List[Reified_Binder]] :: $Boolean;
+
+{#E} 
+O-AllReused2[T_REUSE, #Arguments] →
+    {#E}O-AllReused[#Arguments] // Argument can be reuse... continue analysis
+;
+
+{#E}
+O-AllReused2[T_NO_REUSE, #Arguments] →
+    $False // Argument cannot be reused. 
+;
+ 
+//⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Pair
+
+∀ a b.PairSort[a,b] ::= ( Pair[a, b]; );
+
+∀ a b.PairFirst [PairSort[a, b]] :: a;
+PairFirst[Pair[#1, #2]] → #1;
+
+∀ a b.PairSecond[PairSort[a, b]] :: b;
+PairSecond[Pair[#1, #2]] → #2;
+
+∀ a b.PairUnzip1[$List[PairSort[a, $List[b]]]] :: PairSort[$List[a], $List[b]];
+
+PairUnzip1[#Pairs] → Pair[Map[x.PairFirst[x], #Pairs], Concat[Map[x.PairSecond[x], #Pairs]]];
+
+// FIX EDITOR!
+∀ a b c d.PairSplit[PairSort[a, b], first::a second::b.PairSort[c, d]] :: PairSort[c, d];
+
+PairSplit[Pair[#1, #2], first second.#[first, second]] →
+    #[#1, #2]
+;
+
+)]

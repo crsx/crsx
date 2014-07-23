@@ -33,13 +33,13 @@ clean::
 TARGETS=CRSXC
 
 # CRSX rule families
-CRSXCFAMILIES=RULE TERM EVAL HEADER SORTS SYMBOLS D CD Reified Text
+CRSXCFAMILIES=EVAL RULE TERM HEADER SORTS SYMBOLS D CD OPT Reified Text
 
 # Same as FAMILIES but as CRSX list format
 CRSXCMODULES=( $(patsubst %,'%';,$(CRSXCFAMILIES)) )
 
 # The crsxc rules files.
-CRSXCRULESFILES =  ../crsxc.crs rules.crs evaluators.crs term.crs header.crs sorts.crs symbols.crs ../defs.crs ../reify.crs cdefs.crs 
+CRSXCRULESFILES =  ../crsxc.crs ../opt.crs rules.crs evaluators.crs term.crs header.crs sorts.crs symbols.crs ../defs.crs ../reify.crs cdefs.crs 
 
 # We need a second expansion: the first expansion generates target rules and the second expansion processes automatic variables	    
 .SECONDEXPANSION:
@@ -58,18 +58,18 @@ define TARGETGEN
 
 # - header fragment for TARGET.h with all declarations.
 $(CRSXCBUILD)/$(1)_%.h: $(CRSXCBUILD)/$(1)_%_header.dr
-	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=header.crs wrapper="ComputeHeader" "MODULE=$$*" sink=net.sf.crsx.text.TextSink input="$$<" output="$$@.tmp"
+	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=header.crs wrapper="ComputeHeader" "MODULE=$$*" sink=net.sf.crsx.text.TextSink omit-linear-variables input="$$<" output="$$@.tmp"
 	@mv $$@.tmp $$@
 
 # - sort data structures and step function definitions.
 
 $(CRSXCBUILD)/$(1)_%_fun.c: $(CRSXCBUILD)/$(1)_%.dr
-	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=rules.crs  wrapper="ComputeRules" "HEADERS=$(1).h" "MODULE=$$*" sink=net.sf.crsx.text.TextSink input="$$<" canonical-variables output="$$@.tmp"
+	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=rules.crs  wrapper="ComputeRules" "HEADERS=$(1).h" "MODULE=$$*" sink=net.sf.crsx.text.TextSink omit-linear-variables input="$$<" canonical-variables output="$$@.tmp"
 	@mv $$@.tmp $$@
  
  # - symbol list for crsx_scan.
  $(CRSXCBUILD)/$(1)_%.symlist: $(CRSXCBUILD)/$(1)_%_header.dr
-	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=symbols.crs wrapper="ComputeSymbols" sink=net.sf.crsx.text.TextSink input="$$<" output="$$@.tmp"
+	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=symbols.crs wrapper="ComputeSymbols" sink=net.sf.crsx.text.TextSink omit-linear-variables input="$$<" output="$$@.tmp"
 	@sed -e 's/ {/\'$$$$'\n{/g' -e 's/ //g' $$@.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $$@
 	@rm -f $$@.tmp
 
@@ -77,17 +77,17 @@ $(CRSXCBUILD)/$(1)_%_fun.c: $(CRSXCBUILD)/$(1)_%.dr
  $(CRSXCBUILD)/$(1)_data.dr: $(CRSXCBUILD)/$(1).dr
 
  $(CRSXCBUILD)/$(1)_data.h: $(CRSXCBUILD)/$(1)_data.dr  
-	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=header.crs wrapper="ComputeHeader" MODULE=DATA sink=net.sf.crsx.text.TextSink input="$(CRSXCBUILD)/$(1)_data.dr" output="$(CRSXCBUILD)/$(1)_data.h.tmp"
+	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=header.crs wrapper="ComputeHeader" MODULE=DATA sink=net.sf.crsx.text.TextSink omit-linear-variables input="$(CRSXCBUILD)/$(1)_data.dr" output="$(CRSXCBUILD)/$(1)_data.h.tmp"
 	@mv $(CRSXCBUILD)/$(1)_data.h.tmp $(CRSXCBUILD)/$(1)_data.h
 
  $(CRSXCBUILD)/$(1)_data.c: $(CRSXCBUILD)/$(1)_data.dr 
-	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=sorts.crs wrapper="ComputeSorts" "HEADERS=$(1).h" sink=net.sf.crsx.text.TextSink input="$(CRSXCBUILD)/$(1)_data.dr" output="$(CRSXCBUILD)/$(1)_data.c.tmp"
+	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=sorts.crs wrapper="ComputeSorts" "HEADERS=$(1).h" sink=net.sf.crsx.text.TextSink omit-linear-variables input="$(CRSXCBUILD)/$(1)_data.dr" output="$(CRSXCBUILD)/$(1)_data.c.tmp"
 	@mv $(CRSXCBUILD)/$(1)_data.c.tmp $(CRSXCBUILD)/$(1)_data.c
 
 $(1)C_FILES+=$(CRSXCBUILD)/$(1)_data.c
 
  $(CRSXCBUILD)/$(1)_data.symlist: $(CRSXCBUILD)/$(1)_data.dr  
-	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=symbols.crs wrapper="ComputeSymbols" sink=net.sf.crsx.text.TextSink input="$(CRSXCBUILD)/$(1)_data.dr" output="$(CRSXCBUILD)/$(1)_data.symlist.tmp"
+	$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules=symbols.crs wrapper="ComputeSymbols" sink=net.sf.crsx.text.TextSink input="$(CRSXCBUILD)/$(1)_data.dr" omit-linear-variables output="$(CRSXCBUILD)/$(1)_data.symlist.tmp"
 	sed -e 's/ {/\'$$$$'\n{/g' -e 's/ //g' $(CRSXCBUILD)/$(1)_data.symlist.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $(CRSXCBUILD)/$(1)_data.symlist
 	@rm $(CRSXCBUILD)/$(1)_data.symlist.tmp
 

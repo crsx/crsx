@@ -38,7 +38,7 @@ function run_dispatch {
    				classpath="$classpath:$2"
    				shift 2
    				;;
-   			--p)
+   			-p)
    			    if [ -z "$2" ]
    			    then
    			        echo "error: missing grammar argument after --p"
@@ -48,7 +48,7 @@ function run_dispatch {
    			    grammar=$2
    			    shift 2
    			    ;;
-   			--o)
+   			-o)
    			    if [ -z "$2" ]
    			    then
    			        echo "error: missing output argument after --o"

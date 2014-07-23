@@ -13,7 +13,6 @@ import net.sf.crsx.Sink;
 import net.sf.crsx.Term;
 import net.sf.crsx.Valuation;
 import net.sf.crsx.Variable;
-import net.sf.crsx.compiler.java.BufferSink;
 
 /**
  * Simple buffering of terms captured from a sink.

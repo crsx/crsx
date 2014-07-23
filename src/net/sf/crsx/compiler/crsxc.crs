@@ -6,5 +6,7 @@ CRSXC[(
 	$Use["compiler/c/header.crs"];
 	$Use["compiler/c/rules.crs"];
 	$Use["compiler/c/sorts.crs"];
-	$Use["compiler/c/symbols.crs"];
+    $Use["compiler/c/symbols.crs"];
+    $Use["compiler/opt.crs"];
+   
 )]
