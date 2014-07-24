@@ -946,6 +946,16 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						return sink;
 					}
 				}
+				else if (symbol.equals(Builder.DELAY_META_CLOSURE_SYMBOL))
+				{
+					if (arity == 0)
+					{
+						if (Util.getInteger(factory, Factory.VERBOSE_OPTION, 0) > 0)
+							factory.message(directive.toString());
+						new DelayMetaClosure(this).optimize(ruleByName);
+						return sink;
+					}
+				}
 				else if (Util.isSequence(directive))
 				{
 					// ( Directive ;...; Directive ;)
@@ -2816,7 +2826,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			}
 			sink = sink.start(sink.makeLiteral(ruleNamePrefix == null ? "" : ruleNamePrefix, CRS.STRING_SORT)).end(); // ruleNamePrefix
 			// - Rule type.
-			sink = sink.start(sink.makeLiteral(compileType == null ? "default" : compileType, CRS.STRING_SORT)).end(); // compileType
+			sink = sink.start(sink.makeLiteral(compileType == null ? "Dispatch" : compileType, CRS.STRING_SORT)).end(); // compileType
 			// - Dispatch pattern.
 			if (discriminatorPath != null)
 				for (Integer n : discriminatorPath)

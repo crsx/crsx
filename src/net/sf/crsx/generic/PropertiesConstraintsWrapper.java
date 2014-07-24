@@ -65,7 +65,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	// Constants.
 
 	/** Base term. */
-	public final GenericTerm term;
+	public GenericTerm term;
 
 	/** The reference to the properties. */
 	protected String propertiesRef;

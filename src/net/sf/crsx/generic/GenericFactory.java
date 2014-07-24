@@ -362,9 +362,7 @@ public class GenericFactory implements Factory<GenericTerm>
 	public GenericTerm newMetaApplication(String metaVariable, GenericTerm[] subterms)
 	{
 		if (subterms == null)
-			subterms = GenericTerm.NO_TERMS;
-//		if (metaVariable.equals("#Γ62"))
-//			message("karma");
+			subterms = GenericTerm.NO_TERMS; 
 		return new GenericMetaApplication(this, metaVariable, subterms);
 	}
 
@@ -520,9 +518,7 @@ public class GenericFactory implements Factory<GenericTerm>
 	    }
 		if (object instanceof String)
 		{
-//			if (object.toString().startsWith("{"))
-//				warning("bad karma: constructor named with {?}?");
-		    return constantConstructor((String) object);
+//			return constantConstructor((String) object);
 		}
 		return new ObjectConstructor(object);
 	}

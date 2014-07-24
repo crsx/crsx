@@ -9,7 +9,6 @@ RULES[(
 
 $Use["compiler/c/cdefs.crs"];
 $Use["compiler/c/term.crs"];
-$Use["compiler/opt.crs"];
 
 $Lax;
 
@@ -24,17 +23,7 @@ $Lax;
 
 ComputeRules[Reify_CRSX] :: Text;
 
-ComputeRules[#Crsx]
-→
-$[If, $[Equal, $[Get[$String], "OPTIMIZE", ""], "1"],
-    ComputeRules2[Optimize1[#Crsx]],
-    ComputeRules2[#Crsx]
-]
-;
-
-ComputeRules2[Reify_CRSX] :: Text;
-
-ComputeRules2[CRSX[#name, #Declarations]]
+ComputeRules[CRSX[#name, #Declarations]]
 →
 F-Declarations[#name, #Declarations, $[Get[$String], "MODULE", ""]]
 ;

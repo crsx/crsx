@@ -3269,10 +3269,6 @@ void normalize(Context context, Term *termp)
                 // (4) If term is a function invocation that is not marked as nostep and that we can in fact step then do so and update term to the result.
                 term = BUFFER_TERM(sink); // Reference is transferred
 
-                /////TEST
-                ///printf("==========\nSTEPPED TO\n");
-                ///pt(sink->context, term);
-
                 DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+5, term));
                 DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
             }
@@ -3462,15 +3458,8 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 # endif
 
     crsxpBeforeSubstitution(sink->context);
-    /////TEST
-    ///printf("==========\nSUBSTITUTE\n==========[\n");
-    ///ptSubstitution(sink->context, substitution);
-    ///printf("==========\nIN\n==========\n");
-    ///pt(sink->context, term);
+
     metaSubstituteTermUpdate(sink->context, &term, substitution, NULL, substitutionCount, &unexhausted, &unweakened, &metaSubstituteSize);
-    ///printf("==========GIVES\n");
-    ///pt(sink->context, term);
-    ///printf("==========]\n");
     COPY(sink, term);
 
     CHECK_METASUBSTITUTE_SIZE(sink->context, metaSubstituteSize);

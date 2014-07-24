@@ -99,6 +99,12 @@ abstract public class GenericTerm implements Pattern, Contractum
 		return NO_TERMS;
 	}
 	
+	/** @return all free variables in this term */
+	public Set<Variable> freeVariables()
+	{
+		return Util.freeVariables(this);
+	}
+	
 	/**
 	 * Insert an extra term with binders just before an existing subterm.
 	 * (Override for terms that support it.)

@@ -289,7 +289,7 @@ T-send-Binder3[NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state
 ;
 
 {#env}
-T-send-Binder2[(OTHER;#occs), #cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
+T-send-Binder2[(#occ;#occs), #cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
 →
 {#env}
 T-send-Binder2[#occs, #cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]

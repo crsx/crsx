@@ -73,8 +73,8 @@ public class GenericRule implements Copyable
 	final Map<Variable, Variable> reused;
 
 	/** Map bound variables in pattern to the pattern meta-application meta-variable and index. */
-	final Map<Variable, Pair<String,Integer>> reusedOrigin;
-	
+	final Map<Variable, Pair<String, Integer>> reusedOrigin;
+
 	/** Set of meta-variables to evaluate before contraction. */
 	final Set<String> forced;
 
@@ -96,7 +96,7 @@ public class GenericRule implements Copyable
 	private Map<Term, Pair<Term, Term>> constructorSorts;
 
 	/** Which sorts are associated with sort parameters */
-	private Map<String,Map<Variable, Term>> paramSorts;
+	private Map<String, Map<Variable, Term>> paramSorts;
 
 	// Constructor.
 
@@ -109,24 +109,21 @@ public class GenericRule implements Copyable
 	 * @param options arguments to name as constructor symbol to list of argument terms (see {@link Builder} for options)
 	 * @throws CRSException when the rule is malformed
 	 */
-	protected GenericRule(GenericCRS crs, Constructor ruleName, Pattern pattern, Contractum contractum, Map<String, List<Term>> options)
-	        throws CRSException
+	protected GenericRule(GenericCRS crs, Constructor ruleName, Pattern pattern, Contractum contractum,
+			Map<String, List<Term>> options) throws CRSException
 	{
 		if (options == null)
 			options = new HashMap<String, List<Term>>();
-		/*
-		if (ruleName.symbol().contains("NEnv-variable3-2"))
-			System.out.println("Have rule.");
-		*/
+
 		if (crs.factory.verbosity() >= 6)
-			crs.factory.message("Adding rule: \n  "+ruleName+options+" :\n  "+pattern+"\n  →  "+contractum);
+			crs.factory.message("Adding rule: \n  " + ruleName + options + " :\n  " + pattern + "\n  →  " + contractum);
 
 		this.crs = crs;
 		this.name = ruleName;
 		this.options = options;
 		this.variableSorts = null;
 		this.metaVariableSorts = null;
-		
+
 		// Extract information from options...
 		// Free[v,...]
 		Map<String, Term> free = new HashMap<String, Term>();
@@ -140,7 +137,7 @@ public class GenericRule implements Copyable
 					free.put(Util.variableWithOptionalSortVariable(z).name(), z);
 			}
 		}
-        // Fresh[v,...] and FreshReuse[v,...] (not distinguished by interpreter)
+		// Fresh[v,...] and FreshReuse[v,...] (not distinguished by interpreter)
 		fresh = new HashMap<String, Term>();
 		if (options.containsKey(Builder.FRESH_OPTION_SYMBOL))
 		{
@@ -154,18 +151,18 @@ public class GenericRule implements Copyable
 					fresh.put(Util.variableWithOptionalSortVariable(z).name(), z);
 			}
 		}
-        if (options.containsKey(Builder.FRESH_REUSE_OPTION_SYMBOL))
-        {
-            for (Term z : options.get(Builder.FRESH_REUSE_OPTION_SYMBOL))
-            {
+		if (options.containsKey(Builder.FRESH_REUSE_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.FRESH_REUSE_OPTION_SYMBOL))
+			{
 				if (!Util.isVariableWithOptionalSort(z))
-                    ruleError("Only variables can be specified as Fresh (" + z + ")", false, false);
-                else if (free.containsKey(Util.variableWithOptionalSortVariable(z).name()))
-                	ruleError("Variable cannot be specified as both Free and Fresh (" + z + ")", false, false);
-                else
+					ruleError("Only variables can be specified as Fresh (" + z + ")", false, false);
+				else if (free.containsKey(Util.variableWithOptionalSortVariable(z).name()))
+					ruleError("Variable cannot be specified as both Free and Fresh (" + z + ")", false, false);
+				else
 					fresh.put(Util.variableWithOptionalSortVariable(z).name(), z);
-            }
-        }
+			}
+		}
 		// Global[v,...]
 		global = new HashMap<String, Term>();
 		if (options.containsKey(Builder.GLOBAL_OPTION_SYMBOL))
@@ -277,17 +274,18 @@ public class GenericRule implements Copyable
 		// Watch.
 		if (options.containsKey(Builder.WATCH_OPTION_SYMBOL))
 			crs.watchedRules.add(name());
-		
+
 		// Repair basic options.
 		if (lax)
 		{
 			// Free.
-			Set<Variable> patternFree = new HashSet<Variable>(); pattern.addFree(patternFree, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null);
+			Set<Variable> patternFree = new HashSet<Variable>();
+			pattern.addFree(patternFree, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null);
 			for (Variable v : patternFree)
 				if (!free.containsKey(v.name()))
 					free.put(v.name(), crs.factory.newVariableUse(v)); // TODO: typefor (Variable v : patternFree)
 			List<String> unusedNames = new ArrayList<String>();
-			for (Map.Entry<String,Term> z : free.entrySet())
+			for (Map.Entry<String, Term> z : free.entrySet())
 				if (!patternFree.contains(Util.variableWithOptionalSortVariable(z.getValue())))
 					unusedNames.add(z.getKey());
 			for (String n : unusedNames)
@@ -298,8 +296,10 @@ public class GenericRule implements Copyable
 			/// 	if (!fresh.containsKey(v.name()))
 			/// 		fresh.put(v.name(), crs.factory.newVariableUse(v));
 			// Compare/Discard/Copy.
-			Map<String,Integer> patternMetaCounts = new HashMap<String, Integer>(); pattern.addMetaCounts(patternMetaCounts);
-			Map<String,Integer> contractumMetaCounts = new HashMap<String, Integer>(); contractum.addMetaCounts(contractumMetaCounts);
+			Map<String, Integer> patternMetaCounts = new HashMap<String, Integer>();
+			pattern.addMetaCounts(patternMetaCounts);
+			Map<String, Integer> contractumMetaCounts = new HashMap<String, Integer>();
+			contractum.addMetaCounts(contractumMetaCounts);
 			for (String m : patternMetaCounts.keySet())
 			{
 				int count = patternMetaCounts.get(m);
@@ -309,7 +309,8 @@ public class GenericRule implements Copyable
 				}
 				if (!contractumMetaCounts.containsKey(m))
 				{
-					 if (!discarded.contains(m)) discarded.add(m);
+					if (!discarded.contains(m))
+						discarded.add(m);
 				}
 				else if (contractumMetaCounts.get(m) > 1)
 				{
@@ -317,13 +318,15 @@ public class GenericRule implements Copyable
 				}
 			}
 		}
-		
+
 		// Check pattern (and extract meta-applications).
 		Map<String, Term> patternMetaApplications = new HashMap<String, Term>();
 		Set<String> patternPropertiesRefs = new HashSet<String>();
 		Map<String, Integer> patternOccurrences = new HashMap<String, Integer>();
 		Map<String, String> patternMetaSorts = new HashMap<String, String>();
-		checkPattern(pattern, free, comparable, weak, patternMetaApplications, patternPropertiesRefs, patternMetaSorts, SimpleVariableSet.EMPTY, patternOccurrences);
+		checkPattern(
+				pattern, free, comparable, weak, patternMetaApplications, patternPropertiesRefs, patternMetaSorts,
+				SimpleVariableSet.EMPTY, patternOccurrences);
 		this.pattern = pattern;
 
 		// Check contractum (and extract explicit counts and reusable binders).
@@ -331,11 +334,13 @@ public class GenericRule implements Copyable
 		Map<String, Integer> contractumOccurrences = new HashMap<String, Integer>();
 		Set<String> nonExplicit = new HashSet<String>();
 		Map<Variable, Variable> reusable = new HashMap<Variable, Variable>();
-		Map<Variable, Pair<String,Integer>> reusableOrigin = new HashMap<Variable, Pair<String,Integer>>();
-		checkContractum(contractum, free, !allowMeta, shared, copied, discarded, patternMetaApplications, patternPropertiesRefs, patternMetaSorts, contractumMetaVariables, contractumOccurrences, nonExplicit, reusable, reusableOrigin);
+		Map<Variable, Pair<String, Integer>> reusableOrigin = new HashMap<Variable, Pair<String, Integer>>();
+		checkContractum(
+				contractum, free, !allowMeta, shared, copied, discarded, patternMetaApplications, patternPropertiesRefs,
+				patternMetaSorts, contractumMetaVariables, contractumOccurrences, nonExplicit, reusable, reusableOrigin);
 
 		this.contractum = contractum;
-		
+
 		reused = reusable;
 		reusedOrigin = reusableOrigin;
 		for (Variable v : reused.values())
@@ -360,10 +365,10 @@ public class GenericRule implements Copyable
 
 	/** Gets rule name */
 	public Constructor getName()
-    {
-	    return name;
-    }
-	
+	{
+		return name;
+	}
+
 	/** Gets rule pattern (lhs). */
 	public Pattern getPattern()
 	{
@@ -375,12 +380,12 @@ public class GenericRule implements Copyable
 	{
 		return contractum;
 	}
-	
+
 	/** Gets rule option */
 	public Map<String, List<Term>> getOptions()
-    {
-	    return options;
-    }
+	{
+		return options;
+	}
 
 	/** 
 	 * Gets the variable occurring in the pattern which can be reused for the given variable occurring in the contractum
@@ -396,11 +401,11 @@ public class GenericRule implements Copyable
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Get the meta-variable and argument index (0-based) of the occurrence in the pattern of the variable to be reused as  var (!).
 	 */
-	public Pair<String,Integer> getFreshOrigin(Variable var)
+	public Pair<String, Integer> getFreshOrigin(Variable var)
 	{
 		Variable v = getReused(var);
 		return (v == null ? null : reusedOrigin.get(v));
@@ -432,14 +437,16 @@ public class GenericRule implements Copyable
 	public void setVariableSorts(Map<Variable, Term> varSorts)
 	{
 		variableSorts = varSorts;
-		
+
 		// Also stuff the relevant declarations into Free/Fresh/FreshReuse/Global options.
 		if (options.containsKey(Builder.FREE_OPTION_SYMBOL))
 			options.put(Builder.FREE_OPTION_SYMBOL, insertVariableSorts(options.get(Builder.FREE_OPTION_SYMBOL), varSorts));
 		if (options.containsKey(Builder.FRESH_OPTION_SYMBOL))
 			options.put(Builder.FRESH_OPTION_SYMBOL, insertVariableSorts(options.get(Builder.FRESH_OPTION_SYMBOL), varSorts));
 		if (options.containsKey(Builder.FRESH_REUSE_OPTION_SYMBOL))
-			options.put(Builder.FRESH_REUSE_OPTION_SYMBOL, insertVariableSorts(options.get(Builder.FRESH_REUSE_OPTION_SYMBOL), varSorts));
+			options.put(
+					Builder.FRESH_REUSE_OPTION_SYMBOL,
+					insertVariableSorts(options.get(Builder.FRESH_REUSE_OPTION_SYMBOL), varSorts));
 		if (options.containsKey(Builder.GLOBAL_OPTION_SYMBOL))
 			options.put(Builder.GLOBAL_OPTION_SYMBOL, insertVariableSorts(options.get(Builder.GLOBAL_OPTION_SYMBOL), varSorts));
 	}
@@ -478,11 +485,11 @@ public class GenericRule implements Copyable
 	 * Give a sort denotation for the sort variables occurring freely in sorts of this rule.
 	 * @param parSorts maps each sort variable to the sort it is instantiated to
 	 */
-	public void setParamSorts(Map<String,Map<Variable, Term>> parSorts)
+	public void setParamSorts(Map<String, Map<Variable, Term>> parSorts)
 	{
 		paramSorts = parSorts;
 	}
-	
+
 	/**
 	 * Returns the sort of a given variable which occurs freely in the rule, if
 	 * this data has previously been set with {@link #setVariableSort}
@@ -529,7 +536,7 @@ public class GenericRule implements Copyable
 		else
 			return null;
 	}
-	
+
 	/**
 	 * Return instantiation of sort parameter for this rule.
 	 * @param sort
@@ -553,9 +560,56 @@ public class GenericRule implements Copyable
 			return Util.variableWithOptionalSortSort(subterm);
 		if (subterm.kind() == Kind.META_APPLICATION)
 			return getMetaVariableSort(subterm.metaVariable());
-		Pair<Term,Term> sortform = getConstructorDeclaration(subterm);
-		if (sortform == null) return null;
-		else return sortform.head();
+		Pair<Term, Term> sortform = getConstructorDeclaration(subterm);
+		if (sortform == null)
+			return null;
+		else
+			return sortform.head();
+	}
+
+	/**
+	 * Determine whether the give meta variable, when used in the contractum
+	 * requires meta-substitution when evaluated.
+	 * 
+	 * @param metavar 
+	 * @return true when the metavar requires substitution. False otherwise or if term is not meta
+	 */
+	public boolean requireSubstitution(Term meta)
+	{
+		if (meta.kind() == Kind.META_APPLICATION)
+		{
+			for (int i = meta.arity() - 1; i >= 0; i--)
+			{
+				Term sub = meta.sub(0);
+				if (sub.kind() != Kind.VARIABLE_USE)
+					return true;
+				Variable var = sub.variable();
+				if (getReused(var) == null)
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Determine whether the given term is a meta-closure
+	 * 
+	 * A meta-application for which substitution is not requires is
+	 * not considered to be a meta-closure.
+	 */
+	public boolean metaClosure(Term meta, Set<Variable> bound)
+	{
+		if (meta.kind() == Kind.META_APPLICATION)
+		{
+			if (requireSubstitution(meta))
+			{
+				Set<Variable> usedBoundVariables = ((GenericMetaApplication) meta).freeVariables();
+				usedBoundVariables.retainAll(bound);
+				return !usedBoundVariables.isEmpty();
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -582,11 +636,10 @@ public class GenericRule implements Copyable
 						return null;
 			}
 		}
-		
-		
+
 		Match match = new GenericMatch(this.crs, explicitCount, global); // tracks what is matched
 		if (pattern.match(
-		        match, term, SimpleVariableSet.EMPTY, explicitCount, false, SimpleVariableSet.EMPTY, new HashSet<Variable>()))
+				match, term, SimpleVariableSet.EMPTY, explicitCount, false, SimpleVariableSet.EMPTY, new HashSet<Variable>()))
 		{
 			// Success...construct valuation!
 			ExtensibleMap<Variable, Variable> boundReuse = new LinkedExtensibleMap<Variable, Variable>();
@@ -603,39 +656,39 @@ public class GenericRule implements Copyable
 	}
 
 	/**
-     * Contract this fragment of contractum (rule right hand side) to sink.
-     * Reduces Data-declared fragments followed by contraction.
-     * @param sink to send the fragment to
-     * @param valuation from successful matching of left-hand side (contains the full contractum of which this is a fragment)
-     * @param renamings already decided mappings of variables for the contraction (maps variables in contractum to variables to use in result of contraction)
-     * @return the sink after reception of the contracted subterm
+	 * Contract this fragment of contractum (rule right hand side) to sink.
+	 * Reduces Data-declared fragments followed by contraction.
+	 * @param sink to send the fragment to
+	 * @param valuation from successful matching of left-hand side (contains the full contractum of which this is a fragment)
+	 * @param renamings already decided mappings of variables for the contraction (maps variables in contractum to variables to use in result of contraction)
+	 * @return the sink after reception of the contracted subterm
 	 */
-    Sink contract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
-    {
-    	for (String metaVariable : forced)
-    	{
-    		Substitute substitute = valuation.getSubstitute(metaVariable);
-    		if (substitute == null)
-    			continue;
-    		try
-    		{
-    			Term body = substitute.getBody();
-    			if (body == null)
-    				continue;
-    			Term replacement = crs.normalize(body);
-    			if (replacement == null)
-    				continue;
-    			substitute.replaceBody(replacement);
-    		}
-    		catch (CRSException e)
-    		{
-    			throw new RuntimeException(e);
-    		}
-    	}
-    	// ENTRY POINT to Contractum.contract().
-    	return contractum.contract(sink, valuation, renamings);
-    }
-	
+	Sink contract(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		for (String metaVariable : forced)
+		{
+			Substitute substitute = valuation.getSubstitute(metaVariable);
+			if (substitute == null)
+				continue;
+			try
+			{
+				Term body = substitute.getBody();
+				if (body == null)
+					continue;
+				Term replacement = crs.normalize(body);
+				if (replacement == null)
+					continue;
+				substitute.replaceBody(replacement);
+			}
+			catch (CRSException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		// ENTRY POINT to Contractum.contract().
+		return contractum.contract(sink, valuation, renamings);
+	}
+
 	/**
 	 * Check that term is a well-formed pattern and construct list of pattern meta-applications.
 	 * @param pattern to search
@@ -653,11 +706,12 @@ public class GenericRule implements Copyable
 	 * @throws CRSException if term is not a subpattern
 	 */
 	private void checkPattern(final Term pattern, final Map<String, Term> free, final Set<String> comparable, final Set<String> weak, final Map<String, Term> metaApplications, final Set<String> propertiesRefs, final Map<String, String> metaSorts, final SimpleVariableSet bound, final Map<String, Integer> occurrences)
-	        throws CRSException
+			throws CRSException
 	{
 		// Free variables that have not yet been encountered.
 		final Set<Variable> unusedFree = new HashSet<Variable>();
-		for (Term freeDecl : free.values()) unusedFree.add(Util.variableWithOptionalSortVariable(freeDecl));
+		for (Term freeDecl : free.values())
+			unusedFree.add(Util.variableWithOptionalSortVariable(freeDecl));
 		// Visitor that checks pieces of the pattern and augments structures in the process...
 		final Visitor visitor = new Visitor()
 			{
@@ -724,9 +778,13 @@ public class GenericRule implements Copyable
 								{
 									Variable v = t.variable();
 									if (seen.contains(v))
-										error("pattern meta-application " + term  + " contains repeated variable argument " + t, false);
+										error(
+												"pattern meta-application " + term + " contains repeated variable argument " + t,
+												false);
 									else if (!bound.contains(v))
-										error("pattern meta-application " + term + " contains unbound variable argument " + t, false);
+										error(
+												"pattern meta-application " + term + " contains unbound variable argument " + t,
+												false);
 									else
 										seen.add(v);
 								}
@@ -743,7 +801,8 @@ public class GenericRule implements Copyable
 							// Already seen - check that is permitted!
 							if (!comparable.contains(metaVariable))
 							{
-								error("pattern meta-application " + term + " cannot be used more than once without a Comparable declaration", true);
+								error("pattern meta-application "
+										+ term + " cannot be used more than once without a Comparable declaration", true);
 								comparable.add(metaVariable);
 							}
 							// Check it is the same and does not include non-promiscuous variables!
@@ -760,22 +819,22 @@ public class GenericRule implements Copyable
 									{
 										Variable v = t.variable();
 										if (!previousV.equals(v))
-											error("repeated pattern meta-application " + term + " contains different variable (" + t + ") from previous instances ("
-											        + previous + ")", false);
+											error("repeated pattern meta-application "
+													+ term + " contains different variable (" + t + ") from previous instances ("
+													+ previous + ")", false);
 										else if (!v.promiscuous())
-											error("repeated pattern meta-application " + term + " contains non-promiscuous variable (" + t + ")", false);
+											error("repeated pattern meta-application "
+													+ term + " contains non-promiscuous variable (" + t + ")", false);
 									}
 								}
 							occurrences.put(metaVariable, occurrences.get(metaVariable) + 1);
 						}
 					}
 				}
-				
-				
 
 				@Override
-                public void visitMetaProperty(String name, boolean start, boolean hasMapping) throws CRSException
-                {
+				public void visitMetaProperty(String name, boolean start, boolean hasMapping) throws CRSException
+				{
 					if (start)
 					{
 						// TODO: should do a proper check. For now just account for it
@@ -788,7 +847,7 @@ public class GenericRule implements Copyable
 							occurrences.put(name, 1);
 						}
 					}
-                }
+				}
 
 				@Override
 				public void visitBound(Variable v, VariableUpdater updater) throws CRSException
@@ -817,7 +876,9 @@ public class GenericRule implements Copyable
 					}
 					if (fresh.containsKey(v.name()))
 					{
-						error("pattern contains free variable that is declared fresh in contractum (" + v + " in " + pattern + ")", true);
+						error(
+								"pattern contains free variable that is declared fresh in contractum ("
+										+ v + " in " + pattern + ")", true);
 						free.put(v.name(), fresh.remove(v.name()));
 					}
 					else
@@ -845,7 +906,9 @@ public class GenericRule implements Copyable
 					{
 						if (propertiesRefs.contains(metaVariable) && !comparable.contains(metaVariable))
 						{
-							error("pattern uses non-comparable environment capture meta-variable twice (" + metaVariable  + ")", true);
+							error(
+									"pattern uses non-comparable environment capture meta-variable twice (" + metaVariable + ")",
+									true);
 							comparable.add(metaVariable);
 						}
 						propertiesRefs.add(metaVariable);
@@ -862,7 +925,7 @@ public class GenericRule implements Copyable
 	}
 
 	private void checkConstructionSort(Term construction, String where, Map<Variable, String> boundVariableSorts, Map<String, String> metaSorts)
-	        throws CRSException
+			throws CRSException
 	{
 		/*
 		final Constructor constructor = construction.constructor();
@@ -952,15 +1015,13 @@ public class GenericRule implements Copyable
 	 * @param that the contraction is in (for errors)
 	 * @throws CRSException when contractum is malformed
 	 */
-	private void checkContractum(final Term contractum, final Map<String, Term> free,
-				final boolean noMeta, final Set<String> shared, final Set<String> copied, final Set<String> discarded, final Map<String, Term> patternMetaApplications, final Set<String> patternPropertiesRefs, final Map<String, String> patternMetaSorts, final List<String> contractumMetaVariables, final Map<String, Integer> contractionCounts,
-				final Set<String> nonExplicit, final Map<Variable, Variable> reusable, final Map<Variable, Pair<String, Integer>> reusableOrigin)
-	        throws CRSException
+	private void checkContractum(final Term contractum, final Map<String, Term> free, final boolean noMeta, final Set<String> shared, final Set<String> copied, final Set<String> discarded, final Map<String, Term> patternMetaApplications, final Set<String> patternPropertiesRefs, final Map<String, String> patternMetaSorts, final List<String> contractumMetaVariables, final Map<String, Integer> contractionCounts, final Set<String> nonExplicit, final Map<Variable, Variable> reusable, final Map<Variable, Pair<String, Integer>> reusableOrigin)
+			throws CRSException
 	{
 		//if (Util.isConstant(contractum) && crs.factory().isSortConstructor(Util.symbol(contractum)))
 		//	crs.factory.warning(name + " rule contractum seems to be a sort -- maybe this should be a sort declaration?");
 		final Set<String> usedFresh = new HashSet<String>();
-		
+
 		final Visitor visitor = new Visitor()
 			{
 				/** Internal error. handling */
@@ -1006,8 +1067,7 @@ public class GenericRule implements Copyable
 				public void visitConstruction(Term construction, boolean start, Set<Variable> bound) throws CRSException
 				{
 					if (start && primitiveNesting == 0)
-						checkConstructionSort(
-						        construction, "contractum", boundVariableSorts, patternMetaSorts);
+						checkConstructionSort(construction, "contractum", boundVariableSorts, patternMetaSorts);
 				}
 
 				@Override
@@ -1018,7 +1078,9 @@ public class GenericRule implements Copyable
 						// Check the meta-application.
 						final String metaVariable = term.metaVariable();
 						if (patternPropertiesRefs.contains(metaVariable))
-							error("contractum uses property reference meta-variable in regular meta-application (" + term + ")", false);
+							error(
+									"contractum uses property reference meta-variable in regular meta-application (" + term + ")",
+									false);
 						contractumMetaVariables.add(metaVariable);
 						if (discarded.contains(metaVariable))
 						{
@@ -1040,8 +1102,7 @@ public class GenericRule implements Copyable
 							// Candidate for being explicit...
 							Map<Variable, Variable> newReusable = new HashMap<Variable, Variable>();
 							boolean explicit = true; // so far
-							CheckExplicit:
-								for (int i = 0; i < arity; ++i)
+							CheckExplicit : for (int i = 0; i < arity; ++i)
 							{
 								Term sub = term.sub(i);
 								if (sub.kind() == Kind.VARIABLE_USE)
@@ -1053,7 +1114,8 @@ public class GenericRule implements Copyable
 										break; // FAIL because we're substituting an existing free variable!
 									}
 									if (pattern.arity() <= i)
-										error("rule contractum has inconsistent arity for pattern meta-application (" + pattern + ")", false);
+										error("rule contractum has inconsistent arity for pattern meta-application ("
+												+ pattern + ")", false);
 									Variable patternVariable = pattern.sub(i).variable();
 									Variable reusedPatternVariable = reusable.get(patternVariable);
 									if (newReusable.containsValue(contractumVariable))
@@ -1066,7 +1128,7 @@ public class GenericRule implements Copyable
 										reusedPatternVariable = newReusable.get(patternVariable);
 										if (reusedPatternVariable == null)
 										{
-											for (Map.Entry<String,Term> e : free.entrySet())
+											for (Map.Entry<String, Term> e : free.entrySet())
 												if (Util.variableWithOptionalSortVariable(e.getValue()) == contractumVariable)
 												{
 													explicit = false;
@@ -1108,8 +1170,8 @@ public class GenericRule implements Copyable
 							{
 								// Following occurrence. 
 								if (!shared.contains(metaVariable)
-								        && !copied.contains(metaVariable)
-								        && (noMeta || patternMetaApplications.containsKey(metaVariable)))
+										&& !copied.contains(metaVariable)
+										&& (noMeta || patternMetaApplications.containsKey(metaVariable)))
 								{
 									error("contractum uses non-shared/copyable meta-variable twice (" + metaVariable + ")", true);
 								}
@@ -1120,10 +1182,11 @@ public class GenericRule implements Copyable
 						{
 							// Used to require explicit Copy[]...
 							if (!shared.contains(metaVariable)
-							        && !copied.contains(metaVariable)
-							        && (noMeta || patternMetaApplications.containsKey(metaVariable)))
+									&& !copied.contains(metaVariable)
+									&& (noMeta || patternMetaApplications.containsKey(metaVariable)))
 							{
-								error("contractum uses non-shared/copyable meta-variable in place that may be copied (" + metaVariable + ")", true);
+								error("contractum uses non-shared/copyable meta-variable in place that may be copied ("
+										+ metaVariable + ")", true);
 								copied.add(metaVariable);
 							}
 							// Not linear (nested in substitution) so insist the meta-variable cannot be counted.
@@ -1175,7 +1238,8 @@ public class GenericRule implements Copyable
 							// Used to require explicit Copy[]...
 							if (!shared.contains(metaVariable) && !copied.contains(metaVariable) && noMeta)
 							{
-								error("contractum uses non-shared/copyable meta-variable in place that may be copied (" + metaVariable + ")", true);
+								error("contractum uses non-shared/copyable meta-variable in place that may be copied ("
+										+ metaVariable + ")", true);
 								copied.add(metaVariable);
 							}
 							// Not linear (nested in substitution) so insist the meta-variable cannot be counted.
@@ -1193,8 +1257,8 @@ public class GenericRule implements Copyable
 						final String metaVariable = term.metaVariable();
 						Term pattern = patternMetaApplications.get(metaVariable); // may be null when free meta-variables allowed
 						if (pattern != null
-						        && pattern.arity() == term.arity()
-						        && linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
+								&& pattern.arity() == term.arity()
+								&& linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
 						{
 							// Push linearity of this meta-application argument.
 							Variable patternVariable = pattern.sub(index).variable();
@@ -1229,7 +1293,7 @@ public class GenericRule implements Copyable
 					if (!v.promiscuous())
 					{
 						if (linearVariables.contains(v))
-							error("contractum uses non-promiscuous bound variable twice (" + v + " in " + contractum  + ")", false);
+							error("contractum uses non-promiscuous bound variable twice (" + v + " in " + contractum + ")", false);
 						//                        if (!linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
 						//                            crs.error("contractum uses non-promiscuous bound variable in promiscuous context (" + v + " in " + contractum + ")", false);
 						else
@@ -1257,7 +1321,7 @@ public class GenericRule implements Copyable
 					}
 					if (!free.containsKey(v.name()) && !fresh.containsKey(v.name()) && !global.containsKey(v.name()))
 					{
-						error("contractum contains unauthorized fresh variable (" + v  + ")", true);
+						error("contractum contains unauthorized fresh variable (" + v + ")", true);
 					}
 					Variable realV = Util.variableWithOptionalSortVariable(free.get(v.name()));
 					if (realV == null)
@@ -1272,9 +1336,9 @@ public class GenericRule implements Copyable
 					if (!realV.promiscuous())
 					{
 						if (linearVariables.contains(realV))
-							{}//error("contractum uses linear free variable twice (" + contractum + ")", false);
-						//if (!linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
-						//	error("contractum uses non-promiscuous free variable in promiscuous context (" + realV + " in " + contractum + ")", false);
+						{}//error("contractum uses linear free variable twice (" + contractum + ")", false);
+							//if (!linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
+							//	error("contractum uses non-promiscuous free variable in promiscuous context (" + realV + " in " + contractum + ")", false);
 						linearVariables.add(realV);
 					}
 					if (!free.containsKey(v.name()) && !global.containsKey(v.name()))
@@ -1293,7 +1357,7 @@ public class GenericRule implements Copyable
 				ruleError("contractum discards meta-variable without Discard declaration (" + u + ")", true, false);
 				discarded.add(u);
 			}
-		
+
 		// Check for unused fresh.
 		Set<String> declaredFresh = new HashSet<String>(fresh.keySet());
 		declaredFresh.removeAll(usedFresh);
@@ -1318,10 +1382,10 @@ public class GenericRule implements Copyable
 		if (recoverable && lax)
 		{
 			if (!fully)
-				crs.factory.warning(message, "Warning in rule "+name+" (fixed): ");
+				crs.factory.warning(message, "Warning in rule " + name + " (fixed): ");
 		}
 		else
-			crs.factory.error(message, "Error in rule "+name+": ");
+			crs.factory.error(message, "Error in rule " + name + ": ");
 	}
 
 	/**
@@ -1333,7 +1397,8 @@ public class GenericRule implements Copyable
 	 * @param variableProps TODO
 	 * @throws IOException in case of write failure
 	 */
-    void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean namedProps, boolean variableProps) throws IOException
+	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean namedProps, boolean variableProps)
+			throws IOException
 	{
 		// Name with options.
 		if (w instanceof FormattingAppendable)
@@ -1359,9 +1424,10 @@ public class GenericRule implements Copyable
 			{
 				w.append(sep + Builder.FRESH_OPTION_SYMBOL + "[");
 				String innerSep = "";
-				for (Map.Entry<String,Term> e : fresh.entrySet())
+				for (Map.Entry<String, Term> e : fresh.entrySet())
 				{
-					w.append(innerSep + Util.safeVariableName(Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
+					w.append(innerSep
+							+ Util.safeVariableName(Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
 					Term sort = e.getValue();
 					if (sort != null)
 					{
@@ -1377,9 +1443,10 @@ public class GenericRule implements Copyable
 			{
 				w.append(sep + Builder.GLOBAL_OPTION_SYMBOL + "[");
 				String innerSep = "";
-				for (Map.Entry<String,Term> e : global.entrySet())
+				for (Map.Entry<String, Term> e : global.entrySet())
 				{
-					w.append(innerSep + Util.safeVariableName(Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
+					w.append(innerSep
+							+ Util.safeVariableName(Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
 					Term sort = e.getValue();
 					if (sort != null)
 					{
@@ -1393,7 +1460,8 @@ public class GenericRule implements Copyable
 			}
 			for (String o : options.keySet())
 			{
-				if (!o.equals(Builder.FREE_OPTION_SYMBOL) && !o.equals(Builder.FRESH_OPTION_SYMBOL) && !o.equals(Builder.GLOBAL_OPTION_SYMBOL))
+				if (!o.equals(Builder.FREE_OPTION_SYMBOL)
+						&& !o.equals(Builder.FRESH_OPTION_SYMBOL) && !o.equals(Builder.GLOBAL_OPTION_SYMBOL))
 				{
 					w.append(sep + o + "[");
 					String innerSep = "";
@@ -1417,7 +1485,9 @@ public class GenericRule implements Copyable
 		{
 			w.append(" // Reuse:");
 			for (Map.Entry<Variable, Variable> e : reused.entrySet())
-				w.append(" " + Util.safeVariableName(e.getKey(), used, false, false) + ":" + Util.safeVariableName(e.getValue(), used, false, false));
+				w.append(" "
+						+ Util.safeVariableName(e.getKey(), used, false, false) + ":"
+						+ Util.safeVariableName(e.getValue(), used, false, false));
 		}
 		w.append("\n");
 
@@ -1437,7 +1507,7 @@ public class GenericRule implements Copyable
 		StringBuilder w = new StringBuilder();
 		try
 		{
-        	appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false);
+			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false);
 		}
 		catch (IOException e)
 		{}
