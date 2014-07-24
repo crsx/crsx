@@ -1259,7 +1259,7 @@ class GenericEvaluator extends FixedGenericConstruction
                 		int index = length - Integer.decode(Util.symbol(sub(1)));
                 		list = sub(2);
                 		if (index < 0) break What;
-                		while (index-- > 0)
+                		while (--index > 0)
                 		{
                 			if (!Util.isCons(list.constructor())) break What;
                 			list = list.sub(1);
@@ -1275,16 +1275,17 @@ class GenericEvaluator extends FixedGenericConstruction
 
 			case LIST_LENGTH : {
 				// $[ListLength, list]
-///				computeArgument(1);
+				// computeArgument(1);
 ///				contractArgument(2);
 				Term list = sub(1);
-                int length=0;
+                int length=0;                
                 while (Util.isCons(list.constructor()))
                 {
                 	list = list.sub(1);
                 	length++;
                 }
-                rewrapWithProperties(factory.literal(length));
+                if (!Util.isNull(list.constructor())) break What;
+                return rewrapWithProperties(factory.literal(length));
 			}
 			
 			case IF_ZERO : {

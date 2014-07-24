@@ -786,7 +786,7 @@ Term «t»,«p»;
 long long «index»;
 «{#env} T-set-int[#Index, #sink, index]»«{#env} T-set-ref[#List, #sink, t]»
 for («p»=«t»; TAG(«p»)!=Data_M__sNil; «index»--) «p» = SUB(«p»,1);
-while («index»++) «t» = SUB(«t»,1);
+while (++«index») «t» = SUB(«t»,1);
 «#result» = LINK(«#sink»->context, SUB(«t»,0));
 }⟫
 ;

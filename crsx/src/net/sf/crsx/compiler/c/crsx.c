@@ -5261,7 +5261,7 @@ void printTermFullWithIndent(Context context,  Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10);
+        used = makeHS2(context, 10, NULL);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5765,7 +5765,7 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
         *posp += fprintSafeVariableName(context, out, (Variable) key, used);
     }
     *posp += FPRINTF(context, out, " : ");
-    fprintTermTop(context, out, term, depth==INT32_MAX?depth:depth-2, encountered, used, (indent ? indent+4 : 0), posp, 1, debug);
+    fprintTermTop(context, out, term, depth==INT32_MAX?depth:depth-2, encountered, used, (indent ? indent+4 : 0), posp, depth==INT32_MAX?depth:1, debug);
     sep = ";\n";
     return sep;
 }
