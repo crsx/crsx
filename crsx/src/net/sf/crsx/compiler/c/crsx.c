@@ -3211,6 +3211,7 @@ void sendSplit(char *string, char *sep, Sink sink)
       const size_t sepz = strlen(sep);
       char *word, *next;
       for (word = (char*)string; (next = strstr(word, sep)); word = next+sepz) {
+          if (next==word) continue;
           START(sink, _M__sCons);
           LITERAL(sink, makeSubstring(sink->context, word, 0, next-word));
           ++depth;
