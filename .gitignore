@@ -1,0 +1,9 @@
+/build
+/crsx.jar
+*.dr
+/.settings
+*.zip
+*.jar
+crsx-javadoc
+out
+outj

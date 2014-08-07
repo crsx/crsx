@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.llvm.clang.macosx.exe.debug.2129038003">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.llvm.clang.macosx.exe.debug.2129038003" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.llvm.clang.macosx.exe.debug.2129038003" name="Debug" parent="cdt.managedbuild.config.llvm.clang.macosx.exe.debug">
+					<folderInfo id="cdt.managedbuild.config.llvm.clang.macosx.exe.debug.2129038003." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.llvm.clang.macosx.exe.debug.2058998710" name="LLVM with Clang (MacOSX)" superClass="cdt.managedbuild.toolchain.llvm.clang.macosx.exe.debug">
+							<targetPlatform archList="all" id="cdt.managedbuild.target.llvm.clang.macosx.platform.exe.debug.1598707847" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.llvm.clang.macosx.platform.exe.debug"/>
+							<builder buildPath="${workspace_loc:/crsx c runtime}/Debug" id="cdt.managedbuild.target.llvm.clang.macosx.builder.exe.debug.1988307766" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.target.llvm.clang.macosx.builder.exe.debug"/>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.assembler.exe.debug.1920289222" name="LLVM assembler" superClass="cdt.managedbuild.tool.llvm.clang.macosx.assembler.exe.debug"/>
+							<tool id="cdt.managedbuild.tool.llvm.archiver.base.2145399521" name="LLVM archiver" superClass="cdt.managedbuild.tool.llvm.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.c.compiler.exe.debug.1145977258" name="LLVM Clang" superClass="cdt.managedbuild.tool.llvm.clang.macosx.c.compiler.exe.debug">
+								<option id="llvm.c_cpp.compiler.option.optimization.level.1289136009" name="Optimization Level" superClass="llvm.c_cpp.compiler.option.optimization.level" value="llvm.c_cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="llvm.c_cpp.compiler.option.debugging.level.858616844" name="Debug Level" superClass="llvm.c_cpp.compiler.option.debugging.level" value="llvm.c_cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="llvm.c_cpp.compiler.option.preprocessor.def.1593422532" name="Defined symbols (-D)" superClass="llvm.c_cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="CRSX_ENABLE_PROFILING"/>
+									<listOptionValue builtIn="false" value="CRSX_ENABLE_CHECK"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.llvm.c.compiler.input.331110765" superClass="cdt.managedbuild.tool.llvm.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.cpp.compiler.exe.debug.1664102878" name="LLVM Clang++" superClass="cdt.managedbuild.tool.llvm.clang.macosx.cpp.compiler.exe.debug">
+								<option id="llvm.c_cpp.compiler.option.optimization.level.1595031491" name="Optimization Level" superClass="llvm.c_cpp.compiler.option.optimization.level" value="llvm.c_cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="llvm.c_cpp.compiler.option.debugging.level.1631137130" name="Debug Level" superClass="llvm.c_cpp.compiler.option.debugging.level" value="llvm.c_cpp.compiler.debugging.level.max" valueType="enumerated"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.c.linker.exe.debug.50046692" name="LLVM Clang C linker" superClass="cdt.managedbuild.tool.llvm.clang.macosx.c.linker.exe.debug">
+								<option defaultValue="false" id="llvm.c.link.option.nativeCBackEnd.74769534" name="Create native binary (with C backend code generator)" superClass="llvm.c.link.option.nativeCBackEnd" valueType="boolean"/>
+								<inputType id="cdt.managedbuild.tool.llvm.c.linker.input.1867976589" superClass="cdt.managedbuild.tool.llvm.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.cpp.linker.exe.debug.1369313909" name="LLVM Clang C++ linker" superClass="cdt.managedbuild.tool.llvm.clang.macosx.cpp.linker.exe.debug">
+								<option defaultValue="false" id="llvm.c.link.option.nativeCBackEnd.1094938405" name="Create native binary (with C backend code generator)" superClass="llvm.c.link.option.nativeCBackEnd" valueType="boolean"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.llvm.clang.macosx.exe.release.732138359">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.llvm.clang.macosx.exe.release.732138359" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<macros>
+					<stringMacro name="CRSXPROF" type="VALUE_TEXT" value=""/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.llvm.clang.macosx.exe.release.732138359" name="Release" parent="cdt.managedbuild.config.llvm.clang.macosx.exe.release">
+					<folderInfo id="cdt.managedbuild.config.llvm.clang.macosx.exe.release.732138359." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.llvm.clang.macosx.exe.release.1830948526" name="LLVM with Clang (MacOSX)" superClass="cdt.managedbuild.toolchain.llvm.clang.macosx.exe.release">
+							<targetPlatform archList="al" id="cdt.managedbuild.target.llvm.clang.macosx.platform.exe.release.797862599" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.llvm.clang.macosx.platform.exe.release"/>
+							<builder buildPath="${workspace_loc:/crsx c runtime}/Release" id="cdt.managedbuild.target.llvm.clang.macosx.builder.exe.release.1906460758" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.target.llvm.clang.macosx.builder.exe.release"/>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.assembler.exe.release.1682403167" name="LLVM assembler" superClass="cdt.managedbuild.tool.llvm.clang.macosx.assembler.exe.release"/>
+							<tool id="cdt.managedbuild.tool.llvm.archiver.base.892757815" name="LLVM archiver" superClass="cdt.managedbuild.tool.llvm.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.c.compiler.exe.release.1126432782" name="LLVM Clang" superClass="cdt.managedbuild.tool.llvm.clang.macosx.c.compiler.exe.release">
+								<option id="llvm.c_cpp.compiler.option.optimization.level.138431501" name="Optimization Level" superClass="llvm.c_cpp.compiler.option.optimization.level" value="llvm.c_cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="llvm.c_cpp.compiler.option.debugging.level.724631171" name="Debug Level" superClass="llvm.c_cpp.compiler.option.debugging.level" value="llvm.c_cpp.compiler.debugging.level.none" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.llvm.c.compiler.input.394328863" superClass="cdt.managedbuild.tool.llvm.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.cpp.compiler.exe.release.956908258" name="LLVM Clang++" superClass="cdt.managedbuild.tool.llvm.clang.macosx.cpp.compiler.exe.release">
+								<option id="llvm.c_cpp.compiler.option.optimization.level.1747611274" name="Optimization Level" superClass="llvm.c_cpp.compiler.option.optimization.level" value="llvm.c_cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="llvm.c_cpp.compiler.option.debugging.level.543010417" name="Debug Level" superClass="llvm.c_cpp.compiler.option.debugging.level" value="llvm.c_cpp.compiler.debugging.level.none" valueType="enumerated"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.c.linker.exe.release.1662790510" name="LLVM Clang C linker" superClass="cdt.managedbuild.tool.llvm.clang.macosx.c.linker.exe.release">
+								<option defaultValue="false" id="llvm.c.link.option.nativeCBackEnd.170350038" name="Create native binary (with C backend code generator)" superClass="llvm.c.link.option.nativeCBackEnd" valueType="boolean"/>
+								<inputType id="cdt.managedbuild.tool.llvm.c.linker.input.1528766833" superClass="cdt.managedbuild.tool.llvm.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.cpp.linker.exe.release.1787629420" name="LLVM Clang C++ linker" superClass="cdt.managedbuild.tool.llvm.clang.macosx.cpp.linker.exe.release">
+								<option defaultValue="false" id="llvm.c.link.option.nativeCBackEnd.989507106" name="Create native binary (with C backend code generator)" superClass="llvm.c.link.option.nativeCBackEnd" valueType="boolean"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="crsx c runtime.cdt.managedbuild.target.llvm.clang.macosx.exe.827209139" name="Executable" projectType="cdt.managedbuild.target.llvm.clang.macosx.exe"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/crsx c runtime"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/crsx c runtime"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>

@@ -1,0 +1,95 @@
+#/bin/bash
+
+function show_help {
+		echo "Usage : $0 pg (help | [-s=<source-directory>] [-o=<output-directory>] [-p=<package-name>] <input.pg>)"
+}
+
+function run_pg {
+	if [ $# -lt 2 ] || [ $2 = "help" ] 
+	then
+		show_help
+		exit
+	fi
+		
+	# Parse arguments
+	OPTIND=1	 
+	local source=
+	local package=
+	local packagepath=
+	local output=
+	while getopts "s:p:o:" opt; do
+    	case "$opt" in
+			s)
+        		source=$OPTARG
+				;;
+			p)
+        		package=$OPTARG
+        		packagepath=${package//./\/}/
+				;;
+			o)
+				output=$OPTARG
+				;;
+    		'?')
+            	show_help 
+            	exit 1
+    			;;
+    	esac
+	done
+	shift $(expr $OPTIND - 1)
+	
+	if [ ! -f $1 ]
+	then
+		echo "Filename given \"$1\" doesn't exist"
+		exit
+	fi
+	
+	local pgarg=
+	if [ -n source ]
+	then
+		pgarg="-source=$source"
+	fi
+	
+	local filename=$(basename $1)
+	filename="${filename%.*}"
+	local jjfile=$source/${packagepath}${filename}.jj
+	local jjfilemoved=$output/${packagepath}${filename}.jj
+	
+	# Generate .jj file from PG
+
+	if [ $jjfilemoved -ot $1 ]
+	then  
+		echo "Generate PG"
+		$JAVA -cp "$CRSXJAR:$JAVACCJAR" net.sf.crsx.pg.PG $1 $pgarg
+	fi
+	
+	if [ ! -f $jjfile ]
+	then
+		# Error already printed
+		exit
+	fi
+	
+	if [ -n output ]
+	then
+		mkdir -p $output/${packagepath} 
+		mv $jjfile $output/${packagepath}  
+	fi	
+	
+	# Generate Java files from .jj
+	local javafile=${filename}.java
+	local javafullfile=$output/${packagepath}$javafile
+	
+	if [ $javafullfile -ot $jjfilemoved ]
+	then  
+		$JAVACC -OUTPUT_DIRECTORY=$output/${packagepath} $jjfilemoved
+	fi
+	
+	if [ ! -f $javafullfile ]
+	then
+		# Error already printed
+		exit
+	fi
+	
+	# Compile java files
+	$JAVAC -cp $output:$CRSXJAR $javafullfile	
+}
+

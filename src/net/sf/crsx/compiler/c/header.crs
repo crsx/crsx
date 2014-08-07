@@ -1,0 +1,129 @@
+// Copyright © 2012 IBM Corporation
+// $Id: header.crs,v 3.3 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C HEADER FILE TEXT FROM REIFIED CRSX.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+HEADER[(
+
+$Use["compiler/c/cdefs.crs"];
+
+$Lax;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// C HEADER FILE TEMPLATE.
+//
+// Create text of name.h file.
+//
+// Environment:
+// - HEADERS: ;-separated list of header file base names.
+
+ComputeHeader[Reify_CRSX] :: Text;
+
+ComputeHeader[CRSX[#name, #Declarations]]
+→
+ComputeHeader2[#name, #Declarations, $[Get[$String], "MODULE", ""]]
+;
+
+ComputeHeader2[$String,  $List[Reified_Declaration], $String] :: Text;
+
+-[Data[#module]]
+:
+ComputeHeader2[#name, #Declarations, #module]
+→
+%n⟪/* C HEADER FOR CRSX « COMMENT_TOKEN[#name] » MODULE « COMMENT_TOKEN[#module] ». */
+#ifndef CRSX_« MANGLE[#name] »« MANGLE[#module] »_H
+#define CRSX_« MANGLE[#name] »« MANGLE[#module] »_H
+« DelayMapText[k x.%n⟨#include "‹ DTOKEN[k, x] ›"
+⟩, $[Split, $[Get[$String], "HEADERS", ""], ";"]] »
+#ifdef __cplusplus
+extern "C" {
+#endif
+«H-Declarations[#Declarations]»
+#ifdef __cplusplus
+}
+#endif
+/* END OF C HEADER FOR CRSX « COMMENT_TOKEN[#name] » MODULE « COMMENT_TOKEN[#module] ». */
+#endif
+⟫
+;
+
+H-Declarations[$List[Reified_Declaration]] :: Text;
+
+H-Declarations[(#Declaration; #Rest)] 	→ %n⟪«H-Declaration[#Declaration]»«H-Declarations[#Rest]»⟫;
+H-Declarations[()]						→ %n⟪⟫;
+
+H-Declaration[Reified_Declaration] :: Text;
+
+Polymorphic[Fresh[arg::Reified_Variable]] 
+: 
+H-Declaration[POLYMORPHIC[a.#Declaration[a]]]
+→ 
+H-Declaration[#Declaration[arg]]
+;
+
+Data                    : H-Declaration[DATA[#Sort, #Forms]                                     ]        → H-Data[#Sort, #Forms] ;
+Function                : H-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]] → H-Function[#name, #kind, #function, #Forms, #Sort, #Rules] ;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// DATA SORT HEADER DECLARATIONS.
+
+H-Data[Reified_Sort, $List[Reified_Form]] :: Text;
+
+H-Data[SORT[#Sort, #args], #Forms]
+→
+%n⟪
+/* DATA SORT « COMMENT_TOKEN[#Sort] » HEADER DECLARATIONS. */
+typedef enum {« EnumFun[#Sort] » = 0, « EnumVar[#Sort] » = 1« DelayMapText[k c.%n⟨, ‹ DEnumTag[k, c] ›⟩, Forms-Constructors[#Forms]] »} « Enum[#Sort] »;
+« MapText[f.H-Form[f], #Forms] »extern struct _SortDescriptor « Sort[#Sort] »;
+⟫
+;
+
+H-Data[SORT-PROPERTY[#Sort1, #Sort2, #Sort3], #Forms] 
+→ 
+H-Data[#Sort3, #Forms]
+;
+
+H-Form[Reified_Form] :: Text;
+
+H-Form[SORT-SET[#Sort1, #Sort2, #Form]]
+→
+H-Form[#Form]
+;
+
+H-Form[SORT-ALLOWS-VARIABLES]
+→
+%n⟪⟫
+;
+
+H-Form[FORM[#name, ()]]
+→
+%n⟪#define STRUCT« Struct[#name] » struct _ConstantConstruction
+extern struct _ConstructionDescriptor « Descriptor[#name] »;
+⟫
+;
+
+H-Form[FORM[#name, (#FormArgument1;#FormArguments)]]
+→
+%n⟪#define STRUCT« Struct[#name] » struct « Struct[#name] »
+struct « Struct[#name] » {struct _Construction construction; Term sub[« INTEGER[Length[#FormArguments, 1]] »]; Variable binder[« INTEGER[FormArguments-binder-count[(#FormArgument1;#FormArguments), 0]] »];};
+extern struct _ConstructionDescriptor « Descriptor[#name] »;
+⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// FUNCTION SORT HEADER DECLARATIONS.
+
+H-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+
+H-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
+→
+%n⟪
+/* FUNCTION « COMMENT_TOKEN[#name] » HEADER DECLARATIONS. */
+« MapText[f.H-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
+⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //HEADER

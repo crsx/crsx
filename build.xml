@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2006, 2011 IBM Corporation. -->
+<project default="compile">
+	
+	<property name="version" value="401"/>
+	
+	<target name="VERSION">
+		<echo file="VERSION">VERSION=${version}</echo>
+	</target>
+	
+	<!-- Simple zip with binary release. -->
+	<target name="zip" depends="jar,javadoczip">
+		<zip destfile="crsx${version}.zip">
+			<zipfileset prefix="crsx" dir="." includes="VERSION"/>
+			<zipfileset prefix="crsx" dir="." includes="README"/>
+			<zipfileset prefix="crsx" dir="." includes="LICENSE.TXT"/>
+			<zipfileset prefix="crsx" dir="." includes="crsx.jar"/>
+			<zipfileset prefix="crsx" dir="." includes="crsx-javadoc.zip"/>
+			<zipfileset prefix="crsx/samples" dir="samples" includes="**/*"/>
+		</zip>
+	</target>
+	
+	<!-- Simple jar with all binaries and non-java sources. -->
+	<target name="jar" depends="compile">
+		<jar destfile="crsx.jar" manifest="crsx.manifest">
+			<fileset dir="build" excludes="net/sf/crsx/compiler/c/build/* net/sf/crsx/compiler/c/Debug/* net/sf/crsx/compiler/c/crsx_scan.c" />
+			<fileset dir="src" excludes="**/*.java net/sf/crsx/compiler/c/build/* net/sf/crsx/compiler/c/Debug/* net/sf/crsx/compiler/c/crsx_scan.c"/>
+		</jar>
+	</target>
+	
+	<target name="compile" depends="src,setup,crs">
+		<javac srcdir="src" destdir="build" classpath="">
+			<classpath>
+				<pathelement path="${classpath}"/>
+				<pathelement location="lib/antlr-runtime-3.1.3.jar"/>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="crs">
+		<copy todir="build/net">
+			<fileset dir="src/net">
+				<include name="**/*.crs"/>
+				<include name="**/*.pg"/>
+				<include name="**/*.c"/>
+				<include name="**/*.h"/>
+				<include name="**/*.l"/>
+				<include name="**/*.flex"/>
+				<include name="**/*.html"/>
+				<exclude name="**/*.java"/>
+				<exclude name="**/*.patch"/>
+				<exclude name="**/README"/>
+			</fileset>
+		</copy>
+		<copy file="src/net/sf/crsx/run/default"
+		      tofile="build/net/sf/crsx/run/default"/>
+	</target>
+
+	<!-- Simple zip with all sources. -->
+	<target name="srczip" depends="src">
+		<zip destfile="crsx${version}-src.zip">
+			<zipfileset prefix="crsx/src" dir="src" includes="**"/>
+		</zip>
+	</target>
+
+	<!-- Source for PG and ClassicParser are generated from grammar. -->
+	<target name="src">
+		<javacc javacchome="${basedir}/lib" target="src/net/sf/crsx/pg/PGParser.jj"/>
+		<javacc javacchome="${basedir}/lib" target="src/net/sf/crsx/parser/ClassicParser.jj"/>
+	</target>
+	
+	<!-- Simple zip with all javadoc. -->
+	<target name="javadoczip" depends="javadoc">
+		<zip destfile="crsx${version}-javadoc.zip" basedir="crsx-javadoc"/>
+	</target>
+	<target name="javadoc" depends="compile">
+		<javadoc
+			access="package"
+			author="true"
+			classpath="."
+			destdir="crsx-javadoc"
+			doctitle="CRSX - Combinatory Reduction Systems (with Extensions) for Java"
+			nodeprecated="false"
+			nodeprecatedlist="false"
+			noindex="false"
+			nonavbar="false"
+			notree="false"
+			overview="overview.html"
+			packagenames="*"
+			source="1.5"
+			sourcepath="src"
+			splitindex="false"
+			use="true"
+			version="true"/>
+	</target>
+	
+	<!-- Clean up. -->
+	<target name="clean">
+		<delete dir="build"/>
+		<delete file="crsx.jar"/>
+		<delete dir="crsx-javadoc"/>
+    	<delete file="crsx-javadoc.zip"/>
+    	<delete file="crsx.zip"/>
+	</target>
+	
+	<!-- Set up. -->
+	<target name="setup">
+		<mkdir dir="build"/>
+	</target>
+
+</project>

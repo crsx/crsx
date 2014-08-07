@@ -1,0 +1,51 @@
+// Copyright © 2014 IBM Corporation
+
+<!--⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+  Print CRSX term as CRSX syntax
+   
+ ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯-->
+
+PRINT[(
+
+$CheckGrammar["net.sf.crsx.text.Text"];
+$Use["text/Text.crs"];
+$Use["compiler/reify.crs"];
+$Use["compiler/defs.crs"];
+
+$Lax;
+
+Print[Reify_CRSX] :: Text;
+
+Print[CRSX[#Name, #Declarations]] →
+    %n⟨«TOKEN[#Name]»[(«MapText[x.PrintDeclaration[x], #Declarations]»)]⟩
+;
+
+PrintDeclaration[Reified_Declaration] :: Text;
+
+PrintDeclaration[var.POLYMORPHIC[#Declaration[var]] →
+    %n⟨∀ «PrintVariable[var]».«PrintDeclaration[#Declaration[var]]»⟩
+;
+
+PrintDeclaration[DATA[#Sort, #Forms]] →
+    %n⟨
+«PrintSort[#Sort]» ::= ( «MapText[x.PrintForm[x], #Forms]» );⟩
+;
+
+PrintDeclaration[FUNCTION[#QName, #CompileType, #Path, #FunctionName, #Forms, #Sort, #Rules]] →
+    %n⟨«MapText[x.PrintForm[x], #Forms]» :: «PrintSort[#Sort]»;«MapText[x.PrintRule[x], #Rules]»⟩
+;
+
+PrintSort[Reified_Sort] :: Text;
+
+PrintSort[SORT-PROPERTY[#SortKey, #SortValue, #NextSort]] →
+    %n⟨{«PrintSort[#SortKey]»:«PrintSort[#SortValue]»}⟩
+;
+//
+//    // type-variable
+//    SORT-VARIABLE[ Reified_Variable ];
+//
+//    // Name[Sort*]
+//    SORT[ $String<!--Name-->, $List[Reified_Sort] ];
+
+)]
