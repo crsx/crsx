@@ -2367,6 +2367,29 @@ char *«trimmed» = memcpy(ALLOCA(«sink»->context, z+1), p1, z); «trimmed»[z
 ⟫]
 ;
 
+// $[Squash, #1] corresponds to constant #1 with all occurrences of white space collapsed to single ordinary spaces. 
+//
+STRING_LOCAL_PRIMITIVE[E_Squash] ;
+
+Set-String-Squash[Fresh[squashed::Text]]:
+{#env}E-local-string[E_Squash, (#Name; #String;), #Options, sink, sub sp.#[sub,sp]]
+→
+{#env}T-local-string[#String, sink, string post . %n⟪{⟦
+char *«squashed»=ALLOCA(«sink»->context, strlen(«string»)+1);
+char *p1=«string», *p2=«squashed»;
+int wasspace=0;
+for (; *p1; ++p1) {
+   if (isspace(*p1)) { 
+      if (!wasspace) { wasspace=1; *p2++=' '; }
+   } else {
+      *p2++=*p1; wasspace=0;
+   }
+}
+*p2++='\0';
+«post»« #[squashed, %n⟨⟩] »⟧}
+⟫]
+;
+
 // $[Split, #string, #delim] splits the #string into a list ( s1; ... ; sn; ) where the si are the fragments separated by #delim.
 //
 //SEND_PRIMITIVE[E_Split];

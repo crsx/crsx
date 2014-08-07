@@ -354,6 +354,7 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Replace"],				E_Replace,
 	$[If, $[Equal, #Primitive, "Trim"],					E_Trim,
 	$[If, $[Equal, #Primitive, "Split"],				E_Split,
+	$[If, $[Equal, #Primitive, "Squash"],				E_Squash,
 	$[If, $[Equal, #Primitive, "Rescape"],				E_Rescape,
 	$[If, $[Equal, #Primitive, "Keys"],					E_Keys,
 	$[If, $[Equal, #Primitive, "ParseURL"],				E_ParseURL,
@@ -364,7 +365,7 @@ Primitive[#Primitive] →
 	
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 

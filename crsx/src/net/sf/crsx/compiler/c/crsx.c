@@ -3207,18 +3207,29 @@ int matchRegex(char* pat, char* str)
 void sendSplit(char *string, char *sep, Sink sink)
 {
   int depth = 0;
+  int trailingNulls = 0;
   if (*sep && *string) {
       const size_t sepz = strlen(sep);
       char *word, *next;
       for (word = (char*)string; (next = strstr(word, sep)); word = next+sepz) {
-          if (next==word) continue;
+          if (next==word) {          
+          	trailingNulls++;
+          	continue;
+          }
+          for (; trailingNulls; trailingNulls--) {
+          	START(sink, _M__sCons);
+          	LITERAL(sink, "");
+          	++depth;
+          }
           START(sink, _M__sCons);
           LITERAL(sink, makeSubstring(sink->context, word, 0, next-word));
           ++depth;
       }
-      START(sink, _M__sCons);
-      LITERAL(sink, makeString(sink->context, word));
-      ++depth;
+      if (*word) {
+         START(sink, _M__sCons);
+         LITERAL(sink, makeString(sink->context, word));
+         ++depth;
+      }
   }
   START(sink, _M__sNil);
   END(sink, _M__sNil);
@@ -5738,7 +5749,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                         *posp = (deep && indent && depth>1 ? 0 : *posp+1);
                     }
                     // Subterm.
-                    fprintTermTop(context, out, SUB(term, i), depth-1, encountered, used, (indent ? indent+(rank>0 ? 2 : 1) : 0), posp, includeprops, debug);
+                    fprintTermTop(context, out, SUB(term, i), depth==INT32_MAX?depth:depth-1, encountered, used, (indent ? indent+(rank>0 ? 2 : 1) : 0), posp, includeprops, debug);
                 }
                 *posp += FPRINTF(context, out, "]");
             }
