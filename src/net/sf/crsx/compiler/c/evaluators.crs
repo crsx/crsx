@@ -33,6 +33,7 @@ $Use["compiler/reify.crs"];
 
 $Lax;
 
+EVAL1[(
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // UTILITIES
@@ -198,13 +199,13 @@ $Meta[(
   SEND_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-send-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-send-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-send-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]];
   );
 )];
 
@@ -613,13 +614,13 @@ $Meta[(
   SET_REF_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-set-ref-to-send[##PRIMITIVE, #Args, #Options, #sink];
-    $[:,##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]] → {#env}E-set-ref-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-set-ref-to-send[##PRIMITIVE, #Args, #Options, #sink];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-ref-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]] → {#env}E-set-ref-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]];
   );
 )];
 
@@ -766,13 +767,13 @@ $Meta[(
   BOOL_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-bool[##PRIMITIVE, #Args, #Options, #sink];
-    $[:,##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]] → {#env}E-set-bool-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-bool[##PRIMITIVE, #Args, #Options, #sink];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-bool-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]] → {#env}E-set-bool-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]];
   );
 )];
 
@@ -1047,6 +1048,9 @@ E-set-deep-equal[(#BoolTerm;), #sink, #term1, #term2, #bool]
 %n⟪int «checkenv»; «{#env} T-set-bool[#BoolTerm, #sink, checkenv]»«#bool» = deepEqual(«#sink»->context, «#term1», «#term2», «checkenv»);⟫
 ;
 
+)]; // EVAL1
+
+EVAL2[(
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // INTEGER PRIMITIVES
@@ -1058,13 +1062,13 @@ $Meta[(
   INT_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-int[##PRIMITIVE, #Args, #Options, #sink];
-    $[:,##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-set-int-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-int[##PRIMITIVE, #Args, #Options, #sink];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-int-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-set-int-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]];
   );
 )];
 
@@ -1260,12 +1264,12 @@ $Meta[(
   NUM_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-num[##PRIMITIVE, #Args, #Options, #sink];
-    $[:,##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-set-num-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-num[##PRIMITIVE, #Args, #Options, #sink];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-num-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-set-num-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]];
   );
 )];
 
@@ -1427,19 +1431,19 @@ $Meta[(
   STRING_AND_LOCAL_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-string[##PRIMITIVE, #Args, #Options, #sink];
-    $[:,##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
-    $[:,##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-send"]: {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env}E-send-string[##PRIMITIVE, #Args, #Options, #sink];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set"]: {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-ref"]: {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-set[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-bool"]: {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-bool[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-int"]: {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-int[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-num"]: {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-set-string-to-num[##PRIMITIVE, #Args, #Options, #sink, #variable];
   );
 
   -[Meta,Lax]:
   STRING_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-string-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]: {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]] → {#env}E-string-to-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s,p]];
     STRING_AND_LOCAL_PRIMITIVE[##PRIMITIVE]
   );
 
@@ -1447,7 +1451,7 @@ $Meta[(
   STRING_LOCAL_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[:,##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-local-string-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
+    $[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]: {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env}E-local-string-to-string[##PRIMITIVE, #Args, #Options, #sink, #variable];
     STRING_AND_LOCAL_PRIMITIVE[##PRIMITIVE]
   );
 )];
@@ -1829,14 +1833,14 @@ $Meta[(
   POLY_PRIMITIVE[##PRIMITIVE]
   →
   (
-    $[C,$[:,##PRIMITIVE,"-send"]] : {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-send[ok,result,#sink]] ;
-    $[C,$[:,##PRIMITIVE,"-set"]] : {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set[ok,result,#sink,#variable]] ;
-    $[C,$[:,##PRIMITIVE,"-set-ref"]] : {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-ref[ok,result,#sink,#variable]] ;
-    $[C,$[:,##PRIMITIVE,"-set-bool"]] : {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-bool[ok,result,#sink,#variable]] ;
-    $[C,$[:,##PRIMITIVE,"-set-int"]] : {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-int[ok,result,#sink,#variable]] ;
-    $[C,$[:,##PRIMITIVE,"-set-num"]] : {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-num[ok,result,#sink,#variable]] ;
-    $[C,$[:,##PRIMITIVE,"-set-string"]] : {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-string[ok,result,#sink,#variable]] ;
-    $[C,$[:,##PRIMITIVE,"-local-string"]] : {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-local-string[ok,result,#sink,s p.#[s,p]]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-send"]] : {#env} E-send[##PRIMITIVE, #Args, #Options, #sink] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-send[ok,result,#sink]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-set"]] : {#env} E-set[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set[ok,result,#sink,#variable]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-set-ref"]] : {#env} E-set-ref[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-ref[ok,result,#sink,#variable]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-set-bool"]] : {#env} E-set-bool[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-bool[ok,result,#sink,#variable]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-set-int"]] : {#env} E-set-int[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-int[ok,result,#sink,#variable]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-set-num"]] : {#env} E-set-num[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-num[ok,result,#sink,#variable]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-set-string"]] : {#env} E-set-string[##PRIMITIVE, #Args, #Options, #sink, #variable] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-set-string[ok,result,#sink,#variable]] ;
+    $[C,$[:,"E-EVAL1", ##PRIMITIVE,"-local-string"]] : {#env} E-local-string[##PRIMITIVE, #Args, #Options, #sink, s p.#[s, p]] → {#env} E-poly[##PRIMITIVE, #Args, #Options, #sink, ok result.T-then-local-string[ok,result,#sink,s p.#[s,p]]] ;
   );
 )];
 
@@ -2351,6 +2355,7 @@ Poly-Echo:
 «p»« {#env}E-optional[(), #Options, sink, ok arg.#Tail[ok,arg]] »⟫]
 ;
 
+)]; //EVAL2
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-)] //EVAL
+)] //E

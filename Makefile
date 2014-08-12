@@ -24,3 +24,6 @@ lib/antlr-runtime-3.1.3.jar:
 bin/crsxc:
 	cd $(COMPILERSRC)/c && $(MAKE)
 	cp $(COMPILERSRC)/c/build/crsxc bin/crsxc
+	
+clean:
+	cd $(COMPILERSRC)/c && $(MAKE) clean

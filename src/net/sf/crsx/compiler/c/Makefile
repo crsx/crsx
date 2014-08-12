@@ -24,6 +24,16 @@ ifdef ICU4CDIR
 LDFLAGS+=-L$(ICU4CDIR)
 CCFLAGS+=-I$(ICU4CDIR)/../include
 endif 
+
+ifneq ($(UNAME_S),Darwin)
+RTLIB=-lrt
+endif
+
+ifdef RTDIR
+LDFLAGS+=-L$(RTDIR)
+CCFLAGS+=-I$(RTDIR)/../include
+endif
+
 all: rules $(CRSXCBUILD)/crsxc
 
 include Files.mk
@@ -45,14 +55,17 @@ $(CRSXCBUILD)/prof.o: prof.c prof.h crsx.h
 # C files
 
 #
-$(CRSXCBUILD)/%.o: %.c 
+$(CRSXCBUILD)/%.o: %.c
+	@mkdir -p $(CRSXCBUILD)
 	$(CC) $(CCFLAGS) -c $< -o $@
 
-$(CRSXCBUILD)/%.o: $(CRSXCBUILD)/%.c 
+$(CRSXCBUILD)/%.o: $(CRSXCBUILD)/%.c rules  
+	@mkdir -p $(CRSXCBUILD)
 	$(CC) $(CCFLAGS) -c $< -o $@
 #
 $(CRSXCBUILD)/crsx_scan.o: $(CRSXCBUILD)/crsx_scan.c crsx.h 
 $(CRSXCBUILD)/crsx_scan.c: crsx_scan.l
+	@mkdir -p $(CRSXCBUILD)
 	$(FLEX) -v -s -o $(CRSXCBUILD)/crsx_scan.c crsx_scan.l
 
 
@@ -60,27 +73,35 @@ $(CRSXCBUILD)/crsx_scan.c: crsx_scan.l
 # Generated Rules C files
 
 # CRSX rule families
-CRSXCFAMILIES=RULE TERM EVAL HEADER SYMBOLS SORTS D CD Reified Text
+CRSXCFAMILIES=EVAL RULE TERM HEADER SYMBOLS SORTS D CD Reified Text
 CRSXCO_FILES=$(CRSXCBUILD)/CRSXC_data.o $(CRSXCBUILD)/CRSXCsymbols.o
 
-$(CRSXCBUILD)/CRSXC_symbols.o: $(CRSXCBUILD)/CRSXC_symbols.c crsx.h $(CRSXCBUILD)/CRSXC_data.h $(CRSXCBUILD)/CRSXC.h
-$(CRSXCBUILD)/CRSXC_data.o: $(CRSXCBUILD)/CRSXC_data.c crsx.h $(CRSXCBUILD)/CRSXC_data.h $(CRSXCBUILD)/CRSXC.h
-
+$(CRSXCBUILD)/CRSXCsymbols.c: rules
+$(CRSXCBUILD)/CRSXCsymbols.o: $(CRSXCBUILD)/CRSXCsymbols.c  
+	$(CC) $(CCFLAGS) -c $< -o $@ 
+	 
+$(CRSXCBUILD)/CRSXC_data.c: rules
+$(CRSXCBUILD)/CRSXC_data.o: $(CRSXCBUILD)/CRSXC_data.c   
+	$(CC) $(CCFLAGS) -c $< -o $@
+	
 define TARGETS
 CRSXCO_FILES+=$(CRSXCBUILD)/CRSXC_$(1)_fun.o
-$(CRSXCBUILD)/CRSXC_$(1)_fun.o:	$(CRSXCBUILD)/CRSXC_$(1)_fun.c $(CRSXCBUILD)/CRSXC.h
+$(CRSXCBUILD)/CRSXC_$(1)_fun.c : rules
+$(CRSXCBUILD)/CRSXC_$(1)_fun.o: $(CRSXCBUILD)/CRSXC_$(1)_fun.c 
+	$(CC) $(CCFLAGS) -c $$< -o $$@  
 endef
 $(foreach family, $(CRSXCFAMILIES), $(eval $(call TARGETS,$(family))))
+
 
 #===================================================================================================
 # crsxc
 
-.PHONY: rules
 rules: 
 	export MAKEFILE_CC=$(MAKEFILE_CC) && $(MAKE) -f Rules.mk
 	
 $(CRSXCBUILD)/crsxc: $(CRSXCO_FILES) $(CRSX_O_FILES)
-	$(CXX) $^ $(ICU4CLIB) $(LDFLAGS) -o $@
+	$(CXX) $^ $(ICU4CLIB) $(RTLIB) $(LDFLAGS) -o $@
 
 clean::
-	rm -f $(CRSXCBUILD)/crsxc $(CRSXCO_FILES) $(CRSX_O_FILES) 
+	rm -f $(CRSXCBUILD)/crsxc $(CRSXCO_FILES) $(CRSX_O_FILES)
+	$(MAKE) -f Rules.mk clean 

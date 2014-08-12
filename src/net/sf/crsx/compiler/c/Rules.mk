@@ -16,14 +16,15 @@ CRSXCBUILD=build
 #Keep the intermediate files in cache.
 .SECONDARY:
 
-all: prereq genfiles
+all: prereq rules
 	
 .PHONY: prereq  
 prereq:
 	mkdir -p $(CRSXCBUILD)
 
 clean::
-	rmdir -f $(CRSXCC_FILES) $(CRSXCH_FILES) $(CRSXCBUILD)/CRSXCsymbols.c $(CRSXCSYMLIST_FILES) $(CRSXCDR_FILES)
+	rm -rf $(CRSXCBUILD)
+	rm -f rules
 
 
 #===================================================================================================
@@ -116,7 +117,6 @@ define FAMILY_DEPENDENCIES
 #$(CRSXCBUILD)/$(1)_$(2)_fun.o:	$(CRSXCBUILD)/$(1)_$(2)_fun.c $(H_FILES) $(CRSXCBUILD)/$(1).h
 #$(1)O_FILES += $(CRSXCBUILD)/$(1)_$(2)_fun.o
 
-#$(CRSXCBUILD)/$(1)symbols.o: $(CRSXCBUILD)/$(1)symbols.c crsx.h $(CRSXCBUILD)/$(1)_data.h $(CRSXCBUILD)/$(1).h
 
 endef
 
@@ -145,6 +145,8 @@ $(CRSXCBUILD)/$(1)symbols.c: $$($(1)SYMLIST_FILES)
 	  cat $$@.tmp;\
 	  echo '{NULL, NULL}};') > $$@
 
+$(CRSXCBUILD)/$(1)symbols.o: $(CRSXCBUILD)/$(1)symbols.c crsx.h $(CRSXCBUILD)/$(1)_data.h $(CRSXCBUILD)/$(1).h
+	$(CC) $(CCFLAGS) -I$(CRSXCBUILD) -I. -c $$< -o $$@
 
 # OBJECT FILES.
 #$(CRSXCBUILD)/$(1)_data.o: $(CRSXCBUILD)/$(1)_data.c $($(1)H_FILES) $(CRSXCBUILD)/$(1).h $(CRSX_FILES) 
@@ -156,5 +158,6 @@ $(foreach family,$($(1)FAMILIES),$(eval $(call FAMILY_DEPENDENCIES,$(1),$(family
 endef
 $(foreach tgt, $(TARGETS), $(eval $(call TARGETED_FAMILY_DEPENDENCIES,$(tgt))))
 
-.PHONY: genfiles
-genfiles: $(CRSXCC_FILES) $(CRSXCH_FILES) $(CRSXCBUILD)/CRSXCsymbols.c 
+
+rules: $(CRSXCC_FILES) $(CRSXCH_FILES) $(CRSXCBUILD)/CRSXCsymbols.c 
+	touch rules
