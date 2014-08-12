@@ -1,4 +1,5 @@
 /* Copyright (c) 2007 IBM Corporation. */
+
 package net.sf.crsx.generic;
 
 import java.io.IOException;
@@ -71,16 +72,24 @@ final public class GenericIndexedConstructor implements Constructor
 	{
 		return null;
 	}
-	
+
 	public String object()
 	{
 		return symbol();
 	}
+	
+	@Override
+	public boolean isClosure()
+	{
+		return false;
+	}
 
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
 	{
-		return that != null &&
-			(that instanceof GenericIndexedConstructor ? index == ((GenericIndexedConstructor) that).index : symbol().equals(that.symbol()));
+		return that != null
+				&& (that instanceof GenericIndexedConstructor
+						? index == ((GenericIndexedConstructor) that).index
+						: symbol().equals(that.symbol()));
 	}
 
 	public void addFree(Set<Variable> set, ExtensibleSet<Variable> bound, boolean includemetaapps, Set<Variable> base)
@@ -99,15 +108,14 @@ final public class GenericIndexedConstructor implements Constructor
 	public void visit(Visitor visitor, ExtensibleSet<Variable> bound)
 	{}
 
-    public Constructor oldunify(ExtensibleMap<Variable, Variable> thisBound, Map<Variable, Variable> thisBaseVariable, Map<String, String> thisBaseMeta, Constructor that, ExtensibleMap<Variable, Variable> thatBound, Map<Variable, Variable> thatBaseVariable, Map<String, String> thatBaseMeta, Match unifyMatch, ExtensibleMap<Variable, Variable> unifyBound, Map<String, List<Pair<ExtensibleMap<Variable, Variable>, Term>>> unifiedMatched)
-    {
-        return (equals(that) ? this : null);
-    }
+	public Constructor oldunify(ExtensibleMap<Variable, Variable> thisBound, Map<Variable, Variable> thisBaseVariable, Map<String, String> thisBaseMeta, Constructor that, ExtensibleMap<Variable, Variable> thatBound, Map<Variable, Variable> thatBaseVariable, Map<String, String> thatBaseMeta, Match unifyMatch, ExtensibleMap<Variable, Variable> unifyBound, Map<String, List<Pair<ExtensibleMap<Variable, Variable>, Term>>> unifiedMatched)
+	{
+		return (equals(that) ? this : null);
+	}
 
-	public Constructor unify(Unification unification, Constructor that,
-			StackedMap<Variable> rho,
-			StackedMap<Variable> rhoprime) {
-        return (equals(that) ? this : null);
+	public Constructor unify(Unification unification, Constructor that, StackedMap<Variable> rho, StackedMap<Variable> rhoprime)
+	{
+		return (equals(that) ? this : null);
 	}
 
 	public Constructor copy(ExtensibleMap<Variable, Variable> renamings)
@@ -123,7 +131,8 @@ final public class GenericIndexedConstructor implements Constructor
 		return this;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -144,7 +153,7 @@ final public class GenericIndexedConstructor implements Constructor
 			java.seedExpression(sinkName);
 		java.wrapExpression("", ".start(" + sinkName + ".makeConstructor(" + Util.quoteJava(symbol()) + "))");
 	}
-	
+
 	// PropertiesHolder...
 
 	public Iterable<String> propertyNames()
@@ -171,15 +180,15 @@ final public class GenericIndexedConstructor implements Constructor
 	{
 		return false;
 	}
-	
+
 	public boolean canSetProperty(Variable variable)
 	{
 		return false;
 	}
-	
+
 	public void setProperty(String name, Term value)
 	{}
-	
+
 	public void setProperty(Variable variable, Term value)
 	{}
 
@@ -190,12 +199,16 @@ final public class GenericIndexedConstructor implements Constructor
 		for (Variable variable : properties.propertyVariables())
 			setProperty(variable, properties.getProperty(variable));
 	}
-	
+
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
+	{}
+
 	public boolean isMeta()
 	{
 		return false;
 	}
-	
+
 	// Object...
 
 	public boolean equals(Object that)
@@ -218,7 +231,9 @@ final public class GenericIndexedConstructor implements Constructor
 		StringWriter w = new StringWriter();
 		try
 		{
-			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			appendTo(
+					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true,
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
 		}
 		catch (IOException e)
 		{}

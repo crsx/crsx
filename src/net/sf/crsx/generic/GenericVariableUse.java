@@ -61,9 +61,9 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		this.variable = variable;
 		this.properties = properties;
 	}
-	
+
 	// Methods.
-	
+
 	void addProperties(PropertiesWrapperConstructor pcw)
 	{
 		if (properties == null)
@@ -74,33 +74,33 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 			properties.variablePropertyConstraints.putAll(pcw.variablePropertyConstraints);
 			properties.metaPropertyConstraints.putAll(pcw.metaPropertyConstraints);
 		}
- 	}
+	}
 
 	// GenericTerm...
 
-    @Override
-    public GenericTerm stripProperties()
-    {
-    	properties = null;
-	    return this;
-    }
+	@Override
+	public GenericTerm stripProperties()
+	{
+		properties = null;
+		return this;
+	}
 
 	// GenericTerm+.Visitor.VariableUpdater...
 
-    @Override
+	@Override
 	final public void setVariable(Variable v)
 	{
 		variable = v;
 	}
 
-    private void setupProperties()
-    {
-    	if (properties == null)
-    	{
-    		properties = new PropertiesWrapperConstructor(null, null, null, null);
-    	}
-    }
-    
+	private void setupProperties()
+	{
+		if (properties == null)
+		{
+			properties = new PropertiesWrapperConstructor(null, null, null, null);
+		}
+	}
+
 	// Copyable...
 
 	@Override
@@ -108,19 +108,21 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 	{
 		Variable v = (renames == null ? null : renames.get(variable));
 		if (properties != null)
-			sink =sink.start(properties);
+			sink = sink.start(properties);
 		if (v == null)
 		{
-			if (factory.verbosity() > 9) factory.message("VARIABLE "+variable+" REFERENCE");
+			if (factory.verbosity() > 9)
+				factory.message("VARIABLE " + variable + " REFERENCE");
 			sink = sink.use(variable);
 		}
 		else
 		{
-			if (factory.verbosity() > 9) factory.message("VARIABLE "+v+" COPIED AS "+v);
+			if (factory.verbosity() > 9)
+				factory.message("VARIABLE " + v + " COPIED AS " + v);
 			sink = sink.use(v);
 		}
 		if (properties != null)
-			sink =sink.end();
+			sink = sink.end();
 		return sink;
 	}
 
@@ -145,19 +147,22 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 			renames = LinkedExtensibleMap.EMPTY_RENAMING;
 		if (discard && renames.isEmpty())
 		{
-			if (factory.verbosity() > 9) factory.message("VARIABLE "+variable+" REUSED");
+			if (factory.verbosity() > 9)
+				factory.message("VARIABLE " + variable + " REUSED");
 			return this;
 		}
-		
+
 		Variable v = renames.get(variable);
 		if (v == null)
 		{
-			if (factory.verbosity() >  9) factory.message("VARIABLE "+variable+" REFERENCE");
+			if (factory.verbosity() > 9)
+				factory.message("VARIABLE " + variable + " REFERENCE");
 			return factory.newVariableUse(variable);
 		}
 		else
 		{
-			if (factory.verbosity() > 9) factory.message("VARIABLE "+v+" COPIED AS "+v);
+			if (factory.verbosity() > 9)
+				factory.message("VARIABLE " + v + " COPIED AS " + v);
 			return factory.newVariableUse(v);
 		}
 	}
@@ -182,36 +187,35 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 	}
 
 	public void addMetaCounts(Map<String, Integer> counts)
-	{
-	}
-	
+	{}
+
 	final public void analyzeMetaUseContractum(Map<String, Integer> counts, Map<String, MetaAnalyzer> subAnalyzers)
-	{
-	}
-	
+	{}
+
 	final public void analyzeMetaUsePattern(Map<String, Integer> counts)
-	{
-	}
+	{}
 
 	public Sink subsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
 	{
 		Variable v = bound.get(variable);
 		if (v != null)
 		{
-			if (factory.verbosity() >= 6) factory.message("VARIABLE "+variable+" RENAMED TO "+v);
+			if (factory.verbosity() >= 6)
+				factory.message("VARIABLE " + variable + " RENAMED TO " + v);
 			return sink.use(v); // locally bound variable mapped to new definition
 		}
-		
+
 		Contractum subContractum = substitution.get(variable);
 		if (subContractum == null)
 		{
-			if (factory.verbosity() >= 6) factory.message("VARIABLE "+variable+" UNCHANGED");
+			if (factory.verbosity() >= 6)
+				factory.message("VARIABLE " + variable + " UNCHANGED");
 			return sink.use(variable); // free variable just copied
 		}
-		
+
 		if (!variable.promiscuous())
 			possible.remove(variable); // used to switch to copying
-		
+
 		// ENTRY POINT to Contractum.contract().
 		return subContractum.contract(sink, valuation, renamings);
 	}
@@ -226,7 +230,8 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		visitor.visitUse(this, false, bound);
 	}
 
-	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -240,14 +245,14 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		else
 			writer.append(Util.safeVariableName(variable, used, factory.defined(GenericFactory.NO_LINEAR_VARIABLES), false));
 	}
-	
+
 	public Sink reify(Sink sink, Map<String, Term> metaArgSort, Map<Variable, Term> freeSort, Map<String, Reifier> subReifiers)
-    {
-    	sink = sink.start(sink.makeConstructor(CRS.REIFY_VARIABLE_USE));
-    	sink = sink.use(variable);
-	    sink = sink.end();
-	    return sink;
-    }
+	{
+		sink = sink.start(sink.makeConstructor(CRS.REIFY_VARIABLE_USE));
+		sink = sink.use(variable);
+		sink = sink.end();
+		return sink;
+	}
 
 	public boolean equalsModulo(Term that, ExtensibleMap<Variable, Variable> renamings)
 	{
@@ -277,13 +282,13 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 			// Previously matched variable
 			if (!v.equals(term.variable()))
 				return false; // fail because it was previously matched differently
-				//            if (once.contains(v))
-				//            {
-				//                if (onceSeen.contains(v))
-				//                    return false; // fail because it must be linear and was already seen
-				//                else
-				//                    onceSeen.add(v); // just record that linear has now been seen
-				//            }
+			//            if (once.contains(v))
+			//            {
+			//                if (onceSeen.contains(v))
+			//                    return false; // fail because it must be linear and was already seen
+			//                else
+			//                    onceSeen.add(v); // just record that linear has now been seen
+			//            }
 		}
 		return true;
 	}
@@ -304,12 +309,12 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 				}
 				return null;
 			}
-				//Let metaaplication take care of stuff.
-				//Switch order of arguments and results.
+			//Let metaaplication take care of stuff.
+			//Switch order of arguments and results.
 			case META_APPLICATION : {
 				return ((GenericTerm) that).unifyThese(unification, this, rhoprime, rho, existingMVars);
 			}
-				//Variables
+			//Variables
 			case VARIABLE_USE : {
 				Variable thisbound = rho.get(this.variable());
 				Variable thatbound = rhoprime.get(that.variable());
@@ -446,7 +451,7 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 	@Override
 	protected void generateBitmasks(Set<Variable> legalvars, StackedMap<Variable> rhoprime, StackedMap<Variable> inscope, Map<String, Boolean[]> bitmasks, Map<String, GenericMetaApplication> occurrences)
 	{
-	//Nothing to check
+		//Nothing to check
 	}
 
 	// Contractum...
@@ -457,12 +462,14 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		if (v == null)
 		{
 			v = valuation.getVariable(variable); // matched free variable?
-			if (factory.verbosity() >= 6) factory.message("VARIABLE "+variable+" REPLACED BY "+v);
+			if (factory.verbosity() >= 6)
+				factory.message("VARIABLE " + variable + " REPLACED BY " + v);
 		}
 		if (v == null)
 		{
 			v = variable;
-			if (factory.verbosity() >= 6) factory.message("VARIABLE "+variable);
+			if (factory.verbosity() >= 6)
+				factory.message("VARIABLE " + variable);
 		}
 		return sink.use(v);
 	}
@@ -491,35 +498,68 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 	{
 		return ((GenericTerm) this.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
 	}
-	
+
 	// PropertiesHolder...
 
-    public Iterable<String> propertyNames() { return properties==null ? new EmptyIterable<String>() : properties.propertyNames(); }
-    
-    public Term getProperty(String name) { return properties==null ? null : properties.getProperty(name); }
+	public Iterable<String> propertyNames()
+	{
+		return properties == null ? new EmptyIterable<String>() : properties.propertyNames();
+	}
 
-    public Iterable<Variable> propertyVariables() { return properties==null ? new EmptyIterable<Variable>() : properties.propertyVariables(); }
-    
-    public Term getProperty(Variable variable) { return properties==null ? null : properties.getProperty(variable); }
-    
-    public boolean canSetProperty(String name) { return properties==null ? true : properties.canSetProperty(name); }
-    
-    public boolean canSetProperty(Variable variable) { return properties==null ? true : properties.canSetProperty(variable); }
-    
-    public void setProperty(String name, Term value) throws CRSException { setupProperties(); properties.setProperty(name, value); }
-    
-    public void setProperty(Variable variable, Term value) throws CRSException { setupProperties(); properties.setProperty(variable, value); }
+	public Term getProperty(String name)
+	{
+		return properties == null ? null : properties.getProperty(name);
+	}
 
-    public void setProperties(PropertiesHolder props) throws CRSException { setupProperties(); properties.setProperties(props); }
-    
-    public boolean isMeta() { return properties==null ? false : properties.isMeta(); }
-    
+	public Iterable<Variable> propertyVariables()
+	{
+		return properties == null ? new EmptyIterable<Variable>() : properties.propertyVariables();
+	}
+
+	public Term getProperty(Variable variable)
+	{
+		return properties == null ? null : properties.getProperty(variable);
+	}
+
+	public boolean canSetProperty(String name)
+	{
+		return properties == null ? true : properties.canSetProperty(name);
+	}
+
+	public boolean canSetProperty(Variable variable)
+	{
+		return properties == null ? true : properties.canSetProperty(variable);
+	}
+
+	public void setProperty(String name, Term value) throws CRSException
+	{
+		setupProperties();
+		properties.setProperty(name, value);
+	}
+
+	public void setProperty(Variable variable, Term value) throws CRSException
+	{
+		setupProperties();
+		properties.setProperty(variable, value);
+	}
+
+	public void setProperties(PropertiesHolder props) throws CRSException
+	{
+		setupProperties();
+		properties.setProperties(props);
+	}
+
+	public boolean isMeta()
+	{
+		return properties == null ? false : properties.isMeta();
+	}
+
 	// Object...
 
-    @Override
-    public int hashCode()
-    {
-    	int h = Kind.VARIABLE_USE.ordinal();
-    	return h;
-    }
+	@Override
+	public int hashCode()
+	{
+		int h = Kind.VARIABLE_USE.ordinal();
+		return h;
+	}
 }

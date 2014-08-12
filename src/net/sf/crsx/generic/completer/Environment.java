@@ -21,6 +21,7 @@ import net.sf.crsx.analysis.Unifier;
 import net.sf.crsx.generic.Completer;
 import net.sf.crsx.generic.GenericFactory;
 import net.sf.crsx.generic.GenericTerm;
+import net.sf.crsx.generic.sort.SortUtil;
 import net.sf.crsx.util.Util;
 
 /**
@@ -247,7 +248,7 @@ final public class Environment
 			{
 				// Try to improve the sort of a term using current information.
 				Term term = (Term) key;
-				Term keysort = Util.sortOf(factory, term);
+				Term keysort = SortUtil.sortOf(factory, term);
 				if (keysort != null)
 				{
 					sort = keysort;

@@ -17,8 +17,8 @@
 	$[IfDef, "rules-term", $[ParseText, "", $[Get, "rules-term"]], ()] ;
 	
 	$[IfDef, "check-sorts", $CheckSorts, ()] ;
-	$[IfDef, "delay-meta-closure", $DelayMetaClosure, ()] ;
-    $[IfDef, "sortify", $Sortify, ()] ;
+	$[IfDef, "sortify", $Sortify, ()] ;
+	$[IfDef, "simplify", $Simplify, ()] ;
 	$[IfDef, "locify", $Locify, ()] ;
 	$[IfDef, "dispatchify", $Dispatchify, ()] ;
 	$[IfDef, "dump-rules", $DumpRules[$[Get, "dump-rules", 1], $[Get, "dump-part", ""]], ()] ;

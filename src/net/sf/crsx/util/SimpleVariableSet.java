@@ -36,6 +36,14 @@ public class SimpleVariableSet implements ExtensibleSet<Variable>
             return new SimpleVariableSet(null, collection.toArray(new Variable[collection.size()]));
     }
 
+
+    /** Create set based on variable array. */
+    public static SimpleVariableSet make(Variable[] binders)
+    {
+        return new SimpleVariableSet(null, binders);
+    }
+
+    
 	// State.
 	
 	/** Parent in set. */

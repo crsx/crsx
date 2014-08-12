@@ -224,6 +224,21 @@ public class TraceSink implements Sink
 		return sink.makeConstructor(object);
 	}
 
+	
+	
+	@Override
+	public Constructor makeConstructor(Object object, boolean closure)
+	{
+		try
+		{
+			log.write(prefix+"makeConstructor("+object+","+closure+")\n");
+			log.flush();
+		}
+		catch (IOException e)
+		{}
+		return sink.makeConstructor(object,closure);
+	}
+
 	/* @see net.sf.crsx.Maker#makeLiteral(java.lang.Object, java.lang.String)*/
     public Constructor makeLiteral(Object object, String sort)
     {

@@ -86,11 +86,12 @@ public class PropertiesConstructor extends DelegateConstructor
 		{
 			if (that == null)
 				return false; // fail because there are no properties to match
-			
+
 			// Check that every constraint is accounted for.
 			for (String key : pattern.propertyNames())
 			{
-				if (key.startsWith("$")) continue;
+				if (key.startsWith("$"))
+					continue;
 				Pattern valuePattern = (Pattern) pattern.getProperty(key);
 				assert valuePattern != null : "Negative named property " + key + "?";
 				// The constraint is that there is a matching property for key.
@@ -133,27 +134,31 @@ public class PropertiesConstructor extends DelegateConstructor
 	 * @param omitProps specific variable properties to omit
 	 * @throws IOException
 	 */
-	public static void appendPropertiesTo(PropertiesHolder properties, Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public static void appendPropertiesTo(PropertiesHolder properties, Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		Iterator<String> namedPropertyIterator = properties.propertyNames().iterator();
 		Iterator<Variable> variablePropertyIterator = properties.propertyVariables().iterator();
-		if (omitProps == null) omitProps = LinkedExtensibleSet.EMPTY_VARIABLE_SET;
-		
+		if (omitProps == null)
+			omitProps = LinkedExtensibleSet.EMPTY_VARIABLE_SET;
+
 		// make sure we only do the following if there are non-hidden properties to print
 		boolean visibleProperties = false;
 		while (namedPropertyIterator.hasNext() && !visibleProperties)
 		{
 			String next = namedPropertyIterator.next();
-			if (next != null && (next.length() < 2 || !next.substring(0,2).equals("$$"))) visibleProperties = true;
+			if (next != null && (next.length() < 2 || !next.substring(0, 2).equals("$$")))
+				visibleProperties = true;
 		}
 		while (variablePropertyIterator.hasNext() && !visibleProperties)
 		{
 			Variable next = variablePropertyIterator.next();
-			if (next != null && !omitProps.contains(next)) visibleProperties = true;
+			if (next != null && !omitProps.contains(next))
+				visibleProperties = true;
 		}
 		namedPropertyIterator = properties.propertyNames().iterator();
 		variablePropertyIterator = properties.propertyVariables().iterator();
-		
+
 		if (visibleProperties)
 		{
 			if (!namedProps && !variableProps)
@@ -177,7 +182,8 @@ public class PropertiesConstructor extends DelegateConstructor
 				while (namedPropertyIterator.hasNext())
 				{
 					String key = namedPropertyIterator.next();
-					if (key != null && key.length() > 2 && key.substring(0, 2).equals("$$")) continue;
+					if (key != null && key.length() > 2 && key.substring(0, 2).equals("$$"))
+						continue;
 					Term value = properties.getProperty(key);
 					if (Util.isNull(value.constructor()))
 					{
@@ -186,7 +192,7 @@ public class PropertiesConstructor extends DelegateConstructor
 					else
 					{
 						writer.append(sep + (full ? Util.quoteJava(key) : Util.externalizeLiteral(key)) + " : ");
-						value.appendTo(writer, used, depth-1, full, namedProps, variableProps, null);
+						value.appendTo(writer, used, depth - 1, full, namedProps, variableProps, null);
 					}
 					sep = semi;
 				}
@@ -206,7 +212,7 @@ public class PropertiesConstructor extends DelegateConstructor
 						else
 						{
 							writer.append(sep + Util.safeVariableName(key, used, false, false) + " : ");
-							value.appendTo(writer, used, depth-1, full, true, variableProps, null);
+							value.appendTo(writer, used, depth - 1, full, true, variableProps, null);
 						}
 						sep = semi;
 					}
@@ -225,7 +231,7 @@ public class PropertiesConstructor extends DelegateConstructor
 	final protected Maker maker;
 
 	/** Named properties. */
-	protected Map<String, Term> namedProperties;
+	public Map<String, Term> namedProperties;
 
 	/** Variable properties. */
 	protected Map<Variable, Term> variableProperties;
@@ -254,7 +260,7 @@ public class PropertiesConstructor extends DelegateConstructor
 		super(base);
 		this.maker = maker;
 		assert base != null;
-		
+
 		if (base instanceof PropertiesConstructor)
 		{
 			PropertiesConstructor old = (PropertiesConstructor) base;
@@ -276,9 +282,11 @@ public class PropertiesConstructor extends DelegateConstructor
 		else
 		{
 			namedProperties = new HashMap<String, Term>();
-			if (properties != null) namedProperties.putAll(properties);
+			if (properties != null)
+				namedProperties.putAll(properties);
 			variableProperties = new HashMap<Variable, Term>();
-			if (varProperties != null) variableProperties.putAll(varProperties);
+			if (varProperties != null)
+				variableProperties.putAll(varProperties);
 		}
 	}
 
@@ -343,21 +351,21 @@ public class PropertiesConstructor extends DelegateConstructor
 	{
 		return that instanceof Constructor && symbol().equals(((Constructor) that).symbol());
 
-//		if (!super.equals(that))
-//			return false;
-//
-//		// Must be the same kind of constructor!
-//		if (!(that instanceof PropertiesConstructor))
-//			return false;
-//		final PropertiesConstructor thatConstructor = (PropertiesConstructor) that;
-//
-//		// Compare properties.
-//		final Map<String, Term> thatProperties = thatConstructor.namedProperties;
-//		if (namedProperties == thatProperties)
-//			return true;
-//		if (thatProperties == null)
-//			return false;
-//		return namedProperties.equals(thatProperties);
+		//		if (!super.equals(that))
+		//			return false;
+		//
+		//		// Must be the same kind of constructor!
+		//		if (!(that instanceof PropertiesConstructor))
+		//			return false;
+		//		final PropertiesConstructor thatConstructor = (PropertiesConstructor) that;
+		//
+		//		// Compare properties.
+		//		final Map<String, Term> thatProperties = thatConstructor.namedProperties;
+		//		if (namedProperties == thatProperties)
+		//			return true;
+		//		if (thatProperties == null)
+		//			return false;
+		//		return namedProperties.equals(thatProperties);
 
 	}
 
@@ -366,7 +374,7 @@ public class PropertiesConstructor extends DelegateConstructor
 		// First check that the real constructor matches (ignoring properties).
 		if (!constructor.match(match, that, bound, contractionCount, promiscuous, once, onceSeen))
 			return false;
-		
+
 		return checkProperties(this, that, match, bound, contractionCount, promiscuous, once, onceSeen);
 	}
 
@@ -626,17 +634,21 @@ public class PropertiesConstructor extends DelegateConstructor
 		}
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
 			writer.append("...");
 			return;
 		}
-		if (writer instanceof FormattingAppendable) ((FormattingAppendable) writer).open("");
-		if (namedProps || variableProps) appendPropertiesTo(this, writer, used, depth-1, full, namedProps, variableProps, omitProps);
+		if (writer instanceof FormattingAppendable)
+			((FormattingAppendable) writer).open("");
+		if (namedProps || variableProps)
+			appendPropertiesTo(this, writer, used, depth - 1, full, namedProps, variableProps, omitProps);
 		constructor.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps); //TODO: will omit nested properties...does this happen?
-		if (writer instanceof FormattingAppendable) ((FormattingAppendable) writer).close("");
+		if (writer instanceof FormattingAppendable)
+			((FormattingAppendable) writer).close("");
 	}
 
 	final public SortedSet<Path> paths(Path base)
@@ -665,8 +677,8 @@ public class PropertiesConstructor extends DelegateConstructor
 					Term term = entry.getValue();
 					if (term != null)
 					{
-						PlainJavaSink.generateJavaToBuffer(java, term.maker(), term, sinkName, "properties.put("
-								+ Util.quoteJava(key) + ", ", ".term(true));");
+						PlainJavaSink.generateJavaToBuffer(
+								java, term.maker(), term, sinkName, "properties.put(" + Util.quoteJava(key) + ", ", ".term(true));");
 					}
 				}
 			}
@@ -680,8 +692,9 @@ public class PropertiesConstructor extends DelegateConstructor
 					Term term = entry.getValue();
 					if (term != null)
 					{
-						PlainJavaSink.generateJavaToBuffer(java, term.maker(), term, sinkName, "properties.put("
-								+ variable2java.get(key) + ", ", ".term(true));");
+						PlainJavaSink.generateJavaToBuffer(
+								java, term.maker(), term, sinkName, "properties.put(" + variable2java.get(key) + ", ",
+								".term(true));");
 					}
 				}
 			}
@@ -754,12 +767,13 @@ public class PropertiesConstructor extends DelegateConstructor
 	{
 		return true;
 	}
-	
+
 	public void setProperty(String key, Term value) throws CRSException
 	{
 		if (value == null)
 		{
-			if (super.canSetProperty(key)) super.setProperty(key, value);
+			if (super.canSetProperty(key))
+				super.setProperty(key, value);
 			namedProperties.remove(key);
 		}
 		else if (super.canSetProperty(key))
@@ -780,7 +794,8 @@ public class PropertiesConstructor extends DelegateConstructor
 	{
 		if (value == null)
 		{
-			if (super.canSetProperty(key)) super.setProperty(key, value);
+			if (super.canSetProperty(key))
+				super.setProperty(key, value);
 			variableProperties.remove(key);
 		}
 		else if (super.canSetProperty(key))
@@ -790,6 +805,12 @@ public class PropertiesConstructor extends DelegateConstructor
 			variableProperties.put(key, value);
 			propertiesNormalized = false;
 		}
+	}
+
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
+	{
+		variableProperties.remove(variable);
 	}
 
 	public void setProperties(PropertiesHolder properties) throws CRSException
@@ -823,7 +844,9 @@ public class PropertiesConstructor extends DelegateConstructor
 		StringWriter w = new StringWriter();
 		try
 		{
-			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			appendTo(
+					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true,
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
 		}
 		catch (IOException e)
 		{

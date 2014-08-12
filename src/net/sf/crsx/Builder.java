@@ -196,8 +196,8 @@ public interface Builder
     public final static String LAX_SYMBOL = "$Lax";
     /** $Assert directive. */
     public final static String ASSERT_SYMBOL = "$Assert";
-    /** Internal constructor name for $DelayMetaClosure directive as passed to {@link #load(Sink, Term)}. */
-    public final static String DELAY_META_CLOSURE_SYMBOL = "$DelayMetaClosure";
+    /** Internal constructor name for $Simplify directive as passed to {@link #load(Sink, Term)}. */
+    public final static String SIMPLIFY_SYMBOL = "$Simplify";
     
     
     /** Constructor for "Free" option used by $Rule in {@link #load(Sink, Term)}. */

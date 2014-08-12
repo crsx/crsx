@@ -56,16 +56,16 @@ public class GenericMetaApplication extends GenericTerm
 
 	/** The subterms. */
 	final GenericTerm[] sub;
-	
+
 	/** Whether this meta-application is forced. */
 	final boolean data;
-	
+
 	/** 
 	 * Reference management, based on context:
 	 * pattern    : 0=DISCARD, > 0=USE[Counter]
 	 * contractum : > 0=USE[Counter]
 	 * other      : -3=N/A,
-	 */ 
+	 */
 	int count;
 
 	/** Rewrite system or null. */
@@ -98,7 +98,7 @@ public class GenericMetaApplication extends GenericTerm
 	}
 
 	// GenericTerm...
-	
+
 	@Override
 	GenericTerm[] allSubs()
 	{
@@ -112,11 +112,11 @@ public class GenericMetaApplication extends GenericTerm
 		sub[i] = t;
 	}
 
-    @Override
-    public GenericTerm stripProperties()
-    {
-	    return this;
-    }
+	@Override
+	public GenericTerm stripProperties()
+	{
+		return this;
+	}
 
 	// Copyable...
 
@@ -186,7 +186,7 @@ public class GenericMetaApplication extends GenericTerm
 				public void store(Variable[] binders, Term term, ContinuationSinkSetter continuationSetter)
 				{
 					assert binders.length == 0 : "Cannot have binders on meta-application arguments!";
-					sub[i] =(GenericTerm) term;
+					sub[i] = (GenericTerm) term;
 				}
 			});
 	}
@@ -202,7 +202,8 @@ public class GenericMetaApplication extends GenericTerm
 
 	public void addFree(Set<Variable> set, ExtensibleSet<Variable> bound, boolean includemetaapps, Set<Variable> base)
 	{
-		if (includemetaapps){
+		if (includemetaapps)
+		{
 			final int arity = arity();
 			for (int i = 0; i < arity; ++i)
 				sub[i].addFree(set, bound, includemetaapps, base); // TODO: not sort sensitive!
@@ -211,37 +212,37 @@ public class GenericMetaApplication extends GenericTerm
 
 	public void addMetaCounts(Map<String, Integer> counts)
 	{
-		counts.put(metaVariable, counts.containsKey(metaVariable) ? counts.get(metaVariable)+1 : 1);
+		counts.put(metaVariable, counts.containsKey(metaVariable) ? counts.get(metaVariable) + 1 : 1);
 		final int arity = arity();
 		for (int i = 0; i < arity; ++i)
 			sub[i].addMetaCounts(counts);
 	}
-	
+
 	final public void analyzeMetaUseContractum(Map<String, Integer> counts, Map<String, MetaAnalyzer> subAnalyzers)
 	{
-		counts.put(metaVariable, counts.containsKey(metaVariable) ? counts.get(metaVariable)+1 : 1);
+		counts.put(metaVariable, counts.containsKey(metaVariable) ? counts.get(metaVariable) + 1 : 1);
 		count = counts.get(metaVariable);
-		
+
 		final int arity = arity();
-		for (int i = arity - 1; i >= 0; i--) // Reverse order
+		for (int i = arity - 1; i >= 0; i--)
+			// Reverse order
 			sub[i].analyzeMetaUseContractum(counts, subAnalyzers);
 	}
-	
+
 	final public void analyzeMetaUsePattern(Map<String, Integer> counts)
 	{
 		Integer c = counts.get(metaVariable);
 		if (c == null)
-			count = 0; 	// Meta variable is discarded
+			count = 0; // Meta variable is discarded
 		else
 			count = c;
 	}
-		
 
 	public Sink subsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
 	{
 		if (possible.isEmpty())
 			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
-		
+
 		sink = sink.startMetaApplication(metaVariable);
 		for (int i = 0; i < sub.length; ++i)
 			sink = sub[i].subsubstitute(sink, valuation, renamings, substitution, bound, possible);
@@ -267,7 +268,8 @@ public class GenericMetaApplication extends GenericTerm
 		return true;
 	}
 
-	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -279,66 +281,68 @@ public class GenericMetaApplication extends GenericTerm
 		if (arity > 0)
 		{
 			writer.open("[");
-			sub[0].appendTo(writer, used, depth-1, full, namedProps, variableProps, null);
+			sub[0].appendTo(writer, used, depth - 1, full, namedProps, variableProps, null);
 			for (int i = 1; i < arity; ++i)
 			{
 				writer.close(",\n");
 				writer.open("");
 				if (sub[i] instanceof GenericTerm)
-					((GenericTerm) sub[i]).appendTermTo(writer, used, noLinear, depth-1, false, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					((GenericTerm) sub[i]).appendTermTo(
+							writer, used, noLinear, depth - 1, false, full, namedProps, variableProps,
+							LinkedExtensibleSet.EMPTY_VARIABLE_SET);
 				else
-					sub[i].appendTo(writer, used, depth-1, full, namedProps, variableProps, null);
+					sub[i].appendTo(writer, used, depth - 1, full, namedProps, variableProps, null);
 			}
 			writer.close("]");
 		}
 	}
 
 	public Sink reify(Sink sink, Map<String, Term> metaArgSort, Map<Variable, Term> freeSort, Map<String, Reifier> subReifiers)
-    {
-    	// Meta-application.
-    	sink = sink.start(sink.makeConstructor(CRS.REIFY_META_APPLICATION)); // META-APPLICATION[
-    	int ends = 0;
-    	sink = sink.start(sink.makeLiteral(metaVariable, CRS.STRING_SORT)).end();
-    	for (int i = 0; i < arity(); ++i)
-    	{
-    		sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL)); // CONS[
-    		++ends;
-    		Term sort = metaArgSort.get(metaVariable+"-"+i);
-    		if (Completer.PRESENT.equals(Util.symbol(sub(i))))
-    		{
-    			Variable v = sub(i).sub(0).variable();
-        		sink = sink.start(sink.makeConstructor(CRS.REIFY_META_REQUIRED_VARIABLE)); // META-REQUIRED-VARIABLE[
-        		sink = sink.use(v); // variable
-        		sink = sink.end(); // ] of META-REQUIRED-VARIABLE
-        		if (sort == null)
-        			sort = freeSort.get(v);
-    		}
-    		else
-    		{
-        		if (sort == null && sub(i).kind() == Kind.VARIABLE_USE)
-        			sort = freeSort.get(sub(i).variable());
-        		sink = sink.start(sink.makeConstructor(CRS.REIFY_ARGUMENT)); // ARGUMENT[
-        		sink = GenericCRS.reifySort(factory, sink, sort);
-        		sink = sub(i).reify(sink, metaArgSort, freeSort, subReifiers); // argument
-        		sink = sink.end(); // ] of ARGUMENT
-    		}
-    	}
-    	sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // NIL
-    	while (ends-- > 0)
-    		sink = sink.end(); // ] of CONS
-    	if (count == -3)
-    		sink = sink.start(sink.makeConstructor(CRS.REIFY_NA)).end(); // NA
-    	else if (count == 0) // DISCARD
-    		sink = sink.start(sink.makeConstructor(CRS.REIFY_DISCARD)).end(); // DISCARD
-    	else
-    	{
-    		sink = sink.start(sink.makeConstructor(CRS.REIFY_USE)); // USE
-    		sink = sink.start(sink.makeLiteral(Integer.toString(count), CRS.NUMERIC_SORT)).end();
-    		sink = sink.end(); // ] of COPY
-    	}
-    	sink = sink.end(); // ] of META-APPLICATION
-	    return sink;
-    }
+	{
+		// Meta-application.
+		sink = sink.start(sink.makeConstructor(CRS.REIFY_META_APPLICATION)); // META-APPLICATION[
+		int ends = 0;
+		sink = sink.start(sink.makeLiteral(metaVariable, CRS.STRING_SORT)).end();
+		for (int i = 0; i < arity(); ++i)
+		{
+			sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL)); // CONS[
+			++ends;
+			Term sort = metaArgSort.get(metaVariable + "-" + i);
+			if (Completer.PRESENT.equals(Util.symbol(sub(i))))
+			{
+				Variable v = sub(i).sub(0).variable();
+				sink = sink.start(sink.makeConstructor(CRS.REIFY_META_REQUIRED_VARIABLE)); // META-REQUIRED-VARIABLE[
+				sink = sink.use(v); // variable
+				sink = sink.end(); // ] of META-REQUIRED-VARIABLE
+				if (sort == null)
+					sort = freeSort.get(v);
+			}
+			else
+			{
+				if (sort == null && sub(i).kind() == Kind.VARIABLE_USE)
+					sort = freeSort.get(sub(i).variable());
+				sink = sink.start(sink.makeConstructor(CRS.REIFY_ARGUMENT)); // ARGUMENT[
+				sink = GenericCRS.reifySort(factory, sink, sort);
+				sink = sub(i).reify(sink, metaArgSort, freeSort, subReifiers); // argument
+				sink = sink.end(); // ] of ARGUMENT
+			}
+		}
+		sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // NIL
+		while (ends-- > 0)
+			sink = sink.end(); // ] of CONS
+		if (count == -3)
+			sink = sink.start(sink.makeConstructor(CRS.REIFY_NA)).end(); // NA
+		else if (count == 0) // DISCARD
+			sink = sink.start(sink.makeConstructor(CRS.REIFY_DISCARD)).end(); // DISCARD
+		else
+		{
+			sink = sink.start(sink.makeConstructor(CRS.REIFY_USE)); // USE
+			sink = sink.start(sink.makeLiteral(Integer.toString(count), CRS.NUMERIC_SORT)).end();
+			sink = sink.end(); // ] of COPY
+		}
+		sink = sink.end(); // ] of META-APPLICATION
+		return sink;
+	}
 
 	// Pattern...
 
@@ -393,485 +397,521 @@ public class GenericMetaApplication extends GenericTerm
 	/** Whether this meta-application might be contracted more than once for particular contraction. */
 	private boolean metaVariablePromiscuous(Map<String, Integer> contractionCount)
 	{
-	    if (contractionCount == null)
-	        return false; // 0 < 2.
-	    Integer count = contractionCount.get(metaVariable);
-        if (count == null)
-            return false; // 0 < 2.
-        if (count == -1)
-            return true; // unknown so assume promiscuous
-        return (count > 1); // simple check
+		if (contractionCount == null)
+			return false; // 0 < 2.
+		Integer count = contractionCount.get(metaVariable);
+		if (count == null)
+			return false; // 0 < 2.
+		if (count == -1)
+			return true; // unknown so assume promiscuous
+		return (count > 1); // simple check
 	}
 
-    final public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException
-    {
-        visitor.visitMetaApplication(this, true, bound);
-        final int arity = arity();
-        for (int i = 0; i < arity; ++i)
-        {
-            visitor.visitMetaApplicationSub(this, i, true, bound);
-            sub(i).visit(visitor, bound.extend(binders(i)));
-            visitor.visitMetaApplicationSub(this, i, false, bound);
-        }
-        visitor.visitMetaApplication(this, false, bound);
-    }
+	final public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException
+	{
+		visitor.visitMetaApplication(this, true, bound);
+		final int arity = arity();
+		for (int i = 0; i < arity; ++i)
+		{
+			visitor.visitMetaApplicationSub(this, i, true, bound);
+			sub(i).visit(visitor, bound.extend(binders(i)));
+			visitor.visitMetaApplicationSub(this, i, false, bound);
+		}
+		visitor.visitMetaApplication(this, false, bound);
+	}
 
-    final public Contractum oldunify(ExtensibleMap<Variable, Variable> thisBound, Map<Variable, Variable> thisBaseVariable, Map<String, String> thisBaseMeta,
-            Pattern that, ExtensibleMap<Variable, Variable> thatBound, Map<Variable, Variable> thatBaseVariable, Map<String, String> thatBaseMeta,
-            Match unifiedMatch, ExtensibleMap<Variable, Variable> unifiedBound, Map<String, List<Pair<ExtensibleMap<Variable, Variable>, Term>>> unifiedMatched)
-    {
-        // Note: this handles all combinations with meta-applications.
-        
-        // Properties of this pattern meta-application.
-        String thisMetaVariable = metaVariable();
-        String thisBaseMetaVariable = thisBaseMeta.get(thisMetaVariable);
-        
-        // Compute variable lists for this, also after mapping to unified term.  TODO: be lazy about it...
-        int thisArity = arity();
-        List<Variable> thisPatternVariables = new ArrayList<Variable>(thisArity);
-        List<Variable> thisBasePatternVariables = new ArrayList<Variable>(thisArity);
-        for (int i = 0; i < thisArity; ++i)
-        {
-            assert sub(i).kind() == Kind.VARIABLE_USE : "Unify applied to non-pattern meta-application ("+this+")";
-            Variable v = sub(i).variable();
-            assert thisBound.containsKey(v) : "Unbound pattern variable slipped through?!?";
-            assert !thisPatternVariables.contains(v) : "Repeated pattern variable slipped through?!?";
-            thisPatternVariables.add(v);
-            thisBasePatternVariables.add(thisBaseVariable.get(v));
-        }
-        
-        // Unified structures.
-        Substitute baseSubstitute;
-        GenericTerm base = null;
-        
-        // Now deal with that.
-        switch (that.kind())
-        {
-            case CONSTRUCTION :
-            case VARIABLE_USE : {
-                // The meta-application is being matched against some term.
-                if (thisMetaVariable == null)
-                {
-                    // Previously unmatched meta-variable: Setup corresponding base pattern and check it matches
-                    thisBaseMetaVariable = makeMetaVar(thisMetaVariable, thisBaseMeta, thatBaseMeta);
-                    thisBaseMeta.put(thisMetaVariable, thisBaseMetaVariable);
-                    base = unifiedMetaApplication(thisBaseMetaVariable, thisBound.getAll(thisPatternVariables));
-                    if (!base.match(unifiedMatch, that, SimpleVariableSet.make(thatBound.values()), null, true, SimpleVariableSet.EMPTY, null))
-                        return null; // this does not match, so fail
-                    
-                    assert !unifiedMatched.containsKey(thisBaseMetaVariable) : "Previously unmatched meta-variable already registered as matched?!?";
-                    List<Pair<ExtensibleMap<Variable,Variable>,Term>> matched = new LinkedList<Pair<ExtensibleMap<Variable,Variable>,Term>>();
-                    matched.add(new Pair<ExtensibleMap<Variable,Variable>,Term>(unifiedBound, that));
-                    unifiedMatched.put(thisBaseMetaVariable, matched);
-                }
-                else
-                {
-                    // Previously matched meta-variable. Rematch the substitution against the new term. 
-                    thisBaseMetaVariable = thisBaseMeta.get(thisMetaVariable);
-                    base = unifiedMetaApplication(thisBaseMetaVariable, thisBound.getAll(thisPatternVariables));
-                    baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
-                    assert baseSubstitute != null : "Lost previously matched unified substitute?!?";
-                    if (!baseSubstitute.rematch(unifiedMatch, baseSubstitute.getBindings(), that))
-                        return null; // this does not rematch that, so fail
-                    
-                    assert unifiedMatched.containsKey(thisBaseMetaVariable) : "Previously matched meta-variable not registered?!?";
-                    List<Pair<ExtensibleMap<Variable,Variable>,Term>> matched = unifiedMatched.get(thisBaseMetaVariable);
-                    matched.add(new Pair<ExtensibleMap<Variable,Variable>,Term>(unifiedBound, that));
-                }
-                return base; // success
-            }
-            
-            case META_APPLICATION : {
-                // The meta-application is being matched against that meta-application.
-                // Unification succeeds if the base and unified can be updated consistently.
-                
-                // Record properties of that.
-                String thatMetaVariable = that.metaVariable();
-                String thatBaseMetaVariable = thatBaseMeta.get(thatMetaVariable);
-                
-                // Compute variable lists for that, also after mapping to unified term.
-                int thatArity = that.arity();
-                List<Variable> thatPatternVariables = new ArrayList<Variable>(thatArity);
-                List<Variable> thatBasePatternVariables = new ArrayList<Variable>(thatArity);
-                for (int i = 0; i < thatArity; ++i)
-                {
-                    assert that.sub(i).kind() == Kind.VARIABLE_USE : "Unify applied to non-pattern meta-application ("+that+")";
-                    Variable v = that.sub(i).variable();
-                    assert thatBound.containsKey(v) : "Unbound pattern variable slipped through?!?";
-                    assert !thatPatternVariables.contains(v) : "Repeated pattern variable slipped through?!?";
-                    thatPatternVariables.add(v);
-                    thatBasePatternVariables.add(thatBaseVariable.get(v));
-                }
-                
-                // Compute common pattern variables.
-                List<Variable> commonBasePatternVariables = new ArrayList<Variable>();
-                commonBasePatternVariables.addAll(thisBasePatternVariables);
-                commonBasePatternVariables.retainAll(thatBasePatternVariables);
-                
-                // Now derive the appropriate base pattern meta-application...
-                if (thisBaseMetaVariable == null)
-                {
-                    if (thatBaseMetaVariable == null)
-                    {
-                        // For two previously unknown meta-variables craft fresh base pattern meta-variable.
-                        thisBaseMetaVariable = makeMetaVar(thisMetaVariable+"-"+thatMetaVariable, thisBaseMeta, thatBaseMeta);
-                        thisBaseMeta.put(thisMetaVariable, thisBaseMetaVariable);
-                        thatBaseMetaVariable = thisBaseMetaVariable;
-                        thatBaseMeta.put(thatMetaVariable, thatBaseMetaVariable);
-                        
-                        // Fabricate initial base and baseSubstitute!
-                        base = unifiedMetaApplication(thisBaseMetaVariable, commonBasePatternVariables);
-                        base.match(unifiedMatch, base, SimpleVariableSet.make(thatBound.values()), null, true, SimpleVariableSet.EMPTY, null); // match with itself...really just to register as Substitute
-                        baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
-                    }
-                    else
-                    {
-                        // Only that previously matched - make this an alias.
-                        thisBaseMetaVariable = thatBaseMetaVariable;
-                        thisBaseMeta.put(thisMetaVariable, thisBaseMetaVariable);
-                        baseSubstitute = unifiedMatch.getSubstitute(thatBaseMetaVariable);
-                        
-                        List<Variable> baseSubstituteBindings = Arrays.asList(baseSubstitute.getBindings());
-                        if (!baseSubstituteBindings.equals(commonBasePatternVariables))
-                        {
-                            // TODO: actually rematch with restricted variable list...
-                            return null;
-                        }
-                        base = unifiedMetaApplication(thatBaseMetaVariable, commonBasePatternVariables);
-                        if (!baseSubstitute.rematch(unifiedMatch, baseSubstituteBindings.toArray(new Variable[0]), that))
-                        {
-                            assert false : "Rematch of constructed pattern fails?!?";
-                            return null;
-                        }
-                    }
-                }
-				else
-                {
-                    // This previously matched...
-                    baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
-                    base = unifiedMetaApplication(thisBaseMetaVariable, Arrays.asList(baseSubstitute.getBindings()));
-                    //
-                    if (thatBaseMetaVariable == null)
-                    {
-                        // Only this previously matched - reuse for that.
-                        thatBaseMetaVariable = thisBaseMetaVariable;
-                        thatBaseMeta.put(thatMetaVariable, thatBaseMetaVariable);
-                        baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
-                        
-                        List<Variable> baseSubstituteBindings = Arrays.asList(baseSubstitute.getBindings());
-                        if (!baseSubstituteBindings.equals(commonBasePatternVariables))
-                        {
-                            // TODO: actually rematch with restricted variable list...
-                            return null;
-                        }
-                        base = unifiedMetaApplication(thisBaseMetaVariable, commonBasePatternVariables);
-                        if (!baseSubstitute.rematch(unifiedMatch, baseSubstituteBindings.toArray(new Variable[0]), this))
-                        {
-                            assert false : "Rematch of constructed pattern fails?!?";
-                            return null;
-                        }
-                    }
-                    else if (thisBaseMetaVariable.equals(thatBaseMetaVariable))
-                    {
-                        // Already matched to each other -- nothing more to do.
-                    }
-                    else
-                    {
-                        // Both this and that previously matched but to different base patterns...join them!
-                        // TODO:  Join this and that match...rematch all for the combined base variable!
-                        return null; 
-                    }
-                }
-                return base; // success
-            }
-        }
-        assert false : "Matching against improper term";
-        return null;
-    }
-    
-    @Override
-	protected Unification unifyThese(Unification unification, Pattern that,
-			StackedMap<Variable> rho,
-			StackedMap<Variable> rhoprime, Set<String> existingMVars) throws CRSException {
-    	
-    	Substitute s = unification.getSubstitute(this.metaVariable());
-    	
-    	if (s != null){
-    		//TODO : Fix for left-linearity
-    		assert false : "Metavariable already bound - not a left-linear system";
-//    		//Metavariable is already bound. Apply substitute and redo unification
-//    		Copyable c = s.substitute(new DummyValuation(), this.sub);
-//    		Buffer b = new Buffer(maker);
-//			c.copy(b.sink(), false, LinkedExtensibleMap.EMPTY_RENAMING);
-//    		return ((GenericTerm)(b.term(true))).unifyThese(unification, that, rho, rhoprime, existingMVars);
-    	}
-    	else {
-    		//Metavariable not bound yet.
+	final public Contractum oldunify(ExtensibleMap<Variable, Variable> thisBound, Map<Variable, Variable> thisBaseVariable, Map<String, String> thisBaseMeta, Pattern that, ExtensibleMap<Variable, Variable> thatBound, Map<Variable, Variable> thatBaseVariable, Map<String, String> thatBaseMeta, Match unifiedMatch, ExtensibleMap<Variable, Variable> unifiedBound, Map<String, List<Pair<ExtensibleMap<Variable, Variable>, Term>>> unifiedMatched)
+	{
+		// Note: this handles all combinations with meta-applications.
 
-    		//TODO : Fix occurs check when non-linearity is introduced
-//    		//Occurs check
-//    		if (that.occurs(this.metaVariable(), unification)){
-//    			//this metavariable occurs in that pattern under substitution, so fail. 
-//    			return null;
-//    		}
-    		
-    		
-    		switch(that.kind()){
-    		case CONSTRUCTION:{
-    			//Check for GenericEvaluators, and delegate if needed
-    			if (that instanceof GenericEvaluator){
-    				return ((GenericEvaluator) that).unifyThese(unification, this, rhoprime, rhoprime, existingMVars);
-    			}
-    			int arity = this.arity();
+		// Properties of this pattern meta-application.
+		String thisMetaVariable = metaVariable();
+		String thisBaseMetaVariable = thisBaseMeta.get(thisMetaVariable);
 
-    			//Compute free variables of that
-    			Set<Variable> thatFVmin = new HashSet<Variable>();
-    			that.addFree(thatFVmin, new LinkedExtensibleSet<Variable>(), false, null);
+		// Compute variable lists for this, also after mapping to unified term.  TODO: be lazy about it...
+		int thisArity = arity();
+		List<Variable> thisPatternVariables = new ArrayList<Variable>(thisArity);
+		List<Variable> thisBasePatternVariables = new ArrayList<Variable>(thisArity);
+		for (int i = 0; i < thisArity; ++i)
+		{
+			assert sub(i).kind() == Kind.VARIABLE_USE : "Unify applied to non-pattern meta-application (" + this + ")";
+			Variable v = sub(i).variable();
+			assert thisBound.containsKey(v) : "Unbound pattern variable slipped through?!?";
+			assert !thisPatternVariables.contains(v) : "Repeated pattern variable slipped through?!?";
+			thisPatternVariables.add(v);
+			thisBasePatternVariables.add(thisBaseVariable.get(v));
+		}
 
-    			//Compute allowable variables 
-    			Set<Variable> thisfree = new HashSet<Variable>();
-    			this.addFree(thisfree, new LinkedExtensibleSet<Variable>(), true, null);
-    			Set<Variable> rhothisfree = new HashSet<Variable>();
-    			for (Variable v : thisfree){
-    				Variable rhov = rho.get(v);
-    				assert rhov != null : "Variable of metaapplication occurs unbound";
-    				rhothisfree.add(rhov);
-    			}
-    			
-    			//Check that free variables of that are allowed to occur
-    			for (Variable v : thatFVmin){
-    				Variable rhoprimev = rhoprime.get(v);
-    				if (rhoprimev == null){
-    					throw new CRSException("Metaapplication being unified with construction containing free variable");
-    				}
-    				if (!rhothisfree.contains(rhoprimev)){
-    					//Variable not allowed to occur. Unification fails.
-    					return null;
-    				}
-    			}
-    			
-    			//TODO: Fix when introducing non-linearity
-    			//Collect bitmasks for each metavariable and collect an occurrence for each metavariable
-    			Map<String, Boolean[]> bitmasks = new HashMap<String, Boolean[]>();
-    			Map<String, GenericMetaApplication> occurrences = new HashMap<String, GenericMetaApplication>();
+		// Unified structures.
+		Substitute baseSubstitute;
+		GenericTerm base = null;
 
-    			((GenericTerm)that).generateBitmasks(rhothisfree, rhoprime, new StackedMap<Variable>(), bitmasks, occurrences);
-    			
-    			//Assign new metavariable names to metavariables in that
-    			Map<String, String> newmvars = new HashMap<String, String>();
-    			for (String mvar : bitmasks.keySet()){
-    				String newmvar = GenericUnification.makeMetaVar(mvar, existingMVars);
-    				existingMVars.add(newmvar);
-    				newmvars.put(mvar, newmvar);
-    			}
-    			
-    			//Construct trivial substitutes for metavars in that, using newmvars and bitmasks, 
-    			//and add to unification.
-    			for (Map.Entry<String, GenericMetaApplication> entry : occurrences.entrySet()){
-    				Variable[] args = new Variable[entry.getValue().arity()];
-    				for (int i = 0; i < args.length; i++){
-    					Variable argsource = entry.getValue().sub(i).variable();
-    					Variable argtarget = rhoprime.get(argsource); 
-    					if (argtarget != null){
-    						args[i] = argtarget;
-    					}
-    					else {
-    						//Variable bound below current node. Just reuse name.
-    						args[i] = argsource;
-    					}
-    				}
-    				
-    				Boolean[] bitmask = bitmasks.get(entry.getKey());
-    				LinkedList<Variable> bodyargs = new LinkedList<Variable>();
-    				for (int i = 0; i < bitmask.length; i++){
-    					if (bitmask[i]){
-    						bodyargs.addLast(args[i]);
-    					}
-    				}
-    				
-    				GenericTerm body = unifiedMetaApplication(newmvars.get(entry.getKey()), bodyargs);
-    				//TODO: Figure out whether these substitutes should be added to sigma, or whether
-    				//they should be handled by unificationcopy
-    				unification.putSubstitute(entry.getKey(), args, body);
-    			}
-    			
-    			//Construct substitute for this
-    			Variable[] thissubbinders = new Variable[arity];
-    			for (int i = 0; i < arity; i++){
-    				Variable subibinder = rho.get(((GenericTerm)sub[i]).variable());
-    				if (subibinder != null){
-    					thissubbinders[i] = subibinder; 
-    				}
-    				else {
-    					thissubbinders[i] = ((GenericTerm)sub[i]).variable(); 
-    				}
-    			}
-    			
-    			ExtensibleMap<Variable, Variable> renames = new LinkedExtensibleMap<Variable, Variable>().extend(rhoprime);
-    			
-    			GenericTerm thissubbody = (GenericTerm)((GenericTerm)that).applySubstitutes(unification).copy(true, renames);
+		// Now deal with that.
+		switch (that.kind())
+		{
+			case CONSTRUCTION :
+			case VARIABLE_USE : {
+				// The meta-application is being matched against some term.
+				if (thisMetaVariable == null)
+				{
+					// Previously unmatched meta-variable: Setup corresponding base pattern and check it matches
+					thisBaseMetaVariable = makeMetaVar(thisMetaVariable, thisBaseMeta, thatBaseMeta);
+					thisBaseMeta.put(thisMetaVariable, thisBaseMetaVariable);
+					base = unifiedMetaApplication(thisBaseMetaVariable, thisBound.getAll(thisPatternVariables));
+					if (!base.match(
+							unifiedMatch, that, SimpleVariableSet.make(thatBound.values()), null, true, SimpleVariableSet.EMPTY,
+							null))
+						return null; // this does not match, so fail
 
-
-    			//Construct substitute and add to unification
-    			unification.putSubstitute(this.metaVariable(), thissubbinders, thissubbody);
-
-    			return unification;
-    			
-    		}
-    		case VARIABLE_USE:{
-    			GenericTerm subbody;
-				Variable localTarget = rhoprime.get(that.variable());  
-    			
-				if (localTarget == null){
-					throw new CRSException("Metaapplication being unified with free variable");
+					assert !unifiedMatched.containsKey(thisBaseMetaVariable) : "Previously unmatched meta-variable already registered as matched?!?";
+					List<Pair<ExtensibleMap<Variable, Variable>, Term>> matched = new LinkedList<Pair<ExtensibleMap<Variable, Variable>, Term>>();
+					matched.add(new Pair<ExtensibleMap<Variable, Variable>, Term>(unifiedBound, that));
+					unifiedMatched.put(thisBaseMetaVariable, matched);
 				}
-				else {
-    				//Variable occurs bound. Unify if corresponding variable is allowed in metaapplication
-    				boolean found = false;
-    				for (int i = 0; i < sub.length && !found; i++){
-    					Variable metaAppArg = ((GenericVariableUse)sub[i]).variable();
-    					Variable argTarget = rho.get(metaAppArg);
-    					assert argTarget != null : "Free variable occurs in metaapplication";
-    					if (argTarget.equals(localTarget)){
-    						found = true;
-    					}
-    				}
-    				if (found){
-    					//Unification succeeds
-    					ExtensibleMap<Variable, Variable> renames = new LinkedExtensibleMap<Variable, Variable>();
-    					subbody = (GenericTerm)that.copy(false, renames.extend(rhoprime));
-    				}
-    				else {
-    					//Unification fails
-    					return null;
-    				}
-    			}
-    				
-    			Variable[] subbinders = new Variable[sub.length];
-    			for (int i = 0; i < sub.length; i++){
-    				Variable rhov = rho.get(((GenericVariableUse)sub[i]).variable());
-    				assert rhov != null : "This assertion did not fail 20 lines ago!";
-    				subbinders[i] = rhov;
-    			}
-    			
-    			unification.putSubstitute(this.metaVariable(), subbinders, subbody);
-    			return unification;
-    		}	
-    		case META_APPLICATION:{
-    			//Check that other metaapplication is not bound.
-    			Substitute thatbound = unification.getSubstitute(that.metaVariable()); 
-    			if (thatbound != null){
-    				//TODO : Fix when introducing non-linearity
-    				assert false : "Metavariable already bound - non-linear system";
-    				//Other metavariable is bound. Apply substitute and redo call
-//    	    		Copyable c = thatbound.substitute(new DummyValuation(), ((GenericMetaApplication)that).sub);
-//    	    		Buffer b = new Buffer(that.maker());
-//						c.copy(b.sink(), false, LinkedExtensibleMap.EMPTY_RENAMING);
-//    	    		return this.unifyThese(unification, (GenericTerm)(b.term(true)), rho, rhoprime, existingMVars);
-    			}
-    			else{
-    				//Other metavariable is not bound. Create identical metaapplications and bind both 
-    				//metavariables to substitutes with that metaapplication as its body.
-    				
-    				//Create new metavariable
-    				String newmvar = GenericUnification.makeMetaVar(this.metaVariable() + that.metaVariable(), existingMVars);
-    				existingMVars.add(newmvar);
-    				
-    				//Create list of variables to apply new metavariable to.
-    				LinkedList<Variable> metaappargs = new LinkedList<Variable>();
-    				int arity = this.arity(); 
-					int thatarity = that.arity();
-    				for (int i = 0; i < arity; i++){
-    					Variable appargtarget = rho.get(sub[i]);
-    					assert appargtarget != null : "Variable occurs free in metaapplication";
-    					for (int j = 0; j < thatarity; j++){    					
-    						Variable thatappargtarget = rhoprime.get(that.sub(j));
-    						assert thatappargtarget != null : "Variable occurs free in metaapplication";
-    						if (thatappargtarget.equals(appargtarget)){
-    							//Variable allowed to occur. Add to metaappargs, and move to outer loop
-    							metaappargs.addLast(appargtarget);
-    							break;
-    						}
-    						//else variable is not allowed to occur, so do not add. Continue searching.
-    					}
-    					//Variable either found and added, or not found and hence ignored. Continue outer loop
-    				}
-    				
-    				//Create new identical metaapplications
-    				GenericTerm thismetaapp = unifiedMetaApplication(newmvar, metaappargs);
-    				GenericTerm thatmetaapp = unifiedMetaApplication(newmvar, metaappargs);
-    				
-    				//Create argument lists for substitutes
-    				Variable[] thisargs = new Variable[arity];
-    				for (int i = 0; i < arity; i++){
-    					Variable subi = ((GenericTerm)sub[i]).variable();
-    					Variable subiTarget = rho.get(subi);
-    					assert subiTarget != null : "This assertion did not fail 20 lines ago!";
-    					thisargs[i] = subiTarget;
-    				}
-    				
-    				Variable[] thatargs = new Variable[thatarity];
-    				for (int i = 0; i < thatarity; i++){
-    					Variable subi = ((GenericTerm)that.sub(i)).variable();
-    					Variable subiTarget = rhoprime.get(subi);
-    					assert subiTarget != null : "This assertion did not fail 30 lines ago!";
-    					thatargs[i] = subiTarget;
-    				}
-    				
-    				unification.putSubstitute(newmvar, thisargs, thismetaapp);
-    				unification.putSubstitute(newmvar, thatargs, thatmetaapp);
-    				
-    				return unification;
-    			}
-    		}
-    		}
-    	}
-    	assert false : "Control fell through in GenericMetaApplication.unifyThese";
-    	return null;
-    }
-    
-    /** Helper to create unused meta-variable name. */
-    private static String makeMetaVar(String unifiedMetaVariable, Map<String, String> thisMeta, Map<String, String> thatMeta)
-    {
-        String result = unifiedMetaVariable;
-        for (int i = 0; thisMeta.containsValue(result) || thatMeta.containsValue(result); ++i)
-            result = unifiedMetaVariable + "-" + i;
-        return result;
-    }
+				else
+				{
+					// Previously matched meta-variable. Rematch the substitution against the new term. 
+					thisBaseMetaVariable = thisBaseMeta.get(thisMetaVariable);
+					base = unifiedMetaApplication(thisBaseMetaVariable, thisBound.getAll(thisPatternVariables));
+					baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
+					assert baseSubstitute != null : "Lost previously matched unified substitute?!?";
+					if (!baseSubstitute.rematch(unifiedMatch, baseSubstitute.getBindings(), that))
+						return null; // this does not rematch that, so fail
+
+					assert unifiedMatched.containsKey(thisBaseMetaVariable) : "Previously matched meta-variable not registered?!?";
+					List<Pair<ExtensibleMap<Variable, Variable>, Term>> matched = unifiedMatched.get(thisBaseMetaVariable);
+					matched.add(new Pair<ExtensibleMap<Variable, Variable>, Term>(unifiedBound, that));
+				}
+				return base; // success
+			}
+
+			case META_APPLICATION : {
+				// The meta-application is being matched against that meta-application.
+				// Unification succeeds if the base and unified can be updated consistently.
+
+				// Record properties of that.
+				String thatMetaVariable = that.metaVariable();
+				String thatBaseMetaVariable = thatBaseMeta.get(thatMetaVariable);
+
+				// Compute variable lists for that, also after mapping to unified term.
+				int thatArity = that.arity();
+				List<Variable> thatPatternVariables = new ArrayList<Variable>(thatArity);
+				List<Variable> thatBasePatternVariables = new ArrayList<Variable>(thatArity);
+				for (int i = 0; i < thatArity; ++i)
+				{
+					assert that.sub(i).kind() == Kind.VARIABLE_USE : "Unify applied to non-pattern meta-application (" + that + ")";
+					Variable v = that.sub(i).variable();
+					assert thatBound.containsKey(v) : "Unbound pattern variable slipped through?!?";
+					assert !thatPatternVariables.contains(v) : "Repeated pattern variable slipped through?!?";
+					thatPatternVariables.add(v);
+					thatBasePatternVariables.add(thatBaseVariable.get(v));
+				}
+
+				// Compute common pattern variables.
+				List<Variable> commonBasePatternVariables = new ArrayList<Variable>();
+				commonBasePatternVariables.addAll(thisBasePatternVariables);
+				commonBasePatternVariables.retainAll(thatBasePatternVariables);
+
+				// Now derive the appropriate base pattern meta-application...
+				if (thisBaseMetaVariable == null)
+				{
+					if (thatBaseMetaVariable == null)
+					{
+						// For two previously unknown meta-variables craft fresh base pattern meta-variable.
+						thisBaseMetaVariable = makeMetaVar(thisMetaVariable + "-" + thatMetaVariable, thisBaseMeta, thatBaseMeta);
+						thisBaseMeta.put(thisMetaVariable, thisBaseMetaVariable);
+						thatBaseMetaVariable = thisBaseMetaVariable;
+						thatBaseMeta.put(thatMetaVariable, thatBaseMetaVariable);
+
+						// Fabricate initial base and baseSubstitute!
+						base = unifiedMetaApplication(thisBaseMetaVariable, commonBasePatternVariables);
+						base.match(
+								unifiedMatch, base, SimpleVariableSet.make(thatBound.values()), null, true,
+								SimpleVariableSet.EMPTY, null); // match with itself...really just to register as Substitute
+						baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
+					}
+					else
+					{
+						// Only that previously matched - make this an alias.
+						thisBaseMetaVariable = thatBaseMetaVariable;
+						thisBaseMeta.put(thisMetaVariable, thisBaseMetaVariable);
+						baseSubstitute = unifiedMatch.getSubstitute(thatBaseMetaVariable);
+
+						List<Variable> baseSubstituteBindings = Arrays.asList(baseSubstitute.getBindings());
+						if (!baseSubstituteBindings.equals(commonBasePatternVariables))
+						{
+							// TODO: actually rematch with restricted variable list...
+							return null;
+						}
+						base = unifiedMetaApplication(thatBaseMetaVariable, commonBasePatternVariables);
+						if (!baseSubstitute.rematch(unifiedMatch, baseSubstituteBindings.toArray(new Variable[0]), that))
+						{
+							assert false : "Rematch of constructed pattern fails?!?";
+							return null;
+						}
+					}
+				}
+				else
+				{
+					// This previously matched...
+					baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
+					base = unifiedMetaApplication(thisBaseMetaVariable, Arrays.asList(baseSubstitute.getBindings()));
+					//
+					if (thatBaseMetaVariable == null)
+					{
+						// Only this previously matched - reuse for that.
+						thatBaseMetaVariable = thisBaseMetaVariable;
+						thatBaseMeta.put(thatMetaVariable, thatBaseMetaVariable);
+						baseSubstitute = unifiedMatch.getSubstitute(thisBaseMetaVariable);
+
+						List<Variable> baseSubstituteBindings = Arrays.asList(baseSubstitute.getBindings());
+						if (!baseSubstituteBindings.equals(commonBasePatternVariables))
+						{
+							// TODO: actually rematch with restricted variable list...
+							return null;
+						}
+						base = unifiedMetaApplication(thisBaseMetaVariable, commonBasePatternVariables);
+						if (!baseSubstitute.rematch(unifiedMatch, baseSubstituteBindings.toArray(new Variable[0]), this))
+						{
+							assert false : "Rematch of constructed pattern fails?!?";
+							return null;
+						}
+					}
+					else if (thisBaseMetaVariable.equals(thatBaseMetaVariable))
+					{
+						// Already matched to each other -- nothing more to do.
+					}
+					else
+					{
+						// Both this and that previously matched but to different base patterns...join them!
+						// TODO:  Join this and that match...rematch all for the combined base variable!
+						return null;
+					}
+				}
+				return base; // success
+			}
+		}
+		assert false : "Matching against improper term";
+		return null;
+	}
+
+	@Override
+	protected Unification unifyThese(Unification unification, Pattern that, StackedMap<Variable> rho, StackedMap<Variable> rhoprime, Set<String> existingMVars)
+			throws CRSException
+	{
+
+		Substitute s = unification.getSubstitute(this.metaVariable());
+
+		if (s != null)
+		{
+			//TODO : Fix for left-linearity
+			assert false : "Metavariable already bound - not a left-linear system";
+			//    		//Metavariable is already bound. Apply substitute and redo unification
+			//    		Copyable c = s.substitute(new DummyValuation(), this.sub);
+			//    		Buffer b = new Buffer(maker);
+			//			c.copy(b.sink(), false, LinkedExtensibleMap.EMPTY_RENAMING);
+			//    		return ((GenericTerm)(b.term(true))).unifyThese(unification, that, rho, rhoprime, existingMVars);
+		}
+		else
+		{
+			//Metavariable not bound yet.
+
+			//TODO : Fix occurs check when non-linearity is introduced
+			//    		//Occurs check
+			//    		if (that.occurs(this.metaVariable(), unification)){
+			//    			//this metavariable occurs in that pattern under substitution, so fail. 
+			//    			return null;
+			//    		}
+
+			switch (that.kind())
+			{
+				case CONSTRUCTION : {
+					//Check for GenericEvaluators, and delegate if needed
+					if (that instanceof GenericEvaluator)
+					{
+						return ((GenericEvaluator) that).unifyThese(unification, this, rhoprime, rhoprime, existingMVars);
+					}
+					int arity = this.arity();
+
+					//Compute free variables of that
+					Set<Variable> thatFVmin = new HashSet<Variable>();
+					that.addFree(thatFVmin, new LinkedExtensibleSet<Variable>(), false, null);
+
+					//Compute allowable variables 
+					Set<Variable> thisfree = new HashSet<Variable>();
+					this.addFree(thisfree, new LinkedExtensibleSet<Variable>(), true, null);
+					Set<Variable> rhothisfree = new HashSet<Variable>();
+					for (Variable v : thisfree)
+					{
+						Variable rhov = rho.get(v);
+						assert rhov != null : "Variable of metaapplication occurs unbound";
+						rhothisfree.add(rhov);
+					}
+
+					//Check that free variables of that are allowed to occur
+					for (Variable v : thatFVmin)
+					{
+						Variable rhoprimev = rhoprime.get(v);
+						if (rhoprimev == null)
+						{
+							throw new CRSException("Metaapplication being unified with construction containing free variable");
+						}
+						if (!rhothisfree.contains(rhoprimev))
+						{
+							//Variable not allowed to occur. Unification fails.
+							return null;
+						}
+					}
+
+					//TODO: Fix when introducing non-linearity
+					//Collect bitmasks for each metavariable and collect an occurrence for each metavariable
+					Map<String, Boolean[]> bitmasks = new HashMap<String, Boolean[]>();
+					Map<String, GenericMetaApplication> occurrences = new HashMap<String, GenericMetaApplication>();
+
+					((GenericTerm) that).generateBitmasks(rhothisfree, rhoprime, new StackedMap<Variable>(), bitmasks, occurrences);
+
+					//Assign new metavariable names to metavariables in that
+					Map<String, String> newmvars = new HashMap<String, String>();
+					for (String mvar : bitmasks.keySet())
+					{
+						String newmvar = GenericUnification.makeMetaVar(mvar, existingMVars);
+						existingMVars.add(newmvar);
+						newmvars.put(mvar, newmvar);
+					}
+
+					//Construct trivial substitutes for metavars in that, using newmvars and bitmasks, 
+					//and add to unification.
+					for (Map.Entry<String, GenericMetaApplication> entry : occurrences.entrySet())
+					{
+						Variable[] args = new Variable[entry.getValue().arity()];
+						for (int i = 0; i < args.length; i++)
+						{
+							Variable argsource = entry.getValue().sub(i).variable();
+							Variable argtarget = rhoprime.get(argsource);
+							if (argtarget != null)
+							{
+								args[i] = argtarget;
+							}
+							else
+							{
+								//Variable bound below current node. Just reuse name.
+								args[i] = argsource;
+							}
+						}
+
+						Boolean[] bitmask = bitmasks.get(entry.getKey());
+						LinkedList<Variable> bodyargs = new LinkedList<Variable>();
+						for (int i = 0; i < bitmask.length; i++)
+						{
+							if (bitmask[i])
+							{
+								bodyargs.addLast(args[i]);
+							}
+						}
+
+						GenericTerm body = unifiedMetaApplication(newmvars.get(entry.getKey()), bodyargs);
+						//TODO: Figure out whether these substitutes should be added to sigma, or whether
+						//they should be handled by unificationcopy
+						unification.putSubstitute(entry.getKey(), args, body);
+					}
+
+					//Construct substitute for this
+					Variable[] thissubbinders = new Variable[arity];
+					for (int i = 0; i < arity; i++)
+					{
+						Variable subibinder = rho.get(((GenericTerm) sub[i]).variable());
+						if (subibinder != null)
+						{
+							thissubbinders[i] = subibinder;
+						}
+						else
+						{
+							thissubbinders[i] = ((GenericTerm) sub[i]).variable();
+						}
+					}
+
+					ExtensibleMap<Variable, Variable> renames = new LinkedExtensibleMap<Variable, Variable>().extend(rhoprime);
+
+					GenericTerm thissubbody = (GenericTerm) ((GenericTerm) that).applySubstitutes(unification).copy(true, renames);
+
+					//Construct substitute and add to unification
+					unification.putSubstitute(this.metaVariable(), thissubbinders, thissubbody);
+
+					return unification;
+
+				}
+				case VARIABLE_USE : {
+					GenericTerm subbody;
+					Variable localTarget = rhoprime.get(that.variable());
+
+					if (localTarget == null)
+					{
+						throw new CRSException("Metaapplication being unified with free variable");
+					}
+					else
+					{
+						//Variable occurs bound. Unify if corresponding variable is allowed in metaapplication
+						boolean found = false;
+						for (int i = 0; i < sub.length && !found; i++)
+						{
+							Variable metaAppArg = ((GenericVariableUse) sub[i]).variable();
+							Variable argTarget = rho.get(metaAppArg);
+							assert argTarget != null : "Free variable occurs in metaapplication";
+							if (argTarget.equals(localTarget))
+							{
+								found = true;
+							}
+						}
+						if (found)
+						{
+							//Unification succeeds
+							ExtensibleMap<Variable, Variable> renames = new LinkedExtensibleMap<Variable, Variable>();
+							subbody = (GenericTerm) that.copy(false, renames.extend(rhoprime));
+						}
+						else
+						{
+							//Unification fails
+							return null;
+						}
+					}
+
+					Variable[] subbinders = new Variable[sub.length];
+					for (int i = 0; i < sub.length; i++)
+					{
+						Variable rhov = rho.get(((GenericVariableUse) sub[i]).variable());
+						assert rhov != null : "This assertion did not fail 20 lines ago!";
+						subbinders[i] = rhov;
+					}
+
+					unification.putSubstitute(this.metaVariable(), subbinders, subbody);
+					return unification;
+				}
+				case META_APPLICATION : {
+					//Check that other metaapplication is not bound.
+					Substitute thatbound = unification.getSubstitute(that.metaVariable());
+					if (thatbound != null)
+					{
+						//TODO : Fix when introducing non-linearity
+						assert false : "Metavariable already bound - non-linear system";
+						//Other metavariable is bound. Apply substitute and redo call
+						//    	    		Copyable c = thatbound.substitute(new DummyValuation(), ((GenericMetaApplication)that).sub);
+						//    	    		Buffer b = new Buffer(that.maker());
+						//						c.copy(b.sink(), false, LinkedExtensibleMap.EMPTY_RENAMING);
+						//    	    		return this.unifyThese(unification, (GenericTerm)(b.term(true)), rho, rhoprime, existingMVars);
+					}
+					else
+					{
+						//Other metavariable is not bound. Create identical metaapplications and bind both 
+						//metavariables to substitutes with that metaapplication as its body.
+
+						//Create new metavariable
+						String newmvar = GenericUnification.makeMetaVar(this.metaVariable() + that.metaVariable(), existingMVars);
+						existingMVars.add(newmvar);
+
+						//Create list of variables to apply new metavariable to.
+						LinkedList<Variable> metaappargs = new LinkedList<Variable>();
+						int arity = this.arity();
+						int thatarity = that.arity();
+						for (int i = 0; i < arity; i++)
+						{
+							Variable appargtarget = rho.get(sub[i]);
+							assert appargtarget != null : "Variable occurs free in metaapplication";
+							for (int j = 0; j < thatarity; j++)
+							{
+								Variable thatappargtarget = rhoprime.get(that.sub(j));
+								assert thatappargtarget != null : "Variable occurs free in metaapplication";
+								if (thatappargtarget.equals(appargtarget))
+								{
+									//Variable allowed to occur. Add to metaappargs, and move to outer loop
+									metaappargs.addLast(appargtarget);
+									break;
+								}
+								//else variable is not allowed to occur, so do not add. Continue searching.
+							}
+							//Variable either found and added, or not found and hence ignored. Continue outer loop
+						}
+
+						//Create new identical metaapplications
+						GenericTerm thismetaapp = unifiedMetaApplication(newmvar, metaappargs);
+						GenericTerm thatmetaapp = unifiedMetaApplication(newmvar, metaappargs);
+
+						//Create argument lists for substitutes
+						Variable[] thisargs = new Variable[arity];
+						for (int i = 0; i < arity; i++)
+						{
+							Variable subi = ((GenericTerm) sub[i]).variable();
+							Variable subiTarget = rho.get(subi);
+							assert subiTarget != null : "This assertion did not fail 20 lines ago!";
+							thisargs[i] = subiTarget;
+						}
+
+						Variable[] thatargs = new Variable[thatarity];
+						for (int i = 0; i < thatarity; i++)
+						{
+							Variable subi = ((GenericTerm) that.sub(i)).variable();
+							Variable subiTarget = rhoprime.get(subi);
+							assert subiTarget != null : "This assertion did not fail 30 lines ago!";
+							thatargs[i] = subiTarget;
+						}
+
+						unification.putSubstitute(newmvar, thisargs, thismetaapp);
+						unification.putSubstitute(newmvar, thatargs, thatmetaapp);
+
+						return unification;
+					}
+				}
+			}
+		}
+		assert false : "Control fell through in GenericMetaApplication.unifyThese";
+		return null;
+	}
+
+	/** Helper to create unused meta-variable name. */
+	private static String makeMetaVar(String unifiedMetaVariable, Map<String, String> thisMeta, Map<String, String> thatMeta)
+	{
+		String result = unifiedMetaVariable;
+		for (int i = 0; thisMeta.containsValue(result) || thatMeta.containsValue(result); ++i)
+			result = unifiedMetaVariable + "-" + i;
+		return result;
+	}
+
 	/** Helper to create meta-application with variable arguments. */
-    private GenericTerm unifiedMetaApplication(String unifiedMetaVariable, List<Variable> variables)
-    {
-        int thisArity = variables.size();
-        GenericTerm[] unifiedSub = new GenericTerm[thisArity];
-        for (int i = 0; i < thisArity; ++i)
-            unifiedSub[i] = new GenericVariableUse(factory, variables.get(i), null);
-        return new GenericMetaApplication(factory, unifiedMetaVariable, unifiedSub);
-    }
-    
-    @Override
-	protected void generateBitmasks(Set<Variable> legalvars, StackedMap<Variable> rhoprime,
-			StackedMap<Variable> inscope, Map<String, Boolean[]> bitmasks,
-			Map<String, GenericMetaApplication> occurrences) {
-    	int arity = this.arity();
-    	Boolean[] bitmask;
-    	if (bitmasks.containsKey(this.metaVariable())){
-    		bitmask = bitmasks.get(this.metaVariable());
-    	}
-    	else {
-    		//New occurrence
-    		occurrences.put(this.metaVariable(), this);
-    		bitmask = new Boolean[arity];
-    	}
-    	
-    	for (int i = 0; i < arity; i++){
-    		if (bitmask[i]){
-    			//Check whether ith variable is allowed to occur
-    			Variable ith = ((GenericTerm)this.sub(i)).variable();
-    			Variable ithtarget = rhoprime.get(ith);
-    			bitmask[i] = inscope.containsKey(ith) || ithtarget == null || legalvars.contains(ithtarget);
-    		}
-    	}
-    }
+	private GenericTerm unifiedMetaApplication(String unifiedMetaVariable, List<Variable> variables)
+	{
+		int thisArity = variables.size();
+		GenericTerm[] unifiedSub = new GenericTerm[thisArity];
+		for (int i = 0; i < thisArity; ++i)
+			unifiedSub[i] = new GenericVariableUse(factory, variables.get(i), null);
+		return new GenericMetaApplication(factory, unifiedMetaVariable, unifiedSub);
+	}
+
+	@Override
+	protected void generateBitmasks(Set<Variable> legalvars, StackedMap<Variable> rhoprime, StackedMap<Variable> inscope, Map<String, Boolean[]> bitmasks, Map<String, GenericMetaApplication> occurrences)
+	{
+		int arity = this.arity();
+		Boolean[] bitmask;
+		if (bitmasks.containsKey(this.metaVariable()))
+		{
+			bitmask = bitmasks.get(this.metaVariable());
+		}
+		else
+		{
+			//New occurrence
+			occurrences.put(this.metaVariable(), this);
+			bitmask = new Boolean[arity];
+		}
+
+		for (int i = 0; i < arity; i++)
+		{
+			if (bitmask[i])
+			{
+				//Check whether ith variable is allowed to occur
+				Variable ith = ((GenericTerm) this.sub(i)).variable();
+				Variable ithtarget = rhoprime.get(ith);
+				bitmask[i] = inscope.containsKey(ith) || ithtarget == null || legalvars.contains(ithtarget);
+			}
+		}
+	}
 
 	// Contractum.
 
@@ -882,13 +922,13 @@ public class GenericMetaApplication extends GenericTerm
 		{
 			if (data && crs != null)
 			{
-                try
-                {
-                	Term nf = crs.normalize(s.getBody());
+				try
+				{
+					Term nf = crs.normalize(s.getBody());
 					s.replaceBody(nf);
-                }
-                catch (CRSException e)
-                {}
+				}
+				catch (CRSException e)
+				{}
 			}
 			// ENTRY POINT TO Substitute.substitute().
 			return s.substitute(valuation, sub).copy(sink, true, renamings); // normal case...
@@ -911,10 +951,11 @@ public class GenericMetaApplication extends GenericTerm
 			//This is the mvar we're looking for.
 			return true;
 		}
-		
+
 		Substitute s = unification.getSubstitute(mvar);
-		
-		if (s == null){
+
+		if (s == null)
+		{
 			//This is not the mvar, we're looking for, and this one is not bound.
 			return false;
 		}
@@ -922,54 +963,61 @@ public class GenericMetaApplication extends GenericTerm
 		return ((GenericTerm) (s.getBody())).occurs(mvar, unification);
 	}
 
-	public Set<String> mvars() {
+	public Set<String> mvars()
+	{
 		Set<String> result = new HashSet<String>();
 		result.add(this.metaVariable());
 		return result;
 	}
 
 	@Override
-	public GenericTerm makeUnificationCopy(StackedMap<Variable> varrenamings,
-			Map<String, String> mvarrenamings) {
+	public GenericTerm makeUnificationCopy(StackedMap<Variable> varrenamings, Map<String, String> mvarrenamings)
+	{
 		String mv = mvarrenamings.get(this.metaVariable());
-		if (mv == null){
+		if (mv == null)
+		{
 			mv = this.metaVariable();
 		}
-		
+
 		GenericTerm[] subs = new GenericTerm[this.arity()];
-		for (int i = 0; i < sub.length; i++){
-			subs[i] = ((GenericTerm)sub[i]).makeUnificationCopy(varrenamings, mvarrenamings);
+		for (int i = 0; i < sub.length; i++)
+		{
+			subs[i] = ((GenericTerm) sub[i]).makeUnificationCopy(varrenamings, mvarrenamings);
 		}
 
 		return factory.newMetaApplication(mv, subs);
 	}
 
 	@Override
-	public GenericTerm applySubstitutes(Unification unification) {
+	public GenericTerm applySubstitutes(Unification unification)
+	{
 		Substitute s = unification.getSubstitute(this.metaVariable());
-		
-		if (s == null){
+
+		if (s == null)
+		{
 			//Metavariable not bound. Apply substitutes to children, and return copy
 			GenericTerm[] subs = new GenericTerm[this.arity()];
-			for (int i = 0; i < subs.length; i++){
-				subs[i] = ((GenericTerm)this.sub(i)).applySubstitutes(unification);
+			for (int i = 0; i < subs.length; i++)
+			{
+				subs[i] = ((GenericTerm) this.sub(i)).applySubstitutes(unification);
 			}
 			return factory.newMetaApplication(this.metaVariable(), subs);
 		}
-		else {
+		else
+		{
 			Copyable c = s.substitute(new DummyValuation(), this.sub);
 			Buffer b = new Buffer(this.maker());
 			c.copy(b.sink(), false, LinkedExtensibleMap.EMPTY_RENAMING);
-			return ((GenericTerm)b.term(true)).applySubstitutes(unification);
+			return ((GenericTerm) b.term(true)).applySubstitutes(unification);
 		}
 	}
-	
+
 	// Object...
 
-    @Override
-    public int hashCode()
-    {
-    	int h = Kind.META_APPLICATION.ordinal() + metaVariable.hashCode();
-    	return h;
-    }
+	@Override
+	public int hashCode()
+	{
+		int h = Kind.META_APPLICATION.ordinal() + metaVariable.hashCode();
+		return h;
+	}
 }

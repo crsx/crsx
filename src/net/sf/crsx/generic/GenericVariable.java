@@ -19,25 +19,16 @@ class GenericVariable implements Variable
      */
     static GenericVariable makeVariable(String name, boolean promiscuous)
     {
-        return (promiscuous ? new GenericVariable(name) : new Linear(name));
+        return new GenericVariable(name, promiscuous);
     }
-    /** Helper class to support variables with {@link #promiscuous()} false. */
-    static class Linear extends GenericVariable
-    {
-        public Linear(String symbol)
-        {
-            super(symbol);
-        }
-        public boolean promiscuous()
-        {
-            return false;
-        }
-    }
-    
+ 
 	// State.
 	
 	/** Symbol. */
 	String name;
+	
+	/** Linear? */
+	boolean promiscuous;
 
 	// Constructors.
 	
@@ -45,9 +36,10 @@ class GenericVariable implements Variable
 	 * Create unique variable.
 	 * @param name of variable (not semantically significant, may be modified)
 	 */
-	private GenericVariable(String name)
+	private GenericVariable(String name, boolean promiscuous)
 	{
 		this.name = name;
+		this.promiscuous = promiscuous;
 	}
 
 	// CRS.Variable implementation.
@@ -59,12 +51,17 @@ class GenericVariable implements Variable
 	
 	public boolean promiscuous()
 	{
-	    return true;
+	    return promiscuous;
 	}
 	
 	public void setName(String name)
 	{
 		this.name = name;
+	}
+	
+	public void setPromiscuous(boolean promiscuous)
+	{
+		this.promiscuous = promiscuous;
 	}
 	
 	public boolean equals(Object that)

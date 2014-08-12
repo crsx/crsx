@@ -58,12 +58,21 @@ typedef struct _TermLink *TermLink;
 // Defaults to having no content but can be extended as desired because main functions and data
 // structures propagate a pointer to "the context" but never create any or access the content.
 //
+#define CONS_POOL_MAX_SIZE_SIZE 32
+#define CONS_POOL_MAX_SIZE 4096
+
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
     int poolRefCount;
     Hashset2 stringPool;  // Set of char*
     Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
+
+    Construction** consPool; // Array Construction
+    ssize_t* consPoolSize;
+
+    Properties noProperties;
+
     char *str_filelocation;
     char *str_linelocation;
     char *str_columnlocation;
@@ -485,6 +494,7 @@ struct _Construction
 
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
+    unsigned int closure : 1; // whether function construction is a closure
 
     Properties properties;
 
@@ -703,13 +713,6 @@ extern Term makeStringLiteral(Context context, const char *text);
 #define ADD_PROPERTY_WEAKEN(sink,variable) ((Sink)(sink))->propertyWeaken(sink, variable)
 #define PROPERTIES_RESET(sink) ((Sink)(sink))->propertiesReset(sink)
 
-#define WEAKEN(sink,variable) ((Sink)(sink))->weaken(sink, variable)
-
-#define WEAKENINGS_OF(sink,term) weakenings_of(sink, term)
-#define WEAKENINGS_COPY(context,source,target) weakenings_copy(context, source, target)
-extern void weakenings_of(Sink sink, Term term);
-extern void weakenings_copy(Context context, Term source, Term target);
-
 // A Sink is a generic event handler for capturing terms.
 //
 typedef enum { SINK_UNDEFINED, SINK_IS_BUFFER, SINK_IS_SHOW } SinkKind;
@@ -726,15 +729,11 @@ struct _Sink
     Sink (*binds)(Sink sink, int rank, Variable binds[]); // binds event. Variable references are transferred.
     Sink (*copy)(Sink sink, Term term); // copy term as event(s)
 
-    Sink (*weakeningRef)(Sink sink, Construction construction); // base weakenings for next START
-    Sink (*weaken)(Sink sink, Variable variable); // weaken following term to *not* permit variable
-
     Sink (*propertyRef)(Sink sink, Construction construction); // base properties for next START
     Sink (*properties)(Sink sink, VARIABLESET namedFVs, VARIABLESET varFVs, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
 
     Sink (*propertyNamed)(Sink sink, const char *name, Term term); // add named property to next START
     Sink (*propertyVariable)(Sink sink, Variable variable, Term term); // add variable property to next START. Variable reference is transferred.
-    Sink (*propertyWeaken)(Sink sink, Variable variable); // add properties weakening to *preceding* properties for next START
     Sink (*propertiesReset)(Sink sink); // reset property state
 };
 
@@ -753,7 +752,7 @@ struct _Buffer
     BufferSegment first; // the first segment; all allocated segments available through segment ->next chain TODO: include first segment here!
     BufferSegment last; // the last segment (with top of stack in it) or NULL when empty
     int lastTop; // index of top entry (in last segment) or <0 when empty
-    VariableSetLink pendingWeakenings; // weakenings for next START (NOTE: cannot be shared)
+    VariableSetLink pendingFreeVars; // weakenings for next START (NOTE: cannot be shared)
     NamedPropertyLink pendingNamedProperties; // named properties for next START (NOTE: cannot be shared)
     VariablePropertyLink pendingVariableProperties; // variable properties for next START (NOTE: cannot be shared)
 
@@ -828,7 +827,6 @@ extern Term compute(Context context, Term term);
 //
 // Usage:
 // - SUBSTITUTE(sink,T,frame) sends a copy of term T to the sink except as substituted by frame;
-//   Note that T must be an lvalue.
 
 struct _SubstitutionFrame
 {
@@ -1065,6 +1063,10 @@ extern Hashset2 clearHS2(Context context, Hashset2 set);
 extern void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int constrained, VariablePropertyLink props);
 // Return memory used
 extern long memoryUsedHS2(Hashset2 set);
+// Convert to array. Don't copy entries (treat as read-only)
+extern Pair* toArrayHS2(Context context, Hashset2 set);
+
+
 extern void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set);
 extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
 

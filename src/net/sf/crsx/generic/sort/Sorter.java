@@ -1,6 +1,6 @@
 /* Copyright (c) 2010,2012 IBM Corporation. */
 
-package net.sf.crsx.generic;
+package net.sf.crsx.generic.sort;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +23,11 @@ import net.sf.crsx.PropertiesHolder;
 import net.sf.crsx.Term;
 import net.sf.crsx.Variable;
 import net.sf.crsx.analysis.Unifier;
+import net.sf.crsx.generic.GenericEvaluator;
+import net.sf.crsx.generic.GenericFactory;
+import net.sf.crsx.generic.GenericRule;
+import net.sf.crsx.generic.GenericTerm;
+import net.sf.crsx.generic.PropertiesConstraintsWrapper;
 import net.sf.crsx.util.ExtensibleMap;
 import net.sf.crsx.util.HashMultiMap;
 import net.sf.crsx.util.LinkedExtensibleMap;
@@ -34,8 +39,6 @@ import net.sf.crsx.util.Util;
 
 /**
  * This class is used to check whether a given set of rules is properly sorted.
- * For more information on the nature of sort declarations, data constructors
- * and function constructors, please refer to the external file SORTS.txt.
  * <p>
  * This class takes a set of rules, and a factory which contains declarations
  * for the constructors used in the given set of rules.
@@ -638,7 +641,7 @@ public class Sorter
 
 			// check arities, and save polymorphic sorts for all variables,
 			// meta-variables and previously unknown function symbols
-			Map<Variable,Term> varSorts = new HashMap<Variable,Term>();
+			Map<Variable,Term> varSorts = new HashMap<Variable,Term>();   // Free and fresh variable sorts.
 			Map<String,Term[]> metaSorts = new HashMap<String,Term[]>();
 			Map<Term,Pair<Term,Term>> constructorSorts = new IdentityHashMap<Term,Pair<Term,Term>>();
 			
@@ -1573,7 +1576,7 @@ public class Sorter
 			Term rsort = termUnification(rule.getContractum(), theta, rule.getName());
 			if (!Unifier.unify_help(lsort, rsort, theta, factory))
 			{
-				error("the two sides of rule " + name + " cannot be unified");
+				error("The two sides of rule " + name + " cannot be unified. The rule expects a " + lsort.toString() + " but the contractum sort is " + rsort.toString());
 				theta.clear();
 			}
 		}
@@ -1918,7 +1921,7 @@ public class Sorter
 			String sortname = sortdesignate.substring(1);
 			if (sortdesignate.startsWith("S") && !sortSetContains.multiContainsKey(sortdesignate) && factory.sortsetFor(sortname) == null)
 				error("Encountered property set for sort " + sortname + " which is not declared to have a sort set; "+
-					  "if this is intentional, pleasure declare the sort set of a function sort set for rule " + e.getKey());
+					  "if this is intentional, please declare the sort set of a function sort set for rule " + e.getKey());
 		}
 		
 		// STEP 3b: deal with the remaining sort sets
@@ -2179,7 +2182,7 @@ public class Sorter
 		if (sortsetdesignate == null)
 		{
 			Term sort = getSort(term, rulename.symbol(), boundVariables);
-			if (Util.isBuiltinSort(Util.symbol(sort)))
+			if (SortUtil.isBuiltinSort(Util.symbol(sort)))
 			{
 				//error("rule " + rulename + " uses a property set on a literal (" + term + ").");
 				//return;
@@ -2206,6 +2209,7 @@ public class Sorter
 			ref = ((PropertiesConstraintsWrapper) ph).getRef();
 		if (ref != null)
 		{
+			String originalref = ref;
 			ref = rulename + " -- " + ref;
 			if (left)
 			{
@@ -2257,14 +2261,14 @@ public class Sorter
 							else if (T == null)
 							{
 								// term has no function symbol sort set and term's sort has no data sort set...
-								warning("rule reference meta-variable " + ref + " causes unusual requirement [sort set for " + othersortcons + " = " + S  +
+								warning("rule reference meta-variable " + originalref + " causes unusual requirement [sort set for " + othersortcons + " = " + S  +
 										"] ⊆ [sort set for " + sortcons + " is undefined].  It is recommended to declare the data sort set for sort " + sortcons + ".\n" +
 								"Assuming equality of sort sets was intended.");
 							}
 							else if (S == null)
 							{
 								// reference variable has no function symbol sort set and no data sort set...
-								warning("rule reference meta-variable " + ref + " causes unusual requirement [sort set for " + othersortcons + " is undefined]" +
+								warning("rule reference meta-variable " + originalref + " causes unusual requirement [sort set for " + othersortcons + " is undefined]" +
 										" ⊆ [sort set for " + sortcons + " = " + T + "].  If you intended " +
 										"strict inclusion, please declare the sort set for these sorts.\n" +
 								"Assuming equality of sort sets was intended.");
@@ -2276,10 +2280,9 @@ public class Sorter
 								{
 									if (!T.containsKey(k) || !Unifier.equalSorts(factory, S.get(k), T.get(k)))
 									{
-										error("rule reference meta-variable " + ref +
-												" causes a requirement [sort set for " + othersortcons +
-												"] ⊆ [sort set for " + sortcons + "].  This requirement " +
-												"is not satisfied!");
+										error("sorts cannot be unified for the reference meta-variable " + originalref + " in the rule " + rulename +
+												"\n\t" + othersortcons + " sort set is: " + S + "\n\t"
+												+ sortcons + " sort set is: " + T);
 										break;
 									}
 								}

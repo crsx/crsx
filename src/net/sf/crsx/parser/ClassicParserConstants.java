@@ -43,39 +43,41 @@ public interface ClassicParserConstants {
   /** RegularExpression Id. */
   int LINEAR = 27;
   /** RegularExpression Id. */
-  int QUOTED_VARIABLE = 28;
+  int CLOSURE = 28;
   /** RegularExpression Id. */
-  int QUOTED_METAVARIABLE = 29;
+  int QUOTED_VARIABLE = 29;
   /** RegularExpression Id. */
-  int CONSTRUCTOR_PREFIX = 30;
+  int QUOTED_METAVARIABLE = 30;
   /** RegularExpression Id. */
-  int VARIABLE_PREFIX = 31;
+  int CONSTRUCTOR_PREFIX = 31;
   /** RegularExpression Id. */
-  int METAVARIABLE_PREFIX = 32;
+  int VARIABLE_PREFIX = 32;
   /** RegularExpression Id. */
-  int PART = 33;
+  int METAVARIABLE_PREFIX = 33;
   /** RegularExpression Id. */
-  int UPPER = 34;
+  int PART = 34;
   /** RegularExpression Id. */
-  int LOWER = 35;
+  int UPPER = 35;
   /** RegularExpression Id. */
-  int DIGIT = 36;
+  int LOWER = 36;
   /** RegularExpression Id. */
-  int ALPHANUMERIC = 37;
+  int DIGIT = 37;
   /** RegularExpression Id. */
-  int CONNECTOR = 38;
+  int ALPHANUMERIC = 38;
   /** RegularExpression Id. */
-  int OTHER = 39;
+  int CONNECTOR = 39;
   /** RegularExpression Id. */
-  int PERCENT_NAME = 40;
+  int OTHER = 40;
   /** RegularExpression Id. */
-  int STRING = 41;
+  int PERCENT_NAME = 41;
   /** RegularExpression Id. */
-  int ATOM = 42;
+  int STRING = 42;
   /** RegularExpression Id. */
-  int NUMERIC = 43;
+  int ATOM = 43;
   /** RegularExpression Id. */
-  int EMBEDDED = 47;
+  int NUMERIC = 44;
+  /** RegularExpression Id. */
+  int EMBEDDED = 48;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -120,6 +122,7 @@ public interface ClassicParserConstants {
     "<VARIABLE>",
     "<METAVARIABLE>",
     "<LINEAR>",
+    "\"^\"",
     "<QUOTED_VARIABLE>",
     "<QUOTED_METAVARIABLE>",
     "<CONSTRUCTOR_PREFIX>",
@@ -159,7 +162,7 @@ public interface ClassicParserConstants {
     "\"\\u2983\"",
     "\"\\u2983\"",
     "\"\\u2984\"",
-    "<token of kind 67>",
+    "<token of kind 68>",
   };
 
 }

@@ -44,6 +44,13 @@ public interface PropertiesHolder
     public void setProperty(Variable variable, Term value) throws CRSException;
     
     /**
+     * Remove variable property
+     * @param variable
+     * @throws CRSException
+     */
+    public void removeProperty(Variable variable) throws CRSException;
+    
+        /**
      * Add all the properties at once.
      * @throws CRSException if a property cannot be set
      */

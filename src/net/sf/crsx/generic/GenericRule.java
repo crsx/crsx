@@ -19,6 +19,7 @@ import net.sf.crsx.Kind;
 import net.sf.crsx.Match;
 import net.sf.crsx.Pattern;
 import net.sf.crsx.Primitive;
+import net.sf.crsx.PropertiesHolder;
 import net.sf.crsx.Sink;
 import net.sf.crsx.Substitute;
 import net.sf.crsx.Term;
@@ -26,6 +27,7 @@ import net.sf.crsx.Valuation;
 import net.sf.crsx.Variable;
 import net.sf.crsx.Visitor;
 import net.sf.crsx.util.ExtensibleMap;
+import net.sf.crsx.util.ExtensibleSet;
 import net.sf.crsx.util.FormattingAppendable;
 import net.sf.crsx.util.LinkedExtensibleMap;
 import net.sf.crsx.util.LinkedExtensibleSet;
@@ -63,6 +65,9 @@ public class GenericRule implements Copyable
 	/** For meta-variables that can just be copied (no substitutions) we give the contraction occurrence count. */
 	final Map<String, Integer> explicitCount;
 
+	/** Map free variable to their sort */
+	final Map<String, Term> free;
+
 	/** The fresh variables in contractum that should be created, with their declarations. */
 	final Map<String, Term> fresh;
 
@@ -70,33 +75,44 @@ public class GenericRule implements Copyable
 	final Map<String, Term> global;
 
 	/** Map bound variables in pattern to what (bound or fresh) variable they can be reused as in contractum. */
-	final Map<Variable, Variable> reused;
+	Map<Variable, Variable> reused;
 
 	/** Map bound variables in pattern to the pattern meta-application meta-variable and index. */
-	final Map<Variable, Pair<String, Integer>> reusedOrigin;
+	Map<Variable, Pair<String, Integer>> reusedOrigin;
 
 	/** Set of meta-variables to evaluate before contraction. */
 	final Set<String> forced;
 
 	/** What valuations created from this rule return from {@link Valuation#leave()}. */
-	final boolean leaf;
+	boolean leaf;
 
 	/** Whether the rule is tolerantly loaded... */
-	final boolean lax;
+	boolean lax;
 
-	/** Which sorts are associated with the free variables (null unless an external class specifies this data) */
+	/** Which sorts are associated with the free variables (set by the sorter) */
 	private Map<Variable, Term> variableSorts;
 
-	/** Which sorts are associated with the meta-variables (null unless an external class specifies this data) */
+	/** Which sorts are associated with the meta-variables (set by the sorter) */
 	private Map<String, Term> metaVariableSorts;
 
-	/** Which sorts and forms are associated with the constructors (null unless an external class specifies this data;
-	 * saved on the construction rather than the constructor to avoid problems when the same constructor is used
-	 * twice in the same rule with different sorts (this technically shouldn't happen, but sometimes it does)) */
+	/** 
+	 * Which sorts and forms are associated with the constructors (set by the sorter)
+	 * <p>Saved on the construction rather than the constructor to avoid problems when the same constructor is used
+	 * twice in the same rule with different sorts (this technically shouldn't happen, but sometimes it does) */
 	private Map<Term, Pair<Term, Term>> constructorSorts;
 
-	/** Which sorts are associated with sort parameters */
+	/** Which sorts are associated with sort parameters (for polymorphic sorts) */
 	private Map<String, Map<Variable, Term>> paramSorts;
+
+	private Set<String> comparable;
+
+	private Set<String> discarded;
+
+	private Set<String> shared;
+
+	private Set<String> copied;
+
+	private Set<String> weak;
 
 	// Constructor.
 
@@ -124,241 +140,21 @@ public class GenericRule implements Copyable
 		this.variableSorts = null;
 		this.metaVariableSorts = null;
 
-		// Extract information from options...
-		// Free[v,...]
-		Map<String, Term> free = new HashMap<String, Term>();
-		if (options.containsKey(Builder.FREE_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.FREE_OPTION_SYMBOL))
-			{
-				if (!Util.isVariableWithOptionalSort(z))
-					ruleError("Only variables can be specified as Free (" + z + ")", false, false);
-				else
-					free.put(Util.variableWithOptionalSortVariable(z).name(), z);
-			}
-		}
-		// Fresh[v,...] and FreshReuse[v,...] (not distinguished by interpreter)
-		fresh = new HashMap<String, Term>();
-		if (options.containsKey(Builder.FRESH_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.FRESH_OPTION_SYMBOL))
-			{
-				if (!Util.isVariableWithOptionalSort(z))
-					ruleError("Only variables can be specified as Fresh (" + z + ")", false, false);
-				else if (free.containsKey(Util.variableWithOptionalSortVariable(z).name()))
-					ruleError("Variable cannot be specified as both Free and Fresh (" + z + ")", false, false);
-				else
-					fresh.put(Util.variableWithOptionalSortVariable(z).name(), z);
-			}
-		}
-		if (options.containsKey(Builder.FRESH_REUSE_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.FRESH_REUSE_OPTION_SYMBOL))
-			{
-				if (!Util.isVariableWithOptionalSort(z))
-					ruleError("Only variables can be specified as Fresh (" + z + ")", false, false);
-				else if (free.containsKey(Util.variableWithOptionalSortVariable(z).name()))
-					ruleError("Variable cannot be specified as both Free and Fresh (" + z + ")", false, false);
-				else
-					fresh.put(Util.variableWithOptionalSortVariable(z).name(), z);
-			}
-		}
-		// Global[v,...]
-		global = new HashMap<String, Term>();
-		if (options.containsKey(Builder.GLOBAL_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.GLOBAL_OPTION_SYMBOL))
-			{
-				if (!Util.isVariableWithOptionalSort(z))
-					ruleError("Only variables can be specified as Global (" + z + ")", false, false);
-				else
-				{
-					Variable v = Util.variableWithOptionalSortVariable(z);
-					if (free.containsKey(v.name()))
-						ruleError("Variable cannot be specified as both Free and Global (" + v + ")", false, false);
-					else if (fresh.containsKey(v.name()))
-						ruleError("Variable cannot be specified as both Fresh and Global (" + v + ")", false, false);
-					else
-					{
-						for (Variable gv : crs.global)
-							if (v.name().equals(gv.name()))
-							{
-								v = gv; // pick 
-								break;
-							}
-						global.put(v.name(), crs.factory.newVariableUse(v));
-						if (!crs.global.contains(v))
-							crs.global.add(v);
-					}
-				}
-			}
-		}
-		// Comparable[#,...]
-		Set<String> comparable = new HashSet<String>();
-		if (options.containsKey(Builder.COMPARABLE_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.COMPARABLE_OPTION_SYMBOL))
-			{
-				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
-					ruleError("Only meta-variable names can be specified as Comparable (" + z + ")", false, false);
-				else
-					comparable.add(z.metaVariable());
-			}
-		}
-		// Discard[#,...]
-		Set<String> discarded = new HashSet<String>();
-		if (options.containsKey(Builder.DISCARD_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.DISCARD_OPTION_SYMBOL))
-			{
-				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
-					ruleError("Only meta-variable names can be specified with Discard (" + z + ")", false, false);
-				else
-					discarded.add(z.metaVariable());
-			}
-		}
-		// Share[#,...]
-		Set<String> shared = new HashSet<String>();
-		if (options.containsKey(Builder.SHARE_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.SHARE_OPTION_SYMBOL))
-			{
-				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
-					ruleError("Only meta-variable names can be specified with Share (" + z + ")", false, false);
-				else
-					shared.add(z.metaVariable());
-			}
-		}
-		// Copy[#,...]
-		Set<String> copied = new HashSet<String>();
-		if (options.containsKey(Builder.COPY_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.COPY_OPTION_SYMBOL))
-			{
-				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
-					ruleError("Only meta-variable names can be specified with Copy(" + z + ")", false, false);
-				else
-					copied.add(z.metaVariable());
-			}
-		}
-		// Weak[#,...]
-		Set<String> weak = new HashSet<String>();
-		if (options.containsKey(Builder.WEAK_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.WEAK_OPTION_SYMBOL))
-			{
-				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
-					ruleError("Only meta-variable names can be specified as Weak (" + z + ")", false, false);
-				else
-					weak.add(z.metaVariable());
-			}
-		}
-		// Data[#,...]
-		forced = new HashSet<String>();
-		if (options.containsKey(Builder.DATA_OPTION_SYMBOL))
-		{
-			for (Term z : options.get(Builder.DATA_OPTION_SYMBOL))
-			{
-				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
-					ruleError("Only meta-variable names can be specified with Data(" + z + ")", false, false);
-				else
-					forced.add(z.metaVariable());
-			}
-		}
-		// Meta.
-		boolean allowMeta = options.containsKey(Builder.META_OPTION_SYMBOL);
-		// Leaf.
-		leaf = options.containsKey(Builder.LEAF_OPTION_SYMBOL);
-		// Lax.
-		lax = crs.factory().defined(Builder.LAX_SYMBOL) || options.containsKey(Builder.LAX_OPTION_SYMBOL);
-		// Watch.
-		if (options.containsKey(Builder.WATCH_OPTION_SYMBOL))
-			crs.watchedRules.add(name());
-
-		// Repair basic options.
-		if (lax)
-		{
-			// Free.
-			Set<Variable> patternFree = new HashSet<Variable>();
-			pattern.addFree(patternFree, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null);
-			for (Variable v : patternFree)
-				if (!free.containsKey(v.name()))
-					free.put(v.name(), crs.factory.newVariableUse(v)); // TODO: typefor (Variable v : patternFree)
-			List<String> unusedNames = new ArrayList<String>();
-			for (Map.Entry<String, Term> z : free.entrySet())
-				if (!patternFree.contains(Util.variableWithOptionalSortVariable(z.getValue())))
-					unusedNames.add(z.getKey());
-			for (String n : unusedNames)
-				free.remove(n);
-			/// // Fresh - disabled since types missing!
-			/// Set<Variable> contractumFresh = new HashSet<Variable>(); contractum.addFree(contractumFresh, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null); contractumFresh.removeAll(patternFree); 
-			/// for (Variable v : contractumFresh)
-			/// 	if (!fresh.containsKey(v.name()))
-			/// 		fresh.put(v.name(), crs.factory.newVariableUse(v));
-			// Compare/Discard/Copy.
-			Map<String, Integer> patternMetaCounts = new HashMap<String, Integer>();
-			pattern.addMetaCounts(patternMetaCounts);
-			Map<String, Integer> contractumMetaCounts = new HashMap<String, Integer>();
-			contractum.addMetaCounts(contractumMetaCounts);
-			for (String m : patternMetaCounts.keySet())
-			{
-				int count = patternMetaCounts.get(m);
-				if (count > 1)
-				{
-					comparable.add(m);
-				}
-				if (!contractumMetaCounts.containsKey(m))
-				{
-					if (!discarded.contains(m))
-						discarded.add(m);
-				}
-				else if (contractumMetaCounts.get(m) > 1)
-				{
-					copied.add(m);
-				}
-			}
-		}
-
-		// Check pattern (and extract meta-applications).
-		Map<String, Term> patternMetaApplications = new HashMap<String, Term>();
-		Set<String> patternPropertiesRefs = new HashSet<String>();
-		Map<String, Integer> patternOccurrences = new HashMap<String, Integer>();
-		Map<String, String> patternMetaSorts = new HashMap<String, String>();
-		checkPattern(
-				pattern, free, comparable, weak, patternMetaApplications, patternPropertiesRefs, patternMetaSorts,
-				SimpleVariableSet.EMPTY, patternOccurrences);
+		this.free = new HashMap<String, Term>(4);
+		this.fresh = new HashMap<String, Term>(4);
+		this.global = new HashMap<String, Term>(2);
+		this.comparable = new HashSet<String>(2);
+		this.discarded = new HashSet<String>(8);
+		this.shared = new HashSet<String>(8);
+		this.copied = new HashSet<String>(2);
+		this.weak = new HashSet<String>(2);
+	
+		this.forced = new HashSet<>(4);
 		this.pattern = pattern;
-
-		// Check contractum (and extract explicit counts and reusable binders).
-		List<String> contractumMetaVariables = new ArrayList<String>();
-		Map<String, Integer> contractumOccurrences = new HashMap<String, Integer>();
-		Set<String> nonExplicit = new HashSet<String>();
-		Map<Variable, Variable> reusable = new HashMap<Variable, Variable>();
-		Map<Variable, Pair<String, Integer>> reusableOrigin = new HashMap<Variable, Pair<String, Integer>>();
-		checkContractum(
-				contractum, free, !allowMeta, shared, copied, discarded, patternMetaApplications, patternPropertiesRefs,
-				patternMetaSorts, contractumMetaVariables, contractumOccurrences, nonExplicit, reusable, reusableOrigin);
-
 		this.contractum = contractum;
-
-		reused = reusable;
-		reusedOrigin = reusableOrigin;
-		for (Variable v : reused.values())
-		{
-			fresh.remove(v.name());
-		}
-
 		this.explicitCount = new HashMap<String, Integer>();
-		for (String m : patternMetaApplications.keySet())
-		{
-			if (!nonExplicit.contains(m))
-			{
-				// Only occurs in explict configuration - record count, if useful!
-				Integer count = ((shared != null && shared.contains(m)) ? Integer.valueOf(1) : contractumOccurrences.get(m));
-				if (count != null && count > 0)
-					explicitCount.put(m, count);
-			}
-		}
+		
+		reconcile();
 	}
 
 	// Methods.
@@ -422,12 +218,282 @@ public class GenericRule implements Copyable
 	}
 
 	/**
+	 * Gets fresh variable sort declaration. 
+	 * @param name variable name
+	 * @return A sort or null if no fresh variable of the given name.
+	 */
+	public Term getFresh(Variable var)
+	{
+		return fresh.get(var.name());
+	}
+
+	/**
 	 * Get the rule name
 	 * @return
 	 */
 	public String name()
 	{
 		return name.symbol();
+	}
+
+	/**
+	 * Reconcile information stored on the option/pattern/contractum with cached value
+	 * @throws CRSException 
+	 */
+	public void reconcile() throws CRSException
+	{
+		// Extract information from options...
+		// Free[v,...]
+		free.clear();
+		if (options.containsKey(Builder.FREE_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.FREE_OPTION_SYMBOL))
+			{
+				if (!Util.isVariableWithOptionalSort(z))
+					ruleError("Only variables can be specified as Free (" + z + ")", false, false);
+				else
+					free.put(Util.variableWithOptionalSortVariable(z).name(), z);
+			}
+		}
+		// Fresh[v,...] and FreshReuse[v,...] (not distinguished by interpreter)
+		fresh.clear();
+		if (options.containsKey(Builder.FRESH_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.FRESH_OPTION_SYMBOL))
+			{
+				if (!Util.isVariableWithOptionalSort(z))
+					ruleError("Only variables can be specified as Fresh (" + z + ")", false, false);
+				else if (free.containsKey(Util.variableWithOptionalSortVariable(z).name()))
+					ruleError("Variable cannot be specified as both Free and Fresh (" + z + ")", false, false);
+				else
+					fresh.put(Util.variableWithOptionalSortVariable(z).name(), z);
+			}
+		}
+		if (options.containsKey(Builder.FRESH_REUSE_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.FRESH_REUSE_OPTION_SYMBOL))
+			{
+				if (!Util.isVariableWithOptionalSort(z))
+					ruleError("Only variables can be specified as Fresh (" + z + ")", false, false);
+				else if (free.containsKey(Util.variableWithOptionalSortVariable(z).name()))
+					ruleError("Variable cannot be specified as both Free and Fresh (" + z + ")", false, false);
+				else
+					fresh.put(Util.variableWithOptionalSortVariable(z).name(), z);
+			}
+		}
+		// Global[v,...]
+		global.clear();
+		if (options.containsKey(Builder.GLOBAL_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.GLOBAL_OPTION_SYMBOL))
+			{
+				if (!Util.isVariableWithOptionalSort(z))
+					ruleError("Only variables can be specified as Global (" + z + ")", false, false);
+				else
+				{
+					Variable v = Util.variableWithOptionalSortVariable(z);
+					if (free.containsKey(v.name()))
+						ruleError("Variable cannot be specified as both Free and Global (" + v + ")", false, false);
+					else if (fresh.containsKey(v.name()))
+						ruleError("Variable cannot be specified as both Fresh and Global (" + v + ")", false, false);
+					else
+					{
+						for (Variable gv : crs.global)
+							if (v.name().equals(gv.name()))
+							{
+								v = gv; // pick 
+								break;
+							}
+						global.put(v.name(), crs.factory.newVariableUse(v));
+						if (!crs.global.contains(v))
+							crs.global.add(v);
+					}
+				}
+			}
+		}
+		comparable.clear();
+		if (options.containsKey(Builder.COMPARABLE_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.COMPARABLE_OPTION_SYMBOL))
+			{
+				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
+					ruleError("Only meta-variable names can be specified as Comparable (" + z + ")", false, false);
+				else
+					comparable.add(z.metaVariable());
+			}
+		}
+		discarded.clear();
+		if (options.containsKey(Builder.DISCARD_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.DISCARD_OPTION_SYMBOL))
+			{
+				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
+					ruleError("Only meta-variable names can be specified with Discard (" + z + ")", false, false);
+				else
+					discarded.add(z.metaVariable());
+			}
+		}
+		shared.clear();
+		if (options.containsKey(Builder.SHARE_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.SHARE_OPTION_SYMBOL))
+			{
+				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
+					ruleError("Only meta-variable names can be specified with Share (" + z + ")", false, false);
+				else
+					shared.add(z.metaVariable());
+			}
+		}
+		copied.clear();
+		if (options.containsKey(Builder.COPY_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.COPY_OPTION_SYMBOL))
+			{
+				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
+					ruleError("Only meta-variable names can be specified with Copy(" + z + ")", false, false);
+				else
+					copied.add(z.metaVariable());
+			}
+		}
+		weak.clear();
+		if (options.containsKey(Builder.WEAK_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.WEAK_OPTION_SYMBOL))
+			{
+				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
+					ruleError("Only meta-variable names can be specified as Weak (" + z + ")", false, false);
+				else
+					weak.add(z.metaVariable());
+			}
+		}
+		// Data[#,...]
+		forced.clear();
+		if (options.containsKey(Builder.DATA_OPTION_SYMBOL))
+		{
+			for (Term z : options.get(Builder.DATA_OPTION_SYMBOL))
+			{
+				if (z.kind() != Kind.META_APPLICATION || z.arity() > 0)
+					ruleError("Only meta-variable names can be specified with Data(" + z + ")", false, false);
+				else
+					forced.add(z.metaVariable());
+			}
+		}
+		// Meta.
+		boolean allowMeta = options.containsKey(Builder.META_OPTION_SYMBOL);
+		// Leaf.
+		leaf = options.containsKey(Builder.LEAF_OPTION_SYMBOL);
+		// Lax.
+		lax = crs.factory().defined(Builder.LAX_SYMBOL) || options.containsKey(Builder.LAX_OPTION_SYMBOL);
+		// Watch.
+		if (options.containsKey(Builder.WATCH_OPTION_SYMBOL))
+			crs.watchedRules.add(name());
+
+		// Repair basic options.
+		if (lax)
+		{
+			// Free.
+			Set<Variable> patternFree = new HashSet<Variable>(4);
+			pattern.addFree(patternFree, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null);
+			for (Variable v : patternFree)
+				if (!free.containsKey(v.name()))
+					free.put(v.name(), crs.factory.newVariableUse(v)); // TODO: typefor (Variable v : patternFree)
+			List<String> unusedNames = new ArrayList<String>();
+			for (Map.Entry<String, Term> z : free.entrySet())
+				if (!patternFree.contains(Util.variableWithOptionalSortVariable(z.getValue())))
+					unusedNames.add(z.getKey());
+			for (String n : unusedNames)
+				free.remove(n);
+			/// Set<Variable> contractumFresh = new HashSet<Variable>(); contractum.addFree(contractumFresh, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null); contractumFresh.removeAll(patternFree); 
+			/// for (Variable v : contractumFresh)
+			/// 	if (!fresh.containsKey(v.name()))
+			/// 		fresh.put(v.name(), crs.factory.newVariableUse(v));
+			// Compare/Discard/Copy.
+			Map<String, Integer> patternMetaCounts = new HashMap<String, Integer>();
+			pattern.addMetaCounts(patternMetaCounts);
+			Map<String, Integer> contractumMetaCounts = new HashMap<String, Integer>();
+			contractum.addMetaCounts(contractumMetaCounts);
+			for (String m : patternMetaCounts.keySet())
+			{
+				int count = patternMetaCounts.get(m);
+				if (count > 1)
+				{
+					comparable.add(m);
+				}
+				if (!contractumMetaCounts.containsKey(m))
+				{
+					if (!discarded.contains(m))
+						discarded.add(m);
+				}
+				else if (contractumMetaCounts.get(m) > 1)
+				{
+					copied.add(m);
+				}
+			}
+		}
+
+		// Check pattern (and extract meta-applications).
+		Map<String, Term> patternMetaApplications = new HashMap<String, Term>(4);
+		Set<String> patternPropertiesRefs = new HashSet<String>(4);
+		Map<String, Integer> patternOccurrences = new HashMap<String, Integer>(4);
+		Map<String, String> patternMetaSorts = new HashMap<String, String>(4);
+		checkPattern(
+				pattern, free, comparable, weak, patternMetaApplications, patternPropertiesRefs, patternMetaSorts,
+				SimpleVariableSet.EMPTY, patternOccurrences);
+		
+		// Check contractum (and extract explicit counts and reusable binders).
+		List<String> contractumMetaVariables = new ArrayList<String>();
+		Map<String, Integer> contractumOccurrences = new HashMap<String, Integer>();
+		Set<String> nonExplicit = new HashSet<String>();
+		Map<Variable, Variable> reusable = new HashMap<Variable, Variable>();
+		Map<Variable, Pair<String, Integer>> reusableOrigin = new HashMap<Variable, Pair<String, Integer>>();
+		checkContractum(
+				contractum, free, !allowMeta, shared, copied, discarded, patternMetaApplications, patternPropertiesRefs,
+				patternMetaSorts, contractumMetaVariables, contractumOccurrences, nonExplicit, reusable, reusableOrigin);
+
+		
+		reused = reusable;
+		reusedOrigin = reusableOrigin;
+		for (Variable v : reused.values())
+		{
+			fresh.remove(v.name());
+		}
+
+		explicitCount.clear();
+		for (String m : patternMetaApplications.keySet())
+		{
+			if (!nonExplicit.contains(m))
+			{
+				// Only occurs in explict configuration - record count, if useful!
+				Integer count = ((shared != null && shared.contains(m)) ? Integer.valueOf(1) : contractumOccurrences.get(m));
+				if (count != null && count > 0)
+					explicitCount.put(m, count);
+			}
+		}
+	}
+
+	/**
+	 * Search for the meta declaration of the given name on the pattern
+	 * @param name 
+	 * @throws CRSException 
+	 */
+	public GenericTerm getMetaOnPattern(final String name) throws CRSException
+	{
+		final GenericTerm[] result = new GenericTerm[1];
+
+		final Visitor visitor = new Visitor()
+			{
+				@Override
+				public void visitMetaApplication(Term metaApplication, boolean start, Set<Variable> bound) throws CRSException
+				{
+					if (start && metaApplication.metaVariable().equals(name))
+						result[0] = (GenericTerm) metaApplication;
+					super.visitMetaApplication(metaApplication, start, bound);
+				}
+
+			};
+		pattern.visit(visitor, SimpleVariableSet.EMPTY);
+		return result[0];
+
 	}
 
 	/**
@@ -502,7 +568,42 @@ public class GenericRule implements Copyable
 		if (variableSorts != null && variableSorts.containsKey(x))
 			return variableSorts.get(x);
 		else
-			return null;
+		{
+			// The sort hasn't been cached. Try to recompute it.
+			Pair<Term, Integer> decl;
+			try
+			{
+				decl = findBinder(x);
+
+				if (decl != null)
+				{
+					Pair<Term, Term> sortDeclaration = getConstructorDeclaration(decl.head());
+					if (sortDeclaration != null)
+					{
+						Term form = sortDeclaration.tail();
+
+						Variable[] bindersOnTerm = decl.head().binders(decl.tail());
+						for (int i = bindersOnTerm.length - 1; i >= 0; i--)
+						{
+							if (bindersOnTerm[i] == x)
+							{
+								Variable binderOnForm = form.binders(decl.tail())[i];
+
+								return ((PropertiesHolder) form.sub(decl.tail())).getProperty(binderOnForm);
+							}
+						}
+					}
+
+				}
+				return null;
+			}
+			catch (CRSException e)
+			{
+				throw new RuntimeException(e);
+
+			}
+
+		}
 	}
 
 	/**
@@ -565,6 +666,65 @@ public class GenericRule implements Copyable
 			return null;
 		else
 			return sortform.head();
+	}
+
+	/**
+	 * Whether the sub is a closure
+	 * 
+	 * <p>The notion of closure only make sens when the term is part of
+	 * a contraction
+	 * 
+	 * @param index of the sub
+	 * @throws CRSException 
+	 */
+	public boolean isClosure(Term term, int index) throws CRSException
+	{
+		return term.sub(index).kind() != Kind.META_APPLICATION && term.binders(index) != null;
+	}
+
+	/**
+	 * Whether the sub is a deep closure. Ignore properties.
+	 * @param index of the sub
+	 * @throws CRSException 
+	 */
+	public boolean isDeepClosure(Term term, int index) throws CRSException
+	{
+		if (isClosure(term, index))
+		{
+			Term sub = term.sub(index);
+			if (sub.kind() == Kind.VARIABLE_USE || sub.arity() == 0)
+				return false;
+
+			// sub is a construction with binders and optionally with properties.
+			Variable[] binders = term.binders(index);
+			for (int i = 0; i < sub.arity(); i++)
+			{
+				Term subsub = sub.sub(i);
+
+				switch (subsub.kind())
+				{
+					case VARIABLE_USE :
+						// Shallow variable use	
+						break;
+					case META_APPLICATION :
+						// This is a meta-closure, not a a deep closure;
+						break;
+					case CONSTRUCTION :
+					default :
+						// Check if the subsub contains at least one binder use.
+						// TODO: addFree is a bit overkill. 
+						Set<Variable> free = new HashSet<>();
+						ExtensibleSet<Variable> bound = SimpleVariableSet.EMPTY;
+						subsub.addFree(free, bound, false, null);
+
+						for (int j = 0; j < binders.length; j++)
+							if (free.contains(binders[j]))
+								return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -1321,7 +1481,7 @@ public class GenericRule implements Copyable
 					}
 					if (!free.containsKey(v.name()) && !fresh.containsKey(v.name()) && !global.containsKey(v.name()))
 					{
-						error("contractum contains unauthorized fresh variable (" + v + ")", true);
+						error("contractum contains unauthorized fresh variable (" + v + ")", false);
 					}
 					Variable realV = Util.variableWithOptionalSortVariable(free.get(v.name()));
 					if (realV == null)
@@ -1368,6 +1528,46 @@ public class GenericRule implements Copyable
 				fresh.remove(varname);
 		}
 
+	}
+
+	/**
+	 * Gets the construction holding the binder corresponding to the variable
+	 * @param x
+	 * @return
+	 * @throws CRSException 
+	 */
+	private Pair<Term, Integer> findBinder(final Variable x) throws CRSException
+	{
+		@SuppressWarnings("unchecked")
+		final Pair<Term, Integer>[] result = new Pair[1];
+		result[0] = null;
+		final Visitor visitor = new Visitor()
+			{
+
+				@Override
+				public void visitConstruction(Term construction, boolean start, Set<Variable> bound) throws CRSException
+				{
+					if (start && result[0] == null)
+					{
+						for (int i = construction.arity() - 1; i >= 0; i--)
+						{
+							if (Util.contains(construction.binders(i), x))
+							{
+								result[0] = new Pair<>(construction, i);
+								break;
+							}
+
+						}
+					}
+					super.visitConstruction(construction, start, bound);
+				}
+
+			};
+		pattern.visit(visitor, SimpleVariableSet.EMPTY);
+		if (result[0] == null)
+			contractum.visit(visitor, SimpleVariableSet.EMPTY);
+
+		return result[0];
 	}
 
 	/**
@@ -1525,4 +1725,5 @@ public class GenericRule implements Copyable
 		sink = sink.end();
 		return sink;
 	}
+
 }

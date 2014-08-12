@@ -40,6 +40,10 @@ final public class ObjectConstructor implements Constructor
 	/** The constructor object.toString(). */
 	final private Object object;
 
+	/** Whether it's a closure. */
+	final private boolean closure;
+
+	
 	// Constructor.
 
 	/**
@@ -52,9 +56,15 @@ final public class ObjectConstructor implements Constructor
 	 */
 	public ObjectConstructor(Object object)
 	{
-		this.object = object;
+		this(object, false);
 	}
 
+	public ObjectConstructor(Object object, boolean closure)
+	{
+		this.object = object;
+		this.closure = closure;
+	}
+	
 	// Constructor...
 
 	public String symbol()
@@ -66,10 +76,16 @@ final public class ObjectConstructor implements Constructor
 	{
 		return null;
 	}
-	
+
 	public Object object()
 	{
 		return object;
+	}
+
+	@Override
+	public boolean isClosure()
+	{
+		return closure;
 	}
 
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
@@ -97,10 +113,9 @@ final public class ObjectConstructor implements Constructor
 		return (equals(that) ? this : null);
 	}
 
-	public Constructor unify(Unification unification, Constructor that,
-			StackedMap<Variable> rho,
-			StackedMap<Variable> rhoprime) {
-	    return (equals(that) ? this : null);
+	public Constructor unify(Unification unification, Constructor that, StackedMap<Variable> rho, StackedMap<Variable> rhoprime)
+	{
+		return (equals(that) ? this : null);
 	}
 
 	public Constructor copy(ExtensibleMap<Variable, Variable> renamings)
@@ -119,7 +134,8 @@ final public class ObjectConstructor implements Constructor
 		return this;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -170,16 +186,20 @@ final public class ObjectConstructor implements Constructor
 	{
 		return false;
 	}
-	
+
 	public boolean canSetProperty(Variable variable)
 	{
 		return false;
 	}
-	
+
 	public void setProperty(String name, Term value)
 	{}
-	
+
 	public void setProperty(Variable variable, Term value)
+	{}
+
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
 	{}
 
 	public void setProperties(PropertiesHolder properties) throws CRSException
@@ -194,7 +214,7 @@ final public class ObjectConstructor implements Constructor
 	{
 		return false;
 	}
-	
+
 	// Object...
 
 	public boolean equals(Object that)

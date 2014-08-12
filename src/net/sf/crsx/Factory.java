@@ -92,6 +92,9 @@ public interface Factory<T extends Term> extends Maker, Parser, Sorting, ErrorHa
     
     /** Environment variable that, when {@link #set(String, Stub)}, makes CRSX run in parallel */
     public final static String PARALLEL_OPTION = "parallel";
+    
+    /** Environment variable that, when {@link #set(String, Stub)}, makes $Simplify reporting of potential missing closure markers */
+    public final static String SHOW_POTENTIAL_CLOSURE_OPTION = "show-potential-closure";
 
 	// Methods.
 

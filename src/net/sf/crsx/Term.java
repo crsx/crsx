@@ -73,7 +73,7 @@ public interface Term extends Stub
 	 * @param base limit the set to a subset of this set (or use null to not have a limit)
 	 */
 	void addFree(Set<Variable> set, ExtensibleSet<Variable> bound, boolean includemetaapps, Set<Variable> base);
-
+	
 	/**
 	 * Add all meta-variables with their occurrence count in this term to the set.
 	 * @param counts where meta-variable names and their occurrence counts will be inserted

@@ -169,7 +169,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	}
 
 	/** Whether the wrapper contains any unknown keys (hidden in meta-variables)... */
-	boolean hasUnknownKeys()
+	public boolean hasUnknownKeys()
 	{
 		return propertiesRef != null || !metaPropertyConstraints.isEmpty();
 	}
@@ -295,7 +295,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	
 	// DelegateGenericTerm...
 	
-	final protected GenericTerm term()
+	public final GenericTerm term()
 	{
 		return term;
 	}
@@ -485,7 +485,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 			if (t != null) t.addFree(set, bound, includemetaapps, base);
 		term.addFree(set, bound, includemetaapps, base);
 	}
-
+	
 	public void addMetaCounts(Map<String, Integer> counts)
 	{
 		if (propertiesRef != null)

@@ -51,7 +51,7 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 	final public static String VARIABLE = Variable.class.getCanonicalName();
 
 	// Static utilities.
-	
+
 	/**
 	 * Helper function to "start" properties annotation constraint wrapper.
 	 * @param sink that should receive the extended start action with an annotated constructor
@@ -63,7 +63,8 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 	 */
 	public static Sink start(Sink sink, String reference, Map<String, Term> namedPropertyConstraints, Map<Variable, Term> variablePropertyConstraints, Map<String, Term> metaPropertyConstraints)
 	{
-		return sink.start(new PropertiesWrapperConstructor(reference, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints));
+		return sink.start(new PropertiesWrapperConstructor(reference, namedPropertyConstraints, variablePropertyConstraints,
+				metaPropertyConstraints));
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 			namedPropertyConstraints = pcw.namedPropertyConstraints;
 			variablePropertyConstraints = pcw.variablePropertyConstraints;
 			metaPropertyConstraints = pcw.metaPropertyConstraints;
-			
+
 		}
 		else if (term instanceof PropertiesHolder)
 		{
@@ -95,18 +96,19 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 			for (Variable variable : properties.propertyVariables())
 				variablePropertyConstraints.put(variable, properties.getProperty(variable));
 		}
-//		Constructor c = term.constructor();
-//		if (c != null)
-//		{
-//			for (String name : c.propertyNames())
-//				namedPropertyConstraints.put(name, c.getProperty(name));
-//			for (Variable variable : c.propertyVariables())
-//				variablePropertyConstraints.put(variable, c.getProperty(variable));
-//		}
-		sink = sink.start(new PropertiesWrapperConstructor(propertiesRef, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints));
+		//		Constructor c = term.constructor();
+		//		if (c != null)
+		//		{
+		//			for (String name : c.propertyNames())
+		//				namedPropertyConstraints.put(name, c.getProperty(name));
+		//			for (Variable variable : c.propertyVariables())
+		//				variablePropertyConstraints.put(variable, c.getProperty(variable));
+		//		}
+		sink = sink.start(new PropertiesWrapperConstructor(propertiesRef, namedPropertyConstraints, variablePropertyConstraints,
+				metaPropertyConstraints));
 		return sink;
 	}
-	
+
 	// Constructor.
 
 	/**
@@ -129,14 +131,20 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		return "$Constraints$Dummy";
 	}
 
-    public String literalSort()
-    {
-	    return null;
-    }
+	public String literalSort()
+	{
+		return null;
+	}
 
 	public Object object()
 	{
 		return symbol();
+	}
+
+	@Override
+	public boolean isClosure()
+	{
+		return false;
 	}
 
 	public void normalize(CRS crs) throws CRSException
@@ -206,7 +214,8 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 
 		for (Term t : metaPropertyConstraints.values())
 		{
-			if (t != null) t.visit(visitor, bound);
+			if (t != null)
+				t.visit(visitor, bound);
 		}
 
 		propertiesNormalized = false;
@@ -220,11 +229,10 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
 	}
 
-	public Constructor unify(Unification unification, Constructor that,
-			StackedMap<Variable> rho,
-			StackedMap<Variable> rhoprime) {
-        // TODO
-        throw new UnsupportedOperationException("Operation not implemented yet.");
+	public Constructor unify(Unification unification, Constructor that, StackedMap<Variable> rho, StackedMap<Variable> rhoprime)
+	{
+		// TODO
+		throw new UnsupportedOperationException("Operation not implemented yet.");
 	}
 
 	public Constructor copy(ExtensibleMap<Variable, Variable> renamings)
@@ -237,15 +245,18 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
-		PropertiesConstraintsWrapper.appendTo(writer, used, depth, propertiesRef, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints, full, namedProps, variableProps, omitProps);
+		PropertiesConstraintsWrapper.appendTo(
+				writer, used, depth, propertiesRef, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints,
+				full, namedProps, variableProps, omitProps);
 	}
 
 	final public SortedSet<Path> paths(Path base)
 	{
 		// TODO
-        throw new UnsupportedOperationException("Operation not implemented yet.");
+		throw new UnsupportedOperationException("Operation not implemented yet.");
 	}
 
 	public void javaInvokeStart(SourceBuilder code, String sinkName, Map<Variable, String> variable2java)
@@ -284,8 +295,8 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 				}
 				else
 				{
-					PlainJavaSink.generateJavaToBuffer(code, term.maker(), term, sinkName, "properties.put("
-							+ variable2java.get(key) + ", ", ".term(true));");
+					PlainJavaSink.generateJavaToBuffer(
+							code, term.maker(), term, sinkName, "properties.put(" + variable2java.get(key) + ", ", ".term(true));");
 				}
 			}
 		}
@@ -294,17 +305,20 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 
 	public boolean equals(Object that)
 	{
-		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor (only for passing into GenericBuffer.sink())?");
+		throw new UnsupportedOperationException(
+				"Misuse of PropertiesWrapperConstructor (only for passing into GenericBuffer.sink())?");
 	}
 
 	public int hashCode()
 	{
-		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor (only for passing into GenericBuffer.sink())?");
+		throw new UnsupportedOperationException(
+				"Misuse of PropertiesWrapperConstructor (only for passing into GenericBuffer.sink())?");
 	}
 
 	public Constructor baseConstructor()
 	{
-		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor (only for passing into GenericBuffer.sink())?");
+		throw new UnsupportedOperationException(
+				"Misuse of PropertiesWrapperConstructor (only for passing into GenericBuffer.sink())?");
 	}
 
 	public String toString()
@@ -312,7 +326,9 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		StringBuilder b = new StringBuilder();
 		try
 		{
-			appendTo(b, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			appendTo(
+					b, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false,
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
 		}
 		catch (IOException e)
 		{}

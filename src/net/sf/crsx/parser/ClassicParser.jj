@@ -102,9 +102,9 @@ public class ClassicParser implements Parser
 
 	/** Whether location properties are added to constructors. */
 	private boolean captureLocations;
-	private Constructor makeConstructor(Sink sink, Token t, String s, String sort)
+	private Constructor makeConstructor(Sink sink, Token t, String s, boolean closure, String sort)
 	{
-		Constructor c = sort == null ? sink.makeConstructor(s) : sink.makeLiteral(s, sort);
+		Constructor c = sort == null ? sink.makeConstructor(s, closure) : sink.makeLiteral(s, sort);
 		return locateConstructor(sink, t, c);
 	}
 	private Constructor locateConstructor(Sink sink, Token t, Constructor c)
@@ -206,6 +206,17 @@ public class ClassicParser implements Parser
 		}
 		return s;
 	}
+
+    private boolean isClosure(String s)
+    {        return s.endsWith("^");
+    } 
+
+	private String unClosure(String s)
+	{
+	   if (s.endsWith("^"))
+	   {	       return s.substring(0, s.length() - 1);
+	   }
+	   return s;     }	 
 	
 	/** Create a parse error on the current token with a nicely formatted message. */
 	ParseException oops(String summary, Token t, Throwable e)
@@ -568,7 +579,7 @@ Term BufferedSimple(Maker maker, ExtensibleMap<String, Variable> bound) :
 Sink Simple(Sink sink, ExtensibleMap<String, Variable> bound, Map<String, Term> properties, Map<Variable, Term> varProperties, HashMap<String,Term> metaProperties, Set<String> refs) :
 {
 	Token t; String sort = null, s, category; int embeddedOffset = 0;
-	boolean wrap = false, linear = false;
+	boolean wrap = false, linear = false, closure = false;
 	if (properties != null) for (Map.Entry<String, Term> e : properties.entrySet()) if (e.getValue() == null) wrap = true;
 	if (varProperties != null) for (Map.Entry<Variable, Term> e : varProperties.entrySet()) if (e.getValue() == null) wrap = true;
 	if (metaProperties != null && !metaProperties.isEmpty()) wrap = true;
@@ -597,7 +608,7 @@ Sink Simple(Sink sink, ExtensibleMap<String, Variable> bound, Map<String, Term> 
 |
 	// C[b,...,b]...(including special lexical forms of constructors)
 	(
-		t=<CONSTRUCTOR> {s = t.toString();}
+		t=<CONSTRUCTOR> {closure = isClosure(t.toString()); s = unClosure(t.toString());}
 	|
 		t=<ATOM> {s = unquote(t.toString());}
 	|
@@ -616,14 +627,14 @@ Sink Simple(Sink sink, ExtensibleMap<String, Variable> bound, Map<String, Term> 
 			// Meta-properties...we need fully general pattern/contraction wrapper.
 			String ref = (refs.isEmpty() ? null : refs.iterator().next());
 			sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
-			sink=sink.start(makeConstructor(sink, t, s, sort));
+			sink=sink.start(makeConstructor(sink, t, s, closure, sort));
 		}
 		else
 		{
 			// At most simple key=value properties so use property-extended constructor.
 		try
 			{
-				sink=sink.start(Util.wrapWithProperties(sink, makeConstructor(sink, t, s, sort), properties, varProperties));
+				sink=sink.start(Util.wrapWithProperties(sink, makeConstructor(sink, t, s, closure, sort), properties, varProperties));
 			}
 			catch (CRSException e)
 			{
@@ -749,7 +760,7 @@ void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Te
 	<NOT>
 	(
 		// ¬ C
-		( t=<CONSTRUCTOR> {p = t.toString();} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
+		( t=<CONSTRUCTOR> {p = unClosure(t.toString());} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
 		{
 //			if (properties.containsKey(p))
 //				throw oops("CRS error: Cannot explicitly repeat property name in property pattern!", t, null);
@@ -804,7 +815,7 @@ void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Te
 	)
 |
 	// C:t or C (short for C:()).
-	( t=<CONSTRUCTOR> {p = t.toString();} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
+	( t=<CONSTRUCTOR> {p = unClosure(t.toString());} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
 	[ <COLON> term=BufferedSimple(maker, bound) ]
 	{
 //			if (properties.containsKey(p))
@@ -899,11 +910,12 @@ TOKEN :
 	< NOT : "\u00AC" | "&not;" > |
 	
 	/* Names. */
-	< CONSTRUCTOR : (<CONSTRUCTOR_PREFIX> | <CONNECTOR> <PART>) (<CONNECTOR> <PART>)* > |
+	< CONSTRUCTOR : (<CONSTRUCTOR_PREFIX> | <CONNECTOR> <PART>) (<CONNECTOR> <PART>)* (<CLOSURE>)? > |
 	< VARIABLE : (<LINEAR>)? <VARIABLE_PREFIX> (<CONNECTOR> <PART>)* (<LINEAR>)? > |
 	< METAVARIABLE : <METAVARIABLE_PREFIX> (<CONNECTOR> <PART>)* > |
 
-	< #LINEAR : "&sup1;" | "\u00B9" > |
+    < #LINEAR : "&sup1;" | "\u00B9" > |
+    < #CLOSURE : "^" > |
 
     < QUOTED_VARIABLE : (<LINEAR>)? ("v" <STRING>) > |
     < QUOTED_METAVARIABLE : "#" <STRING> > |

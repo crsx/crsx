@@ -68,7 +68,7 @@ extern void crsxpBeforeStep(Context context, Term term);
 extern void crsxpAfterStep(Context context);
 
 /** Called before meta substitute */
-void crsxpBeforeSubstitution(Context context);
+void crsxpBeforeSubstitution(Context context, Term term);
 
 /** Called after meta substitute */
 void crsxpAfterSubstitution(Context context);

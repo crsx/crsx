@@ -24,7 +24,7 @@ public class GenericProperties implements PropertiesHolder
 	protected String propertiesRef;
 
 	/** Named properties. */
-	protected Map<String, Term> namedPropertyConstraints;
+	public Map<String, Term> namedPropertyConstraints;
 
 	/** Bound variable properties. */
 	protected Map<Variable, Term> variablePropertyConstraints;
@@ -150,6 +150,12 @@ public class GenericProperties implements PropertiesHolder
 			variablePropertyConstraints.put(key, value);
 		else
 			variablePropertyConstraints.remove(key);
+	}
+	
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
+	{
+		variablePropertyConstraints.remove(variable);
 	}
 
 	public void setProperties(PropertiesHolder properties) throws CRSException

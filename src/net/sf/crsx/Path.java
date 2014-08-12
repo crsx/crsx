@@ -37,8 +37,7 @@ import net.sf.crsx.util.Util;
  * @author <a href="mailto:krisrose@us.ibm.com">Kristoffer Rose</a>
  * @version $Id: Path.java,v 3.0 2012/12/17 18:04:47 krisrose Exp $
  */
-public abstract class Path implements Comparable<Path>, MeetSemiLattice<Path>
-{
+public abstract class Path implements Comparable<Path>  {
 	// State.
 	
 	/** Prefix path. */

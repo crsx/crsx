@@ -17,6 +17,7 @@ import net.sf.crsx.Contractum;
 import net.sf.crsx.Maker;
 import net.sf.crsx.Match;
 import net.sf.crsx.Path;
+import net.sf.crsx.PropertiesHolder;
 import net.sf.crsx.SourceBuilder;
 import net.sf.crsx.Term;
 import net.sf.crsx.Unification;
@@ -62,6 +63,12 @@ public abstract class DelegateConstructor implements Constructor
 	public Object object()
 	{
 		return constructor.object();
+	}
+
+	@Override
+	public boolean isClosure()
+	{
+		return constructor.isClosure();
 	}
 
 	// @see net.sf.crsx.Constructor#match(net.sf.crsx.Match, net.sf.crsx.Constructor, net.sf.crsx.util.ExtensibleMap)

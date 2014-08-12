@@ -24,25 +24,25 @@ public interface CRS
     public static final String XML = "?xml";
     
 	/** Constructor name for application. */
-	public final static String APPLICATION_SYMBOL = "@".intern();
+	public final static String APPLICATION_SYMBOL = "@";
 	/** Constructor name for sequences. */
-	public final static String CONS_SYMBOL = "$Cons".intern();
+	public final static String CONS_SYMBOL = "$Cons";
 	/** Constructor name for sequences. */
-	public final static String NIL_SYMBOL = "$Nil".intern();
+	public final static String NIL_SYMBOL = "$Nil";
 	/** Constructor name for plain truth. */
-	public final static String TRUE_SYMBOL = "$True".intern();
+	public final static String TRUE_SYMBOL = "$True";
 	/** Constructor name for plain false. */
-	public final static String FALSE_SYMBOL = "$False".intern();
+	public final static String FALSE_SYMBOL = "$False";
 	/** Constructor name for evaluation. */
-	public final static String EVAL_SYMBOL = "$".intern();
+	public final static String EVAL_SYMBOL = "$";
 	/** Constructor name for lists. */
-	public final static String LIST_SORT = "$List".intern();
+	public final static String LIST_SORT = "$List";
 	/** Constructor name for strings. */
-	public final static String STRING_SORT = "$String".intern();
+	public final static String STRING_SORT = "$String";
 	/** Constructor name for booleans. */
-	public final static String BOOLEAN_SORT = "$Boolean".intern();
+	public final static String BOOLEAN_SORT = "$Boolean";
 	/** Constructor name for integers. */
-	public final static String NUMERIC_SORT = "$Numeric".intern();
+	public final static String NUMERIC_SORT = "$Numeric";
 	/** Constructor name for $TryResult. */
 	public final static String TRYRESULT_SORT = "$TryResult";
 	/** Constructor name for $TrySuccess. */
@@ -51,7 +51,7 @@ public interface CRS
 	public final static String TRYFAILURE_SYMBOL = "$TryFailure";
 	/** Constructor name for $NativeSort. */
 	public final static String NATIVE_SORT = "$NativeSort";
-
+	
 	/** {@link for CRSX: Declaration*. */
 	public static final String REIFY_CRSX = "CRSX";
 	/** Reify constructor for Declaration:  &forall; x . Declaration. */

@@ -1,3 +1,4 @@
+
 package net.sf.crsx.antlr;
 
 import java.io.IOException;
@@ -68,29 +69,27 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	// Constants.
 
 	private static final long serialVersionUID = -3528905428088123506L;
-	
+
 	/** Property names. */
-	final public static String
-		TEXT = "$Text",
-		CHANNEL = "$Channel";
+	final public static String TEXT = "$Text", CHANNEL = "$Channel";
 
 	/** Special token types. */
-	public final static int
-		NIL_TYPE = -1,
-		ERROR_TYPE = -2,
-		CRSX_TYPE = -3;
-	
+	public final static int NIL_TYPE = -1, ERROR_TYPE = -2, CRSX_TYPE = -3;
+
 	// State.
-	
+
 	/** Factory. */
 	final CommonTokenFactory factory;
-	
+
 	/** Parent of owning node...ignored by CRSX but maintained by TreeAdaptor. */
 	private GenericTerm parent;
-	
+
 	/** Whether this particular token has an input location (concretely or virtually). */
 	private CharStream stream;
 	
+	/** Whether the constructor has the closure marker */
+	private boolean closure;
+
 	// Constructors.
 
 	/** Create token corresponding to anonymous token with just a type. */
@@ -100,15 +99,26 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		this.factory = factory;
 	}
 
-	/** Create anonymous token based on just the type and name. */
+	/** Create anonymous token based on just the type and name.*/
 	public CommonTokenConstructor(CommonTokenFactory factory, int type, String text)
 	{
 		super(type, text);
 		this.factory = factory;
+		this.closure = false;
 	}
 
+	/** Create anonymous token based on just the type and name.*/
+	public CommonTokenConstructor(CommonTokenFactory factory, int type, String text, boolean closure)
+	{
+		super(type, text);
+		this.factory = factory;
+		this.closure = closure;
+	}
+
+	
 	/** Create token from substring and channel of character stream. */
-	public CommonTokenConstructor(CommonTokenFactory factory, CharStream input, int type, int channel, int start, int stop, String[] names)
+	public CommonTokenConstructor(CommonTokenFactory factory, CharStream input, int type, int channel, int start, int stop,
+			String[] names)
 	{
 		super(input, type, channel, start, stop);
 		this.factory = factory;
@@ -121,7 +131,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 				assert names == factory.symbols : "Attempt to use GenericFactoryTreeAdaptor for multiple parsers?";
 		}
 	}
-	
+
 	/**
 	 * Special token for use by custom {@link Lexer#emit()}.
 	 * @param input characters
@@ -129,7 +139,8 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	 * @param stop points to the end of gthe token
 	 * @param names of tokens
 	 */
-	public CommonTokenConstructor(CommonTokenFactory factory, CharStream input, RecognizerSharedState state, int stop, String[] names)
+	public CommonTokenConstructor(CommonTokenFactory factory, CharStream input, RecognizerSharedState state, int stop,
+			String[] names)
 	{
 		this(factory, input, state.type, state.channel, state.tokenStartCharIndex, stop, names);
 		setLine(state.tokenStartLine);
@@ -144,8 +155,9 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		CommonTokenConstructor t = (CommonTokenConstructor) payload;
 		factory = t.factory;
 		stream = t.stream;
+		closure = t.closure;
 	}
-	
+
 	// Methods.
 
 	/** Whether this is a "textual" token that must have a {@link #TEXT} property even when it does not originate from the input. */
@@ -153,12 +165,12 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		String[] syms = factory.symbols();
 		String textPrefix;
-		return
-			syms != null && type >= 0 && type < syms.length 
-			&& (textPrefix = Util.symbol(factory.get(TreeAdaptorFactory.TEXT_TOKEN_PREFIX_PROPERTY))) != null
-			&& syms[type].startsWith(textPrefix);
+		return syms != null
+				&& type >= 0 && type < syms.length
+				&& (textPrefix = Util.symbol(factory.get(TreeAdaptorFactory.TEXT_TOKEN_PREFIX_PROPERTY))) != null
+				&& syms[type].startsWith(textPrefix);
 	}
-	
+
 	/** Return previously {@link #setParent(GenericTerm)}. */
 	public GenericTerm getParent()
 	{
@@ -170,7 +182,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		this.parent = parent;
 	}
-	
+
 	// Overrides of CommonToken...
 
 	@Override
@@ -214,7 +226,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		super.setStopIndex(stop);
 	}
-	
+
 	// Implementation of Constructor...
 
 	public String symbol()
@@ -222,11 +234,11 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		switch (type)
 		{
 			case NIL_TYPE :
-				return("$$NIL");
+				return ("$$NIL");
 			case ERROR_TYPE :
-				return("$$ERROR");
+				return ("$$ERROR");
 			case CRSX_TYPE :
-				return(getText());
+				return (getText());
 			default : {
 				String[] symbols = factory.symbols();
 				return symbols != null && type >= 0 && type < symbols.length ? symbols[type] : getText();
@@ -238,10 +250,16 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		return null; // not a literal but a Constructor with a $Text property...
 	}
-	
+
 	public Token object()
 	{
 		return this;
+	}
+
+	@Override
+	public boolean isClosure()
+	{
+		return closure;
 	}
 
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
@@ -301,17 +319,23 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	public void normalize(CRS crs) throws CRSException
 	{}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
 			writer.append("...");
 			return;
 		}
-		if (writer instanceof FormattingAppendable) ((FormattingAppendable) writer).open("");
-		if (namedProps) PropertiesConstructor.appendPropertiesTo(this, writer, used, depth-1, full, namedProps, variableProps, omitProps);
-		writer.append(literalSort() != null ? Util.quoteJava(symbol()) : Util.externalizeConstructor(text != null ? text : symbol()));
-		if (writer instanceof FormattingAppendable) ((FormattingAppendable) writer).close("");
+		if (writer instanceof FormattingAppendable)
+			((FormattingAppendable) writer).open("");
+		if (namedProps)
+			PropertiesConstructor.appendPropertiesTo(this, writer, used, depth - 1, full, namedProps, variableProps, omitProps);
+		writer.append(literalSort() != null
+				? Util.quoteJava(symbol())
+				: Util.externalizeConstructor(text != null ? text : symbol()));
+		if (writer instanceof FormattingAppendable)
+			((FormattingAppendable) writer).close("");
 	}
 
 	final public SortedSet<Path> paths(Path base)
@@ -328,19 +352,23 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		throw new UnsupportedOperationException("TODO: Implement Java code emit for CommonTokenConstructor!");
 	}
-	
+
 	// PropertiesHolder...
-	
+
 	public Iterable<String> propertyNames()
 	{
 		List<String> list = new ArrayList<String>();
-		if (text != null && isTextual()) list.add(TEXT);
+		if (text != null && isTextual())
+			list.add(TEXT);
 		if (stream != null)
 		{
 			list.add(Parser.TOKEN_FILE_LOCATION);
-			if (line > 0) list.add(Parser.TOKEN_LINE_LOCATION);
-			if (charPositionInLine > 0) list.add(Parser.TOKEN_COLUMN_LOCATION);
-			if (channel > 0) list.add(CHANNEL);
+			if (line > 0)
+				list.add(Parser.TOKEN_LINE_LOCATION);
+			if (charPositionInLine > 0)
+				list.add(Parser.TOKEN_COLUMN_LOCATION);
+			if (channel > 0)
+				list.add(CHANNEL);
 		}
 		return list;
 	}
@@ -378,7 +406,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		}
 		return false;
 	}
-	
+
 	public void setProperty(String name, Term value) throws CRSException
 	{
 		try
@@ -396,11 +424,11 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 					setChannel(Integer.parseInt(Util.symbol(value)));
 			}
 			else
-				throw new CRSException("Property "+name+" cannot be set directly on CommonToken");
+				throw new CRSException("Property " + name + " cannot be set directly on CommonToken");
 		}
 		catch (NumberFormatException e)
 		{
-			throw new CRSException("Property "+name+" must be set to numeric value", e);
+			throw new CRSException("Property " + name + " must be set to numeric value", e);
 		}
 	}
 
@@ -423,7 +451,11 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		throw new CRSException("Variable property cannot be set directly on CommonToken");
 	}
-	
+
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
+	{}
+
 	public void setProperties(PropertiesHolder properties) throws CRSException
 	{
 		for (String name : properties.propertyNames())
@@ -445,7 +477,9 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		StringWriter w = new StringWriter();
 		try
 		{
-			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			appendTo(
+					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false,
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
 		}
 		catch (IOException e)
 		{
@@ -453,7 +487,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		}
 		return w.toString();
 	}
-	
+
 	@Override
 	public boolean equals(Object that)
 	{
@@ -469,7 +503,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		return symbol().hashCode();
 	}
-	
+
 	public Constructor baseConstructor()
 	{
 		return this;

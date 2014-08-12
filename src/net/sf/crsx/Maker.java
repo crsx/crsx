@@ -23,6 +23,22 @@ public interface Maker
 	 */
 	public Constructor makeConstructor(Object object);
 
+
+	/**
+	 * Create a constructor from the given object.
+	 * What the object should be depends on the notion of term used;
+	 * two conventions are supported by all implementations:
+	 * <ul>
+	 * <li>A simple String value creates a constructor "with that name".
+	 * <li>A constructor (from the same or a compatible {@link Maker}) duplicates the constructor. 
+	 * </ul>
+	 * @param object with constructor configuration
+	 * @throws ClassCastException if the object is not useful for making a constructor
+	 * 		(this is implementation dependent)
+	 */
+	public Constructor makeConstructor(Object object, boolean closure);
+	
+	
 	/**
 	 * Create a literal constructor from the given object with the specified sort.
 	 * The object can be

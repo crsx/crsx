@@ -61,10 +61,16 @@ final public class JokerConstructor implements Constructor
 	{
 		return null;
 	}
-	
+
 	public Object object()
 	{
 		return symbol();
+	}
+	
+	@Override
+	public boolean isClosure()
+	{
+		return false;
 	}
 
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
@@ -90,10 +96,9 @@ final public class JokerConstructor implements Constructor
 		return that.copy(thatBound);
 	}
 
-	public Constructor unify(Unification unification, Constructor that,
-			StackedMap<Variable> rho,
-			StackedMap<Variable> rhoprime) {
-        return that.copy(new LinkedExtensibleMap<Variable, Variable>().extend(rhoprime));
+	public Constructor unify(Unification unification, Constructor that, StackedMap<Variable> rho, StackedMap<Variable> rhoprime)
+	{
+		return that.copy(new LinkedExtensibleMap<Variable, Variable>().extend(rhoprime));
 	}
 
 	public Constructor copy(ExtensibleMap<Variable, Variable> renamings)
@@ -112,7 +117,8 @@ final public class JokerConstructor implements Constructor
 		return this;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+			throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -163,16 +169,20 @@ final public class JokerConstructor implements Constructor
 	{
 		return false;
 	}
-	
+
 	public boolean canSetProperty(Variable variable)
 	{
 		return false;
 	}
-	
+
 	public void setProperty(String name, Term value)
 	{}
-	
+
 	public void setProperty(Variable variable, Term value)
+	{}
+
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
 	{}
 
 	public void setProperties(PropertiesHolder properties) throws CRSException
@@ -205,7 +215,9 @@ final public class JokerConstructor implements Constructor
 		StringWriter w = new StringWriter();
 		try
 		{
-			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			appendTo(
+					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true,
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
 		}
 		catch (IOException e)
 		{}

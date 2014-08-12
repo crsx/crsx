@@ -170,8 +170,8 @@ public class GenericFactory implements Factory<GenericTerm>
 	/** The sort constructors that permit matching against variables. */
 	final private Set<String> sortsWithClosedData = new HashSet<String>();
 	
-	/** The sort constructors which come with a sort set. */
-	final private Map<String,Map<String,Term>> sortsWithSortSet = new HashMap<String,Map<String,Term>>();
+	/** The data sort constructors which come with a sort set. */
+	final public Map<String,Map<String,Term>> sortsWithSortSet = new HashMap<String,Map<String,Term>>();
 	
 	/** Maps each constructor name to a set of pairs <sort,form>. */
 	final private MultiMap<String, Pair<Term, Term>> constructorSortForm = new HashMultiMap<String, Pair<Term, Term>>();
@@ -210,7 +210,7 @@ public class GenericFactory implements Factory<GenericTerm>
         trueConstructor = new BooleanConstructor(true);
         falseConstructor = new BooleanConstructor(false);
         trySuccessConstructor = makeConstructor(CRS.TRYSUCCESS_SYMBOL);
-        tryFailureConstructor = makeConstructor(CRS.TRYFAILURE_SYMBOL);
+        tryFailureConstructor = makeConstructor(CRS.TRYFAILURE_SYMBOL); 
         
         classicParser = new ClassicParser();
         
@@ -278,6 +278,8 @@ public class GenericFactory implements Factory<GenericTerm>
 		dataConstructors.add(CRS.TRYFAILURE_SYMBOL);
 		
 		
+		// 
+		
 		// don't create ints and strings, as there are infinitely many of them!
 	}
     /** Internal class for the unique boolean values. */
@@ -312,8 +314,10 @@ public class GenericFactory implements Factory<GenericTerm>
     {
     	return Util.getInteger(this, VERBOSE_OPTION, 0);
     }
+    
 	/**
 	 * Create a new construction.
+	 * 
 	 * @param constructor to use
 	 * @param binders to use
 	 * @param subterms under the binders
@@ -350,7 +354,8 @@ public class GenericFactory implements Factory<GenericTerm>
 			return new GenericConstant(this, constructor);
 		for (int i = 0; i < subterms.length; ++i)
 			if (subterms[i] == null)
-				warning("Incomplete sort information for "+constructor+": please declare it explicitly (no sort information for argument "+i+")");
+				warning("Incomplete term for "+constructor+": (missing sub term "+i+")");
+			
 		return new FixedGenericConstruction(this, constructor, binders, subterms);
 	}
 	
@@ -398,7 +403,7 @@ public class GenericFactory implements Factory<GenericTerm>
 	 * (Helper that uses {@link #newConstruction(Constructor, Variable[][], Term[])}.)
 	 * @param constructor to use
 	 */
-	final public GenericTerm constant(Constructor constructor)
+	final public GenericConstruction constant(Constructor constructor)
 	{
 		return newConstruction(constructor, GenericTerm.NO_BINDS, GenericTerm.NO_TERMS);
 	}
@@ -511,7 +516,13 @@ public class GenericFactory implements Factory<GenericTerm>
 
 	public Constructor makeConstructor(Object object)
 	{
-	    // Note: This is the only actual implementation of .makeConstructor() used by the generic implementation!
+	   return makeConstructor(object, false);
+	}
+	
+    @Override
+	public Constructor makeConstructor(Object object, boolean closure)
+	{
+    	 // Note: This is the only actual implementation of .makeConstructor() used by the generic implementation!
 	    if (object instanceof Constructor)
 	    {
 	        return ((Constructor) object).copy(LinkedExtensibleMap.EMPTY_RENAMING);
@@ -520,10 +531,10 @@ public class GenericFactory implements Factory<GenericTerm>
 		{
 //			return constantConstructor((String) object);
 		}
-		return new ObjectConstructor(object);
+		return new ObjectConstructor(object, closure);
 	}
 
-    public Constructor makeLiteral(Object object, String sort)
+	public Constructor makeLiteral(Object object, String sort)
     {
 //    	if (object.toString().startsWith("'"))
 //    		message("karma?!?");
@@ -572,6 +583,8 @@ public class GenericFactory implements Factory<GenericTerm>
 		if (verbosity() > 9) message("VARIABLE "+v+" CREATED");
 		return v;
 	}
+	
+	
 
 	public Variable freeVariable(String name, boolean promiscuous, boolean create)
 	{	String richName = (promiscuous ? "¹" : "") + name;
@@ -1239,7 +1252,7 @@ public class GenericFactory implements Factory<GenericTerm>
 				Variable x = keySort.variable();
 				if (!boundVars.contains(x))
 				{
-					error("sort set " + A + " contains illegal variable key "+x);
+					error("Property sort " + A + " contains illegal variable key " + x + " in term " + hostSort);
 					return false;
 				}
 			}
@@ -1371,13 +1384,13 @@ public class GenericFactory implements Factory<GenericTerm>
 //				message("bad karma: " + formText);
 //			if (formText.contains("FT-item-intersect2-record"))
 //				warning("karma");
-	    	if (verbosity() >= 6)
-	    	{
+	    	//if (verbosity() >= 6)
+	    	//{
 	    		if (function)
 	    			message(("Declaring function sort form " + form + " :: " + sortTerm));
 	    		else
 	    			message(("Declaring data sort form "+sortTerm+" ::= "+form));
-	    	}
+	    	//}
 		}
     	if (sortTerm == null)
     	{
@@ -1385,8 +1398,7 @@ public class GenericFactory implements Factory<GenericTerm>
             	message("bad karma: null sort");
     		return;
     	}
-///		if ("Text".equals(Util.symbol(sortTerm)))
-///        	message("karma: Text sort!");
+
     	if (sortParams == null)
     	{
     		sortParams = new HashSet<Variable>();
@@ -1442,7 +1454,7 @@ public class GenericFactory implements Factory<GenericTerm>
     		if (args.size() != sortParams.size())
     			error("sort declaration: " + sortTerm + " - does not contain all bound sort variables!");
     		if (args.size() != 0 && hasSortSet)
-    			error("sort declaration: " + sortTerm + " - it is not allowed for a polymorphic sort to be equippred with a sort set.");
+    			error("sort declaration: " + sortTerm + " - it is not allowed for a polymorphic sort to be equipped with a sort set.");
     	}
     	
     	// CHECK 2: if the form is a variable, this should be a data symbol; if so, save it and return
@@ -1478,6 +1490,7 @@ public class GenericFactory implements Factory<GenericTerm>
    			Variable[] binders = form.binders(i);
    			if (sub == null || binders == null)
    				warning("Incomplete sort information for "+formSymbol+": please declare explicitly (bad binders for sort argument "+i+")");
+   		
    			Set<Variable> binds = new HashSet<Variable>();
 			if (binders != null) for (Variable v : binders) binds.add(v);
 			

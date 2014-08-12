@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -53,243 +52,149 @@ import net.sf.crsx.generic.PropertiesWrapperConstructor;
  */
 public final class Util
 {
-    /** Instances not possible. */
-    private Util()
-    {}
-    
+	/** Instances not possible. */
+	private Util()
+	{}
+
 	/** Regular expression that conservatively approximates constructors that can be parsed without being quoted. */
-	public static final java.util.regex.Pattern CONSTRUCTOR_PATTERN = java.util.regex.Pattern.compile(
-			"(?:\\w*[$A-Z]+\\w*|[\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]|\\d+(?:[.]\\d+)?(?:[Ee]\\d+)?|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+|<(i|b|u|tt|q)>(?:[^<>&\n\r]|&(?:#[0-9]+|[-$A-Za-z0-9_]+);)+</\\1>)"
-			+"(?:[-](?:[$A-Za-z]+\\w*|\\d+|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+))*");
-			// TODO: handle more...
+	public static final java.util.regex.Pattern CONSTRUCTOR_PATTERN = java.util.regex.Pattern.compile("(?:\\w*[$A-Z]+\\w*|[\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]|\\d+(?:[.]\\d+)?(?:[Ee]\\d+)?|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+|<(i|b|u|tt|q)>(?:[^<>&\n\r]|&(?:#[0-9]+|[-$A-Za-z0-9_]+);)+</\\1>)"
+			+ "(?:[-](?:[$A-Za-z]+\\w*|\\d+|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+))*");
+	// TODO: handle more...
 
 	/** Conservative approximation of string that it is safe to print as an unquoted variable name */
-	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile(
-			"[a-z][A-Za-z0-9\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
+	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile("[a-z][A-Za-z0-9\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
 
 	/** Conservative approximation of string that it is safe to print as an unquoted meta-variable name. */
-	public static final java.util.regex.Pattern META_VARIABLE_PATTERN = java.util.regex.Pattern.compile(
-			"(?:[<]em[>].*[<][/]em[>]|[A-Za-z0-9_$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[#]+[A-Za-z0-9_$#\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)(?:-[A-Za-z0-9$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)*|[#]['][^']*[']|[#][\"][^\"]*[\"]");
+	public static final java.util.regex.Pattern META_VARIABLE_PATTERN = java.util.regex.Pattern.compile("(?:[<]em[>].*[<][/]em[>]|[A-Za-z0-9_$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[#]+[A-Za-z0-9_$#\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)(?:-[A-Za-z0-9$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)*|[#]['][^']*[']|[#][\"][^\"]*[\"]");
 
-    /** Whether this is a constant. */
-    final public static boolean isConstant(Stub term)
-    {
-    	return term != null && term.kind() == Kind.CONSTRUCTION && term.arity() == 0;
-    }
+	/** Whether this is a constant. */
+	final public static boolean isConstant(Stub term)
+	{
+		return term != null && term.kind() == Kind.CONSTRUCTION && term.arity() == 0;
+	}
 
-    /** Whether this is a literal constant. */
-    final public static boolean isLiteral(Stub term)
-    {
-    	return isConstant(term) && term.constructor().literalSort() != null;
-    }
+	/** Whether this is a literal constant. */
+	final public static boolean isLiteral(Stub term)
+	{
+		return isConstant(term) && term.constructor().literalSort() != null;
+	}
 
-    /** Whether this is a string constant. */
-    final public static boolean isString(Stub term)
-    {
-    	return isConstant(term) && CRS.STRING_SORT.equals(term.constructor().literalSort());
-    }
+	/** Whether this is a string constant. */
+	final public static boolean isString(Stub term)
+	{
+		return isConstant(term) && CRS.STRING_SORT.equals(term.constructor().literalSort());
+	}
 
-    /** Whether this is a numeric constant. */
-    final public static boolean isNumeric(Stub term)
-    {
-    	return isConstant(term) && CRS.NUMERIC_SORT.equals(term.constructor().literalSort());
-    }
+	/** Whether this is a numeric constant. */
+	final public static boolean isNumeric(Stub term)
+	{
+		return isConstant(term) && CRS.NUMERIC_SORT.equals(term.constructor().literalSort());
+	}
 
-    /** Whether this is a boolean constant. */
-    final public static boolean isBoolean(Stub term)
-    {
-    	return isConstant(term) && CRS.BOOLEAN_SORT.equals(term.constructor().literalSort());
-    }
+	/** Whether this is a boolean constant. */
+	final public static boolean isBoolean(Stub term)
+	{
+		return isConstant(term) && CRS.BOOLEAN_SORT.equals(term.constructor().literalSort());
+	}
 
-    /** Whether this is a meta-application. */
-    public static boolean isMetaApplication(Stub term)
-    {
-    	return term.kind() == Kind.META_APPLICATION;
-    }
+	/** Whether this is a meta-application. */
+	public static boolean isMetaApplication(Stub term)
+	{
+		return term.kind() == Kind.META_APPLICATION;
+	}
 
-    /** Whether this is a plain application. */
-    public static boolean isApply(Constructor constructor)
-    {
-    	return constructor != null && constructor.symbol().equals(CRS.APPLICATION_SYMBOL);
-    }
+	/** Whether this is a plain application. */
+	public static boolean isApply(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(CRS.APPLICATION_SYMBOL);
+	}
 
-    /** Whether this is a constructed sequence. */
-    public static boolean isSequence(Term term)
-    {
-        do
-        {
-            if (term.kind() == Kind.CONSTRUCTION)
-            {
-                switch (term.arity())
-                {
-                    case 0 :
-                        return term.constructor().symbol().equals(CRS.NIL_SYMBOL);
-    
-                    case 2 :
-                        if (term.constructor().symbol().equals(CRS.CONS_SYMBOL))
-                        {
-                            term = term.sub(1);
-                            continue;
-                        }
-                }
-            }
-            return false;
-        }
-        while (true);
-    }
-
-    /** Whether this is an empty sequence. */
-    public static boolean isNull(Constructor constructor)
-    {
-        return constructor != null && constructor.symbol().equals(CRS.NIL_SYMBOL);
-    }
-
-    /** Whether this is an empty sequence. */
-    public static boolean isNull(Term term)
-    {
-    	return term == null || (term.kind() == Kind.CONSTRUCTION && term.arity() == 0 && isNull(term.constructor()));
-    }
-
-    /** Whether this is the false constructor (for legacy reasons, the empty sequence is also considered as False) */
-    public static boolean isFalse(Constructor constructor)
-    {
-    	return constructor != null && (constructor.symbol().equals(CRS.FALSE_SYMBOL) || constructor.symbol().equals(CRS.NIL_SYMBOL));
-    }
-    
-    /** Whether this is a non-empty sequence. */
-    public static boolean isCons(Constructor constructor)
-    {
-        return constructor != null && constructor.symbol().equals(CRS.CONS_SYMBOL);
-    }
-
-    /** Whether this is a rule. */
-    public static boolean isRule(Constructor constructor)
-    {
-    	return constructor != null && constructor.symbol().equals(Builder.RULE_SYMBOL);
-    }
-
-    /** Whether this is a (data) sort declaration. */
-    public static boolean isSort(Constructor constructor)
-    {
-    	return constructor != null && constructor.symbol().equals(Builder.DATA_SORT_SYMBOL);
-    }
-
-    /** Whether this is a function sort declaration. */
-    public static boolean isFunctionSort(Constructor constructor)
-    {
-    	return constructor != null && constructor.symbol().equals(Builder.FUNCTION_SORT_SYMBOL);
-    }
-
-    /** Whether this is an evaluation primitive. */
-    public static boolean isEval(Constructor constructor)
-    {
-    	return constructor != null && constructor.symbol().equals(CRS.EVAL_SYMBOL);
-    }
-
-    /** Whether this is a special constructor...it starts with '$'. */
-    public static boolean isSpecial(Constructor c)
-    {
-    	return c.symbol().startsWith("$") && !c.symbol().startsWith("$Text");
-    }
-
-    /** Whether this is a special constructor...it starts with '$'. */
-    public static boolean isInvisibleProperty(String name)
-    {
-    	return name.startsWith("$$");
-    }
-
-    /** Whether this is a special sort...it starts with '$'. */
-    public static boolean isBuiltinSort(String sort)
-    {
-    	return sort != null && sort.startsWith("$") && !sort.startsWith("$Text");
-    }
-
-    /** Whether this is a literal sort. */
-    public static boolean isLiteralSort(String sort)
-    {
-    	return sort != null && (CRS.STRING_SORT.equals(sort) || CRS.BOOLEAN_SORT.equals(sort) || CRS.NUMERIC_SORT.equals(sort));
-    }
-    
-    /**
-     * Compute sort of term as can be derived from a top-down investigation. 
-     * @param factory for checking sorts
-     * @param term to guess the sort of
-     */
-    public static GenericTerm sortOf(GenericFactory factory, Term term)
-    {
-    	if (term == null || term.kind() != Kind.CONSTRUCTION)
-    		return null;
-    	String literalSort = term.constructor().literalSort();
-    	if (literalSort != null)
-    		return factory.constant(factory.makeLiteral(literalSort, CRS.STRING_SORT));
-    	Set<Pair<Term,Term>> sortforms = factory.formsOf(Util.symbol(term));
-    	if (sortforms == null || sortforms.isEmpty())
-    		return null;
-    	// Search for a form that can be used to retrieve sort!
-    	for (Pair<Term,Term> sortform : sortforms)
-    	{
-        	Term form = sortform.tail();
-        	if (form.kind() == Kind.CONSTRUCTION && Factory.SORT_VAR.equals(Util.symbol(form)))
-        		form = form.sub(0);
-        	if (form.arity() != term.arity())
-        		continue;
-        	// We found a form that fits.
-        	Map<Variable,Term> variableSorts = impliedVariableSorts(factory, term, form);
-        	GenericTerm sort = (GenericTerm) sortform.head();
-        	// TODO: Sort variables...not just variable sorts!!!
-    		if (sort.kind() == Kind.VARIABLE_USE && variableSorts.containsKey(sort.variable()))
-    		{
-    			// Sort is variable that we could resolve.
-    			return (GenericTerm) variableSorts.get(sort.variable());
-    		}
-    		else if (sort.arity() == 0)
-    		{
-    			// Got a sort with no sort variables so we are done.
-    			return sort;
-    		}
-    		else
-    		{
-    			// Got a polymorphic sort that we shall instantiate as much as possible.
-    			GenericTerm[] argumentSorts = new GenericTerm[sort.arity()];
-    			for (int i = 0; i < argumentSorts.length; ++i)
-    				if (sort.sub(i).kind() == Kind.VARIABLE_USE && variableSorts.containsKey(sort.sub(i).variable()))
-    					argumentSorts[i] = (GenericTerm) variableSorts.get(sort.sub(i).variable());
-    				else
-    					argumentSorts[i] = sort.sub(i); // alas
-    			return factory.newForm(Util.symbol(sort), argumentSorts);
-    		}
-    	}
-    	return null; // failed to find sort
-    }
-    
-	/**
-	 * Compute any sort variable bindings implied by relationship between term and form.
-	 * @param factory for term creation and sort lookups
-	 * @param term to extract information from
-	 * @param form of the term
-	 * @return map from variables to sorts that are implied by the term having the sort
-	 */
-	public static Map<Variable,Term> impliedVariableSorts(GenericFactory factory, Term term, Term form)
-    {
-		assert term.kind() == Kind.CONSTRUCTION && form.kind() == Kind.CONSTRUCTION; 
-		assert Util.symbol(term).equals(Util.symbol(form));
-		assert term.arity() == form.arity();
-		Map<Variable,Term> impliedVariableSorts = new IdentityHashMap<Variable, Term>();
-		for (int i = 0; i < term.arity(); ++i)
+	/** Whether this is a constructed sequence. */
+	public static boolean isSequence(Term term)
+	{
+		do
 		{
-			Term formSub = form.sub(i);
-			// TODO: also extract form *binder sorts* to add constraints.
-			if (formSub.kind() == Kind.VARIABLE_USE)
+			if (term.kind() == Kind.CONSTRUCTION)
 			{
-				Term sub = term.sub(i);
-				Term subSort = sortOf(factory, sub);
-				if (subSort != null)
-					impliedVariableSorts.put(formSub.variable(), subSort);
+				switch (term.arity())
+				{
+					case 0 :
+						return term.constructor().symbol().equals(CRS.NIL_SYMBOL);
+
+					case 2 :
+						if (term.constructor().symbol().equals(CRS.CONS_SYMBOL))
+						{
+							term = term.sub(1);
+							continue;
+						}
+				}
 			}
+			return false;
 		}
-	    return impliedVariableSorts;
-    }
-	
+		while (true);
+	}
+
+	/** Whether this is an empty sequence. */
+	public static boolean isNull(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(CRS.NIL_SYMBOL);
+	}
+
+	/** Whether this is an empty sequence. */
+	public static boolean isNull(Term term)
+	{
+		return term == null || (term.kind() == Kind.CONSTRUCTION && term.arity() == 0 && isNull(term.constructor()));
+	}
+
+	/** Whether this is the false constructor (for legacy reasons, the empty sequence is also considered as False) */
+	public static boolean isFalse(Constructor constructor)
+	{
+		return constructor != null
+				&& (constructor.symbol().equals(CRS.FALSE_SYMBOL) || constructor.symbol().equals(CRS.NIL_SYMBOL));
+	}
+
+	/** Whether this is a non-empty sequence. */
+	public static boolean isCons(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(CRS.CONS_SYMBOL);
+	}
+
+	/** Whether this is a rule. */
+	public static boolean isRule(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(Builder.RULE_SYMBOL);
+	}
+
+	/** Whether this is a (data) sort declaration. */
+	public static boolean isSort(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(Builder.DATA_SORT_SYMBOL);
+	}
+
+	/** Whether this is a function sort declaration. */
+	public static boolean isFunctionSort(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(Builder.FUNCTION_SORT_SYMBOL);
+	}
+
+	/** Whether this is an evaluation primitive. */
+	public static boolean isEval(Constructor constructor)
+	{
+		return constructor != null && constructor.symbol().equals(CRS.EVAL_SYMBOL);
+	}
+
+	/** Whether this is a special constructor...it starts with '$'. */
+	public static boolean isSpecial(Constructor c)
+	{
+		return c.symbol().startsWith("$") && !c.symbol().startsWith("$Text");
+	}
+
+	/** Whether this is a special constructor...it starts with '$'. */
+	public static boolean isInvisibleProperty(String name)
+	{
+		return name.startsWith("$$");
+	}
+
 	/** Return the array with the rank (number of binders) of each subterm. */
 	public static int[] ranks(Term form)
 	{
@@ -298,19 +203,40 @@ public final class Util
 			ranks[i] = form.binders(i).length;
 		return ranks;
 	}
-	
-	/** Return the array of variable parameters of the sort term. */
-	public static Variable[] sortParams(Term sortTerm)
-    {
-		final Variable[] params = new Variable[sortTerm.arity()];
-		for (int i = 0; i < params.length; ++i)
-			params[i] = sortTerm.sub(i).variable();
-	    return params;
-    }
+
+	/**
+	 * Whether the array contains the value
+	 * @param array
+	 * @param value
+	 * @return
+	 */
+	public static boolean contains(Object[] array, Object value)
+	{
+		for (Object object : array)
+		{
+			if (object == value)
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * The index of the value in the array. -1 if no in it.
+	 * @param array
+	 * @param value
+	 * @return
+	 */
+	public static int indexOf(Object[] array, Object value)
+	{
+		for (int i = 0; i < array.length; i++)
+			if (array[i] == value)
+				return i;
+		return -1;
+	}
 
 	/** Global randomizer */
-	final public static Random RANDOM = new Random(); 
-	
+	final public static Random RANDOM = new Random();
+
 	/**
 	 * Return unique name for v that can be reparsed...
 	 * @param v variable to get name for
@@ -329,10 +255,11 @@ public final class Util
 				String[] words = v.name().split("[-_0-9]", 2);
 				n = words[0];
 				n = n.replaceAll("__V[0-9]+¹", "");
-				if (n.isEmpty() || !n.matches("[a-z][A-Za-z0-9]*")) n = "v";
+				if (n.isEmpty() || !n.matches("[a-z][A-Za-z0-9]*"))
+					n = "v";
 				int i = Integer.parseInt(used.get(null));
 				n = n + "__V" + i;
-				used.put(null, Integer.toString(i+1));
+				used.put(null, Integer.toString(i + 1));
 				used.put(v, n);
 			}
 			else
@@ -364,7 +291,7 @@ public final class Util
 		}
 		return (omitLinearity || v.promiscuous() ? "" : "\u00B9") + (omitEncoding ? n : externalizeVariable(n));
 	}
-	
+
 	/**
 	 * Output variable set in context.
 	 * @param set of variables to output
@@ -406,38 +333,29 @@ public final class Util
 		}
 		return fallback;
 	}
-	
-    /** Utility to export &lang;CONSTRUCTOR&rang; token in reparseable form. */
+
+	/** Utility to export &lang;CONSTRUCTOR&rang; token in reparseable form. */
 	public static String externalizeConstructor(String symbol)
 	{
-		return CONSTRUCTOR_PATTERN.matcher(symbol).matches()
-			? symbol
-			: Util.singleQuoteJava(symbol); // fall back to quoting as Java string
+		return CONSTRUCTOR_PATTERN.matcher(symbol).matches() ? symbol : Util.singleQuoteJava(symbol); // fall back to quoting as Java string
 	}
 
-    /** Utility to export literal &lang;CONSTRUCTOR&rang; token in reparseable form. */
+	/** Utility to export literal &lang;CONSTRUCTOR&rang; token in reparseable form. */
 	public static String externalizeLiteral(String symbol)
 	{
-		return CONSTRUCTOR_PATTERN.matcher(symbol).matches()
-			? symbol
-			: Util.quoteJava(symbol); // fall back to quoting as Java string
+		return CONSTRUCTOR_PATTERN.matcher(symbol).matches() ? symbol : Util.quoteJava(symbol); // fall back to quoting as Java string
 	}
-	
+
 	/** Utility to export &lang;VARIABLE&rang; token in reparseable form. */
 	public static String externalizeVariable(String name)
 	{
-		return name == null ? "vNULL" :
-			VARIABLE_PATTERN.matcher(name).matches()
-			? name
-			: "v" + Util.quoteJava(name); // fall back to quoting as Java string
+		return name == null ? "vNULL" : VARIABLE_PATTERN.matcher(name).matches() ? name : "v" + Util.quoteJava(name); // fall back to quoting as Java string
 	}
 
 	/** Utility to export &lang;METAVARIABLE&rang; token in reparseable form. */
 	public static String externalizeMetaVariable(String name)
 	{
-		return META_VARIABLE_PATTERN.matcher(name).matches()
-			? name
-			: "#" + Util.quoteJava(name); // fall back to quoting
+		return META_VARIABLE_PATTERN.matcher(name).matches() ? name : "#" + Util.quoteJava(name); // fall back to quoting
 	}
 
 	/**
@@ -449,7 +367,8 @@ public final class Util
 	 * @param quote character for which two consecutive copies are reduced to one
 	 * @throws IOException if there is an output error
 	 */
-	public static void appendUnescaped(Appendable appendable, String stringWithEscapes, int begin, int end, char quote) throws IOException
+	public static void appendUnescaped(Appendable appendable, String stringWithEscapes, int begin, int end, char quote)
+			throws IOException
 	{
 		if (stringWithEscapes == null)
 			return;
@@ -469,26 +388,45 @@ public final class Util
 				// Escape characters.
 				switch (c = stringWithEscapes.charAt(++i))
 				{
-					case 'b' : appendable.append('\b'); break;
-					case 't' : appendable.append('\t'); break;
-					case 'n' : appendable.append('\n'); break;
-					case 'f' : appendable.append('\f'); break;
-					case 'r' : appendable.append('\r'); break;
+					case 'b' :
+						appendable.append('\b');
+						break;
+					case 't' :
+						appendable.append('\t');
+						break;
+					case 'n' :
+						appendable.append('\n');
+						break;
+					case 'f' :
+						appendable.append('\f');
+						break;
+					case 'r' :
+						appendable.append('\r');
+						break;
 
-					case '0' : case '1' : case '2' : case '3' :
-						appendable.append((char) Integer.parseInt(stringWithEscapes.substring(i, i+3), 8)); i += 3;
+					case '0' :
+					case '1' :
+					case '2' :
+					case '3' :
+						appendable.append((char) Integer.parseInt(stringWithEscapes.substring(i, i + 3), 8));
+						i += 3;
 						break;
 
 					case 'u' : {
-						String sub = (stringWithEscapes.length()-i < 5 ? stringWithEscapes.substring(i+1) : stringWithEscapes.substring(i+1, i+5));
-						appendable.append((char) Integer.parseInt(sub, 16)); i += sub.length();
+						String sub = (stringWithEscapes.length() - i < 5
+								? stringWithEscapes.substring(i + 1)
+								: stringWithEscapes.substring(i + 1, i + 5));
+						appendable.append((char) Integer.parseInt(sub, 16));
+						i += sub.length();
 						break;
 					}
 
 					case 'U' : {
-						int codePoint = Integer.parseInt(stringWithEscapes.substring(i+1, i+9), 16); i += 8;
+						int codePoint = Integer.parseInt(stringWithEscapes.substring(i + 1, i + 9), 16);
+						i += 8;
 						char[] chars = Character.toChars(codePoint);
-						for (char surrogate : chars) appendable.append(surrogate);
+						for (char surrogate : chars)
+							appendable.append(surrogate);
 						break;
 					}
 
@@ -506,7 +444,7 @@ public final class Util
 			}
 		}
 	}
-	
+
 	/**
 	 * Generalized quote remover.
 	 * <ol>
@@ -526,18 +464,19 @@ public final class Util
 		char quote = quotedString.charAt(0);
 		switch (quote)
 		{
-			case '\'' : case '"' :
+			case '\'' :
+			case '"' :
 				assert quote == quotedString.charAt(quotedString.length() - 1) : "Bad Java string: " + quotedString;
 				break;
 		}
 		StringBuilder b = new StringBuilder();
 		try
 		{
-			Util.appendUnescaped(b, quotedString, 1, quotedString.length()-1, quote);
+			Util.appendUnescaped(b, quotedString, 1, quotedString.length() - 1, quote);
 		}
 		catch (IOException e)
 		{
-			assert false : "Unexpected exception: "+e.getMessage();
+			assert false : "Unexpected exception: " + e.getMessage();
 		}
 		return b.toString();
 	}
@@ -584,7 +523,8 @@ public final class Util
 	/** Convert string to Java/C identifier form with leading _M_ (reversible and idempotent, suspicious characters are replaced with hex form). */
 	public static String quoteJavaIdentifierPart(String s)
 	{
-		if (s.startsWith("_M_")) return s; // already mangled!
+		if (s.startsWith("_M_"))
+			return s; // already mangled!
 		StringBuilder b = new StringBuilder();
 		b.append("_M_");
 		final int n = s.length();
@@ -594,16 +534,24 @@ public final class Util
 			switch (c)
 			{
 				case '-' : {
-					if (i+1 >= s.length() || ('A' <= s.charAt(i+1) && s.charAt(i+1) <= 'Z'))
+					if (i + 1 >= s.length() || ('A' <= s.charAt(i + 1) && s.charAt(i + 1) <= 'Z'))
 						b.append("_");
 					else
 						b.append("__");
 					break;
 				}
-				case '_' : b.append("_x"); break;
-				case '~' : b.append("_w"); break;
-				case '$' : b.append("_s"); break;
-				case '#' : b.append("_h"); break;
+				case '_' :
+					b.append("_x");
+					break;
+				case '~' :
+					b.append("_w");
+					break;
+				case '$' :
+					b.append("_s");
+					break;
+				case '#' :
+					b.append("_h");
+					break;
 				default :
 					if (c <= '~')
 					{
@@ -618,11 +566,12 @@ public final class Util
 		}
 		return b.toString();
 	}
-	
+
 	/** Reverse the effect of {@link #quoteJavaIdentifierPart(String)}. */
 	public static String unquoteJavaIdentifierPart(String s)
 	{
-		if (!s.startsWith("_M_")) return s; // already unmangled!
+		if (!s.startsWith("_M_"))
+			return s; // already unmangled!
 		StringBuilder b = new StringBuilder();
 		for (int i = 3; i < s.length(); ++i)
 		{
@@ -631,20 +580,44 @@ public final class Util
 			{
 				switch (c = s.charAt(i))
 				{
-					case '_' : b.append("-"); break;
-					case 'x' : b.append("_"); break;
-					case 'w' : b.append("~"); break;
-					case 's' : b.append("$"); break;
-					case 'h' : b.append("#"); break;
-					
-					case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' : case '9' :
-					case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' :
-						b.append(Integer.parseInt(s.substring(i, i+2), 16));
+					case '_' :
+						b.append("-");
+						break;
+					case 'x' :
+						b.append("_");
+						break;
+					case 'w' :
+						b.append("~");
+						break;
+					case 's' :
+						b.append("$");
+						break;
+					case 'h' :
+						b.append("#");
+						break;
+
+					case '0' :
+					case '1' :
+					case '2' :
+					case '3' :
+					case '4' :
+					case '5' :
+					case '6' :
+					case '7' :
+					case '8' :
+					case '9' :
+					case 'a' :
+					case 'b' :
+					case 'c' :
+					case 'd' :
+					case 'e' :
+					case 'f' :
+						b.append(Integer.parseInt(s.substring(i, i + 2), 16));
 						break;
 					case 'u' :
-						b.append(Integer.parseInt(s.substring(i, i+4), 16));
+						b.append(Integer.parseInt(s.substring(i, i + 4), 16));
 					default :
-						b.append("-"+c);
+						b.append("-" + c);
 				}
 			}
 			else
@@ -665,7 +638,7 @@ public final class Util
 		for (int i = 0; i < chars.length(); ++i)
 			quotedJavaChar(chars.charAt(i), b);
 	}
-	
+
 	/**
 	 * Convert character to Java-compatible source form for use in a string.
 	 * @param c character
@@ -675,14 +648,30 @@ public final class Util
 	{
 		switch (c)
 		{
-			case '\b' : b.append("\\b"); break;
-			case '\t' : b.append("\\t"); break;
-			case '\n' : b.append("\\n"); break;
-			case '\f' : b.append("\\f"); break;
-			case '\r' : b.append("\\r"); break;
-			case '\'' : b.append("\\'"); break;
-			case '\"' : b.append("\\\""); break;
-			case '\\' : b.append("\\\\"); break;
+			case '\b' :
+				b.append("\\b");
+				break;
+			case '\t' :
+				b.append("\\t");
+				break;
+			case '\n' :
+				b.append("\\n");
+				break;
+			case '\f' :
+				b.append("\\f");
+				break;
+			case '\r' :
+				b.append("\\r");
+				break;
+			case '\'' :
+				b.append("\\'");
+				break;
+			case '\"' :
+				b.append("\\\"");
+				break;
+			case '\\' :
+				b.append("\\\\");
+				break;
 			default :
 				if (Character.isISOControl(c))
 					b.append("\\" + octal((int) c, "000"));
@@ -715,23 +704,25 @@ public final class Util
 	 */
 	public static String unbrace(String s)
 	{
-		if (!s.startsWith("{") || !s.endsWith("}")) throw new IllegalArgumentException("unbrace of string without leading { and trailing }");
+		if (!s.startsWith("{") || !s.endsWith("}"))
+			throw new IllegalArgumentException("unbrace of string without leading { and trailing }");
 		{
 			int firstEnd = s.indexOf('}');
 			int lastBegin = s.lastIndexOf('{');
-			if (lastBegin == 0 && firstEnd == s.length()-1)
-				return s.substring(1, s.length()-1);
+			if (lastBegin == 0 && firstEnd == s.length() - 1)
+				return s.substring(1, s.length() - 1);
 		}
-		
+
 		StringBuilder b = new StringBuilder();
-		for (int i = 1; i < s.length()-1; ++i)
+		for (int i = 1; i < s.length() - 1; ++i)
 		{
 			char c = s.charAt(i);
 			switch (c)
 			{
 				case '{' :
 				case '}' :
-					if (i == s.length()-1 || s.charAt(i+1) != c) throw new IllegalArgumentException("unbrace of string with lone { or } character.");
+					if (i == s.length() - 1 || s.charAt(i + 1) != c)
+						throw new IllegalArgumentException("unbrace of string with lone { or } character.");
 					++i;
 			}
 			b.append(c);
@@ -746,8 +737,9 @@ public final class Util
 	 */
 	public static String unwrap2(String s)
 	{
-		if (s == null) return s;
-		return s.substring(2, s.length()-2);
+		if (s == null)
+			return s;
+		return s.substring(2, s.length() - 2);
 	}
 
 	/**
@@ -759,7 +751,7 @@ public final class Util
 	{
 		return stub == null ? null : stub.copy(discard, null);
 	}
-	
+
 	/**
 	 * Defensive symbol extraction.
 	 * @param stub to extract the symbol of
@@ -784,7 +776,7 @@ public final class Util
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Defensive subterm.
 	 */
@@ -794,7 +786,7 @@ public final class Util
 			return term.sub(index);
 		return null;
 	}
-	
+
 	/**
 	 * Lookup class.
 	 * @param factory with environment where package=... prefix is obtained in className is not qualified
@@ -843,7 +835,7 @@ public final class Util
 			throw new CRSException(e);
 		}
 	}
-	
+
 	/**
 	 * Invoke a dynamically named method with zero arguments.
 	 * @param object to invoke the method on
@@ -879,7 +871,7 @@ public final class Util
 			throw new CRSException(e);
 		}
 	}
-	
+
 	/**
 	 * Invoke a dynamically named method with one argument.
 	 * @param object to invoke the method on
@@ -889,7 +881,8 @@ public final class Util
 	 * @param argumentType declared type of argument in method
 	 * @throws CRSException if anything goes wrong...
 	 */
-	public static Object invoke1(Object object, Class<?> type, String methodName, Object argument, Class<?> argumentType) throws CRSException
+	public static Object invoke1(Object object, Class<?> type, String methodName, Object argument, Class<?> argumentType)
+			throws CRSException
 	{
 		try
 		{
@@ -952,214 +945,218 @@ public final class Util
 		if (original != null)
 		{
 			try
-            {
-				Term file = original.getProperty(Parser.TOKEN_FILE_LOCATION); 
+			{
+				Term file = original.getProperty(Parser.TOKEN_FILE_LOCATION);
 				if (file != null)
 					target = Util.wrapWithProperty(maker, target, Parser.TOKEN_FILE_LOCATION, file);
-				Term line = original.getProperty(Parser.TOKEN_LINE_LOCATION); 
+				Term line = original.getProperty(Parser.TOKEN_LINE_LOCATION);
 				if (line != null)
 					target = Util.wrapWithProperty(maker, target, Parser.TOKEN_LINE_LOCATION, line);
-				Term column = original.getProperty(Parser.TOKEN_LINE_LOCATION); 
+				Term column = original.getProperty(Parser.TOKEN_LINE_LOCATION);
 				if (column != null)
 					target = Util.wrapWithProperty(maker, target, Parser.TOKEN_COLUMN_LOCATION, column);
-            }
-            catch (NumberFormatException e)
-            {}
-            catch (CRSException e)
-            {}
+			}
+			catch (NumberFormatException e)
+			{}
+			catch (CRSException e)
+			{}
 		}
 		return target;
 	}
 
-    /** Return the propertiesholder for the term, or null if none. The result may be a {@link PropertiesConstraintsWrapper}. */
-    public static PropertiesHolder propertiesHolder(Term term)
-    {
-    	return (term == null || term instanceof PropertiesHolder ? (PropertiesHolder) term : term.constructor());
-    }
-    
-    /** Whether term has a property. */
-    public static boolean hasProperty(Term term, Variable variable)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-    	return ph != null && ph.getProperty(variable) != null;
-    }
+	/** Return the propertiesholder for the term, or null if none. The result may be a {@link PropertiesConstraintsWrapper}. */
+	public static PropertiesHolder propertiesHolder(Term term)
+	{
+		return (term == null || term instanceof PropertiesHolder ? (PropertiesHolder) term : term.constructor());
+	}
 
-    /** Whether term has a property. */
-    public static boolean hasProperty(Term term, String name)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-    	return ph != null && ph.getProperty(name) != null;
-    }
+	/** Whether term has a property. */
+	public static boolean hasProperty(Term term, Variable variable)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		return ph != null && ph.getProperty(variable) != null;
+	}
 
-    /** Whether term has a negated property. */
-    public static boolean hasNotProperty(Term term, String name)
-    {
-    	return term instanceof PropertiesConstraintsWrapper && ((PropertiesConstraintsWrapper) term).hasNotProperty(name);
-    }
+	/** Whether term has a property. */
+	public static boolean hasProperty(Term term, String name)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		return ph != null && ph.getProperty(name) != null;
+	}
 
-    /** Whether term has any properties at all.  A properties reference does not count. */
-    public static boolean hasProperties(Term term)
-    {
-    	if (term == null) return false;
-    	PropertiesHolder ph = propertiesHolder(term);
-    	if (ph == null) return false;
-	    if (ph.propertyNames().iterator().hasNext())
-	    	return true; // succeed because named properties
-	    if (ph.propertyVariables().iterator().hasNext())
-	    	return true; // succeed because variable properties
-	    if (ph.isMeta())
-	    {
-    		if (ph instanceof PropertiesConstraintsWrapper)
-    		{
-    			PropertiesConstraintsWrapper pcw = (PropertiesConstraintsWrapper) ph;
-    			if (pcw.propertyMetaVariables().iterator().hasNext())
-    				return true; // succeed because there are meta-properties
-    		}
-	    }
-	    return false; // no success means failure...
-    }
+	/** Whether term has a negated property. */
+	public static boolean hasNotProperty(Term term, String name)
+	{
+		return term instanceof PropertiesConstraintsWrapper && ((PropertiesConstraintsWrapper) term).hasNotProperty(name);
+	}
 
-    /** Whether term has any properties at all.  A properties reference does not count. */
-    public static boolean hasNonVariableProperties(Term term)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-	    if (ph.propertyNames().iterator().hasNext())
-	    	return true; // succeed because named properties
-	    if (ph.isMeta())
-	    {
-    		if (ph instanceof PropertiesConstraintsWrapper)
-    		{
-    			PropertiesConstraintsWrapper pcw = (PropertiesConstraintsWrapper) ph;
-    			if (pcw.propertyMetaVariables().iterator().hasNext())
-    				return true; // succeed because there are meta-properties
-    		}
-	    }
-	    return false; // no success means failure...
-    }
+	/** Whether term has any properties at all.  A properties reference does not count. */
+	public static boolean hasProperties(Term term)
+	{
+		if (term == null)
+			return false;
+		PropertiesHolder ph = propertiesHolder(term);
+		if (ph == null)
+			return false;
+		if (ph.propertyNames().iterator().hasNext())
+			return true; // succeed because named properties
+		if (ph.propertyVariables().iterator().hasNext())
+			return true; // succeed because variable properties
+		if (ph.isMeta())
+		{
+			if (ph instanceof PropertiesConstraintsWrapper)
+			{
+				PropertiesConstraintsWrapper pcw = (PropertiesConstraintsWrapper) ph;
+				if (pcw.propertyMetaVariables().iterator().hasNext())
+					return true; // succeed because there are meta-properties
+				if (pcw.getRef() != null)
+					return true;
+			}
+		}
+		return false; // no success means failure...
+	}
 
-    /**
-     * Whether term is of special case where it has at most one variable property.
-     * @param term to test
-     * @param variable only property permitted (or null for none permitted) 
-     */
+	/** Whether term has any properties at all.  A properties reference does not count. */
+	public static boolean hasNonVariableProperties(Term term)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		if (ph.propertyNames().iterator().hasNext())
+			return true; // succeed because named properties
+		if (ph.isMeta())
+		{
+			if (ph instanceof PropertiesConstraintsWrapper)
+			{
+				PropertiesConstraintsWrapper pcw = (PropertiesConstraintsWrapper) ph;
+				if (pcw.propertyMetaVariables().iterator().hasNext())
+					return true; // succeed because there are meta-properties
+			}
+		}
+		return false; // no success means failure...
+	}
+
+	/**
+	 * Whether term is of special case where it has at most one variable property.
+	 * @param term to test
+	 * @param variable only property permitted (or null for none permitted) 
+	 */
 	public static boolean hasAtMostVariableProperty(Term term, Variable variable)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-	    if (ph.propertyNames().iterator().hasNext())
-	    	return false; // fail because non-variable properties
-	    Iterator<Variable> vs = ph.propertyVariables().iterator();
-	    if (vs.hasNext())
-	    {
-	    	if (vs.next() != variable)
-	    		return false; // fail because bad variable property
-		    if (vs.hasNext())
-	    		return false; // fail because more than the single permitted variable property
-	    }
-	    if (ph.isMeta())
-	    	return false; // fail because there are meta-properties
-	    return true; // no fail means success
-    }
-	
-    /** Get property from term or null. */
-    public static Term getProperty(Term term, Variable variable)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-    	return ph == null ? null : ph.getProperty(variable);
-    }
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		if (ph.propertyNames().iterator().hasNext())
+			return false; // fail because non-variable properties
+		Iterator<Variable> vs = ph.propertyVariables().iterator();
+		if (vs.hasNext())
+		{
+			if (vs.next() != variable)
+				return false; // fail because bad variable property
+			if (vs.hasNext())
+				return false; // fail because more than the single permitted variable property
+		}
+		if (ph.isMeta())
+			return false; // fail because there are meta-properties
+		return true; // no fail means success
+	}
 
-    /** Get property from term or null. */
-    public static Term getProperty(Term term, String name)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-    	return ph == null ? null : ph.getProperty(name);
-    }
+	/** Get property from term or null. */
+	public static Term getProperty(Term term, Variable variable)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		return ph == null ? null : ph.getProperty(variable);
+	}
 
-    /** Whether term has a property reference. */
-    public static boolean hasPropertyRef(Term term)
-    {
-    	return term instanceof PropertiesConstraintsWrapper && ((PropertiesConstraintsWrapper) term).propertiesRef() != null;
-    }
+	/** Get property from term or null. */
+	public static Term getProperty(Term term, String name)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		return ph == null ? null : ph.getProperty(name);
+	}
 
-    /** Property reference. */
-    public static String propertyRef(Term term)
-    {
-    	return term instanceof PropertiesConstraintsWrapper ? ((PropertiesConstraintsWrapper) term).propertiesRef() : null;
-    }
+	/** Whether term has a property reference. */
+	public static boolean hasPropertyRef(Term term)
+	{
+		return term instanceof PropertiesConstraintsWrapper && ((PropertiesConstraintsWrapper) term).propertiesRef() != null;
+	}
 
-    /** Get property from term or null. */
-    public static GenericTerm wrapWithProperty(GenericTerm term, Variable key, Term value)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-    	if (ph != null)
-    	{
-    		try
-    		{
-    			ph.setProperty(key, value);
-    			return term;
-    		}
-    		catch (CRSException e)
-    		{}
-    	}
-    	// Fallback.
-    	Map<Variable,Term> extra = new HashMap<Variable, Term>();
-    	extra.put(key, value);
-    	return new PropertiesConstraintsWrapper(term, null, null, extra, null);
-    }
+	/** Property reference. */
+	public static String propertyRef(Term term)
+	{
+		return term instanceof PropertiesConstraintsWrapper ? ((PropertiesConstraintsWrapper) term).propertiesRef() : null;
+	}
 
-    /** Set a property and return term with property set. */
-    public static GenericTerm wrapWithProperty(GenericTerm term, String key, Term value)
-    {
-    	PropertiesHolder ph = propertiesHolder(term);
-    	if (ph != null)
-    	{
-	        try
-            {
-	            ph.setProperty(key, value);
-    			return term;
-            }
-            catch (CRSException e)
-            {}
-    	}
-    	// Fallback.
-    	Map<String,Term> extra = new HashMap<String, Term>();
-    	extra.put(key, value);
-    	return new PropertiesConstraintsWrapper(term, null, extra, null, null);
-    }
+	/** Get property from term or null. */
+	public static GenericTerm wrapWithProperty(GenericTerm term, Variable key, Term value)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		if (ph != null)
+		{
+			try
+			{
+				ph.setProperty(key, value);
+				return term;
+			}
+			catch (CRSException e)
+			{}
+		}
+		// Fallback.
+		Map<Variable, Term> extra = new HashMap<Variable, Term>();
+		extra.put(key, value);
+		return new PropertiesConstraintsWrapper(term, null, null, extra, null);
+	}
 
-    /**
-     * Get a list with a pair for every key in the properties of the term. 
-     * @param term to look for properties in
-     * @param factory to generate the terms
-     */
-    public static List<Pair<Term,Term>> allProperties(PropertiesHolder ph, GenericFactory factory)
-    {
-    	List<Pair<Term,Term>> list = new ArrayList<Pair<Term,Term>>();
-    	for (String n : ph.propertyNames())
-    		list.add(new Pair<Term, Term>(factory.constant(factory.makeLiteral(n, CRS.STRING_SORT)), ph.getProperty(n)));
-    	for (Variable v : ph.propertyVariables())
-    		list.add(new Pair<Term, Term>(factory.newVariableUse(v), ph.getProperty(v)));
-    	if (ph.isMeta())
-    	{
-    		if (ph instanceof PropertiesConstraintsWrapper)
-    		{
-    			PropertiesConstraintsWrapper pcw = (PropertiesConstraintsWrapper) ph;
-    			for (String m : pcw.propertyMetaVariables())
-    	    		list.add(new Pair<Term, Term>(factory.newMetaApplication(m, null), pcw.getMetaProperty(m)));
-    		}
-    	}
-    	return list;
-    }
-    
-    /**
-     * Get the named properties...
-     */
-    public static Map<String,Term> namedProperties(PropertiesHolder ph, GenericFactory factory)
-    {
-    	Map<String,Term> list = new HashMap<String, Term>();
-    	for (String n : ph.propertyNames())
-    		list.put(n, ph.getProperty(n));
-    	return list;
-    }
+	/** Set a property and return term with property set. */
+	public static GenericTerm wrapWithProperty(GenericTerm term, String key, Term value)
+	{
+		PropertiesHolder ph = propertiesHolder(term);
+		if (ph != null)
+		{
+			try
+			{
+				ph.setProperty(key, value);
+				return term;
+			}
+			catch (CRSException e)
+			{}
+		}
+		// Fallback.
+		Map<String, Term> extra = new HashMap<String, Term>();
+		extra.put(key, value);
+		return new PropertiesConstraintsWrapper(term, null, extra, null, null);
+	}
+
+	/**
+	 * Get a list with a pair for every key in the properties of the term. 
+	 * @param term to look for properties in
+	 * @param factory to generate the terms
+	 */
+	public static List<Pair<Term, Term>> allProperties(PropertiesHolder ph, GenericFactory factory)
+	{
+		List<Pair<Term, Term>> list = new ArrayList<Pair<Term, Term>>();
+		for (String n : ph.propertyNames())
+			list.add(new Pair<Term, Term>(factory.constant(factory.makeLiteral(n, CRS.STRING_SORT)), ph.getProperty(n)));
+		for (Variable v : ph.propertyVariables())
+			list.add(new Pair<Term, Term>(factory.newVariableUse(v), ph.getProperty(v)));
+		if (ph.isMeta())
+		{
+			if (ph instanceof PropertiesConstraintsWrapper)
+			{
+				PropertiesConstraintsWrapper pcw = (PropertiesConstraintsWrapper) ph;
+				for (String m : pcw.propertyMetaVariables())
+					list.add(new Pair<Term, Term>(factory.newMetaApplication(m, null), pcw.getMetaProperty(m)));
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * Get the named properties...
+	 */
+	public static Map<String, Term> namedProperties(PropertiesHolder ph, GenericFactory factory)
+	{
+		Map<String, Term> list = new HashMap<String, Term>();
+		for (String n : ph.propertyNames())
+			list.put(n, ph.getProperty(n));
+		return list;
+	}
 
 	/**
 	 * Add or remove a single named property to a constructor, returning the possibly wrapped extended constructor.
@@ -1205,11 +1202,11 @@ public final class Util
 			constructor = new PropertiesConstructor(maker, constructor, namedProperties, variableProperties);
 		}
 		try
-        {
-	        constructor.setProperty(variable, value);
-        }
-        catch (CRSException e)
-        {}
+		{
+			constructor.setProperty(variable, value);
+		}
+		catch (CRSException e)
+		{}
 		return constructor;
 	}
 
@@ -1222,7 +1219,8 @@ public final class Util
 	 * @param variableProperties to set (null means none)
 	 * @throws CRSException if any of the properties are impossible to set
 	 */
-	public static Constructor wrapWithProperties(Maker maker, Constructor constructor, Map<String, Term> namedProperties, Map<Variable, Term> variableProperties) throws CRSException
+	public static Constructor wrapWithProperties(Maker maker, Constructor constructor, Map<String, Term> namedProperties, Map<Variable, Term> variableProperties)
+			throws CRSException
 	{
 		if (constructor instanceof PropertiesConstructor)
 		{
@@ -1231,7 +1229,8 @@ public final class Util
 			pc.setVariableProperties(variableProperties);
 			return constructor;
 		}
-		else if ((namedProperties == null || namedProperties.isEmpty()) && (variableProperties == null || variableProperties.isEmpty()))
+		else if ((namedProperties == null || namedProperties.isEmpty())
+				&& (variableProperties == null || variableProperties.isEmpty()))
 		{
 			return constructor;
 		}
@@ -1248,7 +1247,8 @@ public final class Util
 	 * @param constructor to set properties on
 	 * @param properties to set (null means none)
 	 */
-	public static Constructor wrapWithProperties(Maker maker, Constructor constructor, PropertiesHolder properties) throws CRSException
+	public static Constructor wrapWithProperties(Maker maker, Constructor constructor, PropertiesHolder properties)
+			throws CRSException
 	{
 		if (properties != null)
 		{
@@ -1298,7 +1298,7 @@ public final class Util
 			term.replaceSub(i, term.binders(i), inherit(factory, term.sub(i), ref));
 		return term;
 	}
-	
+
 	/**
 	 * Special variant for wrapping with properties describing the location of something.
 	 * @param maker for creating constants
@@ -1313,11 +1313,17 @@ public final class Util
 		try
 		{
 			if (file != null)
-				c = Util.wrapWithProperty(maker, c, Parser.TOKEN_FILE_LOCATION, Buffer.materializeTagged(maker, Parser.TOKEN_FILE_LOCATION_WRAPPER, file));
+				c = Util.wrapWithProperty(
+						maker, c, Parser.TOKEN_FILE_LOCATION,
+						Buffer.materializeTagged(maker, Parser.TOKEN_FILE_LOCATION_WRAPPER, file));
 			if (line > 0)
-				c = Util.wrapWithProperty(maker, c, Parser.TOKEN_LINE_LOCATION, Buffer.materializeTagged(maker, Parser.TOKEN_LINE_LOCATION_WRAPPER, line));
+				c = Util.wrapWithProperty(
+						maker, c, Parser.TOKEN_LINE_LOCATION,
+						Buffer.materializeTagged(maker, Parser.TOKEN_LINE_LOCATION_WRAPPER, line));
 			if (column > 0)
-				c = Util.wrapWithProperty(maker, c, Parser.TOKEN_COLUMN_LOCATION, Buffer.materializeTagged(maker, Parser.TOKEN_COLUMN_LOCATION_WRAPPER, column));
+				c = Util.wrapWithProperty(
+						maker, c, Parser.TOKEN_COLUMN_LOCATION,
+						Buffer.materializeTagged(maker, Parser.TOKEN_COLUMN_LOCATION_WRAPPER, column));
 		}
 		catch (CRSException e)
 		{}
@@ -1359,7 +1365,7 @@ public final class Util
 		renames = (renames != null ? renames : LinkedExtensibleMap.EMPTY_RENAMING);
 		if (discard && renames.isEmpty()) // TODO:  if renames and fv(variabled) disjoint 
 			return variabled;
-	
+
 		Map<Variable, Term> vp = new HashMap<Variable, Term>();
 		for (Map.Entry<Variable, Term> e : variabled.entrySet())
 		{
@@ -1371,7 +1377,7 @@ public final class Util
 		}
 		return vp;
 	}
-	
+
 	/**
 	 * Whether the stub represents a True value (not null, not 0, not the empty sequence or string, not $False).
 	 * @param stub to investigate
@@ -1412,17 +1418,17 @@ public final class Util
 			InputStream resourceStream = factory.getClass().getResourceAsStream(resource);
 			if (resourceStream != null)
 				return wrapInputStreamInReader(resourceStream, encoding);
-			
+
 			// try full path
 			File file = new File(resource);
 			if (file.exists())
 				return wrapInputStreamInReader(new FileInputStream(file), encoding);
-			
+
 			// ...then resource with prefix, if any...
 			String resourcePrefix = Util.symbol(factory.get(Factory.RESOURCE_PREFIX));
 			if (resourcePrefix != null)
 			{
-				resourceStream = factory.getClass().getResourceAsStream(resourcePrefix+"/"+resource);
+				resourceStream = factory.getClass().getResourceAsStream(resourcePrefix + "/" + resource);
 				if (resourceStream != null)
 					return wrapInputStreamInReader(resourceStream, encoding);
 			}
@@ -1444,13 +1450,15 @@ public final class Util
 		}
 	}
 
-	private static final Reader wrapInputStreamInReader(InputStream resourceStream, String encoding) throws UnsupportedEncodingException {
+	private static final Reader wrapInputStreamInReader(InputStream resourceStream, String encoding)
+			throws UnsupportedEncodingException
+	{
 		if (encoding == null)
 			return new InputStreamReader(resourceStream); // default encoding is used
 		else
 			return new InputStreamReader(resourceStream, encoding);
 	}
-	
+
 	/** Create singleton array. */
 	public static Term[] singletonTerms(Term term)
 	{
@@ -1458,7 +1466,7 @@ public final class Util
 		terms[0] = term;
 		return terms;
 	}
-	
+
 	/** Create singleton set. */
 	public static <T> Set<T> singletonSet(T member)
 	{
@@ -1466,14 +1474,14 @@ public final class Util
 		set.add(member);
 		return set;
 	}
-	
+
 	/** Print array. */
 	public static <T> String show(T[] array)
 	{
 		StringBuilder b = new StringBuilder();
 		b.append("[");
 		for (int i = 0; i < array.length; ++i)
-			b.append((i == 0 ? "" : ", ")+show(array[i]));
+			b.append((i == 0 ? "" : ", ") + show(array[i]));
 		b.append("]");
 		return b.toString();
 	}
@@ -1486,7 +1494,7 @@ public final class Util
 		String sep = "";
 		for (T member : collection)
 		{
-			b.append(sep+show(member));
+			b.append(sep + show(member));
 			sep = ", ";
 		}
 		b.append("]");
@@ -1501,21 +1509,21 @@ public final class Util
 		String sep = "";
 		for (Map.Entry<K, V> e : map.entrySet())
 		{
-			b.append(sep+show(e.getKey())+"="+show(e.getValue()));
+			b.append(sep + show(e.getKey()) + "=" + show(e.getValue()));
 			sep = "; ";
 		}
 		b.append("}");
 		return b.toString();
 	}
-	
-	public static <H,T> String show(Pair<H, T> pair)
+
+	public static <H, T> String show(Pair<H, T> pair)
 	{
-		return "("+show(pair.head())+","+show(pair.tail())+")";
+		return "(" + show(pair.head()) + "," + show(pair.tail()) + ")";
 	}
 
 	public static <One, Two, Three> String show(Triple<One, Two, Three> triple)
 	{
-		return "("+show(triple.one())+","+show(triple.two())+","+show(triple.three())+")";
+		return "(" + show(triple.one()) + "," + show(triple.two()) + "," + show(triple.three()) + ")";
 	}
 
 	/** Print object. */
@@ -1567,10 +1575,13 @@ public final class Util
 	{
 		List<Path> differences = new ArrayList<Path>();
 		List<List<Variable>> binders = new ArrayList<List<Variable>>();
-		for (@SuppressWarnings("unused") T t : functionPatterns) binders.add(new ArrayList<Variable>());
+		for (@SuppressWarnings("unused")
+		T t : functionPatterns)
+			binders.add(new ArrayList<Variable>());
 		addDifferencePaths(differences, factory, Path.EMPTY, functionPatterns, null);
 		return differences;
 	}
+
 	@SuppressWarnings("unchecked")
 	private static <T extends Term> void addDifferencePaths(List<Path> differences, Factory<? extends Term> factory, Path path, List<T> subterms, Term sort)
 	{
@@ -1600,16 +1611,24 @@ public final class Util
 					{
 						// All subterms are constructions c[...]
 						T form = null;
-						Set<Pair<Term,Term>> forms = factory.formsOf(c.symbol());
-						for (Pair<Term,Term> pair : forms)
+						Set<Pair<Term, Term>> forms = factory.formsOf(c.symbol());
+						for (Pair<Term, Term> pair : forms)
 						{
-							if (!pair.head().equals(sort)) continue;
-							if (form == null) form = (T) pair.tail();
-							else { form = null; break; }
+							if (!pair.head().equals(sort))
+								continue;
+							if (form == null)
+								form = (T) pair.tail();
+							else
+							{
+								form = null;
+								break;
+							}
 						}
 						for (int i = 0; i < a; ++i)
 						{
-							List<T> sss = new ArrayList<T>(); for (T s : subterms) sss.add((T) s.sub(i));
+							List<T> sss = new ArrayList<T>();
+							for (T s : subterms)
+								sss.add((T) s.sub(i));
 							Term subsort = (form == null ? null : form.sub(i));
 							addDifferencePaths(differences, factory, path.extend(i), sss, subsort);
 						}
@@ -1647,13 +1666,21 @@ public final class Util
 	 */
 	public static Sink unifier(Sink sink, List<Term> terms)
 	{
-		return unifier2(sink, terms, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<Variable>(), LinkedExtensibleMap.EMPTY_RENAMING);
+		return unifier2(
+				sink, terms, new ArrayList<String>(), new ArrayList<String>(), new ArrayList<Variable>(),
+				LinkedExtensibleMap.EMPTY_RENAMING);
 	}
+
 	public static Sink unifier2(Sink sink, List<Term> terms, List<String> metaVariables, List<String> propsVariables, List<Variable> bound, ExtensibleMap<Variable, Variable> renames)
 	{
 		Term first = terms.get(0);
 		boolean sameKind = true;
-		for (Term t : terms)  if (first.kind() != t.kind()) {sameKind = false; break;}
+		for (Term t : terms)
+			if (first.kind() != t.kind())
+			{
+				sameKind = false;
+				break;
+			}
 		if (sameKind)
 		{
 			Same : switch (first.kind())
@@ -1680,16 +1707,19 @@ public final class Util
 						if (first.binders(i).length > 0)
 						{
 							Variable[] newBinders = new Variable[first.binders(i).length];
-							for (int j = 0; j < newBinders.length; ++j) newBinders[j] = sink.makeVariable(first.binders(i)[j].name(), first.binders(i)[j].promiscuous());
+							for (int j = 0; j < newBinders.length; ++j)
+								newBinders[j] = sink.makeVariable(first.binders(i)[j].name(), first.binders(i)[j].promiscuous());
 							for (Term t : terms)
 								renames = renames.extend(t.binders(i), newBinders);
 							sink = sink.binds(newBinders);
 							subbound = new ArrayList<Variable>(bound);
-							for (Variable b : newBinders) subbound.add(b);
+							for (Variable b : newBinders)
+								subbound.add(b);
 						}
 						// Emit subterm.
 						List<Term> subterms = new ArrayList<Term>();
-						for (Term t : terms) subterms.add(t.sub(i));
+						for (Term t : terms)
+							subterms.add(t.sub(i));
 						sink = unifier2(sink, subterms, metaVariables, propsVariables, subbound, renames);
 					}
 					sink = sink.end();
@@ -1699,11 +1729,13 @@ public final class Util
 
 				case VARIABLE_USE : { // all terms are variable usage terms
 					Variable v = renames.get(first.variable());
-					if (v == null) v = first.variable();
+					if (v == null)
+						v = first.variable();
 					for (Term t : terms)
 					{
 						Variable v2 = renames.get(t.variable());
-						if (v2 == null) v2 = t.variable();
+						if (v2 == null)
+							v2 = t.variable();
 						if (v != v2)
 							break Same; // different variables
 					}
@@ -1722,24 +1754,24 @@ public final class Util
 		sink = sink.endMetaApplication();
 		return sink;
 	}
-	
+
 	/** Return set of all free variables in term. */
 	public static Set<Variable> freeVariables(Term term)
 	{
 		final Set<Variable> free = new HashSet<Variable>();
 		Visitor addFree = new Visitor()
-		{
-            @Override
-		    public void visitUse(Term use, boolean start, Set<Variable> bound) throws CRSException
-		    {
-            	if (start)
-            	{
-            		Variable v = use.variable();
-            		if (!bound.contains(v))
-            			free.add(v);
-            	}
-		    }
-		};
+			{
+				@Override
+				public void visitUse(Term use, boolean start, Set<Variable> bound) throws CRSException
+				{
+					if (start)
+					{
+						Variable v = use.variable();
+						if (!bound.contains(v))
+							free.add(v);
+					}
+				}
+			};
 		try
 		{
 			term.visit(addFree, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
@@ -1778,25 +1810,26 @@ public final class Util
 	 * @param purgeVariables
 	 * @param purgeMetaVariables
 	 */
-	public static PropertiesConstraintsWrapper makePropertiesConstraintsWrapper(GenericTerm term, String propertiesRef, Map<String, Term> namedPropertiesConstraints,
-			Map<Variable, Term> variablePropertiesConstraints, Map<String,Term> metaPropertyConstraints)
+	public static PropertiesConstraintsWrapper makePropertiesConstraintsWrapper(GenericTerm term, String propertiesRef, Map<String, Term> namedPropertiesConstraints, Map<Variable, Term> variablePropertiesConstraints, Map<String, Term> metaPropertyConstraints)
 	{
 		PropertiesConstraintsWrapper pcw;
 		if (term instanceof PropertiesConstraintsWrapper)
 		{
 			pcw = new PropertiesConstraintsWrapper((PropertiesConstraintsWrapper) term, true);
-			if (propertiesRef != null) pcw.setPropertiesRef(propertiesRef);
+			if (propertiesRef != null)
+				pcw.setPropertiesRef(propertiesRef);
 			pcw.setPropertyConstraints(namedPropertiesConstraints);
 			pcw.setVariablePropertyConstraints(variablePropertiesConstraints);
 			pcw.setMetaPropertyConstraints(metaPropertyConstraints);
 		}
 		else
 		{
-			pcw = new PropertiesConstraintsWrapper(term, propertiesRef, namedPropertiesConstraints, variablePropertiesConstraints, metaPropertyConstraints);
+			pcw = new PropertiesConstraintsWrapper(term, propertiesRef, namedPropertiesConstraints, variablePropertiesConstraints,
+					metaPropertyConstraints);
 		}
 		return pcw;
 	}
-	
+
 	/**
 	 * Helper class for collecting occurrences of variable.
 	 * After processing visitor, the {@link #occurrences} field will contain one element per occurrence, which is either a Pair(MetaVar,Index) or null.
@@ -1805,51 +1838,57 @@ public final class Util
 	static class CountingVisitor extends Visitor
 	{
 		final Variable variable;
-		List<Pair<String,Integer>> occurrences = new ArrayList<Pair<String,Integer>>();
+		List<Pair<String, Integer>> occurrences = new ArrayList<Pair<String, Integer>>();
+
 		CountingVisitor(Variable variable)
 		{
 			this.variable = variable;
 		}
-        @Override
-        public void visitMetaApplicationSub(Term metaApplication, int index, boolean start, Set<Variable> bound) throws CRSException
-        {
-        	if (!start && metaApplication.sub(index).kind() == Kind.VARIABLE_USE && metaApplication.sub(index).variable() == variable)
-        	{
-        		// Replace pushed 'null' with proper pair.
-        		final int last = occurrences.size()-1;
-        		assert last >= 0 && occurrences.get(last) == null;
-        		occurrences.set(last, new Pair<String, Integer>(metaApplication.metaVariable(), index));
-        	}
-        }
+
 		@Override
-        public void visitUse(Term use, boolean start, Set<Variable> bound) throws CRSException
-        {
-        	if (start && use.variable() == variable)
-        		occurrences.add(null);
-        }
-        @Override
-        public void visitVariableProperty(Variable property, boolean start, boolean hasMapping) throws CRSException
-        {
-        	if (start && property == variable)
-        		occurrences.add(null);
-        }
+		public void visitMetaApplicationSub(Term metaApplication, int index, boolean start, Set<Variable> bound)
+				throws CRSException
+		{
+			if (!start
+					&& metaApplication.sub(index).kind() == Kind.VARIABLE_USE && metaApplication.sub(index).variable() == variable)
+			{
+				// Replace pushed 'null' with proper pair.
+				final int last = occurrences.size() - 1;
+				assert last >= 0 && occurrences.get(last) == null;
+				occurrences.set(last, new Pair<String, Integer>(metaApplication.metaVariable(), index));
+			}
+		}
+
+		@Override
+		public void visitUse(Term use, boolean start, Set<Variable> bound) throws CRSException
+		{
+			if (start && use.variable() == variable)
+				occurrences.add(null);
+		}
+
+		@Override
+		public void visitVariableProperty(Variable property, boolean start, boolean hasMapping) throws CRSException
+		{
+			if (start && property == variable)
+				occurrences.add(null);
+		}
 	}
-	
+
 	/**
 	 * Returns  list with one element per occurrence of the variable, which is either a Pair(MetaVar,Index) or null for a non-meta-application-subterm occurrence.
 	 * @param term to count in
 	 * @param variable to look for
 	 */
-	public static List<Pair<String,Integer>> metaUses(Term term, Variable variable)
+	public static List<Pair<String, Integer>> metaUses(Term term, Variable variable)
 	{
 		CountingVisitor visitor = new CountingVisitor(variable);
 		try
-        {
-	        term.visit(visitor, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
-        }
-        catch (CRSException e)
-        {}
-        return visitor.occurrences;
+		{
+			term.visit(visitor, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+		}
+		catch (CRSException e)
+		{}
+		return visitor.occurrences;
 	}
 
 	/**
@@ -1858,11 +1897,11 @@ public final class Util
 	 * @param metaVarCount count of each metavariable
 	 * @param variable to look for
 	 */
-	public static Map<String,Integer> metaVars(Term term)
+	public static Map<String, Integer> metaVars(Term term)
 	{
 		final HashMap<String, Integer> metaVarCount = new HashMap<String, Integer>();
 		addMetaVars(term, metaVarCount);
-        return metaVarCount;
+		return metaVarCount;
 	}
 
 	/**
@@ -1874,25 +1913,25 @@ public final class Util
 	public static void addMetaVars(Term term, final HashMap<String, Integer> metaVarCount)
 	{
 		Visitor visitor = new Visitor()
-		{
-            @Override
-            public void visitMetaApplication(Term metaApplication, boolean start, Set<Variable> bound) throws CRSException
-            {
-	            if (start)
-	            {
-	            	String mv = metaApplication.metaVariable();
-	            	metaVarCount.put(mv, (metaVarCount.containsKey(mv) ? metaVarCount.get(mv)+1 : 1));
-	            }
-            }
-		};
+			{
+				@Override
+				public void visitMetaApplication(Term metaApplication, boolean start, Set<Variable> bound) throws CRSException
+				{
+					if (start)
+					{
+						String mv = metaApplication.metaVariable();
+						metaVarCount.put(mv, (metaVarCount.containsKey(mv) ? metaVarCount.get(mv) + 1 : 1));
+					}
+				}
+			};
 		try
-        {
-	        term.visit(visitor,  LinkedExtensibleSet.EMPTY_VARIABLE_SET);
-        }
-        catch (CRSException e)
-        { }
+		{
+			term.visit(visitor, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+		}
+		catch (CRSException e)
+		{}
 	}
-	
+
 	/**
 	 * Generate special occurrence term in reified BINDER structure...
 	 * @param sink to send to
@@ -1901,31 +1940,34 @@ public final class Util
 	 */
 	public static Sink occurrenceDescription(Sink sink, Term term, Variable binder)
 	{
-		final List<Pair<String,Integer>> occs = metaUses(term, binder);
-		for (Pair<String,Integer> pair : occs)
+		final List<Pair<String, Integer>> occs = metaUses(term, binder);
+		for (Pair<String, Integer> pair : occs)
 		{
 			sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL));
 			if (pair == null)
-					sink = sink.start(sink.makeLiteral(CRS.REIFY_OTHER, CRS.STRING_SORT)).end();
+				sink = sink.start(sink.makeLiteral(CRS.REIFY_OTHER, CRS.STRING_SORT)).end();
 			else
 			{
 				final String mv = pair.head();
 				final Integer index = pair.tail();
-				sink = sink.start(sink.makeConstructor(CRS.REIFY_META_USE)).start(sink.makeLiteral(mv, CRS.STRING_SORT)).end().start(sink.makeLiteral(index, CRS.NUMERIC_SORT)).end().end();
+				sink = sink.start(sink.makeConstructor(CRS.REIFY_META_USE)).start(sink.makeLiteral(mv, CRS.STRING_SORT)).end().start(
+						sink.makeLiteral(index, CRS.NUMERIC_SORT)).end().end();
 			}
 		}
 		sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end();
-		for (@SuppressWarnings("unused") Pair<String,Integer> pair : occs)
+		for (@SuppressWarnings("unused")
+		Pair<String, Integer> pair : occs)
 			sink = sink.end();
 		return sink;
 	}
 
 	/** Whether the argument is a term of the form (x) or  (x : Term). */
 	public static boolean isVariableWithOptionalSort(Term z)
-    {
-		return z.kind() == Kind.VARIABLE_USE || (Builder.FUNCTION_SORT_SYMBOL.equals(Util.symbol(z)) && z.arity() == 2 && z.sub(0).kind() == Kind.VARIABLE_USE); 
-    }
-	
+	{
+		return z.kind() == Kind.VARIABLE_USE
+				|| (Builder.FUNCTION_SORT_SYMBOL.equals(Util.symbol(z)) && z.arity() == 2 && z.sub(0).kind() == Kind.VARIABLE_USE);
+	}
+
 	/** Return the variable from a variable with optional sort of the form (x) or  (x : Term). */
 	public static Variable variableWithOptionalSortVariable(Term z)
 	{
@@ -1938,7 +1980,7 @@ public final class Util
 			return z.sub(0).variable();
 	}
 
-	/** Return the variable from a variable with optional sort of the form (x) or  (x : Term). */
+	/** Return the sort from a variable with optional sort of the form (x) or  (x : Term). */
 	public static Term variableWithOptionalSortSort(Term z)
 	{
 		if (z == null)
@@ -1952,16 +1994,18 @@ public final class Util
 
 	/** Generate a variable with sort pair suitable for use in sorted variable options. */
 	public static GenericTerm makeVariableWithSort(GenericFactory factory, Variable variable, GenericTerm sort)
-    {
+	{
 		GenericTerm use = factory.newVariableUse(variable);
-		Variable[][] binders = {GenericTerm.NO_BIND, GenericTerm.NO_BIND};
-		GenericTerm[] subterms = {use, sort};
+		Variable[][] binders =
+			{GenericTerm.NO_BIND, GenericTerm.NO_BIND};
+		GenericTerm[] subterms =
+			{use, sort};
 		return factory.newConstruction(factory.makeConstructor(Builder.FUNCTION_SORT_SYMBOL), binders, subterms);
-    }
+	}
 
 	/** Return index path to leftmost regular subterm where the two terms differ, or null if they are the same. */
 	public static List<Integer> discriminatorPath(Term t1, Term t2)
-    {
+	{
 		List<Integer> prefix = new ArrayList<Integer>();
 		if (discriminatorPath(t1, t2, prefix))
 		{
@@ -1970,32 +2014,34 @@ public final class Util
 		}
 		else
 			return null;
-    }
+	}
+
 	private static boolean discriminatorPath(Term t1, Term t2, List<Integer> prefix)
-    {
+	{
 		final int arity = t1.arity();
-		if (t1.kind() != Kind.CONSTRUCTION || t2.kind() != Kind.CONSTRUCTION || arity != t2.arity() || Util.symbol(t1).equals(Util.symbol(t2)))
+		if (t1.kind() != Kind.CONSTRUCTION
+				|| t2.kind() != Kind.CONSTRUCTION || arity != t2.arity() || Util.symbol(t1).equals(Util.symbol(t2)))
 			return true; // prefix is correct because the terms differ here
 		for (int i = 0; i < arity; ++i)
 		{
 			prefix.add(i);
 			if (discriminatorPath(t1.sub(i), t2.sub(i), prefix))
 				return true; // pass found difference
-			prefix.remove(prefix.size()-1);
+			prefix.remove(prefix.size() - 1);
 		}
 		return false; // no difference found
-    }
+	}
 
 	/**
 	 * Create singleton list.
 	 * @param e single element
 	 */
 	public static <E> List<E> singleton(E e)
-    {
+	{
 		List<E> list = new ArrayList<E>(1);
 		list.add(e);
 		return list;
-    }
+	}
 
 	/**
 	 * Return value from relational map, or key if there is no maping.
@@ -2003,11 +2049,11 @@ public final class Util
 	 * @param key
 	 * @return
 	 */
-	public static <S> S getOrKeep(Map<S,S> map, S key)
-    {
+	public static <S> S getOrKeep(Map<S, S> map, S key)
+	{
 		S value = map.get(key);
 		return (value == null ? key : value);
-    }
+	}
 
 	/**
 	 * Create a $Cons/$Nil list from set.
@@ -2029,7 +2075,7 @@ public final class Util
 	 * @return
 	 */
 	public static Set<Variable> extractVariableSet(GenericTerm sub)
-    {
+	{
 		Set<Variable> vs = new TreeSet<Variable>();
 		while (Util.isCons(sub.constructor()))
 		{
@@ -2038,5 +2084,6 @@ public final class Util
 			sub = sub.sub(1);
 		}
 		return vs;
-    }
+	}
+
 }

@@ -201,22 +201,12 @@ $[If, $[Equal, #name, "Fresh"], F-Fresh2[sink, #value],  %n⟪⟫]
 
 F-Fresh2[Text, Reified_Term] :: Text;
 
-
-//-[Free[sink::Text,key::Reified_Variable]]
-//: 
-//F-Fresh2[sink, VARIABLE-USE[key]]	 
-//→ 
-//%n⟪Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, «STRING[$[Show,key]]»);
-//⟫
-//;
-
 -[Free[sink::Text]]	
 : 
 F-Fresh2[sink, CONSTRUCTION[#symbol, #binders]] 
 → 
 F-Fresh3[sink, #binders]
 ;
-
 
 -[Free[sink::Text, key::Text]]
 :

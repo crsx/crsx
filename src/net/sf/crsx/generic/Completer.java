@@ -33,6 +33,7 @@ import net.sf.crsx.analysis.Unifier;
 import net.sf.crsx.generic.completer.Environment;
 import net.sf.crsx.generic.completer.StandardizedRule;
 import net.sf.crsx.generic.completer.Standardizer;
+import net.sf.crsx.generic.sort.SortUtil;
 import net.sf.crsx.util.HashMultiMap;
 import net.sf.crsx.util.LinkedExtensibleMap;
 import net.sf.crsx.util.LinkedExtensibleSet;
@@ -626,7 +627,7 @@ public class Completer
 		
 		// check whether sort and form of the pattern are as expected (minimal)
 		final Pair<Term,Term> declaration = rule.getConstructorDeclaration(rule.getPattern());
-		if (declaration == null) fatal("Sorter should have been called before calling Completer!");
+		if (declaration == null) fatal("Missing sort for rule " + rule.name());
 		
 		/*
 		String description = printDeclarationModuloVariables(declaration.head(), declaration.tail());
@@ -4624,7 +4625,7 @@ public class Completer
 				{
 					// Desperate repair of uninstatiated sort variable.
 					Term oldValue = Util.getProperty(examplePattern, key);
-					valueSort = Util.sortOf(factory, oldValue);
+					valueSort = SortUtil.sortOf(factory, oldValue);
 				}
 			}
 			else if (keyConstructorName != null)

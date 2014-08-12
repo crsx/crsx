@@ -42,6 +42,7 @@ import net.sf.crsx.Valuation;
 import net.sf.crsx.Variable;
 import net.sf.crsx.Visitor;
 import net.sf.crsx.analysis.Unifier;
+import net.sf.crsx.generic.sort.SortUtil;
 import net.sf.crsx.util.Buffer;
 import net.sf.crsx.util.ExtensibleMap;
 import net.sf.crsx.util.ExtensibleSet;
@@ -75,7 +76,7 @@ import net.sf.crsx.util.WriterAppender;
  * @author <a href="http://www.research.ibm.com/people/k/krisrose">Kristoffer Rose</a>.
  * @version $Id: GenericEvaluator.java,v 3.46 2014/02/05 22:28:34 krisrose Exp $
  */
-class GenericEvaluator extends FixedGenericConstruction
+public class GenericEvaluator extends FixedGenericConstruction
 {
 	// Constants.
 	
@@ -2595,7 +2596,7 @@ class GenericEvaluator extends FixedGenericConstruction
 			subs.add((GenericTerm) (ac != null ? ac : a).copy(true, renamings));
 			rest = rest.sub(1);
 		}
-		return factory.newConstruction((Util.isLiteralSort(sort) ? factory.makeLiteral(symbol, sort) : factory.makeConstructor(symbol)), binders.toArray(new Variable[0][]), subs.toArray(new GenericTerm[0]));
+		return factory.newConstruction((SortUtil.isLiteralSort(sort) ? factory.makeLiteral(symbol, sort) : factory.makeConstructor(symbol)), binders.toArray(new Variable[0][]), subs.toArray(new GenericTerm[0]));
 	}
 	
 	/**

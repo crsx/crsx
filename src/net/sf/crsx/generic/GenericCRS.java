@@ -50,6 +50,7 @@ import net.sf.crsx.Unification;
 import net.sf.crsx.Valuation;
 import net.sf.crsx.Variable;
 import net.sf.crsx.Visitor;
+import net.sf.crsx.generic.sort.Sorter;
 import net.sf.crsx.util.Buffer;
 import net.sf.crsx.util.ConstructorFilterSink;
 import net.sf.crsx.util.ContextStack;
@@ -88,6 +89,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 
 	/** Rules by constructor - may not include all rules! */
 	final private Map<Constructor, ArrayList<GenericRule>> rulesByConstructor;
+	
 	/** Whether rule by constructor structure is current. */
 	private boolean rulesByConstructorDirty;
 
@@ -287,6 +289,18 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			verboseWrite(rule.toString() + "\n");
 	}
 
+	void addRule(String name, GenericRule rule) throws CRSException
+	{
+		if (rule.crs != this)
+			throw new CRSException("Cannot add rule from another CRS");
+		
+		indexRule(rule);
+		if (verbosity >= 3)
+			verboseWrite(rule.toString() + "\n");
+
+	}
+	
+	
 	/**
 	 * (Re)generate (if needed) and return rules by constructor structure.
 	 * @return
@@ -946,13 +960,13 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						return sink;
 					}
 				}
-				else if (symbol.equals(Builder.DELAY_META_CLOSURE_SYMBOL))
+				else if (symbol.equals(Builder.SIMPLIFY_SYMBOL))
 				{
 					if (arity == 0)
 					{
 						if (Util.getInteger(factory, Factory.VERBOSE_OPTION, 0) > 0)
 							factory.message(directive.toString());
-						new DelayMetaClosure(this).optimize(ruleByName);
+						new Simplifier(this).simplify(ruleByName);
 						return sink;
 					}
 				}
@@ -1722,6 +1736,14 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		for (Variable variable : properties.propertyVariables())
 			setProperty(variable, properties.getProperty(variable));
 	}
+	
+	
+
+	@Override
+	public void removeProperty(Variable variable) throws CRSException
+	{
+		throw new CRSException("removeProperty not implemented");
+	}
 
 	public boolean isMeta()
 	{
@@ -1819,6 +1841,12 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 	{
 		return this;
 	}
+	
+	@Override
+	public boolean isClosure()
+	{
+		return false;
+	}
 
 	public Variable variable()
 	{
@@ -1882,7 +1910,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			r.contractum.addFree(set, bound, includemetaapps, base);
 		}
 	}
-
+	
 	public void addMetaCounts(Map<String, Integer> counts)
 	{
 		for (GenericRule r : ruleByName.values())

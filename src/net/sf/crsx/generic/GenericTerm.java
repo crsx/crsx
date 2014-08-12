@@ -225,6 +225,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 		}
 	}
 	
+	
 	// Copyable...
 
 	abstract public Sink copy(Sink sink, boolean discard, ExtensibleMap<Variable, Variable> renames);
@@ -245,8 +246,6 @@ abstract public class GenericTerm implements Pattern, Contractum
 
 	public Variable variable()
 	{
-//		if (Builder.FUNCTION_SORT_SYMBOL.equals(Util.symbol(this)))
-//			factory.warning("bad karma", "requesting variable for "+this);
 		return null;
 	}
 

@@ -40,6 +40,11 @@ public interface Constructor extends PropertiesHolder
      * in other cases may be null.
      */
     Object object();
+
+    /**
+     * Whether this constructor represents a closure
+     */
+	boolean isClosure();
     
 	/**
 	 * Whether this constructor (used in a {@link Pattern}) matches the other constructor (used in the redex).
@@ -76,7 +81,7 @@ public interface Constructor extends PropertiesHolder
      * @param base TODO
      */
     void addFree(Set<Variable> set, ExtensibleSet<Variable> bound, boolean includemetaapps, Set<Variable> base);
-
+    
 	/**
 	 * Copy this constructor as part of a subterm subject to substitution.
 	 * (Invoked by {@link Term#subsubstitute(Sink, Valuation, ExtensibleMap, ExtensibleMap, ExtensibleMap, Set)}.)
@@ -174,4 +179,5 @@ public interface Constructor extends PropertiesHolder
 	 * @return paths to all the subterms
 	 */
 	SortedSet<Path> paths(Path base);
+
 }

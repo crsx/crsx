@@ -25,7 +25,12 @@ public abstract class DelegateMaker implements Maker
         return maker().makeConstructor(object);
     }
     
-    final public Constructor makeLiteral(Object object, String sort)
+    final public Constructor makeConstructor(Object object, boolean closure)
+	{
+		return maker().makeConstructor(object, closure);
+	}
+
+	final public Constructor makeLiteral(Object object, String sort)
     {
 	    return maker().makeLiteral(object, sort);
     }
