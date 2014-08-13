@@ -1265,12 +1265,18 @@ public class Sorter
 				sort = factory.newVariableUse(alpha);
 				break;
 			}
-			case PICK : {
+			case PICK : 
+			case REVERSE_PICK : {
 				argumentsorts[0] = freshForm(CRS.NUMERIC_SORT, 0);
 				argumentsorts[1] = freshForm(CRS.LIST_SORT, 1);
 				sort = factory.newVariableUse(subSort(argumentsorts[1], 0).variable());
 				break;
 			}
+			case LIST_LENGTH : {
+				argumentsorts[0] = freshForm(CRS.LIST_SORT, 1);
+				sort = freshForm(CRS.NUMERIC_SORT, 0);
+				break;
+			}			
 			case IF :
 			case IF_ZERO :
 			case IF_EMPTY :

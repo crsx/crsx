@@ -8,16 +8,10 @@
 #include <alloca.h>
 #include <stdlib.h>
 #include <string.h>
-#include "prof.h"
-#include "invariant.h"
 
 #include <unicode/umachine.h>
 #include <unicode/uregex.h>
 #include <unicode/ustring.h>
-
-/////////////////////////////////////////////////////////////////////////////////
-// Debugging && profiling
-
 
 // Debug printfs
 #if 0
@@ -26,19 +20,150 @@
 #  define crsx_debug if (0) fprintf
 #endif
 
+// Collects data and output profiling analysis at the end of a rewrite
+#ifdef CRSXPROF
+
+#include <sys/time.h>
+#include <sys/resource.h>
+
+char* profStepStack[16384];
+unsigned profStepStackSize;
+
+typedef struct _ProfMetaSubstitute *ProfMetaSubstitute;
+
+struct _ProfMetaSubstitute {
+  char** backtrace;
+  unsigned backtraceSize;
+  unsigned size;
+  unsigned termSize;
+  unsigned envSize;
+  char* term;
+  unsigned nf; // Whether the term is NF
+  long memuse; // memory use for the substitution
+  ProfMetaSubstitute next;
+};
+
+long profMemuseMetaSubstitutes; // in KB
+
+ProfMetaSubstitute profLargeMetaSubstitutes;
+
+#ifndef CRSXLARGEMS
+#define CRSXLARGEMS 160000
+#endif
+
+typedef struct _ProfBufferCopy *ProfBufferCopy;
+
+struct _ProfBufferCopy {
+  char** backtrace;
+  unsigned backtraceSize;
+  unsigned size;
+  ProfBufferCopy next;
+};
+
+ProfBufferCopy profLargeBufferCopy;
+
+#ifndef CRSXLARGECOPY
+#define CRSXLARGECOPY 10000
+#endif
+
+typedef struct _ProfFunctionEntry *ProfFunctionEntry;
+
+struct _ProfFunctionEntry {
+  char* name;
+  // TODO: merge backtrace.
+  //char** backtrace;
+  //unsigned backtraceSize;
+  unsigned metaCount; // Number of meta substitution
+  long metaMemuse; // metasubstution memuse
+  unsigned count; // number of time function has been called
+};
+
+ProfFunctionEntry profFunctions[16384]; // use array for sorting
+unsigned profFunctionsCount = 0;
+long pPeakTermSize, pNSPeakTermSize;
+long pPeakTermMemuse, pNSPeakTermMemuse; // in Bytes
+long pDuplicateMemuse;
+
+static void printProfiling(Context context);
+static void printMetasubstituteRecord(Context context, ProfMetaSubstitute c);
+static void profAddStepFunction(Context context, char* functionName);
+static void pIncMetaCountFunction(Context context, char* functionName, long memuse);
+static void pEndMetaSubstitute(Context context, struct rusage ubefore);
+static void pTermSize(Term term);
+static void termSize(Term term, long* size, long* memuse, int sharing);
+
+
+size_t pMarker = 0;
+
+#endif
+
+
 // Print debugging information while normalizing.
-#if defined(DEBUG)
+#if defined(DEBUG) || defined(CRSXPROF)
 long stepCount = 0L;
 int stepNesting = 0;
 #endif
 
+// Checking terms.
 
-void enableProfiling(Context context)
+#ifdef CHECKREF
+static TermLink occurLink(TermLink link, void* p)
 {
-#ifdef CRSX_ENABLE_PROFILING
-    context->profiling = 1;
-#endif
+    while (link)
+    {
+        if (link->p == p)
+            return link;
+        link = link->link;
+    }
+    return NULL;
 }
+
+static int addOccur(Context context, TermLink* linkp, void* p)
+{
+    TermLink ol = linkp ? occurLink(*linkp, p) : NULL;
+    if (ol)
+    {
+        ol->count ++;
+        return ol->count;
+    }
+
+    TermLink newLink = ALLOCATE(context, sizeof(struct _TermLink));
+    newLink->p = p;
+    newLink->count = 1;
+    newLink->link = *linkp;
+    *linkp = newLink;
+    return 1;
+}
+#endif
+
+void InitCRSXContext(Context context)
+{
+    context->stamp = 0;
+    context->poolRefCount = 0;
+    context->stringPool = NULL;
+    context->keyPool = NULL;
+
+    crsxAddPools(context);
+
+    context->str_filelocation = GLOBAL(context, "$FileLocation");
+    context->str_linelocation = GLOBAL(context, "$LineLocation");
+    context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
+}
+
+static void freeOccur(Context context, TermLink link)
+{
+    while (link)
+    {
+        TermLink next = link->link;
+        FREE(context, link);
+        link = next;
+    }
+}
+
+static int checkTerm(Context context, Term term, int nf);
+static int checkTerm2(Context context, Term term, int nf, unsigned* envsize);
+static int checkTerm3(Context context, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse);
+static int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse, TermLink *usedp);
 
 /////////////////////////////////////////////////////////////////////////////////
 // Variable allocation.
@@ -111,71 +236,6 @@ void setVariableBaseName(Context context, Variable variable, char *newbase)
     }
 }
 
-
-/////////////////////////////////////////////////////////////////////////////////
-// Construction allocation.
-
-static
-Construction makeConstruction(Context context, ConstructionDescriptor descriptor)
-{
-    Construction construction;
-    int poolIndex = (descriptor->size - sizeof(struct _Construction)) / sizeof(Construction);
-    if (poolIndex < CONS_POOL_MAX_SIZE_SIZE && context->consPoolSize[poolIndex] > 0)
-        construction = context->consPool[poolIndex][--context->consPoolSize[poolIndex]];
-    else
-        construction = ALLOCATE(context, descriptor->size);
-
-    construction->term.descriptor = descriptor;
-    construction->term.nr = 1;
-
-#ifdef CRSX_ENABLE_PROFILING
-    construction->term.marker = 0;
-#endif
-
-    return construction;
-}
-
-static
-void freeConstruction(Context context, Construction construction)
-{
-    UNLINK_Properties(context, construction->properties);
-    construction->properties = NULL;
-
-    UNLINK_VARIABLESET(context, construction->fvs);
-    construction->fvs = NULL;
-    UNLINK_VARIABLESET(context, construction->nfvs);
-    construction->nfvs = NULL;
-    UNLINK_VARIABLESET(context, construction->vfvs);
-    construction->nfvs = NULL;
-
-    // Subterms and binders.
-    Term term = &construction->term;
-
-    const int arity = ARITY(term);
-    int i;
-    for (i = 0; i < arity; ++i)
-    {
-        UNLINK(context, SUB(term, i));
-        const int rank = RANK(term,i);
-        int j;
-        for (j = 0; j < rank; ++j)
-        {
-            Variable b = BINDER(term,i,j);
-            UNBIND(b);
-            // Variable are not ref counted. Can't free.
-            //freeVariable(context, b);
-        }
-    }
-
-    int poolIndex = (term->descriptor->size - sizeof(struct _Construction)) / sizeof(Construction);
-
-    if (poolIndex < CONS_POOL_MAX_SIZE_SIZE && context->consPoolSize[poolIndex] < CONS_POOL_MAX_SIZE)
-        context->consPool[poolIndex][context->consPoolSize[poolIndex]++] = construction;
-    else
-        FREE(context, term);
-}
-
-
 /////////////////////////////////////////////////////////////////////////////////
 // Predefined components for ConstructorDescriptors.
 
@@ -217,12 +277,13 @@ Term makeStringLiteral(Context context, const char *text)
     Literal literal = ALLOCATE(context, sizeof(struct _Literal));
     literal->construction.term.descriptor = &literalConstructionDescriptor;
     literal->construction.term.nr = 1;
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
     literal->construction.term.marker = 0;
 #endif
     literal->construction.nf = 1;
     literal->construction.nostep = 1;
-    literal->construction.properties = context->noProperties;
+    literal->construction.properties =
+      ALLOCATE_Properties(context, NULL, NULL, NULL, NULL);
 
     literal->construction.fvs = NULL;
     literal->construction.nfvs = NULL;
@@ -363,8 +424,14 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     Buffer buffer = (Buffer) sink;
 
     // Start construction
-    Construction construction = makeConstruction(sink->context, descriptor);
 
+    Construction construction = ALLOCATE(sink->context, descriptor->size);
+    //DEBUGF(sink->context, "//START(%d)\n", buffer->lastTop);
+    construction->term.descriptor = descriptor;
+    construction->term.nr = 1;
+#ifdef CRSXPROF
+    construction->term.marker = 0;
+#endif
     construction->properties =
       ALLOCATE_Properties(sink->context,
                           LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars),
@@ -377,17 +444,7 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     construction->vfvs = LINK_VARIABLESET(sink->context, construction->properties->variableFreeVars);
 
     construction->nf = 0;
-    construction->closure = 0;
-
-    if (descriptor && descriptor != &literalConstructionDescriptor)
-    {
-        char* name = descriptor->name((Term) construction);
-        if (name && strstr(name, "$C$")) // TODO: cleaner way
-            construction->closure = 1;
-    }
-
-    construction->nostep = construction->closure;
-
+    construction->nostep = 0;
     // term->sub and term->binders will be populated incrementally.
     bufferPush(buffer, (Term) construction); // suspend current construction in favor of children
     // Setup fresh context for first child.
@@ -443,7 +500,7 @@ Sink bufferEnd(Sink sink, ConstructionDescriptor descriptor)
     bufferInsert(buffer, childTerm);
 
     // Fresh context for next child.
-    buffer->pendingFreeVars = NULL;
+    buffer->pendingWeakenings = NULL;
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
 
@@ -479,7 +536,7 @@ Sink bufferUse(Sink sink, Variable variable)
     //DEBUGF(sink->context, "//USE(%d)\n", buffer->lastTop);
     VariableUse use = ALLOCATE(sink->context, sizeof(struct _VariableUse));
     use->term.nr = 1;
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
     use->term.marker = 0;
 #endif
     use->variable = variable; // No need to link.
@@ -487,7 +544,7 @@ Sink bufferUse(Sink sink, Variable variable)
     bufferInsert(buffer, (Term) use);
 
     // Fresh context for next child.
-    buffer->pendingFreeVars = NULL;
+    buffer->pendingWeakenings = NULL;
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
     return sink;
@@ -565,91 +622,111 @@ Sink bufferCopy(Sink sink, Term term)
     }
     else
     {
-        // construction
-        Construction c = asConstruction(term);
+        // Construction cannot be reused: deep copy
 
-        // Construct
-        if (IS_LITERAL(term))
-        {
-            LITERALU(sink, TEXT(term));
-        }
-        else
-        {
-            NamedPropertyLink namedLink = buffer->pendingNamedProperties;
-            buffer->pendingNamedProperties = LINK_NamedPropertyLink(sink->context, c->properties->namedProperties);
-            VariablePropertyLink variableLink = buffer->pendingVariableProperties;
-            buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, c->properties->variableProperties);
+//        if (IS_VARIABLE_USE(term))
+//        {
+//            USE(sink, VARIABLE(term));
+//            UNLINK(sink->context, term);
+//        }
+//        else
+//        {
+            // construction
+            Construction c = asConstruction(term);
 
-            VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
-            buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->namedFreeVars);
-            VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
-            buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->variableFreeVars);
-
-            sink->start(sink, c->term.descriptor);
-
-            buffer->pendingNamedProperties = namedLink;
-            buffer->pendingVariableProperties = variableLink;
-
-            buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
-            buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
-
-            bufferMergeProperties(sink->context, buffer, asConstruction(bufferTop(buffer)->term));
-
-            int a = ARITY(term);
-            int i;
-            for (i = 0; i < a; i ++)
+            // Construct
+            if (IS_LITERAL(term))
             {
-                const int rank = RANK(term, i);
-                if (rank == 0)
-                {
-                    // --  i'th subterm with no binders: just continue copying.
-                    COPY(sink, LINK(sink->context, SUB(term, i)));
-                }
-                else
-                {
-                    Variable *oldBinders = BINDERS(term, i);
-                    Variable *subBinders = ALLOCA(sink->context, rank*sizeof(Variable)); // does not escapes
-                    VariableUse subUses[rank]; // does not escape
-                    struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
-                    SubstitutionFrame subSubstitution = &_subSubstitution;
-
-                    // --- populate per binder
-                    int j;
-                    for (j = 0; j < rank; ++j)
-                    {
-                        char *oldname = oldBinders[j]->name;
-                        char *baseendp = strrchr(oldname, '_');
-                        char *basename = oldname;
-                        if (baseendp)
-                        {
-                            const int z = baseendp - oldname;
-                            basename = ALLOCA(sink->context, z+1); // does not escape
-                            memcpy(basename, oldname, z);
-                            basename[z] = '\0';
-                        }
-                        int isLinear = IS_LINEAR(oldBinders[j]);
-                        subBinders[j] = makeVariable(sink->context, oldBinders[j]->name, 1, isLinear); // escapes
-                        subUses[j] = ALLOCATE(sink->context, sizeof(struct _VariableUse)); // escapes
-                        subUses[j]->term.descriptor = NULL;
-                        subUses[j]->term.nr = 1;
-                        subUses[j]->variable = subBinders[j];
-                    }
-
-                    // --- send new binders
-                    BINDS(sink, rank, subBinders); // escape of subBinders!
-                    //FREE(sink->context, subBinders) (no need: allocated on the stack)
-                    // --- now process subterm!
-                    metaSubstitute(sink, LINK(sink->context, SUB(term, i)), subSubstitution);
-                }
+                LITERALU(sink, TEXT(term));
             }
-            sink->end(sink, c->term.descriptor);
-        }
-        UNLINK(sink->context, term);
+            else
+            {
+                NamedPropertyLink namedLink = buffer->pendingNamedProperties;
+                buffer->pendingNamedProperties = LINK_NamedPropertyLink(sink->context, c->properties->namedProperties);
+                VariablePropertyLink variableLink = buffer->pendingVariableProperties;
+                buffer->pendingVariableProperties = LINK_VariablePropertyLink(sink->context, c->properties->variableProperties);
+
+                VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
+                buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->namedFreeVars);
+                VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
+                buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(sink->context, c->properties->variableFreeVars);
+
+                sink->start(sink, c->term.descriptor);
+
+                buffer->pendingNamedProperties = namedLink;
+                buffer->pendingVariableProperties = variableLink;
+
+                buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
+                buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
+
+                bufferMergeProperties(sink->context, buffer, asConstruction(bufferTop(buffer)->term));
+
+                int a = ARITY(term);
+                int i;
+                for (i = 0; i < a; i ++)
+                {
+                    const int rank = RANK(term, i);
+                    if (rank == 0)
+                    {
+                        // --  i'th subterm with no binders: just continue copying.
+                        COPY(sink, LINK(sink->context, SUB(term, i)));
+                    }
+                    else
+                    {
+                        Variable *oldBinders = BINDERS(term, i);
+                        Variable *subBinders = ALLOCA(sink->context, rank*sizeof(Variable)); // does not escapes
+                        VariableUse subUses[rank]; // does not escape
+                        struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+                        SubstitutionFrame subSubstitution = &_subSubstitution;
+
+                        // --- populate per binder
+                        int j;
+                        for (j = 0; j < rank; ++j)
+                        {
+                            char *oldname = oldBinders[j]->name;
+                            char *baseendp = strrchr(oldname, '_');
+                            char *basename = oldname;
+                            if (baseendp)
+                            {
+                                const int z = baseendp - oldname;
+                                basename = ALLOCA(sink->context, z+1); // does not escape
+                                memcpy(basename, oldname, z);
+                                basename[z] = '\0';
+                            }
+                            int isLinear = IS_LINEAR(oldBinders[j]);
+                            subBinders[j] = makeVariable(sink->context, oldBinders[j]->name, 1, isLinear); // escapes
+                            subUses[j] = ALLOCATE(sink->context, sizeof(struct _VariableUse)); // escapes
+                            subUses[j]->term.descriptor = NULL;
+                            subUses[j]->term.nr = 1;
+                            subUses[j]->variable = subBinders[j];
+                        }
+
+                        // --- send new binders
+                        BINDS(sink, rank, subBinders); // escape of subBinders!
+                        //FREE(sink->context, subBinders) (no need: allocated on the stack)
+                        // --- now process subterm!
+                        metaSubstitute(sink, LINK(sink->context, SUB(term, i)), subSubstitution);
+                    }
+                }
+                sink->end(sink, c->term.descriptor);
+            }
+            UNLINK(sink->context, term);
+        //}
     }
 
     ASSERT(sink->context, !buffer->pendingNamedProperties);
     ASSERT(sink->context, !buffer->pendingVariableProperties);
 
+    return sink;
+}
+
+Sink bufferWeakeningRef(Sink sink, Construction construction)
+{
+    return sink;
+}
+
+Sink bufferWeaken(Sink sink, Variable variable)
+{
     return sink;
 }
 
@@ -725,7 +802,7 @@ Sink bufferPropertyVariable(Sink sink, Variable variable, Term term)
     VariablePropertyLink link = ALLOCATE(sink->context, sizeof(struct _VariablePropertyLink));
     link->link = buffer->pendingVariableProperties; // transfer ref
     link->nr = 1;
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
     link->marker = 0;
 #endif
     link->variable = variable; // Transfer ref.
@@ -735,6 +812,11 @@ Sink bufferPropertyVariable(Sink sink, Variable variable, Term term)
     buffer->pendingVariablePropertiesFreeVars = VARIABLESET_MERGEALL(sink->context, buffer->pendingVariablePropertiesFreeVars, freeVars(sink->context, term));
     buffer->pendingVariablePropertiesFreeVars = VARIABLESET_ADDVARIABLE(sink->context, buffer->pendingVariablePropertiesFreeVars, variable);
 
+    return sink;
+}
+
+Sink bufferPropertyWeaken(Sink sink, Variable weakening)
+{
     return sink;
 }
 
@@ -779,10 +861,13 @@ Sink initBuffer(Context context, Buffer buffer, int free)
     buffer->sink.use = &bufferUse;
     buffer->sink.binds = &bufferBinds;
     buffer->sink.copy = &bufferCopy;
+    buffer->sink.weakeningRef = &bufferWeakeningRef;
+    buffer->sink.weaken = &bufferWeaken;
     buffer->sink.propertyRef = &bufferPropertyRef;
     buffer->sink.properties = &bufferProperties;
     buffer->sink.propertyNamed = &bufferPropertyNamed;
     buffer->sink.propertyVariable = &bufferPropertyVariable;
+    buffer->sink.propertyWeaken = &bufferPropertyWeaken;
     buffer->sink.propertiesReset = &bufferPropertiesReset;
     // Initialize buffer to be empty.
     buffer->first = NULL;
@@ -915,7 +1000,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
                 VariablePropertyLink newLink = memcpy(ALLOCATE(context, sizeof(struct _VariablePropertyLink)), link, sizeof(struct _VariablePropertyLink));
                 newLink->variable = linkVariable(context, link->variable);
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
                 newLink->marker = 0;
 #endif
                 newLink->link = NULL;
@@ -967,6 +1052,17 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+// Weakening helper.
+
+void weakenings_of(Sink sink, Term term)
+{
+}
+
+void weakenings_copy(Context context, Term source, Term target)
+{
+}
+
+/////////////////////////////////////////////////////////////////////////////////
 // Variable sets.
 
 // Some forward declarations
@@ -1007,19 +1103,19 @@ void freeVariableSet(VariableSet set)
 
 /////////////////////////////////////////////////////////////////////////////////
 // Linked list based variable sets.
-//
-//static inline
-//VariableSetLink linkVariableSetLink(Context context, VariableSetLink link)
-//{
-//    if (link)
-//    {
-//        ASSERT(context, link->nr > 0);
-//
-//        ++(link->nr);
-//        return link;
-//    }
-//    return NULL;
-//};
+
+static inline
+VariableSetLink linkVariableSetLink(Context context, VariableSetLink link)
+{
+    if (link)
+    {
+        ASSERT(context, link->nr > 0);
+
+        ++(link->nr);
+        return link;
+    }
+    return NULL;
+};
 
 static
 VariableSetLink unlinkVariableSetLink(Context context, VariableSetLink link)
@@ -1497,7 +1593,7 @@ Hashset makeHS(Context context)
 {
      Hashset set = ALLOCATE(context, sizeof(struct _Hashset));
      set->nr = 1;
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
      set->marker = 0;
 #endif
      set->nbits = 5;
@@ -1513,7 +1609,7 @@ Hashset copyHS(Context context, Hashset set)
 {
     Hashset newset = ALLOCATE(context, sizeof(struct _Hashset));
     newset->nr = 1;
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
      newset->marker = 0;
 #endif
     newset->nbits = set->nbits;
@@ -1775,19 +1871,19 @@ Hashset UNLINK_Hashset(Context context, Hashset set)
         ASSERT(context, set->nr > 0);
         if (--set->nr == 0)
         {
-//            int i = set->capacity - 1;
-//            int r = set->nitems;
-//            for (; i >= 0; i --)
-//            {
-//                size_t item = set->items[i];
-//                if (item != 0 && item != 1)
-//                {
-//                    unlinkVariable(context, (Variable) item);
-//                    r --;
-//                    if (r == 0)
-//                        break;
-//                }
-//            }
+            int i = set->capacity - 1;
+            int r = set->nitems;
+            for (; i >= 0; i --)
+            {
+                size_t item = set->items[i];
+                if (item != 0 && item != 1)
+                {
+                    unlinkVariable(context, (Variable) item);
+                    r --;
+                    if (r == 0)
+                        break;
+                }
+            }
             FREE(context, set->items);
             FREE(context, set);
             return NULL;
@@ -2328,30 +2424,6 @@ void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int cons
     }
 }
 
-Pair*
-toArrayHS2(Context context, Hashset2 set)
-{
-    if (set->size == 0)
-        return NULL;
-
-    Pair* array = ALLOCATE(context, sizeof(struct _Pair)* set->size);
-
-    int j = 0;
-    int i;
-    for (i = 0 ; i < set->nslots ; i++)
-    {
-        LinkedList2 slot = set->entries[i];
-        while (slot)
-        {
-            Pair pair = (Pair) slot->entry;
-            ASSERT(context, pair);
-            array[j ++] = pair;
-            slot = slot->next;
-        }
-    }
-    return array;
-}
-
 long memoryUsedHS2(Hashset2 set)
 {
     long ans = (4 + set->nslots) * sizeof(size_t);
@@ -2375,6 +2447,25 @@ void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set)
         }
     }
 }
+
+int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp)
+{
+    int i;
+    int size = 0;
+    for (i = 0 ; i < set->nslots ; i++)
+    {
+        LinkedList2 slot = set->entries[i];
+        while (slot)
+        {
+            Pair pair = (Pair) slot->entry;
+            Term term = (Term) pair->value;
+            size += checkTerm4(context, NULL, 0, term, nf, 0, envsize, memuse, usedp);
+            slot = slot->next;
+        }
+    }
+    return size;
+}
+
 static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, const void *key, Term term, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max);
 
 char * fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
@@ -2582,20 +2673,10 @@ void crsx_free(Context context, void *pointer)
 
 void crsxAddPools(Context context)
 {
-    if (!context->poolRefCount)
+    if (! context->poolRefCount)
     {
         context->stringPool = makeHS2(context, 16, NULL);
         context->keyPool = makeHS2(context, 16, NULL);
-
-        context->consPool = ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(Construction));
-        context->consPoolSize = ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(ssize_t));
-        int i;
-        for (i = 0; i < CONS_POOL_MAX_SIZE_SIZE; i ++)
-        {
-            context->consPool[i] = ALLOCATE(context, CONS_POOL_MAX_SIZE * sizeof(Construction));
-            context->consPoolSize[i] = 0;
-        }
-
     }
     ++context->poolRefCount;
 }
@@ -2609,19 +2690,6 @@ void crsxReleasePools(Context context)
         context->stringPool = NULL;
         unlinkHS2(context, context->keyPool);
         context->keyPool = NULL;
-
-        int i;
-        for (i = 0; i < CONS_POOL_MAX_SIZE_SIZE; i ++)
-        {
-            ssize_t j = context->consPoolSize[i] - 1;
-            while (j >= 0)
-            {
-                FREE(context, context->consPool[i][j]);
-                j --;
-            }
-        }
-        FREE(context, context->consPool);
-        FREE(context, context->consPoolSize);
     }
 }
 
@@ -2757,7 +2825,7 @@ static void escape(char **sourcep, char **targetp, char *endsource, char *endtar
         switch (c)
         {
         case '\"' : *(t++) = '\\'; *(t++) = '\"'; break;
-        case '\\' : *(t++) = '\\'; *(t++) = '\\'; break;
+    	case '\\' : *(t++) = '\\'; *(t++) = '\\'; break;
         case '\n' : *(t++) = '\\'; *(t++) = 'n'; break;
         case '\r' : *(t++) = '\\'; *(t++) = 'r'; break;
         case '\f' : *(t++) = '\\'; *(t++) = 'f'; break;
@@ -2984,6 +3052,7 @@ char *makeMangled(Context context, const char *src)
     return dst;
 }
 
+
 char * makeEncodePoint(Context context, unsigned int c)
 {
   unsigned char *res;
@@ -3012,6 +3081,7 @@ char * makeEncodePoint(Context context, unsigned int c)
   }
   return res;   
 }
+
 
 
 char *stringnf(Context context, size_t size, const char *format, ...)
@@ -3143,13 +3213,13 @@ void sendSplit(char *string, char *sep, Sink sink)
       char *word, *next;
       for (word = (char*)string; (next = strstr(word, sep)); word = next+sepz) {
           if (next==word) {          
-                trailingNulls++;
-                continue;
+          	trailingNulls++;
+          	continue;
           }
           for (; trailingNulls; trailingNulls--) {
-                START(sink, _M__sCons);
-                LITERAL(sink, "");
-                ++depth;
+          	START(sink, _M__sCons);
+          	LITERAL(sink, "");
+          	++depth;
           }
           START(sink, _M__sCons);
           LITERAL(sink, makeSubstring(sink->context, word, 0, next-word));
@@ -3387,6 +3457,10 @@ void normalize(Context context, Term *termp)
                 // (4) If term is a function invocation that is not marked as nostep and that we can in fact step then do so and update term to the result.
                 term = BUFFER_TERM(sink); // Reference is transferred
 
+                /////TEST
+                ///printf("==========\nSTEPPED TO\n");
+                ///pt(sink->context, term);
+
                 DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+5, term));
                 DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
             }
@@ -3459,7 +3533,12 @@ static int step(Sink sink, Term term)
     long int count = ++stepCount;
 #   endif    
 
-    crsxpBeforeStep(sink->context, term);
+#   ifdef CRSXPROF
+    profStepStack[profStepStackSize++] = SYMBOL(term);
+    profAddStepFunction(sink->context, SYMBOL(term));
+    pTermSize(term);
+    ++stepCount;
+#   endif
 
     ///PRINTF(sink->context, "STEP<%s>\n", SYMBOL(term));
     DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), check(sink->context, term), allocateCount, freeCount);
@@ -3472,40 +3551,49 @@ static int step(Sink sink, Term term)
 
     DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount);
 
-    crsxpAfterStep(sink->context);
+#   ifdef CRSXPROF
+    profStepStackSize --;
+#   endif
 
     return step;
 }
 
-void InitCRSXContext(Context context)
-{
-    context->stamp = 0;
-    context->poolRefCount = 0;
-    context->stringPool = NULL;
-    context->keyPool = NULL;
-    context->consPool = NULL;
-    context->noProperties =  ALLOCATE_Properties(context, NULL, NULL, NULL, NULL);
-
-    crsxAddPools(context);
-
-    context->str_filelocation = GLOBAL(context, "$FileLocation");
-    context->str_linelocation = GLOBAL(context, "$LineLocation");
-    context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
-
-#ifdef CRSX_ENABLE_PROFILING
-    context->profiling = 0;
-#endif
-}
 
 Term compute(Context context, Term term)
 {
-    crsxpInit(context);
+#   ifdef CRSXPROF
+    struct rusage usagebefore;
+    getrusage(RUSAGE_SELF, &usagebefore);
+    profStepStackSize = 0;
+    profFunctionsCount = 0;
+    profMemuseMetaSubstitutes = 0l;
+    pPeakTermSize = pNSPeakTermSize = 0l;
+    pPeakTermMemuse = pNSPeakTermMemuse = 0l;
+    pDuplicateMemuse = 0l;
+#   endif
+
     crsxAddPools(context);
 
     normalize(context, &term);
 
     crsxReleasePools(context);
-    crsxpDestroy(context);
+
+#   ifdef CRSXPROF
+    printProfiling(context);
+
+    struct rusage usageafter;
+    getrusage(RUSAGE_SELF, &usageafter);
+    long use = (usageafter.ru_maxrss - usagebefore.ru_maxrss) / 1024.0;
+    PRINTF(context, "\nmemory use: %ldM\n", use);
+
+    int i = 0;
+    while (i < profFunctionsCount)
+    {
+        FREE(context, profFunctions[i]);
+        profFunctions[i] = NULL;
+        i ++;
+    }
+#   endif
 
 #ifdef DEBUG
     DEBUGF(context, "END COMPUTE");
@@ -3514,86 +3602,6 @@ Term compute(Context context, Term term)
 
     return term;
 }
-
-
-/////////////////////////////////////////////////////////////////////////////////
-// Closure call
-//
-
-static
-void call(Sink sink, Term term, SubstitutionFrame values)
-{
-    ASSERT(sink->context, !values->parent);
-
-    const Context context = sink->context;
-    const int arity = term->descriptor->arity;
-
-    //crsxpBeforeCall(context);
-
-    if (term->nr > 1) // Shared?
-    {
-        sink->start(sink, term->descriptor);
-
-        int bound;
-        int i;
-        for (i = 0; i < arity; ++i)
-        {
-            Term sub = SUB(term, i);
-            bound = 0;
-            if (IS_VARIABLE_USE(sub))
-            {
-                Variable v = VARIABLE(sub);
-                int j;
-                for (j = 0; j < values->count; ++j)
-                {
-                    if (v == values->variables[j])
-                    {
-                        COPY(sink, LINK(context, values->substitutes[j]));
-                        bound = 1;
-                        break;
-                    }
-                }
-            }
-            if (!bound)
-                COPY(sink, LINK(context, sub));
-        }
-
-        if (values->renamings != RENAME_ALL)
-            asConstruction(bufferTop((Buffer) sink))->nostep = 0;
-
-        sink->end(sink, term->descriptor);
-    }
-    else
-    {
-        int i;
-        for (i = 0; i < arity; ++i)
-        {
-            Term sub = SUB(term, i);
-            if (IS_VARIABLE_USE(sub))
-            {
-                Variable v = VARIABLE(sub);
-                int j;
-                for (j = 0; j < values->count; ++j)
-                {
-                    if (v == values->variables[j])
-                    {
-                        UNLINK(sink->context, sub);
-                        SUB(term, i) = LINK(context,
-                                values->substitutes[j]);
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (values->renamings != RENAME_ALL)
-            asConstruction(term)->nostep = 0;
-
-        COPY(sink, term);
-    }
-
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////
 // Substitution.
@@ -3612,7 +3620,7 @@ void call(Sink sink, Term term, SubstitutionFrame values)
 //   exhausted - the variables in the substitution that are linear and have been globally eliminated.
 //   renamings - map of binders introduced in redex to corresponding binders in result.
 //
-#if defined(DEBUG)
+#if defined(DEBUG) || defined(CRSXPROF)
 long metaSubstituteCount = 0l;
 long metaSubstituteWork;
 #endif
@@ -3623,12 +3631,22 @@ static void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitut
 static void metaSubstituteProperties(Sink sink, Construction construction, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhaustedp, BitSetP unweakened, long *metaSubstituteSizep);
 static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionFrame substitution, VariableSetLink pendingWeakenings, int substitutionCount, BitSetP unexhaustedp, BitSetP unweakened, long *metaSubstituteSizep);
 
+///static void ptSubstitution(Context context, SubstitutionFrame substitution)
+///{
+///    for (; substitution; substitution = substitution->parent)
+///    {
+///        int i;
+///        for (i = 0; i < substitution->count; ++i)
+///        {
+///            PRINTF(context, "  %s => ", substitution->variables[i]->name);
+///            pt(context, substitution->substitutes[i]);
+///        }
+///    }
+///}
+
 void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 {
     ASSERT(sink->context, term->nr > 0);
-
-    if (IS_CONSTRUCTION(term) && asConstruction(term)->closure)
-        return call(sink, term, substitution);
 
     // Prepare helper bitsets.
     assert(!substitution || (substitution && !substitution->parent));
@@ -3644,12 +3662,25 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
     int size = checkTerm3(sink->context, term, 0, 0,&envsize, &termMemuse);
     metaSubstituteWork = 0l;
 # endif
+# ifdef CRSXPROF
+    struct rusage ubefore;
+    getrusage(RUSAGE_SELF, &ubefore);
+# endif
 
-    crsxpBeforeSubstitution(sink->context, term);
-
+    /////TEST
+    ///printf("==========\nSUBSTITUTE\n==========[\n");
+    ///ptSubstitution(sink->context, substitution);
+    ///printf("==========\nIN\n==========\n");
+    ///pt(sink->context, term);
     metaSubstituteTermUpdate(sink->context, &term, substitution, NULL, substitutionCount, &unexhausted, &unweakened, &metaSubstituteSize);
+    ///printf("==========GIVES\n");
+    ///pt(sink->context, term);
+    ///printf("==========]\n");
     COPY(sink, term);
 
+#   ifdef DEBUG
+    //DEBUGF(sink->context, "//%*sMETASUBSTITUTE(%ld): %s[%d/%ld] (%ld,%ld)\n", stepNesting, "", ++metaSubstituteCount, SYMBOL(term), size, metaSubstituteWork, allocateCount, freeCount);
+#   endif
     CHECK_METASUBSTITUTE_SIZE(sink->context, metaSubstituteSize);
 
     FREE_LBITS(sink->context, unexhausted);
@@ -3659,7 +3690,10 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
     for (i = 0; i < substitutionCount; ++i)
         UNLINK(sink->context, substitution->substitutes[i]);
 
-    crsxpAfterSubstitution(sink->context);
+
+#   ifdef CRSXPROF
+    pEndMetaSubstitute(sink->context, ubefore);
+#   endif
 }
 
 /**
@@ -3859,7 +3893,7 @@ SETUP_STACK_TYPE(VariablePropertyLink)
     int copyDepth;
 #endif
 
-static void substitutePropertiesPrefix(Sink sink, Construction construction, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep,
+static void metaSubstitutePropertiesPrefix(Sink sink, Construction construction, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep,
         int mergeNamedProperties, int mergeVariableProperties, NamedPropertyLinkStack namedStack, NamedPropertyLink *namedLinkp, VariablePropertyLinkStack variableStack, VariablePropertyLink *variableLinkp)
 {
     NamedPropertyLink namedLink;
@@ -3978,9 +4012,6 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
 
 static void metaSubstituteProperties(Sink sink, Construction construction, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep)
 {
-    if (!construction->properties || (!construction->properties->namedProperties && !construction->properties->variableProperties))
-        return; // no properties.
-
     int mergeNamedProperties = 0, mergeVariableProperties = 0;
     if (SINK_IS_BUFFER(sink))
     {
@@ -4001,7 +4032,7 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
     VariablePropertyLink variableLink; // the first link not copied (NULL if all)
 
     // Collect prefixes.
-    substitutePropertiesPrefix(sink, construction, substitution, substitutionCount, unexhausted, unweakened, metaSubstituteSizep,
+    metaSubstitutePropertiesPrefix(sink, construction, substitution, substitutionCount, unexhausted, unweakened, metaSubstituteSizep,
             mergeNamedProperties, mergeVariableProperties, namedStack, &namedLink, variableStack, &variableLink);
 
     if (namedLink || variableLink)
@@ -4369,7 +4400,34 @@ void freeTerm(Context context, Term term)
     else
     {
         Construction construction = asConstruction(term);
-        freeConstruction(context, construction);
+
+        UNLINK_Properties(context, construction->properties);
+        //construction->properties = NULL;
+
+        UNLINK_VARIABLESET(context, construction->fvs);
+        construction->fvs = NULL;
+        UNLINK_VARIABLESET(context, construction->nfvs);
+        construction->nfvs = NULL;
+        UNLINK_VARIABLESET(context, construction->vfvs);
+        construction->nfvs = NULL;
+
+        // Subterms and binders.
+        const int arity = ARITY(term);
+        int i;
+        for (i = 0; i < arity; ++i)
+        {
+            UNLINK(context, SUB(term, i));
+            const int rank = RANK(term,i);
+            int j;
+            for (j = 0; j < rank; ++j)
+            {
+                Variable b = BINDER(term,i,j);
+                UNBIND(b);
+                // Variable are not ref counted. Can't free.
+                //freeVariable(context, b);
+            }
+        }
+        FREE(context, term);
     }
 }
 
@@ -4435,7 +4493,7 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         link->link = NULL; // sets always include everything else
         link->name = NULL; // NULL means it is a hashset
         link->u.propset = set;
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
         link->marker = 0;
 #endif
         link->count = 0; // count==0 means group-allocation (hashset)
@@ -4449,7 +4507,7 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         link->link = nlink;
         link->name = name;
         link->u.term = term; // Transfer ref
-#ifdef CRSX_ENABLE_PROFILING
+#ifdef CRSXPROF
         link->marker = 0;
 #endif
         link->count = nlink ? nlink->count + 1 : 1;
@@ -4465,6 +4523,7 @@ inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLi
 
     return link;
 }
+
 
 NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link)
 {
@@ -4543,7 +4602,7 @@ Properties LINK_Properties(Context context, Properties env)
 
 Properties UNLINK_Properties(Context context, Properties env)
 {
-    if (env && env != context->noProperties)
+    if (env)
     {
         ASSERT(context, env->nr > 0);
 
@@ -4567,6 +4626,247 @@ Properties UNLINK_Properties(Context context, Properties env)
     }
     return env;
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+// Check that term is fully formed and return size.
+
+int check(Context context, Term term)
+{
+    return checkTerm(context, term, 0);
+}
+static int checkTerm(Context context, Term term, int nf)
+{
+    unsigned envsize = 0;
+    return checkTerm2(context, term, 0, &envsize);
+}
+static int checkTerm2(Context context, Term term, int nf, unsigned* envsize)
+{
+    long memuse = 0;
+    return checkTerm3(context, term, 0, 0, envsize, &memuse);
+}
+static int checkTerm3(Context context, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse)
+{
+    TermLink used = (TermLink)0;
+    int result = checkTerm4(context, NULL, 0, term, 0, depth, envsize, memuse, &used);
+    freeOccur(context, used);
+    return result;
+}
+static int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse, TermLink* usedp)
+{
+    if (term->nr <= 0)
+    {
+         DEBUGF(context, "//CRSX_CHECK: %s HAS NO REFERENCES!\n", SYMBOL(term));
+         ASSERT(context, term->nr > 0);
+    }
+
+#ifdef CHECKREF
+    // This is quite expensive without a proper hash set
+
+    // Check proper reference count
+    unsigned oc = addOccur(context, usedp, (void*)term);
+    if (oc > term->nr)
+    {
+        DEBUGF(context, "//CRSX_CHECK: %s HAS NOT ENOUGH REFERENCES!\n", SYMBOL(term));
+        ASSERT(context, oc <= term->nr);
+    }
+    if (oc > 1)
+        return 0; // Don't traverse twice the same subterm
+#endif
+
+    int size = 1;
+
+    ASSERT(context, term);
+    if (IS_VARIABLE_USE(term))
+    {
+        Variable v = VARIABLE(term);
+        ASSERT(context, v);
+
+        (*memuse) += sizeof(struct _Variable);
+        (*memuse) += strlen(v->name) + 1;
+    }
+    else
+    {
+        ASSERT(context, IS_CONSTRUCTION(term));
+        ASSERT(context, !nf || IS_NF(term));
+        Construction construction = asConstruction(term);
+
+        (*memuse) += sizeof(struct _Construction);
+
+        // Check properties.
+        int propertiesSize = 0;
+
+#ifdef HSFREEVARS
+        if (construction->fvs)
+        {
+            (*memuse) += sizeof(struct _Hashset);
+            (*memuse) += construction->fvs->capacity * sizeof(size_t);
+        }
+        if (construction->nfvs)
+        {
+            (*memuse) += sizeof(struct _Hashset);
+            (*memuse) += construction->nfvs->capacity * sizeof(size_t);
+        }
+        if (construction->vfvs)
+        {
+            (*memuse) += sizeof(struct _Hashset);
+            (*memuse) += construction->vfvs->capacity * sizeof(size_t);
+        }
+#endif
+        {
+            //int c = 5; // Check only the first 10 properties (ref count won't be accurate)
+            NamedPropertyLink link;
+            for (link = construction->properties->namedProperties; link; link = link->link)
+            {
+                ASSERT(context, link->nr > 0);
+#ifdef CHECKREF
+
+                oc = addOccur(context, usedp, (void*)link);
+                if (oc > link->nr)
+                {
+                    DEBUGF(context, "//CRSX_CHECK: NAMED PROPERTY %s HAS NOT ENOUGH REFERENCES!\n", link->name ? link->name : "MARKER");
+                    ASSERT(context, oc <= link->nr);
+                }
+                if (oc > 1)
+                    break;
+#endif
+
+                if (link->name)
+                {
+
+                    propertiesSize += checkTerm4(context, NULL, 0, link->u.term, nf, 0, envsize, memuse, usedp);
+
+                    //(*memuse) += strlen(link->name) + 1;
+                }
+                else
+                {
+                    propertiesSize += checkPropsHS2(context, link->u.propset, nf, envsize, memuse, usedp);
+                }
+
+                (*envsize) ++;
+                (*memuse) += sizeof(struct _NamedPropertyLink);
+
+                //if (c-- <= 0)
+                //    break;
+            }
+        }
+
+        {
+            VariablePropertyLink link;
+            for (link = construction->properties->variableProperties; link; link = link->link)
+            {
+                ASSERT(context, link->nr > 0);
+
+#ifdef CHECKREF
+                // Check refs
+                oc = addOccur(context, usedp, (void*)link);
+                if (oc > link->nr)
+                {
+                    DEBUGF(context, "//CRSX_CHECK: VARIABLE PROPERTY %s HAS NOT ENOUGH REFERENCES!\n", link->variable ? link->variable->name : "MARKER");
+                    ASSERT(context, oc <= link->nr);
+                }
+                if (oc > 1)
+                    break;
+#endif
+                if (link->variable)
+                {
+
+                    propertiesSize += checkTerm4(context, NULL, 0, link->u.term, nf, 0, envsize, memuse, usedp);
+
+                    (*memuse) += sizeof(struct _Variable);
+                }
+                else
+                {
+                    propertiesSize += checkPropsHS2(context, link->u.propset, nf, envsize, memuse, usedp);
+                }
+
+                (*envsize) ++;
+                (*memuse) += sizeof(struct _VariablePropertyLink);
+            }
+        }
+        size += propertiesSize;
+
+        VARIABLESET subfvs = NULL;
+
+        // Check binders and subterms.
+      //  if (depth < 5)
+        {
+            const int arity = ARITY(term);
+            int i;
+            for (i = 0; i < arity; ++i)
+            {
+                const int rank = RANK(term,i);
+                int j;
+                for (j = 0; j < rank; ++j)
+                {
+                    ASSERT(context, BINDER(term,i,j));
+                    ++size;
+                }
+                size += checkTerm4(context, term, i, SUB(term,i), IS_NF(term), depth + 1, envsize, memuse, usedp);
+
+
+            }
+        }
+
+        //UNLINK_VARIABLESET(context, subfvs);
+        if (0)
+        {
+            if (parent)
+            {
+                unsigned rank = RANK(parent, index);
+                if (rank > 0)
+                    subfvs = VARIABLESET_REMOVEALL(context, subfvs, BINDERS(parent, index), rank);
+
+                // Ideally we want the sets to be equal. For now, make sure the term set includes the computed one
+                subfvs = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
+                if (!VARIABLESET_ISEMPTY(subfvs))
+                {
+                    FPRINTF(context, STDOUT, "ASSERTION FAIL ============\n");
+                    VARIABLESET_PRINTF(context, STDOUT, subfvs);
+                    FPRINTF(context, STDOUT, "\nTERM ============\n");
+                    subfvs = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
+                    ppt(context, 2, term);
+                    ASSERT(context, !subfvs);
+                }
+
+            }
+
+            // Quick check properties free vars wrt to term fvs
+            VARIABLESET nps = LINK_VARIABLESET(context, asConstruction(term)->nfvs);
+            if (!VARIABLESET_ISEMPTY(nps))
+            {
+                nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
+                if (!VARIABLESET_ISEMPTY(nps))
+                {
+                    FPRINTF(context, STDOUT, "ASSERTION FAIL ============\n");
+                    VARIABLESET_PRINTF(context, STDOUT, nps);
+                    FPRINTF(context, STDOUT, "\nTERM ============\n");
+
+                    ppt(context, 2, term);
+                    ASSERT(context, !nps);
+                }
+            }
+
+            nps = LINK_VARIABLESET(context, asConstruction(term)->properties->variableFreeVars);
+            if (!VARIABLESET_ISEMPTY(nps))
+            {
+                nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
+                if (!VARIABLESET_ISEMPTY(nps))
+                {
+                    FPRINTF(context, STDOUT, "ASSERTION FAIL ============\n");
+                    VARIABLESET_PRINTF(context, STDOUT, nps);
+                    FPRINTF(context, STDOUT, "\nTERM ============\n");
+
+                    ppt(context, 2, term);
+                    ASSERT(context, !nps);
+                }
+            }
+        }
+
+
+    }
+    return size;
+}
+
 //
 static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLink boundLink)
 {
@@ -4966,6 +5266,7 @@ void printTermWithIndent(Context context, Term term)
     fprintTermWithIndent(context,STDOUT,term);
 }
 
+
 void printTermFullWithIndent(Context context,  Term term)
 {
     printCookieNameList = NULL;
@@ -4993,7 +5294,7 @@ void printTermFullWithIndent(Context context,  Term term)
 //     ch - the character to be tested.
 // Returns:
 //     true if the character is an ISO control character; false otherwise.
-int isISOControl(unsigned char c)
+int isISOControl(char c)
 {
     return (c > 0x00 && c <= 0x1F) || (c >= 0x7F && c <= 0x9F);
 }
@@ -5497,13 +5798,13 @@ char* fprintNamedProperties(Context context, FILE* out, NamedPropertyLink namedP
             sep = fprintPropsHS2(context, out, 1, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
         if ((max==INT32_MAX?max:max--) <=0)
-            break;
+        	break;
     }
     return sep;
 }
 
 /** Print variable properties (and return sep on empty, "; " otherwise). */
-char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink variableProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max /*includeprops*/)
+char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink variableProperties, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max/*includeprops*/)
 {
     VariablePropertyLink link;
     for (link = variableProperties; link; link = link->link)
@@ -5516,8 +5817,9 @@ char* fprintVariableProperties(Context context, FILE* out, VariablePropertyLink 
         {
             sep = fprintPropsHS2(context, out, 0, link->u.propset, sep, depth, encountered, used, indent, posp, debug, max);
         }
+
         if ((max==INT32_MAX?max:max--) <=0)
-            break;
+           	break;
     }
     return sep;
 }
@@ -5651,19 +5953,384 @@ void printCTerm2(Context context, Term term, VariableSet allocated, char *sink, 
     }
 }
 
+#ifdef CRSXPROF
 
-///static void ptSubstitution(Context context, SubstitutionFrame substitution)
-///{
-///    for (; substitution; substitution = substitution->parent)
-///    {
-///        int i;
-///        for (i = 0; i < substitution->count; ++i)
-///        {
-///            PRINTF(context, "  %s => ", substitution->variables[i]->name);
-///            pt(context, substitution->substitutes[i]);
-///        }
-///    }
-///}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+// Compute term size without check overhead
+
+static void termSize2(Term term, long* size, long* memuse, int sharing);
+
+
+// size    : total number of nodes, excluding property links.
+// memuse  : total memory use.
+// sharing : when true, account for shared terms.
+static void termSize(Term term, long* size, long* memuse, int sharing)
+{
+    pMarker ++;
+    termSize2(term, size, memuse, sharing);
+}
+
+static void termSize2(Term term, long* size, long* memuse, int sharing)
+{
+    if (!sharing && term->marker == pMarker)
+        return;
+
+    term->marker = pMarker;
+
+    (*size) ++;
+
+    if (IS_VARIABLE_USE(term))
+    {
+        Variable v = VARIABLE(term);
+
+        (*memuse) += sizeof(struct _Variable);
+        (*memuse) += strlen(v->name) + 1;
+    }
+    else
+    {
+        Construction construction = asConstruction(term);
+
+        (*memuse) += sizeof(struct _Construction);
+
+#ifdef HSFREEVARS
+        if (construction->fvs && (sharing || construction->fvs->marker != pMarker))
+        {
+            construction->fvs->marker = pMarker;
+
+            (*memuse) += sizeof(struct _Hashset);
+            (*memuse) += construction->fvs->capacity * sizeof(size_t);
+        }
+        if (construction->nfvs && (sharing || construction->nfvs->marker != pMarker))
+        {
+            construction->nfvs->marker = pMarker;
+
+            (*memuse) += sizeof(struct _Hashset);
+            (*memuse) += construction->nfvs->capacity * sizeof(size_t);
+        }
+        if (construction->vfvs && (sharing || construction->vfvs->marker != pMarker))
+        {
+            construction->vfvs->marker = pMarker;
+
+            (*memuse) += sizeof(struct _Hashset);
+            (*memuse) += construction->vfvs->capacity * sizeof(size_t);
+        }
+#endif
+        {
+            NamedPropertyLink link;
+            for (link = construction->properties->namedProperties; link; link = link->link)
+            {
+                if (!sharing && link->marker == pMarker)
+                    break;
+
+                link->marker = pMarker;
+
+                if (link->name)
+                {
+                    termSize2(link->u.term, size, memuse, sharing);
+                }
+                else
+                {
+                    (*memuse) += memoryUsedHS2(link->u.propset);
+                }
+
+                (*memuse) += sizeof(struct _NamedPropertyLink);
+            }
+        }
+
+        {
+            VariablePropertyLink link;
+            for (link = construction->properties->variableProperties; link; link = link->link)
+            {
+                if (!sharing && link->marker == pMarker)
+                    break;
+
+                if (link->variable)
+                {
+                    termSize2(link->u.term, size, memuse, sharing);
+
+                    (*memuse) += sizeof(struct _Variable);
+                }
+                else
+                {
+                    (*memuse) += memoryUsedHS2(link->u.propset);
+                }
+
+                (*memuse) += sizeof(struct _VariablePropertyLink);
+            }
+        }
+
+        const int arity = ARITY(term);
+        int i;
+        for (i = 0; i < arity; ++i)
+        {
+            termSize2(SUB(term,i), size, memuse, sharing);
+        }
+    }
+}
+
+
+
+
+void profAddStepFunction(Context context, char* name)
+{
+    if (profFunctionsCount >= 16384)
+        return;
+
+    // Search for existing entry
+    // function name are of the form R4a-Form-let2$XX
+
+//    char* d = strchr(name, '$');
+//    char* stem = name;
+//    if (d)
+//    {
+//        int len = strlen(name) - strlen(d);
+//        stem = ALLOCATE(context, len + 1);
+//        memcpy(stem, name, len);
+//        stem[len] = '\0';
+//    }
+
+    char* stem = name;
+
+    int i = 0;
+    while (i < profFunctionsCount)
+    {
+
+        if (strcmp(profFunctions[i]->name, stem) == 0)
+        {
+            break;
+        }
+        i ++;
+    }
+
+    if (i < profFunctionsCount)
+    {
+        profFunctions[i]->count ++;
+  //      if (d)
+    //       FREE(context, stem);
+    }
+    else
+    {
+        ProfFunctionEntry record = ALLOCATE(context, sizeof(struct _ProfFunctionEntry));
+        record->name = stem;
+        record->count = 1;
+        record->metaCount = 0;
+        record->metaMemuse = 0;
+        profFunctions[profFunctionsCount ++] = record;
+    }
+}
+
+void pIncMetaCountFunction(Context context, char* name, long memuse)
+{
+    // Search for existing entry
+    // function name are of the form R4a-Form-let2$XX
+
+//    char* d = strchr(name, '$');
+//    char* stem = name;
+//    if (d)
+//    {
+//        int len = strlen(name) - strlen(d);
+//        stem = ALLOCATE(context, len + 1);
+//        memcpy(stem, name, len);
+//        stem[len] = '\0';
+//    }
+    char * stem = name;
+
+    int i = 0;
+    while (i < profFunctionsCount)
+    {
+
+        if (strcmp(profFunctions[i]->name, stem) == 0)
+        {
+            break;
+        }
+        i ++;
+    }
+
+    if (i < profFunctionsCount)
+    {
+        profFunctions[i]->metaCount ++;
+        profFunctions[i]->metaMemuse += memuse;
+//        if (d)
+//           FREE(context, stem);
+    }
+}
+
+static int profEntryCmp(const void* p1, const void* p2)
+{
+    ProfFunctionEntry e1 = *(ProfFunctionEntry*) p1;
+    ProfFunctionEntry e2 = *(ProfFunctionEntry*) p2;
+
+//    if (e1->count == e2->count)
+//        return 0;
+//    if (e1->count > e2->count)
+//        return -1;
+//        if (e1->metaCount == e2->metaCount)
+//            return 0;
+//        if (e1->metaCount > e2->metaCount)
+//            return -1;
+        if (e1->metaMemuse == e2->metaMemuse)
+               return 0;
+           if (e1->metaMemuse > e2->metaMemuse)
+               return -1;
+
+        return 1;
+}
+
+void printProfiling(Context context)
+{
+    if (profLargeMetaSubstitutes || profLargeBufferCopy)
+    {
+        PRINTF(context, "Profiling information...");
+
+        if (profLargeMetaSubstitutes)
+        {
+            PRINTF(context, "\n\nReport large meta substitutes...\n");
+
+            ProfMetaSubstitute c = profLargeMetaSubstitutes;
+            while (c)
+            {
+                PRINTF(context, "\n===========================");
+                PRINTF(context, "\n  Large meta substitute");
+                printMetasubstituteRecord(context, c);
+                c = c->next;
+
+                PRINTF(context, "\n");
+            }
+        }
+
+        if (profLargeBufferCopy)
+        {
+            PRINTF(context, "\n\nReport large environment copy...\n");
+
+            ProfBufferCopy b = profLargeBufferCopy;
+            while (b)
+            {
+                PRINTF(context, "\n===========================");
+                PRINTF(context, "\n  Large environment copy");
+                PRINTF(context, "\n  size      : %u", b->size);
+                PRINTF(context, "\n  backtrace : ");
+
+                int i =  b->backtraceSize - 1;
+                while (i >= 0)
+                {
+                    PRINTF(context, "\n    %s", b->backtrace[i]);
+                    i --;
+                }
+
+                b = b->next;
+
+                PRINTF(context, "\n");
+            }
+        }
+    }
+
+    PRINTF(context, "\n\nReport function count...\n");
+
+    qsort (profFunctions, profFunctionsCount, sizeof(ProfFunctionEntry), profEntryCmp);
+
+    int i = 0;
+    while (i < 50 && i < profFunctionsCount)
+    {
+        PRINTF(context, "\n  %s : %d (call count), %d (metacount), %ld (memuse, M)", profFunctions[i]->name, profFunctions[i]->count, profFunctions[i]->metaCount, profFunctions[i]->metaMemuse / 1024);
+        i++;
+    }
+
+    PRINTF(context, "\nTotal memory use used by meta substitution: %ldM", (profMemuseMetaSubstitutes / 1024));
+    PRINTF(context, "\nPeak term size (number of nodes) : %ld", pPeakTermSize);
+    PRINTF(context, "\nPeak term memory use             : %ldM\n", (pPeakTermMemuse / 1024 / 1024));
+    PRINTF(context, "\nMemory use due to Duplicate      : %ldM\n", (pDuplicateMemuse / 1024));
+}
+
+void printMetasubstituteRecord(Context context, ProfMetaSubstitute c)
+{
+    PRINTF(context, "\n  size               : %u", c->size);
+    PRINTF(context, "\n  term size          : %u", c->termSize);
+    PRINTF(context, "\n  environment size   : %u", c->envSize);
+    PRINTF(context, "\n  normal form        : %s", (c->nf ? "no" : "yes"));
+    PRINTF(context, "\n  memory use         : %ldM", (c->memuse / 1024));
+    PRINTF(context, "\n  backtrace          : ");
+
+    int i =  c->backtraceSize - 1;
+    while (i >= 0)
+    {
+        PRINTF(context, "\n    %s", c->backtrace[i]);
+        i --;
+    }
+}
+
+void pEndMetaSubstitute(Context context, struct rusage ubefore)
+{
+    struct rusage uafter;
+    getrusage(RUSAGE_SELF, &uafter);
+
+    long memuse = uafter.ru_maxrss - ubefore.ru_maxrss;
+    //if (memuse > 50)
+    //    PRINTF(context, "High:= %ld\n",memuse);
+
+//    profMemuseMetaSubstitutes += memuse;
+//
+//    pIncMetaCountFunction(sink->context, profStepStack[profStepStackSize - 1], memuse);
+//
+//    if (metaSubstituteSize > CRSXLARGEMS)
+//    {
+//        ProfMetaSubstitute record = ALLOCATE(sink->context, sizeof(struct _ProfMetaSubstitute));
+//        int len = sizeof(char*) * profStepStackSize;
+//        record->backtrace = ALLOCATE(sink->context, len);
+//        memcpy(record->backtrace, profStepStack, len);
+//        record->backtraceSize = profStepStackSize;
+//        record->size  = metaSubstituteSize;
+//        record->termSize = size;
+//        record->envSize = envsize;
+//        record->nf = IS_NF(term);
+//        record->memuse = memuse;
+//
+//        record->next = profLargeMetaSubstitutes;
+//        profLargeMetaSubstitutes = record;
+//
+//#   ifdef CRSXPROFRT
+//        PRINTF(sink->context, "============================");
+//        PRINTF(sink->context, "\nLarge meta substitute");
+//        printMetasubstituteRecord(sink->context, record);
+//
+//        PRINTF(sink->context, "\nFor term:\n");
+//        VariableSet set = makeVariableSet(sink->context);
+//        fprintTermTop(sink->context, STDOUT, term, 10, set, 0, 2, 0, 0);
+//        PRINTF(sink->context, "\n");
+//#   endif
+//    }
+}
+
+void pTermSize(Term term)
+{
+    if (stepCount % 1000 == 0)
+    {
+        long size = 0;
+        long memuse = 0;
+        termSize(term, &size, &memuse, 0);
+
+        int p = size > pPeakTermSize;
+
+        pPeakTermSize = p ? size : pPeakTermSize;
+        pPeakTermMemuse= (memuse > pPeakTermMemuse) ? memuse : pPeakTermMemuse;
+
+        size = 0;
+        memuse = 0;
+        termSize(term, &size, &memuse, 1);
+        pNSPeakTermSize = (size > pNSPeakTermSize) ? size : pNSPeakTermSize;
+        pNSPeakTermMemuse= (memuse > pNSPeakTermMemuse) ? memuse : pNSPeakTermMemuse;
+
+        if (p)
+        {
+            printf("\r(nodes: %ld, memuse: %ldM, ns nodes: %ld, ns memuse: %ldM)        ", pPeakTermSize, (pPeakTermMemuse / 1024 / 1024), pNSPeakTermSize, (pNSPeakTermMemuse / 1024 / 1024) );
+            fflush(stdout);
+        }
+    }
+}
+
+#endif
 
 
 /////////////////////////////////////////////////////////////////////////////////

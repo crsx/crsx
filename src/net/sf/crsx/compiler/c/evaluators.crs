@@ -284,7 +284,7 @@ SEND_PRIMITIVE[E_LoadTerm];
 Send-LoadTerm:
 {#env} E-send[E_LoadTerm, (#Name; #Url;), #Options, #sink]
 →
-{#env} T-local-string[#Url, #sink, url p.%n⟪LOAD_TERM(«#sink», «url»);
+{#env} T-local-string[#Url, #sink, url p.%n⟪LOAD_TERM(«#sink», "", «url»);
 «p»⟫]
 ;
 
@@ -462,7 +462,6 @@ char* «regex»;
 «{#env}T-set-string[#Regex, #sink, regex]»SEND_SPLIT(«str», «regex», «#sink»);⟧
 }
 ⟫;
-
 
 // $[TryCall[$ResultSort, $Arg1Sort, ...], Name, ...]
 //
@@ -756,6 +755,42 @@ E-VariableProperties[#RefCookie]
 →
 %n⟪«#varP»⟫;
 
+
+
+// $[Pick, #index, #list] with constant #index evaluates as the index'th member of list (starting from 0). 
+//
+SET_REF_PRIMITIVE[E_Pick];
+
+Set-Pick[Fresh[index::Text,t::Text]]
+:
+{#env}E-set-ref[E_Pick, (#Name; #Index; #List;), #Options, #sink, #result]
+→
+%n⟪{
+Term «t»;
+long long «index»;
+«{#env} T-set-int[#Index, #sink, index]»«{#env} T-set-ref[#List, #sink, t]»
+while («index»--) «t» = SUB(«t»,1);
+«#result» = LINK(«#sink»->context, SUB(«t»,0));
+}⟫
+;
+
+// $[ReversePick, #index, #list] with constant #index evaluates as the index'th member of the reverse of list (starting from 0). 
+//
+SET_REF_PRIMITIVE[E_ReversePick];
+
+Set-ReversePick[Fresh[index::Text,t::Text,p::Text,index::Text]]
+:
+{#env}E-set-ref[E_ReversePick, (#Name; #Index; #List;), #Options, #sink, #result]
+→
+%n⟪{
+Term «t»,«p»;
+long long «index»;
+«{#env} T-set-int[#Index, #sink, index]»«{#env} T-set-ref[#List, #sink, t]»
+for («p»=«t»; TAG(«p»)!=Data_M__sNil; «index»--) «p» = SUB(«p»,1);
+while (++«index») «t» = SUB(«t»,1);
+«#result» = LINK(«#sink»->context, SUB(«t»,0));
+}⟫
+;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // BOOLEAN PRIMITIVES
@@ -1174,6 +1209,20 @@ Set-Int-Length:
 «p»⟫]
 ;
 
+// $[Index, #1, #2] returns the index in constant #1 of the first occurrence of #2 in the constructor symbol. 
+//
+INT_PRIMITIVE[E_Index];
+
+Set-Int-Index[Fresh[u::Text]]:
+{#env}E-set-int[E_Index, (#Name; #String; #Pattern;), #Options, #sink, #int]
+→
+{#env} T-local-string[#String, #sink, s p1. {#env} T-local-string[#Pattern, #sink, t p2. 
+%n⟪char* «u» = strstr(«s», «t»);
+«#int» = «u» ? «u» - «s» : -1;
+«p1»«p2»⟫]]
+;
+
+
 // $[Absolute,#n] corresponds to the unsigned integer with same magnitude as #n
 //
 INT_PRIMITIVE[E_Absolute];
@@ -1251,6 +1300,18 @@ Set-Int-HashCode[Fresh[term::Text]]
 %n⟪{⟦ Term «term»;
 « {#env}T-set[#Term, #sink, term] »«#int» = HASH_CODE(«#sink»->context, «term»);
 UNLINK(«#sink»->context, «term»); ⟧}
+⟫
+;
+
+// $[ListLength, #list] returns length of list
+//
+INT_PRIMITIVE[E_ListLength];
+
+Set-ListLength[Fresh[t::Text]]
+:
+{#env}E-set-int[E_ListLength, (#Name; #List;), #Options, #sink, #int]
+→
+%n⟪{ Term «t»; « {#env}T-set-ref[#List, #sink, t] »«#int»=0; while (TAG(«t»)!=Data_M__sNil) { «t» = SUB(«t»,1); «#int»++; }}
 ⟫
 ;
 
@@ -1469,10 +1530,14 @@ $Meta[(
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-string-to-set[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
 
+-[Fresh[str::Text]] :
 {#env}E-set-string-to-set[#Primitive, #Args, #Options, #sink, #variable]
 →
-{#env}E-local-string[#Primitive, #Args, #Options, #sink, str p. %n⟪«#variable» = makeStringLiteral(«#sink»->context, «str»);
-«p»⟫]
+//{#env}E-local-string[#Primitive, #Args, #Options, #sink, str p. %n⟪«#variable» = makeStringLiteral(«#sink»->context, «str»);
+//«p»⟫]
+%n⟪{⟦ char *«str»;
+«{#env}E-set-string[#Primitive, #Args, #Options, #sink, str] »«#variable» = makeStringLiteral(«#sink»->context, «str»); ⟧}
+⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-string-to-bool[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -1641,15 +1706,15 @@ else «substring» = «string»+«start»;
 ⟫]
 ;
 
-Set-String-Substring2[Fresh[start::Text, z::Text]]
+Set-String-Substring2[Fresh[start::Text, length::Text]]
 :
 {#env}E-set-string[E_Substring, (#Name; #String; #start;), #Options, #sink, #substring]
 →
 {#env}T-local-string[#String, #sink, string p. %n⟪{⟦ long long «start»;
 « {#env} T-set-int[#start, #sink, start]
-»size_t «z» = strlen(«string»);
-if («start» >= (long long) «z») «#substring» = "";
-else memcpy(«#substring» = ALLOCATE(«#sink»->context, «z»+1), «string»+«start», «z»+1);
+»long long «length» = (long long) strlen(«string»);
+if («start» >= «length») «#substring» = "";
+else memcpy(«#substring» = ALLOCATE(«#sink»->context, «length»-«start»+1), «string»+«start», «length»-«start»+1);
 «p»}⟧
 ⟫];
 
@@ -1661,7 +1726,10 @@ Set-String-Substring3-Local[Fresh[substring::Text, start::Text, end::Text, lengt
 « {#env} T-set-int[#start, #sink, start] »« {#env} T-set-int[#end, #sink, end]
 »long long «length» = (long long) strlen(«string»);
 if («start» >= «length» || «start» >= «end») «substring» = "";
-else {⟦ «substring» = «string»+«start»; if («end» < «length») «string»[«end»] = '\0'; ⟧}
+else if («end» < «length») {
+⟦memcpy(«substring»=ALLOCA(«#sink»->context, «end»-«start»+1), «string»+«start», «end»-«start»);
+«substring»[«end»-«start»]='\0';⟧
+} else «substring» = «string»+«start»;
 « #[substring,p] » ⟧}
 ⟫]
 ;
@@ -1700,6 +1768,20 @@ Set-String-Escape
 {#env}T-local-string[#String, #sink, s p.%n⟪{⟦«#str» = makeEscaped(«#sink»->context, «s»);
 «p»⟧}
 ⟫]
+;
+
+// $[EncodePoint, #int] returns a Unicode string corresponding to the single character with code point #int. */
+//
+STRING_LOCAL_PRIMITIVE[E_EncodePoint];
+
+Set-String-EncodePoint[Fresh[code::Text, str::Text]]
+:
+{#env}E-local-string[E_EncodePoint, (#Name; #code;), #Options, #sink, s p.#[s, p]] 
+→ 
+%n⟪{⟦unsigned int «code»;
+«{#env} T-set-int[#code, #sink, code]»char *«str» = makeEncodePoint(«#sink»->context, «code»);
+« #[str, %n⟨⟩] »⟧}
+⟫
 ;
 
 // $[FormatNumber, #number ,#format] is a string representing the number (TODO: use #format).
@@ -1868,6 +1950,21 @@ Poly-SaveTerm[Fresh[term::Text]]
 {#env} T-local-string[#Url, #sink, url p.%n⟪{⟦ Term «term»;
 «{#env} T-set[#Term, #sink, term]»SAVE_TERM(«#sink»->context, «url», «term»); UNLINK(«#sink»->context, «term»);«p» ⟧}
 «{#env} E-optional[#Result, #O4, #sink, ok r.#Tail[ok,r]]»⟫]
+;
+
+// $[Dump, #prefix, #term] prints #prefix and #term and acts like #term. 
+//
+POLY_PRIMITIVE[E_Dump];
+
+Poly-Dump[Fresh[str::Text]] 
+:
+{#env}E-poly[E_Dump, (#Name; #Prefix; #Term;), #Options, #sink, ok result.#Tail[ok,result]]
+→
+%n⟪char* «str»;
+«{#env}T-set-string[#Prefix, #sink, str]»
+ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «str»);
+«{#env}#Tail[OK, #Term]»
+⟫
 ;
 
 // $[Error[#kind], #format[, #arg,...]] emits an exception.
@@ -2267,10 +2364,33 @@ Set-String-Trim[Fresh[trimmed::Text]]:
 {#env}E-local-string[E_Trim, (#Name; #String;), #Options, sink, sub sp.#[sub,sp]]
 →
 {#env}T-local-string[#String, sink, string post . %n⟪{⟦char *p1; for (p1 = «string»; *p1 && isspace(*p1); ++p1);
-char *p2; for (p2 = «string»+strlen(«string»); p1 <= p2 && isspace(*(p2-1)); --p2);
+char *p2; for (p2 = «string»+strlen(«string»); p1 < p2 && isspace(*(p2-1)); --p2);
 size_t z = p2 - p1;
 char *«trimmed» = memcpy(ALLOCA(«sink»->context, z+1), p1, z); «trimmed»[z] = '\0';
 «post»« #[trimmed, %n⟨⟩] »⟧}
+⟫]
+;
+
+// $[Squash, #1] corresponds to constant #1 with all occurrences of white space collapsed to single ordinary spaces. 
+//
+STRING_LOCAL_PRIMITIVE[E_Squash] ;
+
+Set-String-Squash[Fresh[squashed::Text]]:
+{#env}E-local-string[E_Squash, (#Name; #String;), #Options, sink, sub sp.#[sub,sp]]
+→
+{#env}T-local-string[#String, sink, string post . %n⟪{⟦
+char *«squashed»=ALLOCA(«sink»->context, strlen(«string»)+1);
+char *p1=«string», *p2=«squashed»;
+int wasspace=0;
+for (; *p1; ++p1) {
+   if (isspace(*p1)) { 
+      if (!wasspace) { wasspace=1; *p2++=' '; }
+   } else {
+      *p2++=*p1; wasspace=0;
+   }
+}
+*p2++='\0';
+«post»« #[squashed, %n⟨⟩] »⟧}
 ⟫]
 ;
 
@@ -2285,6 +2405,7 @@ char *«trimmed» = memcpy(ALLOCA(«sink»->context, z+1), p1, z); «trimmed»[z
 //«post1»«post2»⟫]]
 //;
 
+
 // $[ParseURL, #url] parses the URL and returns the term.
 //
 SEND_PRIMITIVE[E_ParseURL];
@@ -2292,10 +2413,21 @@ SEND_PRIMITIVE[E_ParseURL];
 Send-ParseURL:
 {#env} E-send[E_ParseURL, (#Name; #Category; #Url;), #Options, sink]
 →
-{#env} T-local-string[#Category, sink, cat post1.{#env}T-local-string[#Url, sink, url post2.%n⟪LOAD_TERM(«sink», «url»);
+{#env} T-local-string[#Category, sink, cat post1.{#env}T-local-string[#Url, sink, url post2.%n⟪LOAD_TERM(«sink», «cat», «url»);
 «post1»«post2»⟫]]
 ;
-// TODO: invent primitive that takes category into account.
+
+// $[ParseText, #text] parses the string and returns the term.
+//
+SEND_PRIMITIVE[E_ParseText];
+
+Send-ParseText:
+{#env} E-send[E_ParseText, (#Name; #Category; #Text;), #Options, sink]
+→
+{#env} T-local-string[#Category, sink, cat post1.{#env}T-local-string[#Text, sink, text post2.%n⟪SCAN_TERM(«sink», «cat», «text»);
+«post1»«post2»⟫]]
+;
+
 
 // $[Rescape, #string] is the #string with all leading and trailing spaces removed.
 //

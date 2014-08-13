@@ -21,7 +21,7 @@ INCLUDES = /usr/include
 
 UNAME_S=$(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-CCFLAGS+=-Wno-gnu-variable-sized-type-not-at-end -std=c99
+CCFLAGS+=-Wno-gnu-variable-sized-type-not-at-end -Wbitwise-op-parentheses -std=c99
 endif
 
 ifndef ICU4CDIR
