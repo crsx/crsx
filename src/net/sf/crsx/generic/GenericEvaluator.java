@@ -1,4 +1,5 @@
 /* Copyright © 2008, 2013 IBM Corporation. */
+/* Copyright © 2014 Kristoffer H. Rose <krisrose@crsx.org> */
 
 package net.sf.crsx.generic;
 
@@ -1019,8 +1020,27 @@ public class GenericEvaluator extends FixedGenericConstruction
                         if (!Util.isConstant(sub(i)))
                             break What; // parsing not supported until all arguments constant.
 
+		    ExtensibleMap<String,Variable> bound = LinkedExtensibleMap.EMPTY_SCOPE;
+		    // LINENUMBERFIX chunk 1 code that works but needs IBM side testing [Kris]
+		    //if (globals != null)
+		    //{
+		    //	for (Variable v : globals)
+		    //	    bound = bound.extend(v.name(), v);
+		    //}
+		    //PropertiesHolder ph = Util.propertiesHolder(sub(0));
+		    //if (ph != null)
+		    //{
+		    //	for (String key : ph.propertyNames())
+		    //	{
+		    //	    Term value = ph.getProperty(key);
+		    //	    if (value.kind() == Kind.VARIABLE_USE)
+		    //		bound = bound.extend(key, value.variable());
+		    //	}
+		    //}
+
                     String category;
-                    String resource;
+                    String resource = null;
+                    int line = 1, column = 1;
                     Reader reader;
                     switch (what)
                     {
@@ -1051,7 +1071,13 @@ public class GenericEvaluator extends FixedGenericConstruction
                         case PARSE_TEXT : {
                         	// $[ParseText[Sort], category, text]
                         	category = Util.symbol(sub(1));
-                        	resource = null;
+				// LINENUMBERFIX chunk 2 [Kris]
+                        	//{
+                        	//	PropertiesHolder locationPH = Util.propertiesHolder(sub(2));
+                        	//	resource = Util.symbol(Util.sub(locationPH.getProperty("$FileLocation"), 0));
+                        	//	line = Util.integer(Util.sub(locationPH.getProperty("$LineLocation"), 0));
+                        	//	column = Util.integer(Util.sub(locationPH.getProperty("$ColumnLocation"), 0));
+                        	//}
                             reader = new StringReader(Util.symbol(sub(2)));
                             break;
                         }
@@ -1080,19 +1106,21 @@ public class GenericEvaluator extends FixedGenericConstruction
                         default :
                         	break What; // "Unknown $[Parse...] command?!?"
                     }
-					if (Util.getInteger(factory, Factory.VERBOSE_OPTION, 0) > 0)
+
+                    if (Util.getInteger(factory, Factory.VERBOSE_OPTION, 0) > 0)
 	                    if (Util.getInteger(factory, GenericFactory.VERBOSE_OPTION, 0) >= 0)
                         	factory.message(toString());
                     Buffer buffer = new Buffer(factory);
                     Sink bufferSink = buffer.sink();
-					Map<String,Variable> free = null;
-					if (globals != null)
-					{
-						free = new HashMap<String, Variable>();
-						for (Variable v : globals)
-							free.put(v.name(), v);
-					}
-                    factory.parser(factory).parse(bufferSink, category, reader, resource, 1, 1, null);
+		                        // LINENUMBERFIX this is dead code redundant with LINENUMBERFIX chunk 1 above! [Kris]
+					//Map<String,Variable> free = null;
+					//if (globals != null)
+					//{
+					//	free = new HashMap<String, Variable>();
+					//	for (Variable v : globals)
+					//		free.put(v.name(), v);
+					//}
+                    factory.parser(factory).parse(bufferSink, category, reader, resource, line, column, bound);
                     Term result = buffer.term(true);
                     assert result != null : "Parser did not build complete term.";
                     return rewrapWithProperties(result);
@@ -1478,6 +1506,30 @@ public class GenericEvaluator extends FixedGenericConstruction
                 	}
                 }
                 break;
+			}
+
+			case IF_DATA : {
+				// $[IfData, #t, #true, #false]
+				computeArgument(1);
+				if (sub(1).kind() == Kind.CONSTRUCTION)
+				{
+					if (SortUtil.isData(factory, sub(1).constructor()))
+					{
+						computeArgument(2);
+						return rewrapWithProperties(sub(2));
+					}
+					else
+					{
+						if (arity() == 3)
+							return rewrapWithProperties(factory.nil());
+						else
+						{
+							computeArgument(3);
+							return rewrapWithProperties(sub(3));
+						}
+					}
+				}
+				break;
 			}
 			
 			case GET :
@@ -2678,18 +2730,38 @@ public class GenericEvaluator extends FixedGenericConstruction
 	 * @param factory for construction?
 	 * @param props list of property units
 	 * @param term to wrap the properties around
-	 * @return
+	 * @return updated term
+	 * @see Primitive#PROPERTIES
 	 */
 	private static Term unquoteProperties(Factory<? extends Term> factory, Term props, Term term)
 	{
-		assert(false);
-		return null;
+		if (!(term instanceof GenericTerm))
+			assert false : "Cannot wrap non-generic term with meta-properties...";
+		GenericTerm t = (GenericTerm) term;
+		while (Util.isCons(props.constructor()))
+		{
+			Term instructionTerm = props.sub(0);
+			String instruction = Util.symbol(instructionTerm);
+			if ("$RP".equals(instruction))
+				t = t.wrapWithPropertiesRef(Util.symbol(instructionTerm.sub(0)), true);
+			else if ("$NP".equals(instruction))
+				t = t.wrapWithProperty(Util.symbol(instructionTerm.sub(0)), instructionTerm.sub(1), true);
+			else if ("$VP".equals(instruction))
+				t = t.wrapWithProperty(instructionTerm.sub(0).variable(), instructionTerm.sub(1), true);
+			else if ("$MP".equals(instruction))
+				t = t.wrapWithMetaProperty(Util.symbol(instructionTerm.sub(0)), instructionTerm.sub(1), true);
+			else
+				assert false : "Unimplemented quoted property "+instruction;
+			props = props.sub(1);
+		}
+		return t;
 	}
 	
 	/**
 	 * Explicit properties in the format used by {@link Primitive#PROPERTIES}.
 	 * @param term with properties
 	 * @return list of just the quoted properties
+	 * @see Primitive#PROPERTIES
 	 */
 	private static Term quoteProperties(Term term)
 	{

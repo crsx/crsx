@@ -776,6 +776,26 @@ public final class Util
 		}
 		return null;
 	}
+	
+	/**
+	 * Defensive extraction of numeric value.
+	 * @param stub term with property
+	 * @return numeric value or 0 if there is something wrong
+	 */
+	public static int integer(Stub stub)
+	{
+		String symbol = symbol(stub);
+		if (symbol == null)
+			return 0;
+		try
+		{
+			return Integer.parseInt(symbol);
+		}
+		catch (NumberFormatException e)
+		{
+			return 0;
+		}
+	}
 
 	/**
 	 * Defensive subterm.

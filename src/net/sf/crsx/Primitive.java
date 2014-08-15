@@ -1,4 +1,5 @@
 /* Copyright © 2008, 2013 IBM Corporation. */
+/* Copyright © 2014 Kristoffer H. Rose <krisrose@crsx.org> */
 
 package net.sf.crsx;
 
@@ -207,13 +208,13 @@ public enum Primitive
     
 	/** TODO. */
 	HAS_GRAMMAR("HasGrammar", 1, 2),
-	/** $[Parse, #filename] loads a file by using the standard parser and category. */
+	/** $[{#}Parse[sort], #filename] loads a file by using the standard parser and category, respecting the variable name mapping {#} with entries "Name" : v. */
 	PARSE("Parse", 1, 1),
-	/** $[ParseURL[sort], #category, #url] for constant arguments, evaluates to the term obtained by parsing the content of the #url as a #category term. */
+	/** $[{#}ParseURL[sort], #category, #url] for constant arguments, evaluates to the term obtained by parsing the content of the #url as a #category term. */
 	PARSE_URL("ParseURL", 2, 2),
-	/** $[ParseResource, #category, #name] for constant arguments, evaluates to the term obtained by getting and parsing the #name resource as a #category term. */
+	/** $[{#}ParseResource, #category, #name] for constant arguments, evaluates to the term obtained by getting and parsing the #name resource as a #category term. */
 	PARSE_RESOURCE("ParseResource", 2, 2),
-	/** $[ParseText[sort], #category, #text] for constant arguments, evaluates to the term obtained by parsing the #text as a #category term. */
+	/** $[{#}ParseText[sort], #category, #text] for constant arguments, evaluates to the term obtained by parsing the #text as a #category term. */
 	PARSE_TEXT("ParseText", 2, 2),
 	/** $[Load[sort], #r, #category] parses the resource #r using the category, if any, and returns the term. */
 	LOAD("Load", 1, 2),
@@ -242,8 +243,10 @@ public enum Primitive
 	IF_EMPTY("IfEmpty", 2, 3),
 	/** $[{#environment}IfDef, #name, #true[, #false]] with constant #name evaluates as either #true or #false depending on whether name is defined in #environment. */
 	IF_DEF("IfDef", 2, 3),
-	/** $[IfLinear, v] is true if v is a linear variable (¹v). */
+	/** $[IfLinear, v, #true[, #false]] is #true if v is a linear variable (¹v) otherwise #false or (). */
 	IF_LINEAR("IfLinear", 2, 3),
+	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, oherwise #false or (). */
+	IF_DATA("IfData", 2, 3),
 
 	// Environment operations.
 
