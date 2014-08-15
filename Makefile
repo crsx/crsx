@@ -5,10 +5,10 @@ CRSXHOME = $(abspath .)
 
 include Env.mk
 
-.PHONY: all compile upload clean
+.PHONY: all compile upload clean realclean
 
 all: lib/javacc.jar lib/antlr-runtime-3.1.3.jar compile bin/crsxc crsx.jar
-	
+
 compile:
 	$(ANT) compile
 
@@ -24,6 +24,9 @@ lib/antlr-runtime-3.1.3.jar:
 bin/crsxc:
 	cd $(COMPILERSRC)/c && $(MAKE)
 	cp $(COMPILERSRC)/c/build/crsxc bin/crsxc
-	
+
 clean:
 	cd $(COMPILERSRC)/c && $(MAKE) clean
+
+realclean: clean
+	rm -fr build $(COMPILERSRC)/c/build bin/crsxc
