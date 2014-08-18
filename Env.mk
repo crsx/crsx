@@ -29,7 +29,7 @@ ICU4CDIR=/usr/local/opt/icu4c/lib
 endif
 endif
 
-CCFLAGS=-g -Wall
+CCFLAGS+=-g -Wall
 INCLUDES = /usr/include
 
 # CRSX setup.
