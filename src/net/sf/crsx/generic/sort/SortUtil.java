@@ -6,6 +6,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.crsx.Constructor;
 import net.sf.crsx.CRS;
 import net.sf.crsx.Factory;
 import net.sf.crsx.Kind;
@@ -208,4 +209,16 @@ public class SortUtil
 		return sort != null && (CRS.STRING_SORT.equals(sort) || CRS.BOOLEAN_SORT.equals(sort) || CRS.NUMERIC_SORT.equals(sort));
 	}
 
+
+	/**
+	 * Whether the constructor is a data constructor.
+	 * @param factory with sorts
+	 * @param constructor to check
+	 */
+	public static boolean isData(GenericFactory factory, Constructor constructor)
+    {
+		boolean result = (constructor != null && factory.isData(constructor.symbol())); 
+		//System.out.println("IS_DATA("+constructor.symbol()+") = "+result);
+		return result;
+    }
 }
