@@ -153,14 +153,14 @@ a  ::=
     B(Before);
 
     /* V as top level t or property value t. */
-<Before>{VARIABLE_T}             { USE(topSink(state), lookupName(state, yytext)); B(AfterSimple); }
-<Before>{VARIABLEQ_T}             { USE(topSink(state), lookupName(state, unquote(topSink(state)->context, yytext+1))); B(AfterSimple); }
+<Before>{VARIABLE_T}             { USEL(topSink(state), lookupName(state, yytext)); B(AfterSimple); }
+<Before>{VARIABLEQ_T}             { USEL(topSink(state), lookupName(state, unquote(topSink(state)->context, yytext+1))); B(AfterSimple); }
     /* V as t in a without binders or as first binder in a. */
 <BeforeArgument>{VARIABLE_T}     { pushString(&state, yytext); B(AfterFirstVariable); }
 <BeforeArgument>{VARIABLEQ_T}     { pushString(&state, unquote(topSink(state)->context, yytext+1)); B(AfterFirstVariable); }
     /* V as t in a after binders. */
-<BeforeWithBinders>{VARIABLE_T}  { Variable variable = lookupName(state, yytext); popBinders(&state); USE(topSink(state), variable); B(AfterSimple); }
-<BeforeWithBinders>{VARIABLEQ_T}  { Variable variable = lookupName(state, unquote(topSink(state)->context, yytext+1)); popBinders(&state); USE(topSink(state), variable); B(AfterSimple); }
+<BeforeWithBinders>{VARIABLE_T}  { Variable variable = lookupName(state, yytext); popBinders(&state); USEL(topSink(state), variable); B(AfterSimple); }
+<BeforeWithBinders>{VARIABLEQ_T}  { Variable variable = lookupName(state, unquote(topSink(state)->context, yytext+1)); popBinders(&state); USEL(topSink(state), variable); B(AfterSimple); }
     /* V as key in p. */
 <BeforeKey,BeforeFirstKey>{VARIABLE_T}  { pushVariableProperty(&state, yytext); B(AfterKey); }
 <BeforeKey,BeforeFirstKey>{VARIABLEQ_T}  { pushVariableProperty(&state, unquote(topSink(state)->context, yytext+1)); B(AfterKey); }
@@ -232,12 +232,12 @@ a  ::=
     /* "," */
 <AfterSimple>","                     { B(BeforeArgument); }
 <AfterConstructor,AfterArguments>"," { popConstruction(&state); B(BeforeArgument); }
-<AfterFirstVariable>","              { USE(topSink(state), lookupName(state, topString(state))); popString(&state); B(BeforeArgument); }
+<AfterFirstVariable>","              { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); B(BeforeArgument); }
 
     /* "]" */
 <AfterSimple>"]"                     { B(AfterArguments); }
 <AfterConstructor,AfterArguments>"]" { popConstruction(&state); B(AfterArguments); }
-<AfterFirstVariable>"]"              { USE(topSink(state), lookupName(state, topString(state))); popString(&state); B(AfterArguments); }
+<AfterFirstVariable>"]"              { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); B(AfterArguments); }
 
     /* "." */
 <AfterFirstVariable>"." { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); B(BeforeWithBinders); }
@@ -246,7 +246,7 @@ a  ::=
     /* EOF */
 <AfterSimple><<EOF>>                     { yyterminate(); }
 <AfterConstructor,AfterArguments><<EOF>> { popConstruction(&state); yyterminate(); }
-<AfterFirstVariable><<EOF>>              { USE(topSink(state), lookupName(state, topString(state))); popString(&state); yyterminate(); }
+<AfterFirstVariable><<EOF>>              { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); yyterminate(); }
 
     /* Skip spaces. */
 <*>{SPACE_T} {}

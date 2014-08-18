@@ -105,6 +105,7 @@ int run(void)
 {
 	Context context = (Context) calloc(1, sizeof(struct _Context));
 	InitCRSXContext(context);
+	//context->fv_enabled = 0;
 	Term term = NULL;
 	// if input: read term from file
 	char *infile = getenv("input");

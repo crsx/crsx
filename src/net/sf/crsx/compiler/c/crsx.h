@@ -77,6 +77,7 @@ struct _Context
     char *str_linelocation;
     char *str_columnlocation;
 
+    int fv_enabled; // Whether the free variable optimization is on.
 
 #ifdef CRSX_ENABLE_PROFILING
     int profiling;
@@ -429,7 +430,7 @@ static inline void permitUnusedVariable(Variable v) {}
 struct _Term
 {
     ConstructionDescriptor descriptor; // of the term or NULL for variables
-    size_t nr;                         // number of references to this term (node)
+    ssize_t nr;                         // number of references to this term (node)
 #ifdef CRSX_ENABLE_PROFILING
     size_t marker; // counter helper for graph traversal.
 #endif
@@ -473,8 +474,7 @@ extern void freeTerm(Context context, Term term);
 
 static inline Term unlinkTerm(Context context, Term t)
 {
-    if (t->nr <= 0)
-        assert(t->nr > 0);
+    assert(t->nr > 0);
 
     if ((--LINK_COUNT(t)) == 0)
     {
@@ -611,21 +611,69 @@ struct _SortDescriptor
 //
 struct _Variable
 {
-    size_t nr;               // Number of reference to this variable
+    ssize_t nr;               // Number of references
+    ssize_t uses;             // Number of uses in the tree term and properties. Speed up meta substitution.
     char *name;              // name...neither guaranteed to be globally unique nor the same as originally provided
     unsigned int linear : 1; // whether this variable is linear
     unsigned int bound : 1;  // whether this variable is bound
 };
 
 /**
- * @Brief Make new variable
+ * @Brief Make new variable. Reference count is 1, use count is 0
  */
 extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear);
 
 /**
- * @Brief Increment variable reference
+ * @Brief Free variable
  */
-extern Variable linkVariable(Context context, Variable variable);
+extern void freeVariable(Context context, Variable variable);
+
+/**
+ * @Brief Make term using the given variable reference
+ */
+extern VariableUse makeVariableUse(Context context, Variable variable);
+
+/**
+ * @Brief Increment variable reference count. Don't increment use count
+ */
+static inline Variable linkVariable(Context context, Variable variable)
+{
+    //assert(variable->nr > 0);
+    variable->nr ++;
+    return variable;
+}
+
+/**
+ * @Brief Decrement variable reference count. Don't decrement use count
+ */
+static inline void unlinkVariable(Context context, Variable variable)
+{
+    //assert(variable->nr > 0);
+    variable->nr --;
+    if (variable->nr == 0)
+        freeVariable(context, variable);
+}
+
+/**
+ * @Brief Unuse variable. Decrement ref count and use count
+ */
+static inline Variable useVariable(Context context, Variable variable)
+{
+//    assert(variable->nr > 0);
+    variable->uses ++;
+    return variable;
+}
+
+
+/**
+ * @Brief Unuse variable. Decrement ref count and use count
+ */
+static inline void unuseVariable(Context context, Variable variable)
+{
+  //  assert(variable->nr > 0);
+//    assert(variable->uses > 0);
+    variable->uses --;
+}
 
 #define IS_BOUND(v) ((v)->bound)
 #define IS_LINEAR(v) ((v)->linear)
@@ -634,6 +682,9 @@ extern Variable linkVariable(Context context, Variable variable);
 #define UNBIND(variable) (variable)->bound = 0
 #define REBIND(variable) (variable)->bound = 1
 
+/**
+ * @Brief set the base variable name. The base name occurs before the first occurrence of '_'
+ */
 extern void setVariableBaseName(Context context, Variable variable, char *newbase);
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -696,6 +747,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 #define START(sink,c) ((sink) ? ((Sink)(sink))->start(sink, &descriptor##c) : NULL)
 #define END(sink,c) ((sink) ? ((Sink)(sink))->end(sink, &descriptor##c) : NULL)
 #define USE(sink,variable) ((sink) ? ((Sink)(sink))->use(sink, variable) : NULL)
+#define USEL(sink,variable) ((sink) ? ((Sink)(sink))->use(sink, linkVariable(((Sink)sink)->context, variable)) : NULL)
 #define BINDS(sink,rank,binders) ((sink) ? ((Sink)(sink))->binds(sink, rank, binders) : NULL)
 
 #define COPY(sink,term) ((sink) ? ((Sink)(sink))->copy(sink, term) : NULL)
@@ -913,13 +965,18 @@ struct _VariablePropertyLink
 #endif
 };
 
-static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link) { if (link) ++(link->nr); return link; };
+static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link)
+{
+    if (link)
+        ++(link->nr);
+    return link;
+};
 #define UNLINKSET_VariablePropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
 
 extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link);
 
 #define ASSERT_VARIABLE_PROPERTIES(context, properties) \
-ASSERT(context, ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars)));
+ASSERT(context, (!context->fv_enabled || ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars))));
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -981,10 +1038,10 @@ extern VariableSetLink mergeAllL(Context context, VariableSetLink first, Variabl
 extern VariableSetLink minusL(Context context, VariableSetLink set, VariableSetLink other);
 // Remove all given variables from set. 'set' reference is transferred.
 extern VariableSetLink removeAllL(Context context, VariableSetLink set, Variable* vars, int len);
-// Compute intersection
-extern VariableSetLink intersectL(Context context, VariableSetLink set, VariableSetLink other);
-// Compute intersection
-extern VariableSetLink intersectGL(Context context, VariableSetLink set, VariableSetLink other, VariableSetLink* removed);
+//// Compute intersection
+//extern VariableSetLink intersectL(Context context, VariableSetLink set, VariableSetLink other);
+//// Compute intersection
+//extern VariableSetLink intersectGL(Context context, VariableSetLink set, VariableSetLink other, VariableSetLink* removed);
 // Clear set
 extern VariableSetLink clearL(Context context, VariableSetLink set);
 // Print out set
@@ -1017,7 +1074,6 @@ struct _Pair {
     const void* key;
     void* value;
 };
-
 
 struct _Hashset2
 {
@@ -1075,14 +1131,13 @@ extern void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_
 extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
 
 
-static inline Hashset LINK_Hashset(Context context, Hashset set) { if (set && set != AllFreeVariables) ++(set->nr); return set; };
-extern Hashset UNLINK_Hashset(Context context, Hashset set);
-
 // Allocation variable set.
 extern Hashset makeHS(Context context);
+// Free variable set.
+extern void freeHS(Context context, Hashset set);
 // Copy variable set.
 extern Hashset copyHS(Context context, Hashset set);
-// Add variable to set. Create new set if needed.
+// Add variable reference to set. Create new set if needed.
 extern Hashset addVariableHS(Context context, Hashset set, Variable variable);
 // Remove variable from set. 'set' reference is transferred.
 extern Hashset removeVariableHS(Context context, Hashset set, Variable var);
@@ -1101,6 +1156,26 @@ extern void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int
 // Print out set
 extern void printfHS(Context context, FILE* out, Hashset set);
 
+static inline Hashset LINK_Hashset(Context context, Hashset set)
+{
+    if (set && set != AllFreeVariables)
+        ++(set->nr);
+    return set;
+}
+
+static inline Hashset UNLINK_Hashset(Context context, Hashset set)
+{
+    if (set && set != AllFreeVariables)
+    {
+        assert(set->nr > 0);
+        if (--set->nr == 0)
+        {
+            freeHS(context, set);
+            return NULL;
+        }
+    }
+    return set;
+}
 
 struct _TermLink {
     void* p;

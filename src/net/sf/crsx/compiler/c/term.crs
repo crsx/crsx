@@ -104,7 +104,7 @@ T-send[PROPERTY[VARIABLE-USE[key], #Value, #Term], sink]
 →
 %n⟪{⟦ Term «value»;
 « {#env} T-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
-ADD_PROPERTY_VARIABLE(«sink», «key», «value»); ⟧}
+ADD_PROPERTY_VARIABLE(«sink», linkVariable(«sink»->context, «key»), «value»); ⟧}
 « {#env} T-send[#Term, sink] »⟫
 ;
 
@@ -155,7 +155,7 @@ Send-Variable[Free[sink::Text, variable::Reified_Variable]]
 {#env}
 T-send[VARIABLE-USE[variable], sink]
 →
-%n⟪USE(«sink», «variable»);
+%n⟪USE(«sink», linkVariable(«sink»->context, «variable»));
 ⟫
 ;
 
@@ -217,7 +217,8 @@ E-send[Primitive[#Primitive], #Terms, #Options, #sink]
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code for construction subterms, with binders.
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binders[$List[Reified_Binder], Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-send-Binders[$List[Reified_Binder], Text] :: Text;
 
 -[Free[sink::Text]]
 :
@@ -235,7 +236,8 @@ T-send-Binders[(#Binder; #Binders), sink]
 %n⟪« {#env}T-send-Binder[#Binder, sink] »« {#env}T-send-Binders[#Binders, sink] »⟫
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder[Reified_Binder, Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-send-Binder[Reified_Binder, Text] :: Text;
 
 // Subterm without binders.
 {#env}
@@ -258,7 +260,8 @@ T-send-Binder[BINDER[#promisc, #sort, #occs, b.#Binder[b]], #sink]
 ;
 
 // - Analyze each binder and either allocate it or reuse the unique variable it replaces.
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder1[Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-send-Binder1[Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
 
 {#env}
 T-send-Binder1[BINDER[#promisc, #sort, #occs, b.#Binder[b]], #sink, #index, #bs, #sep, #state]
@@ -268,7 +271,8 @@ T-send-Binder2[#occs, NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep,
 ;
 
 // -- if binder occurs in exactly one meta-application then record a cookie for that meta-application position and promiscuity -
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder2[$List[Reified_Occurrence], Meta-Occurrence, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-send-Binder2[$List[Reified_Occurrence], Meta-Occurrence, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
 
 {#env}
 T-send-Binder2[(META-USE[#mv,#k];#occs), NOTHING, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
@@ -303,7 +307,8 @@ T-send-Binder3[#cookie, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state
 ;
 
 // -- test whether uniquely used local binder was also unique in pattern?
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder3[Meta-Occurrence, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-send-Binder3[Meta-Occurrence, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
 
 {#env}
 T-send-Binder3[UNIQUE[#cookie], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
@@ -324,7 +329,8 @@ T-send-Binder6[#promisc, b.#Binder[b], sink, #index, #bs, #sep, #state]
 ;
 
 // -- outermost reused binder.
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder4[STRING_ENTRY, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-send-Binder4[STRING_ENTRY, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
 
 {#env}
 T-send-Binder4[VARIABLE[#reused], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, OUTER]
@@ -344,10 +350,9 @@ T-send-Binder5[#reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, REUSIN
 
 // -- binder that should not be reused because we are copying.
 {#env}
-T-send-Binder4[#reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
+T-send-Binder4[VARIABLE[#reused], #promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
 →
-{#env}
-T-send-Binder6[#promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
+{#env}T-send-Binder6[#promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-Binder5[Text, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Text, Text, Binder-State] :: Text;
@@ -357,7 +362,7 @@ T-send-Binder6[#promisc, b.#Binder[b], #sink, #index, #bs, #sep, COPYING]
 {#env; "$Binders":LIST_VARIABLE[#binders]}
 T-send-Binder5[reused, #promisc, b.#Binder[b], #sink, #index, #bs, #sep, #state]
 →
-%n⟪REBIND(«reused»);
+%n⟪REBIND(linkVariable(«#sink»->context, «reused»));
 « {#env; reused : BOUNDREUSE; "$Binders":LIST_VARIABLE[(reused;#binders)]}T-send-Binder1[#Binder[reused], #sink, $[Plus,#index,1], %n⟨‹#bs›‹#sep›‹reused›⟩, %n⟨,⟩, #state] »⟫
 ;
 
@@ -488,8 +493,6 @@ T-link-prefix[Text] :: Text;
 T-link-prefix[#sink]
 →
 %n⟪LINK(«#sink»->context,⟫;
-
-
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-UnlinkLastMetaUse[$String, Reified_Use, Text] :: Text;
 
@@ -751,7 +754,7 @@ T-set-string[#Term, #sink, #variable]
 {#env}
 T-set-string[VARIABLE-USE[v], #sink, #string] 
 → 
-T-set-string2[#string, %n⟪«v»->name⟫]
+T-set-string2[#string, %n⟪makeString(«#sink»->context, «v»->name)⟫]
 ;
 
 {#env} 

@@ -84,7 +84,7 @@ VARIABLE_ENTRY ::=
 ( 
 	SUB[Text<!-- Parent Variable -->, $Numeric<!-- Index in parent -->, $Boolean<!-- Linked? -->];
 
-	BOUND; 
+    BOUND;       
 	FREE;
 	BOUNDREUSE;
 	FRESH;	
