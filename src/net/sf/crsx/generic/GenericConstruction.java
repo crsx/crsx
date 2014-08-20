@@ -118,7 +118,7 @@ public abstract class GenericConstruction extends GenericTerm
 					for (int j = 0; j < bs.length; ++j)
 					{
 					    Variable v = binders(i)[j];
-						localRenames = localRenames.extend(v, (bs[j] = sink.makeVariable(v.name(), v.promiscuous())));
+						localRenames = localRenames.extend(v, (bs[j] = sink.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow())));
 					}
 					sink = sink.binds(bs);
 				}
@@ -161,7 +161,7 @@ public abstract class GenericConstruction extends GenericTerm
             for (int j = 0; j < bs.length; ++j)
             {
                 Variable v = binders(i)[j];
-                bs[j] = factory.makeVariable(v.name(), v.promiscuous());
+                bs[j] = factory.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow());
                 r = r.extend(v, bs[j]);
             }
             bss[i] = bs;
@@ -324,7 +324,7 @@ public abstract class GenericConstruction extends GenericTerm
 				for (int j = 0; j < b.length; ++j)
 				{
 				    Variable v = b[j];
-					newb[j] = factory.makeVariable(v.name(), v.promiscuous());
+					newb[j] = factory.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow());
 				}
 				innerBound = bound.extend(b, newb);
 				sink = sink.binds(newb);
@@ -715,7 +715,9 @@ public abstract class GenericConstruction extends GenericTerm
     				Variable b = binders(i)[j];
     				sink = sink.start(sink.makeConstructor(CRS.REIFY_BINDER)); // BINDER[
     				sink = sink.start(sink.makeConstructor(b.promiscuous() ? CRS.REIFY_PROMISCUOUS : CRS.REIFY_LINEAR)).end(); // LINEAR/PROMISCUOUS
-    				Term binderSort = formSort == null ? factory.nil() : Util.propertiesHolder(formSort).getProperty(formBinders[j]);
+    				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_BLOCK : CRS.REIFY_PERMIT)).end();
+    				sink = sink.start(sink.makeConstructor(b.shallow() ? CRS.REIFY_SHALLOW : CRS.REIFY_DEEP)).end();
+    		    				Term binderSort = formSort == null ? factory.nil() : Util.propertiesHolder(formSort).getProperty(formBinders[j]);
     				sink = GenericCRS.reifySort(factory, sink, binderSort);
     				freeSort.put(b, binderSort);
     				sink = Util.occurrenceDescription(sink, sub(i), b); // (OTHER/META-USE[]/...)
@@ -842,7 +844,7 @@ public abstract class GenericConstruction extends GenericTerm
             	
             	//add binder associations for new scope
             	for (int bIndex = 0; bIndex < bLength; bIndex++){
-            		Variable freshvar = factory.makeVariable(xs[bIndex].name() + xprimes[bIndex].name(), false);
+            		Variable freshvar = factory.makeVariable(xs[bIndex].name() + xprimes[bIndex].name(), false, false, false);
             		rho.put(xs[bIndex], freshvar);
             		rhoprime.put(xprimes[bIndex], freshvar);
             	}
@@ -934,7 +936,7 @@ public abstract class GenericConstruction extends GenericTerm
 					if (renamedVariable == null)
 					{
 					    // This is the normal case where fresh bound variables are needed - the above is merely to allow preallocation of all bound variables by Valuation. 
-					    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous());
+					    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous(), currentVariable.blocking(), currentVariable.shallow());
 					}
                     innerRenamings = innerRenamings.extend(currentVariable, renamedVariable);
 					mappedBinds[b] = renamedVariable;

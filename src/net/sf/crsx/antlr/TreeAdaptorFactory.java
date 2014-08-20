@@ -145,7 +145,7 @@ public class TreeAdaptorFactory extends CommonTokenFactory implements TreeAdapto
 	public GenericTerm create(int tokenType, String text)
 	{
 		if (metaToken() != null && text.startsWith(metaToken())) return newMeta(text);
-		return constant(createToken(tokenType, text, false));
+		return constant(createToken(tokenType, text));
 	}
 	
 	/**

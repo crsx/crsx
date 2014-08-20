@@ -770,7 +770,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 					ExtensibleMap<Variable,Variable> renames = LinkedExtensibleMap.EMPTY_RENAMING;
 					for (int j = 0; j < rank; ++j)
 					{
-						newBinders[j] = factory.makeVariable(oldBinders[j].name(), oldBinders[j].promiscuous());
+						newBinders[j] = factory.makeVariable(oldBinders[j].name(), oldBinders[j].promiscuous(), oldBinders[j].blocking(), oldBinders[j].shallow());
 						renames = renames.extend(oldBinders[j], newBinders[j]);
 					}
 					sink = sub(i).copy(sink, false, renames);

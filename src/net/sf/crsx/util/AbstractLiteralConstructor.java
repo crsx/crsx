@@ -46,12 +46,6 @@ public abstract class AbstractLiteralConstructor implements Constructor
 		return object().toString();
 	}
 	
-	@Override
-	public boolean isClosure()
-	{
-	return false;
-	}
-
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
 	{
 		if (that instanceof PropertiesConstructor)

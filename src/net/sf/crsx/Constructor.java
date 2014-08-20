@@ -40,11 +40,6 @@ public interface Constructor extends PropertiesHolder
      * in other cases may be null.
      */
     Object object();
-
-    /**
-     * Whether this constructor represents a closure
-     */
-	boolean isClosure();
     
 	/**
 	 * Whether this constructor (used in a {@link Pattern}) matches the other constructor (used in the redex).

@@ -224,21 +224,6 @@ public class TraceSink implements Sink
 		return sink.makeConstructor(object);
 	}
 
-	
-	
-	@Override
-	public Constructor makeConstructor(Object object, boolean closure)
-	{
-		try
-		{
-			log.write(prefix+"makeConstructor("+object+","+closure+")\n");
-			log.flush();
-		}
-		catch (IOException e)
-		{}
-		return sink.makeConstructor(object,closure);
-	}
-
 	/* @see net.sf.crsx.Maker#makeLiteral(java.lang.Object, java.lang.String)*/
     public Constructor makeLiteral(Object object, String sort)
     {
@@ -264,6 +249,19 @@ public class TraceSink implements Sink
 		return sink.makeVariable(name, promiscuous);
 	}
 
+
+	public Variable makeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow)
+	{
+		try
+		{
+			log.write(prefix+"makeVariable("+name+")\n");
+			log.flush();
+		}
+		catch (IOException e)
+		{}
+		return sink.makeVariable(name, promiscuous, blocking, shallow);
+	}
+	
 	public Variable freeVariable(String name, boolean promiscuous, boolean create)
     {
 		try
@@ -276,6 +274,20 @@ public class TraceSink implements Sink
 		return sink.freeVariable(name, promiscuous, create);
     }
 
+
+	public Variable freeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow, boolean create)
+    {
+		try
+		{
+			log.write(prefix+"freeVariable("+name+","+promiscuous+","+blocking+","+shallow+","+create+")\n");
+			log.flush();
+		}
+		catch (IOException e)
+		{}
+		return sink.freeVariable(name, promiscuous, create);
+    }
+
+	
 	public Sink makeBuffer(Maker.CallBack callBack)
 	{
 		try

@@ -103,11 +103,10 @@ public class CommonTokenFactory extends GenericFactory
 	 * Create unattached token of type.
 	 * @param type of the token to create
 	 * @param text of token
-	 * @param closure 
 	 */
-	protected CommonTokenConstructor createToken(int type, String text, boolean closure)
+	protected CommonTokenConstructor createToken(int type, String text)
 	{
-		return new CommonTokenConstructor(this, type, text, closure);
+		return new CommonTokenConstructor(this, type, text);
 	}
 	
 	/**
@@ -166,22 +165,16 @@ public class CommonTokenFactory extends GenericFactory
 	@Override
 	public CommonTokenConstructor makeConstructor(Object object)
 	{
-		return (CommonTokenConstructor) makeConstructor(object, false);
-	}
-
-	@Override
-	public Constructor makeConstructor(Object object, boolean closure)
-	{
 		// Note: This is the only actual implementation of .makeConstructor() used by the generic implementation!
 	    if (object instanceof Constructor)
-			return createToken(CommonTokenConstructor.CRSX_TYPE, ((Constructor) object).symbol(), closure);
+			return createToken(CommonTokenConstructor.CRSX_TYPE, ((Constructor) object).symbol());
 		// Tokens are packaged.
 		if (object instanceof Token)
 			return createToken((Token) object);
 //		if (object.toString().startsWith("{"))
 //			warning("bad karma: constructor named with {?}?");
 		// Fall back to using the text representation.
-		return createToken(CommonTokenConstructor.CRSX_TYPE, object.toString(), closure);
+		return createToken(CommonTokenConstructor.CRSX_TYPE, object.toString());
 	}
 	
 	

@@ -43,41 +43,43 @@ public interface ClassicParserConstants {
   /** RegularExpression Id. */
   int LINEAR = 27;
   /** RegularExpression Id. */
-  int CLOSURE = 28;
+  int BLOCKING = 28;
   /** RegularExpression Id. */
-  int QUOTED_VARIABLE = 29;
+  int SHALLOW = 29;
   /** RegularExpression Id. */
-  int QUOTED_METAVARIABLE = 30;
+  int QUOTED_VARIABLE = 30;
   /** RegularExpression Id. */
-  int CONSTRUCTOR_PREFIX = 31;
+  int QUOTED_METAVARIABLE = 31;
   /** RegularExpression Id. */
-  int VARIABLE_PREFIX = 32;
+  int CONSTRUCTOR_PREFIX = 32;
   /** RegularExpression Id. */
-  int METAVARIABLE_PREFIX = 33;
+  int VARIABLE_PREFIX = 33;
   /** RegularExpression Id. */
-  int PART = 34;
+  int METAVARIABLE_PREFIX = 34;
   /** RegularExpression Id. */
-  int UPPER = 35;
+  int PART = 35;
   /** RegularExpression Id. */
-  int LOWER = 36;
+  int UPPER = 36;
   /** RegularExpression Id. */
-  int DIGIT = 37;
+  int LOWER = 37;
   /** RegularExpression Id. */
-  int ALPHANUMERIC = 38;
+  int DIGIT = 38;
   /** RegularExpression Id. */
-  int CONNECTOR = 39;
+  int ALPHANUMERIC = 39;
   /** RegularExpression Id. */
-  int OTHER = 40;
+  int CONNECTOR = 40;
   /** RegularExpression Id. */
-  int PERCENT_NAME = 41;
+  int OTHER = 41;
   /** RegularExpression Id. */
-  int STRING = 42;
+  int PERCENT_NAME = 42;
   /** RegularExpression Id. */
-  int ATOM = 43;
+  int STRING = 43;
   /** RegularExpression Id. */
-  int NUMERIC = 44;
+  int ATOM = 44;
   /** RegularExpression Id. */
-  int EMBEDDED = 48;
+  int NUMERIC = 45;
+  /** RegularExpression Id. */
+  int EMBEDDED = 49;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -122,7 +124,8 @@ public interface ClassicParserConstants {
     "<VARIABLE>",
     "<METAVARIABLE>",
     "<LINEAR>",
-    "\"^\"",
+    "\"\\u1d47\"",
+    "\"\\u02e2\"",
     "<QUOTED_VARIABLE>",
     "<QUOTED_METAVARIABLE>",
     "<CONSTRUCTOR_PREFIX>",
@@ -162,7 +165,7 @@ public interface ClassicParserConstants {
     "\"\\u2983\"",
     "\"\\u2983\"",
     "\"\\u2984\"",
-    "<token of kind 68>",
+    "<token of kind 69>",
   };
 
 }

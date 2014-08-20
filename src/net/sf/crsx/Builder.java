@@ -32,7 +32,7 @@ import java.util.Set;
  *  where the rule annotations should be of the following:
  *  <ul>
  *  <li>Free[v,...] - permits the variables v,... to occur free in <em>pattern</em> (and thus match free variables).
- *  <li>New[v,...] - permits the variables v,... to occur free in <em>contractum</em> (and thus create fresh free variables).
+ *  <li>Fresh[v,...] - permits the variables v,... to occur free in <em>contractum</em> (and thus create fresh free variables).
  *  <li>Meta[#,...] - permits the meta-variables #,... to occur only in <em>contractum</em> (and thus create meta-applications).
  *  <li>Discard[#,...] - permits the meta-variables #,... to occur only in <em>pattern</em> (and thus contraction can delete the matched subterm).
  *  <li>Copy[#,...] - permits the meta-variables #,... to occur more than once in <em>contractum</em> (thus permits contraction to duplicate matched subterms).
@@ -41,6 +41,7 @@ import java.util.Set;
  *  <li>Weak[#,...] - permits the meta-variables #,... to occur in patterns in weakened form, i.e., without all the possible bound variables (so matching does a variable occurrence check). 
  *  <li>Comparable[#,...] - permits the meta-variables #,... to occur multiple times in <em>pattern</em> (and thus match equal subterms).
  *  <li>Leaf - asserts that the result of contracting the rule will always be a normal form.
+ *  <li>Shallow[v,...] - asserts that the variable v is shallow (occurs as direct parameter of the bound construction).
  *  </ul>
  *  Note that the standard parser allows the special form ( <em>name</em> : )?<em>pattern</em> &rarr; <em>contractum</em> for rules
  *  (where "(...)?" denotes optionality).
@@ -232,7 +233,7 @@ public interface Builder
     public final static String MIXED_OPTION_SYMBOL = "Mixed";
     /** Constructor for "Watch" option used by $Rule in {@link #load(Sink, Term)}. */
     public final static String WATCH_OPTION_SYMBOL = "Watch";
-
+    
     /** Constructor for EXPERIMENTAL "FreshReuse" option used by $Rule in {@link #load(Sink, Term)}. */
     public final static String FRESH_REUSE_OPTION_SYMBOL = "FreshReuse";
     /** Constructor for EXPERIMENTAL "FreshReuseOrigin" option used by $Rule in {@link #load(Sink, Term)}. */

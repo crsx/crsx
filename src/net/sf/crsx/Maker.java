@@ -22,22 +22,6 @@ public interface Maker
 	 * 		(this is implementation dependent)
 	 */
 	public Constructor makeConstructor(Object object);
-
-
-	/**
-	 * Create a constructor from the given object.
-	 * What the object should be depends on the notion of term used;
-	 * two conventions are supported by all implementations:
-	 * <ul>
-	 * <li>A simple String value creates a constructor "with that name".
-	 * <li>A constructor (from the same or a compatible {@link Maker}) duplicates the constructor. 
-	 * </ul>
-	 * @param object with constructor configuration
-	 * @throws ClassCastException if the object is not useful for making a constructor
-	 * 		(this is implementation dependent)
-	 */
-	public Constructor makeConstructor(Object object, boolean closure);
-	
 	
 	/**
 	 * Create a literal constructor from the given object with the specified sort.
@@ -51,13 +35,21 @@ public interface Maker
 	 * @throws ClassCastException if the object is not useful for making a literal of such a sort
 	 */
 	public Constructor makeLiteral(Object object, String sort);
+
+	/**
+	 * Create a unique variable instance.
+	 * @param name hint for use when assigning a name to the variable
+	 * @param promiscuous whether the variable can be used more than once 
+     */
+	public Variable makeVariable(String name, boolean promiscuous);
 	
 	/**
 	 * Create a unique variable instance.
 	 * @param name hint for use when assigning a name to the variable
 	 * @param promiscuous whether the variable can be used more than once
+	 * @param blocking whether the variable blocks the bound term reduction 
      */
-	public Variable makeVariable(String name, boolean promiscuous);
+	public Variable makeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow);
 
 	/**
 	 * Retrieve global free variable.
@@ -66,7 +58,17 @@ public interface Maker
 	 * @param create whether variable should be created if not there
 	 */
 	public Variable freeVariable(String name, boolean promiscuous, boolean create);
-	
+
+
+	/**
+	 * Retrieve global free variable.
+	 * @param name of variable
+	 * @param promiscuous whether variable is permitted duplication
+	 * @param blocking whether the variable blocks the bound term reduction 
+	 * @param create whether variable should be created if not there
+	 */
+	public Variable freeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow, boolean create);
+
 	/**
 	 * Create a buffer ready to receive data.
 	 * When the sink has received a full term (with optional binders prefix) then it

@@ -67,12 +67,6 @@ final public class JokerConstructor implements Constructor
 		return symbol();
 	}
 	
-	@Override
-	public boolean isClosure()
-	{
-		return false;
-	}
-
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
 	{
 		return true;

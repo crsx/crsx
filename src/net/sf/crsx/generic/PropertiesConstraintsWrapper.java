@@ -1947,7 +1947,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 								if (renamedVariable == null)
 								{
 								    // This is the normal case where fresh bound variables are needed - the above is merely to allow preallocation of all bound variables by Valuation. 
-								    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous());
+								    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous(), currentVariable.blocking(), currentVariable.shallow());
 								}
 			                    innerRenamings = innerRenamings.extend(currentVariable, renamedVariable);
 								mappedBinds[b] = renamedVariable;
@@ -2108,7 +2108,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 						if (renamedVariable == null)
 						{
 						    // This is the normal case where fresh bound variables are needed - the above is merely to allow preallocation of all bound variables by Valuation. 
-						    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous());
+						    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous(), currentVariable.blocking(), currentVariable.shallow());
 						}
 	                    innerRenamings = innerRenamings.extend(currentVariable, renamedVariable);
 						mappedBinds[b] = renamedVariable;

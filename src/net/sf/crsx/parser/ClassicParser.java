@@ -77,9 +77,9 @@ public class ClassicParser implements Parser, ClassicParserConstants {
 
         /** Whether location properties are added to constructors. */
         private boolean captureLocations;
-        private Constructor makeConstructor(Sink sink, Token t, String s, boolean closure, String sort)
+        private Constructor makeConstructor(Sink sink, Token t, String s, String sort)
         {
-                Constructor c = sort == null ? sink.makeConstructor(s, closure) : sink.makeLiteral(s, sort);
+                Constructor c = sort == null ? sink.makeConstructor(s) : sink.makeLiteral(s, sort);
                 return locateConstructor(sink, t, c);
         }
         private Constructor locateConstructor(Sink sink, Token t, Constructor c)
@@ -182,19 +182,26 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                 return s;
         }
 
-    private boolean isClosure(String s)
+    private boolean isBlocking(String s)
     {
-        return s.endsWith("^");
+        return s.contains("\u1d47");
     }
 
-        private String unClosure(String s)
+        private String unBlocking(String s)
         {
-           if (s.endsWith("^"))
-           {
-               return s.substring(0, s.length() - 1);
-           }
-           return s;
+           return s.replaceAll("\u1d47", "");
+        }
+
+    private boolean isShallow(String s)
+    {
+        return s.contains("\u02e2");
     }
+
+    private String unShallow(String s)
+    {
+       return s.replaceAll("\u02e2", "");
+    }
+
 
         /** Create a parse error on the current token with a nicely formatted message. */
         ParseException oops(String summary, Token t, Throwable e)
@@ -491,7 +498,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                                         if (term.kind() != Kind.VARIABLE_USE)
                                                 {if (true) throw oops("CRS error: dot abstraction must only have variables (with optional inner property) between constructor and dot", t, null);}
                                         Variable tv = term.variable();
-                                        Variable v = sink.makeVariable(tv.name(), tv.promiscuous()); // vi
+                                        Variable v = sink.makeVariable(tv.name(), tv.promiscuous(), tv.blocking(), tv.shallow()); // vi
                                         Variable[] bs = {v};
                                         Constructor c = constructor;
                                         if (lastVariableWithProperty != null)
@@ -526,7 +533,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                                         if (term.kind() != Kind.VARIABLE_USE)
                                                 {if (true) throw oops("CRS error: binders for argument must only have variables (with optional inner property) before dot", t, null);}
                                         Variable tv = term.variable();
-                                        Variable v = sink.makeVariable(tv.name(), tv.promiscuous()); // vi
+                                        Variable v = sink.makeVariable(tv.name(), tv.promiscuous(), tv.blocking(), tv.shallow()); // vi
                                         bs.add(v);
                                         bound = bound.extend(v.name(), v);
                                         if (i+2 < list.size() && (":".equals(Util.symbol(list.get(i+1))) || "::".equals(Util.symbol(list.get(i+1))))) // got : type
@@ -632,7 +639,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
     trace_call("Simple");
     try {
         Token t; String sort = null, s, category; int embeddedOffset = 0;
-        boolean wrap = false, linear = false, closure = false;
+        boolean wrap = false, linear = false, blocking = false, shallow = false;
         if (properties != null) for (Map.Entry<String, Term> e : properties.entrySet()) if (e.getValue() == null) wrap = true;
         if (varProperties != null) for (Map.Entry<Variable, Term> e : varProperties.entrySet()) if (e.getValue() == null) wrap = true;
         if (metaProperties != null && !metaProperties.isEmpty()) wrap = true;
@@ -685,7 +692,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case CONSTRUCTOR:
           t = jj_consume_token(CONSTRUCTOR);
-                                 closure = isClosure(t.toString()); s = unClosure(t.toString());
+                                 s = t.toString();
           break;
         case ATOM:
           t = jj_consume_token(ATOM);
@@ -718,14 +725,14 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                         // Meta-properties...we need fully general pattern/contraction wrapper.
                         String ref = (refs.isEmpty() ? null : refs.iterator().next());
                         sink = PropertiesWrapperConstructor.start(sink, ref, properties, varProperties, metaProperties);
-                        sink=sink.start(makeConstructor(sink, t, s, closure, sort));
+                        sink=sink.start(makeConstructor(sink, t, s, sort));
                 }
                 else
                 {
                         // At most simple key=value properties so use property-extended constructor.
                 try
                         {
-                                sink=sink.start(Util.wrapWithProperties(sink, makeConstructor(sink, t, s, closure, sort), properties, varProperties));
+                                sink=sink.start(Util.wrapWithProperties(sink, makeConstructor(sink, t, s, sort), properties, varProperties));
                         }
                         catch (CRSException e)
                         {
@@ -770,11 +777,11 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case VARIABLE:
           t = jj_consume_token(VARIABLE);
-                        s=t.toString(); linear = isLinear(s); s = unLinear(s);
+                        s=t.toString(); shallow = isShallow(s); s = unShallow(s); blocking = isBlocking(s); s = unBlocking(s); linear = isLinear(s); s = unLinear(s);
           break;
         case QUOTED_VARIABLE:
           t = jj_consume_token(QUOTED_VARIABLE);
-                                                                                                       s=unvar(t.toString()); linear = isLinear(s); s = unLinear(s);
+                                                                                                                                                                                               s=unvar(t.toString());  shallow = isShallow(s); s = unShallow(s);  blocking = isBlocking(s); s = unBlocking(s); linear = isLinear(s); s = unLinear(s);
           break;
         default:
           jj_la1[9] = jj_gen;
@@ -789,7 +796,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                         wrap = true;
                 }
                 Variable v = bound.get(s);
-                if (v == null) v = factory.freeVariable(s, !linear, true);
+                if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
                 sink = sink.use(v);
                 {if (true) return wrap ? sink.end() : sink;}
         }
@@ -1013,7 +1020,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
     try {
         Token t;
         Term term = null;
-        boolean linear = false;
+        boolean linear, blocking, shallow = false;
         String p, s, category;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NOT:
@@ -1026,19 +1033,19 @@ public class ClassicParser implements Parser, ClassicParserConstants {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case CONSTRUCTOR:
             t = jj_consume_token(CONSTRUCTOR);
-                                   p = unClosure(t.toString());
+                                   p = t.toString();
             break;
           case ATOM:
             t = jj_consume_token(ATOM);
-                                                                             p = unquote(t.toString());
+                                                                  p = unquote(t.toString());
             break;
           case NUMERIC:
             t = jj_consume_token(NUMERIC);
-                                                                                                                        p = t.toString();
+                                                                                                             p = t.toString();
             break;
           case STRING:
             t = jj_consume_token(STRING);
-                                                                                                                                                         p = unquote(t.toString());
+                                                                                                                                              p = unquote(t.toString());
             break;
           default:
             jj_la1[20] = jj_gen;
@@ -1054,11 +1061,11 @@ public class ClassicParser implements Parser, ClassicParserConstants {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case VARIABLE:
             t = jj_consume_token(VARIABLE);
-                            s=t.toString(); linear = isLinear(s); s = unLinear(s);
+                            s=t.toString(); shallow = isShallow(s); s = unShallow(s); blocking = isBlocking(s); s = unBlocking(s); linear = isLinear(s); s = unLinear(s);
             break;
           case QUOTED_VARIABLE:
             t = jj_consume_token(QUOTED_VARIABLE);
-                                                                                                           s=unvar(t.toString()); linear = isLinear(s); s = unLinear(s);
+                                                                                                                                                                                                  s=unvar(t.toString());  shallow = isShallow(s); s = unShallow(s);  blocking = isBlocking(s); s = unBlocking(s); linear = isLinear(s); s = unLinear(s);
             break;
           default:
             jj_la1[21] = jj_gen;
@@ -1067,7 +1074,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
           }
                  {
                         Variable v = bound.get(s);
-                        if (v == null) v = factory.freeVariable(s, !linear, true);
+                        if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
 //			if (varProperties.containsKey(v))
 //				throw oops("CRS error: Cannot explicitly repeat property variable in property pattern!", t, null);
                         varProperties.put(v, null);
@@ -1148,19 +1155,19 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case CONSTRUCTOR:
           t = jj_consume_token(CONSTRUCTOR);
-                           p = unClosure(t.toString());
+                           p = t.toString();
           break;
         case ATOM:
           t = jj_consume_token(ATOM);
-                                                                     p = unquote(t.toString());
+                                                          p = unquote(t.toString());
           break;
         case NUMERIC:
           t = jj_consume_token(NUMERIC);
-                                                                                                                p = t.toString();
+                                                                                                     p = t.toString();
           break;
         case STRING:
           t = jj_consume_token(STRING);
-                                                                                                                                                 p = unquote(t.toString());
+                                                                                                                                      p = unquote(t.toString());
           break;
         default:
           jj_la1[25] = jj_gen;
@@ -1185,11 +1192,11 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case VARIABLE:
           t = jj_consume_token(VARIABLE);
-                    s=t.toString(); linear = isLinear(s); s = unLinear(s);
+                    s=t.toString();  shallow = isShallow(s); s = unShallow(s); blocking = isBlocking(s); s = unBlocking(s); linear = isLinear(s); s = unLinear(s);
           break;
         case QUOTED_VARIABLE:
           t = jj_consume_token(QUOTED_VARIABLE);
-                                                                                                   s=unvar(t.toString()); linear = isLinear(s); s = unLinear(s);
+                                                                                                                                                                                           s=unvar(t.toString());  shallow = isShallow(s); s = unShallow(s); blocking = isBlocking(s); s = unBlocking(s);  linear = isLinear(s); s = unLinear(s);
           break;
         default:
           jj_la1[27] = jj_gen;
@@ -1207,7 +1214,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         }
          {
                 Variable v = bound.get(s);
-                if (v == null) v = factory.freeVariable(s, !linear, true);
+                if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
 //		if (varProperties.containsKey(v))
 //			throw oops("CRS error: Cannot explicitly repeat property variable!", t, null);
                 varProperties.put(v, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
@@ -1336,10 +1343,10 @@ public class ClassicParser implements Parser, ClassicParserConstants {
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1000,0x10000,0x678a4000,0x678a4000,0x2000,0x678e4000,0x1804000,0x678a4000,0x200000,0x22000000,0x44000000,0x678a4000,0x200000,0x0,0x0,0x67800000,0x10000,0x67800000,0x678a4000,0x8000,0x1000000,0x22000000,0x44000000,0x0,0x67000000,0x1000000,0x4000,0x22000000,0x4000,0x0,0x4000,0x44000000,0x4000,0x67800000,};
+      jj_la1_0 = new int[] {0x1000,0x10000,0xc78a4000,0xc78a4000,0x2000,0xc78e4000,0x1804000,0xc78a4000,0x200000,0x42000000,0x84000000,0xc78a4000,0x200000,0x0,0x0,0xc7800000,0x10000,0xc7800000,0xc78a4000,0x8000,0x1000000,0x42000000,0x84000000,0x0,0xc7000000,0x1000000,0x4000,0x42000000,0x4000,0x0,0x4000,0x84000000,0x4000,0xc7800000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x11e00,0x11e00,0x0,0x11e00,0x1c00,0x11e00,0x0,0x0,0x0,0x11e00,0x0,0x10400,0x10200,0x1e00,0x0,0x1e00,0x11e00,0x0,0x1c00,0x0,0x0,0x10400,0x1e00,0x1c00,0x0,0x0,0x0,0x10400,0x0,0x0,0x0,0x1e00,};
+      jj_la1_1 = new int[] {0x0,0x0,0x23c00,0x23c00,0x0,0x23c00,0x3800,0x23c00,0x0,0x0,0x0,0x23c00,0x0,0x20800,0x20400,0x3c00,0x0,0x3c00,0x23c00,0x0,0x3800,0x0,0x0,0x20800,0x3c00,0x3800,0x0,0x0,0x0,0x20800,0x0,0x0,0x0,0x3c00,};
    }
    private static void jj_la1_init_2() {
       jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
@@ -1431,7 +1438,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[69];
+    boolean[] la1tokens = new boolean[70];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -1451,7 +1458,7 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         }
       }
     }
-    for (int i = 0; i < 69; i++) {
+    for (int i = 0; i < 70; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

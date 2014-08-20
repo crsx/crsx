@@ -87,9 +87,6 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	/** Whether this particular token has an input location (concretely or virtually). */
 	private CharStream stream;
 	
-	/** Whether the constructor has the closure marker */
-	private boolean closure;
-
 	// Constructors.
 
 	/** Create token corresponding to anonymous token with just a type. */
@@ -104,17 +101,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		super(type, text);
 		this.factory = factory;
-		this.closure = false;
 	}
-
-	/** Create anonymous token based on just the type and name.*/
-	public CommonTokenConstructor(CommonTokenFactory factory, int type, String text, boolean closure)
-	{
-		super(type, text);
-		this.factory = factory;
-		this.closure = closure;
-	}
-
 	
 	/** Create token from substring and channel of character stream. */
 	public CommonTokenConstructor(CommonTokenFactory factory, CharStream input, int type, int channel, int start, int stop,
@@ -155,7 +142,6 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		CommonTokenConstructor t = (CommonTokenConstructor) payload;
 		factory = t.factory;
 		stream = t.stream;
-		closure = t.closure;
 	}
 
 	// Methods.
@@ -254,12 +240,6 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	public Token object()
 	{
 		return this;
-	}
-
-	@Override
-	public boolean isClosure()
-	{
-		return closure;
 	}
 
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)

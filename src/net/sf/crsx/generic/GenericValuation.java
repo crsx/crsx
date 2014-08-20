@@ -76,7 +76,7 @@ class GenericValuation implements Valuation
     	for (Term vd : rule.fresh.values())
     	{
     		Variable v = Util.variableWithOptionalSortVariable(vd);
-    		Variable freshV = sink.makeVariable(v.name(), v.promiscuous());
+    		Variable freshV = sink.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow());
     		mapped = mapped.extend(v, freshV);
     	}
         // ENTRY POINT to Contractum.contract().

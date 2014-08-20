@@ -65,12 +65,6 @@ public abstract class DelegateConstructor implements Constructor
 		return constructor.object();
 	}
 
-	@Override
-	public boolean isClosure()
-	{
-		return constructor.isClosure();
-	}
-
 	// @see net.sf.crsx.Constructor#match(net.sf.crsx.Match, net.sf.crsx.Constructor, net.sf.crsx.util.ExtensibleMap)
 	public boolean match(Match match, Constructor other, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)
 	{

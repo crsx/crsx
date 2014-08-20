@@ -25,7 +25,17 @@ public interface Variable extends Comparable<Variable>
      * Whether the variable permits more than occurrence.
      */
     boolean promiscuous();
-	
+
+    /**
+     * Whether the variable blocks the term reduction.
+     */
+    boolean blocking();
+    
+    /**
+     * Whether the variable occurs only at the same level it is bound.
+     */
+    boolean shallow();
+    
 	/**
 	 * Set the name representing the variable.
 	 * @param name some string to use for the name - does not need to be unique

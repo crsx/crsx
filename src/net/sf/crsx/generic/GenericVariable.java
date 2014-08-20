@@ -12,34 +12,46 @@ import net.sf.crsx.util.Util;
  */
 class GenericVariable implements Variable
 {
-    /**
-     * Return fresh variable with specific {@link #name()} and {@link #promiscuous()} values.
-     * @param name of variable
-     * @param promiscuous whether multiple occurrences of variable permitted
-     */
-    static GenericVariable makeVariable(String name, boolean promiscuous)
-    {
-        return new GenericVariable(name, promiscuous);
-    }
- 
+	/**
+	 * Return fresh variable with specific {@link #name()} and {@link #promiscuous()} values.
+	 * @param name of variable
+	 * @param promiscuous whether multiple occurrences of variable permitted
+	 * @param blocking whether the variable blocks the reduction of the bound term.
+	 * @param shallow whether the variable occurrences are all shallow
+	 */
+	static GenericVariable makeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow)
+	{
+		return new GenericVariable(name, promiscuous, blocking, shallow);
+	}
+
 	// State.
-	
+
 	/** Symbol. */
 	String name;
-	
+
 	/** Linear? */
 	boolean promiscuous;
 
+	/** Blocking */
+	boolean blocking;
+
+	/** Shallow */
+	boolean shallow;
+
 	// Constructors.
-	
+
 	/**
 	 * Create unique variable.
 	 * @param name of variable (not semantically significant, may be modified)
+	 * @param blocking 
+	 * @param shallow  
 	 */
-	private GenericVariable(String name, boolean promiscuous)
+	private GenericVariable(String name, boolean promiscuous, boolean blocking, boolean shallow)
 	{
 		this.name = name;
 		this.promiscuous = promiscuous;
+		this.blocking = blocking;
+		this.shallow = shallow;
 	}
 
 	// CRS.Variable implementation.
@@ -48,36 +60,56 @@ class GenericVariable implements Variable
 	{
 		return name;
 	}
-	
+
 	public boolean promiscuous()
 	{
-	    return promiscuous;
+		return promiscuous;
 	}
-	
+
+	public boolean blocking()
+	{
+		return blocking;
+	}
+
+	public boolean shallow()
+	{
+		return shallow;
+	}
+
 	public void setName(String name)
 	{
 		this.name = name;
 	}
-	
+
 	public void setPromiscuous(boolean promiscuous)
 	{
 		this.promiscuous = promiscuous;
 	}
-	
+
+	public void setBlocking(boolean blocking)
+	{
+		this.blocking = blocking;
+	}
+
+	public void setShallow(boolean shallow)
+	{
+		this.shallow = shallow;
+	}
+
 	public boolean equals(Object that)
 	{
 		return this == that;
 	}
 
-    public int compareTo(Variable o)
-    {
+	public int compareTo(Variable o)
+	{
 		return this.name().compareTo(o.name());
-    }
-	
+	}
+
 	// Sic.
-	
+
 	public String toString()
 	{
-		return (promiscuous() ? "" : "\u00B9") + Util.externalizeVariable(name);
+		return (promiscuous() ? "" : "\u00B9") + Util.externalizeVariable(name) + (blocking ? "ᵇ" : "") + (shallow ? "ˢ" : "");
 	}
 }

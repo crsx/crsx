@@ -73,6 +73,18 @@ void crsxpBeforeSubstitution(Context context, Term term);
 /** Called after meta substitute */
 void crsxpAfterSubstitution(Context context);
 
+/** Called before call */
+void crsxpBeforeCall(Context context);
+
+/** Called after call */
+void crsxpAfterCall(Context context);
+
+/** Called when a variable set is created or copied */
+void crsxpVSCreated(Context context);
+
+/** Called when a variable is added to a variable set */
+void crsxpVSAdded(Context context, Hashset set);
+
 
 extern void printProfiling(Context context);
 extern void printMetasubstituteRecord(Context context, ProfMetaSubstitute c);

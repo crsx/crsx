@@ -498,7 +498,6 @@ struct _Construction
 
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
-    unsigned int closure : 1; // whether function construction is a closure
 
     Properties properties;
 
@@ -604,24 +603,31 @@ struct _SortDescriptor
 //
 // Variables are compared as pointers with ==.  The name is a guideline and may be ignored.
 //
-#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,1,0)
-#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0)
-#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1)
-#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1)
+#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,1,0,0,0)
+#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0,0,0)
+#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1,0,0)
+#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1,0,0)
+#define SHALLOW(v) ((v)->shallow = 1)
+#define BLOCK(v) ((v)->block = 1)
+
 //
 struct _Variable
 {
-    ssize_t nr;               // Number of references
-    ssize_t uses;             // Number of uses in the tree term and properties. Speed up meta substitution.
+    long nr;               // Number of references
+    long uses;             // Number of uses in the tree term and properties. Speed up meta substitution.
     char *name;              // name...neither guaranteed to be globally unique nor the same as originally provided
     unsigned int linear : 1; // whether this variable is linear
     unsigned int bound : 1;  // whether this variable is bound
+    unsigned int block : 1;  // whether this variable is blocking reduction
+    unsigned int shallow : 1; // whether this variable (when bound) has only shallow occurrences (before reduction)
+
+    unsigned int track : 1; // whether to track this variable in free variable sets (if optimization enabled)
 };
 
 /**
  * @Brief Make new variable. Reference count is 1, use count is 0
  */
-extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear);
+extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int block, unsigned int shallow);
 
 /**
  * @Brief Free variable
@@ -815,7 +821,9 @@ struct _Buffer
     VARIABLESET pendingNamedPropertiesFreeVars; // Free variables to insert before a batch of new named properties
     VARIABLESET pendingVariablePropertiesFreeVars; // Free variables to insert before a batch of new variable properties
 
+    unsigned blocking : 1; // whether there is at least one blocking binder
     unsigned free : 1; // whether the buffer structure itself should be freed
+
 };
 struct _BufferEntry
 {
