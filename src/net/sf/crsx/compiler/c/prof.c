@@ -153,6 +153,12 @@ static struct timespec diff(struct timespec start, struct timespec end)
     return temp;
 }
 
+static long long nano2ms(struct timespec time)
+{
+    return time.tv_sec * 1000 + (time.tv_nsec / 1000000);
+}
+
+
 void crsxpAfterSubstitution(Context context)
 {
     if (context->profiling)
@@ -397,7 +403,7 @@ void printProfiling(Context context)
         }
 
         PRINTF(context,
-                "\n\nReport meta count  (step name) (time ns) (percent time) ...\n");
+                "\n\nReport meta count  (step name) (time ms) (percent time) ...\n");
 
         Pair* counts = toArrayHS2(context, crsxpMetaCount);
         qsort(counts, crsxpMetaCount->size, sizeof(Pair), pairEntryCmp);
@@ -405,7 +411,7 @@ void printProfiling(Context context)
         struct timespec endTime;
         clock_gettime(CLOCK_REALTIME, &endTime);
         struct timespec d = diff(pStartTime, endTime);
-        double dl = (double) (d.tv_sec * 1000000000 + d.tv_nsec);
+        double dl = (double) (d.tv_sec * 1000000000l + d.tv_nsec);
 
         if (counts)
         {
@@ -414,7 +420,7 @@ void printProfiling(Context context)
                 long time = *(long*) counts[i]->value;
                 double percent = time / dl;
                 PRINTF(context, "\n%-50s : %10ld %2.2f",
-                        (const char* ) counts[i]->key, time, percent);
+                        (const char* ) counts[i]->key, (long) (time / 1000000.0), percent);
             }
         }
 
@@ -432,6 +438,8 @@ void printProfiling(Context context)
         PRINTF(context, "\n%-50s : %ld", "Free variable set count", pFVCount);
         PRINTF(context, "\n%-50s : %ld", "Free variable set maximum size",
                 pFVMaxSize);
+        PRINTF(context, "\n%-50s : %lldms", "Total time",
+                        nano2ms(d));
 
     }
 }
@@ -502,117 +510,117 @@ void crsxpPrintStats(Context context, Term term)
 /////////////////////////////////////////////////////////////////////////////////
 // Compute term size without check overhead
 
-static void termSize2(Term term, long* size, long* memuse, int sharing);
-
-// size    : total number of nodes, excluding property links.
-// memuse  : total memory use.
-// sharing : when true, account for shared terms.
-static void termSize(Term term, long* size, long* memuse, int sharing)
-{
-    pMarker++;
-    termSize2(term, size, memuse, sharing);
-}
-
-static void termSize2(Term term, long* size, long* memuse, int sharing)
-{
-    if (!sharing && term->marker == pMarker)
-        return;
-
-    term->marker = pMarker;
-
-    (*size)++;
-
-    if (IS_VARIABLE_USE(term))
-    {
-        Variable v = VARIABLE(term);
-
-        (*memuse) += sizeof(struct _Variable);
-        (*memuse) += strlen(v->name) + 1;
-    } else
-    {
-        (*memuse) += sizeof(struct _Construction);
-
-        Construction construction = asConstruction(term);
-        if (construction->fvs && construction->fvs != AllFreeVariables
-                && (sharing || construction->fvs->marker != pMarker))
-        {
-            construction->fvs->marker = pMarker;
-
-            (*memuse) += sizeof(struct _Hashset);
-            (*memuse) += construction->fvs->capacity * sizeof(size_t);
-        }
-        if (construction->nfvs && construction->nfvs != AllFreeVariables
-                && (sharing || construction->nfvs->marker != pMarker))
-        {
-            construction->nfvs->marker = pMarker;
-
-            (*memuse) += sizeof(struct _Hashset);
-            (*memuse) += construction->nfvs->capacity * sizeof(size_t);
-        }
-        if (construction->vfvs && construction->vfvs != AllFreeVariables
-                && (sharing || construction->vfvs->marker != pMarker))
-        {
-            construction->vfvs->marker = pMarker;
-
-            (*memuse) += sizeof(struct _Hashset);
-            (*memuse) += construction->vfvs->capacity * sizeof(size_t);
-        }
-
-        if (construction->properties)
-        {
-            NamedPropertyLink link;
-
-            for (link = construction->properties->namedProperties; link; link =
-                    link->link)
-            {
-                if (!sharing && link->marker == pMarker)
-                    break;
-
-                link->marker = pMarker;
-
-                if (link->name)
-                {
-                    termSize2(link->u.term, size, memuse, sharing);
-                } else
-                {
-                    (*memuse) += memoryUsedHS2(link->u.propset);
-                }
-
-                (*memuse) += sizeof(struct _NamedPropertyLink);
-            }
-        }
-
-        if (construction->properties)
-        {
-            VariablePropertyLink link;
-            for (link = construction->properties->variableProperties; link;
-                    link = link->link)
-            {
-                if (!sharing && link->marker == pMarker)
-                    break;
-
-                if (link->variable)
-                {
-                    termSize2(link->u.term, size, memuse, sharing);
-
-                    (*memuse) += sizeof(struct _Variable);
-                } else
-                {
-                    (*memuse) += memoryUsedHS2(link->u.propset);
-                }
-
-                (*memuse) += sizeof(struct _VariablePropertyLink);
-            }
-        }
-
-        const int arity = ARITY(term);
-        int i;
-        for (i = 0; i < arity; ++i)
-        {
-            termSize2(SUB(term, i), size, memuse, sharing);
-        }
-    }
-}
+//static void termSize2(Term term, long* size, long* memuse, int sharing);
+//
+//// size    : total number of nodes, excluding property links.
+//// memuse  : total memory use.
+//// sharing : when true, account for shared terms.
+//static void termSize(Term term, long* size, long* memuse, int sharing)
+//{
+//    pMarker++;
+//    termSize2(term, size, memuse, sharing);
+//}
+//
+//static void termSize2(Term term, long* size, long* memuse, int sharing)
+//{
+//    if (!sharing && term->marker == pMarker)
+//        return;
+//
+//    term->marker = pMarker;
+//
+//    (*size)++;
+//
+//    if (IS_VARIABLE_USE(term))
+//    {
+//        Variable v = VARIABLE(term);
+//
+//        (*memuse) += sizeof(struct _Variable);
+//        (*memuse) += strlen(v->name) + 1;
+//    } else
+//    {
+//        (*memuse) += sizeof(struct _Construction);
+//
+//        Construction construction = asConstruction(term);
+//        if (construction->fvs && construction->fvs != AllFreeVariables
+//                && (sharing || construction->fvs->marker != pMarker))
+//        {
+//            construction->fvs->marker = pMarker;
+//
+//            (*memuse) += sizeof(struct _Hashset);
+//            (*memuse) += construction->fvs->capacity * sizeof(size_t);
+//        }
+//        if (construction->nfvs && construction->nfvs != AllFreeVariables
+//                && (sharing || construction->nfvs->marker != pMarker))
+//        {
+//            construction->nfvs->marker = pMarker;
+//
+//            (*memuse) += sizeof(struct _Hashset);
+//            (*memuse) += construction->nfvs->capacity * sizeof(size_t);
+//        }
+//        if (construction->vfvs && construction->vfvs != AllFreeVariables
+//                && (sharing || construction->vfvs->marker != pMarker))
+//        {
+//            construction->vfvs->marker = pMarker;
+//
+//            (*memuse) += sizeof(struct _Hashset);
+//            (*memuse) += construction->vfvs->capacity * sizeof(size_t);
+//        }
+//
+//        if (construction->properties)
+//        {
+//            NamedPropertyLink link;
+//
+//            for (link = construction->properties->namedProperties; link; link =
+//                    link->link)
+//            {
+//                if (!sharing && link->marker == pMarker)
+//                    break;
+//
+//                link->marker = pMarker;
+//
+//                if (link->name)
+//                {
+//                    termSize2(link->u.term, size, memuse, sharing);
+//                } else
+//                {
+//                    (*memuse) += memoryUsedHS2(link->u.propset);
+//                }
+//
+//                (*memuse) += sizeof(struct _NamedPropertyLink);
+//            }
+//        }
+//
+//        if (construction->properties)
+//        {
+//            VariablePropertyLink link;
+//            for (link = construction->properties->variableProperties; link;
+//                    link = link->link)
+//            {
+//                if (!sharing && link->marker == pMarker)
+//                    break;
+//
+//                if (link->variable)
+//                {
+//                    termSize2(link->u.term, size, memuse, sharing);
+//
+//                    (*memuse) += sizeof(struct _Variable);
+//                } else
+//                {
+//                    (*memuse) += memoryUsedHS2(link->u.propset);
+//                }
+//
+//                (*memuse) += sizeof(struct _VariablePropertyLink);
+//            }
+//        }
+//
+//        const int arity = ARITY(term);
+//        int i;
+//        for (i = 0; i < arity; ++i)
+//        {
+//            termSize2(SUB(term, i), size, memuse, sharing);
+//        }
+//    }
+//}
 
 #else
 

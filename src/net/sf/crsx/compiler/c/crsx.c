@@ -390,6 +390,7 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
 
     construction->nf = 0;
     construction->nostep = buffer->blocking; // no normalization if at least one blocking binder
+    //construction->nostep = 0; // no normalization if at least one blocking binder
 
     // term->sub and term->binders will be populated incrementally.
     bufferPush(buffer, (Term) construction); // suspend current construction in favor of children
@@ -510,8 +511,7 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
     ASSERT(context, 0 <= index && index < ARITY(term));
     ASSERT(context, size == RANK(term,index));
 
-    unsigned int allBlocking = 1;
-    unsigned int allShallow = 1;
+    unsigned int notrack = 1;
     buffer->blocking = 0;
     int i;
     for (i = 0; i < size; ++i)
@@ -520,19 +520,12 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
         BINDER(term,index,i) = b; // No need to link variables. Also binders are not considered used.
         buffer->blocking |= b->block;
 
-        allBlocking &= b->block;
-        allShallow &= b->shallow;
+        notrack &= b->block & b->shallow;
     }
 
-    if (context->fv_enabled)
-    {
-        // If all binders are blocking and all binders are shallowm, then don't track them.
-        if (allBlocking && allShallow)
-        {
-            for (i = 0; i < size; ++i)
-                binds[i]->track = 0;
-        }
-    }
+    if (context->fv_enabled && notrack) // full meta-substitute won't be called, so don't track these binders
+        for (i = 0; i < size; ++i)
+            binds[i]->track = 0;
 
     return sink;
 }
@@ -3555,9 +3548,9 @@ void call(Sink sink, Term term, SubstitutionFrame values)
     ASSERT(sink->context, !values->parent);
 
     const Context context = sink->context;
-    const int arity = term->descriptor->arity;
-
     crsxpBeforeCall(context);
+
+    const int arity = term->descriptor->arity;
 
     if (term->nr > 1) // Shared?
     {
@@ -3667,13 +3660,16 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 
     // When all substituted variables are (statically) shallow and blocking
     // then use lightweight substitution.
-    unsigned int lightweight = 1;
-    int i;
-    for (i = 0; i < substitutionCount; ++i)
-        lightweight &= substitution->variables[i]->block & substitution->variables[i]->shallow;
+    if (IS_CONSTRUCTION(term))
+    {
+        unsigned int lightweight = 1;
+        int i;
+        for (i = 0; i < substitutionCount; ++i)
+            lightweight &= substitution->variables[i]->block & substitution->variables[i]->shallow;
 
-    if (lightweight)
-        return call(sink, term, substitution);
+        if (lightweight)
+            return call(sink, term, substitution);
+    }
 
     // Prepare helper bitsets.
 
@@ -3698,7 +3694,7 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
     FREE_LBITS(sink->context, unexhausted);
     FREE_LBITS(sink->context, unweakened);
 
-
+    int i;
     for (i = 0; i < substitutionCount; ++i)
         UNLINK(sink->context, substitution->substitutes[i]);
 

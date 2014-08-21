@@ -605,7 +605,7 @@ public class GenericFactory implements Factory<GenericTerm>
 
 	public Variable freeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow, boolean create)
 	{
-		String richName = (promiscuous ? "¹" : "") + name;
+		String richName = (promiscuous ? "¹" : "") + name + (blocking ? "ᵇ" : "") + (shallow ? "ˢ" : "");
 		if (create && !globalFreeVariables.containsKey(richName))
 			globalFreeVariables.put(richName, makeVariable(name, promiscuous, blocking, shallow));
 		return globalFreeVariables.get(richName);
