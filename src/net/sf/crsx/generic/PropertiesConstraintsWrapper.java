@@ -2071,7 +2071,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 							break;
 						}
 					default :
-						throw new UnsupportedOperationException("Contracted property that is neither variable nor constant.");
+						throw new UnsupportedOperationException("Contracted property that is neither variable nor constant: " + key);
 				}
 			}
 			else
