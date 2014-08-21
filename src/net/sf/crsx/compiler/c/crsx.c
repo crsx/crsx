@@ -2543,6 +2543,23 @@ Term c_variableProperty(VariablePropertyLink link, Variable variable)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+// Global Environement accessor.
+
+char* getEnvValue(Context context, const char *name)
+{
+    char* value = (char*) getValuePtrHS2(context->env, name);
+    if (!value)
+        value = getenv(name);
+
+    return value;
+}
+
+char* setContextEnv(Context context, const char *name, const char* value)
+{
+    addValueHS2(context, context->env, name, (void*) value);
+}
+
+/////////////////////////////////////////////////////////////////////////////////
 // Errors.
 
 void *errorf(Context context, char *format, ...)
@@ -2602,6 +2619,7 @@ void crsxAddPools(Context context)
 {
     if (!context->poolRefCount)
     {
+        context->env = makeHS2(context, 4, NULL);
         context->stringPool = makeHS2(context, 16, NULL);
         context->keyPool = makeHS2(context, 16, NULL);
 
@@ -2623,6 +2641,8 @@ void crsxReleasePools(Context context)
     --context->poolRefCount;
     if (! context->poolRefCount)
     {
+        unlinkHS2(context, context->env);
+        context->env = NULL;
         unlinkHS2(context, context->stringPool);
         context->stringPool = NULL;
         unlinkHS2(context, context->keyPool);
@@ -3501,6 +3521,9 @@ static int step(Sink sink, Term term)
 void InitCRSXContext(Context context)
 {
     context->stamp = 0;
+
+    context->env = NULL;
+
     context->poolRefCount = 0;
     context->stringPool = NULL;
     context->keyPool = NULL;

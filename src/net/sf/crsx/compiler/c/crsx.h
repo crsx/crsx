@@ -64,6 +64,9 @@ typedef struct _TermLink *TermLink;
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
+
+    Hashset2 env;         // General environment.
+
     int poolRefCount;
     Hashset2 stringPool;  // Set of char*
     Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
@@ -912,14 +915,12 @@ extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // PROPERTIES
 
-
 extern Term c_namedProperty(NamedPropertyLink link, char *name);
 extern Term c_variableProperty(VariablePropertyLink link, Variable variable);
 static inline Term c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
-
 
 struct _Properties
 {
@@ -985,6 +986,20 @@ extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, Variabl
 
 #define ASSERT_VARIABLE_PROPERTIES(context, properties) \
 ASSERT(context, (!context->fv_enabled || ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars))));
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GLOBAL ENVIRONMENT
+
+/**
+ * Returns the value of the environment name.
+ * First look in the normalization context and if not defined, look in the global environment
+ */
+extern char* getEnvValue(Context context, const char *name);
+
+/**
+ * Set the value of the environment name in the context
+ */
+extern char* setContextEnv(Context context, const char *name, const char* value);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
