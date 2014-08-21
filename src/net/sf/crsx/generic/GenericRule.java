@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.xml.internal.bind.v2.model.core.MaybeElement;
-
 import net.sf.crsx.Builder;
 import net.sf.crsx.CRSException;
 import net.sf.crsx.Constructor;
