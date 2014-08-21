@@ -435,12 +435,6 @@ public class JoelFactory extends GenericFactory
 			this.symbol = name.intern();
 		}
 
-		@Override
-		public boolean isClosure()
-		{
-			return false;
-		}
-
 		// Methods.
 		/**
 		 * Handler for {@link Sink#start(Constructor)} with the constructor.
@@ -735,13 +729,6 @@ public class JoelFactory extends GenericFactory
 		{
 			return JoelFactory.this.makeConstructor(object);
 		}
-		
-
-		@Override
-		public Constructor makeConstructor(Object object, boolean closure)
-		{
-			return makeConstructor(object);
-		}
 
 		public Constructor makeLiteral(Object object, String sort)
 		{
@@ -752,10 +739,20 @@ public class JoelFactory extends GenericFactory
 		{
 			return JoelFactory.this.makeVariable(name, promiscuous);
 		}
+		
+		final public Variable makeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow)
+		{
+			return JoelFactory.this.makeVariable(name, promiscuous, blocking, shallow);
+		}
 
 		final public Variable freeVariable(String name, boolean promiscuous, boolean create)
 		{
 			return JoelFactory.this.freeVariable(name, promiscuous, create);
+		}
+
+		final public Variable freeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow, boolean create)
+		{
+			return JoelFactory.this.freeVariable(name, promiscuous, blocking, shallow, create);
 		}
 
 		final public Sink makeBuffer(Maker.CallBack callBack)
@@ -1323,12 +1320,6 @@ public class JoelFactory extends GenericFactory
 			return JoelFactory.this.makeConstructor(object);
 		}
 		
-		@Override
-		public Constructor makeConstructor(Object object, boolean closure)
-		{
-			return JoelFactory.this.makeConstructor(object);
-		}
-
 		public Constructor makeLiteral(Object object, String sort)
 		{
 			return JoelFactory.this.makeLiteral(object, sort);
@@ -1338,12 +1329,24 @@ public class JoelFactory extends GenericFactory
 		{
 			return JoelFactory.this.makeVariable(name, promiscuous);
 		}
+		
+		final public Variable makeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow)
+		{
+			return JoelFactory.this.makeVariable(name, promiscuous, blocking, shallow);
+		}
 
 		final public Variable freeVariable(String name, boolean promiscuous, boolean create)
 		{
 			return JoelFactory.this.freeVariable(name, promiscuous, create);
 		}
 
+
+		final public Variable freeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow, boolean create)
+		{
+			return JoelFactory.this.freeVariable(name, promiscuous, blocking, shallow, create);
+		}
+
+		
 		final public Sink makeBuffer(Maker.CallBack callBack)
 		{
 			return JoelFactory.this.makeBuffer(callBack);

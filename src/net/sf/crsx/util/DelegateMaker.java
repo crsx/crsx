@@ -25,11 +25,6 @@ public abstract class DelegateMaker implements Maker
         return maker().makeConstructor(object);
     }
     
-    final public Constructor makeConstructor(Object object, boolean closure)
-	{
-		return maker().makeConstructor(object, closure);
-	}
-
 	final public Constructor makeLiteral(Object object, String sort)
     {
 	    return maker().makeLiteral(object, sort);
@@ -40,11 +35,22 @@ public abstract class DelegateMaker implements Maker
         return maker().makeVariable(name, promiscuous);
     }
 	
+	final public Variable makeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow)
+    {
+        return maker().makeVariable(name, promiscuous, blocking, shallow);
+    }
+	
 	final public Variable freeVariable(String name, boolean promiscuous, boolean create)
     {
 		return maker().freeVariable(name, promiscuous, create);
     }
 
+	final public Variable freeVariable(String name, boolean promiscuous, boolean blocking, boolean shallow, boolean create)
+    {
+		return maker().freeVariable(name, promiscuous, blocking, shallow, create);
+    }
+
+	
 	final public Sink makeBuffer(CallBack callBack)
     {
         return maker().makeBuffer(callBack);

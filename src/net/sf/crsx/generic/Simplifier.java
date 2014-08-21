@@ -31,39 +31,37 @@ import net.sf.crsx.util.Util;
 /**
  * Simplify contractum.
  * 
- 
  * <p>
  * A simplify contraction as the following characteristics:
  * <ul>
- * <li>Deep closures are transformed into shallow closure and continuation (see below)
- * <li>Meta closures are transformed into closure and substitution (see below)
+ * <li>Deep binders are transformed into shallow binders and blocked reduction (see below)
+ * <li>Bound meta substitution are transformed into bound construction and unbound substitution (see below)
  * </ul>
  * 
  * <p>
- * A deep closure is a closure where binder uses don't only occur directly on the closure itself
- * but at a deeper level. For instance:
+ * Here an illustrative example of a deep binder occurrence:
  * 
- * <pre>F[b.{#E}DeepClosure[C[b]]]</pre>
+ * <pre>... → F[b.{#E}F[C[b]]]</pre>
  * 
- * is a deep closure because b occurs in a construction that is not directly where the binder has been defined.
- * It is instead simplified as follows:
+ * It is simplified as follows:
  * 
  * <pre>
- * F[b.DeepClosure$C[{#E}Prop, b]] 
- * DeepClosure$C[{#E}#Prop, #b] → {#E}DeepClosure[C[#b]];
+ * ...                → F[bᵇ.F$C[{#E}Prop, b]] 
+ * F$C[{#E}#Prop, #b] → {#E}F[#b]];
  * </pre>
  * 
+ * Where b occurs at the top-level and block the reduction of F$C (as b has the ᵇ marker)
+ * 
  * <p>
- * A meta closure is a contraction on the form: 
+ * A bound meta substitution is a contraction on the form: 
  * 
  * <pre>  b<sub>1</sub>....b<sub>n</sub>....{#E}#[a<sub>1</sub> ... a<sub>n</sub>]</pre>
  * 
  * where the arguments contains the bound variables <code>b<sub>1..n</sub></code>.
  * <p>
- * It is rewriting as a closure effectively delaying the meta-substitution:
+ * It is rewritten to a delayed unbound meta-substitution as follows:
  * 
- * <pre>  b<sub>1</sub>....b<sub>n</sub>.{#E}Delay<i>I</i>[a<sub>1</sub> ... a<sub>n</sub>, ba<sub>1</sub> ... ba<sub>n</sub>.#[ba<sub>1</sub> ... ba<sub>n</sub>]]</pre>
- * 
+ * <pre>  b<sub>1</sub>ᵇ....b<sub>n</sub>ᵇ.{#E}Delay<i>I</i>[a<sub>1</sub> ... a<sub>n</sub>, ba<sub>1</sub> ... ba<sub>n</sub>.#[ba<sub>1</sub> ... ba<sub>n</sub>]]</pre>
  * 
  * <p>
  * Meta notes:
@@ -109,7 +107,7 @@ public class Simplifier
 
 			state.changed = false;
 			state.rule = rule;
-			GenericTerm newContractum = eliminateMetaClosure(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY);
+			GenericTerm newContractum = eliminateBoundMeta(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY);
 
 			if (state.changed)
 			{
@@ -132,7 +130,6 @@ public class Simplifier
 			state.newrules = new LinkedList<>();
 			for (GenericRule rule : ruleByName.values())
 			{
-
 				// Some $ primitives are currently not properly sorted. Ignore rules containing those.
 				PrimitiveDetector detector = new PrimitiveDetector();
 				rule.getContractum().visit(detector, SimpleVariableSet.EMPTY);
@@ -141,7 +138,7 @@ public class Simplifier
 				{
 					state.changed = false;
 					state.rule = rule;
-					GenericTerm newContractum = eliminateDeepClosure(
+					GenericTerm newContractum = eliminateDeepBinders(
 							state, (GenericTerm) rule.getContractum(), new LinkedExtensibleSet<Pair<Variable, Term>>());
 
 					if (state.changed)
@@ -165,7 +162,7 @@ public class Simplifier
 	}
 
 	/**
-	 * Simplify meta-closure on a term
+	 * Simplify bound meta application on a term
 	 * 
 	 * @param state
 	 * @param term
@@ -173,7 +170,7 @@ public class Simplifier
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateMetaClosure(Env1 state, GenericTerm term, ExtensibleSet<Variable> bound) throws CRSException
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericTerm term, ExtensibleSet<Variable> bound) throws CRSException
 	{
 		if (term instanceof PropertiesConstraintsWrapper)
 		{
@@ -182,7 +179,7 @@ public class Simplifier
 
 			// TODO: simplify properties
 
-			props.term = eliminateMetaClosure(state, props.term, bound);
+			props.term = eliminateBoundMeta(state, props.term, bound);
 			return props;
 		}
 		else
@@ -190,9 +187,9 @@ public class Simplifier
 			switch (term.kind())
 			{
 				case CONSTRUCTION :
-					return eliminateMetaClosure(state, (GenericConstruction) term, bound);
+					return eliminateBoundMeta(state, (GenericConstruction) term, bound);
 				case META_APPLICATION :
-					return eliminateMetaClosure(state, (GenericMetaApplication) term, bound);
+					return eliminateBoundMeta(state, (GenericMetaApplication) term, bound);
 				case VARIABLE_USE :
 				default :
 					return term;
@@ -201,7 +198,7 @@ public class Simplifier
 	}
 
 	/**
-	 * Simplify meta-closure on a construction
+	 * Simplify bound meta application on a construction
 	 * 
 	 * @param state
 	 * @param term
@@ -209,20 +206,20 @@ public class Simplifier
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateMetaClosure(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound)
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound)
 			throws CRSException
 	{
 		for (int i = term.arity() - 1; i >= 0; i--)
 		{
 			ExtensibleSet<Variable> subbound = bound.extend(term.binders(i));
-			GenericTerm newsub = eliminateMetaClosure(state, term.sub(i), subbound);
+			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound);
 			term.replaceSub(i, term.binders(i), newsub);
 		}
 		return term;
 	}
 
 	/**
-	 * Simplify meta-closure on a meta application
+	 * Simplify bound meta application on a meta
 	 *
 	 * @param state
 	 * @param term
@@ -230,13 +227,13 @@ public class Simplifier
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateMetaClosure(Env1 state, GenericMetaApplication term, ExtensibleSet<Variable> bound)
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericMetaApplication term, ExtensibleSet<Variable> bound)
 			throws CRSException
 	{
 		for (int i = term.arity() - 1; i >= 0; i--)
 		{
 			ExtensibleSet<Variable> subbound = bound.extend(term.binders(i));
-			GenericTerm newsub = eliminateMetaClosure(state, term.sub(i), subbound);
+			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound);
 			term.replaceSub(i, term.binders(i), newsub);
 		}
 
@@ -257,7 +254,7 @@ public class Simplifier
 			for (int i = term.arity() - 1; i >= 0; i--)
 			{
 				Variable original = metaOnPattern.sub(i).variable();
-				binders[i] = factory.makeVariable(original.name(), original.promiscuous());
+				binders[i] = factory.makeVariable(original.name(), original.promiscuous(), original.blocking(), original.shallow());
 				args[i] = factory.newVariableUse(binders[i]);
 
 				allbinders[i] = GenericTerm.NO_BIND;
@@ -277,7 +274,7 @@ public class Simplifier
 	}
 
 	/**
-	 * Simplify deep-closure on a term
+	 *  Simplify uses of deep binders in a term
 	 * 
 	 * @param state
 	 * @param term
@@ -286,7 +283,7 @@ public class Simplifier
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateDeepClosure(Env1 state, GenericTerm term, ExtensibleSet<Pair<Variable, Term>> bound)
+	private GenericTerm eliminateDeepBinders(Env1 state, GenericTerm term, ExtensibleSet<Pair<Variable, Term>> bound)
 			throws CRSException
 	{
 		if (term instanceof PropertiesConstraintsWrapper)
@@ -296,7 +293,7 @@ public class Simplifier
 
 			// TODO: simplify properties
 
-			props.term = eliminateDeepClosure(state, props.term, bound);
+			props.term = eliminateDeepBinders(state, props.term, bound);
 			return props;
 		}
 		else
@@ -304,9 +301,9 @@ public class Simplifier
 			switch (term.kind())
 			{
 				case CONSTRUCTION :
-					return eliminateDeepClosure(state, (GenericConstruction) term, bound);
+					return eliminateDeepBinders(state, (GenericConstruction) term, bound);
 				case META_APPLICATION :
-					return eliminateDeepClosure(state, (GenericMetaApplication) term, bound);
+					return eliminateDeepBinders(state, (GenericMetaApplication) term, bound);
 				case VARIABLE_USE :
 				default :
 					return term;
@@ -315,7 +312,7 @@ public class Simplifier
 	}
 
 	/**
-	 * Simplify deep-closure of a construction
+	 * Simplify uses of deep binders in a construction
 	 * 
 	 * @param state
 	 * @param term
@@ -323,7 +320,7 @@ public class Simplifier
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateDeepClosure(Env1 state, GenericConstruction term, ExtensibleSet<Pair<Variable, Term>> bound)
+	private GenericTerm eliminateDeepBinders(Env1 state, GenericConstruction term, ExtensibleSet<Pair<Variable, Term>> bound)
 			throws CRSException
 	{
 		if (Util.isEval(term.constructor))
@@ -339,28 +336,28 @@ public class Simplifier
 			Pair<Term, Term> sortDeclaration = getSortDeclaration(rulename, term.constructor.symbol());
 			Term[] binderSorts = getBindersSort(rulename, sortDeclaration.tail(), i);
 
-			final boolean hasClosureMarker = sub.constructor() != null && sub.constructor().isClosure();
-			final boolean hasDeepBinders = state.rule.isDeepClosure(term, i);
-			if (hasClosureMarker && hasDeepBinders)
+			boolean hasBlockingMarker = false;
+			for (int j = 0; j < binders.length; j ++)
+				hasBlockingMarker |= binders[j].blocking();
+			
+			final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
+			if (hasBlockingMarker && hasDeepBinders)
 			{
-				// The sub is a deep closure so eliminate...only if has marker
-
+				// The sub is a deep binder so eliminate...only if has marker
 				ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
 
 				Env2 env = new Env2(state.rule, subbound, sub.arity());
 
 				GenericTerm contractum = rewrite(env, term, i, sub, binders, subbound);
 
-				// Replace sub with call to the new closure.
+				// Replace sub with call to the new function.
 				Constructor name = factory.makeConstructor(state.rule.name() + "$C$" + state.counter++);
 				GenericTerm newsub = factory.newConstruction(
 						name, env.argsBinders.toArray(GenericTerm.NO_BINDS), env.args.toArray(GenericTerm.NO_TERMS));
 				term.replaceSub(i, binders, newsub);
 				env.rule.reconcile();
-				
-				//System.out.println("=======\nupdated rule:" + state.rule);
 
-				// Create new rule corresponding to the new closure
+				// Create new rule corresponding to the simplified function
 				GenericTerm pattern = factory.newConstruction(
 						name, env.patternBinders.toArray(GenericTerm.NO_BINDS), env.patternArgs.toArray(GenericTerm.NO_TERMS));
 
@@ -383,8 +380,6 @@ public class Simplifier
 				options.put(Builder.LAX_OPTION_SYMBOL, new LinkedList<Term>());
 
 				GenericRule rule = new GenericRule(crs, name, pattern, contractum, options);
-
-				//System.out.println("=======\nnew rule:" + rule);
 
 				// Set meta sorts to rule so that the sortifier does not have to run after each main iteration (see simplify)!
 				Map<String, Term> metavarSorts = new HashMap<>(8); // Map meta variable name to sorts
@@ -417,7 +412,7 @@ public class Simplifier
 					}
 				}
 
-				// The new closure is a function: strip properties (they are on the form)
+				// Simplified rules don't have properties (they are on the form)
 				Term sortTerm = subSortDeclaration.head();
 				if (Util.hasProperties(sortTerm))
 					sortTerm = ((PropertiesConstraintsWrapper) sortTerm).term;
@@ -430,13 +425,13 @@ public class Simplifier
 				{
 					if (factory.defined(Factory.SHOW_POTENTIAL_CLOSURE_OPTION))
 						warning("construction "
-								+ Util.symbol(sub) + " contains deep binder uses. Consider using the closure marker (^) in rule "
+								+ Util.symbol(sub) + " contains deep binder uses. Consider using the blocking marker ᵇ in rule "
 								+ rulename);
 				}
 
 				ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
 
-				GenericTerm newsub = eliminateDeepClosure(state, term.sub(i), subbound);
+				GenericTerm newsub = eliminateDeepBinders(state, term.sub(i), subbound);
 				term.replaceSub(i, binders, newsub);
 			}
 		}
@@ -451,7 +446,7 @@ public class Simplifier
 	 * @param bound
 	 * @return
 	 */
-	private GenericTerm eliminateDeepClosure(Env1 state, GenericMetaApplication term, ExtensibleSet<Pair<Variable, Term>> bound)
+	private GenericTerm eliminateDeepBinders(Env1 state, GenericMetaApplication term, ExtensibleSet<Pair<Variable, Term>> bound)
 	{
 		// TODO: how to get the binders sorts?
 
@@ -681,13 +676,13 @@ public class Simplifier
 								var = original.sub(i).variable();
 
 							// The variable is a binder occurring in the closure. Need to capture the binder
-							Variable capturedBinder = factory.makeVariable(var.name(), var.promiscuous());
+							Variable capturedBinder = factory.makeVariable(var.name(), var.promiscuous(), var.blocking(), var.shallow());
 							patternBindersA.add(capturedBinder);
 
 							patternSubsA.add(factory.newVariableUse(capturedBinder));
 
 							// Update binder sorts
-							Variable binderOnSort = factory.makeVariable(var.name(), var.promiscuous());
+							Variable binderOnSort = factory.makeVariable(var.name(), var.promiscuous(), var.blocking(), var.shallow());
 							patternBindersSortA.add(binderOnSort);
 							Term varSort = env.rule.getVariableSort(var);
 							if (varSort == null)
@@ -905,18 +900,6 @@ public class Simplifier
 		factory.warning(txt, "Simplifier warning: ");
 	}
 
-	/**
-	 * Give an error message to the user, which is collected and not shown
-	 * until factory.errorCheck is called.
-	 * @param txt the error to be displayed
-	 * @throws CRSException if the error handler (the calling CRS) is set
-	 * to be strict about errors 
-	 */
-	//	private void error(String txt) throws CRSException
-	//	{
-	//		factory.error(txt, "Simplifier error: ");
-	//	}
-
 	/** Throw a fatal error */
 	private void fatal(String txt) throws CRSException
 	{
@@ -992,7 +975,6 @@ public class Simplifier
 			}
 			super.visitPrimitive(primitive, start);
 		}
-
 	}
 
 }

@@ -179,7 +179,7 @@ final public class Standardizer
 			case VARIABLE_USE : {
 				Variable x = term.variable();
 				if (!varSubstitution.containsKey(x))
-					varSubstitution.put(x, env.makeVariable(variablePositions.get(x), x.promiscuous()));
+					varSubstitution.put(x, env.makeVariable(variablePositions.get(x), x.promiscuous(), x.blocking(), x.shallow()));
 				Variable y = varSubstitution.get(x);
 				ret = factory.newVariableUse(y);
 				if (sorts.containsKey(y))
@@ -253,7 +253,7 @@ final public class Standardizer
 				{
 					Variable x = Util.variableWithOptionalSortVariable(term);
 					if (!varSubstitution.containsKey(x))
-						varSubstitution.put(x, env.makeVariable(variablePositions.get(x), x.promiscuous()));
+						varSubstitution.put(x, env.makeVariable(variablePositions.get(x), x.promiscuous(), x.blocking(), x.shallow()));
 					Variable y = varSubstitution.get(x);
 					GenericTerm sort = (GenericTerm) Util.variableWithOptionalSortSort(term);
 					//ret = Util.makeVariableWithSort(factory, Util.variableWithOptionalSortVariable(term), standardize(Util.variableWithOptionalSortSort(term), metaVariablePositions, variablePositions, setMetaVariableArgs, varSubstitution, pos, explicitMeta, bound, rule, sorts, keysorts, left, belowSemantic));
@@ -284,7 +284,7 @@ final public class Standardizer
 						for (int j = 0; j < term.binders(i).length; j++)
 						{
 							Variable b = term.binders(i)[j];
-							binds[i][j] = env.makeVariable(variablePositions.get(b), b.promiscuous());
+							binds[i][j] = env.makeVariable(variablePositions.get(b), b.promiscuous(), b.blocking(), b.shallow());
 							varSubstitution.put(term.binders(i)[j], binds[i][j]);
 							bound.add(binds[i][j]);
 							if (subHolder != null)
@@ -461,7 +461,7 @@ final public class Standardizer
 			Variable[] formBinders = form.binders(i);
 			binders[i] = new Variable[formBinders.length];
 			for (int j = 0; j < binders[i].length; j++)
-				binders[i][j] = env.makeVariable("x" + pos + subVariablePosition(i, form.arity(), j, binders[i].length), formBinders[j].promiscuous());
+				binders[i][j] = env.makeVariable("x" + pos + subVariablePosition(i, form.arity(), j, binders[i].length), formBinders[j].promiscuous(), formBinders[j].blocking(), formBinders[j].shallow());
 
 			// determine the arguments for the meta-variable application
 			GenericTerm[] mvarargs = new GenericTerm[binders[i].length + bound.size()];
@@ -691,7 +691,7 @@ final public class Standardizer
 			for (int j = 0; j < bs.length; ++j)
 			{
 				Variable b = bs[j];
-				Variable nub = factory.makeVariable(b.name(), b.promiscuous());
+				Variable nub = factory.makeVariable(b.name(), b.promiscuous(), b.blocking(), b.shallow());
 				subrenamings = subrenamings.extend(b, nub);
 				nuBinders[i][j] = nub;
 			}

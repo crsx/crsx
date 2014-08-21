@@ -60,9 +60,9 @@ public final class Util
 	public static final java.util.regex.Pattern CONSTRUCTOR_PATTERN = java.util.regex.Pattern.compile("(?:\\w*[$A-Z]+\\w*|[\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]|\\d+(?:[.]\\d+)?(?:[Ee]\\d+)?|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+|<(i|b|u|tt|q)>(?:[^<>&\n\r]|&(?:#[0-9]+|[-$A-Za-z0-9_]+);)+</\\1>)"
 			+ "(?:[-](?:[$A-Za-z]+\\w*|\\d+|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+))*");
 	// TODO: handle more...
-
+	
 	/** Conservative approximation of string that it is safe to print as an unquoted variable name */
-	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile("[a-z][A-Za-z0-9\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
+	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile("[a-z][A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
 
 	/** Conservative approximation of string that it is safe to print as an unquoted meta-variable name. */
 	public static final java.util.regex.Pattern META_VARIABLE_PATTERN = java.util.regex.Pattern.compile("(?:[<]em[>].*[<][/]em[>]|[A-Za-z0-9_$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[#]+[A-Za-z0-9_$#\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)(?:-[A-Za-z0-9$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)*|[#]['][^']*[']|[#][\"][^\"]*[\"]");
@@ -289,6 +289,10 @@ public final class Util
 				used.put(v, n);
 			}
 		}
+		if (!omitLinearity && v.blocking())
+			n += "ᵇ";
+		if (!omitLinearity && v.shallow())
+			n += "ˢ";
 		return (omitLinearity || v.promiscuous() ? "" : "\u00B9") + (omitEncoding ? n : externalizeVariable(n));
 	}
 
@@ -1728,7 +1732,7 @@ public final class Util
 						{
 							Variable[] newBinders = new Variable[first.binders(i).length];
 							for (int j = 0; j < newBinders.length; ++j)
-								newBinders[j] = sink.makeVariable(first.binders(i)[j].name(), first.binders(i)[j].promiscuous());
+								newBinders[j] = sink.makeVariable(first.binders(i)[j].name(), first.binders(i)[j].promiscuous(), first.binders(i)[j].blocking(), first.binders(i)[j].shallow());
 							for (Term t : terms)
 								renames = renames.extend(t.binders(i), newBinders);
 							sink = sink.binds(newBinders);

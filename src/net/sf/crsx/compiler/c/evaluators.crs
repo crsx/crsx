@@ -731,7 +731,7 @@ else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink,
 Set-Term-Get-Global[Fresh[value::Text]]:
 {#env}E-set-ref[E_Get, ($[NotMatch,PROPERTY-REF[#_Ref, #_Name],#Name]; #Key; #Defaults), #Options,  #sink, #property]
 →
-{#env} T-local-string[#Key, #sink, key p. %n⟪{⟦ char *«value» = getenv(«key»);
+{#env} T-local-string[#Key, #sink, key p. %n⟪{⟦ char *«value» = getEnvValue(«#sink»->context, «key»);
 «p»if («value») «#property» = makeStringLiteral(«#sink»->context, «value»);
 else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink, #property]]»⟧}⟧
 }
@@ -752,7 +752,6 @@ else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink,
 }
 ⟫;
 
-
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-Get-Property[$String, Text, Text] :: Text;
 
 {#env; #RefCookie: PROPERTY_VARIABLE[#namedFV, #varFV, #namedP, #varP]}
@@ -767,8 +766,6 @@ E-Get-Property[#RefCookie, #sink, #key]
 E-VariableProperties[#RefCookie]
 →
 %n⟪«#varP»⟫;
-
-
 
 // $[Pick, #index, #list] with constant #index evaluates as the index'th member of list (starting from 0). 
 //

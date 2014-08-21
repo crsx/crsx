@@ -1313,7 +1313,7 @@ public class Completer
 						for (int j = 0; j < term.binders(i).length; j++)
 						{
 							Variable x = term.binders(i)[j];
-							binds[i][j] = env.makeVariable(x.name().substring(0,1) + position + x.name().substring(1), x.promiscuous());
+							binds[i][j] = env.makeVariable(x.name().substring(0,1) + position + x.name().substring(1), x.promiscuous(), x.blocking(), x.shallow());
 							varChange.put(term.binders(i)[j], binds[i][j]);
 							varName.put(term.binders(i)[j].name(), term.binders(i)[j]);
 							varName.put(binds[i][j].name(), binds[i][j]);
@@ -1393,7 +1393,7 @@ public class Completer
 		else
 		{
 			String name = variable.name();
-			x = env.makeVariable(name.substring(0, 1) + position + name.substring(1), variable.promiscuous());
+			x = env.makeVariable(name.substring(0, 1) + position + name.substring(1), variable.promiscuous(), variable.blocking(), variable.shallow());
 			varChange.put(variable, x);
 			varName.put(name, variable);
 			varName.put(x.name(), x);
@@ -2388,7 +2388,7 @@ public class Completer
 						for (int j = 0; j < term.binders(i).length; j++)
 						{
 							Variable b = term.binders(i)[j];
-							binders[i][j] = env.makeVariable(b.name(), b.promiscuous());
+							binders[i][j] = env.makeVariable(b.name(), b.promiscuous(), b.blocking(), b.shallow());
 							varSub.put(term.binders(i)[j], binders[i][j]);
 							sorts.put(binders[i][j], sorts.get(term.binders(i)[j]));
 						}
@@ -2515,7 +2515,7 @@ public class Completer
 				for (int j = 0; j < term.binders(i).length; j++)
 				{
 					Variable b = term.binders(i)[j];
-					binders[i][j] = env.makeVariable("x" + currentPosition + "_" +  Standardizer.subVariablePosition(i, term.arity(), j, term.binders(i).length), b.promiscuous());
+					binders[i][j] = env.makeVariable("x" + currentPosition + "_" +  Standardizer.subVariablePosition(i, term.arity(), j, term.binders(i).length), b.promiscuous(), b.blocking(), b.shallow());
 					boundReplace.put(b, binders[i][j]);
 					sorts.put(binders[i][j], sorts.get(b));
 				}
@@ -3300,7 +3300,7 @@ public class Completer
 		{
 			String name = term.variable().name();
 			if (!varRenaming.containsKey(name) && name.charAt(0) != 'x')
-				varRenaming.put(name, env.makeVariable("y" + varRenaming.size(), term.variable().promiscuous()));
+				varRenaming.put(name, env.makeVariable("y" + varRenaming.size(), term.variable().promiscuous(), term.variable().blocking(), term.variable().shallow()));
 			return;
 		}
 		
@@ -3319,7 +3319,7 @@ public class Completer
 			for (String name : A.propertyNames())
 			{
 				if (!name.startsWith("%") && !name.startsWith("#") && !varRenaming.containsKey(name))
-					varRenaming.put(name, env.makeVariable("y" + varRenaming.size(), name.contains("¹")));
+					varRenaming.put(name, env.makeVariable("y" + varRenaming.size(), name.contains("¹"), name.contains("ᵇ"), name.contains("ˢ")));
 				lookupFreeVariablesAndMetas(A.getProperty(name), varRenaming, metaRenaming);
 			}
 	}
@@ -3385,7 +3385,7 @@ public class Completer
 								binds[i][j] = varChange.get(b.name());
 							else
 							{
-								binds[i][j] = env.makeVariable("x" + numberBounds + "_" + j, b.promiscuous());
+								binds[i][j] = env.makeVariable("x" + numberBounds + "_" + j, b.promiscuous(), b.blocking(), b.shallow());
 								varChange.put(b.name(), binds[i][j]);
 							}
 						}
@@ -3602,7 +3602,7 @@ public class Completer
 					{
 						if (exampleForm == null || exampleForm.binders(i) == null || exampleForm.binders(i).length < j)
 							factory.error("PANIC...inconsistent example?");
-						binds[i][j] = env.makeVariable("x" + j, exampleForm.binders(i)[j].promiscuous());
+						binds[i][j] = env.makeVariable("x" + j, exampleForm.binders(i)[j].promiscuous(), exampleForm.binders(i)[j].blocking(), exampleForm.binders(i)[j].shallow());
 						Term binderSort = sortGet(sortsSave, example.binders(i)[j]);
 						if (binderSort == null)
 						{

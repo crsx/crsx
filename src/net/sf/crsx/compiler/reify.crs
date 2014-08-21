@@ -130,7 +130,7 @@ Reified_Variable ::=( variable; );
 Reified_Binder ::=(
 
 	// b Binder (not as meta-application arguments)
-	BINDER[ Reified_Promiscuity, Reified_Sort, $List[Reified_Occurrence], binder : Reified_Variable . Reified_Binder ];
+	BINDER[ Reified_Promiscuity, Reified_Guard, Reified_Depth, Reified_Sort, $List[Reified_Occurrence], binder : Reified_Variable . Reified_Binder ];
 
 	// . Term
 	ARGUMENT[ Reified_Sort, Reified_Term ]; // note: Reified_Sort only instantiated in constructions
@@ -141,6 +141,10 @@ Reified_Binder ::=(
 );
 
 Reified_Promiscuity ::=( LINEAR; PROMISCUOUS; );
+
+Reified_Guard ::=( BLOCK; PERMIT; ); // Whether binder blocks reduction or permits it.
+
+Reified_Depth ::=( SHALLOW; DEEP; ); // Whether binder occurrence is shallow or deep
 
 Reified_Occurrence ::=( META-USE[$String<!--MetaVar-->, $Numeric<!--Count-->]; OTHER; );
 

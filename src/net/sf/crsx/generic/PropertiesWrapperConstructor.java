@@ -141,12 +141,6 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		return symbol();
 	}
 
-	@Override
-	public boolean isClosure()
-	{
-		return false;
-	}
-
 	public void normalize(CRS crs) throws CRSException
 	{
 		if (!propertiesNormalized)

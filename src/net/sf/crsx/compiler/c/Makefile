@@ -18,7 +18,7 @@ ifndef CRSXCBUILD
 CRSXCBUILD=build
 endif
 
-ICU4CLIB=-licui18n -licuuc -licudata
+ICU4CLIB=-licui18n -licuuc -licudata -ldl
 CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING
 ifdef ICU4CDIR
 LDFLAGS+=-L$(ICU4CDIR)

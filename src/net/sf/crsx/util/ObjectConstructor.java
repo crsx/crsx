@@ -39,10 +39,6 @@ final public class ObjectConstructor implements Constructor
 
 	/** The constructor object.toString(). */
 	final private Object object;
-
-	/** Whether it's a closure. */
-	final private boolean closure;
-
 	
 	// Constructor.
 
@@ -56,13 +52,7 @@ final public class ObjectConstructor implements Constructor
 	 */
 	public ObjectConstructor(Object object)
 	{
-		this(object, false);
-	}
-
-	public ObjectConstructor(Object object, boolean closure)
-	{
 		this.object = object;
-		this.closure = closure;
 	}
 	
 	// Constructor...
@@ -80,12 +70,6 @@ final public class ObjectConstructor implements Constructor
 	public Object object()
 	{
 		return object;
-	}
-
-	@Override
-	public boolean isClosure()
-	{
-		return closure;
 	}
 
 	public boolean match(Match match, Constructor that, ExtensibleSet<Variable> bound, Map<String, Integer> contractionCount, boolean promiscuous, Collection<Variable> once, Collection<Variable> onceSeen)

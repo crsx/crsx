@@ -1842,12 +1842,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		return this;
 	}
 	
-	@Override
-	public boolean isClosure()
-	{
-		return false;
-	}
-
 	public Variable variable()
 	{
 		return null;
@@ -2728,7 +2722,9 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		    				Variable b = original.binders(source)[j];
 		    				sink = sink.start(sink.makeConstructor(CRS.REIFY_BINDER)); // BINDER[
 		    				sink = sink.start(sink.makeConstructor(b.promiscuous() ? CRS.REIFY_PROMISCUOUS : CRS.REIFY_LINEAR)).end(); // LINEAR/PROMISCUOUS
-		    				Term binderSort = formSort == null ? factory.nil() : Util.propertiesHolder(formSort).getProperty(formBinders[j]);
+		    				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_BLOCK : CRS.REIFY_PERMIT)).end(); // BLOCK/PERMIT
+		    				sink = sink.start(sink.makeConstructor(b.shallow() ? CRS.REIFY_SHALLOW : CRS.REIFY_DEEP)).end();
+			    				Term binderSort = formSort == null ? factory.nil() : Util.propertiesHolder(formSort).getProperty(formBinders[j]);
 		    				sink = GenericCRS.reifySort(factory, sink, binderSort);
 		    				freeSort.put(b, binderSort);
 		    				sink = Util.occurrenceDescription(sink, original.sub(source), b); // (OTHER/META-USE[]/...)

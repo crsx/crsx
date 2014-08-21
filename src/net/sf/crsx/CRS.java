@@ -104,6 +104,14 @@ public interface CRS
 	public static final String REIFY_PROMISCUOUS = "PROMISCUOUS";
 	/** Reify constructor for: LINEAR */
 	public static final String REIFY_LINEAR = "LINEAR";
+	/** Reify constructor for: BLOCK */
+	public static final String REIFY_BLOCK = "BLOCK";
+	/** Reify constructor for: PERMIT */
+	public static final String REIFY_PERMIT = "PERMIT";
+	/** Reify constructor for: SHALLOW */
+	public static final String REIFY_SHALLOW = "SHALLOW";
+	/** Reify constructor for: DEEP */
+	public static final String REIFY_DEEP = "DEEP";
 	/** Reify constructor for: META-USE */
 	public static final String REIFY_META_USE = "META-USE";
 	/** Reify constructor for: OTHER */

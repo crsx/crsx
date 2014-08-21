@@ -172,7 +172,8 @@ F-then-Fresh[OK_SORT, Text, $List[Reified_Option], ok::OK_SORT.Text] :: Text;
 {#env}
 F-then-Fresh[OK, sink, #Options, ok.#[ok]] 
 → 
-{#env}F-Freshes[sink, #Options, ok.#[ok]]
+{#env}
+F-Freshes[sink, #Options, ok.#[ok]]
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -358,16 +359,17 @@ $[If, $[Equal, #option, "FreshReuseOrigin"], {#env}F-variableFreshReuseOriginOpt
 -[Free[key::Reified_Variable]]
 :
 {#env}
-F-variableOption[#option, VARIABLE-USE[key], ok.#[ok]]
+F-variableOption[#option, VARIABLE-USE[key], ok.#[ok]] // Unsorted variable
 → 
 {#env; key : #option}
 F-recordFreeOption[#option, key, ok.#[ok]]
 ;
 
 {#env}
-F-variableOption[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]]
+F-variableOption[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]] // Sorted variable
 →
-{#env} F-variableOption2[#option, #symbol, #binders, ok.#[ok]]
+{#env} 
+F-variableOption2[#option, #symbol, #binders, ok.#[ok]]
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-then-VariableOption2[OK_SORT, VARIABLE_ENTRY, $String, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
@@ -801,7 +803,7 @@ F-PatternBinder[PASS, Pattern-Stage, Reified_Binder, Text, Text, $Boolean, Text,
 
 // Pattern argument b . Binder:
 {#env}
-F-PatternBinder[#pass, #stage, BINDER[#promisc, #sort, #occs, b . #Binder[b]], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+F-PatternBinder[#pass, #stage, BINDER[#promisc, #guard, #depth, #sort, #occs, b . #Binder[b]], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
 →
 {#env}
 F-PatternBinder1[#occs, NOTHING, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
