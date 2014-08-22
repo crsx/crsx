@@ -292,24 +292,5 @@ int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, 
 }
 
 
-int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp)
-{
-    int i;
-    int size = 0;
-    for (i = 0 ; i < set->nslots ; i++)
-    {
-        LinkedList2 slot = set->entries[i];
-        while (slot)
-        {
-            Pair pair = (Pair) slot->entry;
-            Term term = (Term) pair->value;
-            size += checkTerm4(context, NULL, 0, term, nf, 0, envsize, memuse, usedp);
-            slot = slot->next;
-        }
-    }
-    return size;
-}
-
-
 
 #endif

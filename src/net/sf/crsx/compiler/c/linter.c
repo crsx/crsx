@@ -30,7 +30,7 @@ LinterReport lint(Context context, Term term, int flags)
     lcontext->context = context;
 
     if (flags & CHECK_CLOSED)
-        lcontext->bound = makeHS2(context, 9, NULL);
+        lcontext->bound = makeHS2(context, 9, NULL, equalsPtr, hashPtr);
 
     lintTerm(lcontext, NULL, 0, term, flags, report);
 
@@ -152,7 +152,7 @@ static int lintTerm(LintContext context, Term parent, unsigned index, Term term,
                 // Record bound variables
                 int j;
                 for (j = 0; j < rank; ++j)
-                    addHS2(context->context, context->bound, BINDER(term,i,j));
+                    addValueHS2(context->context, context->bound, (const void*) BINDER(term,i,j), NULL);
             }
 
             if (!lintTerm(context, term, i, SUB(term,i), flags, report))
@@ -163,7 +163,7 @@ static int lintTerm(LintContext context, Term parent, unsigned index, Term term,
                 // Unrecord bound variables
                 int j;
                 for (j = 0; j < rank; ++j)
-                    removeHS2(context->context, context->bound, BINDER(term,i,j));
+                    removeHS2(context->context, context->bound, (const void*) BINDER(term,i,j));
             }
         }
     }

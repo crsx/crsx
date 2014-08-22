@@ -46,7 +46,6 @@ typedef struct _VariableMapLink *VariableMapLink;
 typedef struct _VariableNameMapLink *VariableNameMapLink;
 typedef struct _Hashset* Hashset;
 typedef struct _Hashset2* Hashset2;
-typedef struct _Pair* Pair;
 typedef struct _TermLink *TermLink;
 
 
@@ -817,12 +816,11 @@ struct _Buffer
     BufferSegment first; // the first segment; all allocated segments available through segment ->next chain TODO: include first segment here!
     BufferSegment last; // the last segment (with top of stack in it) or NULL when empty
     int lastTop; // index of top entry (in last segment) or <0 when empty
-    VariableSetLink pendingFreeVars; // weakenings for next START (NOTE: cannot be shared)
-    NamedPropertyLink pendingNamedProperties; // named properties for next START (NOTE: cannot be shared)
-    VariablePropertyLink pendingVariableProperties; // variable properties for next START (NOTE: cannot be shared)
+    NamedPropertyLink pendingNamedProperties; // named properties for next START (NOTE: cannot be shared). Buffer owns ref.
+    VariablePropertyLink pendingVariableProperties; // variable properties for next START (NOTE: cannot be shared). Buffer owns ref.
 
-    VARIABLESET pendingNamedPropertiesFreeVars; // Free variables to insert before a batch of new named properties
-    VARIABLESET pendingVariablePropertiesFreeVars; // Free variables to insert before a batch of new variable properties
+    VARIABLESET pendingNamedPropertiesFreeVars; // Free variables to insert before a batch of new named properties. Buffer owns ref.
+    VARIABLESET pendingVariablePropertiesFreeVars; // Free variables to insert before a batch of new variable properties. Buffer owns ref.
 
     unsigned blocking : 1; // whether there is at least one blocking binder
     unsigned free : 1; // whether the buffer structure itself should be freed
@@ -928,7 +926,7 @@ struct _Properties
     VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
     NamedPropertyLink namedProperties; // named properties.
     VariablePropertyLink variableProperties; // variable properties.
-    int nr;
+    ssize_t nr;
 };
 
 Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
@@ -991,16 +989,16 @@ ASSERT(context, (!context->fv_enabled || ((properties->variableProperties && pro
 // GLOBAL ENVIRONMENT
 
 /**
- * Returns the value of the environment name.
+ * Return the value of the environment name. The returned value is not copied.
  * First look in the normalization context and if not defined, look in the global environment
  */
 extern char* getEnvValue(Context context, const char *name);
 
 /**
- * Set the value of the environment name in the context
+ * Set the value of the environment name in the context.
+ * The name and value strings are not copied. They will be released upon crsx shutdown.
  */
-extern char* setContextEnv(Context context, const char *name, const char* value);
-
+extern void setContextEnv(Context context, const char *name, const char* value);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERIC VARIABLE SETS AND MAPS
@@ -1086,72 +1084,63 @@ struct _Hashset {
     size_t nitems;
 };
 
+// General bucket-based hash set. Read-only when shared.
+
+typedef struct _Pair* Pair;
+
+struct _Pair {
+    const void *key;
+    void* value; // may be null
+};
+
+
 typedef struct _LinkedList2* LinkedList2;
 
 struct _LinkedList2 {
-    void *entry;
+    const void *key;
+    void* value; // may be null for set.
     LinkedList2 next;
-};
-
-struct _Pair {
-    const void* key;
-    void* value;
 };
 
 struct _Hashset2
 {
-    size_t nr;               // Number of references
-    size_t nbits;            // Number of bits for nslots
+    int nr;
+    unsigned int nbits;      // Number of bits for nslots
     size_t nslots;           // Number of entry slots. Always nbits ^ 2
     size_t size;             // Number of entries
 
-    LinkedList2 *entries;    // Array of entries. Size of array = nslots
-    void (*unlinkEntry)(Context, void*); // function to unlink entries
-};
+    LinkedList2 *entries;                // Array of entries. Size of array = nslots
 
-// Increment reference count
-static inline Hashset2 linkHS2(Hashset2 set)
-{
-    if (set) ++(set->nr); return set;
-}
-// Decrement reference count
-extern Hashset2 unlinkHS2(Context context, Hashset2 set);
+    void   (*unlink)(Context, const void*, void*);   // function to unlink key-value entries
+    int    (*equals)(const void*, const void*);      // function to compare entries
+    size_t (*hash)  (const void*);                   // function to hash entries
+};
+// Increment ref count.
+extern Hashset2 linkHS2(Hashset2 set);
+// Decrement ref count.
+extern void unlinkHS2(Context context, Hashset2 set);
 // Allocate set
-extern Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void*));
-// Copy set.
-extern Hashset2 copyHS2(Context context, Hashset2 set);
-// Add entry to set. Create new set if needed.
-extern Hashset2 addHS2(Context context, Hashset2 set, void* entry);
-// Add value of given string key to set. Create new set if needed.
-extern Hashset2 addValueHS2(Context context, Hashset2 set, const char* key, void* value);
+extern Hashset2 makeHS2(Context context, unsigned int numbits, void (*unlink)(Context, const void*, void*), int (*equals)(const void*, const void*), size_t (*hash)(const void*));
+// Add key-value pair to set. Value may be null. If key exists, replace value and call unlink on key/old value
+extern Hashset2 addValueHS2(Context context, Hashset2 set, const void* key, void* value);
 // Get value for given string key
-extern void* getValuePtrHS2(Hashset2 set, const char* key);
-// Add value of given pointer key to set. Create new set if needed.
-extern Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, const void* key, void* value);
-// Get value for given pointer key
-extern void* getKeyPtrValuePtrHS2(Hashset2 set, void* key);
+extern void* getValueHS2(Hashset2 set, const void* key);
 // Remove entry to set.
-extern Hashset2 removeHS2(Context context, Hashset2 set, void* entry);
-// Check whether set contains the given entry.
-extern int containsHS2(Hashset2 set, void* entry);
-// Merge the two sets. Both references are transferred.
-extern Hashset2 mergeAllHS2(Context context, Hashset2 first, Hashset2 second);
-// Remove all entrios contains in other from set. 'set' reference is transferred. 'other' is not transferred.
-extern Hashset2 minusHS2(Context context, Hashset2 set, Hashset2 other);
-// Remove all given entries from set. 'set' reference is transferred.
-extern Hashset2 removeAllHS2(Context context, Hashset2 set, void** vars, ssize_t len);
+extern Hashset2 removeHS2(Context context, Hashset2 set, const void* key);
+// Check whether set contains the given key.
+extern int containsHS2(Hashset2 set, const void* key);
 // Clear set
 extern Hashset2 clearHS2(Context context, Hashset2 set);
-// Enumerate set as old-fashioned VariableSet
-extern void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int constrained, VariablePropertyLink props);
-// Return memory used
-extern long memoryUsedHS2(Hashset2 set);
 // Convert to array. Don't copy entries (treat as read-only)
 extern Pair* toArrayHS2(Context context, Hashset2 set);
+// Print out HS2
+extern void printPropsHS2(Context context, Hashset2 set);
 
+extern int equalsPtr(const void* left, const void* right);
+extern size_t hashPtr(const void* entry);
 
-extern void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set);
-extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
+int equalsChars(const void* left, const void* right);
+size_t hashChars(const void* key);
 
 
 // Allocation variable set.
