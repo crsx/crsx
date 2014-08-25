@@ -379,10 +379,10 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
 
     construction->properties =
       ALLOCATE_Properties(sink->context,
-                          LINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars),
-                          LINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars),
-                          LINK_NamedPropertyLink(sink->context, buffer->pendingNamedProperties),
-                          LINK_VariablePropertyLink(sink->context, buffer->pendingVariableProperties));
+                          buffer->pendingNamedPropertiesFreeVars,
+                          buffer->pendingVariablePropertiesFreeVars,
+                          buffer->pendingNamedProperties,
+                          buffer->pendingVariableProperties);
 
     construction->fvs = NULL;
     construction->nfvs = LINK_VARIABLESET(sink->context, construction->properties->namedFreeVars);
@@ -448,7 +448,6 @@ Sink bufferEnd(Sink sink, ConstructionDescriptor descriptor)
     bufferInsert(buffer, childTerm);
 
     // Fresh context for next child.
-    buffer->pendingFreeVars = NULL;
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
 
@@ -487,7 +486,6 @@ Sink bufferUse(Sink sink, Variable variable)
     bufferInsert(buffer, (Term) use);
 
     // Fresh context for next child.
-    buffer->pendingFreeVars = NULL;
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
     return sink;
@@ -533,17 +531,15 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
 static
 void bufferMergeProperties(Context context, Buffer buffer, Construction c);
 
-Sink bufferCopy(Sink sink, Term term)
+Sink bufferCopy(Sink sink, Term term) // Transfer ref
 {
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     ASSERT(sink->context, term->nr > 0);
-    //CRSX_CHECK(sink->context, term);
-    //ASSERT(sink->context, check(sink->context, term));
 
     Buffer buffer = (Buffer) sink;
     const Context context = sink->context;
 
-    // If no properties and weakenings, just share!
+    // If no properties just share!
     if (IS_VARIABLE_USE(term)
             || (buffer->pendingNamedProperties == asConstruction(term)->properties->namedProperties
                     && buffer->pendingVariableProperties == asConstruction(term)->properties->variableProperties
@@ -568,95 +564,85 @@ Sink bufferCopy(Sink sink, Term term)
     ++eventCount;
 #   endif
 
+    Construction c = asConstruction(term);
+
     if (LINK_COUNT(term) == 1)
     {
-        // Reuse original term (with updated properties and weakenings).
-        Construction c = asConstruction(term);
-
+        // Reuse original term (with updated properties).
         bufferMergeProperties(context, buffer, c);
-
         bufferInsert(buffer, term);
     }
     else
     {
-        // construction
-        Construction c = asConstruction(term);
+        // All these pointer manipulation in order to reuse bufferMergeProperties
+        NamedPropertyLink namedLink = buffer->pendingNamedProperties;
+        buffer->pendingNamedProperties = LINK_NamedPropertyLink(context, c->properties->namedProperties);
+        VariablePropertyLink variableLink = buffer->pendingVariableProperties;
+        buffer->pendingVariableProperties = LINK_VariablePropertyLink(context, c->properties->variableProperties);
 
-        // Construct
-        if (IS_LITERAL(term))
+        VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
+        buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(context, c->properties->namedFreeVars);
+        VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
+        buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(context, c->properties->variableFreeVars);
+
+        sink->start(sink, c->term.descriptor);
+
+        buffer->pendingNamedProperties = namedLink;
+        buffer->pendingVariableProperties = variableLink;
+
+        buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
+        buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
+
+        bufferMergeProperties(context, buffer, asConstruction(bufferTop(buffer)->term));
+
+        int a = ARITY(term);
+        int i;
+        for (i = 0; i < a; i ++)
         {
-            LITERALU(sink, TEXT(term));
-        }
-        else
-        {
-            NamedPropertyLink namedLink = buffer->pendingNamedProperties;
-            buffer->pendingNamedProperties = LINK_NamedPropertyLink(context, c->properties->namedProperties);
-            VariablePropertyLink variableLink = buffer->pendingVariableProperties;
-            buffer->pendingVariableProperties = LINK_VariablePropertyLink(context, c->properties->variableProperties);
-
-            VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
-            buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(context, c->properties->namedFreeVars);
-            VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
-            buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(context, c->properties->variableFreeVars);
-
-            sink->start(sink, c->term.descriptor);
-
-            buffer->pendingNamedProperties = namedLink;
-            buffer->pendingVariableProperties = variableLink;
-
-            buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
-            buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
-
-            bufferMergeProperties(context, buffer, asConstruction(bufferTop(buffer)->term));
-
-            int a = ARITY(term);
-            int i;
-            for (i = 0; i < a; i ++)
+            const int rank = RANK(term, i);
+            if (rank == 0)
             {
-                const int rank = RANK(term, i);
-                if (rank == 0)
-                {
-                    // --  i'th subterm with no binders: just continue copying.
-                    COPY(sink, LINK(context, SUB(term, i)));
-                }
-                else
-                {
-                    // Rename binders and substitute..
-
-                    Variable *oldBinders = BINDERS(term, i);
-                    Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
-                    VariableUse subUses[rank]; // does not escape
-                    struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
-                    SubstitutionFrame subSubstitution = &_subSubstitution;
-
-                    // --- populate per binder
-                    int j;
-                    for (j = 0; j < rank; ++j)
-                    {
-                        char *oldname = oldBinders[j]->name;
-                        char *baseendp = strrchr(oldname, '_');
-                        char *basename = oldname;
-                        if (baseendp)
-                        {
-                            const int z = baseendp - oldname;
-                            basename = ALLOCA(context, z+1); // does not escape
-                            memcpy(basename, oldname, z);
-                            basename[z] = '\0';
-                        }
-                        int isLinear = IS_LINEAR(oldBinders[j]);
-                        subBinders[j] = makeVariable(context, oldBinders[j]->name, 1, isLinear, oldBinders[j]->block, oldBinders[j]->shallow); // escapes
-                        subUses[j] = makeVariableUse(context, linkVariable(context, subBinders[j])); // escapes
-                    }
-
-                    // --- send new binders
-                    BINDS(sink, rank, subBinders); // escape of subBinders. Variable references are transfered.
-                    //FREE(context, subBinders) (no need: allocated on the stack). Variable references have been transferred.
-                    // --- now process subterm!
-                    metaSubstitute(sink, LINK(context, SUB(term, i)), subSubstitution);
-                }
+                // --  i'th subterm with no binders: just continue copying.
+                COPY(sink, LINK(context, SUB(term, i)));
             }
-            sink->end(sink, c->term.descriptor);
+            else
+            {
+                // Rename binders and substitute..
+
+                Variable *oldBinders = BINDERS(term, i);
+                Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
+                VariableUse subUses[rank]; // does not escape
+                struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+                SubstitutionFrame subSubstitution = &_subSubstitution;
+
+                // --- populate per binder
+                int j;
+                for (j = 0; j < rank; ++j)
+                {
+                    char *oldname = oldBinders[j]->name;
+                    char *baseendp = strrchr(oldname, '_');
+                    char *basename = oldname;
+                    if (baseendp)
+                    {
+                        const int z = baseendp - oldname;
+                        basename = ALLOCA(context, z+1); // does not escape
+                        memcpy(basename, oldname, z);
+                        basename[z] = '\0';
+                    }
+                    int isLinear = IS_LINEAR(oldBinders[j]);
+                    subBinders[j] = makeVariable(context, oldBinders[j]->name, 1, isLinear, oldBinders[j]->block, oldBinders[j]->shallow); // escapes
+                    subUses[j] = makeVariableUse(context, linkVariable(context, subBinders[j])); // escapes
+                }
+
+                // --- send new binders
+                BINDS(sink, rank, subBinders); // escape of subBinders. Variable references are transfered.
+                //FREE(context, subBinders) (no need: allocated on the stack). Variable references have been transferred.
+                // --- now process subterm!
+                metaSubstitute(sink, LINK(context, SUB(term, i)), subSubstitution);
+            }
         }
+        sink->end(sink, c->term.descriptor);
+
         UNLINK(context, term);
     }
 
@@ -844,11 +830,11 @@ void freeBuffer(Sink sink)
 static
 void bufferMergeProperties(Context context, Buffer buffer, Construction construction)
 {
+    crsxpBeforeMergeProperties(context);
+
     if (buffer->pendingNamedProperties && construction->properties->namedProperties != buffer->pendingNamedProperties)
     {
-        // There is new properties.
-
-        VARIABLESET freeVars = construction->properties->namedFreeVars;
+        // There are new properties.
 
         if (!construction->properties->namedProperties) // no existing properties. Good.
             construction->properties->namedProperties = buffer->pendingNamedProperties; // transfer ref
@@ -858,7 +844,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             // Merge property lists. Unlink the single-linked prefix with the event-generated properties.
 
             // TODO: avoid copying when buffer->pendingNamedProperties->nr == 1
-
+            int count = 0;
             NamedPropertyLink link = buffer->pendingNamedProperties, newTop = NULL, newLast = NULL;
             for (; link; link = link->link)
             {
@@ -879,19 +865,22 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 else
                     newTop = newLink;
                 newLast = newLink;
+                count++;
             }
             newLast->link = construction->properties->namedProperties; // transfer ref to old properties to tail of new.
-
 
             // Set final links
             construction->properties->namedProperties = LINK_NamedPropertyLink(context, newTop);
             UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
 
+            crsxpNamedPropertiesMerged(context, count);
         }
         buffer->pendingNamedProperties = NULL;
 
         if (context->fv_enabled)
         {
+            VARIABLESET freeVars = construction->properties->namedFreeVars;
+
             // Merge free variables and put them in front of property list
             freeVars = VARIABLESET_MERGEALL(context, freeVars, LINK_VARIABLESET(context, buffer->pendingNamedPropertiesFreeVars));
 
@@ -918,15 +907,11 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
     if (buffer->pendingVariableProperties && construction->properties->variableProperties != buffer->pendingVariableProperties)
     {
-        // TODO? : VARIABLESET freeVars = LINK_VARIABLESET(context, construction->properties->variableProperties);
-        VARIABLESET freeVars = construction->properties->variableFreeVars;
-
         if (!construction->properties->variableProperties)
             construction->properties->variableProperties = buffer->pendingVariableProperties;
         else
         {
             // Merge property lists.
-            int count = 0;
             VariablePropertyLink link = buffer->pendingVariableProperties, newTop = NULL, newLast = NULL;
             for (; link; link = link->link)
             {
@@ -953,7 +938,6 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                     newTop = newLink;
                 newLast = newLink;
 
-                count++;
             }
 
             newLast->link = construction->properties->variableProperties;
@@ -965,6 +949,8 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
         if (context->fv_enabled)
         {
+            VARIABLESET freeVars = construction->properties->variableFreeVars;
+
             // Merge free variables and put them in front of property list
             freeVars = VARIABLESET_MERGEALL(context, freeVars, LINK_VARIABLESET(context, buffer->pendingVariablePropertiesFreeVars));
             ASSERT(context, freeVars);
@@ -973,6 +959,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             ASSERT_VARIABLE_PROPERTIES(context, construction->properties);
 
             // And add to the construction..
+
             construction->vfvs =  VARIABLESET_MERGEALL(context, construction->vfvs, buffer->pendingVariablePropertiesFreeVars);
             buffer->pendingVariablePropertiesFreeVars = NULL; // Ref has been transferred.
         }
@@ -984,6 +971,9 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
         UNLINK_VARIABLESET(context, buffer->pendingVariablePropertiesFreeVars);
         buffer->pendingVariablePropertiesFreeVars = NULL;
     }
+
+    crsxpAfterMergeProperties(context);
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -1347,63 +1337,6 @@ VariableSetLink removeAllL(Context context, VariableSetLink set, Variable* vars,
 
     return set;
 }
-
-//VariableSetLink intersectL(Context context, VariableSetLink set, VariableSetLink other)
-//{
-//    return intersectGL(context, set, other, NULL);
-//}
-//
-//VariableSetLink intersectGL(Context context, VariableSetLink set, VariableSetLink other, VariableSetLink* removed)
-//{
-//    if (other == NULL)
-//    {
-//        if (removed)
-//            (*removed) = set; // Transfer ref
-//        return NULL;
-//    }
-//
-//    VariableSetLink link = set;
-//    VariableSetLink top = NULL;
-//    VariableSetLink prev = NULL;
-//    while (link)
-//    {
-//        ASSERT(context, link->nr == 1);
-//
-//        if (!containsL(other, link->variable))
-//        {
-//            // Remove link.
-//            VariableSetLink next = link->link;
-//
-//            if (prev != NULL)
-//                prev->link = next; // transfer ref
-//
-//            // Add to removed list.
-//            if (removed)
-//            {
-//                link->link = *removed;
-//                *removed = link;
-//            }
-//            else
-//            {
-//                link->link = NULL;
-//                unlinkVariableSetLink(context, link);
-//            }
-//
-//            link = next;
-//        }
-//        else
-//        {
-//            // Process next.
-//            if (top == NULL)
-//                top = link;
-//
-//            prev = link;
-//            link = link->link;
-//        }
-//    }
-//
-//    return top;
-//}
 
 VariableSetLink removeL(Context context, VariableSetLink set, Variable var)
 {
@@ -1826,33 +1759,34 @@ Hashset clearHS(Context context, Hashset set)
 ///////////////////////////////////////////////////
 // bucket-based hash set implementation
 
-static int equalsPtrEntry(void* left, void* right)
+int equalsPtr(const void* left, const void* right)
 {
     return left == right;
 }
 
-static int equalsStringPairEntry(void* left, void* right)
+int equalsChars(const void* left, const void* right)
 {
-    return strcmp((char*) ((Pair) left)->key, (char*) ((Pair) right)->key) == 0;
+    return strcmp((char*) left, (char*) right) == 0;
 }
 
-static int equalsPtrPairEntry(void* left, void* right)
+static void freeKeyValue(Context context, const void* key, void* value)
 {
-    return ((Pair) left)->key == ((Pair) right)->key;
+    FREE(context, (void*) key);
+    if (value)
+        FREE(context, value);
 }
 
-static void freePtrEntry(Context context, void* entry)
-{}
-
-static void freePairEntry(Context context, void* entry)
+static void freeValue(Context context, const void* key, void* value)
 {
-    FREE(context, entry);
+    if (value)
+        FREE(context, value);
 }
 
-static LinkedList2 makeLL2(Context context, void* entry)
+static LinkedList2 makeLL2(Context context, const void* key, void* value)
 {
     LinkedList2 ll = ALLOCATE(context, sizeof(struct _LinkedList2));
-    ll->entry = entry;
+    ll->key = key;
+    ll->value = value;
     ll->next = NULL;
     return ll;
 }
@@ -1862,34 +1796,37 @@ static inline LinkedList2 prependLL2(LinkedList2 list, LinkedList2 entry)
     entry->next = list;
     return entry;
 }
+//
+//static LinkedList2 copyLL2(Context context, LinkedList2 head, void (*linkKey)(Context, const void*), void (*linkValue)(Context, void*))
+//{
+//    LinkedList2 newhead = NULL;
+//    while (head)
+//    {
+//        LinkedList2 n = makeLL2(context, linkKey(context, head->key), linkValue(context, head->value));
+//        n->next = newhead;
+//        newhead = n;
+//
+//        head = head->next;
+//    }
+//    return newhead;
+//}
 
-static LinkedList2 copyLL2(Context context, LinkedList2 head)
-{
-    LinkedList2 newhead = NULL;
-    while (head)
-    {
-        LinkedList2 n = makeLL2(context, head->entry);
-        n->next = newhead;
-        newhead = n;
-
-        head = head->next;
-    }
-    return newhead;
-}
-
-static void freeLL2(Context context, LinkedList2 head, void (*unlinkEntry)(Context, void*))
+static void freeLL2(Context context, LinkedList2 head, void (*unlink)(Context, const void*, void*))
 {
     while (head)
     {
         LinkedList2 next = head->next;
-        if (unlinkEntry) unlinkEntry(context, head->entry);
+        if (unlink)
+            unlink(context, head->key, head->value);
         FREE(context, head);
         head = next;
     }
 }
 
-static size_t hashChars(const char* data)
+size_t hashChars(const void* key)
 {
+    const char* data = (const char*) key;
+
     size_t len = strlen(data);
     size_t h = len;
     while ( len > 3 )
@@ -1902,14 +1839,14 @@ static size_t hashChars(const char* data)
         data += 4;
     }
     switch ( len ) {
-      case 3: h += data[2];
-      case 2: h += data[1]<<8;
-      case 1: h += data[0];
+      case 3: h += data[2]; // no break
+      case 2: h += data[1]<<8;// no break
+      case 1: h += data[0];// no break
     }
     return h;
 }
 
-static size_t hashPtr(const void* entry)
+size_t hashPtr(const void* entry)
 {
     size_t key = (size_t) entry;
 
@@ -1924,29 +1861,14 @@ static size_t hashPtr(const void* entry)
     return key;
 }
 
-static size_t hashStringPair(const void* pair)
+static Hashset2 growHS2(Context context, Hashset2 set)
 {
-    const char* data = (const char *) ((Pair) pair)->key;
-    return hashChars(data);
-}
-
-static size_t hashPtrPair(const void* pair)
-{
-    return hashPtr(((const Pair) pair)->key);
-}
-
-static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(const void*))
-{
-    ASSERT(context, set->nr > 0);
-
     int oldsize = set->nslots;
     LinkedList2 *oldentries = set->entries;
 
     set->nbits++;
     set->nslots *= 2;
-    // TODO: use calloc
-    set->entries = ALLOCATE(context, set->nslots * sizeof(LinkedList2));
-    memset(set->entries, 0, set->nslots * sizeof(LinkedList2));
+    set->entries = CALLOCATE(context, set->nslots * sizeof(LinkedList2));
 
     size_t i;
     for (i = 0; i < oldsize; i++)
@@ -1956,7 +1878,7 @@ static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(const void
         {
             LinkedList2 n = l->next;
 
-            int index = hash(l->entry) & ((1 << set->nbits) - 1);
+            int index = set->hash(l->key) & ((1 << set->nbits) - 1);
             l->next = set->entries[index];
             set->entries[index] = l;
 
@@ -1967,32 +1889,32 @@ static Hashset2 growHS2(Context context, Hashset2 set, size_t (*hash)(const void
     return set;
 }
 
-
 static void freeHS2(Context context, Hashset2 set)
 {
+    if (!set)
+        return;
+
     size_t i;
     for (i = 0; i < set->nslots; i++)
-      freeLL2(context, set->entries[i], set->unlinkEntry);
+      freeLL2(context, set->entries[i], set->unlink);
 
     FREE(context, set->entries);
     FREE(context, set);
 }
 
-Hashset2 unlinkHS2(Context context, Hashset2 set)
+Hashset2 linkHS2(Hashset2 set)
 {
-    if (set)
-    {
-        ASSERT(context, set->nr > 0);
-        if (--set->nr == 0)
-        {
-            freeHS2(context, set);
-            return NULL;
-        }
-    }
+    set->nr ++;
     return set;
 }
 
-Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void*))
+void unlinkHS2(Context context, Hashset2 set)
+{
+    if (--set->nr == 0)
+        freeHS2(context, set);
+}
+
+Hashset2 makeHS2(Context context, unsigned int numbits, void (*unlink)(Context, const void*,void*), int (*equals)(const void*,const void*), size_t (*hash)(const void*))
 {
     Hashset2 set = ALLOCATE(context, sizeof(struct _Hashset2));
     set->nr = 1;
@@ -2000,349 +1922,135 @@ Hashset2 makeHS2(Context context, int numbits, void (*unlinkEntry)(Context, void
     set->nslots = 1 << set->nbits;
     set->size = 0;
 
-    // TODO: use calloc
-    set->entries = ALLOCATE(context, set->nslots * sizeof(LinkedList2));
-    memset(set->entries, 0, set->nslots * sizeof(LinkedList2));
+    set->entries = CALLOCATE(context, set->nslots * sizeof(LinkedList2));
 
-    set->unlinkEntry = unlinkEntry;
+    set->unlink = unlink;
+    set->equals = equals;
+    set->hash = hash;
 
     return set;
 }
 
-Hashset2 copyHS2(Context context, Hashset2 set)
+Hashset2 addValueHS2(Context context, Hashset2 set, const void* key, void* value)
 {
-    ASSERT(context, set->nr > 0);
+    ASSERT(context, set->nr == 1); // Can't update when shared.
 
-    Hashset2 newset = ALLOCATE(context, sizeof(struct _Hashset2));
-    newset->nr = 1;
-    newset->nbits = set->nbits;
-    newset->nslots = set->nslots;
-    newset->entries = ALLOCATE(context, set->nslots * sizeof(size_t));
+    size_t index;
+    LinkedList2 slot;
+    size_t cellno = 0;
 
-    size_t i;
-    for (i = 0; i < set->nslots; i++)
-        newset->entries[i] = copyLL2(context, set->entries[i]);
+    index = set->hash(key) & ((1 << set->nbits) - 1);
+    slot = set->entries[index];
 
-    newset->size = set->size;
-    return newset;
-}
-
-static Hashset2 addInternalHS2(Context context, Hashset2 set, void* entry, int (*equals)(void*, void*), size_t (*hash)(const void*), void (*freeEntry)(Context, void*))
-{
-    if (entry)
+    while (slot != NULL)
     {
-        if (!set)
-            set = makeHS2(context, 4, NULL);
-        else if (set->nr > 1)
+        if (set->equals(slot->key, key))
         {
-            set->nr --;
-            set = copyHS2(context, set);
-        }
-        ASSERT(context, set->nr == 1);
-
-        size_t index;
-        LinkedList2 slot;
-        size_t cellno = 0;
-
-        index = hash(entry) & ((1 << set->nbits) - 1);
-        slot = set->entries[index];
-
-        while (slot != NULL)
-        {
-            if (equals(slot->entry, entry))
-            {
-                freeEntry(context, entry);
-                break; // already there
-            }
-
-            slot = slot->next;
-            cellno++;
+            void* oldval = slot->value;
+            slot->value = value; // Transfer ref.
+            set->unlink(context, key, oldval);
+            break; // already there
         }
 
-        if (slot == NULL)
-        {
-            if (set->size >= 4 * set->nslots)
-            {
-                set = growHS2(context, set, hash);
-                index = hash(entry) & ((1 << set->nbits) - 1);
-            }
-
-            LinkedList2 ll = makeLL2(context, entry);
-            set->entries[index] = prependLL2(set->entries[index], ll);
-            set->size++;
-        }
+        slot = slot->next;
+        cellno++;
     }
+
+    if (slot == NULL)
+    {
+        if (set->size >= 4 * set->nslots)
+        {
+            set = growHS2(context, set);
+            index = set->hash(key) & ((1 << set->nbits) - 1);
+        }
+
+        LinkedList2 ll = makeLL2(context, key, value);
+        set->entries[index] = prependLL2(set->entries[index], ll);
+        set->size++;
+    }
+
     return set;
 }
 
-Hashset2 addHS2(Context context, Hashset2 set, void* entry)
+Hashset2 removeHS2(Context context, Hashset2 set, const void* key)
 {
-    return addInternalHS2(context, set, entry, &equalsPtrEntry, &hashPtr, &freePtrEntry);
-}
+    ASSERT(context, set->nr == 1); // Can't update when shared.
 
-Hashset2 addValueHS2(Context context, Hashset2 set, const char* key, void* value)
-{
-    Pair pair = ALLOCATE(context, sizeof(struct _Pair));
-    pair->key = (void*)key;
-    pair->value = value;
-    return addInternalHS2(context, set, (void*) pair, &equalsStringPairEntry, &hashStringPair, &freePairEntry);
-}
+    size_t index;
+    LinkedList2 slot, prevslot;
 
-Hashset2 addKeyPtrValueHS2(Context context, Hashset2 set, const void* key, void* value)
-{
-    Pair pair = ALLOCATE(context, sizeof(struct _Pair));
-    pair->key = key;
-    pair->value = value;
-    return addInternalHS2(context, set, (void*) pair, &equalsPtrPairEntry, &hashPtrPair, &freePairEntry);
-}
+    index = set->hash(key) & ((1 << set->nbits) - 1);
+    slot = set->entries[index];
+    prevslot = NULL;
 
-Hashset2 removeHS2(Context context, Hashset2 set, void* entry)
-{
-    if (set && entry && set->size > 0)
+    while (slot)
     {
-        if (set->nr > 1)
-        {
-            set->nr --;
-            set = copyHS2(context, set);
-        }
-        ASSERT(context, set->nr == 1);
-
-        size_t index;
-        LinkedList2 slot, prevslot;
-
-        index = hashPtr(entry) & ((1 << set->nbits) - 1);
-        slot = set->entries[index];
-        prevslot = NULL;
-
-        while (slot)
-        {
-           if (slot->entry == entry)
+       if (set->equals(slot->key, key))
+       {
+           // Found it.
+           if (prevslot == NULL)
            {
-               // Found it.
-               if (prevslot == NULL)
-               {
-                   set->entries[index] = slot->next;
-               }
-               else
-               {
-                   prevslot->next = slot->next;
-               }
-
-               FREE(context, slot);
-               set->size--;
-               return set;
+               set->entries[index] = slot->next;
+           }
+           else
+           {
+               prevslot->next = slot->next;
            }
 
-           prevslot = slot;
-           slot = slot->next;
-        }
+           freeLL2(context, slot, set->unlink);
+           set->size--;
+           return set;
+       }
+
+       prevslot = slot;
+       slot = slot->next;
     }
+
     return set;
 }
 
-int containsHS2(Hashset2 set, void* entry)
+int containsHS2(Hashset2 set, const void* key)
 {
-    if (set && entry)
+    size_t index = set->hash(key) & ((1 << set->nbits) - 1);
+    LinkedList2 slot = set->entries[index];
+
+    while (slot)
     {
-        size_t index = hashPtr(entry) & ((1 << set->nbits) - 1);
-        LinkedList2 slot = set->entries[index];
+        if (set->equals(slot->key, key))
+            return 1;
 
-        while (slot)
-        {
-            if (slot->entry == entry)
-                return 1;
-
-            slot = slot->next;
-        }
+        slot = slot->next;
     }
+
     return 0;
 }
 
-void* getValuePtrHS2(Hashset2 set, const char* key)
+void* getValueHS2(Hashset2 set, const void* key)
 {
-    if (set && key)
+    size_t index = set->hash(key) & ((1 << set->nbits) - 1);
+    LinkedList2 slot = set->entries[index];
+    while (slot)
     {
-        size_t index = hashChars(key) & ((1 << set->nbits) - 1);
-        LinkedList2 slot = set->entries[index];
-        while (slot)
-        {
-            if (!strcmp(((Pair) slot->entry)->key, key))
-                return ((Pair) slot->entry)->value;
+        if (set->equals(slot->key, key))
+            return slot->value;
 
-            slot = slot->next;
-        }
+        slot = slot->next;
     }
     return NULL;
-}
-
-void* getKeyPtrValuePtrHS2(Hashset2 set, void* key)
-{
-    if (set && key)
-    {
-        size_t index = hashPtr(key) & ((1 << set->nbits) - 1);
-        LinkedList2 slot = set->entries[index];
-        while (slot)
-        {
-            if (((Pair) slot->entry)->key == key)
-                return ((Pair) slot->entry)->value;
-
-            slot = slot->next;
-        }
-    }
-    return NULL;
-}
-
-Hashset2 mergeAllHS2(Context context, Hashset2 first, Hashset2 second)
-{
-    if (first)
-    {
-        if (second)
-        {
-            if (first == second)
-            {
-                unlinkHS2(context, second);
-                return first;
-            }
-
-            if (first->nr > 1)
-            {
-                first->nr --;
-                first = copyHS2(context, first);
-            }
-            ASSERT(context, first->nr == 1);
-
-            size_t i;
-            size_t r = second->size;
-            if (r > 0)
-            {
-                for (i = 0; i < second->nslots; i++)
-                {
-                    LinkedList2 l = second->entries[i];
-                    while (l)
-                    {
-                        // TODO: avoid linklist allocation
-                        first = addHS2(context, first, l->entry);
-
-                        r--;
-                        if (r == 0)
-                            goto MergeDone;
-
-                        l = l->next;
-                    }
-                }
-            }
-            MergeDone:
-                unlinkHS2(context, second);
-        }
-
-        return first;
-    }
-    return second;
-}
-
-
-Hashset2 minusHS2(Context context, Hashset2 set, Hashset2 other)
-{
-    if (set && set->size > 0)
-    {
-        if (other)
-        {
-            if (set->nr > 1)
-            {
-                set->nr --;
-                set = copyHS2(context, set);
-            }
-            ASSERT(context, set->nr == 1);
-
-            size_t i;
-            size_t r = other->size;
-            for (i = 0; i < other->nslots; i++)
-            {
-                LinkedList2 l = other->entries[i];
-                while (l)
-                {
-                    set = removeHS2(context, set, l->entry);
-
-                    if (set->size == 0)
-                        return NULL;
-
-                    r--;
-                    if (r == 0)
-                        goto MinusDone;
-
-                    l = l->next;
-                }
-            }
-
-            MinusDone:;
-        }
-    }
-    return set;
-}
-
-Hashset2 removeAllHS2(Context context, Hashset2 set, void** entries, ssize_t len)
-{
-    if (set)
-    {
-        if (set->nr > 1)
-        {
-            set->nr --;
-            set = copyHS2(context, set);
-        }
-        ASSERT(context, set->nr == 1);
-
-        for (len --; len >= 0; len --)
-        {
-            set = removeHS2(context, set, entries[len]);
-            if (set->size == 0)
-                break;
-        }
-    }
-    return set;
 }
 
 Hashset2 clearHS2(Context context, Hashset2 set)
 {
-    if (set)
-    {
-        if (set->nr > 1)
-        {
-            set->nr --;
-            return NULL;
-        }
-        ASSERT(context, set->nr == 1);
-
-        size_t i;
-        for (i = 0; i < set->nslots; i++)
-        {
-            freeLL2(context, set->entries[i], set->unlinkEntry);
-            set->entries[i] = NULL;
-        }
-    }
-    return set;
-}
-
-
-void addVariablesOfHS2(Context context, VariableSet vars, Hashset2 set, int constrained, VariablePropertyLink props)
-{
-    if (!set || set->size == 0)
-        return;
+    ASSERT(context, set->nr == 1); // Can't update when shared.
 
     size_t i;
-    size_t r = set->size;
-    for (i =0 ; i < set->nslots; i ++)
+    for (i = 0; i < set->nslots; i++)
     {
-        LinkedList2 l = set->entries[i];
-        while (l)
-        {
-            Variable v = (Variable) l->entry;
-            if (!constrained || c_variableProperty(props, v) != NULL)
-                addVariable(vars, v);
-            r --;
-            if (r == 0)
-                break;
-        }
+        freeLL2(context, set->entries[i], set->unlink);
+        set->entries[i] = NULL;
     }
+
+    return set;
 }
 
 Pair*
@@ -2360,8 +2068,9 @@ toArrayHS2(Context context, Hashset2 set)
         LinkedList2 slot = set->entries[i];
         while (slot)
         {
-            Pair pair = (Pair) slot->entry;
-            ASSERT(context, pair);
+            Pair pair = ALLOCATE(context, sizeof(struct _Pair));
+            pair->key = slot->key;
+            pair->value = slot->value;
             array[j ++] = pair;
             slot = slot->next;
         }
@@ -2369,47 +2078,7 @@ toArrayHS2(Context context, Hashset2 set)
     return array;
 }
 
-long memoryUsedHS2(Hashset2 set)
-{
-    long ans = (4 + set->nslots) * sizeof(size_t);
-    ans += set->size * sizeof(struct _Term);
-    return ans;
-}
-
-void addSetToPropsSetHS2(Context context, Hashset2 to_set, Hashset2 from_set)
-{
-    int i;
-    for (i = 0 ; i < from_set->nslots ; i++)
-    {
-        LinkedList2 slot = from_set->entries[i];
-        while (slot)
-        {
-            Pair pair = (Pair) slot->entry;
-            Term term = LINK(context, (Term) pair->value);
-            ASSERT(context, term);
-            addKeyPtrValueHS2(context, to_set, pair->key, term);
-            slot = slot->next;
-        }
-    }
-}
 static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, const void *key, Term term, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max);
-
-char * fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
-{
-    int i;
-    for (i = 0 ; i < set->nslots ; i++)
-    {
-        LinkedList2 slot = set->entries[i];
-        while (slot)
-        {
-            Pair pair = (Pair) slot->entry;
-            Term term = (Term) pair->value;
-            sep = fprintProperty(context, out, isNamed, set->nr, (const void *) pair->key, term, sep, depth, encountered, used, indent, posp, debug, max);
-            slot = slot->next;
-        }
-    }
-    return sep;
-}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Map from variables to variables.
@@ -2521,8 +2190,9 @@ Term c_namedProperty(NamedPropertyLink link, char *name)
     {
         if (! link->name) // hashset
         {
-            Term term = (Term) getKeyPtrValuePtrHS2(link->u.propset, name);
-            if (term) return term;
+            Term term = (Term) getValueHS2(link->u.propset, name);
+            if (term)
+                return term;
         }
         else if (name == link->name)
         {
@@ -2547,16 +2217,15 @@ Term c_variableProperty(VariablePropertyLink link, Variable variable)
 
 char* getEnvValue(Context context, const char *name)
 {
-    char* value = (char*) getValuePtrHS2(context->env, name);
+    char* value = (char*) getValueHS2(context->env, (const void*) name);
     if (!value)
         value = getenv(name);
-
     return value;
 }
 
-char* setContextEnv(Context context, const char *name, const char* value)
+void setContextEnv(Context context, const char *name, const char* value)
 {
-    addValueHS2(context, context->env, name, (void*) value);
+    addValueHS2(context, context->env, (const void*) name, (void*) value);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -2619,9 +2288,9 @@ void crsxAddPools(Context context)
 {
     if (!context->poolRefCount)
     {
-        context->env = makeHS2(context, 4, NULL);
-        context->stringPool = makeHS2(context, 16, NULL);
-        context->keyPool = makeHS2(context, 16, NULL);
+        context->env = makeHS2(context, 4, freeKeyValue, equalsChars, hashChars);
+        context->stringPool = makeHS2(context, 16, freeValue, equalsChars, hashChars);
+        context->keyPool = makeHS2(context, 16, freeValue, equalsChars, hashChars);
 
         context->consPool = ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(Construction));
         context->consPoolSize = ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(ssize_t));
@@ -2638,14 +2307,17 @@ void crsxAddPools(Context context)
 
 void crsxReleasePools(Context context)
 {
+    crsxpReleasePools(context);
+
     --context->poolRefCount;
     if (! context->poolRefCount)
     {
-        unlinkHS2(context, context->env);
+        
+        freeHS2(context, context->env);
         context->env = NULL;
-        unlinkHS2(context, context->stringPool);
+        freeHS2(context, context->stringPool);
         context->stringPool = NULL;
-        unlinkHS2(context, context->keyPool);
+        freeHS2(context, context->keyPool);
         context->keyPool = NULL;
 
         int i;
@@ -2657,6 +2329,7 @@ void crsxReleasePools(Context context)
                 FREE(context, context->consPool[i][j]);
                 j --;
             }
+            FREE(context, context->consPool[i]);
         }
         FREE(context, context->consPool);
         FREE(context, context->consPoolSize);
@@ -2676,14 +2349,15 @@ char *makeString(Context context, const char *src)
 char *makeKeyString(Context context, const char *src)
 {
     Hashset2 pool = context->keyPool;
-    assert(pool); if (!pool) return NULL;
-    char *interned_string = (char *) getValuePtrHS2(pool, src);
-    //if (interned_string) printf("makeKeyString finds %s : '%p'\n", interned_string, interned_string);
-    if (interned_string) return interned_string;
+    assert(pool);
+    if (!pool)
+        return NULL;
+    char *interned_string = (char *) getValueHS2(pool, (const void*) src);
+    if (interned_string)
+        return interned_string;
 
     interned_string = makeString(context, src);
-    addValueHS2(context, pool, interned_string, (void*) interned_string);
-    //if (interned_string) printf("makeKeyString defines %s : '%p'\n", interned_string, interned_string);
+    addValueHS2(context, pool, (const void*) interned_string, (void*) interned_string);
     return interned_string;
 }
 
@@ -3528,7 +3202,6 @@ void InitCRSXContext(Context context)
     context->stringPool = NULL;
     context->keyPool = NULL;
     context->consPool = NULL;
-    context->noProperties =  ALLOCATE_Properties(context, NULL, NULL, NULL, NULL);
 
     crsxAddPools(context);
 
@@ -3537,6 +3210,9 @@ void InitCRSXContext(Context context)
     context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 
     context->fv_enabled = 1;
+
+    context->noProperties = ALLOCATE(context, sizeof(struct _Properties));
+
 
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 0;
@@ -4449,22 +4125,28 @@ void freeTerm(Context context, Term term)
     }
 }
 
-void unlinkValueTerm(Context context, void *entry)
+void unlinkValueTerm(Context context, const void* key, void* value)
 {
-    Pair pair = (Pair) entry;
-    Term term = (Term) pair->value;
-    //if (term)
-    unlinkTerm(context, term);
+    unlinkTerm(context, (Term) value);
 }
 
-void debugPropsHS2(Context context, Hashset2 set)
+static void addAllTerms(Context context, Hashset2 to_set, Hashset2 from_set)
 {
-    VariableSet encountered = makeVariableSet(context);
-    Hashset2 used = makeHS2(context, 10, NULL);
-    int pos = 0;
-
-    fprintPropsHS2(context, STDOUT, 1 /* names, not variables */,
-                   set, ";\n", -1, encountered, used, 1, &pos, 0, 0);
+    int i;
+    for (i = 0 ; i < from_set->nslots ; i++)
+    {
+        LinkedList2 slot = from_set->entries[i];
+        while (slot)
+        {
+            if (!containsHS2(to_set, slot->key))
+            {
+                Term term = LINK(context, (Term) slot->value);
+                ASSERT(context, term);
+                addValueHS2(context, to_set, slot->key, term);
+            }
+            slot = slot->next;
+        }
+    }
 }
 
 NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink)
@@ -4475,10 +4157,10 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         ASSERT(context, term);
 
         // Make a hashset
-        Hashset2 set = makeHS2(context, 8, unlinkValueTerm);
+        Hashset2 set = makeHS2(context, 8, unlinkValueTerm, equalsChars, hashChars);
         
         // 0th = new, 1st = nlink, 2nd..count-1 = older
-        addKeyPtrValueHS2(context, set, name, LINK(context, term));
+        addValueHS2(context, set, name, term); // Transfer term ref.
 
         // Copy initialize old elements
         NamedPropertyLink old_link = nlink;
@@ -4486,14 +4168,17 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         {
             if (old_link->name)
             {
-                Term term = LINK(context, old_link->u.term);
-                ASSERT(context, term);
-                addKeyPtrValueHS2(context, set, old_link->name, term);
+                if (!containsHS2(set, (const void*) old_link->name)) // make sure not to override newer entries
+                {
+                    Term term = LINK(context, old_link->u.term);
+                    ASSERT(context, term);
+                    addValueHS2(context, set, old_link->name, term);
+                }
             }
             else
             {
                 Hashset2 old_set = old_link->u.propset;
-                addSetToPropsSetHS2(context, set, old_set);
+                addAllTerms(context, set, old_set);
             }
 
             // move on
@@ -4501,9 +4186,6 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
         }
 
         UNLINK_NamedPropertyLink(context, nlink);
-
-        //printf("Just constructed this prop set %p:\n", set);
-        //debugPropsHS2(context, set);
 
         // Just allocate one link for the whole hashset
         NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
@@ -4543,30 +4225,30 @@ inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLi
 
 NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link)
 {
-    if (link)
+    if (!link)
+        return NULL;
+    ASSERT(context, link->nr >0);
+
+    if (--link->nr > 0)
+        return link;
+
+    // Free.
+    if (link->name)
     {
-        ASSERT(context, link->nr >0);
-
-        if (--link->nr == 0)
-        {
-            if (link->name)
-            {
-                UNLINK(context, link->u.term);
-            }
-            else
-            {
-                unlinkHS2(context, link->u.propset);
-                link->u.propset = NULL;
-            }
-
-            UNLINK_NamedPropertyLink(context, link->link);
-            link->link = NULL;
-
-            FREE(context, link);
-            return NULL;
-        }
+        UNLINK(context, link->u.term);
     }
-    return link;
+    else
+    {
+        unlinkHS2(context, link->u.propset);
+        link->u.propset = NULL;
+    }
+
+    NamedPropertyLink next = link->link;
+
+    link->link = NULL;
+    link->name = NULL; // No need to free name as it is stored in the pool.
+    FREE(context, link);
+    return UNLINK_NamedPropertyLink(context, next); // tail.
 }
 
 VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link)
@@ -4599,6 +4281,11 @@ VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariableProper
 Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
                                  NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
 {
+
+    // TODO:
+    //if (!namedFreeVars && !variableFreeVars && !namedProperties && !variableProperties)
+    //    return context->noProperties;
+
     Properties env = ALLOCATE(context, sizeof(struct _Properties));
     env->nr = 1;
     env->namedFreeVars = namedFreeVars;
@@ -4966,7 +4653,7 @@ void fprintTerm(Context context, FILE* out, Term term)
 {
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10, NULL);
+        used = makeHS2(context, 10, NULL, equalsChars, hashChars);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5024,7 +4711,7 @@ void fprintTermWithIndent(Context context, FILE* out, Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10, NULL);
+        used = makeHS2(context, 10, NULL, equalsChars, hashChars);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5048,7 +4735,7 @@ void printTermFullWithIndent(Context context,  Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10, NULL);
+        used = makeHS2(context, 10, NULL,  equalsChars, hashChars);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -5150,7 +4837,7 @@ int fprintSafeVariableName(Context context, FILE* out, Variable v, Hashset2 used
     if (!used)
         return fprintVariable(context, out, v);
 
-    char* n = (char*) getKeyPtrValuePtrHS2(used, (void*)v);
+    char* n = (char*) getValueHS2(used, (const void*) v);
     if (n == NULL)
     {
         // Search for [-_0-9] and retain prefix.
@@ -5216,7 +4903,7 @@ int fprintSafeVariableName(Context context, FILE* out, Variable v, Hashset2 used
         strcat(n, index);
         free(index);
 
-        addKeyPtrValueHS2(context, used, v, n);
+        addValueHS2(context, used, (const void*) v, (void*) n);
     }
     return FPRINTF(context, out, "%s", n);
 }
@@ -5555,6 +5242,32 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
     fprintTermTop(context, out, term, depth==INT32_MAX?depth:depth-2, encountered, used, (indent ? indent+4 : 0), posp, depth==INT32_MAX?depth:1, debug);
     sep = ";\n";
     return sep;
+}
+
+static char *fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
+{
+    int i;
+    for (i = 0 ; i < set->nslots ; i++)
+    {
+        LinkedList2 slot = set->entries[i];
+        while (slot)
+        {
+            Term term = (Term) slot->value;
+            sep = fprintProperty(context, out, isNamed, set->nr, slot->key, term, sep, depth, encountered, used, indent, posp, debug, max);
+            slot = slot->next;
+        }
+    }
+    return sep;
+}
+
+void printPropsHS2(Context context, Hashset2 set)
+{
+    VariableSet encountered = makeVariableSet(context);
+    Hashset2 used = makeHS2(context, 10, NULL, equalsChars, hashChars);
+    int pos = 0;
+
+    fprintPropsHS2(context, STDOUT, 1 /* names, not variables */,
+                   set, ";\n", -1, encountered, used, 1, &pos, 0, 0);
 }
 
 

@@ -32,10 +32,11 @@ int clock_gettime(int clk_id, struct timespec *t)
 
 // Global profiler state.
 
-char* profStepStack[16384];
-unsigned profStepStackSize;
 long profMemuseMetaSubstitutes; // in KB
 long pMetaSubstituteCount; // Count total number of meta substitutions
+long pAccuMetaTime; // Time spent doing meta application
+long pAccuMergeTime; // Time spent doing meta application
+long pMergeCount;
 long pCallCount; // Count total number of simple meta substitutions
 long pFVCount; // Count total number of free variable sets
 long pFVMaxSize; // Maximum free variable sets size
@@ -52,6 +53,9 @@ time_t pTime; // Keep track of time
 int pSampleRate; // Random term size sample rate
 struct timespec pStartTime;
 struct timespec pNanoTime;
+struct timespec pMergeClock;
+size_t pKeyPoolSize;
+char* pStepName; // Current step function
 
 // Measure memory use after computation.
 struct rusage crsxpComputeUse;
@@ -69,7 +73,6 @@ void crsxpInit(Context context)
     if (context->profiling)
     {
         getrusage(RUSAGE_SELF, &crsxpComputeUse);
-        profStepStackSize = 0;
         profFunctionsCount = 0;
         profMemuseMetaSubstitutes = 0l;
         pPeakTermSize = pNSPeakTermSize = 0l;
@@ -83,7 +86,10 @@ void crsxpInit(Context context)
         time(&pTime);
         clock_gettime(CLOCK_REALTIME, &pStartTime);
         pSampleRate = (rand() % 500) + 500;
-        crsxpMetaCount = makeHS2(context, 8, NULL);
+        crsxpMetaCount = makeHS2(context, 8, NULL, equalsChars, hashChars);
+        pAccuMetaTime = 0l;
+        pAccuMergeTime = 0l;
+        pMergeCount = 0;
     }
 }
 
@@ -98,13 +104,13 @@ void crsxpDestroy(Context context)
         long use = (usageafter.ru_maxrss - crsxpComputeUse.ru_maxrss) / 1024.0;
         PRINTF(context, "\nmemory use: %ldM\n", use);
 
-        int i = 0;
-        while (i < profFunctionsCount)
-        {
-            FREE(context, profFunctions[i]);
-            profFunctions[i] = NULL;
-            i++;
-        }
+//        int i = 0;
+//        while (i < profFunctionsCount)
+//        {
+//            FREE(context, profFunctions[i]);
+//            profFunctions[i] = NULL;
+//            i++;
+//        }
     }
 }
 
@@ -112,7 +118,7 @@ void crsxpBeforeStep(Context context, Term term)
 {
     if (context->profiling)
     {
-        profStepStack[profStepStackSize++] = SYMBOL(term);
+        //      profStepStack[profStepStackSize++] = SYMBOL(term);
         profAddStepFunction(context, SYMBOL(term));
         crsxpPrintStats(context, term);
         ++pStepCount;
@@ -121,10 +127,10 @@ void crsxpBeforeStep(Context context, Term term)
 
 void crsxpAfterStep(Context context)
 {
-    if (context->profiling)
-    {
-        profStepStackSize--;
-    }
+//    if (context->profiling)
+//    {
+//
+//    }
 }
 
 void crsxpBeforeSubstitution(Context context, Term term)
@@ -134,7 +140,6 @@ void crsxpBeforeSubstitution(Context context, Term term)
         getrusage(RUSAGE_SELF, &crsxpSubstitutionUse);
 
         clock_gettime(CLOCK_REALTIME, &pNanoTime);
-
     }
 }
 
@@ -153,11 +158,10 @@ static struct timespec diff(struct timespec start, struct timespec end)
     return temp;
 }
 
-static long long nano2ms(struct timespec time)
+static long nano2ms(long nano)
 {
-    return time.tv_sec * 1000 + (time.tv_nsec / 1000000);
+    return nano / 1000000;
 }
-
 
 void crsxpAfterSubstitution(Context context)
 {
@@ -178,21 +182,22 @@ void crsxpAfterSubstitution(Context context)
         struct timespec d = diff(pNanoTime, nanoTime);
         long dl = d.tv_sec * 1000000000 + d.tv_nsec;
 
-        //const char* symbol = (const char*)SYMBOL(term);
-        const char* symbol = profStepStack[profStepStackSize - 1];
+        const char* symbol = pStepName;
         if (symbol)
         {
-            long* count = getValuePtrHS2(crsxpMetaCount, symbol);
+            long* count = (long*) getValueHS2(crsxpMetaCount,
+                    (const void*) symbol);
             if (!count)
             {
                 count = (long*) malloc(sizeof(long));
                 (*count) = dl;
-                addValueHS2(context, crsxpMetaCount, symbol, (void*) count);
+                addValueHS2(context, crsxpMetaCount, (const void*) symbol,
+                        (void*) count);
             } else
                 (*count) += dl;
-
-            //PRINTF(context, "\n%-8ld# meta substitution for %s : %ld", pStepCount, symbol, (*count));
         }
+
+        pAccuMetaTime += dl;
     }
 }
 
@@ -218,6 +223,7 @@ void crsxpVSCreated(Context context)
         pFVCount++;
     }
 }
+
 void crsxpVSAdded(Context context, Hashset set)
 {
     if (context->profiling)
@@ -227,100 +233,139 @@ void crsxpVSAdded(Context context, Hashset set)
     }
 }
 
+void crsxpReleasePools(Context context)
+{
+    if (context->profiling)
+    {
+        pKeyPoolSize = 0;
+        if (context->keyPool)
+            pKeyPoolSize = context->keyPool->size;
+    }
+}
+
+void crsxpBeforeMergeProperties(Context context)
+{
+    if (context->profiling)
+    {
+        clock_gettime(CLOCK_REALTIME, &pMergeClock);
+    }
+}
+
+void crsxpAfterMergeProperties(Context context)
+{
+    if (context->profiling)
+    {
+        struct timespec nanoTime;
+        clock_gettime(CLOCK_REALTIME, &nanoTime);
+        struct timespec d = diff(pMergeClock, nanoTime);
+        long dl = d.tv_sec * 1000000000 + d.tv_nsec;
+
+        pAccuMergeTime += dl;
+    }
+}
+void crsxpNamedPropertiesMerged(Context context, int count)
+{
+    if (context->profiling)
+    {
+        pMergeCount += count;
+    }
+}
+
 void profAddStepFunction(Context context, char* name)
 {
     if (context->profiling)
     {
-        if (profFunctionsCount >= 16384)
-            return;
-
-        char* stem = name;
-
-        int i = 0;
-        while (i < profFunctionsCount)
-        {
-
-            if (strcmp(profFunctions[i]->name, stem) == 0)
-                break;
-            i++;
-        }
-
-        if (i < profFunctionsCount)
-        {
-            profFunctions[i]->count++;
-        } else
-        {
-            ProfFunctionEntry record = ALLOCATE(context,
-                    sizeof(struct _ProfFunctionEntry));
-            record->name = stem;
-            record->count = 1;
-            record->metaCount = 0;
-            record->metaMemuse = 0;
-            profFunctions[profFunctionsCount++] = record;
-        }
+        pStepName = name;
+//        if (profFunctionsCount >= 16384)
+//            return;
+//
+//        char* stem = name;
+//
+//        int i = 0;
+//        while (i < profFunctionsCount)
+//        {
+//
+//            if (strcmp(profFunctions[i]->name, stem) == 0)
+//                break;
+//            i++;
+//        }
+//
+//        if (i < profFunctionsCount)
+//        {
+//            profFunctions[i]->count++;
+//        } else
+//        {
+//            ProfFunctionEntry record = ALLOCATE(context,
+//                    sizeof(struct _ProfFunctionEntry));
+//            record->name = stem;
+//            record->count = 1;
+//            record->metaCount = 0;
+//            record->metaMemuse = 0;
+//            profFunctions[profFunctionsCount++] = record;
+//        }
     }
 }
-
-void pIncMetaCountFunction(Context context, char* name, long memuse)
-{
-    if (context->profiling)
-    {
-        // Search for existing entry
-        // function name are of the form R4a-Form-let2$XX
-
-        //    char* d = strchr(name, '$');
-        //    char* stem = name;
-        //    if (d)
-        //    {
-        //        int len = strlen(name) - strlen(d);
-        //        stem = ALLOCATE(context, len + 1);
-        //        memcpy(stem, name, len);
-        //        stem[len] = '\0';
-        //    }
-        char * stem = name;
-
-        int i = 0;
-        while (i < profFunctionsCount)
-        {
-
-            if (strcmp(profFunctions[i]->name, stem) == 0)
-            {
-                break;
-            }
-            i++;
-        }
-
-        if (i < profFunctionsCount)
-        {
-            profFunctions[i]->metaCount++;
-            profFunctions[i]->metaMemuse += memuse;
-            //        if (d)
-            //           FREE(context, stem);
-        }
-    }
-}
-
-static int profEntryCmp(const void* p1, const void* p2)
-{
-
-    ProfFunctionEntry e1 = *(ProfFunctionEntry*) p1;
-    ProfFunctionEntry e2 = *(ProfFunctionEntry*) p2;
-
-    if (e1->count == e2->count)
-        return 0;
-    if (e1->count > e2->count)
-        return -1;
-//        if (e1->metaCount == e2->metaCount)
-//            return 0;
-//        if (e1->metaCount > e2->metaCount)
-//            return -1;
-//        if (e1->metaMemuse == e2->metaMemuse)
-//               return 0;
-//           if (e1->metaMemuse > e2->metaMemuse)
-//               return -1;
-
-    return 1;
-}
+//
+//void pIncMetaCountFunction(Context context, char* name, long memuse)
+//{
+//    if (context->profiling)
+//    {
+//        // Search for existing entry
+//        // function name are of the form R4a-Form-let2$XX
+//
+//        //    char* d = strchr(name, '$');
+//        //    char* stem = name;
+//        //    if (d)
+//        //    {
+//        //        int len = strlen(name) - strlen(d);
+//        //        stem = ALLOCATE(context, len + 1);
+//        //        memcpy(stem, name, len);
+//        //        stem[len] = '\0';
+//        //    }
+//        char * stem = name;
+//
+//        int i = 0;
+//        while (i < profFunctionsCount)
+//        {
+//
+//            if (strcmp(profFunctions[i]->name, stem) == 0)
+//            {
+//                break;
+//            }
+//            i++;
+//        }
+//
+//        if (i < profFunctionsCount)
+//        {
+//            profFunctions[i]->metaCount++;
+//            profFunctions[i]->metaMemuse += memuse;
+//            //        if (d)
+//            //           FREE(context, stem);
+//        }
+//    }
+//}
+//
+//static int profEntryCmp(const void* p1, const void* p2)
+//{
+//
+//    ProfFunctionEntry e1 = *(ProfFunctionEntry*) p1;
+//    ProfFunctionEntry e2 = *(ProfFunctionEntry*) p2;
+//
+//    if (e1->count == e2->count)
+//        return 0;
+//    if (e1->count > e2->count)
+//        return -1;
+////        if (e1->metaCount == e2->metaCount)
+////            return 0;
+////        if (e1->metaCount > e2->metaCount)
+////            return -1;
+////        if (e1->metaMemuse == e2->metaMemuse)
+////               return 0;
+////           if (e1->metaMemuse > e2->metaMemuse)
+////               return -1;
+//
+//    return 1;
+//}
 
 static int pairEntryCmp(const void* p1, const void* p2)
 {
@@ -341,66 +386,66 @@ void printProfiling(Context context)
 {
     if (context->profiling)
     {
-        if (profLargeMetaSubstitutes || profLargeBufferCopy)
-        {
-            PRINTF(context, "Profiling information...");
+//        if (profLargeMetaSubstitutes || profLargeBufferCopy)
+//        {
+//            PRINTF(context, "Profiling information...");
+//
+//            if (profLargeMetaSubstitutes)
+//            {
+//                PRINTF(context, "\n\nReport large meta substitutes...\n");
+//
+//                ProfMetaSubstitute c = profLargeMetaSubstitutes;
+//                while (c)
+//                {
+//                    PRINTF(context, "\n===========================");
+//                    PRINTF(context, "\n  Large meta substitute");
+//                    printMetasubstituteRecord(context, c);
+//                    c = c->next;
+//
+//                    PRINTF(context, "\n");
+//                }
+//            }
 
-            if (profLargeMetaSubstitutes)
-            {
-                PRINTF(context, "\n\nReport large meta substitutes...\n");
+//            if (profLargeBufferCopy)
+//            {
+//                PRINTF(context, "\n\nReport large environment copy...\n");
+//
+//                ProfBufferCopy b = profLargeBufferCopy;
+//                while (b)
+//                {
+//                    PRINTF(context, "\n===========================");
+//                    PRINTF(context, "\n  Large environment copy");
+//                    PRINTF(context, "\n  size      : %u", b->size);
+//                    PRINTF(context, "\n  backtrace : ");
+//
+//                    int i = b->backtraceSize - 1;
+//                    while (i >= 0)
+//                    {
+//                        PRINTF(context, "\n    %s", b->backtrace[i]);
+//                        i--;
+//                    }
+//
+//                    b = b->next;
+//
+//                    PRINTF(context, "\n");
+//                }
+//            }
+//        }
 
-                ProfMetaSubstitute c = profLargeMetaSubstitutes;
-                while (c)
-                {
-                    PRINTF(context, "\n===========================");
-                    PRINTF(context, "\n  Large meta substitute");
-                    printMetasubstituteRecord(context, c);
-                    c = c->next;
-
-                    PRINTF(context, "\n");
-                }
-            }
-
-            if (profLargeBufferCopy)
-            {
-                PRINTF(context, "\n\nReport large environment copy...\n");
-
-                ProfBufferCopy b = profLargeBufferCopy;
-                while (b)
-                {
-                    PRINTF(context, "\n===========================");
-                    PRINTF(context, "\n  Large environment copy");
-                    PRINTF(context, "\n  size      : %u", b->size);
-                    PRINTF(context, "\n  backtrace : ");
-
-                    int i = b->backtraceSize - 1;
-                    while (i >= 0)
-                    {
-                        PRINTF(context, "\n    %s", b->backtrace[i]);
-                        i--;
-                    }
-
-                    b = b->next;
-
-                    PRINTF(context, "\n");
-                }
-            }
-        }
-
-        PRINTF(context,
-                "\n\nReport function count  (call count) (meta count) (memuse, M)...\n");
-
-        qsort(profFunctions, profFunctionsCount, sizeof(ProfFunctionEntry),
-                profEntryCmp);
-
-        size_t i = 0;
-        while (i < 50 && i < profFunctionsCount)
-        {
-            PRINTF(context, "\n%-50s : %10d %10d %5ld", profFunctions[i]->name,
-                    profFunctions[i]->count, profFunctions[i]->metaCount,
-                    profFunctions[i]->metaMemuse / 1024);
-            i++;
-        }
+//        PRINTF(context,
+//                "\n\nReport function count  (call count) (meta count) (memuse, M)...\n");
+//
+//        qsort(profFunctions, profFunctionsCount, sizeof(ProfFunctionEntry),
+//                profEntryCmp);
+//
+//        size_t i = 0;
+//        while (i < 50 && i < profFunctionsCount)
+//        {
+//            PRINTF(context, "\n%-50s : %10d %10d %5ld", profFunctions[i]->name,
+//                    profFunctions[i]->count, profFunctions[i]->metaCount,
+//                    profFunctions[i]->metaMemuse / 1024);
+//            i++;
+//        }
 
         PRINTF(context,
                 "\n\nReport meta count  (step name) (time ms) (percent time) ...\n");
@@ -411,21 +456,28 @@ void printProfiling(Context context)
         struct timespec endTime;
         clock_gettime(CLOCK_REALTIME, &endTime);
         struct timespec d = diff(pStartTime, endTime);
-        double dl = (double) (d.tv_sec * 1000000000l + d.tv_nsec);
+        long dl = d.tv_sec * 1000000000l + d.tv_nsec;
 
         if (counts)
         {
+            size_t i;
             for (i = 0; i < crsxpMetaCount->size && i < 50; i++)
             {
                 long time = *(long*) counts[i]->value;
-                double percent = time / dl;
+                double percent = (time / (double) dl) * 100.0;
                 PRINTF(context, "\n%-50s : %10ld %2.2f",
-                        (const char* ) counts[i]->key, (long) (time / 1000000.0), percent);
+                        (const char* ) counts[i]->key,
+                        (long ) (time / 1000000.0), percent);
             }
         }
 
-        PRINTF(context, "\nTotal memory used by meta substitution: %ldM",
+        PRINTF(context, "\n===\n\n%-50s : %ldM",
+                "Total memory used by meta substitution",
                 (profMemuseMetaSubstitutes / 1024));
+        PRINTF(context, "\n%-50s : %ldms(%2.2f%%)",
+                "Total time spent in meta substitution", nano2ms(pAccuMetaTime),
+                (pAccuMetaTime / (double ) dl) * 100.0);
+
 //        PRINTF(context, "\nPeak term size (sample)          : %ld nodes",
 //                pPeakTermSize);
         //PRINTF(context, "\nPeak term memory use (sample)    : %ldM\n",
@@ -435,11 +487,15 @@ void printProfiling(Context context)
                 pMetaSubstituteCount);
         PRINTF(context, "\n%-50s : %ld", "Shallow meta substitution count",
                 pCallCount);
+        PRINTF(context, "\n%-50s : %ld (%2.2f%%)", "Total time spent merging environments",
+                                nano2ms(pAccuMergeTime), (pAccuMergeTime / (double ) dl) * 100.0);
+        PRINTF(context, "\n%-50s : %ld", "Total number of properties merged",
+                        pMergeCount);
         PRINTF(context, "\n%-50s : %ld", "Free variable set count", pFVCount);
         PRINTF(context, "\n%-50s : %ld", "Free variable set maximum size",
                 pFVMaxSize);
-        PRINTF(context, "\n%-50s : %lldms", "Total time",
-                        nano2ms(d));
+        PRINTF(context, "\n%-50s : %ld", "String key pool size", pKeyPoolSize);
+        PRINTF(context, "\n%-50s : %ldms", "Total time", nano2ms(dl));
 
     }
 }
@@ -461,7 +517,8 @@ void printMetasubstituteRecord(Context context, ProfMetaSubstitute c)
     }
 }
 
-static void termSize(Term term, long* size, long* memuse, int sharing);
+//
+//static void termSize(Term term, long* size, long* memuse, int sharing);
 
 void crsxpPrintStats(Context context, Term term)
 {
@@ -503,7 +560,6 @@ void crsxpPrintStats(Context context, Term term)
                 fflush(stdout);
             }
         }
-
     }
 }
 
