@@ -504,8 +504,8 @@ struct _Construction
     Properties properties;
 
     VARIABLESET fvs;  // free variables known to occur in subterms only (excluding properties)
-    VARIABLESET nfvs; // free variables known to occur in named properties (on this construction and subterms)   s
-    VARIABLESET vfvs; // free variables known to occur in variable properties (on this construction and subterms)
+    VARIABLESET nfvs; // free variables known to occur in named properties (on this construction AND subterms)
+    VARIABLESET vfvs; // free variables known to occur in variable properties (on this construction AND subterms)
 
     Term sub[]; // subterms -- actual size is ARITY(term)
     // Variable binder[]; // binders -- actual size is term->descriptor->binderoffset[ARITY(term)]
@@ -922,17 +922,28 @@ static inline Term c_property(Context context, NamedPropertyLink namedProperties
 
 struct _Properties
 {
-    VARIABLESET namedFreeVars; // set of free variables in named properties (unless all properties are closed)
-    VARIABLESET variableFreeVars; // set of free variables in variable properties (never closed)
-    NamedPropertyLink namedProperties; // named properties.
+    VARIABLESET namedFreeVars;               // set of free variables in named properties (unless all properties are closed)
+    VARIABLESET variableFreeVars;            // set of free variables in variable properties (never closed)
+    NamedPropertyLink namedProperties;       // named properties.
     VariablePropertyLink variableProperties; // variable properties.
     ssize_t nr;
 };
 
-Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
+Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
                                NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
-Properties LINK_Properties(Context context, Properties env);
-Properties UNLINK_Properties(Context context, Properties env);
+Properties linkProperties(Context context, Properties env);
+Properties unlinkProperties(Context context, Properties env);
+
+/** Set properties. Allocation new Properties is props is noProperties */
+Properties setProperties(Context context, Properties props, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
+
+
+Properties setNamedFreeVars(Context context, Properties props, VARIABLESET namedFreeVars);
+Properties setVariableFreeVars(Context context, Properties props, VARIABLESET variableFreeVars);
+Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
+Properties setNamedProperties(Context context, Properties props, NamedPropertyLink namedProperties);
+Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
+
 
 struct _NamedPropertyLink
 {

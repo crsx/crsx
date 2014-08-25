@@ -146,7 +146,7 @@ Construction makeConstruction(Context context, ConstructionDescriptor descriptor
 static
 void freeConstruction(Context context, Construction construction)
 {
-    UNLINK_Properties(context, construction->properties);
+    unlinkProperties(context, construction->properties);
     construction->properties = NULL;
 
     UNLINK_VARIABLESET(context, construction->fvs);
@@ -378,7 +378,7 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     Construction construction = makeConstruction(sink->context, descriptor);
 
     construction->properties =
-      ALLOCATE_Properties(sink->context,
+      allocateProperties(sink->context,
                           buffer->pendingNamedPropertiesFreeVars,
                           buffer->pendingVariablePropertiesFreeVars,
                           buffer->pendingNamedProperties,
@@ -574,75 +574,81 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
     }
     else
     {
-        // All these pointer manipulation in order to reuse bufferMergeProperties
-        NamedPropertyLink namedLink = buffer->pendingNamedProperties;
-        buffer->pendingNamedProperties = LINK_NamedPropertyLink(context, c->properties->namedProperties);
-        VariablePropertyLink variableLink = buffer->pendingVariableProperties;
-        buffer->pendingVariableProperties = LINK_VariablePropertyLink(context, c->properties->variableProperties);
-
-        VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
-        buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(context, c->properties->namedFreeVars);
-        VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
-        buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(context, c->properties->variableFreeVars);
-
-        sink->start(sink, c->term.descriptor);
-
-        buffer->pendingNamedProperties = namedLink;
-        buffer->pendingVariableProperties = variableLink;
-
-        buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
-        buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
-
-        bufferMergeProperties(context, buffer, asConstruction(bufferTop(buffer)->term));
-
-        int a = ARITY(term);
-        int i;
-        for (i = 0; i < a; i ++)
+        if (IS_LITERAL(term))
         {
-            const int rank = RANK(term, i);
-            if (rank == 0)
-            {
-                // --  i'th subterm with no binders: just continue copying.
-                COPY(sink, LINK(context, SUB(term, i)));
-            }
-            else
-            {
-                // Rename binders and substitute..
-
-                Variable *oldBinders = BINDERS(term, i);
-                Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
-                VariableUse subUses[rank]; // does not escape
-                struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
-                SubstitutionFrame subSubstitution = &_subSubstitution;
-
-                // --- populate per binder
-                int j;
-                for (j = 0; j < rank; ++j)
-                {
-                    char *oldname = oldBinders[j]->name;
-                    char *baseendp = strrchr(oldname, '_');
-                    char *basename = oldname;
-                    if (baseendp)
-                    {
-                        const int z = baseendp - oldname;
-                        basename = ALLOCA(context, z+1); // does not escape
-                        memcpy(basename, oldname, z);
-                        basename[z] = '\0';
-                    }
-                    int isLinear = IS_LINEAR(oldBinders[j]);
-                    subBinders[j] = makeVariable(context, oldBinders[j]->name, 1, isLinear, oldBinders[j]->block, oldBinders[j]->shallow); // escapes
-                    subUses[j] = makeVariableUse(context, linkVariable(context, subBinders[j])); // escapes
-                }
-
-                // --- send new binders
-                BINDS(sink, rank, subBinders); // escape of subBinders. Variable references are transfered.
-                //FREE(context, subBinders) (no need: allocated on the stack). Variable references have been transferred.
-                // --- now process subterm!
-                metaSubstitute(sink, LINK(context, SUB(term, i)), subSubstitution);
-            }
+            LITERALU(sink, TEXT(term));
         }
-        sink->end(sink, c->term.descriptor);
+        else
+        {
+            // All these pointer manipulation in order to reuse bufferMergeProperties
+            NamedPropertyLink namedLink = buffer->pendingNamedProperties;
+            buffer->pendingNamedProperties = LINK_NamedPropertyLink(context, c->properties->namedProperties);
+            VariablePropertyLink variableLink = buffer->pendingVariableProperties;
+            buffer->pendingVariableProperties = LINK_VariablePropertyLink(context, c->properties->variableProperties);
 
+            VARIABLESET fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
+            buffer->pendingNamedPropertiesFreeVars = LINK_VARIABLESET(context, c->properties->namedFreeVars);
+            VARIABLESET fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
+            buffer->pendingVariablePropertiesFreeVars = LINK_VARIABLESET(context, c->properties->variableFreeVars);
+
+            sink->start(sink, c->term.descriptor);
+
+            buffer->pendingNamedProperties = namedLink;
+            buffer->pendingVariableProperties = variableLink;
+
+            buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
+            buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
+
+            bufferMergeProperties(context, buffer, asConstruction(bufferTop(buffer)->term));
+
+            int a = ARITY(term);
+            int i;
+            for (i = 0; i < a; i ++)
+            {
+                const int rank = RANK(term, i);
+                if (rank == 0)
+                {
+                    // --  i'th subterm with no binders: just continue copying.
+                    COPY(sink, LINK(context, SUB(term, i)));
+                }
+                else
+                {
+                    // Rename binders and substitute..
+
+                    Variable *oldBinders = BINDERS(term, i);
+                    Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
+                    VariableUse subUses[rank]; // does not escape
+                    struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+                    SubstitutionFrame subSubstitution = &_subSubstitution;
+
+                    // --- populate per binder
+                    int j;
+                    for (j = 0; j < rank; ++j)
+                    {
+                        char *oldname = oldBinders[j]->name;
+                        char *baseendp = strrchr(oldname, '_');
+                        char *basename = oldname;
+                        if (baseendp)
+                        {
+                            const int z = baseendp - oldname;
+                            basename = ALLOCA(context, z+1); // does not escape
+                            memcpy(basename, oldname, z);
+                            basename[z] = '\0';
+                        }
+                        int isLinear = IS_LINEAR(oldBinders[j]);
+                        subBinders[j] = makeVariable(context, oldBinders[j]->name, 1, isLinear, oldBinders[j]->block, oldBinders[j]->shallow); // escapes
+                        subUses[j] = makeVariableUse(context, linkVariable(context, subBinders[j])); // escapes
+                    }
+
+                    // --- send new binders
+                    BINDS(sink, rank, subBinders); // escape of subBinders. Variable references are transfered.
+                    //FREE(context, subBinders) (no need: allocated on the stack). Variable references have been transferred.
+                    // --- now process subterm!
+                    metaSubstitute(sink, LINK(context, SUB(term, i)), subSubstitution);
+                }
+            }
+            sink->end(sink, c->term.descriptor);
+        }
         UNLINK(context, term);
     }
 
@@ -837,7 +843,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
         // There are new properties.
 
         if (!construction->properties->namedProperties) // no existing properties. Good.
-            construction->properties->namedProperties = buffer->pendingNamedProperties; // transfer ref
+            construction->properties = setNamedProperties(context, construction->properties, buffer->pendingNamedProperties); // transfer ref
         else
         {
             // New properties and existing properties... merge.
@@ -870,7 +876,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             newLast->link = construction->properties->namedProperties; // transfer ref to old properties to tail of new.
 
             // Set final links
-            construction->properties->namedProperties = LINK_NamedPropertyLink(context, newTop);
+            construction->properties = setNamedProperties(context, construction->properties, LINK_NamedPropertyLink(context, newTop));
             UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
 
             crsxpNamedPropertiesMerged(context, count);
@@ -886,7 +892,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
 
             if (freeVars)
             {
-                construction->properties->namedFreeVars = freeVars;
+                construction->properties = setNamedFreeVars(context, construction->properties, freeVars);
 
                 // And add the new pending free vars also to the construction itself
                 construction->nfvs = VARIABLESET_MERGEALL(context, construction->nfvs, buffer->pendingNamedPropertiesFreeVars);
@@ -908,7 +914,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
     if (buffer->pendingVariableProperties && construction->properties->variableProperties != buffer->pendingVariableProperties)
     {
         if (!construction->properties->variableProperties)
-            construction->properties->variableProperties = buffer->pendingVariableProperties;
+            construction->properties = setVariableProperties(context, construction->properties, buffer->pendingVariableProperties);
         else
         {
             // Merge property lists.
@@ -941,7 +947,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             }
 
             newLast->link = construction->properties->variableProperties;
-            construction->properties->variableProperties = LINK_VariablePropertyLink(context, newTop);
+            construction->properties = setVariableProperties(context, construction->properties, LINK_VariablePropertyLink(context, newTop));
 
             UNLINK_VariablePropertyLink(context, buffer->pendingVariableProperties);
         }
@@ -955,7 +961,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
             freeVars = VARIABLESET_MERGEALL(context, freeVars, LINK_VARIABLESET(context, buffer->pendingVariablePropertiesFreeVars));
             ASSERT(context, freeVars);
 
-            construction->properties->variableFreeVars = freeVars;
+            construction->properties = setVariableFreeVars(context, construction->properties, freeVars);
             ASSERT_VARIABLE_PROPERTIES(context, construction->properties);
 
             // And add to the construction..
@@ -3888,9 +3894,9 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
 
         // - destroy property pointers in term itself (as they are now in the buffer pending list)
         UNLINK_NamedPropertyLink(sink->context, construction->properties->namedProperties);
-        construction->properties->namedProperties = NULL;
+        construction->properties->namedProperties = NULL; // no need to check for noProperties
         UNLINK_VariablePropertyLink(sink->context, construction->properties->variableProperties);
-        construction->properties->variableProperties = NULL;
+        construction->properties->variableProperties = NULL; // no need to check for noProperties
 
         // TODO : Should some or all of these be unlinked?
         // UNLINK_VARIABLESET(context, construction->fvs);
@@ -4078,17 +4084,15 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                 Term locvalue = NAMED_PROPERTY(context, locConstruction, key);
                 if (locvalue && strcmp(SYMBOL(value), SYMBOL(locvalue)))
                 {
-                    VARIABLESET fvs = construction->properties->namedFreeVars;
+                    //VARIABLESET fvs = construction->properties->namedFreeVars;
 
                     // Location has been changed...update.
                     NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), LINK(context, locvalue), construction->properties->namedProperties);
 
-                    construction->properties->namedProperties = link;
+                    construction->properties = setNamedProperties(context, construction->properties, link);
 
-                    if (fvs)
-                    {
-                        construction->properties->namedFreeVars = LINK_VARIABLESET(context, fvs);
-                    }
+                    //if (fvs)
+                      //  construction->properties = setNamedFreeVars(context, construction->properties, LINK_VARIABLESET(context, fvs));
                 }
             }
         }
@@ -4278,13 +4282,11 @@ VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariableProper
     return link;
 }
 
-Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
+Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
                                  NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
 {
-
-    // TODO:
     //if (!namedFreeVars && !variableFreeVars && !namedProperties && !variableProperties)
-    //    return context->noProperties;
+     //   return context->noProperties;
 
     Properties env = ALLOCATE(context, sizeof(struct _Properties));
     env->nr = 1;
@@ -4296,15 +4298,60 @@ Properties ALLOCATE_Properties(Context context, VARIABLESET namedFreeVars, VARIA
     return env;
 }
 
-Properties LINK_Properties(Context context, Properties env)
+Properties setProperties(Context context, Properties props, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
 {
-    if (env)
-        env->nr++;
+    if (context->noProperties == props)
+        return allocateProperties(context, NULL, NULL, namedProperties, variableProperties);
 
+    props->namedProperties = namedProperties;
+    props->variableProperties = variableProperties;
+    return props;
+}
+
+Properties setNamedFreeVars(Context context, Properties props, VARIABLESET namedFreeVars)
+{
+    if (context->noProperties == props)
+        return allocateProperties(context, namedFreeVars, NULL, NULL, NULL);
+
+    props->namedFreeVars = namedFreeVars;
+    return props;
+}
+
+Properties setVariableFreeVars(Context context, Properties props, VARIABLESET variableFreeVars)
+{
+    if (context->noProperties == props)
+        return allocateProperties(context, NULL, variableFreeVars, NULL, NULL);
+
+    props->variableFreeVars = variableFreeVars;
+    return props;
+}
+
+Properties setNamedProperties(Context context, Properties props, NamedPropertyLink namedProperties)
+{
+    if (context->noProperties == props)
+        return allocateProperties(context, NULL, NULL, namedProperties, NULL);
+
+    props->namedProperties = namedProperties;
+    return props;
+}
+
+Properties setVariableProperties(Context context, Properties props,
+        VariablePropertyLink variableProperties)
+{
+    if (context->noProperties == props)
+        return allocateProperties(context, NULL, NULL, NULL, NULL);
+
+    props->variableProperties = variableProperties;
+    return props;
+}
+
+inline Properties linkProperties(Context context, Properties env)
+{
+    env->nr++;
     return env;
 }
 
-Properties UNLINK_Properties(Context context, Properties env)
+Properties unlinkProperties(Context context, Properties env)
 {
     if (env && env != context->noProperties)
     {
