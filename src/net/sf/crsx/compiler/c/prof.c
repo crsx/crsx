@@ -688,7 +688,7 @@ void crsxpBeforeStep(Context context, Term term)
 {}
 void crsxpAfterStep(Context context)
 {}
-void crsxpBeforeSubstitution(Context context)
+void crsxpBeforeSubstitution(Context context, Term term)
 {}
 void crsxpAfterSubstitution(Context context)
 {}
@@ -700,6 +700,12 @@ void crsxpVSCreated(Context context)
 {}
 void crsxpVSAdded(Context context, Hashset set)
 {}
+void crsxpBeforeMergeProperties(Context context)
+{}
+void crsxpAfterMergeProperties(Context context)
+{}
+void crsxpNamedPropertiesMerged(Context context, int count)
+{}
 void printProfiling(Context context)
 {}
 void printMetasubstituteRecord(Context context, ProfMetaSubstitute c)
@@ -708,5 +714,8 @@ void profAddStepFunction(Context context, char* functionName)
 {}
 void pIncMetaCountFunction(Context context, char* functionName, long memuse)
 {}
+void crsxpReleasePools(Context context)
+{}
+
 
 #endif

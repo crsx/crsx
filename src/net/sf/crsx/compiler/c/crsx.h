@@ -104,7 +104,7 @@ extern void InitCRSXContext(Context context);
 # ifndef DEBUGX
 #  define DEBUGX(X) X
 # endif
-# define CRSX_CHECK(CONTEXT,TERM) check(CONTEXT,TERM)
+# define CRSX_CHECK(CONTEXT,TERM) noop()
 #else
 # ifndef DEBUGENV
 #  define DEBUGENV(NAME,CMD) noop()

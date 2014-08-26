@@ -16,6 +16,8 @@
 // Whether or not to check for accurate reference count.
 int gCheckRef = 0;
 
+#endif
+
 extern TermLink occurLink(TermLink link, void* p);
 extern int addOccur(Context context, TermLink* linkp, void* p);
 extern void freeOccur(Context context, TermLink link);
@@ -25,8 +27,6 @@ extern int checkTerm2(Context context, Term term, int nf, unsigned* envsize);
 extern int checkTerm3(Context context, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse);
 extern int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse, TermLink *usedp);
 
-extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
-
-#endif
+//extern int checkPropsHS2(Context context, Hashset2 set, int nf, unsigned* envsize, long* memuse, TermLink* usedp);
 
 #endif /* INVARIANT_H_ */

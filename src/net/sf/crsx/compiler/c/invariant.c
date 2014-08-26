@@ -291,6 +291,22 @@ int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, 
     return size;
 }
 
+#else
+
+TermLink occurLink(TermLink link, void* p)
+{ return 0; }
+int addOccur(Context context, TermLink* linkp, void* p)
+{ return 0; };
+void freeOccur(Context context, TermLink link)
+{};
+int checkTerm(Context context, Term term, int nf)
+{ return 0;};
+int checkTerm2(Context context, Term term, int nf, unsigned* envsize)
+{ return 0;};
+int checkTerm3(Context context, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse)
+{ return 0;};
+int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, unsigned depth, unsigned* envsize, long* memuse, TermLink *usedp)
+{ return 0;};
 
 
 #endif

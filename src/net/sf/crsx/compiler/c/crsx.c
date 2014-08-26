@@ -4700,7 +4700,7 @@ void fprintTerm(Context context, FILE* out, Term term)
 {
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10, NULL, equalsChars, hashChars);
+        used = makeHS2(context, 10, NULL, equalsPtr, hashPtr);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -4758,7 +4758,7 @@ void fprintTermWithIndent(Context context, FILE* out, Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10, NULL, equalsChars, hashChars);
+        used = makeHS2(context, 10, NULL, equalsPtr, hashPtr);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
@@ -4782,7 +4782,7 @@ void printTermFullWithIndent(Context context,  Term term)
 
     Hashset2 used = NULL;
     if (getenv("CANONICAL_VARIABLES"))
-        used = makeHS2(context, 10, NULL,  equalsChars, hashChars);
+        used = makeHS2(context, 10, NULL, equalsPtr, hashPtr);
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
