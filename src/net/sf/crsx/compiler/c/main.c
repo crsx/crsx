@@ -104,7 +104,7 @@ static
 int run(void)
 {
 	Context context = (Context) calloc(1, sizeof(struct _Context));
-	InitCRSXContext(context);
+	initCRSXContext(context);
 	//context->fv_enabled = 0;
 	Term term = NULL;
 	// if input: read term from file
@@ -200,7 +200,7 @@ int runLinter(int argp, int argc, char* argv[])
 
 
     Context context = (Context) calloc(1, sizeof(struct _Context));
-    InitCRSXContext(context);
+    initCRSXContext(context);
 
     // Parse term
     Term term = readTermFromFile (context, input);

@@ -645,32 +645,32 @@ T-set-bool[#Term, #sink, #variable]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-bool[Reified_Term, Text, Text] :: Text;
 
-{#env} T-set-bool[LITERAL[#Literal, #Sort],              #sink, #bool] → T-set-bool2[#bool, STRING[#Literal]] ;
-{#env} T-set-bool[CONSTRUCTION[#Symbol, #Binders],       #sink, #bool] → T-set-bool2[#bool, STRING[#Symbol]] ;
+{#env} T-set-bool[LITERAL[#Literal, #Sort],              #sink, #bool] → T-set-bool2[#bool, STRING[#Literal],%n⟪⟫] ;
+{#env} T-set-bool[CONSTRUCTION[#Symbol, #Binders],       #sink, #bool] → T-set-bool2[#bool, STRING[#Symbol],%n⟪⟫] ;
 
 -[Free[v::Reified_Variable]]
 :  
 {#env}
 T-set-bool[VARIABLE-USE[v], #sink, #bool] 
 → 
-T-set-bool2[#bool, %n⟪«v»->name⟫] // Error? 
+T-set-bool2[#bool, %n⟪«v»->name⟫, %n⟪⟫] // Error? 
 ;
 
 {#env} 
 T-set-bool[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #bool] 
 → 
-T-set-bool2[#bool, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫];
+T-set-bool2[#bool, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫,{#env}T-UnlinkLastMetaUse[#MetaVar, #Use, #sink]];
 
 {#env} T-set-bool[PROPERTY-REF[#Ref, #Term],              #sink, #bool] → {#env} T-set-bool[#Term, #sink, #bool] ;
 {#env} T-set-bool[PROPERTY[#Key, #Value, #Term],          #sink, #bool] → {#env} T-set-bool[#Term, #sink, #bool] ;
 {#env} T-set-bool[PROPERTY-NOT[#Key, #Term],              #sink, #bool] → {#env} T-set-bool[#Term, #sink, #bool] ;
 {#env} T-set-bool[EVALUATOR[#Primitive, #Args, #Options], #sink, #bool] → {#env} E-set-bool[Primitive[#Primitive], #Args, #Options, #sink, #bool] ;
 
-T-set-bool2[Text, Text] :: Text;
+T-set-bool2[Text, Text, Text] :: Text;
 
-T-set-bool2[#bool, #string]
+T-set-bool2[#bool, #string, #suffix]
 →
-%n⟪«#bool» = !strcmp(«#string», True);
+%n⟪«#bool» = !strcmp(«#string», True);«#suffix»
 ⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -687,16 +687,21 @@ T-set-int[#Term, #sink, #variable]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-int[Reified_Term, Text, Text] :: Text;
 
-{#env}T-set-int[LITERAL[#Literal, #Sort],              #sink, #int] → T-set-int2[#int, %n⟪«TOKEN[#Literal]»ll⟫] ;
-{#env}T-set-int[META-APPLICATION[#MetaVar, #Args, #C], #sink, #int] → T-set-int2[#int, %n⟪LONGLONG(« {#env}MetaVar[#MetaVar] »)⟫] ;
-{#env}T-set-int[CONSTRUCTION[#Symbol, #Binders],       #sink, #int] → T-set-int2[#int, %n⟪«TOKEN[#Symbol]»ll⟫] ;
+{#env}T-set-int[LITERAL[#Literal, #Sort],              #sink, #int] → T-set-int2[#int, %n⟪«TOKEN[#Literal]»ll⟫,%n⟪⟫] ;
+
+{#env}
+T-set-int[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #int] → 
+    T-set-int2[#int, %n⟪LONGLONG(« {#env}MetaVar[#MetaVar] »)⟫,{#env}T-UnlinkLastMetaUse[#MetaVar, #Use, #sink]] 
+;
+
+{#env}T-set-int[CONSTRUCTION[#Symbol, #Binders],       #sink, #int] → T-set-int2[#int, %n⟪«TOKEN[#Symbol]»ll⟫,%n⟪⟫] ;
 
 -[Free[v::Text]]
 :
 {#env}
 T-set-int[VARIABLE-USE[v], #sink, #int]
 → 
-T-set-int2[#int, %n⟪LONGLONG(«v»->name)⟫]
+T-set-int2[#int, %n⟪LONGLONG(«v»->name)⟫,%n⟪⟫]
 ; // Error?
 
 {#env}T-set-int[PROPERTY-REF[#Ref, #Term],         #sink, #int] → {#env} T-set-int[#Term, #sink, #int] ;
@@ -705,11 +710,11 @@ T-set-int2[#int, %n⟪LONGLONG(«v»->name)⟫]
 
 {#env}T-set-int[EVALUATOR[#Primitive, #Args, #Options], #sink, #int] → {#env} E-set-int[Primitive[#Primitive], #Args, #Options, #sink, #int] ;
 
-T-set-int2[Text, Text] :: Text;
+T-set-int2[Text, Text, Text] :: Text;
 
-T-set-int2[#int, #integer]
+T-set-int2[#int, #integer, #suffix]
 →
-%n⟪«#int» = «#integer»;
+%n⟪«#int» = «#integer»;«#suffix»
 ⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -726,21 +731,21 @@ T-set-num[#Term, #sink, #variable]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-num[Reified_Term, Text, Text] :: Text;
 
-{#env} T-set-num[LITERAL[#Literal, #Sort],              #sink, #num] → T-set-num2[#num, %n⟪(double) «TOKEN[#Literal]»⟫] ;
-{#env} T-set-num[CONSTRUCTION[#Symbol, #Binders],       #sink, #num] → T-set-num2[#num, %n⟪(double) «TOKEN[#Symbol]»⟫] ;
+{#env} T-set-num[LITERAL[#Literal, #Sort],              #sink, #num] → T-set-num2[#num, %n⟪(double) «TOKEN[#Literal]»⟫,%n⟪⟫] ;
+{#env} T-set-num[CONSTRUCTION[#Symbol, #Binders],       #sink, #num] → T-set-num2[#num, %n⟪(double) «TOKEN[#Symbol]»⟫,%n⟪⟫] ;
 
 -[Free[v::Text]]
 :
 {#env}
 T-set-num[VARIABLE-USE[v], #sink, #num] 
 →
-T-set-num2[#num, %n⟪DOUBLE(«v»->name)⟫]
+T-set-num2[#num, %n⟪DOUBLE(«v»->name)⟫,%n⟪⟫]
 ; // Error?
 
 {#env}
 T-set-num[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #num] 
 →  
-T-set-num2[#num, %n⟪DOUBLE(« {#env}MetaVar[#MetaVar] »)⟫] ; // TODO: Unlink
+T-set-num2[#num, %n⟪DOUBLE(« {#env}MetaVar[#MetaVar] »)⟫, {#env}T-UnlinkLastMetaUse[#MetaVar, #Use, #sink]] ; 
 
 {#env} T-set-num[PROPERTY-REF[#Ref, #Term],         #sink, #num] → {#env} T-set-num[#Term, #sink, #num] ;
 {#env} T-set-num[PROPERTY[#Key, #Value, #Term],     #sink, #num] → {#env} T-set-num[#Term, #sink, #num] ;
@@ -748,11 +753,11 @@ T-set-num2[#num, %n⟪DOUBLE(« {#env}MetaVar[#MetaVar] »)⟫] ; // TODO: Unlin
 
 {#env} T-set-num[EVALUATOR[#Primitive, #Args, #Options], #sink, #num] → {#env} E-set-num[Primitive[#Primitive], #Args, #Options, #sink, #num] ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-num2[Text, Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-num2[Text, Text, Text] :: Text;
 
-T-set-num2[#num, #number]
+T-set-num2[#num, #number, #suffix]
 →
-%n⟪«#num» = «#number»;
+%n⟪«#num» = «#number»;«#suffix» 
 ⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -767,23 +772,24 @@ T-then-set-string[OK, #Term, #sink, #variable]
 T-set-string[#Term, #sink, #variable]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-string[Reified_Term, Text, Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+T-set-string[Reified_Term, Text, Text] :: Text;
 
-{#env}T-set-string[LITERAL[#Literal, #Sort],              #sink, #string] → T-set-string2[#string, STRING[#Literal]] ;
-{#env}T-set-string[CONSTRUCTION[#Symbol, #Binders],       #sink, #string] → T-set-string2[#string, STRING[#Symbol]] ;
+{#env}T-set-string[LITERAL[#Literal, #Sort],              #sink, #string] → T-set-string2[#string, STRING[#Literal], %n⟪⟫] ;
+{#env}T-set-string[CONSTRUCTION[#Symbol, #Binders],       #sink, #string] → T-set-string2[#string, STRING[#Symbol], %n⟪⟫] ;
 
 -[Free[v::Text]]
 : 
 {#env}
 T-set-string[VARIABLE-USE[v], #sink, #string] 
 → 
-T-set-string2[#string, %n⟪makeString(«#sink»->context, «v»->name)⟫]
+T-set-string2[#string, %n⟪makeString(«#sink»->context, «v»->name)⟫, %n⟪⟫]
 ;
 
 {#env} 
 T-set-string[META-APPLICATION[#MetaVar, #Args, #Use], #sink, #string] 
 → 
-T-set-string2[#string, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫] ; // TODO unlink
+T-set-string2[#string, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫, {#env}T-UnlinkLastMetaUse[#MetaVar, #Use, #sink]] ; 
 
 {#env}T-set-string[PROPERTY-REF[#Ref, #Term],         #sink, #string] → {#env} T-set-string[#Term, #sink, #string] ;
 {#env}T-set-string[PROPERTY[#Key, #Value, #Term],     #sink, #string] → {#env} T-set-string[#Term, #sink, #string] ;
@@ -791,11 +797,11 @@ T-set-string2[#string, %n⟪SYMBOL(« {#env}MetaVar[#MetaVar] »)⟫] ; // TODO 
 
 {#env}T-set-string[EVALUATOR[#Primitive, #Args, #Options], #sink, #string] → {#env} E-set-string[Primitive[#Primitive], #Args, #Options, #sink, #string] ;
 
-T-set-string2[Text, Text] :: Text;
+T-set-string2[Text, Text, Text] :: Text;
 
-T-set-string2[#str, #string]
+T-set-string2[#str, #string, #suffix]
 →
-%n⟪«#str» = «#string»;
+%n⟪«#str» = «#string»;«#suffix»
 ⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

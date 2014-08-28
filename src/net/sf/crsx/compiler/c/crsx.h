@@ -46,7 +46,7 @@ typedef struct _VariableMapLink *VariableMapLink;
 typedef struct _VariableNameMapLink *VariableNameMapLink;
 typedef struct _Hashset* Hashset;
 typedef struct _Hashset2* Hashset2;
-typedef struct _TermLink *TermLink;
+typedef struct _Buffer *Buffer;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,6 +60,8 @@ typedef struct _TermLink *TermLink;
 #define CONS_POOL_MAX_SIZE_SIZE 32
 #define CONS_POOL_MAX_SIZE 4096
 
+#define MAX_BUFFER_POOL_SIZE 32
+
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
@@ -70,8 +72,11 @@ struct _Context
     Hashset2 stringPool;  // Set of char*
     Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
 
-    Construction** consPool; // Array Construction
+    Construction** consPool; // Array of Construction
     ssize_t* consPoolSize;
+
+    Buffer bufferPool[MAX_BUFFER_POOL_SIZE];
+    ssize_t bufferPoolSize;
 
     Properties noProperties;
 
@@ -87,7 +92,7 @@ struct _Context
 };
 
 // Call this function before using a Context:
-extern void InitCRSXContext(Context context);
+extern void initCRSXContext(Context context);
 
 // Debugging and profiling
 //
@@ -503,9 +508,9 @@ struct _Construction
 
     Properties properties;
 
-    VARIABLESET fvs;  // free variables known to occur in subterms only (excluding properties)
-    VARIABLESET nfvs; // free variables known to occur in named properties (on this construction AND subterms)
-    VARIABLESET vfvs; // free variables known to occur in variable properties (on this construction AND subterms)
+    Hashset fvs;  // free variables known to occur in subterms only (excluding properties)
+    Hashset nfvs; // free variables known to occur in named properties (on this construction AND subterms)
+    Hashset vfvs; // free variables known to occur in variable properties (on this construction AND subterms)
 
     Term sub[]; // subterms -- actual size is ARITY(term)
     // Variable binder[]; // binders -- actual size is term->descriptor->binderoffset[ARITY(term)]
@@ -646,7 +651,7 @@ extern VariableUse makeVariableUse(Context context, Variable variable);
  */
 static inline Variable linkVariable(Context context, Variable variable)
 {
-    //assert(variable->nr > 0);
+    assert(variable->nr > 0);
     variable->nr ++;
     return variable;
 }
@@ -656,7 +661,7 @@ static inline Variable linkVariable(Context context, Variable variable)
  */
 static inline void unlinkVariable(Context context, Variable variable)
 {
-    //assert(variable->nr > 0);
+    assert(variable->nr > 0);
     variable->nr --;
     if (variable->nr == 0)
         freeVariable(context, variable);
@@ -667,7 +672,7 @@ static inline void unlinkVariable(Context context, Variable variable)
  */
 static inline Variable useVariable(Context context, Variable variable)
 {
-//    assert(variable->nr > 0);
+    assert(variable->nr > 0);
     variable->uses ++;
     return variable;
 }
@@ -678,7 +683,7 @@ static inline Variable useVariable(Context context, Variable variable)
  */
 static inline void unuseVariable(Context context, Variable variable)
 {
-  //  assert(variable->nr > 0);
+//    assert(variable->nr > 0);
 //    assert(variable->uses > 0);
     variable->uses --;
 }
@@ -771,7 +776,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 
 #define ADD_PROPERTIES(sink,namedFVs,varFVs,namedProperties,variableProperties) ((Sink)(sink))->properties(sink,namedFVs,varFVs,namedProperties,variableProperties)
 #define ADD_PROPERTY_REF(sink,construction) ((Sink)(sink))->propertyRef(sink, asConstruction(construction))
-#define ADD_PROPERTY(sink,P,value) (IS_VARIABLE_USE(P) ? ADD_PROPERTY_VARIABLE(sink, VARIABLE(P), value) : ADD_PROPERTY_NAMED(sink, SYMBOL(P), value))
+#define ADD_PROPERTY(sink,P,value) (IS_VARIABLE_USE(P) ? ADD_PROPERTY_VARIABLE(sink, linkVariable(sink->context, VARIABLE(P)), value) : ADD_PROPERTY_NAMED(sink, SYMBOL(P), value))
 #define ADD_PROPERTY_NAMED(sink,name,value) ((Sink)(sink))->propertyNamed(sink, name, value)
 #define ADD_PROPERTY_VARIABLE(sink,variable,value) ((Sink)(sink))->propertyVariable(sink, variable, value)
 #define ADD_PROPERTY_WEAKEN(sink,variable) ((Sink)(sink))->propertyWeaken(sink, variable)
@@ -788,7 +793,7 @@ struct _Sink
 
     Sink (*start)(Sink sink, ConstructionDescriptor descriptor); // start event
     Sink (*end)(Sink sink, ConstructionDescriptor descriptor); // end event
-    Sink (*literal)(Sink sink, const char *text); // literal event. Text reference is *not* transferred
+    Sink (*literal)(Sink sink, const char *text); // literal event. Text reference is transferred
     Sink (*use)(Sink sink, Variable variable); // use event. Variable reference is transferred.
     Sink (*binds)(Sink sink, int rank, Variable binds[]); // binds event. Variable references are transferred.
     Sink (*copy)(Sink sink, Term term); // copy term as event(s)
@@ -805,7 +810,6 @@ struct _Sink
 
 #define BUFFER_SEGMENT_SIZE 127
 
-typedef struct _Buffer *Buffer;
 typedef struct _BufferEntry *BufferEntry;
 typedef struct _BufferSegment *BufferSegment;
 
@@ -823,7 +827,7 @@ struct _Buffer
     VARIABLESET pendingVariablePropertiesFreeVars; // Free variables to insert before a batch of new variable properties. Buffer owns ref.
 
     unsigned blocking : 1; // whether there is at least one blocking binder
-    unsigned free : 1; // whether the buffer structure itself should be freed
+
 
 };
 struct _BufferEntry
@@ -848,7 +852,7 @@ struct _BufferSegment
 //   FREE_BUFFER(sink);
 //
 #ifndef MAKE_BUFFER
-#define MAKE_BUFFER(context) initBuffer(context, (Buffer) ALLOCATE(context, sizeof(struct _Buffer)), 1)
+#define MAKE_BUFFER(context) makeBuffer(context)
 #endif
 #ifndef BUFFER_TERM
 #define BUFFER_TERM(sink) bufferTerm(sink)
@@ -856,13 +860,14 @@ struct _BufferSegment
 #ifndef FREE_BUFFER
 #define FREE_BUFFER(sink) freeBuffer(sink)
 #endif
-extern Sink initBuffer(Context context, Buffer buffer, int free);
+extern Sink makeBuffer(Context context);
+extern Sink initBuffer(Context context, Buffer buffer);
 extern Term bufferTerm(Sink sink);
 extern void freeBuffer(Sink sink);
 //
 #ifndef ALLOCA_BUFFER
 //#define ALLOCA_BUFFER(context) initBuffer(context, (Buffer) ALLOCA(context, sizeof(struct _Buffer)), 0)
-#define ALLOCA_BUFFER(context) initBuffer(context, (Buffer) ALLOCATE(context, sizeof(struct _Buffer)), 1)
+#define ALLOCA_BUFFER(context) makeBuffer(context)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1079,87 +1084,26 @@ extern VariableSetLink clearL(Context context, VariableSetLink set);
 // Print out set
 extern void printfL(Context context, FILE* out, VariableSetLink set);
 
-
-// Copy-on-write hash set
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Copy-on-write open addressing variable set
 
 struct _Hashset {
     unsigned nr;
 #ifdef CRSX_ENABLE_PROFILING
     size_t marker;
 #endif
-    size_t nbits;
-    size_t mask;
 
     size_t capacity;
     size_t *items;
     size_t nitems;
 };
 
-// General bucket-based hash set. Read-only when shared.
-
-typedef struct _Pair* Pair;
-
-struct _Pair {
-    const void *key;
-    void* value; // may be null
-};
-
-
-typedef struct _LinkedList2* LinkedList2;
-
-struct _LinkedList2 {
-    const void *key;
-    void* value; // may be null for set.
-    LinkedList2 next;
-};
-
-struct _Hashset2
-{
-    int nr;
-    unsigned int nbits;      // Number of bits for nslots
-    size_t nslots;           // Number of entry slots. Always nbits ^ 2
-    size_t size;             // Number of entries
-
-    LinkedList2 *entries;                // Array of entries. Size of array = nslots
-
-    void   (*unlink)(Context, const void*, void*);   // function to unlink key-value entries
-    int    (*equals)(const void*, const void*);      // function to compare entries
-    size_t (*hash)  (const void*);                   // function to hash entries
-};
-// Increment ref count.
-extern Hashset2 linkHS2(Hashset2 set);
-// Decrement ref count.
-extern void unlinkHS2(Context context, Hashset2 set);
-// Allocate set
-extern Hashset2 makeHS2(Context context, unsigned int numbits, void (*unlink)(Context, const void*, void*), int (*equals)(const void*, const void*), size_t (*hash)(const void*));
-// Add key-value pair to set. Value may be null. If key exists, replace value and call unlink on key/old value
-extern Hashset2 addValueHS2(Context context, Hashset2 set, const void* key, void* value);
-// Get value for given string key
-extern void* getValueHS2(Hashset2 set, const void* key);
-// Remove entry to set.
-extern Hashset2 removeHS2(Context context, Hashset2 set, const void* key);
-// Check whether set contains the given key.
-extern int containsHS2(Hashset2 set, const void* key);
-// Clear set
-extern Hashset2 clearHS2(Context context, Hashset2 set);
-// Convert to array. Don't copy entries (treat as read-only)
-extern Pair* toArrayHS2(Context context, Hashset2 set);
-// Print out HS2
-extern void printPropsHS2(Context context, Hashset2 set);
-
-extern int equalsPtr(const void* left, const void* right);
-extern size_t hashPtr(const void* entry);
-
-int equalsChars(const void* left, const void* right);
-size_t hashChars(const void* key);
-
-
-// Allocation variable set.
-extern Hashset makeHS(Context context);
+// Allocation variable set. Capacity must be n^2
+extern Hashset makeHS(Context context, size_t capacity);
 // Free variable set.
 extern void freeHS(Context context, Hashset set);
 // Copy variable set.
-extern Hashset copyHS(Context context, Hashset set);
+extern Hashset copyHS(Context context, Hashset set, size_t capacity);
 // Add variable reference to set. Create new set if needed.
 extern Hashset addVariableHS(Context context, Hashset set, Variable variable);
 // Remove variable from set. 'set' reference is transferred.
@@ -1200,24 +1144,63 @@ static inline Hashset UNLINK_Hashset(Context context, Hashset set)
     return set;
 }
 
-struct _TermLink {
-    void* p;
-    unsigned count;
-    TermLink link;
+// General bucket-based hash set. Read-only when shared.
+
+typedef struct _Pair* Pair;
+
+struct _Pair {
+    const void *key;
+    void* value; // may be null
 };
 
+typedef struct _LinkedList2* LinkedList2;
 
-struct _VariableSet2
+struct _LinkedList2 {
+    const void *key;
+    void* value; // may be null for set.
+    LinkedList2 next;
+};
+
+struct _Hashset2
 {
-    Context context;
-    size_t flags;     /** See below */
+    int nr;
+    unsigned int nbits;      // Number of bits for nslots
+    size_t nslots;           // Number of entry slots. Always nbits ^ 2
+    size_t size;             // Number of entries
 
-    union
-    {
-        struct _Hashset2 hash;
-    } set;
+    LinkedList2 *entries;                // Array of entries. Size of array = nslots
+
+    void   (*unlink)(Context, const void*, void*);   // function to unlink key-value entries
+    int    (*equals)(const void*, const void*);      // function to compare entries
+    size_t (*hash)  (const void*);                   // function to hash entries
 };
 
+// Increment ref count.
+extern Hashset2 linkHS2(Hashset2 set);
+// Decrement ref count.
+extern void unlinkHS2(Context context, Hashset2 set);
+// Allocate set
+extern Hashset2 makeHS2(Context context, unsigned int numbits, void (*unlink)(Context, const void*, void*), int (*equals)(const void*, const void*), size_t (*hash)(const void*));
+// Add key-value pair to set. Value may be null. If key exists, replace value and call unlink on key/old value
+extern Hashset2 addValueHS2(Context context, Hashset2 set, const void* key, void* value);
+// Get value for given string key
+extern void* getValueHS2(Hashset2 set, const void* key);
+// Remove entry to set.
+extern Hashset2 removeHS2(Context context, Hashset2 set, const void* key);
+// Check whether set contains the given key.
+extern int containsHS2(Hashset2 set, const void* key);
+// Clear set
+extern Hashset2 clearHS2(Context context, Hashset2 set);
+// Convert to array. Don't copy entries (treat as read-only)
+extern Pair* toArrayHS2(Context context, Hashset2 set);
+// Print out HS2
+extern void printPropsHS2(Context context, Hashset2 set);
+
+extern int equalsPtr(const void* left, const void* right);
+extern size_t hashPtr(const void* entry);
+
+int equalsChars(const void* left, const void* right);
+size_t hashChars(const void* key);
 
 // Link-list based map
 

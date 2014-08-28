@@ -79,11 +79,21 @@ void crsxpBeforeCall(Context context);
 /** Called after call */
 void crsxpAfterCall(Context context);
 
+void crsxpBeforePropagateFV(Context context);
+void crsxpAfterPropagateFV(Context context);
+
 /** Called when a variable set is created or copied */
 void crsxpVSCreated(Context context);
+void crsxpVSRehashed(Context context);
+
+/** Called when a variable set is freed */
+void crsxpVSFreed(Context context);
 
 /** Called when a variable is added to a variable set */
 void crsxpVSAdded(Context context, Hashset set);
+
+void crsxpVSContains(Hashset set);
+
 
 /** Called before releasing pools */
 void crsxpReleasePools(Context context);
@@ -91,6 +101,12 @@ void crsxpReleasePools(Context context);
 void crsxpBeforeMergeProperties(Context context);
 void crsxpAfterMergeProperties(Context context);
 void crsxpNamedPropertiesMerged(Context context, int count);
+
+void crsxpMakeVariable(Context context);
+void crsxpFreeVariable(Context context);
+
+void crsxpMakeConstruction(Context context);
+void crsxpFreeConstruction(Context context);
 
 extern void printProfiling(Context context);
 extern void printMetasubstituteRecord(Context context, ProfMetaSubstitute c);

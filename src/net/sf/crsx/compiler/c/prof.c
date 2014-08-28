@@ -36,10 +36,19 @@ long profMemuseMetaSubstitutes; // in KB
 long pMetaSubstituteCount; // Count total number of meta substitutions
 long pAccuMetaTime; // Time spent doing meta application
 long pAccuMergeTime; // Time spent doing meta application
+long pAccuPropagateTime; // Time spent propagating free vars
 long pMergeCount;
 long pCallCount; // Count total number of simple meta substitutions
-long pFVCount; // Count total number of free variable sets
+long pFVTotalCount; // Count total number of free variable sets
+long pFVCount; // Current number of free variable sets
 long pFVMaxSize; // Maximum free variable sets size
+long pFVUsedCount; // Count total number of free variable set actually used
+long pFVRehashCount; // Count total number of time FV set has been rehashed
+long pVarCount; // Current number of live variables
+long pPeakVarCount; // Peak number of live variables
+long pTotalConsCount; // Total number of construction
+long pConsCount; // Current number of construction
+
 ProfMetaSubstitute profLargeMetaSubstitutes;
 ProfBufferCopy profLargeBufferCopy;
 ProfFunctionEntry profFunctions[16384]; // use array for sorting
@@ -54,6 +63,7 @@ int pSampleRate; // Random term size sample rate
 struct timespec pStartTime;
 struct timespec pNanoTime;
 struct timespec pMergeClock;
+struct timespec pPropagateClock;
 size_t pKeyPoolSize;
 char* pStepName; // Current step function
 
@@ -81,14 +91,22 @@ void crsxpInit(Context context)
         pStepCount = 0l;
         pMetaSubstituteCount = 0l;
         pCallCount = 0l;
+        pFVTotalCount = 0l;
         pFVCount = 0l;
+        pFVUsedCount = 0l;
+        pFVRehashCount = 0l;
         pFVMaxSize = 0l;
+        pVarCount = 0l;
+        pPeakVarCount = 0l;
+        pTotalConsCount = 0l;
+        pConsCount = 0l;
         time(&pTime);
         clock_gettime(CLOCK_REALTIME, &pStartTime);
         pSampleRate = (rand() % 500) + 500;
         crsxpMetaCount = makeHS2(context, 8, NULL, equalsChars, hashChars);
         pAccuMetaTime = 0l;
         pAccuMergeTime = 0l;
+        pAccuPropagateTime = 0l;
         pMergeCount = 0;
     }
 }
@@ -201,12 +219,30 @@ void crsxpAfterSubstitution(Context context)
     }
 }
 
-void crsxpBeforeCall(Context context)
+void crsxpBeforePropagateFV(Context context)
 {
     if (context->profiling)
     {
-        pCallCount++;
+        clock_gettime(CLOCK_REALTIME, &pPropagateClock);
     }
+}
+
+void crsxpAfterPropagateFV(Context context)
+{
+    if (context->profiling)
+    {
+        struct timespec nanoTime;
+        clock_gettime(CLOCK_REALTIME, &nanoTime);
+        struct timespec d = diff(pPropagateClock, nanoTime);
+        long dl = d.tv_sec * 1000000000 + d.tv_nsec;
+
+        pAccuPropagateTime += dl;
+    }
+}
+
+void crsxpBeforeCall(Context context)
+{
+    pCallCount++;
 }
 
 void crsxpAfterCall(Context context)
@@ -218,10 +254,13 @@ void crsxpAfterCall(Context context)
 
 void crsxpVSCreated(Context context)
 {
-    if (context->profiling)
-    {
-        pFVCount++;
-    }
+    pFVCount++;
+    pFVTotalCount++;
+}
+
+void crsxpVSFreed(Context context)
+{
+    pFVCount--;
 }
 
 void crsxpVSAdded(Context context, Hashset set)
@@ -231,6 +270,20 @@ void crsxpVSAdded(Context context, Hashset set)
         if (set->nitems > pFVMaxSize)
             pFVMaxSize = set->nitems;
     }
+}
+
+void crsxpVSContains(Hashset set)
+{
+    if (!set->marker)
+    {
+        pFVUsedCount++;
+        set->marker = 1;
+    }
+}
+
+void crsxpVSRehashed(Context context)
+{
+    pFVRehashCount++;
 }
 
 void crsxpReleasePools(Context context)
@@ -269,6 +322,41 @@ void crsxpNamedPropertiesMerged(Context context, int count)
     {
         pMergeCount += count;
     }
+}
+
+void crsxpMakeVariable(Context context)
+{
+    if (context->profiling)
+    {
+        pVarCount++;
+        if (pVarCount > pPeakVarCount)
+            pPeakVarCount = pVarCount;
+    }
+}
+void crsxpFreeVariable(Context context)
+{
+    if (context->profiling)
+    {
+        pVarCount--;
+    }
+}
+
+void crsxpMakeConstruction(Context context)
+{
+    if (context->profiling)
+    {
+        pConsCount++;
+        pTotalConsCount++;
+    }
+}
+
+void crsxpFreeConstruction(Context context)
+{
+    if (context->profiling)
+    {
+        pConsCount--;
+    }
+
 }
 
 void profAddStepFunction(Context context, char* name)
@@ -487,13 +575,33 @@ void printProfiling(Context context)
                 pMetaSubstituteCount);
         PRINTF(context, "\n%-50s : %ld", "Shallow meta substitution count",
                 pCallCount);
-        PRINTF(context, "\n%-50s : %ld (%2.2f%%)", "Total time spent merging environments",
-                                nano2ms(pAccuMergeTime), (pAccuMergeTime / (double ) dl) * 100.0);
+        PRINTF(context, "\n%-50s : %ld (%2.2f%%)",
+                "Total time spent merging environments",
+                nano2ms(pAccuMergeTime),
+                (pAccuMergeTime / (double ) dl) * 100.0);
+        PRINTF(context, "\n%-50s : %ld (%2.2f%%)",
+                "Total time spent propagating free vars",
+                nano2ms(pAccuPropagateTime),
+                (pAccuPropagateTime / (double ) dl) * 100.0);
         PRINTF(context, "\n%-50s : %ld", "Total number of properties merged",
-                        pMergeCount);
-        PRINTF(context, "\n%-50s : %ld", "Free variable set count", pFVCount);
+                pMergeCount);
+        PRINTF(context, "\n%-50s : %ld", "Free variable sets total count",
+                pFVTotalCount);
+        PRINTF(context, "\n%-50s : %ld", "Free variable sets rehash count",
+                pFVRehashCount);
+        PRINTF(context, "\n%-50s : %ld", "Current free variable set count",
+                pFVCount);
+        PRINTF(context, "\n%-50s : %ld (%2.2f%%)",
+                "Free variable set usage count", pFVUsedCount,
+                (pFVUsedCount / (double ) pFVTotalCount) * 100.0);
         PRINTF(context, "\n%-50s : %ld", "Free variable set maximum size",
                 pFVMaxSize);
+        PRINTF(context, "\n%-50s : %ld", "Current variable count", pVarCount);
+        PRINTF(context, "\n%-50s : %ld", "Peak variable count", pPeakVarCount);
+        PRINTF(context, "\n%-50s : %ld", "Current construction count",
+                pConsCount);
+        PRINTF(context, "\n%-50s : %ld", "Total construction count",
+                pTotalConsCount);
         PRINTF(context, "\n%-50s : %ld", "String key pool size", pKeyPoolSize);
         PRINTF(context, "\n%-50s : %ldms", "Total time", nano2ms(dl));
 
@@ -700,6 +808,12 @@ void crsxpVSCreated(Context context)
 {}
 void crsxpVSAdded(Context context, Hashset set)
 {}
+void crsxpVSContains(Hashset set)
+{}
+void crsxpVSFreed(Context context)
+{}
+void crsxpVSRehashed(Context context)
+{}
 void crsxpBeforeMergeProperties(Context context)
 {}
 void crsxpAfterMergeProperties(Context context)
@@ -716,6 +830,17 @@ void pIncMetaCountFunction(Context context, char* functionName, long memuse)
 {}
 void crsxpReleasePools(Context context)
 {}
-
+void crsxpMakeVariable(Context context)
+{}
+void crsxpFreeVariable(Context context)
+{}
+void crsxpMakeConstruction(Context context)
+{}
+void crsxpFreeConstruction(Context context)
+{}
+void crsxpBeforePropagateFV(Context context)
+{}
+void crsxpAfterPropagateFV(Context context)
+{}
 
 #endif

@@ -610,7 +610,7 @@ Pattern-Construction-SubMatch[Free[sink::Text, term::Text, parent::Text]]
 F-Pattern[#pass, SUBMATCH, CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»;
-if (strcmp(SYMBOL(«term»), «STRING[#Symbol]»)) break;
+if (strcmp(SYMBOL(«term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[sink]» break;}
 « {#env} F-then-PatternBinders[OK, #pass, #Binders, sink, #unique, term, 0, ok.#[ok]] »
 ⟫
 ;
@@ -1151,7 +1151,7 @@ F-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, ter
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-F-PatternSub2[$Boolean, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+F-PatternSub2[$Boolean<!-- Whether to link sub -->, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
 
 -[Free[term::Text], Fresh[sub::Reified_Variable]]
 :
@@ -1169,7 +1169,7 @@ F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = LINK(«
 F-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, term, #i, ok.#[ok]] 
 →
 {#env; sub: SUB[term, #i, $False]}
-F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«term», «INTEGER[#i]»); permitUnusedTerm(«sub»); int «sub»_count = «term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);
+F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«term», «INTEGER[#i]»); int «sub»_count = «term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);
 «D-check-sort[#sink, sub, #sort]»⟫, $False, #unique, sub, ok.#[ok]]
 ;
 

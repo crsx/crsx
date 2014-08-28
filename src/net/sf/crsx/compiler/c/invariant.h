@@ -18,6 +18,15 @@ int gCheckRef = 0;
 
 #endif
 
+typedef struct _TermLink *TermLink;
+
+struct _TermLink {
+    void* p;
+    unsigned count;
+    TermLink link;
+};
+
+
 extern TermLink occurLink(TermLink link, void* p);
 extern int addOccur(Context context, TermLink* linkp, void* p);
 extern void freeOccur(Context context, TermLink link);
