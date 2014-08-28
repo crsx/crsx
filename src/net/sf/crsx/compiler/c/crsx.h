@@ -62,6 +62,9 @@ typedef struct _Buffer *Buffer;
 
 #define MAX_BUFFER_POOL_SIZE 32
 
+#define HASHSET_MAX_NBITS 6
+#define HASHSET_MAX_PER_NBITS 256
+
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
@@ -77,6 +80,9 @@ struct _Context
 
     Buffer bufferPool[MAX_BUFFER_POOL_SIZE];
     ssize_t bufferPoolSize;
+
+    Hashset* hashsetPool[HASHSET_MAX_NBITS];
+    ssize_t hashsetPoolSize[HASHSET_MAX_NBITS];
 
     Properties noProperties;
 
@@ -472,18 +478,25 @@ struct _Term
 //
 #define LINK_COUNT(T) ((T)->nr)
 #define LINK(C,T) linkTerm(C, T)
-extern Term linkTerm(Context context, Term term);
 
 #define UNLINKSET(CONTEXT,T,V) ((--LINK_COUNT(T) ? T : freeTerm(CONTEXT,T)), (T)=V)
 #define UNLINK(CONTEXT, T) (T=unlinkTerm(CONTEXT,T))
 #define UNLINK_SUB(CONTEXT, T, I) UNLINK(CONTEXT, SUB(T, I))
+
 extern void freeTerm(Context context, Term term);
+
+static inline Term linkTerm(Context context, Term t)
+{
+    assert(t->nr > 0);
+    t->nr ++;
+    return t;
+}
 
 static inline Term unlinkTerm(Context context, Term t)
 {
     assert(t->nr > 0);
 
-    if ((--LINK_COUNT(t)) == 0)
+    if (--t->nr == 0)
     {
         freeTerm(context,t);
         return NULL;
@@ -560,22 +573,16 @@ struct _ConstructionDescriptor
 #define CRSX_CHECK_SORT(CONTEXT,T,SORT) noop()
 
 // Casting helpers.
-//static inline VariableUse asVariableUse(Term term) { return (VariableUse) term; }
 #define asVariableUse(term) ((VariableUse) term)
-//static inline Construction asConstruction(Term term) { return (Construction) term; }
 #define asConstruction(term) ((Construction) term)
-//static inline Literal asLiteral(Term term) { return (Literal) term; }
 #define asLiteral(term) ((Literal) term)
 
 // Construction helpers.
-//static inline char *c_name(Construction c) {ConstructionDescriptor d = c->term.descriptor; return d->name(&(c->term)); }
 #define c_name(c)      (c->term.descriptor->name(&(c->term)))
 // Does *not* create a new reference
 #define c_subp(c,i)    (&(c->sub[i]))
 
-//static inline Variable *c_binders(Construction c, int i) { ConstructionDescriptor d = c->term.descriptor; int a = d->arity; Variable *bs = (Variable *) &(c->sub[a]); return &(bs[d->binderoffset[i]]); }
 #define c_binders(c,i) (&(((Variable *) &(c->sub[c->term.descriptor->arity]))[c->term.descriptor->binderoffset[i]]))
-//static inline int c_rank(Construction c, int i) { ConstructionDescriptor d = c->term.descriptor; return (d->binderoffset[i+1] - d->binderoffset[i]); }
 #define c_rank(c,i)    (c->term.descriptor->binderoffset[i+1] - c->term.descriptor->binderoffset[i])
 
 // Constant descriptors used for literals.
@@ -683,8 +690,8 @@ static inline Variable useVariable(Context context, Variable variable)
  */
 static inline void unuseVariable(Context context, Variable variable)
 {
-//    assert(variable->nr > 0);
-//    assert(variable->uses > 0);
+    assert(variable->nr > 0);
+    assert(variable->uses > 0);
     variable->uses --;
 }
 
@@ -967,12 +974,31 @@ struct _NamedPropertyLink
 
 extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink);
 
-extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
+static inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link)
+{
+    if (link)
+        link->nr++;
+
+    return link;
+}
 
 // Property list is not closed when the first element is a list of free variable
 #define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
 
-extern NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link);
+extern void freeNamedPropertyLink(Context context, NamedPropertyLink link);
+
+static inline NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link)
+{
+    if (link)
+    {
+        if (--link->nr == 0)
+        {
+             freeNamedPropertyLink(context, link);
+             return NULL;
+        }
+    }
+    return link;
+}
 
 struct _VariablePropertyLink
 {
@@ -988,15 +1014,28 @@ struct _VariablePropertyLink
 #endif
 };
 
+extern void freeVariablePropertyLink(Context context, VariablePropertyLink link);
+
 static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link)
 {
     if (link)
         ++(link->nr);
     return link;
 };
-#define UNLINKSET_VariablePropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
 
-extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link);
+static inline VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link)
+{
+    if (link)
+    {
+        if (--link->nr == 0)
+        {
+            freeVariablePropertyLink(context, link);
+            return NULL;
+        }
+    }
+    return link;
+}
+
 
 #define ASSERT_VARIABLE_PROPERTIES(context, properties) \
 ASSERT(context, (!context->fv_enabled || ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars))));
@@ -1089,21 +1128,20 @@ extern void printfL(Context context, FILE* out, VariableSetLink set);
 
 struct _Hashset {
     unsigned nr;
+    unsigned nbits;
 #ifdef CRSX_ENABLE_PROFILING
     size_t marker;
 #endif
-
-    size_t capacity;
-    size_t *items;
     size_t nitems;
+    size_t* items;
 };
 
-// Allocation variable set. Capacity must be n^2
-extern Hashset makeHS(Context context, size_t capacity);
-// Free variable set.
-extern void freeHS(Context context, Hashset set);
+// Allocation variable set.
+extern Hashset makeHS(Context context, unsigned nbits);
+// Free variable set. Try to put it in the pool if requested.
+extern void freeHS(Context context, Hashset set, int pool);
 // Copy variable set.
-extern Hashset copyHS(Context context, Hashset set, size_t capacity);
+extern Hashset copyHS(Context context, Hashset set, unsigned nbits);
 // Add variable reference to set. Create new set if needed.
 extern Hashset addVariableHS(Context context, Hashset set, Variable variable);
 // Remove variable from set. 'set' reference is transferred.
@@ -1137,7 +1175,7 @@ static inline Hashset UNLINK_Hashset(Context context, Hashset set)
         assert(set->nr > 0);
         if (--set->nr == 0)
         {
-            freeHS(context, set);
+            freeHS(context, set, 1);
             return NULL;
         }
     }

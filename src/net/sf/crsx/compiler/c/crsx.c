@@ -37,6 +37,7 @@ void enableProfiling(Context context)
 {
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 1;
+    crsxpInit(context);
 #endif
 }
 
@@ -79,7 +80,7 @@ Variable makeVariable(Context context, char *name, unsigned int bound, unsigned 
 
 void freeVariable(Context context, Variable variable)
 {
-    //ASSERT(context, variable->uses == 0);
+    ASSERT(context, variable->uses == 0);
 
     FREE(context, variable->name);
     FREE(context, variable);
@@ -151,6 +152,8 @@ Construction makeConstruction(Context context, ConstructionDescriptor descriptor
 static
 void freeConstruction(Context context, Construction construction)
 {
+    ASSERT(context, construction->term.nr == 0);
+
     unlinkProperties(context, construction->properties);
     construction->properties = NULL;
 
@@ -180,7 +183,6 @@ void freeConstruction(Context context, Construction construction)
     }
 
     int poolIndex = (term->descriptor->size - sizeof(struct _Construction)) / sizeof(Construction);
-
     if (poolIndex < CONS_POOL_MAX_SIZE_SIZE && context->consPoolSize[poolIndex] < CONS_POOL_MAX_SIZE)
         context->consPool[poolIndex][context->consPoolSize[poolIndex]++] = construction;
     else
@@ -368,16 +370,14 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
     // Start construction
     Construction construction = makeConstruction(sink->context, descriptor);
 
-    construction->properties =
-      allocateProperties(sink->context,
-                          buffer->pendingNamedPropertiesFreeVars,
-                          buffer->pendingVariablePropertiesFreeVars,
-                          buffer->pendingNamedProperties,
-                          buffer->pendingVariableProperties);
-
+    construction->properties = allocateProperties(sink->context,
+                                                  buffer->pendingNamedPropertiesFreeVars,
+                                                  buffer->pendingVariablePropertiesFreeVars,
+                                                  buffer->pendingNamedProperties,
+                                                  buffer->pendingVariableProperties);
     construction->fvs = NULL;
-    construction->nfvs = LINK_VARIABLESET(sink->context, construction->properties->namedFreeVars);
-    construction->vfvs = LINK_VARIABLESET(sink->context, construction->properties->variableFreeVars);
+    construction->nfvs = LINK_Hashset(sink->context, construction->properties->namedFreeVars);
+    construction->vfvs = LINK_Hashset(sink->context, construction->properties->variableFreeVars);
 
     construction->nf = 0;
     construction->nostep = buffer->blocking; // no normalization if at least one blocking binder
@@ -471,7 +471,7 @@ Sink bufferUse(Sink sink, Variable variable)
 #   endif
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
-    //DEBUGF(sink->context, "//USE(%d)\n", buffer->lastTop);
+
     VariableUse use = makeVariableUse(sink->context, variable); // No need to link variable
 
     bufferInsert(buffer, (Term) use);
@@ -1410,6 +1410,11 @@ VariableSetLink removeL(Context context, VariableSetLink set, Variable var)
 #define MAX_LOAD_FACTOR_HS 0.80
 #define MAX_ITEMS_HS 25
 
+static inline size_t capacityHS(unsigned nbits)
+{
+    return 1 << (nbits - 1);
+}
+
 static inline size_t firstKeyHS(size_t value, size_t capacity)
 {
 //    return (capacity - 1) & (prime_1 * (value >> 2));
@@ -1428,7 +1433,8 @@ int addItemHS(Hashset set, void* item)
     assert(set->nr == 1);
 
     size_t value = (size_t) item;
-    size_t i = firstKeyHS(value, set->capacity);
+    const size_t capacity = capacityHS(set->nbits);
+    size_t i = firstKeyHS(value, capacity);
 
     while (set->items[i] != 0 && set->items[i] != 1)
     {
@@ -1436,7 +1442,7 @@ int addItemHS(Hashset set, void* item)
             return 0;
 
         /* search free slot */
-        i = nextKeyHS(i, set->capacity);
+        i = nextKeyHS(i, capacity);
     }
 
     set->nitems++;
@@ -1449,26 +1455,27 @@ static inline int needRehashHS(size_t nitems, size_t capacity)
     return (nitems / (double) capacity) > MAX_LOAD_FACTOR_HS;
 }
 
-// Compute capacity for the number of additional expected items
-static inline size_t capacityHS(size_t capacity, size_t nitems, size_t expected)
+// Compute nbits for the number of additional expected items
+static inline unsigned neededNBitsHS(size_t nbits, size_t nitems, size_t expected)
 {
-    while (needRehashHS(nitems + expected, capacity))
-        capacity *= 2;
-    return capacity;
+    while (needRehashHS(nitems + expected, capacityHS(nbits)))
+        nbits ++;
+    return nbits;
 }
 
 static void maybeRehashHS(Context context, Hashset set)
 {
     size_t *old_items;
-    size_t old_capacity, ii;
+    size_t old_capacity = capacityHS(set->nbits);
+    size_t ii;
 
-    if (needRehashHS(set->nitems, set->capacity)) {
+    if (needRehashHS(set->nitems, old_capacity)) {
         old_items = set->items;
-        old_capacity = set->capacity;
 
-        set->capacity = set->capacity * 2;
-        set->items = ALLOCATE(context, set->capacity * sizeof(size_t));
-        memset(set->items, 0, set->capacity * sizeof(size_t));
+        set->nbits = set->nbits + 1;
+        size_t capacity = capacityHS(set->nbits);
+        set->items = ALLOCATE(context, capacity * sizeof(size_t));
+        memset(set->items, 0, capacity * sizeof(size_t));
         set->nitems = 0;
         assert(set->items);
         for (ii = 0; ii < old_capacity; ii++) {
@@ -1481,57 +1488,84 @@ static void maybeRehashHS(Context context, Hashset set)
     }
 }
 
-Hashset makeHS(Context context, size_t capacity)
+Hashset makeHS(Context context, unsigned nbits)
 {
-     Hashset set = ALLOCATE(context, sizeof(struct _Hashset));
-     set->nr = 1;
+//    if (nbits < HASHSET_MAX_NBITS && context->hashsetPoolSize[nbits] > 0)
+//        return context->hashsetPool[nbits][--context->hashsetPoolSize[nbits]];
+
+    Hashset set = ALLOCATE(context, sizeof(struct _Hashset));
+    set->nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
-     set->marker = 0;
+    set->marker = 0;
 #endif
-     set->capacity = capacity;
-     set->items = ALLOCATE(context, set->capacity * sizeof(size_t));
-     memset(set->items, 0, set->capacity * sizeof(size_t));
-     set->nitems = 0;
+    set->nbits = nbits;
+    size_t capacity = capacityHS(nbits);
+    set->items = ALLOCATE(context, capacity * sizeof(size_t));
+    memset(set->items, 0, capacity * sizeof(size_t));
+    set->nitems = 0;
 
-     crsxpVSCreated(context);
+    crsxpVSCreated(context);
 
-     return set;
+    return set;
 }
 
-void freeHS(Context context, Hashset set)
+void freeHS(Context context, Hashset set, int pool)
 {
-    ssize_t i = set->capacity - 1;
-    ssize_t r = set->nitems;
+    ssize_t i = capacityHS(set->nbits) - 1;
+    int r = set->nitems;
     for (; i >= 0; i --)
     {
         size_t item = set->items[i];
         if (item != 0 && item != 1)
         {
             unlinkVariable(context, (Variable) item);
-            r --;
-            if (r == 0)
+            if (--r <= 0)
                 break;
         }
+        //set->items[i] = 0;
     }
-    FREE(context, set->items);
-    FREE(context, set);
 
-    crsxpVSFreed(context);
+//    if (pool && set->nbits < HASHSET_MAX_NBITS && context->hashsetPoolSize[set->nbits] < HASHSET_MAX_PER_NBITS)
+//    {
+//        set->nr = 1;
+//        set->nitems = 0;
+//
+//        context->hashsetPool[set->nbits][context->hashsetPoolSize[set->nbits]++] = set;
+//    }
+//    else
+//    {
+        FREE(context, set->items);
+        FREE(context, set);
+
+        crsxpVSFreed(context);
+    //}
 }
 
-Hashset copyHS(Context context, Hashset set, size_t capacity)
+Hashset copyHS(Context context, Hashset set, unsigned nbits)
 {
-    Hashset newset = ALLOCATE(context, sizeof(struct _Hashset));
-    newset->nr = 1;
+    Hashset newset;
+//    int reset;
+//    if (nbits < HASHSET_MAX_NBITS && context->hashsetPoolSize[nbits] > 0)
+//    {
+//        newset = context->hashsetPool[nbits][--context->hashsetPoolSize[nbits]];
+//        reset = 0;
+//    }
+//    else
+//    {
+        newset = ALLOCATE(context, sizeof(struct _Hashset));
+        newset->nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
-     newset->marker = 0;
+         newset->marker = 0;
 #endif
-    newset->capacity = capacity;
-    newset->items = ALLOCATE(context, newset->capacity * sizeof(size_t));
+        newset->nbits = nbits;
+        newset->items = ALLOCATE(context, capacityHS(newset->nbits) * sizeof(size_t));
+        newset->nitems = 0;
+//        reset = 1;
+    //}
 
-    if (set->capacity == capacity)
+    if (set->nbits == nbits)
     {
-        ssize_t i = set->capacity - 1;
+        ssize_t i = capacityHS(set->nbits) - 1;
         for (; i >= 0; i --)
         {
             size_t item = set->items[i];
@@ -1543,12 +1577,12 @@ Hashset copyHS(Context context, Hashset set, size_t capacity)
     }
     else
     {
-        memset(newset->items, 0, newset->capacity * sizeof(size_t));
+  //      if (reset)
+            memset(newset->items, 0, capacityHS(newset->nbits) * sizeof(size_t));
 
-        newset->nitems = 0;
-        size_t i;
+        size_t i = capacityHS(set->nbits);
         size_t r = set->nitems;
-        for (i = 0; i < set->capacity; i++)
+        while (--i >= 0)
         {
             size_t item = set->items[i];
             if (item != 0 && item != 1)
@@ -1589,7 +1623,7 @@ Hashset addVariableHS(Context context, Hashset set, Variable variable)
     else if (set->nr > 1)
     {
         set->nr --;
-        set = copyHS(context, set, capacityHS(set->capacity, set->nitems, 1));
+        set = copyHS(context, set, neededNBitsHS(set->nbits, set->nitems, 1));
     }
 
     if (!addItemHS(set, variable))
@@ -1613,11 +1647,12 @@ Hashset removeVariableHS(Context context, Hashset set, Variable variable)
     if (set->nr > 1)
     {
         set->nr --;
-        set = copyHS(context, set, capacityHS(set->capacity, set->nitems, -1));
+        set = copyHS(context, set, neededNBitsHS(set->nbits, set->nitems, -1));
     }
 
      size_t value = (size_t) variable;
-     size_t ii = firstKeyHS(value, set->capacity);
+     const size_t capacity = capacityHS(set->nbits);
+     size_t ii = firstKeyHS(value, capacity);
      size_t oii = ii;
 
      while (set->items[ii] != 0)
@@ -1632,7 +1667,7 @@ Hashset removeVariableHS(Context context, Hashset set, Variable variable)
              return set;
          }
 
-         ii = nextKeyHS(ii, set->capacity);
+         ii = nextKeyHS(ii, capacity);
 
          if (oii == ii) // Looping?
              break;
@@ -1652,14 +1687,15 @@ int containsHS(Hashset set, Variable variable)
     crsxpVSContains(set);
 
     size_t value = (size_t) variable;
-    size_t ii = firstKeyHS(value, set->capacity);
+    const size_t capacity = capacityHS(set->nbits);
+    size_t ii = firstKeyHS(value, capacity);
     size_t oii = ii;
     while (set->items[ii] != 0)
     {
         if (set->items[ii] == value)
             return 1;
 
-        ii = nextKeyHS(ii, set->capacity);
+        ii = nextKeyHS(ii, capacity);
 
         if (oii == ii) // looping?
             return 0;
@@ -1695,22 +1731,22 @@ Hashset mergeAllHS(Context context, Hashset first, Hashset second)
         return AllFreeVariables;
     }
 
-    if (first->capacity < second->capacity)
+    if (first->nbits < second->nbits)
     {
         Hashset t = first;
         first = second;
         second = t;
     }
 
-    int newcapacity = capacityHS(first->capacity, first->nitems, second->nitems);
-    if (first->nr > 1 || newcapacity > first->capacity)
+    int newnbits = neededNBitsHS(first->nbits, first->nitems, second->nitems);
+    if (first->nr > 1 || newnbits > first->nbits)
     {
-        Hashset copy = copyHS(context, first, newcapacity);
+        Hashset copy = copyHS(context, first, newnbits);
         UNLINK_Hashset(context, first);
         first = copy;
     }
 
-    int i = second->capacity - 1;
+    int i = capacityHS(second->nbits) - 1;
     int r = second->nitems;
     for (; i >= 0; i --)
     {
@@ -1738,10 +1774,10 @@ Hashset minusHS(Context context, Hashset set, Hashset other)
     if (set->nr > 1)
     {
         set->nr --;
-        set = copyHS(context, set, set->capacity);
+        set = copyHS(context, set, set->nbits);
     }
 
-    int i = other->capacity - 1;
+    int i = capacityHS(other->nbits) - 1;
     int r = other->nitems;
     for (; i >= 0; i --)
     {
@@ -1768,7 +1804,7 @@ Hashset removeAllHS(Context context, Hashset set, Variable* vars, int len)
     if (set->nr > 1)
     {
         set->nr --;
-        set = copyHS(context, set, set->capacity);
+        set = copyHS(context, set, set->nbits);
     }
 
     len --;
@@ -1787,7 +1823,7 @@ void printfHS(Context context, FILE* out, Hashset set)
     if (!set || set->nitems == 0)
         return;
 
-    int i = set->capacity - 1;
+    int i = capacityHS(set->nbits) - 1;
     int r = set->nitems;
     char* sep = "";
     for (; i >= 0; i --)
@@ -1811,7 +1847,7 @@ void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constr
     if (!set || set->nitems == 0)
         return;
 
-    int i = set->capacity - 1;
+    int i = capacityHS(set->nbits) - 1;
     int r = set->nitems;
     for (; i >= 0; i --)
     {
@@ -2382,9 +2418,13 @@ void crsxAddPools(Context context)
             context->consPool[i] = ALLOCATE(context, CONS_POOL_MAX_SIZE * sizeof(Construction));
             context->consPoolSize[i] = 0;
         }
-
         context->bufferPoolSize = 0;
 
+        for (i = 0; i < HASHSET_MAX_NBITS; i ++)
+        {
+            context->hashsetPool[i] = ALLOCATE(context, HASHSET_MAX_PER_NBITS * sizeof(Hashset));
+            context->hashsetPoolSize[i] = 0;
+        }
     }
     ++context->poolRefCount;
 }
@@ -2407,12 +2447,10 @@ void crsxReleasePools(Context context)
         int i;
         for (i = 0; i < CONS_POOL_MAX_SIZE_SIZE; i ++)
         {
-            ssize_t j = context->consPoolSize[i] - 1;
-            while (j >= 0)
-            {
+            ssize_t j = context->consPoolSize[i];
+            while (--j >= 0)
                 FREE(context, context->consPool[i][j]);
-                j --;
-            }
+
             FREE(context, context->consPool[i]);
         }
         FREE(context, context->consPool);
@@ -2421,8 +2459,19 @@ void crsxReleasePools(Context context)
         FREE(context, context->noProperties);
         context->noProperties = NULL;
 
+        for (i = 0; i < HASHSET_MAX_NBITS; i ++)
+        {
+            ssize_t j = context->hashsetPoolSize[i];
+            while (--j >= 0)
+                freeHS(context, context->hashsetPool[i][j], 0);
+
+            FREE(context, context->hashsetPool[i]);
+        }
+
         while (--context->bufferPoolSize >= 0)
             destroyBuffer(context->bufferPool[context->bufferPoolSize]);
+
+        crsxpDestroy(context);
     }
 }
 
@@ -3314,13 +3363,11 @@ void initCRSXContext(Context context)
 
 Term compute(Context context, Term term)
 {
-    crsxpInit(context);
     crsxAddPools(context);
 
     normalize(context, &term);
 
     crsxReleasePools(context);
-    crsxpDestroy(context);
 
 #ifdef DEBUG
     DEBUGF(context, "END COMPUTE");
@@ -4245,15 +4292,6 @@ void passLocationProperties(Context context, Term locTerm, Term term)
 /////////////////////////////////////////////////////////////////////////////////
 // Memory management.
 
-
-inline Term linkTerm(Context context, Term t)
-{
-    assert(t->nr > 0);
-    ++LINK_COUNT(t);
-    return t;
-}
-
-
 void freeTerm(Context context, Term term)
 {
     if (IS_VARIABLE_USE(term))
@@ -4360,24 +4398,8 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
     }
 }
 
-inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link)
+void freeNamedPropertyLink(Context context, NamedPropertyLink link)
 {
-    if (link)
-        link->nr++;
-
-    return link;
-}
-
-NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link)
-{
-    if (!link)
-        return NULL;
-    ASSERT(context, link->nr >0);
-
-    if (--link->nr > 0)
-        return link;
-
-    // Free.
     if (link->name)
     {
         UNLINK(context, link->u.term);
@@ -4393,19 +4415,13 @@ NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink li
     link->link = NULL;
     link->name = NULL; // No need to free name as it is stored in the pool.
     FREE(context, link);
-    return UNLINK_NamedPropertyLink(context, next); // tail.
+
+    if (next && --next->nr == 0)
+        freeNamedPropertyLink(context, next); // tail.
 }
 
-VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link)
+void freeVariablePropertyLink(Context context, VariablePropertyLink link)
 {
-    if (!link)
-        return NULL;
-
-    ASSERT(context, link->nr >0);
-    if (--link->nr > 0)
-        return link;
-
-    // Free
     if (link->variable)
     {
         unuseVariable(context, link->variable);
@@ -4421,10 +4437,10 @@ VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariableProper
 
     VariablePropertyLink next = link->link;
     link->link = NULL;
-
     FREE(context, link);
-    return  UNLINK_VariablePropertyLink(context, next); // Tail
 
+    if (next && --next->nr == 0)
+        freeVariablePropertyLink(context, next); // tail
 }
 
 Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
