@@ -136,6 +136,7 @@ final public class ObjectConstructor implements Constructor
 
 	public void javaInvokeStart(SourceBuilder java, String sinkName, Map<Variable, String> variable2java)
 	{
+		if (!java.seeded()) java.seedExpression(sinkName);
 		java.wrapExpression("", ".start(" + sinkName + ".makeConstructor(" + Util.quoteJava(object.toString()) + "))");
 	}
 
