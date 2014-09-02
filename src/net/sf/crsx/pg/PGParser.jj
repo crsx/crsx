@@ -333,13 +333,13 @@ class PGParser
 	 * If non-null then meta-variables with this production are automatically generated.
 	 * The token <PRODUCTION_NAME> is automatically replaced with the production name.
 	 */
-	private String metaProduction, metaArgumentNonterminal, metaArgumentOpen = "\"[\"", metaArgumentClose = "\"]\"", metaArgumentSep = "\",\"";
+	private String metaProduction, metaArgumentNonterminal, metaArgumentOpen = "\"[\"", metaArgumentClose = "\"]\"", metaArgumentSep = "\",\"", metaStates = "";
 	
 	/**
 	 * If non-null then inject-tokens with this production are automatically generated.
 	 * The token <PRODUCTION_NAME> is automatically replaced with the production name.
 	 */
-	private String injectProduction, injectArgumentNonterminal, injectArgumentOpen = "\"[\"", injectArgumentClose = "\"]\"";
+	private String injectProduction, injectArgumentNonterminal, injectArgumentOpen = "\"[\"", injectArgumentClose = "\"]\"", injectStates = "";
 	
 	/**
 	 * Apply "Use" description to specific constant.
@@ -539,12 +539,12 @@ void Grammar(Maker maker, String jjcrs, String sourcePrefix, boolean makeHtml,
 			if (metaProduction != null)
 			{
 				javacc.append("\n/** Special meta-variable for " + userName + " production. */\n"  +
-					"TOKEN : {<MT_" + derived + " : " + metaProduction.replace("<PRODUCTION_NAME>", userName) + ">}\n");
+					metaStates + "TOKEN : {<MT_" + derived + " : " + metaProduction.replace("<PRODUCTION_NAME>", userName) + ">}\n");
 			}
 			if (injectProduction != null)
 			{
 				javacc.append("\n/** Special injection token for " + userName + " production. */\n"  +
-					"TOKEN : {<IT_" + derived + " : " + injectProduction.replace("<PRODUCTION_NAME>", userName) + ">}\n");
+					injectStates + "TOKEN : {<IT_" + derived + " : " + injectProduction.replace("<PRODUCTION_NAME>", userName) + ">}\n");
 			}
 
 			// Top-level production, if any.
@@ -570,9 +570,8 @@ void Grammar(Maker maker, String jjcrs, String sourcePrefix, boolean makeHtml,
 			if (injectProduction != null)
 			{
 				javacc.append(
-					"\t<IT_"+derived+"> " + injectArgumentOpen + " {sink=N_" + injectArgumentNonterminal + "(sink, env);} " + injectArgumentClose +
-						" {return sink;}\n" +
-					"|\n");
+					"\t<IT_"+derived+"> " +
+						injectArgumentOpen + " sink=N_" + injectArgumentNonterminal + "(sink, env) " + injectArgumentClose + " {return sink;}\n" + "|\n");
 			}
 			if (derived.endsWith("$Maybe"))
 			{
@@ -1168,7 +1167,7 @@ void Structural(String comment, Appendable javacc, Appendable html, Appendable s
 		{
 			javacc.append(
 				"\t<IT_"+name+"> " +
-					injectArgumentOpen + " {sink=N_" + injectArgumentNonterminal + "(sink, env);} " + injectArgumentClose +
+					injectArgumentOpen + " sink=N_" + injectArgumentNonterminal + "(sink, env) " + injectArgumentClose +
 					" {return sink;}\n" +
 				"|\n");
 		}
@@ -1343,6 +1342,7 @@ void Meta(String comment, Appendable javacc, Appendable html) throws IOException
 	Token t; // scratch token
 	StringBuilder body = new StringBuilder(); // production body text accumulator
 	StringBuilder localHtml = new StringBuilder();
+	List<String> states = new ArrayList<String>();
 }
 {
 	// Meta production.
@@ -1354,6 +1354,12 @@ void Meta(String comment, Appendable javacc, Appendable html) throws IOException
 				+"<b>meta</b>[");
 	}
 	"meta" "[" metaArgumentNonterminal=NonterminalName(html) "]"
+    [	"("
+		[	Names(states)	{metaStates = states.toString().replace("[","<").replace("]",">").trim()+" ";}
+		|	"*" {metaStates = "<*> ";}
+		]
+		")"
+	]
 	"::="
 	LexicalConcatenation("meta", body, localHtml)
 	{
@@ -1433,6 +1439,12 @@ void Meta(String comment, Appendable javacc, Appendable html) throws IOException
 				+"<b>inject</b>[");
 	}
 	"inject" "[" injectArgumentNonterminal=NonterminalName(html) "]"
+    [	"("
+		[	Names(states)	{injectStates = states.toString().replace("[","<").replace("]",">").trim()+" ";}
+		|	"*" {injectStates = "<*> ";}
+		]
+		")"
+	]
 	"::="
 	LexicalConcatenation("inject", body, localHtml)
 	{
