@@ -141,6 +141,10 @@ int run(void)
     }
     fprintTermWithIndent (context, out, term);
 
+    // Cleanup
+    unlinkTerm(context, term);
+    crsxReleasePools(context);
+    
     return 0;
 }
 
