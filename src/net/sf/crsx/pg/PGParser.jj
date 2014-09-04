@@ -1741,7 +1741,7 @@ Reverser.Builder Nonterminal(String productionName, Map<String, String> decls, S
 	|
 		t=<EMBEDDED> {arg = t.toString(); arguments.add(unembed(arg)); htmlArgs = htmlArgs+" "+arg;}
 	|
-		[ t=Name() {arg = t.toString();} ] t=MetaVar() {arg = arg + t.toString(); arguments.add(arg); htmlArgs = htmlArgs+" "+arg;}
+		{arg = "";} [ t=Name() {arg = t.toString();} ] t=MetaVar() {arg = arg + t.toString(); arguments.add(arg); htmlArgs = htmlArgs+" "+arg;}
 	)*
 	<RANGLE>
 	[ "*" {repeater='*';} | "+" {repeater='+';} | "?" {repeater='?';} ]
