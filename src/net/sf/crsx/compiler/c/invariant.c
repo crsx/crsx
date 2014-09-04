@@ -137,7 +137,7 @@ int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, 
         {
             //int c = 5; // Check only the first 10 properties (ref count won't be accurate)
             NamedPropertyLink link;
-            for (link = construction->properties->namedProperties; link; link = link->link)
+            for (link = construction->namedProperties; link; link = link->link)
             {
                 ASSERT(context, link->nr > 0);
 
@@ -175,7 +175,7 @@ int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, 
 
         {
             VariablePropertyLink link;
-            for (link = construction->properties->variableProperties; link; link = link->link)
+            for (link = construction->variableProperties; link; link = link->link)
             {
                 ASSERT(context, link->nr > 0);
 
@@ -270,7 +270,7 @@ int checkTerm4(Context context, Term parent, unsigned index, Term term, int nf, 
                 }
             }
 
-            nps = LINK_VARIABLESET(context, asConstruction(term)->properties->variableFreeVars);
+            nps = LINK_VARIABLESET(context, asConstruction(term)->variableFreeVars);
             if (!VARIABLESET_ISEMPTY(nps))
             {
                 nps = VARIABLESET_MINUS(context, subfvs, asConstruction(term)->fvs);
