@@ -1448,7 +1448,7 @@ VariableSetLink removeL(Context context, VariableSetLink set, Variable var)
 //static const unsigned int prime_2 = 5009;
 
 #define MAX_LOAD_FACTOR_HS 0.80
-#define MAX_ITEMS_HS 60
+#define MAX_ITEMS_HS 102
 
 static inline size_t capacityHS(unsigned nbits)
 {
@@ -2252,7 +2252,7 @@ int nextIHS2(Iterator2 iter)
     }
     
     // Search for the next slot
-    size_t index = iter->index + 1;
+    size_t index = iter->index;
     do
     {
         index ++;

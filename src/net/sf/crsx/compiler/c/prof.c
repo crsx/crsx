@@ -10,7 +10,7 @@
 // Mac does not have clock_gettime
 #ifdef __MACH__
 #include <mach/mach_time.h>
-#define CLOCK_REALTIME 0
+#define CLOCK_PROCESS_CPUTIME_ID 0
 #define CLOCK_MONOTONIC 0
 int clock_gettime(int clk_id, struct timespec *t)
 {
@@ -48,6 +48,7 @@ long pVarCount; // Current number of live variables
 long pPeakVarCount; // Peak number of live variables
 long pTotalConsCount; // Total number of construction
 long pConsCount; // Current number of construction
+long pAccuStepTime;
 
 ProfMetaSubstitute profLargeMetaSubstitutes;
 ProfBufferCopy profLargeBufferCopy;
@@ -64,6 +65,7 @@ struct timespec pStartTime;
 struct timespec pNanoTime;
 struct timespec pMergeClock;
 struct timespec pPropagateClock;
+struct timespec pStepClock;
 size_t pKeyPoolSize;
 char* pStepName; // Current step function
 
@@ -101,15 +103,39 @@ void crsxpInit(Context context)
         pTotalConsCount = 0l;
         pConsCount = 0l;
         time(&pTime);
-        clock_gettime(CLOCK_REALTIME, &pStartTime);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pStartTime);
         pSampleRate = (rand() % 500) + 500;
         crsxpMetaCount = makeHS2(context, 8, NULL, equalsChars, hashChars);
         pAccuMetaTime = 0l;
         pAccuMergeTime = 0l;
         pAccuPropagateTime = 0l;
         pMergeCount = 0;
+        pAccuStepTime = 0;
     }
 }
+
+
+static struct timespec diff(struct timespec start, struct timespec end)
+{
+    struct timespec temp;
+    if ((end.tv_nsec - start.tv_nsec) < 0)
+    {
+        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+    } else
+    {
+        temp.tv_sec = end.tv_sec - start.tv_sec;
+        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+    }
+    return temp;
+}
+
+static long nano2ms(long nano)
+{
+    return nano / 1000000;
+}
+
+
 
 void crsxpDestroy(Context context)
 {
@@ -140,15 +166,21 @@ void crsxpBeforeStep(Context context, Term term)
         profAddStepFunction(context, SYMBOL(term));
         crsxpPrintStats(context, term);
         ++pStepCount;
+
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pStepClock);
     }
 }
 
 void crsxpAfterStep(Context context)
 {
-//    if (context->profiling)
-//    {
-//
-//    }
+    if (context->profiling)
+    {
+        struct timespec nanoTime;
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &nanoTime);
+        struct timespec d = diff(pStepClock, nanoTime);
+        long dl = d.tv_sec * 1000000000 + d.tv_nsec;
+        pAccuStepTime += dl;
+    }
 }
 
 void crsxpBeforeSubstitution(Context context, Term term)
@@ -157,30 +189,9 @@ void crsxpBeforeSubstitution(Context context, Term term)
     {
         getrusage(RUSAGE_SELF, &crsxpSubstitutionUse);
 
-        clock_gettime(CLOCK_REALTIME, &pNanoTime);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pNanoTime);
     }
 }
-
-static struct timespec diff(struct timespec start, struct timespec end)
-{
-    struct timespec temp;
-    if ((end.tv_nsec - start.tv_nsec) < 0)
-    {
-        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
-        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
-    } else
-    {
-        temp.tv_sec = end.tv_sec - start.tv_sec;
-        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
-    }
-    return temp;
-}
-
-static long nano2ms(long nano)
-{
-    return nano / 1000000;
-}
-
 void crsxpAfterSubstitution(Context context)
 {
     if (context->profiling)
@@ -191,12 +202,12 @@ void crsxpAfterSubstitution(Context context)
         getrusage(RUSAGE_SELF, &uafter);
 
         long memuse = uafter.ru_maxrss - crsxpSubstitutionUse.ru_maxrss;
-        if (memuse > 50)
+        if (memuse > 300)
             PRINTF(context, "\n%-8ld# large meta substitution size: %ldKb",
                     pStepCount, memuse);
 
         struct timespec nanoTime;
-        clock_gettime(CLOCK_REALTIME, &nanoTime);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &nanoTime);
         struct timespec d = diff(pNanoTime, nanoTime);
         long dl = d.tv_sec * 1000000000 + d.tv_nsec;
 
@@ -223,7 +234,7 @@ void crsxpBeforePropagateFV(Context context)
 {
     if (context->profiling)
     {
-        clock_gettime(CLOCK_REALTIME, &pPropagateClock);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pPropagateClock);
     }
 }
 
@@ -232,7 +243,7 @@ void crsxpAfterPropagateFV(Context context)
     if (context->profiling)
     {
         struct timespec nanoTime;
-        clock_gettime(CLOCK_REALTIME, &nanoTime);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &nanoTime);
         struct timespec d = diff(pPropagateClock, nanoTime);
         long dl = d.tv_sec * 1000000000 + d.tv_nsec;
 
@@ -300,7 +311,7 @@ void crsxpBeforeMergeProperties(Context context)
 {
     if (context->profiling)
     {
-        clock_gettime(CLOCK_REALTIME, &pMergeClock);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pMergeClock);
     }
 }
 
@@ -309,7 +320,7 @@ void crsxpAfterMergeProperties(Context context)
     if (context->profiling)
     {
         struct timespec nanoTime;
-        clock_gettime(CLOCK_REALTIME, &nanoTime);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &nanoTime);
         struct timespec d = diff(pMergeClock, nanoTime);
         long dl = d.tv_sec * 1000000000 + d.tv_nsec;
 
@@ -542,7 +553,7 @@ void printProfiling(Context context)
         qsort(counts, crsxpMetaCount->size, sizeof(Pair), pairEntryCmp);
 
         struct timespec endTime;
-        clock_gettime(CLOCK_REALTIME, &endTime);
+        clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
         struct timespec d = diff(pStartTime, endTime);
         long dl = d.tv_sec * 1000000000l + d.tv_nsec;
 
@@ -575,7 +586,7 @@ void printProfiling(Context context)
                 pMetaSubstituteCount);
         PRINTF(context, "\n%-50s : %ld", "Shallow meta substitution count",
                 pCallCount);
-        PRINTF(context, "\n%-50s : %ld (%2.2f%%)",
+        PRINTF(context, "\n%-50s : %ldms (%2.2f%%)",
                 "Total time spent merging environments",
                 nano2ms(pAccuMergeTime),
                 (pAccuMergeTime / (double ) dl) * 100.0);
@@ -595,7 +606,9 @@ void printProfiling(Context context)
                 "Free variable set usage count", pFVUsedCount,
                 (pFVUsedCount / (double ) pFVTotalCount) * 100.0);
         PRINTF(context, "\n%-50s : %ld", "Free variable set maximum size",
-                pFVMaxSize);
+                        pFVMaxSize);
+        PRINTF(context, "\n%-50s : %ldms (%2.2f%%)", "Time spent in step functions",
+                nano2ms(pAccuStepTime), (pAccuStepTime / (double ) dl) * 100.0);
         PRINTF(context, "\n%-50s : %ld", "Current variable count", pVarCount);
         PRINTF(context, "\n%-50s : %ld", "Peak variable count", pPeakVarCount);
         PRINTF(context, "\n%-50s : %ld", "Current construction count",
