@@ -5632,6 +5632,43 @@ void printCTerm2(Context context, Term term, VariableSet allocated, char *sink, 
     }
 }
 
+void printTraceForCps(Context context, Term term)
+{
+	PRINTF(context, "==>\n");
+	while (1) {
+		if (IS_LITERAL(term))
+    	{
+        	PRINTF(context, "   %s\n", term->descriptor->name(term));
+        	break;
+    	}
+    	else if (IS_CONSTRUCTION(term))
+    	{
+    		char* nm=term->descriptor->name(term);
+        	PRINTF(context, "   %s\n", nm);
+        	int arity=ARITY(term);
+        	if (arity==0) break;
+        	
+        	int k;
+        	for (k=0; k<arity; k++) {
+        		Term sub = SUB(term, k);
+        		if (sub && IS_CONSTRUCTION(sub) && !strncmp(sub->descriptor->name(sub), "CONT", 4)) {
+        			term = SUB(sub, 0);
+        			goto cont;
+        		}
+        	}
+        	
+        	if (RANK(term, arity-1)>0)
+        	{
+				term= SUB(term,arity-1);	
+        	}
+        	else break;
+        }
+        else break;
+    cont:
+    	continue;
+    }
+}
+
 
 ///static void ptSubstitution(Context context, SubstitutionFrame substitution)
 ///{
