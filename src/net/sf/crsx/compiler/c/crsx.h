@@ -62,6 +62,9 @@ typedef struct _Buffer *Buffer;
 
 #define MAX_BUFFER_POOL_SIZE 32
 
+#define HASHSET_MAX_NBITS 6
+#define HASHSET_MAX_PER_NBITS 256
+
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
@@ -78,7 +81,10 @@ struct _Context
     Buffer bufferPool[MAX_BUFFER_POOL_SIZE];
     ssize_t bufferPoolSize;
 
-    Properties noProperties;
+    Hashset* hashsetPool[HASHSET_MAX_NBITS];
+    ssize_t hashsetPoolSize[HASHSET_MAX_NBITS];
+
+    //Properties noProperties;
 
     char *str_filelocation;
     char *str_linelocation;
@@ -415,11 +421,11 @@ typedef struct _BitSet* BitSetP;
 #define LENGTH(T) strlen(TEXT(T))
 
 #define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
-#define PROPERTY(C,T,P) DPROPERTY(C, asConstruction(T)->properties->namedProperties, asConstruction(T)->properties->variableProperties, P)
-#define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->properties->namedProperties, GLOBAL(C,N))
-#define VARIABLE_PROPERTY(T,V)  c_variableProperty(asConstruction(T)->properties->variableProperties, V)
-#define NAMED_PROPERTIES(T) (asConstruction(T)->properties->namedProperties)
-#define VARIABLE_PROPERTIES(T) (asConstruction(T)->properties->variableProperties)
+#define PROPERTY(C,T,P) DPROPERTY(C, asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
+#define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->namedProperties, GLOBAL(C,N))
+#define VARIABLE_PROPERTY(T,V)  c_variableProperty(asConstruction(T)->variableProperties, V)
+#define NAMED_PROPERTIES(T) (asConstruction(T)->namedProperties)
+#define VARIABLE_PROPERTIES(T) (asConstruction(T)->variableProperties)
 
 static inline Term c_deref(Term *p) { return (p ? *p : (Term)0); }
 
@@ -472,18 +478,25 @@ struct _Term
 //
 #define LINK_COUNT(T) ((T)->nr)
 #define LINK(C,T) linkTerm(C, T)
-extern Term linkTerm(Context context, Term term);
 
 #define UNLINKSET(CONTEXT,T,V) ((--LINK_COUNT(T) ? T : freeTerm(CONTEXT,T)), (T)=V)
 #define UNLINK(CONTEXT, T) (T=unlinkTerm(CONTEXT,T))
 #define UNLINK_SUB(CONTEXT, T, I) UNLINK(CONTEXT, SUB(T, I))
+
 extern void freeTerm(Context context, Term term);
+
+static inline Term linkTerm(Context context, Term t)
+{
+    assert(t->nr > 0);
+    t->nr ++;
+    return t;
+}
 
 static inline Term unlinkTerm(Context context, Term t)
 {
     assert(t->nr > 0);
 
-    if ((--LINK_COUNT(t)) == 0)
+    if (--t->nr == 0)
     {
         freeTerm(context,t);
         return NULL;
@@ -506,8 +519,10 @@ struct _Construction
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
 
-    Properties properties;
+    NamedPropertyLink namedProperties;       // named properties. (may be null)
+    VariablePropertyLink variableProperties; // variable properties. (may be null)
 
+    // Keep all free variable sets separated in order to maximize reuse, and minimize merging.
     Hashset fvs;  // free variables known to occur in subterms only (excluding properties)
     Hashset nfvs; // free variables known to occur in named properties (on this construction AND subterms)
     Hashset vfvs; // free variables known to occur in variable properties (on this construction AND subterms)
@@ -560,22 +575,16 @@ struct _ConstructionDescriptor
 #define CRSX_CHECK_SORT(CONTEXT,T,SORT) noop()
 
 // Casting helpers.
-//static inline VariableUse asVariableUse(Term term) { return (VariableUse) term; }
 #define asVariableUse(term) ((VariableUse) term)
-//static inline Construction asConstruction(Term term) { return (Construction) term; }
 #define asConstruction(term) ((Construction) term)
-//static inline Literal asLiteral(Term term) { return (Literal) term; }
 #define asLiteral(term) ((Literal) term)
 
 // Construction helpers.
-//static inline char *c_name(Construction c) {ConstructionDescriptor d = c->term.descriptor; return d->name(&(c->term)); }
 #define c_name(c)      (c->term.descriptor->name(&(c->term)))
 // Does *not* create a new reference
 #define c_subp(c,i)    (&(c->sub[i]))
 
-//static inline Variable *c_binders(Construction c, int i) { ConstructionDescriptor d = c->term.descriptor; int a = d->arity; Variable *bs = (Variable *) &(c->sub[a]); return &(bs[d->binderoffset[i]]); }
 #define c_binders(c,i) (&(((Variable *) &(c->sub[c->term.descriptor->arity]))[c->term.descriptor->binderoffset[i]]))
-//static inline int c_rank(Construction c, int i) { ConstructionDescriptor d = c->term.descriptor; return (d->binderoffset[i+1] - d->binderoffset[i]); }
 #define c_rank(c,i)    (c->term.descriptor->binderoffset[i+1] - c->term.descriptor->binderoffset[i])
 
 // Constant descriptors used for literals.
@@ -683,8 +692,8 @@ static inline Variable useVariable(Context context, Variable variable)
  */
 static inline void unuseVariable(Context context, Variable variable)
 {
-//    assert(variable->nr > 0);
-//    assert(variable->uses > 0);
+    assert(variable->nr > 0);
+    assert(variable->uses > 0);
     variable->uses --;
 }
 
@@ -774,7 +783,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 #define LITERALF(sink,...) LITERALU(sink,ALLOCATENF((sink)->context, (size_t) LITERALF_SIZE_LIMIT, __VA_ARGS__))
 #define LITERALNF(sink,maxsize,...) LITERALU(sink, ALLOCATENF((sink)->context, maxsize, __VA_ARGS__))
 
-#define ADD_PROPERTIES(sink,namedFVs,varFVs,namedProperties,variableProperties) ((Sink)(sink))->properties(sink,namedFVs,varFVs,namedProperties,variableProperties)
+#define ADD_PROPERTIES(sink,namedProperties,variableProperties) ((Sink)(sink))->properties(sink,namedProperties,variableProperties)
 #define ADD_PROPERTY_REF(sink,construction) ((Sink)(sink))->propertyRef(sink, asConstruction(construction))
 #define ADD_PROPERTY(sink,P,value) (IS_VARIABLE_USE(P) ? ADD_PROPERTY_VARIABLE(sink, linkVariable(sink->context, VARIABLE(P)), value) : ADD_PROPERTY_NAMED(sink, SYMBOL(P), value))
 #define ADD_PROPERTY_NAMED(sink,name,value) ((Sink)(sink))->propertyNamed(sink, name, value)
@@ -799,7 +808,7 @@ struct _Sink
     Sink (*copy)(Sink sink, Term term); // copy term as event(s)
 
     Sink (*propertyRef)(Sink sink, Construction construction); // base properties for next START
-    Sink (*properties)(Sink sink, VARIABLESET namedFVs, VARIABLESET varFVs, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
+    Sink (*properties)(Sink sink, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
 
     Sink (*propertyNamed)(Sink sink, const char *name, Term term); // add named property to next START
     Sink (*propertyVariable)(Sink sink, Variable variable, Term term); // add variable property to next START. Variable reference is transferred.
@@ -822,9 +831,6 @@ struct _Buffer
     int lastTop; // index of top entry (in last segment) or <0 when empty
     NamedPropertyLink pendingNamedProperties; // named properties for next START (NOTE: cannot be shared). Buffer owns ref.
     VariablePropertyLink pendingVariableProperties; // variable properties for next START (NOTE: cannot be shared). Buffer owns ref.
-
-    VARIABLESET pendingNamedPropertiesFreeVars; // Free variables to insert before a batch of new named properties. Buffer owns ref.
-    VARIABLESET pendingVariablePropertiesFreeVars; // Free variables to insert before a batch of new variable properties. Buffer owns ref.
 
     unsigned blocking : 1; // whether there is at least one blocking binder
 
@@ -925,30 +931,30 @@ static inline Term c_property(Context context, NamedPropertyLink namedProperties
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
 
-struct _Properties
-{
-    VARIABLESET namedFreeVars;               // set of free variables in named properties (unless all properties are closed)
-    VARIABLESET variableFreeVars;            // set of free variables in variable properties (never closed)
-    NamedPropertyLink namedProperties;       // named properties.
-    VariablePropertyLink variableProperties; // variable properties.
-    ssize_t nr;
-};
-
-Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
-                               NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
-Properties linkProperties(Context context, Properties env);
-Properties unlinkProperties(Context context, Properties env);
-
-/** Set properties. Allocation new Properties is props is noProperties */
-Properties setProperties(Context context, Properties props, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
-
-
-Properties setNamedFreeVars(Context context, Properties props, VARIABLESET namedFreeVars);
-Properties setVariableFreeVars(Context context, Properties props, VARIABLESET variableFreeVars);
-Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
-Properties setNamedProperties(Context context, Properties props, NamedPropertyLink namedProperties);
-Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
-
+//struct _Properties
+//{
+//    VARIABLESET namedFreeVars;               // set of free variables in named properties (unless all properties are closed)
+//    VARIABLESET variableFreeVars;            // set of free variables in variable properties (never closed)
+//    NamedPropertyLink namedProperties;       // named properties.
+//    VariablePropertyLink variableProperties; // variable properties.
+//    ssize_t nr;
+//};
+//
+//Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
+//                               NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
+//Properties linkProperties(Context context, Properties env);
+//Properties unlinkProperties(Context context, Properties env);
+//
+///** Set properties. Allocation new Properties is props is noProperties */
+//Properties setProperties(Context context, Properties props, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
+//
+//
+//Properties setNamedFreeVars(Context context, Properties props, VARIABLESET namedFreeVars);
+//Properties setVariableFreeVars(Context context, Properties props, VARIABLESET variableFreeVars);
+//Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
+//Properties setNamedProperties(Context context, Properties props, NamedPropertyLink namedProperties);
+//Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
+//
 
 struct _NamedPropertyLink
 {
@@ -963,21 +969,39 @@ struct _NamedPropertyLink
 #endif
     int count;
     int nr;
+    Hashset fvs;
 };
 
-extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink);
+// Make a new named property link.
+// All references (term, nlink and fvs) are transferred.
+extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink, Hashset fvs, int index);
 
-extern NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link);
+static inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link)
+{
+    if (link)
+        link->nr++;
 
-// Property list is not closed when the first element is a list of free variable
-#define IS_PROPERTY_CLOSED(P) ((P)->name != NULL)
+    return link;
+}
 
-extern NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link);
+extern void freeNamedPropertyLink(Context context, NamedPropertyLink link);
+
+static inline NamedPropertyLink UNLINK_NamedPropertyLink(Context context, NamedPropertyLink link)
+{
+    if (link)
+    {
+        if (--link->nr == 0)
+        {
+             freeNamedPropertyLink(context, link);
+             return NULL;
+        }
+    }
+    return link;
+}
 
 struct _VariablePropertyLink
 {
     VariablePropertyLink link;
-    int nr;
     Variable variable;
     union {
         Term term; // when variable != NULL
@@ -986,7 +1010,12 @@ struct _VariablePropertyLink
 #ifdef CRSX_ENABLE_PROFILING
     size_t marker; // counter helper for graph traversal.
 #endif
+    int count;
+    int nr;
+    Hashset fvs;
 };
+
+extern void freeVariablePropertyLink(Context context, VariablePropertyLink link);
 
 static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, VariablePropertyLink link)
 {
@@ -994,9 +1023,20 @@ static inline VariablePropertyLink LINK_VariablePropertyLink(Context context, Va
         ++(link->nr);
     return link;
 };
-#define UNLINKSET_VariablePropertyLink(CONTEXT,L,V) (({if (L) --(L)->nr;}), L=V)
 
-extern VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link);
+static inline VariablePropertyLink UNLINK_VariablePropertyLink(Context context, VariablePropertyLink link)
+{
+    if (link)
+    {
+        if (--link->nr == 0)
+        {
+            freeVariablePropertyLink(context, link);
+            return NULL;
+        }
+    }
+    return link;
+}
+
 
 #define ASSERT_VARIABLE_PROPERTIES(context, properties) \
 ASSERT(context, (!context->fv_enabled || ((properties->variableProperties && properties->variableFreeVars) || (! properties->variableProperties &&  ! properties->variableFreeVars))));
@@ -1089,21 +1129,20 @@ extern void printfL(Context context, FILE* out, VariableSetLink set);
 
 struct _Hashset {
     unsigned nr;
+    unsigned nbits;
 #ifdef CRSX_ENABLE_PROFILING
     size_t marker;
 #endif
-
-    size_t capacity;
-    size_t *items;
     size_t nitems;
+    size_t* items;
 };
 
-// Allocation variable set. Capacity must be n^2
-extern Hashset makeHS(Context context, size_t capacity);
-// Free variable set.
-extern void freeHS(Context context, Hashset set);
+// Allocation variable set.
+extern Hashset makeHS(Context context, unsigned nbits);
+// Free variable set. Try to put it in the pool if requested.
+extern void freeHS(Context context, Hashset set, int pool);
 // Copy variable set.
-extern Hashset copyHS(Context context, Hashset set, size_t capacity);
+extern Hashset copyHS(Context context, Hashset set, unsigned nbits);
 // Add variable reference to set. Create new set if needed.
 extern Hashset addVariableHS(Context context, Hashset set, Variable variable);
 // Remove variable from set. 'set' reference is transferred.
@@ -1121,6 +1160,8 @@ extern Hashset clearHS(Context context, Hashset set);
 // Enumerate set as old-fashioned VariableSet
 extern void addVariablesOfHS(Context context, VariableSet vars, Hashset set, int constrained, VariablePropertyLink props);
 // Print out set
+extern void pHS(Context context, Hashset set);
+// Print out set
 extern void printfHS(Context context, FILE* out, Hashset set);
 
 static inline Hashset LINK_Hashset(Context context, Hashset set)
@@ -1137,7 +1178,7 @@ static inline Hashset UNLINK_Hashset(Context context, Hashset set)
         assert(set->nr > 0);
         if (--set->nr == 0)
         {
-            freeHS(context, set);
+            freeHS(context, set, 1);
             return NULL;
         }
     }
@@ -1161,6 +1202,26 @@ struct _LinkedList2 {
     LinkedList2 next;
 };
 
+    
+// Hashset2 iterator state
+typedef struct _Iterator2 *Iterator2;
+struct _Iterator2
+{
+    Hashset2 set;   // The set
+    size_t index; // current table index
+    LinkedList2 slot; // Current slot.
+};
+    
+// Get current key. No ref transfer
+extern const void* getKeyIHS2(Iterator2 iter);
+// Get current value. No ref transfer
+extern void* getValueIHS2(Iterator2 iter);
+// Move to next entry. Returns true if has next.
+extern int nextIHS2(Iterator2 iter);
+// Release iterator.
+extern void freeIHS2(Context context, Iterator2 iter);
+
+    
 struct _Hashset2
 {
     int nr;
@@ -1193,6 +1254,8 @@ extern int containsHS2(Hashset2 set, const void* key);
 extern Hashset2 clearHS2(Context context, Hashset2 set);
 // Convert to array. Don't copy entries (treat as read-only)
 extern Pair* toArrayHS2(Context context, Hashset2 set);
+// Creates an iterator over the set
+extern Iterator2 iteratorHS2(Context context, Hashset2 set);
 // Print out HS2
 extern void printPropsHS2(Context context, Hashset2 set);
 
@@ -1202,6 +1265,7 @@ extern size_t hashPtr(const void* entry);
 int equalsChars(const void* left, const void* right);
 size_t hashChars(const void* key);
 
+    
 // Link-list based map
 
 struct _VariableMap

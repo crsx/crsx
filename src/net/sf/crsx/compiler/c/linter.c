@@ -101,7 +101,7 @@ static int lintTerm(LintContext context, Term parent, unsigned index, Term term,
         // Check properties
         {
             NamedPropertyLink link;
-            for (link = construction->properties->namedProperties; link; link = link->link)
+            for (link = construction->namedProperties; link; link = link->link)
             {
                 if (link->nr <= 0)
                     return error(parent, index, term, ERROR_NO_REFERENCE, report); // TODO: improve
@@ -123,7 +123,7 @@ static int lintTerm(LintContext context, Term parent, unsigned index, Term term,
 
         {
             VariablePropertyLink link;
-            for (link = construction->properties->variableProperties; link; link = link->link)
+            for (link = construction->variableProperties; link; link = link->link)
             {
                 if (link->nr <= 0)
                     return error(parent, index, term, ERROR_NO_REFERENCE, report); // TODO: improve
