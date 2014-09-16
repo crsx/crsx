@@ -924,8 +924,8 @@ TOKEN :
 	< METAVARIABLE : <METAVARIABLE_PREFIX> (<CONNECTOR> <PART>)* > |
 
     < #LINEAR : "&sup1;" | "\u00B9" > |
-    < #BLOCKING : "ᵇ" > |
-    < #SHALLOW : "ˢ" > |
+    < #BLOCKING : "\u1d47" > |
+    < #SHALLOW : "\u02e2" > |
 
     < QUOTED_VARIABLE : (<LINEAR>)? ("v" <STRING>) > |
     < QUOTED_METAVARIABLE : "#" <STRING> > |
