@@ -22,42 +22,6 @@
 
 #endif
 
-typedef struct _ProfMetaSubstitute *ProfMetaSubstitute;
-
-struct _ProfMetaSubstitute {
-  char** backtrace;
-  unsigned backtraceSize;
-  unsigned size;
-  unsigned termSize;
-  unsigned envSize;
-  char* term;
-  unsigned nf; // Whether the term is NF
-  long memuse; // memory use for the substitution
-  ProfMetaSubstitute next;
-};
-
-
-typedef struct _ProfBufferCopy *ProfBufferCopy;
-
-struct _ProfBufferCopy {
-  char** backtrace;
-  unsigned backtraceSize;
-  unsigned size;
-  ProfBufferCopy next;
-};
-
-typedef struct _ProfFunctionEntry *ProfFunctionEntry;
-
-struct _ProfFunctionEntry {
-  char* name;
-  // TODO: merge backtrace.
-  //char** backtrace;
-  //unsigned backtraceSize;
-  unsigned metaCount; // Number of meta substitution
-  long metaMemuse; // metasubstution memuse
-  unsigned count; // number of time function has been called
-};
-
 extern void crsxpInit(Context context);
 extern void crsxpDestroy(Context context);
 
@@ -109,8 +73,6 @@ void crsxpMakeConstruction(Context context);
 void crsxpFreeConstruction(Context context);
 
 extern void printProfiling(Context context);
-extern void printMetasubstituteRecord(Context context, ProfMetaSubstitute c);
-extern void profAddStepFunction(Context context, char* functionName);
 extern void pIncMetaCountFunction(Context context, char* functionName, long memuse);
 
 

@@ -42,7 +42,7 @@ void enableProfiling(Context context)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-// Variable allocation.
+// Variable allocation and utilities
 
 Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int block, unsigned int shallow)
 {
@@ -122,6 +122,19 @@ VariableUse makeVariableUse(Context context, Variable variable)
 
 
     return use;
+}
+
+// Returns 1 when the variable array contains at least one blocking binder.
+static inline
+int hasBlockingBinders(Variable* binders, int size)
+{
+    int i;
+    for (i = 0; i < size; ++i)
+    {
+        if (binders[i]->block)
+            return 1;
+    }
+    return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -387,24 +400,18 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
 
     construction->namedProperties = buffer->pendingNamedProperties; // Transfer ref.
     construction->variableProperties = buffer->pendingVariableProperties; // Transfer ref
-//
-//    construction->fvs = NULL; // Will be computed when propagateFreeVar is called.
-//    construction->nfvs = buffer->pendingNamedPropertiesFreeVars; // Transfer ref
-//    construction->vfvs = buffer->pendingVariablePropertiesFreeVars; // Transfer ref
 
     construction->nf = 0;
-    construction->nostep = buffer->blocking; // no normalization if at least one blocking binder
-    //construction->nostep = 0; // no normalization if at least one blocking binder
+    construction->nostep = 0;
+    construction->blocked = buffer->blocking; // block normalization if at least one blocking binder
 
     // term->sub and term->binders will be populated incrementally.
     bufferPush(buffer, (Term) construction); // suspend current construction in favor of children
-    // Setup fresh context for first child.
 
+    // Setup fresh context for first child.
     buffer->blocking = 0;
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
-//    buffer->pendingNamedPropertiesFreeVars = NULL;
-//    buffer->pendingVariablePropertiesFreeVars = NULL;
     return sink;
 }
 
@@ -441,7 +448,8 @@ Sink bufferEnd(Sink sink, ConstructionDescriptor descriptor)
     }
     else
     {
-        asConstruction(childTerm)->nostep = 0;
+        // This is done in BufferStart
+        //asConstruction(childTerm)->nostep = 0;
     }
 
     // Propagate free variable onto childTerm.
@@ -453,8 +461,6 @@ Sink bufferEnd(Sink sink, ConstructionDescriptor descriptor)
     // Fresh context for next child.
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
-//    buffer->pendingVariablePropertiesFreeVars = NULL;
-//    buffer->pendingNamedPropertiesFreeVars = NULL;
 
     return sink;
 }
@@ -489,6 +495,7 @@ Sink bufferUse(Sink sink, Variable variable)
     bufferInsert(buffer, (Term) use);
 
     // Fresh context for next child.
+    buffer->blocking = 0;
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
     return sink;
@@ -512,27 +519,73 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
     ASSERT(context, 0 <= index && index < ARITY(term));
     ASSERT(context, size == RANK(term,index));
 
-    unsigned int notrack = 1;
     buffer->blocking = 0;
     int i;
     for (i = 0; i < size; ++i)
     {
         Variable b = binds[i];
-        BINDER(term,index,i) = b; // No need to link variables. Also binders are not considered used.
+        BINDER(term, index, i) = b; // No need to link variables. Also binders are not considered used.
+
+        // Block normalization when there is at least one blocking binder.
         buffer->blocking |= b->block;
 
-        notrack &= b->block & b->shallow;
+        // Also if this binder is blocking and shallow, then don't track it as it will stay shallow.
+        if (context->fv_enabled && b->block && b->shallow)
+            b->track = 0;
     }
-
-    if (context->fv_enabled && notrack) // full meta-substitute won't be called, so don't track these binders
-        for (i = 0; i < size; ++i)
-            binds[i]->track = 0;
 
     return sink;
 }
 
 static
 void bufferMergeProperties(Context context, Buffer buffer, Construction c);
+
+// Send a copy of the ith sub to sink. Rename binders.
+static void copySub(Sink sink, Term term, int i)
+{
+    const int rank = RANK(term, i);
+    const Context context = sink->context;
+
+    if (rank == 0)
+    {
+        // --  i'th subterm with no binders: just copy
+        COPY(sink, LINK(context, SUB(term, i)));
+    }
+    else
+    {
+        // Rename binders and substitute..
+        Variable *oldBinders = BINDERS(term, i);
+        Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
+        VariableUse subUses[rank]; // does not escape
+        struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+        SubstitutionFrame subSubstitution = &_subSubstitution;
+
+        // --- populate per binder
+        int j;
+        for (j = 0; j < rank; ++j)
+        {
+            char *oldname = oldBinders[j]->name;
+            char *baseendp = strrchr(oldname, '_');
+            char *basename = oldname;
+            if (baseendp)
+            {
+                const int z = baseendp - oldname;
+                basename = ALLOCA(context, z+1); // does not escape
+                memcpy(basename, oldname, z);
+                basename[z] = '\0';
+            }
+            int isLinear = IS_LINEAR(oldBinders[j]);
+            subBinders[j] = makeVariable(context, oldBinders[j]->name, 1, isLinear, oldBinders[j]->block, oldBinders[j]->shallow); // escapes
+            subUses[j] = makeVariableUse(context, linkVariable(context, subBinders[j])); // escapes
+        }
+
+        // --- send new binders
+        BINDS(sink, rank, subBinders); // escape of subBinders. Variable references are transfered.
+        //FREE(context, subBinders) (no need: allocated on the stack). Variable references have been transferred.
+        // --- now process subterm!
+        metaSubstitute(sink, LINK(context, SUB(term, i)), subSubstitution);
+    }
+}
 
 Sink bufferCopy(Sink sink, Term term) // Transfer ref
 {
@@ -542,21 +595,18 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
     Buffer buffer = (Buffer) sink;
     const Context context = sink->context;
 
-    // If no properties just share!
+    // If no properties and blocking condition matches, then just share!
     if (IS_VARIABLE_USE(term)
             || (buffer->pendingNamedProperties == asConstruction(term)->namedProperties
                     && buffer->pendingVariableProperties == asConstruction(term)->variableProperties
+                    && buffer->blocking == asConstruction(term)->blocked
                ))
     {
         UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
         buffer->pendingNamedProperties = NULL;
         UNLINK_VariablePropertyLink(context, buffer->pendingVariableProperties);
         buffer->pendingVariableProperties = NULL;
-
-//        UNLINK_Hashset(context, buffer->pendingNamedPropertiesFreeVars);
-//        buffer->pendingNamedPropertiesFreeVars = NULL;
-//        UNLINK_Hashset(context, buffer->pendingVariablePropertiesFreeVars);
-//        buffer->pendingVariablePropertiesFreeVars = NULL;
+        buffer->blocking = 0;
 
         bufferInsert(buffer, term);
         return sink;
@@ -574,6 +624,8 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
         // Reuse original term (with updated properties).
         bufferMergeProperties(context, buffer, c);
         bufferInsert(buffer, term);
+
+        c->blocked = buffer->blocking;
     }
     else
     {
@@ -589,17 +641,10 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
             VariablePropertyLink variableLink = buffer->pendingVariableProperties;
             buffer->pendingVariableProperties = LINK_VariablePropertyLink(context, c->variableProperties);
 
-//            Hashset fvNamedLink = buffer->pendingNamedPropertiesFreeVars;
-//            buffer->pendingNamedPropertiesFreeVars = LINK_Hashset(context, c->namedProperties ? c->namedProperties->fvs : NULL);
-//            Hashset fvVariableLink = buffer->pendingVariablePropertiesFreeVars;
-//            buffer->pendingVariablePropertiesFreeVars = LINK_Hashset(context, c->variableProperties ? c->variableProperties->fvs : NULL);
-
             sink->start(sink, c->term.descriptor);
 
             buffer->pendingNamedProperties = namedLink;
             buffer->pendingVariableProperties = variableLink;
-//            buffer->pendingNamedPropertiesFreeVars = fvNamedLink;
-//            buffer->pendingVariablePropertiesFreeVars = fvVariableLink;
 
             bufferMergeProperties(context, buffer, asConstruction(bufferTop(buffer)->term));
 
@@ -654,6 +699,7 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
         UNLINK(context, term);
     }
 
+    buffer->blocking = 0;
     ASSERT(context, !buffer->pendingNamedProperties);
     ASSERT(context, !buffer->pendingVariableProperties);
 
@@ -691,11 +737,6 @@ Sink bufferProperties(Sink sink, NamedPropertyLink namedProperties, VariableProp
 
     buffer->pendingNamedProperties = namedProperties;
     buffer->pendingVariableProperties = variableProperties;
-
-//    buffer->pendingNamedPropertiesFreeVars =  namedProperties ? LINK_Hashset(context, namedProperties->fvs) : NULL;
-//    buffer->pendingVariablePropertiesFreeVars = variableProperties ? LINK_Hashset(context, variableProperties->fvs) : NULL;
-//
-//    ASSERT(context, (!context->fv_enabled || (variableProperties && buffer->pendingVariablePropertiesFreeVars) || (!variableProperties && !buffer->pendingVariablePropertiesFreeVars)));
 
     return sink;
 }
@@ -772,12 +813,6 @@ Sink bufferPropertiesReset(Sink sink)
     buffer->pendingNamedProperties = NULL;
     UNLINK_VariablePropertyLink(sink->context, buffer->pendingVariableProperties);
     buffer->pendingVariableProperties = NULL;
-//
-//    UNLINK_VARIABLESET(sink->context, buffer->pendingNamedPropertiesFreeVars);
-//    buffer->pendingNamedPropertiesFreeVars = NULL;
-//
-//    UNLINK_VARIABLESET(sink->context, buffer->pendingVariablePropertiesFreeVars);
-//    buffer->pendingVariablePropertiesFreeVars = NULL;
 
     return sink;
 }
@@ -822,8 +857,6 @@ Sink initBuffer(Context context, Buffer buffer)
 
     buffer->pendingNamedProperties = NULL;
     buffer->pendingVariableProperties = NULL;
-//    buffer->pendingNamedPropertiesFreeVars = NULL;
-//    buffer->pendingVariablePropertiesFreeVars = NULL;
 
     buffer->blocking = 0;
     // Return as sink for reception...
@@ -858,8 +891,6 @@ void freeBuffer(Sink sink)
         buffer->term = NULL;
         buffer->pendingNamedProperties = NULL;
         buffer->pendingVariableProperties = NULL;
-//        buffer->pendingNamedPropertiesFreeVars = NULL;
- //       buffer->pendingVariablePropertiesFreeVars = NULL;
         buffer->blocking = 0;
     }
     else
@@ -2476,7 +2507,7 @@ void *crsx_allocate(Context context, size_t size)
 #   ifdef DEBUG
     ++allocateCount;
     if (allocateCount % 1000000L == 0L)
-        DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount);
+        DEBUGENV("trace", DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount));
 #   endif
     return p;
 }
@@ -2488,7 +2519,7 @@ void *crsx_callocate(Context context, size_t size)
 #   ifdef DEBUG
     ++allocateCount;
     if (allocateCount % 1000000L == 0L)
-        DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount);
+        DEBUGENV("trace", DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount));
 #   endif
     return p;
 }
@@ -3283,8 +3314,8 @@ void normalize(Context context, Term *termp)
     // Work term.
 #ifdef DEBUG
     Term topTerm = *termp;
-    DEBUGF(context, "//%*sNORMALIZING\n", stepNesting+1, "");
-    DEBUGT(context, stepNesting+3, topTerm);
+    DEBUGENV("trace", DEBUGF(context, "//%*sNORMALIZING\n", stepNesting+1, ""));
+    DEBUGENV("trace", DEBUGT(context, stepNesting+3, topTerm));
 #endif
 
     if (IS_NF(*termp))
@@ -3337,7 +3368,7 @@ void normalize(Context context, Term *termp)
                 }
             }
         }
-        else if (IS_FUNCTION(term) && ! IS_NOSTEP(term))
+        else if (IS_FUNCTION(term) && ! IS_NOSTEP(term) && !IS_BLOCKED(term))
         {
             Sink sink = ALLOCA_BUFFER(context);
             if (step(sink, term)) // Reference is transferred and consumed only when step succeeds
@@ -3419,16 +3450,13 @@ static int step(Sink sink, Term term)
 
     crsxpBeforeStep(sink->context, term);
 
-    ///PRINTF(sink->context, "STEP<%s>\n", SYMBOL(term));
-    DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), check(sink->context, term), allocateCount, freeCount);
+    DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+4, term));
     DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP-INTERNALS(%ld): (%ld,%ld)\n", stepNesting, "", count, allocateCount, freeCount));
-    //DEBUGF(sink->context, "//%*sREDEX:", stepNesting, "");
-    //DEBUGT(sink->context, stepNesting+3, term);
 
     int step = term->descriptor->step(sink, term);
 
-    DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount);
+    DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
 
     crsxpAfterStep(sink->context);
 
@@ -3474,8 +3502,8 @@ Term compute(Context context, Term term)
     crsxReleasePools(context);
 
 #ifdef DEBUG
-    DEBUGF(context, "END COMPUTE");
-    DEBUGT(context, 1, term);
+    DEBUGENV("trace", DEBUGF(context, "END COMPUTE"));
+    DEBUGENV("trace", DEBUGT(context, 1, term));
 #endif
 
     return term;
@@ -3483,10 +3511,10 @@ Term compute(Context context, Term term)
 
 
 /////////////////////////////////////////////////////////////////////////////////
-// Shallow Substitution
+// Shallow metasubstitution
 //
 
-void call(Sink sink, Term term, SubstitutionFrame values)
+void shallowMetaSubstitute(Sink sink, Term term, SubstitutionFrame values)
 {
     ASSERT(sink->context, !values->parent);
 
@@ -3521,11 +3549,17 @@ void call(Sink sink, Term term, SubstitutionFrame values)
                         break;
                     }
                 }
+                if (!bound)
+                    COPY(sink, LINK(context, sub)); // Just copy variable
             }
-            if (!bound)
-                COPY(sink, LINK(context, sub));
+            else
+            {
+                // Construction
+                copySub(sink, term, i); // Copy sub and take care of renamings.
+            }
         }
 
+        // If this just renaming binders, then still block reduction.
         if (values->renamings != RENAME_ALL)
             asConstruction(bufferTop((Buffer) sink))->nostep = 0;
 
@@ -3536,8 +3570,9 @@ void call(Sink sink, Term term, SubstitutionFrame values)
         int i;
         for (i = 0; i < arity; ++i)
         {
+            int rank = RANK(term, i);
             Term sub = SUB(term, i);
-            if (IS_VARIABLE_USE(sub))
+            if (rank == 0 && IS_VARIABLE_USE(sub))
             {
                 Variable v = VARIABLE(sub);
                 int j;
@@ -3559,6 +3594,13 @@ void call(Sink sink, Term term, SubstitutionFrame values)
 
         if (values->renamings != RENAME_ALL)
             asConstruction(term)->nostep = 0;
+
+        // Update nf field of construction.
+        int nf = IS_DATA(term) ? 1 : 0;
+        for (i = 0; nf && i < arity; ++i)
+            if (! IS_NF(SUB(term, i)))
+                nf = 0;
+        asConstruction(term)->nf = nf;
 
         COPY(sink, term);
     }
@@ -3599,45 +3641,47 @@ long metaSubstituteWork;
 
 
 // Forward declarations
-static void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep);
-static void metaSubstituteProperties(Sink sink, Construction construction, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhaustedp, BitSetP unweakened, long *metaSubstituteSizep);
-static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionFrame substitution, VariableSetLink pendingWeakenings, int substitutionCount, BitSetP unexhaustedp, BitSetP unweakened, long *metaSubstituteSizep);
+static void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, int substitutionCount,
+        BitSetP unexhausted, BitSetP unweakened, unsigned int depth, long *metaSubstituteSizep);
+
+static void metaSubstituteProperties(Sink sink, Construction construction, SubstitutionFrame substitution, int substitutionCount,
+        BitSetP unexhaustedp, BitSetP unweakened, long *metaSubstituteSizep);
+
+static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionFrame substitution, int substitutionCount,
+        BitSetP unexhaustedp, BitSetP unweakened, unsigned int depth, unsigned int blocking, long *metaSubstituteSizep);
 
 void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 {
     ASSERT(sink->context, term->nr > 0);
     assert(!substitution || (substitution && !substitution->parent));
+
     const int substitutionCount = (substitution ? substitution->parentCount + substitution->count : 0);
+    const Buffer buffer = (Buffer) sink;
 
     // When all substituted variables are (statically) shallow and blocking
-    // then use lightweight substitution.
-    if (IS_CONSTRUCTION(term))
-    {
-        unsigned int lightweight = 1;
-        int i;
-        for (i = 0; i < substitutionCount; ++i)
-            lightweight &= substitution->variables[i]->block & substitution->variables[i]->shallow;
-
-        if (lightweight)
-            return call(sink, term, substitution);
-    }
+    // use shallow substitution.
+    // Variables have to be blocking, otherwise the shallow property is not satisfy.
+    // TODO: maybe not worthwhile since meta-substitute now clear bits of non-tracked variables.
+    // TODO: and it needs more testing, in particular w.r.t properties
+//    if (IS_CONSTRUCTION(term))
+//    {
+//        unsigned int shallow = 1;
+//        int i;
+//        for (i = 0; i < substitutionCount; ++i)
+//            shallow &= substitution->variables[i]->block & substitution->variables[i]->shallow;
+//
+//        if (shallow)
+//            return shallowMetaSubstitute(sink, term, substitution);
+//    }
 
     // Prepare helper bitsets.
-
     BitSet unexhausted; MAKE_SET_LBITS(sink->context, &unexhausted, substitutionCount);
     BitSet unweakened; MAKE_SET_LBITS(sink->context, &unweakened, substitutionCount);
     long metaSubstituteSize = 0l;
 
-# ifdef DEBUG
-    unsigned envsize = 0;
-    long termMemuse = 0;
-    int size = checkTerm3(sink->context, term, 0, 0,&envsize, &termMemuse);
-    metaSubstituteWork = 0l;
-# endif
-
     crsxpBeforeSubstitution(sink->context, term);
 
-    metaSubstituteTermUpdate(sink->context, &term, substitution, NULL, substitutionCount, &unexhausted, &unweakened, &metaSubstituteSize);
+    metaSubstituteTermUpdate(sink->context, &term, substitution, substitutionCount, &unexhausted, &unweakened, 0, buffer->blocking, &metaSubstituteSize);
     COPY(sink, term);
 
     CHECK_METASUBSTITUTE_SIZE(sink->context, metaSubstituteSize);
@@ -3665,7 +3709,8 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
  *
  **/
 static
-void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep)
+void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, int substitutionCount,
+        BitSetP unexhausted, BitSetP unweakened, unsigned int depth, long *metaSubstituteSizep)
 {
     ++(*metaSubstituteSizep);
 
@@ -3709,7 +3754,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
     {
         Construction construction = asConstruction(term);
 
-        // Add weakenings.
+        // Clear non-occurring free variables.
         BitSet localUnweakened;
         COPY_LBITS(context, &localUnweakened, substitutionCount, unweakened);
 
@@ -3723,7 +3768,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 for (i = 0; i < s->count; ++i)
                 {
                     Variable v = s->variables[i];
-                    if (!VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v))
+                    if ((!v->track && depth == 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
                     {
                         // - Variable we are substituting is not in the free var set: remove from bitmap!
                         CLEAR_LBIT(&localUnweakened, offset+i);
@@ -3775,7 +3820,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 // --  i'th subterm with no binders: just continue copying.
                 BitSet localUnweakenedC2;
                 COPY_LBITS(context, &localUnweakenedC2, substitutionCount, &localUnweakened);
-                metaSubstituteTerm(sink, LINK(context, SUB(term, i)), substitution, substitutionCount, unexhausted, &localUnweakenedC2, metaSubstituteSizep);
+                metaSubstituteTerm(sink, LINK(context, SUB(term, i)), substitution, substitutionCount, unexhausted, &localUnweakenedC2, depth + 1, metaSubstituteSizep);
                 FREE_LBITS(context, &localUnweakenedC2);
             }
             else
@@ -3825,7 +3870,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 FREE(context, subBinders);
 
                 // --- now process subterm!
-                metaSubstituteTerm(sink, LINK(context, SUB(term, i)), subSubstitution, subSubstitutionCount, &subUnexhausted, &subUnweakened, metaSubstituteSizep);
+                metaSubstituteTerm(sink, LINK(context, SUB(term, i)), subSubstitution, subSubstitutionCount, &subUnexhausted, &subUnweakened, depth + 1, metaSubstituteSizep);
 
                 // --- (end of scope for subSubstitution, subUnweakened, and subUses)
                 MASK_LBITS(unexhausted, &subUnexhausted);
@@ -3885,7 +3930,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                             for (i = 0; i < s->count; ++i)
                             {
                                 Variable v = s->variables[i];
-                                if (!containsHS(namedLink->fvs, v))
+                                if (v->track && !containsHS(namedLink->fvs, v))
                                 {
                                     // - Variable we are substituting is not in the free var set: remove from bitmap!
                                     CLEAR_LBIT(&localUnweakened, offset+i);
@@ -3919,7 +3964,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                 Sink propertysink = ALLOCA_BUFFER(sink->context);
                 BitSet localUnweakenedC;
                 COPY_LBITS(sink->context, &localUnweakenedC, substitutionCount, &localUnweakened);
-                metaSubstituteTerm(propertysink, LINK(sink->context, namedLink->u.term), substitution, substitutionCount, unexhausted, &localUnweakenedC, metaSubstituteSizep);
+                metaSubstituteTerm(propertysink, LINK(sink->context, namedLink->u.term), substitution, substitutionCount, unexhausted, &localUnweakenedC, 0, metaSubstituteSizep);
                 Term term = BUFFER_TERM(propertysink); // Transfer reference
                 FREE_BUFFER(propertysink);
 
@@ -3937,7 +3982,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                     Sink propertysink = ALLOCA_BUFFER(sink->context);
                     BitSet localUnweakenedC;
                     COPY_LBITS(sink->context, &localUnweakenedC, substitutionCount, &localUnweakened);
-                    metaSubstituteTerm(propertysink, LINK(sink->context, (Term) getValueIHS2(iter)), substitution, substitutionCount, unexhausted, &localUnweakenedC, metaSubstituteSizep);
+                    metaSubstituteTerm(propertysink, LINK(sink->context, (Term) getValueIHS2(iter)), substitution, substitutionCount, unexhausted, &localUnweakenedC, 0, metaSubstituteSizep);
                     Term term = BUFFER_TERM(propertysink); // Transfer reference
                     FREE_BUFFER(propertysink);
                     
@@ -3982,7 +4027,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                         for (i = 0; i < s->count; ++i)
                         {
                             Variable v = s->variables[i];
-                            if (!containsHS(variableLink->fvs, v))
+                            if (v->track && !containsHS(variableLink->fvs, v))
                             {
                                 // - Variable we are substituting is not in the free var set: remove from bitmap!
                                 CLEAR_LBIT(&localUnweakened, offset+i);
@@ -4035,7 +4080,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                     newLink->fvs = NULL;
                     Sink propertysink = ALLOCA_BUFFER(sink->context);
                     BitSet localUnweakenedC; COPY_LBITS(sink->context, &localUnweakenedC, substitutionCount, &localUnweakened);
-                    metaSubstituteTerm(propertysink, LINK(sink->context, variableLink->u.term), substitution, substitutionCount, unexhausted, &localUnweakenedC, metaSubstituteSizep);
+                    metaSubstituteTerm(propertysink, LINK(sink->context, variableLink->u.term), substitution, substitutionCount, unexhausted, &localUnweakenedC, 0, metaSubstituteSizep);
                     newLink->u.term = BUFFER_TERM(propertysink); // Transfer reference
                     FREE_BUFFER(propertysink);
                     pushVariablePropertyLink(variableStack, newLink);
@@ -4087,26 +4132,6 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
         ++(*metaSubstituteSizep);
     }
 
-#ifdef DEBUG
-    else if (copyDepth > 1000) // DEBUGGING
-    {
-        PRINTF(sink->context, "//DeepCopy");
-        SubstitutionFrame s;
-        int offset = 0;
-        for (s = substitution; s; s = s->parent)
-        {
-            int i;
-            for (i = 0; i < s->count; ++i)
-                if (LBIT(unweakened, offset+i))
-                {
-                    PRINTF(sink->context, " %s", s->variables[i]->name);
-                    break;
-                }
-        }
-        PRINTF(sink->context, "\n");
-    }
-#endif
-
     // Now "play" prefix events (backwards!).
     while (!emptyNamedPropertyLinkStack(namedStack))
     {
@@ -4133,16 +4158,17 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
     freeVariablePropertyLinkStack(variableStack);
 }
 
-// Helper: metaSubstituteTermUpdate(context, term, substitution, unexhaustedp, unweakened, renamings, substituteUnexhaustedp, substituteUnweakened)
+// Helper
 //   termp - pointer to the redex fragment that we are updating
 //
-static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionFrame substitution, VariableSetLink pendingWeakenings, int substitutionCount, BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep)
+static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionFrame substitution, int substitutionCount, BitSetP unexhausted,
+        BitSetP unweakened, unsigned int depth, unsigned int blocking, long *metaSubstituteSizep)
 {
     if (LINK_COUNT(*termp) > 1)
     {
         // Can't update term as it's shared. Fallback to copy-mode.
         Sink sink = ALLOCA_BUFFER(context);
-        metaSubstituteTerm(sink, *termp, substitution, substitutionCount, unexhausted, unweakened, metaSubstituteSizep);
+        metaSubstituteTerm(sink, *termp, substitution, substitutionCount, unexhausted, unweakened, depth, metaSubstituteSizep);
         *termp = BUFFER_TERM(sink);
         FREE_BUFFER(sink);
         return;
@@ -4179,8 +4205,9 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
     else // IS_CONSTRUCTION(term)
     {
         Construction construction = asConstruction(*termp);
+        construction->blocked = blocking;
 
-        // - Clear bit set based on weakenings.
+        // - Clear bit set based on free variables.
         BitSet localUnweakened; COPY_LBITS(context, &localUnweakened, substitutionCount, unweakened);
 
         if (context->fv_enabled)
@@ -4193,9 +4220,10 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
                 for (i = 0; i < s->count; ++i)
                 {
                     Variable v = s->variables[i];
-                    if (!VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v))
+                    if ((!v->track && depth == 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
                     {
                         // - Variable we are substituting is not in the free var list: remove from bitmap!
+                        // - Or variable is no tracked (shallow and blocking) and already doing deeper substitution
                         CLEAR_LBIT(&localUnweakened, offset+i);
                     }
                 }
@@ -4237,10 +4265,10 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
             construction->vfvs = NULL;
         }
         
-        VariableSetLink localPendingWeakenings = NULL;
-
         // - send property-less term to buffer (note: no substitution, relies on bufferCopy reference semantics).
+        ((Buffer) sink)->blocking = blocking;; // to make sure copy just add a ref
         COPY(sink, (Term) construction);  // Transfer reference (for term also)
+
         // - overwrite term with the new term with updated properties.
         *termp = BUFFER_TERM(sink);
         // - done with the buffer.
@@ -4249,6 +4277,7 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
         // - now fall back to update the term itself!
         const int arity = (*termp)->descriptor->arity;
         const Term term = *termp;
+
         int i;
         for (i = 0; i < arity; ++i)
         {
@@ -4269,21 +4298,25 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
                         {
                             int j;
                             for (j = 0; j < rank; ++j)
+                            {
                                 if (s->variables[ii] == BINDER(term, i, j))
                                 {
                                     CLEAR_LBIT(&localUnweakened2, offset+ii);
                                     break;
                                 }
+                            }
                         }
                     }
                 }
-                metaSubstituteTermUpdate(context, &SUB(term, i), substitution, localPendingWeakenings, substitutionCount, unexhausted, &localUnweakened2, metaSubstituteSizep);
+                metaSubstituteTermUpdate(context, &SUB(term, i), substitution, substitutionCount, unexhausted,
+                        &localUnweakened2, depth + 1, hasBlockingBinders(BINDERS(term, i), rank), metaSubstituteSizep);
+
                 FREE_LBITS(context, &localUnweakened2);
             }
             else
             {
                 BitSet unweakenedC; COPY_LBITS(context, &unweakenedC, substitutionCount, unweakened);
-                metaSubstituteTermUpdate(context, &SUB(term, i), substitution, localPendingWeakenings, substitutionCount, unexhausted, &unweakenedC, metaSubstituteSizep);
+                metaSubstituteTermUpdate(context, &SUB(term, i), substitution, substitutionCount, unexhausted, &unweakenedC, depth + 1, 0, metaSubstituteSizep);
             }
         }
 
@@ -4292,8 +4325,8 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
         for (i = 0; nf && i < arity; ++i)
             if (! IS_NF(SUB(term, i)))
                 nf = 0;
-        asConstruction(term)->nf = nf;
 
+        asConstruction(term)->nf = nf;
         asConstruction(term)->nostep = 0;
 
         // Propagate free variables up
@@ -5102,7 +5135,7 @@ void ppt(Context context, int nesting, Term term)
     char *depthString = getenv("depth");
     int depth = depthString ? atoi(depthString) : 10;
     int pos = 0;
-    fprintTermTop(context, STDOUT, term, depth, set, NULL, nesting, &pos, getenv("omit-properties") ? 0 : 10, getenv("include-variable-annotations") ? 1 : 0);
+    fprintTermTop(context, STDOUT, term, depth, set, NULL, nesting, &pos, getenv("omit-properties") ? 0 : 10, getenv("include-annotations") ? 1 : 0);
     PRINTF(context, "\n");
     freeVariableSet(set);
     fprintCookies(context);
@@ -5249,6 +5282,15 @@ int fprintVariable(Context context, FILE* out, Variable x)
         //z += FPRINTF(context, out, "%s'", (IS_LINEAR(x) ? "\302\271" : ""));
         z += FPRINTF(context, out, "'");
     }
+#ifdef DEBUG
+    if (getenv("include-annotations"))
+    {
+        if (x->linear)  z+=FPRINTF(context, out, "¹");
+        if (x->block)   z+=FPRINTF(context, out, "ᵇ");
+        if (x->shallow) z+=FPRINTF(context, out, "ˢ");
+    }
+#endif
+
     return z;
 }
 
@@ -5328,7 +5370,16 @@ int fprintSafeVariableName(Context context, FILE* out, Variable v, Hashset2 used
 
         addValueHS2(context, used, (const void*) v, (void*) n);
     }
-    return FPRINTF(context, out, "%s", n);
+    FPRINTF(context, out, "%s", n);
+#ifdef DEBUG
+    if (getenv("include-annotations"))
+    {
+        if (v->linear)  FPRINTF(context, out, "¹");
+        if (v->block)   FPRINTF(context, out, "ᵇ");
+        if (v->shallow) FPRINTF(context, out, "ˢ");
+    }
+#endif
+    return 1;
 }
 
 
@@ -5584,7 +5635,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
             }
             *posp += fprintConstructor(context, out, nm);
 #ifdef DEBUG
-            DEBUGENV("crsx-debug-addresses", FPRINTF(context, out, "{%p}", (void*)term));
+         //   DEBUGENV("crsx-debug-addresses", FPRINTF(context, out, "{%p}", (void*)term));
 ///            if (asConstruction(term)->constant)
 ///                FPRINTF(context, out, "{C}");
 ///            if (asConstruction(term)->ground)
@@ -5595,8 +5646,10 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                     FPRINTF(context, out, "{NF}");
                 if (asConstruction(term)->nostep)
                     FPRINTF(context, out, "{NS}");
+                if (asConstruction(term)->blocked)
+                    FPRINTF(context, out, "{B}");
 
-                FPRINTF(context, out, "{%d}", term->nr);
+                FPRINTF(context, out, "{%ld}", term->nr);
             }
 #endif
             if (arity > 0)
@@ -5743,11 +5796,14 @@ void pfv(Context context, VARIABLESET freeVars)
 /** Print free variable */
 void fprintFreeVars(Context context, FILE* out, VARIABLESET freeVars)
 {
-    if (!VARIABLESET_ISEMPTY(freeVars))
+    if (getenv("free-var-annotation"))
     {
-        FPRINTF(context, out, "<");
-        VARIABLESET_PRINTF(context, out, freeVars);
-        FPRINTF(context, out, ">");
+        if (!VARIABLESET_ISEMPTY(freeVars))
+        {
+            FPRINTF(context, out, "<");
+            VARIABLESET_PRINTF(context, out, freeVars);
+            FPRINTF(context, out, ">");
+        }
     }
 }
 

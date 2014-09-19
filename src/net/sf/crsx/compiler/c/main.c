@@ -3,6 +3,8 @@
 
 /**
  * CRSXC command line.
+ *
+ * Also serve as a generic loader
  */
 
 #include <assert.h>
@@ -12,14 +14,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 #include "linter.h"
 #include "crsx.h"
 
 // Scanner definitions
 extern int readTerm(Sink sink, FILE *input);
 extern int scanTerm(Sink sink, const char* text);
-
 
 static Term
 readTermFromFile (Context context, char* name)
@@ -91,6 +91,7 @@ int printUsage(char* errmsg)
         printf ("Fatal: %s\n", errmsg);
     }
 
+#ifndef GENERIC_LOADER
     printf ("Usage: crsx <command> [<args>]\n\n");
     printf ("The commands are:\n");
     printf ("  compile <header|rules|sorts|symbols|opt1> <rules.dr>   Compile reified rules to c code.\n");
@@ -98,6 +99,17 @@ int printUsage(char* errmsg)
     printf ("or:\n");
     printf ("  key=value...   Invoke raw rulecompiler with this environment setup.\n");
     exit(1);
+#else
+    printf ("Usage: %s [key]... [key=value]...", getenv("execname"));
+    printf ("Where key is any of");
+    printf ("  term=TERM                        input term using term syntax.");
+    printf ("  wrapper=WRAPPER                  a single construction wrapping the input term (if any)");
+    printf ("  crsx-debug-steps                 print term before each step");
+    printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)");
+    printf ("  free-var-annotation              enable free variable annotation");
+    printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.");
+    printf ("Where");
+#endif
 }
 
 static
@@ -147,6 +159,8 @@ int run(void)
     
     return 0;
 }
+
+#ifndef GENERIC_LOADER
 
 static
 int runCompile(int argp, int argc, char* argv[])
@@ -220,6 +234,8 @@ int runLinter(int argp, int argc, char* argv[])
     return 0;
 }
 
+#endif
+
 static void
 crsx_setenv(const char *key, char *value)
 {
@@ -238,6 +254,9 @@ crsx_setenv(const char *key, char *value)
 int
 main (int argc, char* argv[])
 {
+    crsx_setenv("execname", argv[0]);
+
+#ifndef GENERIC_LOADER
     if (argc <= 1)
         return printUsage(NULL);
 
@@ -249,6 +268,7 @@ main (int argc, char* argv[])
     if (strcmp(command, "lint") == 0)
         return runLinter(2, argc, argv);
 
+#endif
     // "manual" loading.
     int i;
     for (i = 0; i < argc; ++i)
