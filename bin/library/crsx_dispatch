@@ -4,7 +4,7 @@
 
 function show_help {
 	echo "Usage : $0 dispatch help"
-  echo "        $0 dispatch [--cp <path>] [--p <parser>] [--o <file>] <input.crs>"
+  echo "        $0 dispatch [--cp <path>] [-p <parser>] [-o <file>] <input.crs>"
 	echo " where"
 	echo "   <path>    colon-separated class paths"
 	echo "   <parser>  colon-separated parser qualified name"	
@@ -41,7 +41,7 @@ function run_dispatch {
    			-p)
    			    if [ -z "$2" ]
    			    then
-   			        echo "error: missing grammar argument after --p"
+   			        echo "error: missing grammar argument after -p"
    			    	show_help
    			    	exit 0
    			    fi
@@ -51,7 +51,7 @@ function run_dispatch {
    			-o)
    			    if [ -z "$2" ]
    			    then
-   			        echo "error: missing output argument after --o"
+   			        echo "error: missing output argument after -o"
    			    	show_help
    			    	exit 0
    			    fi
@@ -81,7 +81,7 @@ function run_dispatch {
 		cmd="$cmd grammar=('$grammar';)" 
 	fi
 	
-	cmd="$cmd rules=$1 sortify dispatchify simple-terms omit-linear-variables canonical-variables"
+	cmd="$cmd rules=$1 sortify simplify dispatchify simple-terms omit-linear-variables canonical-variables"
 	
 	if [ -n "$output" ]
 	then

@@ -400,7 +400,7 @@ typedef struct _BitSet* BitSetP;
 // Tests: normal form and function that cannot currently step.
 #define IS_NF(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nf)
 #define IS_NOSTEP(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nostep)
-
+#define IS_BLOCKED(T) (!IS_VARIABLE_USE(T) && asConstruction(T)->blocked)
 #define IS_CLOSED(T) (!IS_VARIABLE_USE(T) && !asConstruction(T)->fvs);
 
 // For variable use terms.
@@ -518,6 +518,7 @@ struct _Construction
 
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
+    unsigned int blocked : 1; // whether function construction subterm known to be blocked by blocking binders.
 
     NamedPropertyLink namedProperties;       // named properties. (may be null)
     VariablePropertyLink variableProperties; // variable properties. (may be null)
@@ -911,10 +912,8 @@ struct _SubstitutionFrame
     int count;                 // number of variable-substitute pairs in this frame
     Variable *variables;       // count redex variables to substitute, in order. *Not* owned by frame.
     Term *substitutes;         // count redex subterms to substitute for variables, in order
-    int* renamings;            // Whether substitute is caused by a binder renaming.
+    int depth;                 // Frame depth
 };
-
-#define RENAME_ALL ((int*) 1)
 
 #ifndef SUBSTITUTE
 # define SUBSTITUTE(sink,term,substitution) metaSubstitute(sink, term, substitution)

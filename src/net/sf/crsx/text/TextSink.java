@@ -34,15 +34,40 @@ public class TextSink extends ManagedSink implements Sinker
     /** Whether it is safe to echo the symbol of a particular constructor directly. */
     private static boolean isSafe(Constructor constructor)
 	{
-    	final String symbol = constructor.symbol();
+    	return isSafe(constructor.symbol());
+	}
+    
+    /** Whether it is safe to echo the symbol of a particular constructor directly. */
+    private static boolean isSafe(String symbol)
+	{
     	final int length = symbol == null ? 0 : symbol.length();
     	for (int i = 0; i  < length; ++i)
     	{
     		switch (symbol.charAt(i))
     		{
-    			case '\u00AB' : case '\u00BB' : // « »
+    			case '\u00AB' : // «
+    				if (i+ 1 < length && symbol.charAt(i + 1) == '\u00AB')
+    				{
+    					i++;
+    					break;
+    				}
+    				return false;
+    			case '\u00BB' : // »
+    				if (i+ 1 < length && symbol.charAt(i + 1) == '\u00BB')
+    				{
+    					i++;
+    					break;
+    				}
+    				return false;
+    			case '\u2020' : // †
+    				if (i+ 1 < length && symbol.charAt(i + 1) == '\u2020')
+    				{
+    					i++;
+    					break;
+    				}
+    				return false;
     			case '\u00B6' : // ¶
-    			case '\u2020' : case '\u2021' : // † ‡
+    			case '\u2021' : // ‡
     			case '\u27E6' : case '\u27E7' : // ⟦⟧
     			case '\u2983' : case '\u2984' : // ⦃⦄
     				return false;
@@ -109,7 +134,8 @@ public class TextSink extends ManagedSink implements Sinker
     				Term sub = text.sub(0);
     				if (Util.isConstant(sub) && isSafe(sub.constructor()))
     				{
-    					f.append(Util.symbol(sub));
+    					String symbol = unescape(Util.symbol(sub)); 
+    					f.append(symbol);
     					break;
     				}
     				else
@@ -178,29 +204,6 @@ public class TextSink extends ManagedSink implements Sinker
     			if (name == null)
     			{
     				name = Util.safeVariableName(v, namings, noLinearMarkers, (factory != null && factory.defined("trust-generated-variable-names")));
-    				/*
-    				// Custom version of Util.safeVariableName()...
-    				if (!name.matches("[a-z][A-Za-z0-9_]*"))
-    					name = "v" + Util.quoteJavaIdentifierPart(name);
-    				// Bump it until unique
-    				int modulo = 100;
-    				do
-    				{
-    					//String bumped = n+"<sub>"+i+"</sub>";
-    					String bumped = name+"_"+ (Math.abs(Util.RANDOM.nextInt()) % modulo);
-    		    		
-    					// TODO: remove bottleneck. conatinsValue is linear..
-    					//if (! namings.containsValue(bumped))
-    					if (! existing.contains(bumped))
-    					{
-    						v.setName(bumped);
-    						name = bumped;
-    						break;
-    					}
-    					
-    					modulo += 100;
-    				} while (true);
-    				*/
     				namings.put(v, name);
     				existing.add(name);
     			}
@@ -210,8 +213,14 @@ public class TextSink extends ManagedSink implements Sinker
     	}
     	f.flush();
     }
+
+	private String unescape(String text)
+	{
+		return text.replaceAll("««", "«").replaceAll("»»", "»").replaceAll("††", "†");
+	}
     
     // Sinker...
+
 
 	public void setFactory(Factory<? extends Term> factory)
 	{

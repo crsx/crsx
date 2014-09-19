@@ -4,10 +4,12 @@
 
 function show_help {
 	echo "Usage : $0 compile help"
-	echo "        $0 [--cp <path>] [--p <parser>] [--o <output-dir>] <input.[crs|hx]>"
+	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] <input.[crs|hx]>"
 	echo " where"
-	echo "   <path>    colon-separated class paths"
-	echo "   <parser>  colon-separated parser qualified name"	
+	echo "   --cp <path>        colon-separated class paths"
+    echo "   -p <parser>        colon-separated parser qualified name"   
+    echo "   -o <output-dir>    directory where to store generated files"
+    echo "   -d                 includes debugging information in generated executable"
 }
 
 function run_compile {
@@ -21,7 +23,8 @@ function run_compile {
 	local classpath=
 	local grammar=
 	local input=
-	local output=
+    local output=
+    local debug=
 	while :
     do
    		case $1 in
@@ -39,7 +42,7 @@ function run_compile {
    				classpath="$classpath:$2"
    				shift 2
    				;;
-   			--p)
+   			-p)
    			    if [ -z "$2" ]
    			    then
    			        echo "error: missing grammar argument after --p"
@@ -49,7 +52,7 @@ function run_compile {
    			    grammar=$2
    			    shift 2
    			    ;;
-   			--o)
+   			-o)
    			    if [ -z "$2" ]
    			    then
    			        echo "error: missing output argument after --o"
@@ -58,6 +61,10 @@ function run_compile {
    			    fi
    			    output=$2
    			    shift 2
+   			    ;;
+   			-d)
+   			    debug=$2
+   			    shift
    			    ;;
    			-*)
                	printf >&2 "warning: unknown option: %s\n" "$1"
@@ -85,20 +92,19 @@ function run_compile {
 		# Compile Hacs source file. First make the hxt file. 
 		local outputhxt="${output}/${inputname}.hxt"
 		[ $outputhxt -ot $1 ] && $RUNHACS grammar="('net.sf.crsx.hacs.bootstrap.Raw';'net.sf.crsx.text.Text';)" input=$1 category=rawModule output=${inputname}.hxt simple-terms max-indent=10 width=255
-		
-
 
 	elif [ $inputext = "crs" ];
 	then
 	    # Compile .crs file
 		
 		# FIRST: Generate dr file.
- 
+        [ ! -n "$output" ] && output="."
+        
 		local drfile="${output}/${inputname}.dr"
-	  	local cmd="$CRSXS dispatch --o $drfile"
+	  	local cmd="$CRSXS dispatch -o $drfile"
 
-	  	[ -n $grammar ] && cmd="$cmd --p $grammar"
-		[ -n $classpath ] && cmd="$cmd --cp $classpath"
+	  	[ -n "$grammar" ] && cmd="$cmd -p $grammar"
+		[ -n "$classpath" ] && cmd="$cmd --cp $classpath"
 
 		[ $drfile -ot $1 ] && $cmd $1 
 		
@@ -121,7 +127,7 @@ function run_compile {
 		
 		    # Sort symbol
 		
-			 LC_ALL=C sort -bu $symbols | sed 1d  > ${symbols}.tmp
+			LC_ALL=C sort -bu $symbols | sed 1d  > ${symbols}.tmp
     			
     		# and make proper C file.
     		echo "/* ${inputname}ing symbols. */" > $symbols
@@ -139,9 +145,14 @@ function run_compile {
 		local function_o="${output}/${inputname}_fun.o"
 		local symbols_o="${output}/${inputname}_symbols.o"
 		
-		[ $function_o -ot $function ] && $CC -c $CFLAGS -I$CRSXC_FILES $function -o $function_o
-		[ $data_o -ot $data ] && $CC -c $CFLAGS -I$CRSXC_FILES $data -o $data_o
-		[ $symbols_o -ot $symbols ] && $CC -c $CFLAGS -I$CRSXC_FILES $symbols -o $symbols_o
+		[ -n "$debug" ] && CFLAGS="$CFLAGS -DDEBUG"
+		
+		[ $function_o -ot $function ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $function -o $function_o
+		[ $data_o -ot $data ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $data -o $data_o
+		[ $symbols_o -ot $symbols ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $symbols -o $symbols_o
+		
+		# Link
+		$CC $LDFLAGS $ICU4CLIB $function_o $symbols_o $data_o $CRSXC_O_FILES $CRSXC_O_MAIN 
 		
 		# Explicit exit as maybe no command has been executed.
 		exit 0 

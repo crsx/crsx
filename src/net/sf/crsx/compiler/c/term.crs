@@ -468,7 +468,7 @@ T-substitute2[#MetaVar, (), USE[#Count], sink, #arity, #prefix, #vars, #args, #s
 %n⟪{⟦
 « #prefix »Variable «vars»[«INTEGER[#used]»] = {«#vars»};
 Term «args»[«INTEGER[#used]»] = {«#args»};
-struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args», NULL};
+struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args», 0};
 SUBSTITUTE(«sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, T-link-prefix[sink]]»«{#env}MetaVar[#MetaVar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», &«substitution»); ⟧}
 ⟫
 ;

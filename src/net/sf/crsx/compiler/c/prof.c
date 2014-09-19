@@ -30,6 +30,15 @@ int clock_gettime(int clk_id, struct timespec *t)
 #include <time.h>
 #endif
 
+
+typedef struct _ProfFunctionEntry *ProfFunctionEntry;
+
+struct _ProfFunctionEntry {
+    long count; // number of time function has been called
+    long time; // Accumulated time
+};
+
+
 // Global profiler state.
 
 long profMemuseMetaSubstitutes; // in KB
@@ -50,10 +59,6 @@ long pTotalConsCount; // Total number of construction
 long pConsCount; // Current number of construction
 long pAccuStepTime;
 
-ProfMetaSubstitute profLargeMetaSubstitutes;
-ProfBufferCopy profLargeBufferCopy;
-ProfFunctionEntry profFunctions[16384]; // use array for sorting
-unsigned profFunctionsCount = 0;
 long pPeakTermSize, pNSPeakTermSize;
 long pPeakTermMemuse, pNSPeakTermMemuse; // in Bytes
 long pDuplicateMemuse;
@@ -68,6 +73,8 @@ struct timespec pPropagateClock;
 struct timespec pStepClock;
 size_t pKeyPoolSize;
 char* pStepName; // Current step function
+Hashset2 pSteps; // Track time/count in step
+
 
 // Measure memory use after computation.
 struct rusage crsxpComputeUse;
@@ -85,7 +92,6 @@ void crsxpInit(Context context)
     if (context->profiling)
     {
         getrusage(RUSAGE_SELF, &crsxpComputeUse);
-        profFunctionsCount = 0;
         profMemuseMetaSubstitutes = 0l;
         pPeakTermSize = pNSPeakTermSize = 0l;
         pPeakTermMemuse = pNSPeakTermMemuse = 0l;
@@ -106,6 +112,7 @@ void crsxpInit(Context context)
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pStartTime);
         pSampleRate = (rand() % 500) + 500;
         crsxpMetaCount = makeHS2(context, 8, NULL, equalsChars, hashChars);
+        pSteps = makeHS2(context, 16, NULL, equalsChars, hashChars);
         pAccuMetaTime = 0l;
         pAccuMergeTime = 0l;
         pAccuPropagateTime = 0l;
@@ -135,8 +142,6 @@ static long nano2ms(long nano)
     return nano / 1000000;
 }
 
-
-
 void crsxpDestroy(Context context)
 {
     if (context->profiling)
@@ -147,14 +152,6 @@ void crsxpDestroy(Context context)
         getrusage(RUSAGE_SELF, &usageafter);
         long use = (usageafter.ru_maxrss - crsxpComputeUse.ru_maxrss) / 1024.0;
         PRINTF(context, "\nmemory use: %ldM\n", use);
-
-//        int i = 0;
-//        while (i < profFunctionsCount)
-//        {
-//            FREE(context, profFunctions[i]);
-//            profFunctions[i] = NULL;
-//            i++;
-//        }
     }
 }
 
@@ -162,8 +159,7 @@ void crsxpBeforeStep(Context context, Term term)
 {
     if (context->profiling)
     {
-        //      profStepStack[profStepStackSize++] = SYMBOL(term);
-        profAddStepFunction(context, SYMBOL(term));
+        pStepName = SYMBOL(term);
         crsxpPrintStats(context, term);
         ++pStepCount;
 
@@ -180,6 +176,17 @@ void crsxpAfterStep(Context context)
         struct timespec d = diff(pStepClock, nanoTime);
         long dl = d.tv_sec * 1000000000 + d.tv_nsec;
         pAccuStepTime += dl;
+
+        ProfFunctionEntry entry = getValueHS2(pSteps, (const void*) pStepName);
+        if (!entry)
+        {
+            entry = ALLOCATE(context, sizeof(struct _ProfFunctionEntry));
+            entry->count = 0;
+            entry->time = 0;
+            addValueHS2(context, pSteps, (const void*) pStepName, (void*) entry);
+        }
+        entry->count ++;
+        entry->time += dl;
     }
 }
 
@@ -481,90 +488,72 @@ static int pairEntryCmp(const void* p1, const void* p2)
     return 1;
 }
 
+
+static int stepPairEntryCmp(const void* p1, const void* p2)
+{
+    Pair pair1 = *(Pair*) p1;
+    Pair pair2 = *(Pair*) p2;
+
+    ProfFunctionEntry value1 = (ProfFunctionEntry) pair1->value;
+    ProfFunctionEntry value2 = (ProfFunctionEntry) pair2->value;
+
+    if (value1->time == value2->time)
+        return 0;
+    if (value1->time > value2->time)
+        return -1;
+    return 1;
+}
+
+
+
 void printProfiling(Context context)
 {
     if (context->profiling)
     {
-//        if (profLargeMetaSubstitutes || profLargeBufferCopy)
-//        {
-//            PRINTF(context, "Profiling information...");
-//
-//            if (profLargeMetaSubstitutes)
-//            {
-//                PRINTF(context, "\n\nReport large meta substitutes...\n");
-//
-//                ProfMetaSubstitute c = profLargeMetaSubstitutes;
-//                while (c)
-//                {
-//                    PRINTF(context, "\n===========================");
-//                    PRINTF(context, "\n  Large meta substitute");
-//                    printMetasubstituteRecord(context, c);
-//                    c = c->next;
-//
-//                    PRINTF(context, "\n");
-//                }
-//            }
-
-//            if (profLargeBufferCopy)
-//            {
-//                PRINTF(context, "\n\nReport large environment copy...\n");
-//
-//                ProfBufferCopy b = profLargeBufferCopy;
-//                while (b)
-//                {
-//                    PRINTF(context, "\n===========================");
-//                    PRINTF(context, "\n  Large environment copy");
-//                    PRINTF(context, "\n  size      : %u", b->size);
-//                    PRINTF(context, "\n  backtrace : ");
-//
-//                    int i = b->backtraceSize - 1;
-//                    while (i >= 0)
-//                    {
-//                        PRINTF(context, "\n    %s", b->backtrace[i]);
-//                        i--;
-//                    }
-//
-//                    b = b->next;
-//
-//                    PRINTF(context, "\n");
-//                }
-//            }
-//        }
-
-//        PRINTF(context,
-//                "\n\nReport function count  (call count) (meta count) (memuse, M)...\n");
-//
-//        qsort(profFunctions, profFunctionsCount, sizeof(ProfFunctionEntry),
-//                profEntryCmp);
-//
-//        size_t i = 0;
-//        while (i < 50 && i < profFunctionsCount)
-//        {
-//            PRINTF(context, "\n%-50s : %10d %10d %5ld", profFunctions[i]->name,
-//                    profFunctions[i]->count, profFunctions[i]->metaCount,
-//                    profFunctions[i]->metaMemuse / 1024);
-//            i++;
-//        }
-
-        PRINTF(context,
-                "\n\nReport meta count  (step name) (time ms) (percent time) ...\n");
-
-        Pair* counts = toArrayHS2(context, crsxpMetaCount);
-        qsort(counts, crsxpMetaCount->size, sizeof(Pair), pairEntryCmp);
-
         struct timespec endTime;
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &endTime);
         struct timespec d = diff(pStartTime, endTime);
         long dl = d.tv_sec * 1000000000l + d.tv_nsec;
 
+
+        PRINTF(context,
+                "\n\nStep Function Report (step name) (call count) (time ms) (percent time)\n");
+        PRINTF(context,
+                "========================================================");
+
+        Pair* steps = toArrayHS2(context, pSteps);
+        if (steps)
+        {
+            qsort(steps, pSteps->size, sizeof(Pair), stepPairEntryCmp);
+
+            size_t i;
+            for (i = 0; i < pSteps->size && i < 50; i++)
+            {
+                long time = ((ProfFunctionEntry) steps[i]->value)->time;
+                double percent = (time / (double) dl) * 100.0;
+                PRINTF(context, "\n%-50s : %8ld %10ld %2.2f%%",
+                        (const char* ) steps[i]->key,
+                        ((ProfFunctionEntry) steps[i]->value)->count,
+                        nano2ms(time), percent);
+            }
+        }
+
+        PRINTF(context,
+                "\n\nMeta Substitution Report  (step name) (time ms) (percent time) ...\n");
+        PRINTF(context,
+                "==================================================================");
+
+        Pair* counts = toArrayHS2(context, crsxpMetaCount);
         if (counts)
         {
+            qsort(counts, crsxpMetaCount->size, sizeof(Pair), pairEntryCmp);
+
             size_t i;
             for (i = 0; i < crsxpMetaCount->size && i < 50; i++)
             {
                 long time = *(long*) counts[i]->value;
                 double percent = (time / (double) dl) * 100.0;
-                PRINTF(context, "\n%-50s : %10ld %2.2f",
+                PRINTF(context, "\n%-50s : %10ld %2.2f%%",
                         (const char* ) counts[i]->key,
                         (long ) (time / 1000000.0), percent);
             }
@@ -618,23 +607,6 @@ void printProfiling(Context context)
         PRINTF(context, "\n%-50s : %ld", "String key pool size", pKeyPoolSize);
         PRINTF(context, "\n%-50s : %ldms", "Total time", nano2ms(dl));
 
-    }
-}
-
-void printMetasubstituteRecord(Context context, ProfMetaSubstitute c)
-{
-    PRINTF(context, "\n  size               : %u", c->size);
-    PRINTF(context, "\n  term size          : %u", c->termSize);
-    PRINTF(context, "\n  environment size   : %u", c->envSize);
-    PRINTF(context, "\n  normal form        : %s", (c->nf ? "no" : "yes"));
-    PRINTF(context, "\n  memory use         : %ldM", (c->memuse / 1024));
-    PRINTF(context, "\n  backtrace          : ");
-
-    int i = c->backtraceSize - 1;
-    while (i >= 0)
-    {
-        PRINTF(context, "\n    %s", c->backtrace[i]);
-        i--;
     }
 }
 
