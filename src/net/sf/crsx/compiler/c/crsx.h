@@ -912,10 +912,8 @@ struct _SubstitutionFrame
     int count;                 // number of variable-substitute pairs in this frame
     Variable *variables;       // count redex variables to substitute, in order. *Not* owned by frame.
     Term *substitutes;         // count redex subterms to substitute for variables, in order
-    int* renamings;            // Whether substitute is caused by a binder renaming.
+    int depth;                 // Frame depth
 };
-
-#define RENAME_ALL ((int*) 1)
 
 #ifndef SUBSTITUTE
 # define SUBSTITUTE(sink,term,substitution) metaSubstitute(sink, term, substitution)

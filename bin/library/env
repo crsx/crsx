@@ -15,18 +15,33 @@ CRSX="$JAVA -cp $CRSXJAR net.sf.crsx.run.Crsx allow-unnamed-rules"
 CRSXC="$DIR/crsxc"
 CRSXS="$DIR/crsx"
 
-CRSXC_FILES=$BUILD/crsx
-CRSXC_HEADER=$CRSXC_FILES/crsx.h
-
 # JavaCC configuration
 JAVACCJAR=$LIB/javacc.jar
 JAVACC="$JAVA -cp $JAVACCJAR javacc"
 
 
-# Bash-friendly Common.mk.in
+# Bash-friendly Env.mk
+UNAME_S=`uname -s`
 C99FLAG="-std=c99"
 CLANGFLAGS="-Wno-gnu-variable-sized-type-not-at-end"
-LDFLAGS="-L/usr/local/opt/icu4c/lib"
-CFLAGS="-I/usr/local/opt/icu4c/include $C99FLAG $CLANGFLAGS"
+LDFLAGS=
+CFLAGS="$C99FLAG -g"
+RTLIB=
+if [ "$UNAME_S" = "Darwin" ] 
+then
+    LDFLAGS="$LDFLAGS -L/usr/local/opt/icu4c/lib"
+    CFLAGS="$CFLAGS -I/usr/local/opt/icu4c/include $CLANGFLAGS"
+fi
 CC="gcc"
 CXX="g++"
+
+
+# CRSX C compiler configuration
+CRSXC_HOME="$ROOT/src/net/sf/crsx/compiler/c"
+CRSXC_INCLUDES=$CRSXC_HOME
+CRSXC_BUILD=$CRSXC_HOME/build
+
+CRSXC_O_FILES="$CRSXC_BUILD/crsx.o $CRSXC_BUILD/crsx_scan.o $CRSXC_BUILD/invariant.o $CRSXC_BUILD/prof.o $CRSXC_BUILD/linter.o"  
+CRSXC_O_MAIN=$CRSXC_BUILD/main.o
+
+ICU4CLIB="-licui18n -licuuc -licudata -ldl"

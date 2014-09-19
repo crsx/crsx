@@ -557,7 +557,7 @@ static void copySub(Sink sink, Term term, int i)
         Variable *oldBinders = BINDERS(term, i);
         Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
         VariableUse subUses[rank]; // does not escape
-        struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+        struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, 0}; // does not escape
         SubstitutionFrame subSubstitution = &_subSubstitution;
 
         // --- populate per binder
@@ -665,7 +665,7 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
                     Variable *oldBinders = BINDERS(term, i);
                     Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
                     VariableUse subUses[rank]; // does not escape
-                    struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+                    struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses, 0}; // does not escape
                     SubstitutionFrame subSubstitution = &_subSubstitution;
 
                     // --- populate per binder
@@ -727,8 +727,6 @@ Sink bufferProperties(Sink sink, NamedPropertyLink namedProperties, VariableProp
 #   ifdef DEBUG
     ++eventCount;
 #   endif
-    const Context context = sink->context;
-
     ASSERT(context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
 
@@ -3452,7 +3450,6 @@ static int step(Sink sink, Term term)
 
     DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+4, term));
-    DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP-INTERNALS(%ld): (%ld,%ld)\n", stepNesting, "", count, allocateCount, freeCount));
 
     int step = term->descriptor->step(sink, term);
 
@@ -3559,9 +3556,6 @@ void shallowMetaSubstitute(Sink sink, Term term, SubstitutionFrame values)
             }
         }
 
-        // If this just renaming binders, then still block reduction.
-        if (values->renamings != RENAME_ALL)
-            asConstruction(bufferTop((Buffer) sink))->nostep = 0;
 
         sink->end(sink, term->descriptor);
     }
@@ -3591,9 +3585,6 @@ void shallowMetaSubstitute(Sink sink, Term term, SubstitutionFrame values)
                 }
             }
         }
-
-        if (values->renamings != RENAME_ALL)
-            asConstruction(term)->nostep = 0;
 
         // Update nf field of construction.
         int nf = IS_DATA(term) ? 1 : 0;
@@ -3768,7 +3759,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 for (i = 0; i < s->count; ++i)
                 {
                     Variable v = s->variables[i];
-                    if ((!v->track && depth == 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
+                    if ((!v->track && depth > s->depth + 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
                     {
                         // - Variable we are substituting is not in the free var set: remove from bitmap!
                         CLEAR_LBIT(&localUnweakened, offset+i);
@@ -3831,7 +3822,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 Variable *oldBinders = BINDERS(term, i);
                 Variable *subBinders = ALLOCATE(context, rank*sizeof(Variable)); // does not escapes (ALLOCA?)
                 VariableUse subUses[rank]; // does not escape
-                struct _SubstitutionFrame _subSubstitution = {substitution, substitutionCount, rank, oldBinders, (Term *) subUses, RENAME_ALL}; // does not escape
+                struct _SubstitutionFrame _subSubstitution = {substitution, substitutionCount, rank, oldBinders, (Term *) subUses, depth}; // does not escape
                 SubstitutionFrame subSubstitution = &_subSubstitution;
 
                 // --- allocate bitmaps
@@ -4220,7 +4211,7 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
                 for (i = 0; i < s->count; ++i)
                 {
                     Variable v = s->variables[i];
-                    if ((!v->track && depth == 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
+                    if ((!v->track && depth > s->depth + 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
                     {
                         // - Variable we are substituting is not in the free var list: remove from bitmap!
                         // - Or variable is no tracked (shallow and blocking) and already doing deeper substitution
