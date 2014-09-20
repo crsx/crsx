@@ -208,22 +208,22 @@ public class ClassicParser implements Parser
 	}
 
     private boolean isBlocking(String s)
-    {        return s.contains("ᵇ");
+    {        return s.contains("\u1d47");
     } 
 
 	private String unBlocking(String s)
 	{
-	   return s.replaceAll("ᵇ", "");
+	   return s.replaceAll("\u1d47", "");
 	}	 
 
     private boolean isShallow(String s)
     {
-        return s.contains("ˢ");
+        return s.contains("\u02e2");
     } 
 
     private String unShallow(String s)
     {
-       return s.replaceAll("ˢ", "");
+       return s.replaceAll("\u02e2", "");
     }    
 
 	

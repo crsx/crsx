@@ -161,7 +161,7 @@ public class GenericRule implements Copyable
 		this.weak = new HashSet<String>(2);
 		this.shallow = new HashSet<Variable>(2);
 	
-		this.forced = new HashSet<>(4);
+		this.forced = new HashSet<String>(4);
 		this.pattern = pattern;
 		this.contractum = contractum;
 		this.explicitCount = new HashMap<String, Integer>();
@@ -725,7 +725,7 @@ public class GenericRule implements Copyable
 					default :
 						// Check if the subsub contains at least one binder use.
 						// TODO: addFree is a bit overkill. 
-						Set<Variable> free = new HashSet<>();
+						Set<Variable> free = new HashSet<Variable>();
 						ExtensibleSet<Variable> bound = SimpleVariableSet.EMPTY;
 						subsub.addFree(free, bound, false, null);
 
@@ -1197,7 +1197,7 @@ public class GenericRule implements Copyable
 		final Set<String> usedFresh = new HashSet<String>();
 
 		// Shallow variables (candidates)
-		final Map<Variable, Boolean> maybeShallow = new IdentityHashMap<>(4);
+		final Map<Variable, Boolean> maybeShallow = new IdentityHashMap<Variable, Boolean>(4);
 
 		final Visitor visitor = new Visitor()
 			{
@@ -1622,7 +1622,7 @@ public class GenericRule implements Copyable
 						{
 							if (Util.contains(construction.binders(i), x))
 							{
-								result[0] = new Pair<>(construction, i);
+								result[0] = new Pair<Term,Integer>(construction, i);
 								break;
 							}
 

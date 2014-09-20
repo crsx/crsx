@@ -727,11 +727,11 @@ Sink bufferProperties(Sink sink, NamedPropertyLink namedProperties, VariableProp
 #   ifdef DEBUG
     ++eventCount;
 #   endif
-    ASSERT(context, sink->kind == SINK_IS_BUFFER);
+    ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     Buffer buffer = (Buffer) sink;
 
     // Must be first property event.
-    ASSERT(context, !buffer->pendingNamedProperties && !buffer->pendingVariableProperties);
+    ASSERT(sink->context, !buffer->pendingNamedProperties && !buffer->pendingVariableProperties);
 
     buffer->pendingNamedProperties = namedProperties;
     buffer->pendingVariableProperties = variableProperties;
@@ -5096,6 +5096,20 @@ static void fprintCookies(Context context)
     }
 }
 
+static void fprintCookies_new (Context context, FILE* out)
+{
+    if (printCookieNameList)
+    {
+        FPRINTF(context, out, "//Cookies found:\n");
+        NamedPropertyLink cookie = printCookieNameList;
+        for (; cookie; cookie = cookie->link)
+        {
+            FPRINTF(context, out, "//   %s\n", cookie->name);
+        }
+    }
+}
+
+
 void fprintTerm(Context context, FILE* out, Term term)
 {
     Hashset2 used = NULL;
@@ -5195,6 +5209,24 @@ void printTermFullWithIndent(Context context,  Term term)
         unlinkHS2(context, used);
 }
 
+void fprintTermFullWithIndent (Context context, FILE* out, Term term)
+{
+    printCookieNameList = NULL;
+
+    Hashset2 used = NULL;
+    if (getenv("CANONICAL_VARIABLES"))
+        used = makeHS2(context, 10, NULL, equalsPtr, hashPtr);
+
+    VariableSet set = makeVariableSet(context);
+    int pos = 0;
+    fprintTermTop(context, out, term, INT32_MAX, set, used, 1, &pos, INT32_MAX, 0);
+    FPRINTF(context, out, "\n");
+    freeVariableSet(set);
+    fprintCookies_new (context, out);
+
+    if (getenv("CANONICAL_VARIABLES"))
+        unlinkHS2(context, used);
+}
 
 // Determines if the specified 8-bit character is an ISO control character. A character is considered to be an ISO
 // control character if its code is in the range '\u0000' through '\u001F' or in the range '\u007F' through '\u009F'.

@@ -122,12 +122,12 @@ public class Simplifier
 
 		// Second pass: simplify deep closures
 		Collection<GenericRule> pendingRules = ruleByName.values();
-		List<GenericRule> updatedRules = new LinkedList<>();
+		List<GenericRule> updatedRules = new LinkedList<GenericRule>();
 		state.counter = 1;
 
 		while (!pendingRules.isEmpty())
 		{
-			state.newrules = new LinkedList<>();
+			state.newrules = new LinkedList<GenericRule>();
 			for (GenericRule rule : ruleByName.values())
 			{
 				// Some $ primitives are currently not properly sorted. Ignore rules containing those.
@@ -376,13 +376,13 @@ public class Simplifier
 					contractum = contractum.wrapWithPropertiesRef(metaref, true);
 				}
 
-				HashMap<String, List<Term>> options = new HashMap<>(4);
+				HashMap<String, List<Term>> options = new HashMap<String, List<Term>>(4);
 				options.put(Builder.LAX_OPTION_SYMBOL, new LinkedList<Term>());
 
 				GenericRule rule = new GenericRule(crs, name, pattern, contractum, options);
 
 				// Set meta sorts to rule so that the sortifier does not have to run after each main iteration (see simplify)!
-				Map<String, Term> metavarSorts = new HashMap<>(8); // Map meta variable name to sorts
+				Map<String, Term> metavarSorts = new HashMap<String, Term>(8); // Map meta variable name to sorts
 				for (int j = 0; j < env.patternArgs.size(); j++)
 					metavarSorts.put(env.patternArgs.get(j).metaVariable(), env.patternArgsSort.get(j));
 
@@ -478,7 +478,7 @@ public class Simplifier
 	{
 		if (Util.hasProperties(term))
 		{
-			Map<String, Term> newMetas = new HashMap<>(4);
+			Map<String, Term> newMetas = new HashMap<String, Term>(4);
 			PropertiesConstraintsWrapper wrapper = null;
 			if (term instanceof PropertiesConstraintsWrapper)
 			{
@@ -535,7 +535,7 @@ public class Simplifier
 				properties.setProperty(name, newterm);
 			}
 
-			List<Variable> oldVarProps = new LinkedList<>();
+			List<Variable> oldVarProps = new LinkedList<Variable>();
 
 			for (Variable variable : properties.propertyVariables())
 			{
@@ -659,10 +659,10 @@ public class Simplifier
 					{
 						GenericTerm original = env.rule.getMetaOnPattern(term.metaVariable());
 
-						ArrayList<Variable> patternBindersA = new ArrayList<>();
-						ArrayList<Variable> patternBindersSortA = new ArrayList<>();
+						ArrayList<Variable> patternBindersA = new ArrayList<Variable>();
+						ArrayList<Variable> patternBindersSortA = new ArrayList<Variable>();
 
-						ArrayList<Term> patternSubsA = new ArrayList<>(); // Subs of the captured metavariable. All variables.
+						ArrayList<Term> patternSubsA = new ArrayList<Term>(); // Subs of the captured metavariable. All variables.
 
 						for (int i = 0; i < arity; i++)
 						{
@@ -940,16 +940,16 @@ public class Simplifier
 			this.rule = rule;
 			this.freeBinders = freeBinders;
 
-			patternBinders = new ArrayList<>();
-			patternArgs = new ArrayList<>();
-			patternBindersSort = new ArrayList<>();
-			patternArgsSort = new ArrayList<>();
+			patternBinders = new ArrayList<Variable[]>();
+			patternArgs = new ArrayList<GenericTerm>();
+			patternBindersSort = new ArrayList<Variable[]>();
+			patternArgsSort = new ArrayList<Term>();
 
-			argsBinders = new ArrayList<>();
-			args = new ArrayList<>();
+			argsBinders = new ArrayList<Variable[]>();
+			args = new ArrayList<GenericTerm>();
 
-			metavars = new HashMap<>();
-			propHolder = new HashMap<>();
+			metavars = new HashMap<Object,String>();
+			propHolder = new HashMap<Map<String,Term>,String>();
 
 		}
 	}

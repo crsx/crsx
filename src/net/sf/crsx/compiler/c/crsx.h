@@ -1310,6 +1310,7 @@ extern void printTermWithIndent(Context context, Term term);
 extern void fprintTerm(Context context, FILE* out, Term term);
 extern void fprintTermWithIndent(Context context, FILE* out, Term term);
 extern void printTermFullWithIndent(Context context, Term term);
+extern void fprintTermFullWithIndent(Context context, FILE*, Term term);
 extern void ppt(Context context, int nesting, Term term);
 extern void pt(Context context, Term term);
 
