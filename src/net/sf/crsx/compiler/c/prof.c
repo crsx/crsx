@@ -807,8 +807,6 @@ void crsxpNamedPropertiesMerged(Context context, int count)
 {}
 void printProfiling(Context context)
 {}
-void printMetasubstituteRecord(Context context, ProfMetaSubstitute c)
-{}
 void profAddStepFunction(Context context, char* functionName)
 {}
 void pIncMetaCountFunction(Context context, char* functionName, long memuse)

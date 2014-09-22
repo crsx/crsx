@@ -3477,7 +3477,7 @@ void initCRSXContext(Context context)
     context->str_linelocation = GLOBAL(context, "$LineLocation");
     context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 
-    context->fv_enabled = 1;
+    context->fv_enabled = !getenv("crsx-disable-fv");
 //
 //    context->noProperties = ALLOCATE(context, sizeof(struct _Properties));
 //    context->noProperties->namedFreeVars = NULL;
