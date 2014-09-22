@@ -179,6 +179,8 @@ void freeConstruction(Context context, Construction construction)
     UNLINK_VariablePropertyLink(context, construction->variableProperties);
     construction->variableProperties = NULL;
 
+    construction->blocked = 0;
+
     if (context->fv_enabled)
     {
         UNLINK_Hashset(context, construction->fvs);

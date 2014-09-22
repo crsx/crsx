@@ -25,6 +25,7 @@
 		<jar destfile="crsx.jar" manifest="crsx.manifest">
 			<fileset dir="build" excludes="net/sf/crsx/compiler/c/build/* net/sf/crsx/compiler/c/Debug/* net/sf/crsx/compiler/c/crsx_scan.c net/sf/crsx/compiler/c/rules" />
 			<fileset dir="src" excludes="**/*.java net/sf/crsx/compiler/c/build/* net/sf/crsx/compiler/c/Debug/* net/sf/crsx/compiler/c/crsx_scan.c net/sf/crsx/compiler/c/rules"/>
+		    <fileset dir="." includes="VERSION"/>
 		</jar>
 	</target>
 	
