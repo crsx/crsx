@@ -1,1 +1,0 @@
-java -cp "../../build:" net.sf.crsx.run.Crsx "grammar=(\"net.sf.crsx.samples.guide.DerivParser\";\"net.sf.crsx.text.Text\";)" rules="deriv.crs" term=" \$Print-Fun[ %derivFun⟦ $1 ⟧, 0] " sink="net.sf.crsx.text.TextSink"
