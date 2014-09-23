@@ -286,6 +286,43 @@ Term makeStringLiteral(Context context, const char *text)
 
 static Hashset freeVars(Context context, Term term, Hashset set);
 
+static BufferSegment makeSegment(Context context)
+{
+    if (context->segmentPool)
+    {
+        BufferSegment segment = context->segmentPool;
+        context->segmentPool = segment->next;
+        context->segmentPoolSize --;
+        return segment;
+    }
+
+    return ALLOCATE(context, sizeof(struct _BufferSegment));
+}
+
+static void destroySegment(Context context, BufferSegment head)
+{
+   while (head)
+   {
+       BufferSegment next = head->next;
+       FREE(context, head);
+       head = next;
+   }
+}
+
+static inline void freeSegment(Context context, BufferSegment segment)
+{
+    if (context->segmentPoolSize < MAX_SEGMENT_POOL_SIZE)
+    {
+        segment->next = context->segmentPool;
+        context->segmentPool = segment->next;
+        context->segmentPoolSize ++;
+    }
+    else
+    {
+        destroySegment(context, segment);
+    }
+}
+
 /**
  * @Brief Push term on the stack
  */
@@ -309,7 +346,7 @@ static void bufferPush(Buffer buffer, Term term)
         else
         {
             // Insert an additional segment.
-            BufferSegment segment = ALLOCATE(buffer->sink.context, sizeof(struct _BufferSegment));
+            BufferSegment segment = makeSegment(buffer->sink.context);
             if (!buffer->first)
             {
                 ASSERT(buffer->sink.context, !buffer->last);
@@ -865,13 +902,7 @@ Sink initBuffer(Context context, Buffer buffer)
 
 static void destroyBuffer(Buffer buffer)
 {
-    BufferSegment first = buffer->first;
-    while (first)
-    {
-        BufferSegment next = first->next;
-        FREE(buffer->sink.context, first);
-        first = next;
-    }
+    destroySegment(buffer->sink.context, buffer->first);
     FREE(buffer->sink.context, buffer);
 }
 
@@ -892,6 +923,11 @@ void freeBuffer(Sink sink)
         buffer->pendingNamedProperties = NULL;
         buffer->pendingVariableProperties = NULL;
         buffer->blocking = 0;
+
+        buffer->last = NULL;
+        buffer->lastTop = -1;
+        destroySegment(sink->context, buffer->first); // Put segments back in the pool
+        buffer->first = NULL;
     }
     else
     {
@@ -2560,6 +2596,9 @@ void crsxAddPools(Context context)
             context->hashsetPool[i] = ALLOCATE(context, HASHSET_MAX_PER_NBITS * sizeof(Hashset));
             context->hashsetPoolSize[i] = 0;
         }
+
+        context->segmentPool = NULL;
+        context->segmentPoolSize = 0;
     }
     ++context->poolRefCount;
 }
@@ -2591,9 +2630,6 @@ void crsxReleasePools(Context context)
         FREE(context, context->consPool);
         FREE(context, context->consPoolSize);
 
-//        FREE(context, context->noProperties);
-//        context->noProperties = NULL;
-
         for (i = 0; i < HASHSET_MAX_NBITS; i ++)
         {
             ssize_t j = context->hashsetPoolSize[i];
@@ -2605,6 +2641,10 @@ void crsxReleasePools(Context context)
 
         while (--context->bufferPoolSize >= 0)
             destroyBuffer(context->bufferPool[context->bufferPoolSize]);
+
+        destroySegment(context, context->segmentPool);
+        context->segmentPool = NULL;
+        context->segmentPoolSize = 0;
 
         crsxpDestroy(context);
     }

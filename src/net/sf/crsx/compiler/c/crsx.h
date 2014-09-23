@@ -47,6 +47,8 @@ typedef struct _VariableNameMapLink *VariableNameMapLink;
 typedef struct _Hashset* Hashset;
 typedef struct _Hashset2* Hashset2;
 typedef struct _Buffer *Buffer;
+typedef struct _BufferEntry *BufferEntry;
+typedef struct _BufferSegment *BufferSegment;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,6 +63,7 @@ typedef struct _Buffer *Buffer;
 #define CONS_POOL_MAX_SIZE 4096
 
 #define MAX_BUFFER_POOL_SIZE 32
+#define MAX_SEGMENT_POOL_SIZE 2048
 
 #define HASHSET_MAX_NBITS 6
 #define HASHSET_MAX_PER_NBITS 256
@@ -80,6 +83,9 @@ struct _Context
 
     Buffer bufferPool[MAX_BUFFER_POOL_SIZE];
     ssize_t bufferPoolSize;
+
+    BufferSegment segmentPool;
+    ssize_t segmentPoolSize;
 
     Hashset* hashsetPool[HASHSET_MAX_NBITS];
     ssize_t hashsetPoolSize[HASHSET_MAX_NBITS];
@@ -819,9 +825,6 @@ struct _Sink
 #define SINK_IS_BUFFER(sink) (((Sink)(sink))->kind == SINK_IS_BUFFER)
 
 #define BUFFER_SEGMENT_SIZE 127
-
-typedef struct _BufferEntry *BufferEntry;
-typedef struct _BufferSegment *BufferSegment;
 
 struct _Buffer
 {
