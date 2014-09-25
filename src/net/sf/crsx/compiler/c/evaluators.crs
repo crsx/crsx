@@ -1495,6 +1495,13 @@ ERRORF(«#sink»->context, Crsx, "Illegally formatted $[Decimal,'%s']\n", «deci
 ⟫]
 ;
 
+// $[ElapsedTime]
+//
+NUM_PRIMITIVE[E_ElapsedTime];
+
+{#env}E-set-num[E_ElapsedTime, (#Name;), #Options, #sink, #num] → %n⟪«#num» = (double) elapsed(«#sink»->context);⟫;
+{#env}E-set-int[E_ElapsedTime, (#Name;), #Options, #sink, #int] → %n⟪«#int» = (long long) elapsed(«#sink»->context);⟫;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // STRING EVALUATORS

@@ -275,8 +275,7 @@ Term makeStringLiteral(Context context, const char *text)
     literal->construction.vfvs = NULL;
 
     literal->text = text; // Note: NOT allocated...
-    DEBUGENV("crsx-debug-literals", DEBUGF(context, "//%*sMAKE_LITERAL: %s\n", stepNesting, "", literal->text));
-    ///PRINTF(context, "Literal<%s>\n", text);
+    DEBUGCOND(context->debugliterals, DEBUGF(context, "//%*sMAKE_LITERAL: %s\n", stepNesting, "", literal->text));
     return (Term) literal;
 }
 
@@ -299,16 +298,6 @@ static BufferSegment makeSegment(Context context)
     return ALLOCATE(context, sizeof(struct _BufferSegment));
 }
 
-static void destroySegment(Context context, BufferSegment head)
-{
-   while (head)
-   {
-       BufferSegment next = head->next;
-       FREE(context, head);
-       head = next;
-   }
-}
-
 static inline void freeSegment(Context context, BufferSegment segment)
 {
     if (context->segmentPoolSize < MAX_SEGMENT_POOL_SIZE)
@@ -319,7 +308,27 @@ static inline void freeSegment(Context context, BufferSegment segment)
     }
     else
     {
-        destroySegment(context, segment);
+        FREE(context, segment);
+    }
+}
+
+static inline void freeSegments(Context context, BufferSegment head)
+{
+    while (head)
+    {
+       BufferSegment next = head->next;
+       freeSegment(context, head);
+       head = next;
+    }
+}
+
+static inline void destroySegments(Context context, BufferSegment head)
+{
+    while (head)
+    {
+       BufferSegment next = head->next;
+       FREE(context, head);
+       head = next;
     }
 }
 
@@ -902,7 +911,7 @@ Sink initBuffer(Context context, Buffer buffer)
 
 static void destroyBuffer(Buffer buffer)
 {
-    destroySegment(buffer->sink.context, buffer->first);
+    freeSegments(buffer->sink.context, buffer->first);
     FREE(buffer->sink.context, buffer);
 }
 
@@ -926,7 +935,7 @@ void freeBuffer(Sink sink)
 
         buffer->last = NULL;
         buffer->lastTop = -1;
-        destroySegment(sink->context, buffer->first); // Put segments back in the pool
+        freeSegments(sink->context, buffer->first); // Put segments back in the pool
         buffer->first = NULL;
     }
     else
@@ -2543,7 +2552,7 @@ void *crsx_allocate(Context context, size_t size)
 #   ifdef DEBUG
     ++allocateCount;
     if (allocateCount % 1000000L == 0L)
-        DEBUGENV("trace", DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount));
+        DEBUGCOND(context->debugtrace, DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount));
 #   endif
     return p;
 }
@@ -2555,7 +2564,7 @@ void *crsx_callocate(Context context, size_t size)
 #   ifdef DEBUG
     ++allocateCount;
     if (allocateCount % 1000000L == 0L)
-        DEBUGENV("trace", DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount));
+        DEBUGCOND(context->debugtrace, DEBUGF(context, "//%*sALLOCATION REACHED %ld\n", stepNesting, "", allocateCount));
 #   endif
     return p;
 }
@@ -2642,7 +2651,7 @@ void crsxReleasePools(Context context)
         while (--context->bufferPoolSize >= 0)
             destroyBuffer(context->bufferPool[context->bufferPoolSize]);
 
-        destroySegment(context, context->segmentPool);
+        destroySegments(context, context->segmentPool);
         context->segmentPool = NULL;
         context->segmentPoolSize = 0;
 
@@ -3354,8 +3363,8 @@ void normalize(Context context, Term *termp)
     // Work term.
 #ifdef DEBUG
     Term topTerm = *termp;
-    DEBUGENV("trace", DEBUGF(context, "//%*sNORMALIZING\n", stepNesting+1, ""));
-    DEBUGENV("trace", DEBUGT(context, stepNesting+3, topTerm));
+    DEBUGCOND(context->debugtrace, DEBUGF(context, "//%*sNORMALIZING\n", stepNesting+1, ""));
+    DEBUGCOND(context->debugtrace, DEBUGT(context, stepNesting+3, topTerm));
 #endif
 
     if (IS_NF(*termp))
@@ -3416,8 +3425,8 @@ void normalize(Context context, Term *termp)
                 // (4) If term is a function invocation that is not marked as nostep and that we can in fact step then do so and update term to the result.
                 term = BUFFER_TERM(sink); // Reference is transferred
 
-                DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+5, term));
-                DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
+                DEBUGCOND(context->debugsteps, DEBUGT(sink->context, stepNesting+5, term));
+                DEBUGCOND(context->debugsteps, DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
             }
             else
             {
@@ -3473,8 +3482,8 @@ Term force(Context context, Term term)
                 break;
             }
             term =  BUFFER_TERM(sink); // reload and try again...
-            DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+5, term));
-            DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
+            DEBUGCOND(context->debugsteps, DEBUGT(sink->context, stepNesting+5, term));
+            DEBUGCOND(context->debugsteps, DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
             FREE_BUFFER(sink);
         }
     }
@@ -3490,12 +3499,12 @@ static int step(Sink sink, Term term)
 
     crsxpBeforeStep(sink->context, term);
 
-    DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
-    DEBUGENV("crsx-debug-steps", DEBUGT(sink->context, stepNesting+4, term));
+    DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugsteps, DEBUGT(sink->context, stepNesting+4, term));
 
     int step = term->descriptor->step(sink, term);
 
-    DEBUGENV("crsx-debug-steps", DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
 
     crsxpAfterStep(sink->context);
 
@@ -3505,6 +3514,10 @@ static int step(Sink sink, Term term)
 void initCRSXContext(Context context)
 {
     context->stamp = 0;
+
+    context->debugsteps = getenv("crsx-debug-steps") != NULL;
+    context->debugtrace = getenv("crsx-trace") != NULL;
+    context->debugliterals = getenv("crsx-debug-literals") != NULL;
 
     context->env = NULL;
 
@@ -3519,7 +3532,7 @@ void initCRSXContext(Context context)
     context->str_linelocation = GLOBAL(context, "$LineLocation");
     context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 
-    context->fv_enabled = !getenv("crsx-disable-fv");
+    context->fv_enabled = getenv("crsx-disable-fv") == NULL;
 //
 //    context->noProperties = ALLOCATE(context, sizeof(struct _Properties));
 //    context->noProperties->namedFreeVars = NULL;
@@ -3535,6 +3548,7 @@ void initCRSXContext(Context context)
 Term compute(Context context, Term term)
 {
     crsxAddPools(context);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &context->time);
 
     normalize(context, &term);
 
@@ -3548,6 +3562,13 @@ Term compute(Context context, Term term)
     return term;
 }
 
+long elapsed(Context context)
+{
+    struct timespec current;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current);
+    struct timespec d = diff(context->time, current);
+    return (d.tv_sec * 1000000000 + d.tv_nsec) / 1000000;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 // Shallow metasubstitution

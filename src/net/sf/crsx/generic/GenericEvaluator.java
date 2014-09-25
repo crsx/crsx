@@ -11,8 +11,10 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -540,6 +542,9 @@ public class GenericEvaluator extends FixedGenericConstruction
                 double left = Double.parseDouble(Util.symbol(sub(1)));
                 double right = Double.parseDouble(Util.symbol(sub(2)));
                 return rewrapWithProperties(factory.literal(left == right));
+            }
+            case ELASPED : {
+            	return rewrapWithProperties(factory.literal(System.currentTimeMillis())); // TODO
             }
             case STRING_LT : {
             	// $[StringLessThan, t1, t2]

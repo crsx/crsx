@@ -8,6 +8,20 @@
 #define PROF_H_
 
 #include "crsx.h"
+#include <sys/time.h>
+
+#ifdef __MACH__
+
+#define CLOCK_PROCESS_CPUTIME_ID 0
+#define CLOCK_MONOTONIC 0
+
+extern int clock_gettime(int clk_id, struct timespec *t);
+#else
+#include <time.h>
+#endif
+
+extern struct timespec diff(struct timespec start, struct timespec end);
+
 
 #ifdef CRSX_ENABLE_PROFILING
 

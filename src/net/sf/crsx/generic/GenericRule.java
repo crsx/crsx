@@ -750,6 +750,7 @@ public class GenericRule implements Copyable
 	{
 		if (meta.kind() == Kind.META_APPLICATION)
 		{
+			// TODO: THIS SEEMS NOT QUITE RIGHT. Maybe we should keep the explicits somewhere.
 			for (int i = meta.arity() - 1; i >= 0; i--)
 			{
 				Term sub = meta.sub(0);

@@ -2,16 +2,11 @@
 #include "prof.h"
 #include "crsx.h"
 
-#ifdef CRSX_ENABLE_PROFILING
-
-#include <sys/time.h>
 #include <sys/resource.h>
 
 // Mac does not have clock_gettime
 #ifdef __MACH__
 #include <mach/mach_time.h>
-#define CLOCK_PROCESS_CPUTIME_ID 0
-#define CLOCK_MONOTONIC 0
 int clock_gettime(int clk_id, struct timespec *t)
 {
     mach_timebase_info_data_t timebase;
@@ -26,9 +21,25 @@ int clock_gettime(int clk_id, struct timespec *t)
     t->tv_nsec = nseconds;
     return 0;
 }
-#else
-#include <time.h>
 #endif
+
+
+struct timespec diff(struct timespec start, struct timespec end)
+{
+    struct timespec temp;
+    if ((end.tv_nsec - start.tv_nsec) < 0)
+    {
+        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
+        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
+    } else
+    {
+        temp.tv_sec = end.tv_sec - start.tv_sec;
+        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
+    }
+    return temp;
+}
+
+#ifdef CRSX_ENABLE_PROFILING
 
 
 typedef struct _ProfFunctionEntry *ProfFunctionEntry;
@@ -121,21 +132,6 @@ void crsxpInit(Context context)
     }
 }
 
-
-static struct timespec diff(struct timespec start, struct timespec end)
-{
-    struct timespec temp;
-    if ((end.tv_nsec - start.tv_nsec) < 0)
-    {
-        temp.tv_sec = end.tv_sec - start.tv_sec - 1;
-        temp.tv_nsec = 1000000000 + end.tv_nsec - start.tv_nsec;
-    } else
-    {
-        temp.tv_sec = end.tv_sec - start.tv_sec;
-        temp.tv_nsec = end.tv_nsec - start.tv_nsec;
-    }
-    return temp;
-}
 
 static long nano2ms(long nano)
 {

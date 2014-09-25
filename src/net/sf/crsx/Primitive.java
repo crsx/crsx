@@ -183,6 +183,11 @@ public enum Primitive
 	/** $[VariableNameIs, v, #name, #result] the variable name associated with v is #name and return as result. */
 	VARIABLE_NAME_IS("VariableNameIs", 3, 3),
 	
+	// Time
+	
+	// $[ElapsedTime]
+	ELASPED("ElapsedTime", 0, 0),
+	
 	// Matching.
 	
 	/**
