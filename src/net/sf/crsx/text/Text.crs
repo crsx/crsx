@@ -54,4 +54,21 @@ Text-User[$String<!--ParsePrefix-->, Text<!-- Unparsed -->] :: Text ;
 Text-User[#ParsePrefix, #Unparsed] →  %n⟪%†«#ParsePrefix»†«"\u27ea"»« #Unparsed »†«"\u27eb"»⟫ ;
 
 
+Text-Print[Text] :: $String ;
+Text-Print1[Text, $Numeric] :: $String ;
+Text-Print[#Text] → Text-Print1[#Text, 0];
+-[Copy[#Int]]:Text-Print1[$TextCons[$TextChars[#String], #Text2], #Int] → $[:, Text-Indent[#Int], #String, Text-Print1[#Text2, #Int]];
+-[Copy[#Int]]:Text-Print1[$TextCons[$TextBreak[#String], #Text2], #Int] → $[:, Text-Indent[#Int], #String, "\n", Text-Print1[#Text2, #Int]];
+Text-Print1[$TextCons[$TextSeparator, #Text2], #Int] → Text-Print1[#Text2, #Int];
+-[Copy[#Int]]:Text-Print1[$TextCons[$TextGroup[#Text], #Text2], #Int] → $[:, Text-Print1[#Text, #Int], Text-Print1[#Text2, #Int]];
+-[Copy[#Int]]:Text-Print1[$TextCons[$TextIndent[#Text], #Text2], #Int] → $[:, Text-Print1[#Text, $[Plus, #Int, 2]], Text-Print1[#Text2, $[Plus, #Int, 2]]];
+-[Copy[#Int]]:Text-Print1[$TextCons[$TextEmbed[#Text], #Text2], #Int] → $[:, Text-Print1[#Text, #Int], Text-Print1[#Text2, #Int]];
+-[Copy[#Int]]:Text-Print1[$TextCons[$TextString[#Text], #Text2], #Int] → $[:, Text-Print1[#Text, #Int], Text-Print1[#Text2, #Int]];
+-[Discard[#Int]]:Text-Print1[$TextNil, #Int] → "";
+
+Text-Indent[$Numeric] :: $String ;
+Text-Indent[0] → "" ;
+Text-Indent[#Int] → $[:, "  ", Text-Indent[$[Minus, #Int, 2]]] ; // Should be #Int number of spaces
+
+
 )]
