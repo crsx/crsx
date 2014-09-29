@@ -1229,9 +1229,24 @@ public class Sorter
 				sort = freshForm(CRS.NUMERIC_SORT, 0);
 				break;
 			}
-			case ELASPED:
+			case ELAPSED:
 				sort = freshForm(CRS.NUMERIC_SORT, 0);
 				break;
+			case PROFILE_ENTER : {
+				Variable alpha = freshSortVariable();
+				argumentsorts[0] = freshForm(CRS.NUMERIC_SORT, 0);
+				argumentsorts[1] = freshForm(CRS.STRING_SORT, 0);
+				argumentsorts[2] = factory.newVariableUse(alpha);
+				sort = factory.newVariableUse(alpha);
+				break;
+			}
+			case PROFILE_EXIT : {
+				Variable alpha = freshSortVariable();
+				argumentsorts[0] = freshForm(CRS.NUMERIC_SORT, 0);
+				argumentsorts[1] = factory.newVariableUse(alpha);
+				sort = factory.newVariableUse(alpha);
+				break;
+			}
 			case EQ :
 			case DEEP_EQ :
 			case NE :

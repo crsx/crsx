@@ -96,6 +96,7 @@ int printUsage(char* errmsg)
     printf ("The commands are:\n");
     printf ("  compile <header|rules|sorts|symbols|opt1> <rules.dr>   Compile reified rules to c code.\n");
     printf ("  lint [-c] <input>                                      Check term lexical form.\n");
+    printf ("  report <input.csv>                                         Analyzes profiling information and print report.\n");
     printf ("or:\n");
     printf ("  key=value...   Invoke raw rulecompiler with this environment setup.\n");
     exit(1);
@@ -234,6 +235,44 @@ int runLinter(int argp, int argc, char* argv[])
     return 0;
 }
 
+
+static
+int runReport(int argp, int argc, char* argv[])
+{
+    int flags = 0;
+    char* input = (char*)0;
+
+    int i;
+    for (i = argp; i < argc; ++i)
+    {
+        const char *arg = argv[i];
+        if (input)
+            return printUsage("Too many arguments.");
+        input = (char*)arg;
+    }
+
+    if (!input)
+        return printUsage("Missing input argument.");
+
+
+    Context context = (Context) calloc(1, sizeof(struct _Context));
+    initCRSXContext(context);
+
+    FILE *fp = fopen(input, "r");
+    if (!fp)
+    {
+        printf("Fatal: Cannot read file %s (%s)\n", input, strerror(errno));
+        exit(3);
+    }
+
+    crsxpMergeBacktrace(context, fp);
+
+    fclose(fp);
+
+    return 0;
+}
+
+
 #endif
 
 static void
@@ -266,7 +305,10 @@ main (int argc, char* argv[])
         return runCompile(2, argc, argv);
 
     if (strcmp(command, "lint") == 0)
-        return runLinter(2, argc, argv);
+           return runLinter(2, argc, argv);
+
+    if (strcmp(command, "report") == 0)
+           return runReport(2, argc, argv);
 
 #endif
     // "manual" loading.

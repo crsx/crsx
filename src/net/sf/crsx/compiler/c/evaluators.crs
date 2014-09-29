@@ -1976,7 +1976,8 @@ POLY_PRIMITIVE[E_IfEmpty];
 POLY_PRIMITIVE[E_IfDef];
 POLY_PRIMITIVE[E_VariableNameIs];
 POLY_PRIMITIVE[E_Echo];
-
+POLY_PRIMITIVE[E_ProfileEnter];
+POLY_PRIMITIVE[E_ProfileExit];
 
 )];
 
@@ -2017,6 +2018,29 @@ Poly-Dump[Fresh[str::Text]]
 «{#env}T-set-string[#Prefix, #sink, str]»
 ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «str»);
 «{#env}#Tail[OK, #Term]»
+⟫
+;
+
+// $[ProfileEnter, #id, #name, #cont]  
+
+Poly-ProfileEnter
+:
+{#env}E-poly[E_ProfileEnter, (#Name; META-APPLICATION[#MetaVar, #Args, #Use]; #name; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
+→
+{#env}T-local-string[#name, #sink, s p.%n⟪
+PROFILE_ENTER(«#sink»->context, VARIABLE(«{#env}MetaVar[#MetaVar]»), «s»);«p»
+«{#env}#Tail[OK, #cont]»
+⟫]
+;
+
+// $[ProfileExit, #id, #cont]  
+
+Poly-ProfileExit 
+:
+{#env}E-poly[E_ProfileExit, (#Name; META-APPLICATION[#MetaVar, #Args, #Use]; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
+→
+%n⟪PROFILE_EXIT(«#sink»->context, VARIABLE(«{#env}MetaVar[#MetaVar]»));
+«{#env}#Tail[OK, #cont]»
 ⟫
 ;
 

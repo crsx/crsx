@@ -543,8 +543,14 @@ public class GenericEvaluator extends FixedGenericConstruction
                 double right = Double.parseDouble(Util.symbol(sub(2)));
                 return rewrapWithProperties(factory.literal(left == right));
             }
-            case ELASPED : {
+            case ELAPSED : {
             	return rewrapWithProperties(factory.literal(System.currentTimeMillis())); // TODO
+            }
+            case PROFILE_ENTER:{
+            	return rewrapWithProperties(sub(3));
+            }
+            case PROFILE_EXIT:{
+            	return rewrapWithProperties(sub(2));
             }
             case STRING_LT : {
             	// $[StringLessThan, t1, t2]
@@ -983,6 +989,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             	return rewrapWithProperties(Util.listifyVariableSet(factory, vs));
             }
 			
+            
 			case MATCH :
 				// $[Match,...] does not evaluate at all!
 				break;

@@ -183,11 +183,16 @@ public enum Primitive
 	/** $[VariableNameIs, v, #name, #result] the variable name associated with v is #name and return as result. */
 	VARIABLE_NAME_IS("VariableNameIs", 3, 3),
 	
-	// Time
+	// Time/Profiling
 	
 	// $[ElapsedTime]
-	ELASPED("ElapsedTime", 0, 0),
-	
+	ELAPSED("ElapsedTime", 0, 0),
+	   
+	// $[ProfileEnter, #id, #name, #result]
+	PROFILE_ENTER("ProfileEnter", 3, 3),
+	// $[ProfileExit, #id, #result]
+	PROFILE_EXIT("ProfileExit", 2, 2),
+		
 	// Matching.
 	
 	/**

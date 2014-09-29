@@ -1258,8 +1258,13 @@ public class GenericRule implements Copyable
 					if (start)
 					{
 						Variable[] binders = construction.binders(index);
-						for (int i = 0; i < binders.length; i ++)
-							maybeShallow.put(binders[i], true);
+				
+						// Binders on meta cannot be shallow 
+						if 	(construction.sub(index).kind() != Kind.META_APPLICATION)
+						{
+							for (int i = 0; i < binders.length; i ++)
+								maybeShallow.put(binders[i], true);
+						}
 						
 						scopedBinders.push(binders);
 					}	
@@ -1468,11 +1473,16 @@ public class GenericRule implements Copyable
 						{
 							linearSubstitutionContexts.add(false);
 						}
+						
+						// meta does not define binders
+						scopedBinders.push(GenericTerm.NO_BIND);
 					}
 					else
 					{
 						// Pop linearity of this meta-application argument.
 						linearSubstitutionContexts.remove(linearSubstitutionContexts.size() - 1);
+						
+						scopedBinders.pop();
 					}
 				}
 

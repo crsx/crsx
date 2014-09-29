@@ -578,8 +578,8 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
         buffer->blocking |= b->block;
 
         // Also if this binder is blocking and shallow, then don't track it as it will stay shallow.
-        if (context->fv_enabled && b->block && b->shallow)
-            b->track = 0;
+        //if (context->fv_enabled && b->block && b->shallow)
+        //    b->track = 0;
     }
 
     return sink;
@@ -2016,7 +2016,7 @@ static void freeKeyValue(Context context, const void* key, void* value)
         FREE(context, value);
 }
 
-static void freeValue(Context context, const void* key, void* value)
+void freeValue(Context context, const void* key, void* value)
 {
     if (value)
         FREE(context, value);
@@ -2058,6 +2058,9 @@ static void freeLL2(Context context, LinkedList2 head, void (*unlink)(Context, c
         LinkedList2 next = head->next;
         if (unlink)
             unlink(context, head->key, head->value);
+        head->next = NULL;
+        head->key = NULL;
+        head->value = NULL;
         FREE(context, head);
         head = next;
     }
@@ -2216,12 +2219,9 @@ Hashset2 removeHS2(Context context, Hashset2 set, const void* key)
 {
     ASSERT(context, set->nr == 1); // Can't update when shared.
 
-    size_t index;
-    LinkedList2 slot, prevslot;
-
-    index = set->hash(key) & ((1 << set->nbits) - 1);
-    slot = set->entries[index];
-    prevslot = NULL;
+    size_t index = set->hash(key) & ((1 << set->nbits) - 1);
+    LinkedList2 slot = set->entries[index];
+    LinkedList2 prevslot = NULL;
 
     while (slot)
     {
@@ -2236,7 +2236,7 @@ Hashset2 removeHS2(Context context, Hashset2 set, const void* key)
            {
                prevslot->next = slot->next;
            }
-
+           slot->next = NULL;
            freeLL2(context, slot, set->unlink);
            set->size--;
            return set;
@@ -3417,7 +3417,7 @@ void normalize(Context context, Term *termp)
                 }
             }
         }
-        else if (IS_FUNCTION(term) && ! IS_NOSTEP(term) && !IS_BLOCKED(term))
+        else if (IS_FUNCTION(term) && ! IS_NOSTEP(term)) // && !IS_BLOCKED(term))
         {
             Sink sink = ALLOCA_BUFFER(context);
             if (step(sink, term)) // Reference is transferred and consumed only when step succeeds

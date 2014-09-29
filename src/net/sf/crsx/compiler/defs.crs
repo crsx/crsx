@@ -307,6 +307,7 @@ SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; 
 				 E_IfDef; E_Show; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
 				 E_Match; E_Call; E_TryCall; E_Cast; E_Pick; E_ReversePick; E_ListLength; E_Null; E_Nil; E_ForgivableError; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
                  E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_ParseText; E_Echo; E_DeepEqual; E_HashCode; E_ElapsedTime;
+                 E_ProfileEnter; E_ProfileExit;
 				);
 
 Primitive[$String] :: SPrimitive;
@@ -395,8 +396,6 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "ListLength"], 			E_ListLength,
 	$[If, $[Equal, #Primitive, "Null"], 				E_Null,
 	$[If, $[Equal, #Primitive, "Nil"], 					E_Nil,
-
-    // NEW PRIMITIVES ADDED BY Kris FOR HACS
 	$[If, $[Equal, #Primitive, "UpCase"],				E_UpCase,
 	$[If, $[Equal, #Primitive, "DownCase"],				E_DownCase,
 	$[If, $[Equal, #Primitive, "Replace"],				E_Replace,
@@ -411,10 +410,12 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "DeepEqual"],				E_DeepEqual,
     $[If, $[Equal, #Primitive, "HashCode"],             E_HashCode,
     $[If, $[Equal, #Primitive, "ElapsedTime"],          E_ElapsedTime,
+    $[If, $[Equal, #Primitive, "ProfileEnter"],         E_ProfileEnter,
+    $[If, $[Equal, #Primitive, "ProfileExit"],          E_ProfileExit,
 	
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 

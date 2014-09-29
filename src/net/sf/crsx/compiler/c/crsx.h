@@ -102,9 +102,10 @@ struct _Context
     unsigned int debugtrace : 1;
     unsigned int debugliterals :1;
 
-
 #ifdef CRSX_ENABLE_PROFILING
-    int profiling;
+    unsigned int profiling : 1; // user-defined program profiling
+    unsigned int internal : 1; // internal profiling
+
 #endif
 };
 
@@ -150,6 +151,29 @@ extern void initCRSXContext(Context context);
 #endif
 #ifndef DEBUGRULE
 # define DEBUGRULE(CONTEXT,RULE) DEBUGF(CONTEXT, "//%s\n", RULE)
+#endif
+
+
+#ifdef CRSX_ENABLE_PROFILING
+
+#ifndef PROFILE_ENTER
+#define PROFILE_ENTER(CONTEXT,ID,NAME) crsxpInstrumentEnter(CONTEXT,ID,NAME)
+#endif
+
+#ifndef PROFILE_EXIT
+#define PROFILE_EXIT(CONTEXT,ID) crsxpInstrumentExit(CONTEXT,ID)
+#endif
+
+#else
+
+#ifndef PROFILE_ENTER
+#define PROFILE_ENTER(CONTEXT,ID,NAME) noop()
+#endif
+
+#ifndef PROFILE_EXIT
+#define PROFILE_EXIT(CONTEXT,ID) noop()
+#endif
+
 #endif
 
 // Turn on profiling.
@@ -1275,6 +1299,7 @@ extern Iterator2 iteratorHS2(Context context, Hashset2 set);
 // Print out HS2
 extern void printPropsHS2(Context context, Hashset2 set);
 
+extern void freeValue(Context context, const void* key, void* value);
 extern int equalsPtr(const void* left, const void* right);
 extern size_t hashPtr(const void* entry);
 

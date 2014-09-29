@@ -14,6 +14,7 @@
 
 #define CLOCK_PROCESS_CPUTIME_ID 0
 #define CLOCK_MONOTONIC 0
+#define CLOCK_MONOTONIC_COARSE 0
 
 extern int clock_gettime(int clk_id, struct timespec *t);
 #else
@@ -85,6 +86,13 @@ void crsxpFreeVariable(Context context);
 
 void crsxpMakeConstruction(Context context);
 void crsxpFreeConstruction(Context context);
+
+void crsxpInstrumentEnter(Context context, Variable id, char* name);
+void crsxpInstrumentExit(Context context, Variable id);
+
+// Merge back-traces from raw profiling information
+void crsxpMergeBacktrace(Context context, FILE* file);
+
 
 extern void printProfiling(Context context);
 extern void pIncMetaCountFunction(Context context, char* functionName, long memuse);
