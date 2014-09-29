@@ -14,12 +14,13 @@ extern "C" {
 
 // Includes.
 #include <stdlib.h>
-#include <stdarg.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <alloca.h>
 #include <ctype.h>
 #include <math.h>
@@ -71,7 +72,7 @@ typedef struct _BufferSegment *BufferSegment;
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
-
+    struct timespec time; // time when compute started.
     Hashset2 env;         // General environment.
 
     int poolRefCount;
@@ -96,7 +97,11 @@ struct _Context
     char *str_linelocation;
     char *str_columnlocation;
 
-    int fv_enabled; // Whether the free variable optimization is on.
+    unsigned int fv_enabled : 1; // Whether the free variable optimization is on.
+    unsigned int debugsteps : 1;
+    unsigned int debugtrace : 1;
+    unsigned int debugliterals :1;
+
 
 #ifdef CRSX_ENABLE_PROFILING
     int profiling;
@@ -112,6 +117,9 @@ extern void initCRSXContext(Context context);
 # ifndef DEBUGENV
 #  define DEBUGENV(NAME,CMD) if (getenv(NAME)) CMD
 # endif
+# ifndef DEBUGCOND
+#  define DEBUGCOND(COND,CMD) if (COND) CMD
+# endif
 # ifndef DEBUGF
 #  define DEBUGF(CONTEXT,...) printf(__VA_ARGS__)
 # endif
@@ -125,6 +133,9 @@ extern void initCRSXContext(Context context);
 #else
 # ifndef DEBUGENV
 #  define DEBUGENV(NAME,CMD) noop()
+# endif
+# ifndef DEBUGCOND
+#  define DEBUGCOND(COND,CMD) noop()
 # endif
 # ifndef DEBUGF
 #  define DEBUGF(CONTEXT,FMT,...) noop()
@@ -143,6 +154,9 @@ extern void initCRSXContext(Context context);
 
 // Turn on profiling.
 extern void enableProfiling(Context context);
+
+// Returns elapsed time (in ms) since beginning of compute
+extern long elapsed(Context context);
 
 // Memory allocation.
 //

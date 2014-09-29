@@ -164,42 +164,42 @@ Send-MetaApplication
 {#env}
 T-send[META-APPLICATION[#MetaVar, #Arguments, #Occ], #sink]
 →
-{#env}
-T-send-meta-aplication0[$[{#env}Get[STRING_ENTRY], "$Binders", LIST_VARIABLE[()]], $[FreeVariables, #Arguments], #MetaVar, #Arguments, #Occ, #sink]
-;
-
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication0[STRING_ENTRY, $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
-
-{#env}
-T-send-meta-aplication0[LIST_VARIABLE[#ContextVariables], #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
-→
-{#env}
-T-send-meta-aplication1[#ContextVariables, #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
-;
-
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication1[$List[Reified_Variable], $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
-
-{#env}
-T-send-meta-aplication1[#ContextVariables, #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
-→
-{#env}
-T-send-meta-aplication2[$[ExceptVariables, #ContextVariables, #UsedVariables], #MetaVar, #Arguments, #Occ, #sink]
-;
-
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication2[$List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
-
--[Free[v::Reified_Variable, sink::Text]]
-:
-{#env}
-T-send-meta-aplication2[(v;#rest), #MetaVar, #Arguments, #Occ, sink]
-→
-{#env} 
-T-send-meta-aplication2[#rest, #MetaVar, #Arguments, #Occ, sink]
-;
-
-{#env}
-T-send-meta-aplication2[(), #MetaVar, #Arguments, #Occ, #sink]
-→
+//{#env}
+//T-send-meta-aplication0[$[{#env}Get[STRING_ENTRY], "$Binders", LIST_VARIABLE[()]], $[FreeVariables, #Arguments], #MetaVar, #Arguments, #Occ, #sink]
+//;
+//
+//{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication0[STRING_ENTRY, $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+//
+//{#env}
+//T-send-meta-aplication0[LIST_VARIABLE[#ContextVariables], #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
+//→
+//{#env}
+//T-send-meta-aplication1[#ContextVariables, #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
+//;
+//
+//{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication1[$List[Reified_Variable], $List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+//
+//{#env}
+//T-send-meta-aplication1[#ContextVariables, #UsedVariables, #MetaVar, #Arguments, #Occ, #sink]
+//→
+//{#env}
+//T-send-meta-aplication2[$[ExceptVariables, #ContextVariables, #UsedVariables], #MetaVar, #Arguments, #Occ, #sink]
+//;
+//
+//{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-send-meta-aplication2[$List[Reified_Variable], $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+//
+//-[Free[v::Reified_Variable, sink::Text]]
+//:
+//{#env}
+//T-send-meta-aplication2[(v;#rest), #MetaVar, #Arguments, #Occ, sink]
+//→
+//{#env} 
+//T-send-meta-aplication2[#rest, #MetaVar, #Arguments, #Occ, sink]
+//;
+//
+//{#env}
+//T-send-meta-aplication2[(), #MetaVar, #Arguments, #Occ, #sink]
+//→
 {#env}
 T-substitute[#MetaVar, #Arguments, #Occ, #sink]
 ;

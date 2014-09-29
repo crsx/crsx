@@ -349,8 +349,8 @@ F-Option[#option, #value, ok.#[ok]]
 →
 $[If, $[Equal, #option, "Free"            ], {#env}F-variableOption[FREE, #value, ok.#[ok]],
 $[If, $[Equal, #option, "Fresh"           ], {#env}F-variableOption[FRESH, #value, ok.#[ok]],
-$[If, $[Equal, #option, "FreshReuse"      ], {#env}F-variableOption[FRESHREUSE, #value, ok.#[ok]],
-$[If, $[Equal, #option, "FreshReuseOrigin"], {#env}F-variableFreshReuseOriginOption["FreshReuseOrigin", #value, ok.#[ok]],
+$[If, $[Equal, #option, "FreshReuse"      ], {#env}F-variableOption[FRESHREUSE, #value, ok.#[ok]], // TODO: NOT USED?
+$[If, $[Equal, #option, "FreshReuseOrigin"], {#env}F-variableFreshReuseOriginOption["FreshReuseOrigin", #value, ok.#[ok]], // TODO: NOT USED?
   {#env}F-metaOption[#option, #value, ok.#[ok]]]]]]
 ;
 

@@ -100,25 +100,25 @@ public class Simplifier
 	{
 		Env1 state = new Env1();
 
-		// First pass: simplify meta-closures
-		for (Entry<String, GenericRule> entry : ruleByName.entrySet())
-		{
-			GenericRule rule = entry.getValue();
-
-			state.changed = false;
-			state.rule = rule;
-			GenericTerm newContractum = eliminateBoundMeta(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY);
-
-			if (state.changed)
-			{
-				GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newContractum, rule.options);
-				entry.setValue(newRule);
-			}
-
-		}
-
-		// TODO: should avoid this step by maintaining the sort structure is the new rules..
-		crs.sortify();
+//		// First pass: simplify meta-closures
+//		for (Entry<String, GenericRule> entry : ruleByName.entrySet())
+//		{
+//			GenericRule rule = entry.getValue();
+//
+//			state.changed = false;
+//			state.rule = rule;
+//			GenericTerm newContractum = eliminateBoundMeta(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY);
+//
+//			if (state.changed)
+//			{
+//				GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newContractum, rule.options);
+//				entry.setValue(newRule);
+//			}
+//
+//		}
+//
+//		// TODO: should avoid this step by maintaining the sort structure is the new rules..
+//		crs.sortify();
 
 		// Second pass: simplify deep closures
 		Collection<GenericRule> pendingRules = ruleByName.values();
@@ -206,8 +206,7 @@ public class Simplifier
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound)
-			throws CRSException
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound) throws CRSException
 	{
 		for (int i = term.arity() - 1; i >= 0; i--)
 		{
@@ -337,9 +336,9 @@ public class Simplifier
 			Term[] binderSorts = getBindersSort(rulename, sortDeclaration.tail(), i);
 
 			boolean hasBlockingMarker = false;
-			for (int j = 0; j < binders.length; j ++)
+			for (int j = 0; j < binders.length; j++)
 				hasBlockingMarker |= binders[j].blocking();
-			
+
 			final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
 			if (hasBlockingMarker && hasDeepBinders)
 			{
@@ -676,20 +675,26 @@ public class Simplifier
 								var = original.sub(i).variable();
 
 							// The variable is a binder occurring in the closure. Need to capture the binder
-							Variable capturedBinder = factory.makeVariable(var.name(), var.promiscuous(), var.blocking(), var.shallow());
+							Variable capturedBinder = factory.makeVariable(
+									var.name(), var.promiscuous(), var.blocking(), var.shallow());
 							patternBindersA.add(capturedBinder);
 
 							patternSubsA.add(factory.newVariableUse(capturedBinder));
 
 							// Update binder sorts
-							Variable binderOnSort = factory.makeVariable(var.name(), var.promiscuous(), var.blocking(), var.shallow());
+							// TODO: how to do this on variable use? and Meta?
+							Variable binderOnSort = factory.makeVariable(
+									var.name(), var.promiscuous(), var.blocking(), var.shallow());
 							patternBindersSortA.add(binderOnSort);
+
 							Term varSort = env.rule.getVariableSort(var);
 							if (varSort == null)
 								fatal("Missing sort for variable " + var + " in rule " + env.rule.name());
-
+							
+							if (!(metaSort instanceof PropertiesConstraintsWrapper))
+								metaSort = new PropertiesConstraintsWrapper(metaSort, null, null, null, null);
+							
 							metaSort = metaSort.wrapWithProperty(binderOnSort, varSort, false); // binderOnSort.{binderOnSort:varSort}.MetaSort
-							//							}
 						}
 
 						patternBinders = patternBindersA.toArray(GenericTerm.NO_BIND);
@@ -948,8 +953,8 @@ public class Simplifier
 			argsBinders = new ArrayList<Variable[]>();
 			args = new ArrayList<GenericTerm>();
 
-			metavars = new HashMap<Object,String>();
-			propHolder = new HashMap<Map<String,Term>,String>();
+			metavars = new HashMap<Object, String>();
+			propHolder = new HashMap<Map<String, Term>, String>();
 
 		}
 	}

@@ -1229,6 +1229,9 @@ public class Sorter
 				sort = freshForm(CRS.NUMERIC_SORT, 0);
 				break;
 			}
+			case ELASPED:
+				sort = freshForm(CRS.NUMERIC_SORT, 0);
+				break;
 			case EQ :
 			case DEEP_EQ :
 			case NE :
