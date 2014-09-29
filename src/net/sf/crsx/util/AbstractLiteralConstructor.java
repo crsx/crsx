@@ -100,7 +100,8 @@ public abstract class AbstractLiteralConstructor implements Constructor
 			writer.append("...");
 			return;
 		}
-		writer.append(CRS.STRING_SORT.equals(literalSort()) ? Util.quoteJava(symbol()) : symbol());
+		String symbol = symbol();
+		writer.append(CRS.STRING_SORT.equals(literalSort()) ? Util.quoteJava(symbol) : Util.externalizeConstructor(symbol));
 	}
 
 	final public SortedSet<Path> paths(Path base)

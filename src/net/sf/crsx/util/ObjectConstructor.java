@@ -126,7 +126,7 @@ final public class ObjectConstructor implements Constructor
 			writer.append("...");
 			return;
 		}
-		writer.append(object.toString());
+		writer.append(Util.externalizeConstructor(object.toString()));
 	}
 
 	final public SortedSet<Path> paths(Path base)

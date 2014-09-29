@@ -44,6 +44,7 @@ public class TraceSink implements Sink
 
 	// Constructor.
 	
+    
 	/**
 	 * Create sink that forwards everything to other sink (which it takes over).
 	 * @param real sink to forward to
