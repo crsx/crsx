@@ -563,12 +563,17 @@ struct _Construction
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
     unsigned int blocked : 1; // whether function construction subterm known to be blocked by blocking binders.
+    unsigned int varfvs : 1; // whether fvs is a Variable or a Hashset
 
     NamedPropertyLink namedProperties;       // named properties. (may be null)
     VariablePropertyLink variableProperties; // variable properties. (may be null)
 
     // Keep all free variable sets separated in order to maximize reuse, and minimize merging.
-    Hashset fvs;  // free variables known to occur in subterms only (excluding properties)
+    union {
+        Hashset hashfvs;
+        Variable varfvs;
+    } fvs;  // free variables known to occur in subterms only (excluding properties)
+
     Hashset nfvs; // free variables known to occur in named properties (on this construction AND subterms)
     Hashset vfvs; // free variables known to occur in variable properties (on this construction AND subterms)
 
@@ -668,7 +673,7 @@ struct _SortDescriptor
 #define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0,0,0)
 #define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1,0,0)
 #define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1,0,0)
-#define SHALLOW(v) ((v)->shallow = 1)
+#define SHALLOW(v) noop()
 #define BLOCK(v) ((v)->block = 1)
 
 //
@@ -680,9 +685,9 @@ struct _Variable
     unsigned int linear : 1; // whether this variable is linear
     unsigned int bound : 1;  // whether this variable is bound
     unsigned int block : 1;  // whether this variable is blocking reduction
-    unsigned int shallow : 1; // whether this variable (when bound) has only shallow occurrences (before reduction)
+    //unsigned int shallow : 1; // whether this variable (when bound) has only shallow occurrences (before reduction)
 
-    unsigned int track : 1; // whether to track this variable in free variable sets (if optimization enabled)
+   // unsigned int track : 1; // whether to track this variable in free variable sets (if optimization enabled)
 };
 
 /**
