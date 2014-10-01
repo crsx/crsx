@@ -374,7 +374,7 @@ T-send-Binder6[Reified_Promiscuity, Reified_Guard, Reified_Depth, binder : Reifi
 {#env; "$Binders":LIST_VARIABLE[#binders]}
 T-send-Binder6[#promisc, #guard, #depth, b.#Binder[b], sink, #index, #bs, #sep, #state]
 →
-%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«sink»->context,"«new»");«T-send-Guard[new, #guard]»«T-send-Depth[new, #depth]»
+%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«sink»->context,"«new»");
 « {#env; new : BOUND; "$Binders":LIST_VARIABLE[(new;#binders)]}T-send-Binder1[#Binder[new], sink, $[Plus,#index,1], %n⟨‹#bs›‹#sep›‹new›⟩, %n⟨,⟩, #state] »⟫
 ;
 
@@ -386,28 +386,6 @@ T-send-Binder1[ARGUMENT[#sort, #Term], sink, #rank, #bs, #sep, #state]
 →
 %n⟪Variable «binds»[«INTEGER[#rank]»] = {«#bs»}; BINDS(«sink», «INTEGER[#rank]», «binds»);
 « {#env}T-send[#Term, sink] »⟫
-;
-
-T-send-Guard[Reified_Variable, Reified_Guard] :: Text;
-
-T-send-Guard[#v, BLOCK] →
-    %n⟪
-BLOCK(«#v»);⟫
-;
-
-T-send-Guard[#v, PERMIT] →
-    %n⟪⟫
-;
-
-T-send-Depth[Reified_Variable, Reified_Depth] :: Text;
-
-T-send-Depth[#v, SHALLOW] →
-    %n⟪
-SHALLOW(«#v»);⟫
-;
-
-T-send-Depth[#v, DEEP] →
-    %n⟪⟫
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -468,7 +446,7 @@ T-substitute2[#MetaVar, (), USE[#Count], sink, #arity, #prefix, #vars, #args, #s
 %n⟪{⟦
 « #prefix »Variable «vars»[«INTEGER[#used]»] = {«#vars»};
 Term «args»[«INTEGER[#used]»] = {«#args»};
-struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args», 0};
+struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args»};
 SUBSTITUTE(«sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, T-link-prefix[sink]]»«{#env}MetaVar[#MetaVar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», &«substitution»); ⟧}
 ⟫
 ;

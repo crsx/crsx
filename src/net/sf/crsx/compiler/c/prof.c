@@ -492,7 +492,7 @@ static void printChildReport(Context context, ProfReport report, int maxLength,
         int indent, long totalTime)
 {
     double percent = (report->accutime / (double) totalTime) * 100.0;
-    if (percent > 1)
+    if (percent > 0.1)
     {
         printf("%.*s", indent,
                 "                                                                                                                                                                           ");

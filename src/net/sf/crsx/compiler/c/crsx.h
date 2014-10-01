@@ -562,7 +562,6 @@ struct _Construction
 
     unsigned int nf : 1; // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
-    unsigned int blocked : 1; // whether function construction subterm known to be blocked by blocking binders.
     unsigned int varfvs : 1; // whether fvs is a Variable or a Hashset
 
     NamedPropertyLink namedProperties;       // named properties. (may be null)
@@ -669,12 +668,10 @@ struct _SortDescriptor
 //
 // Variables are compared as pointers with ==.  The name is a guideline and may be ignored.
 //
-#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,1,0,0,0)
-#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0,0,0)
-#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1,0,0)
-#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1,0,0)
-#define SHALLOW(v) noop()
-#define BLOCK(v) ((v)->block = 1)
+#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,1,0)
+#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0)
+#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1)
+#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1)
 
 //
 struct _Variable
@@ -684,16 +681,12 @@ struct _Variable
     char *name;              // name...neither guaranteed to be globally unique nor the same as originally provided
     unsigned int linear : 1; // whether this variable is linear
     unsigned int bound : 1;  // whether this variable is bound
-    unsigned int block : 1;  // whether this variable is blocking reduction
-    //unsigned int shallow : 1; // whether this variable (when bound) has only shallow occurrences (before reduction)
-
-   // unsigned int track : 1; // whether to track this variable in free variable sets (if optimization enabled)
 };
 
 /**
  * @Brief Make new variable. Reference count is 1, use count is 0
  */
-extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int block, unsigned int shallow);
+extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear);
 
 /**
  * @Brief Free variable
@@ -878,16 +871,14 @@ struct _Buffer
     int lastTop; // index of top entry (in last segment) or <0 when empty
     NamedPropertyLink pendingNamedProperties; // named properties for next START (NOTE: cannot be shared). Buffer owns ref.
     VariablePropertyLink pendingVariableProperties; // variable properties for next START (NOTE: cannot be shared). Buffer owns ref.
-
-    unsigned blocking : 1; // whether there is at least one blocking binder
-
-
 };
+
 struct _BufferEntry
 {
     Term term; // allocated partial construction
     int index; // subterm we are working on
 };
+
 struct _BufferSegment
 {
     BufferSegment previous, next; // previous and next buffer segment (NULL for first/last)
@@ -958,7 +949,6 @@ struct _SubstitutionFrame
     int count;                 // number of variable-substitute pairs in this frame
     Variable *variables;       // count redex variables to substitute, in order. *Not* owned by frame.
     Term *substitutes;         // count redex subterms to substitute for variables, in order
-    int depth;                 // Frame depth
 };
 
 #ifndef SUBSTITUTE
@@ -975,31 +965,6 @@ static inline Term c_property(Context context, NamedPropertyLink namedProperties
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
-
-//struct _Properties
-//{
-//    VARIABLESET namedFreeVars;               // set of free variables in named properties (unless all properties are closed)
-//    VARIABLESET variableFreeVars;            // set of free variables in variable properties (never closed)
-//    NamedPropertyLink namedProperties;       // named properties.
-//    VariablePropertyLink variableProperties; // variable properties.
-//    ssize_t nr;
-//};
-//
-//Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
-//                               NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
-//Properties linkProperties(Context context, Properties env);
-//Properties unlinkProperties(Context context, Properties env);
-//
-///** Set properties. Allocation new Properties is props is noProperties */
-//Properties setProperties(Context context, Properties props, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties);
-//
-//
-//Properties setNamedFreeVars(Context context, Properties props, VARIABLESET namedFreeVars);
-//Properties setVariableFreeVars(Context context, Properties props, VARIABLESET variableFreeVars);
-//Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
-//Properties setNamedProperties(Context context, Properties props, NamedPropertyLink namedProperties);
-//Properties setVariableProperties(Context context, Properties props, VariablePropertyLink variableProperties);
-//
 
 struct _NamedPropertyLink
 {
