@@ -80,11 +80,11 @@ public enum Primitive
     LENGTH("Length", 1, 1),
     /** $[Substring, #1, #2, #3] corresponds to substring of constant #1 starting at #2 ending before #3 (defaults to the end) in the constructor symbol (0-indexed). */
     SUBSTRING("Substring", 2, 3),
-    /** $[Escape, #1] returns #1 as a string (quoted with "s and replacing internal "s with \" and special characters with \-escaped version). */
+    /** $[Escape, #] returns # as a string (quoted with "s and replacing internal "s with \" and special characters with \-escaped version). $[Escape[Q],#] uses the Q quote character instead. */
     ESCAPE("Escape", 1, 1),
-    /** $[Rescape, #1] Interprets # as a string (including quotes) and returns internal version where quotes and escapes have been interpreted. */
+    /** $[Rescape, #] Interprets # as a string (including quotes) and returns internal version where quotes and escapes have been interpreted. */
     RESCAPE("Rescape", 1, 1),
-    /** $[Mangle, #1] returns #1 as a constant suitable for use as the tail end of an identifier in (at least) Java and C. */
+    /** $[Mangle, #] returns # as a constant suitable for use as the tail end of an identifier in (at least) Java and C. */
     MANGLE("Mangle", 1, 1),
     /** $[Split, #string, #sep-regex] corresponds to a list of strings (#1;#2;...;#n;) that are the substrings of #string separated by instances of #sep-redex. */
     SPLIT("Split", 2, 2),

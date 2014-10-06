@@ -104,13 +104,15 @@ public class GenericEvaluator extends FixedGenericConstruction
     /**
      * The string with quotes.
      * @param s string to quote
-     * @param quote 
+     * @param quote to surround with and prefix with \ inside.
      */
 	public static String quoteWith(String s, String quote)
 	{
 		StringBuilder b = new StringBuilder();
-		Util.quotedJavaChars(quote, b);
-		return quote + s.replace(quote, b.toString()) + quote;
+		Util.quotedJavaChars(s, b);
+		if (! ("\'".equals(quote) || "\"".equals(quote)))
+		    s = s.replace(quote, "\\"+quote);
+		return quote + b + quote;
 	}
 	
 	/**
@@ -756,6 +758,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 computeArguments();
                 if (!Util.isConstant(sub(1))) break;
 				// $[Escape, string]
+				// $[Escape[Q], string]
                 String string = sub(0).arity() == 0 ? Util.quoteJava(Util.symbol(sub(1))) : quoteWith(Util.symbol(sub(1)), Util.symbol(sub(0).sub(0)));
                 return rewrapWithProperties(factory.literal(string));
 			}
