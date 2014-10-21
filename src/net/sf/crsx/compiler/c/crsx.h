@@ -18,9 +18,9 @@ extern "C" {
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 #include <assert.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <alloca.h>
 #include <ctype.h>
 #include <math.h>

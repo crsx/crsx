@@ -79,11 +79,11 @@ CRSXCO_FILES=$(CRSXCBUILD)/CRSXC_data.o $(CRSXCBUILD)/CRSXCsymbols.o
 $(CRSXCBUILD)/CRSXCsymbols.c: rules
 $(CRSXCBUILD)/CRSXCsymbols.o: $(CRSXCBUILD)/CRSXCsymbols.c  
 	$(CC) $(CCFLAGS) -c $< -o $@ 
-	 
+
 $(CRSXCBUILD)/CRSXC_data.c: rules
 $(CRSXCBUILD)/CRSXC_data.o: $(CRSXCBUILD)/CRSXC_data.c   
 	$(CC) $(CCFLAGS) -c $< -o $@
-	
+
 define TARGETS
 CRSXCO_FILES+=$(CRSXCBUILD)/CRSXC_$(1)_fun.o
 $(CRSXCBUILD)/CRSXC_$(1)_fun.c : rules
@@ -97,8 +97,12 @@ $(foreach family, $(CRSXCFAMILIES), $(eval $(call TARGETS,$(family))))
 # crsxc
 
 rules: 
+ifdef MAKEFILE_CC
 	export MAKEFILE_CC=$(MAKEFILE_CC) && $(MAKE) -f Rules.mk
-	
+else
+	$(MAKE) -f Rules.mk
+endif
+
 $(CRSXCBUILD)/crsxc: $(CRSXCO_FILES) $(CRSX_O_FILES)
 	$(CXX) $^ $(ICU4CLIB) $(RTLIB) $(LDFLAGS) -o $@
 

@@ -2,12 +2,9 @@
 // $Id: crsx.c,v 3.123 2014/02/11 15:56:48 villardl Exp $
 
 // Implementations of externals from the header file.
+
 #include "crsx.h"
 #include <stdint.h>
-#include <ctype.h>
-#include <alloca.h>
-#include <stdlib.h>
-#include <string.h>
 #include "prof.h"
 #include "invariant.h"
 
