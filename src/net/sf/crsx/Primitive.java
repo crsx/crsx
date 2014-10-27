@@ -255,7 +255,7 @@ public enum Primitive
 	IF_DEF("IfDef", 2, 3),
 	/** $[IfLinear, v, #true[, #false]] is #true if v is a linear variable (¹v) otherwise #false or (). */
 	IF_LINEAR("IfLinear", 2, 3),
-	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, oherwise #false or (). */
+	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, otherwise #false or (). */
 	IF_DATA("IfData", 2, 3),
 
 	// Environment operations.

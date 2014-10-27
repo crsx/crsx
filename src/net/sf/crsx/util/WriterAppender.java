@@ -1,5 +1,6 @@
 package net.sf.crsx.util;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
 
@@ -8,7 +9,7 @@ import java.io.Writer;
  * @author <a href="http://www.research.ibm.com/people/k/krisrose">Kristoffer Rose</a>.
  * @version $Id: WriterAppender.java,v 3.0 2012/12/17 18:04:59 krisrose Exp $
  */
-public class WriterAppender implements Appendable
+public class WriterAppender implements Appendable, Closeable
 {
 	final Writer writer;
 	
@@ -37,5 +38,11 @@ public class WriterAppender implements Appendable
 		writer.append(csq, start, end);
 		writer.flush();
 		return this;
+	}
+
+	@Override
+	public void close() throws IOException
+	{
+		writer.close();
 	}
 }

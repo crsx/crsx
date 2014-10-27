@@ -11,10 +11,8 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1160,8 +1158,9 @@ public class GenericEvaluator extends FixedGenericConstruction
             		String resource = Util.quoteJavaIdentifierPart(Util.symbol(sub(1)));
             		try
             		{
-            			Appendable w = new WriterAppender(new FileWriter(resource));
+            			WriterAppender w = new WriterAppender(new FileWriter(resource));
             			sub(2).appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+            			w.close();
             		}
             		catch (IOException e)
             		{
