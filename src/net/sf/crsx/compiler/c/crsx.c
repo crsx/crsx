@@ -3819,8 +3819,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 for (i = 0; i < s->count; ++i)
                 {
                     Variable v = s->variables[i];
-                    if ((!v->track && depth > s->depth + 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
-                    {
+                    if (!VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)) {
                         // - Variable we are substituting is not in the free var set: remove from bitmap!
                         CLEAR_LBIT(&localUnweakened, offset+i);
                     }
@@ -3981,7 +3980,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                             for (i = 0; i < s->count; ++i)
                             {
                                 Variable v = s->variables[i];
-                                if (v->track && !containsHS(namedLink->fvs, v))
+                                if (!containsHS(namedLink->fvs, v))
                                 {
                                     // - Variable we are substituting is not in the free var set: remove from bitmap!
                                     CLEAR_LBIT(&localUnweakened, offset+i);
@@ -4078,7 +4077,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                         for (i = 0; i < s->count; ++i)
                         {
                             Variable v = s->variables[i];
-                            if (v->track && !containsHS(variableLink->fvs, v))
+                            if (!containsHS(variableLink->fvs, v))
                             {
                                 // - Variable we are substituting is not in the free var set: remove from bitmap!
                                 CLEAR_LBIT(&localUnweakened, offset+i);
@@ -4271,7 +4270,7 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
                 for (i = 0; i < s->count; ++i)
                 {
                     Variable v = s->variables[i];
-                    if ((!v->track && depth > s->depth + 1) || (v->track && !VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v)))
+                    if (!VARIABLESET_CONTAINS(construction->fvs, v) && !VARIABLESET_CONTAINS(construction->nfvs, v) && !VARIABLESET_CONTAINS(construction->vfvs, v))
                     {
                         // - Variable we are substituting is not in the free var list: remove from bitmap!
                         // - Or variable is no tracked (shallow and blocking) and already doing deeper substitution
@@ -4399,9 +4398,7 @@ Hashset freeVars(Context context, Term term, Hashset set)
     if (IS_VARIABLE_USE(term))
     {
         const Variable v = VARIABLE(term);
-        if (v->track)
-            return addVariableHS(context, set, linkVariable(context, VARIABLE(term)));
-        return set;
+        return addVariableHS(context, set, linkVariable(context, VARIABLE(term)));
     }
 
     return mergeAllHS(context, set, LINK_Hashset(context, asConstruction(term)->fvs));
@@ -4473,7 +4470,7 @@ void propagateFreeVariables(Context context, Term term)
                     {
                         // Variable
                         const Variable v = VARIABLE(sub);
-                        if (v->track)
+                        //if (v->track)
                         {
                             // Don't add if among binders
                             int bound = 0;
