@@ -24,6 +24,7 @@ int clock_gettime(int clk_id, struct timespec *t)
 }
 #endif
 
+#ifndef OMIT_TIMESPEC
 struct timespec diff(struct timespec start, struct timespec end)
 {
     struct timespec temp;
@@ -38,6 +39,7 @@ struct timespec diff(struct timespec start, struct timespec end)
     }
     return temp;
 }
+#endif
 
 #ifdef CRSX_ENABLE_PROFILING
 
@@ -1101,6 +1103,8 @@ void crsxpAfterPropagateFV(Context context)
 void crsxpInstrumentEnter(Context context, Variable id, char* name)
 {}
 void crsxpInstrumentExit(Context context, Variable id)
+{}
+void crsxpMergeBacktrace(Context context, FILE* file)
 {}
 
 #endif
