@@ -3545,7 +3545,9 @@ void initCRSXContext(Context context)
 Term compute(Context context, Term term)
 {
     crsxAddPools(context);
+#ifndef OMIT_TIMESPEC
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &context->time);
+#endif
 
     normalize(context, &term);
 
@@ -3561,10 +3563,14 @@ Term compute(Context context, Term term)
 
 long elapsed(Context context)
 {
+#ifndef OMIT_TIMESPEC
     struct timespec current;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current);
     struct timespec d = diff(context->time, current);
     return (d.tv_sec * 1000000000 + d.tv_nsec) / 1000000;
+#else
+    return (long)0;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////

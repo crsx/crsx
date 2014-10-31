@@ -72,7 +72,9 @@ typedef struct _BufferSegment *BufferSegment;
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
+#ifndef OMIT_TIMESPEC
     struct timespec time; // time when compute started.
+#endif
     Hashset2 env;         // General environment.
 
     int poolRefCount;
