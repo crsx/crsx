@@ -5098,15 +5098,19 @@ ConstructionDescriptor lookupSymbolTableDescriptor(Context context, SymbolDescri
     while (hi >= lo)
     {
         x = (lo+hi)/2;
-        ASSERT(context, lo <= x && x <= hi && strcmp(table[lo].symbol, symbol) <= 0 && strcmp(symbol, table[hi].symbol) <= 0);
-        SymbolDescriptor candidate = &table[x];
-        int compare = strcmp(symbol, candidate->symbol);
-        if (compare == 0)
-            return candidate->descriptor;
-        if (compare < 0) // what we are searching for is in lower half
-            hi = x-1;
-        else //if (compare > 0) // what we are searching for is in upper half
-            lo = x+1;
+	if (! (lo <= x && x <= hi && strcmp(table[lo].symbol, symbol) <= 0 && strcmp(symbol, table[hi].symbol) <= 0) )
+	{
+	    ERRORF(context, Crsx, "Unrecognized symbol: %s\n", symbol);
+	    break;
+	}
+	SymbolDescriptor candidate = &table[x];
+	int compare = strcmp(symbol, candidate->symbol);
+	if (compare == 0)
+	    return candidate->descriptor;
+	if (compare < 0) // what we are searching for is in lower half
+	    hi = x-1;
+	else //if (compare > 0) // what we are searching for is in upper half
+	    lo = x+1;
     }
     return NULL;
 }
