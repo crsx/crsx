@@ -99,7 +99,6 @@ int printUsage(char* errmsg)
     printf ("  report <input.csv>                                         Analyzes profiling information and print report.\n");
     printf ("or:\n");
     printf ("  key=value...   Invoke raw rulecompiler with this environment setup.\n");
-    exit(1);
 #else
     printf ("Usage: %s [key]... [key=value]...\n", getenv("execname"));
     printf ("Where key and key-value are any of\n");
@@ -110,6 +109,7 @@ int printUsage(char* errmsg)
     printf ("  free-var-annotation              enable free variable annotation\n");
     printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.\n");
 #endif
+    exit(1);
 }
 
 static
