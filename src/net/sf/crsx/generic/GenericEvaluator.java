@@ -11,10 +11,8 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -104,13 +102,15 @@ public class GenericEvaluator extends FixedGenericConstruction
     /**
      * The string with quotes.
      * @param s string to quote
-     * @param quote 
+     * @param quote to surround with and prefix with \ inside.
      */
 	public static String quoteWith(String s, String quote)
 	{
 		StringBuilder b = new StringBuilder();
-		Util.quotedJavaChars(quote, b);
-		return quote + s.replace(quote, b.toString()) + quote;
+		Util.quotedJavaChars(s, b);
+		if (! ("\'".equals(quote) || "\"".equals(quote)))
+		    s = s.replace(quote, "\\"+quote);
+		return quote + b + quote;
 	}
 	
 	/**
@@ -756,6 +756,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 computeArguments();
                 if (!Util.isConstant(sub(1))) break;
 				// $[Escape, string]
+				// $[Escape[Q], string]
                 String string = sub(0).arity() == 0 ? Util.quoteJava(Util.symbol(sub(1))) : quoteWith(Util.symbol(sub(1)), Util.symbol(sub(0).sub(0)));
                 return rewrapWithProperties(factory.literal(string));
 			}
@@ -1157,8 +1158,9 @@ public class GenericEvaluator extends FixedGenericConstruction
             		String resource = Util.quoteJavaIdentifierPart(Util.symbol(sub(1)));
             		try
             		{
-            			Appendable w = new WriterAppender(new FileWriter(resource));
+            			WriterAppender w = new WriterAppender(new FileWriter(resource));
             			sub(2).appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+            			w.close();
             		}
             		catch (IOException e)
             		{

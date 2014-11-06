@@ -2,12 +2,9 @@
 // $Id: crsx.c,v 3.123 2014/02/11 15:56:48 villardl Exp $
 
 // Implementations of externals from the header file.
+
 #include "crsx.h"
 #include <stdint.h>
-#include <ctype.h>
-#include <alloca.h>
-#include <stdlib.h>
-#include <string.h>
 #include "prof.h"
 #include "invariant.h"
 
@@ -143,33 +140,13 @@ Construction makeConstruction(Context context, ConstructionDescriptor descriptor
 
     construction->namedProperties = NULL;
     construction->variableProperties = NULL;
-    construction->varfvs = 1;
-    construction->fvs.varfvs = NULL;
+    construction->fvs = NULL;
     construction->nfvs = NULL;
     construction->vfvs = NULL;
 
     crsxpMakeConstruction(context);
 
     return construction;
-}
-
-static inline
-void freeConstructionFVS(Context context, Construction construction)
-{
-    if (construction->varfvs)
-    {
-        if (construction->fvs.varfvs)
-        {
-            unlinkVariable(context, construction->fvs.varfvs);
-            construction->fvs.varfvs = NULL;
-        }
-    }
-    else
-    {
-        UNLINK_Hashset(context, construction->fvs.hashfvs);
-        construction->fvs.hashfvs = NULL;
-        construction->varfvs = 1;
-    }
 }
 
 static
@@ -184,8 +161,8 @@ void freeConstruction(Context context, Construction construction)
     construction->variableProperties = NULL;
     if (context->fv_enabled)
     {
-        freeConstructionFVS(context, construction);
-
+        UNLINK_Hashset(context, construction->fvs);
+        construction->fvs = NULL;
         UNLINK_Hashset(context, construction->nfvs);
         construction->nfvs = NULL;
         UNLINK_Hashset(context, construction->vfvs);
@@ -267,12 +244,11 @@ Term makeStringLiteral(Context context, const char *text)
 #endif
     literal->construction.nf = 1;
     literal->construction.nostep = 1;
-    literal->construction.varfvs = 1;
 
     literal->construction.namedProperties = NULL;
     literal->construction.variableProperties = NULL;
 
-    literal->construction.fvs.varfvs = NULL;
+    literal->construction.fvs = NULL;
     literal->construction.nfvs = NULL;
     literal->construction.vfvs = NULL;
 
@@ -555,15 +531,16 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
 #   endif
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     const Buffer buffer = (Buffer) sink;
+    const Context context = sink->context;
 
-    ASSERT(sink->context, buffer->lastTop >= 0); // can only have binders on proper construction subterms
+    ASSERT(context, buffer->lastTop >= 0); // can only have binders on proper construction subterms
 
     BufferEntry entry = bufferTop(buffer);
     int index = entry->index;
     Term term = entry->term;
-    ASSERT(sink->context, term->descriptor);
-    ASSERT(sink->context, 0 <= index && index < ARITY(term));
-    ASSERT(sink->context, size == RANK(term,index));
+    ASSERT(context, term->descriptor);
+    ASSERT(context, 0 <= index && index < ARITY(term));
+    ASSERT(context, size == RANK(term,index));
 
     int i;
     for (i = 0; i < size; ++i)
@@ -969,16 +946,26 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
     {
         UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
         buffer->pendingNamedProperties = NULL;
+
+       // UNLINK_VARIABLESET(context, buffer->pendingNamedPropertiesFreeVars);
+      //  buffer->pendingNamedPropertiesFreeVars = NULL;
     }
 
     // Do the same for variable properties
 
     if (buffer->pendingVariableProperties && construction->variableProperties != buffer->pendingVariableProperties)
     {
+         // we won't use this as it is reconstructed below
+       // UNLINK_Hashset(context, buffer->pendingVariablePropertiesFreeVars);
+       // buffer->pendingVariablePropertiesFreeVars = NULL;
+
+        
         if (!construction->variableProperties)
             construction->variableProperties = buffer->pendingVariableProperties; // Transfer ref
         else
         {
+
+
             // Merge property lists.
             VariablePropertyLink link = buffer->pendingVariableProperties, newTop = NULL, newLast = NULL;
             Hashset prevfvs = NULL;   // Previous free var set on original link
@@ -1035,6 +1022,8 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
     {
         UNLINK_VariablePropertyLink(context, buffer->pendingVariableProperties);
         buffer->pendingVariableProperties = NULL;
+    //    UNLINK_Hashset(context, buffer->pendingVariablePropertiesFreeVars);
+    //    buffer->pendingVariablePropertiesFreeVars = NULL;
     }
 
     crsxpAfterMergeProperties(context);
@@ -3472,7 +3461,9 @@ void initCRSXContext(Context context)
 Term compute(Context context, Term term)
 {
     crsxAddPools(context);
+#ifndef OMIT_TIMESPEC
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &context->time);
+#endif
 
     normalize(context, &term);
 
@@ -3488,10 +3479,14 @@ Term compute(Context context, Term term)
 
 long elapsed(Context context)
 {
+#ifndef OMIT_TIMESPEC
     struct timespec current;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &current);
     struct timespec d = diff(context->time, current);
     return (d.tv_sec * 1000000000 + d.tv_nsec) / 1000000;
+#else
+    return (long)0;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -3556,13 +3551,6 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
         UNLINK(sink->context, substitution->substitutes[i]);
 
     crsxpAfterSubstitution(sink->context);
-}
-
-static inline
-int containsFreeVariable(Construction c, Variable v)
-{
-    return (c->varfvs && c->fvs.varfvs == v) || (!c->varfvs && VARIABLESET_CONTAINS(c->fvs.hashfvs, v))
-            || VARIABLESET_CONTAINS(c->nfvs, v) || VARIABLESET_CONTAINS(c->vfvs, v);
 }
 
 /**
@@ -4125,8 +4113,8 @@ static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionF
 
         if (context->fv_enabled)
         {
-            freeConstructionFVS(context, construction);
-
+            UNLINK_Hashset(context, construction->fvs);
+            construction->fvs = NULL;
             UNLINK_Hashset(context, construction->nfvs);
             construction->nfvs = NULL;
             UNLINK_Hashset(context, construction->vfvs);
@@ -4215,15 +4203,7 @@ Hashset freeVars(Context context, Term term, Hashset set)
     if (IS_VARIABLE_USE(term))
         return addVariableHS(context, set, linkVariable(context, VARIABLE(term)));
 
-    const Construction c = asConstruction(term);
-    if (c->varfvs)
-    {
-        if (c->fvs.varfvs)
-            return addVariableHS(context, set, linkVariable(context, c->fvs.varfvs));
-        return NULL;
-    }
-
-    return mergeAllHS(context, set, LINK_Hashset(context, c->fvs.hashfvs));
+    return mergeAllHS(context, set, LINK_Hashset(context, asConstruction(term)->fvs));
 }
 
 void propagateFreeVariables(Context context, Term term)
@@ -4260,16 +4240,14 @@ void propagateFreeVariables(Context context, Term term)
         default:
             {
                 // General case: merge.
-                freeConstructionFVS(context, c);
-
+                UNLINK_Hashset(context, c->fvs);
+                c->fvs = NULL;
                 UNLINK_Hashset(context, c->nfvs);
                 c->nfvs = NULL;
                 UNLINK_Hashset(context, c->vfvs);
                 c->vfvs = NULL;
                 
-                int varfvs = 1;
-                void* fvs = NULL;
-
+                Hashset fvs = NULL;
                 Hashset nfvs = c->namedProperties ? LINK_Hashset(context, c->namedProperties->fvs) : NULL;
                 Hashset vfvs = c->variableProperties ? LINK_Hashset(context, c->variableProperties->fvs) : NULL;
 
@@ -4283,76 +4261,9 @@ void propagateFreeVariables(Context context, Term term)
                     {
                         Construction sc = asConstruction(sub);
 
-                        if (sc->varfvs)
-                        {
-                            if (sc->fvs.varfvs)
-                            {
-                                // Sub is a variable. If not in binders, then add
-                                if (rank == 0 || !containsAL(BINDERS(term, i), rank, sc->fvs.varfvs))
-                                {
-                                    if (fvs == NULL)
-                                    {
-                                        // Cool no variable yet.
-                                        fvs = (void*) linkVariable(context, sc->fvs.varfvs);
-                                    }
-                                    else
-                                    {
-                                        if (varfvs)
-                                        {
-                                            // Was previously just 1 variable. Don't merge is same
-                                            if (((Variable) fvs) == sc->fvs.varfvs)
-                                            {
-                                                // Identical. Great nothing to do
-                                            }
-                                            else
-                                            {
-                                                // 2 different variables. Merge ....
-                                                Hashset set = addVariableHS(context, NULL, (Variable) fvs); // transfer ref
-                                                set = addVariableHS(context, set, linkVariable(context, sc->fvs.varfvs));
-
-                                                fvs = (void*) set; // Can override fvs because ref has been transferred
-                                                varfvs = 0;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            // We have a set already.
-                                            fvs = (void*)  addVariableHS(context, (Hashset) fvs, linkVariable(context, sc->fvs.varfvs));
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // Cool no free var on sub. Nothing to do.
-                            }
-                        }
-                        else
-                        {
-                            if (fvs == NULL)
-                            {
-                                // Cool no variable yet.
-                                fvs = (void*) LINK_Hashset(context, sc->fvs.hashfvs);
-                                varfvs = 0;
-                            }
-                            else
-                            {
-                                if (varfvs)
-                                {
-                                    // 1 variable and a set. Merge.
-                                    fvs = (void*) addVariableHS(context, LINK_Hashset(context, sc->fvs.hashfvs), (Variable) fvs); // Transfer ref
-                                    varfvs = 0;
-                                }
-                                else
-                                {
-                                    // Both are sets.
-                                    fvs = (void*) mergeAllHS(context, (Hashset) fvs, LINK_Hashset(context, sc->fvs.hashfvs));
-                                }
-                            }
-                            // In any cases, remove binders.
-                            if (rank > 0)
-                                fvs = (void*) removeAllHS(context, (Hashset) fvs, BINDERS(term, i), rank);
-                        }
+                        fvs = mergeAllHS(context, fvs, LINK_Hashset(context, sc->fvs));
+                        if (rank > 0)
+                            fvs = removeAllHS(context, fvs, BINDERS(term, i), rank);
 
                         nfvs = mergeAllHS(context, nfvs, LINK_Hashset(context, sc->nfvs));
                         vfvs = mergeAllHS(context, vfvs, LINK_Hashset(context, sc->vfvs));
@@ -4361,80 +4272,52 @@ void propagateFreeVariables(Context context, Term term)
                     {
                         // Variable
                         const Variable v = VARIABLE(sub);
-                        int bound = rank > 0  && containsAL(BINDERS(term, i), rank, v);
-                        if (!bound)
+                        //if (v->track)
                         {
-                            if (varfvs)
+                            // Don't add if among binders
+                            int bound = 0;
+                            if (rank > 0)
                             {
-                                if (fvs == NULL)
-                                {
-                                    fvs = linkVariable(context, v);
-                                }
-                                else
-                                {
-                                    // Was previously just 1 variable. Don't merge is same
-                                    if (((Variable) fvs) == v)
-                                    {
-                                        // Identical. Great nothing to do
-                                    }
-                                    else
-                                    {
-                                        // 2 different variables. Merge ....
-                                        Hashset set = addVariableHS(context, NULL, (Variable) fvs); // transfer ref
-                                        set = addVariableHS(context, set, linkVariable(context, v));
+                                Variable* binders = BINDERS(term, i);
+                                unsigned int j;
 
-                                        fvs = (void*) set; // Can override fvs because ref has been transferred
-                                        varfvs = 0;
+                                for (j = 0; j < rank ; j ++)
+                                {
+                                    if (binders[j] == v)
+                                    {
+                                        bound = 1;
+                                        break;
                                     }
                                 }
                             }
-                            else
-                            {
-                               fvs = (void*) addVariableHS(context, (Hashset) fvs, linkVariable(context, v));
-                            }
+
+                            if (!bound)
+                               fvs = addVariableHS(context, fvs, linkVariable(context, v));
                         }
                     }
+
                 }
 
-                // Assign to construction.
-
-                if (varfvs)
+                if (VARIABLESET_ISEMPTY(fvs))
                 {
-                    if (fvs)
-                    {
-                        c->fvs.varfvs = (Variable) fvs;
-                        c->varfvs = 1; // redundant.
-                    }
+                    UNLINK_VARIABLESET(context, fvs);
+                    c->fvs = NULL;
                 }
                 else
-                {
-                    const Hashset set = (Hashset) fvs;
-                    if (VARIABLESET_ISEMPTY(set))
-                        UNLINK_Hashset(context, set);
-                    else
-                    {
-                        // TODO: extract?
-//                        if (set->nitems == 1)
-//                        {
-//                            c->fvs.varfvs = linkVariable
-//                        }
-                        c->fvs.hashfvs = set;
-                        c->varfvs = 0;
-                    }
-                }
+                    c->fvs = fvs;
 
                 if (VARIABLESET_ISEMPTY(nfvs))
                 {
-                    UNLINK_Hashset(context, nfvs);
-                    c->nfvs = NULL; // Redundant
+                    UNLINK_VARIABLESET(context, nfvs);
+                    c->nfvs = NULL;
                 }
                 else
                     c->nfvs = nfvs;
 
                 if (VARIABLESET_ISEMPTY(vfvs))
                 {
-                    UNLINK_Hashset(context, vfvs);
-                    c->vfvs = NULL;  // Redundant
+                    UNLINK_VARIABLESET(context, vfvs);
+                    c->vfvs = NULL;
                 }
                 else
                     c->vfvs = vfvs;
@@ -4855,18 +4738,10 @@ VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort,
     {
         Construction c = asConstruction(term);
 
-        if (context->fv_enabled && (c->varfvs == 1 || c->fvs.hashfvs != AllFreeVariables) && c->nfvs != AllFreeVariables && c->vfvs != AllFreeVariables)
+        if (context->fv_enabled && c->fvs != AllFreeVariables && c->nfvs != AllFreeVariables && c->vfvs != AllFreeVariables)
         {
             free = makeVariableSet(context);
-            if (c->varfvs)
-            {
-                if (c->fvs.varfvs)
-                    addVariable(free, linkVariable(context, c->fvs.varfvs));
-            }
-            else
-            {
-                VARIABLESET_ADDVARIABLESOF(context, free, c->fvs.hashfvs, constrained, props);
-            }
+            VARIABLESET_ADDVARIABLESOF(context, free, c->fvs, constrained, props);
             VARIABLESET_ADDVARIABLESOF(context, free, c->nfvs, constrained, props);
             VARIABLESET_ADDVARIABLESOF(context, free, c->vfvs, constrained, props);
         }
@@ -5019,15 +4894,19 @@ ConstructionDescriptor lookupSymbolTableDescriptor(Context context, SymbolDescri
     while (hi >= lo)
     {
         x = (lo+hi)/2;
-        ASSERT(context, lo <= x && x <= hi && strcmp(table[lo].symbol, symbol) <= 0 && strcmp(symbol, table[hi].symbol) <= 0);
-        SymbolDescriptor candidate = &table[x];
-        int compare = strcmp(symbol, candidate->symbol);
-        if (compare == 0)
-            return candidate->descriptor;
-        if (compare < 0) // what we are searching for is in lower half
-            hi = x-1;
-        else //if (compare > 0) // what we are searching for is in upper half
-            lo = x+1;
+	if (! (lo <= x && x <= hi && strcmp(table[lo].symbol, symbol) <= 0 && strcmp(symbol, table[hi].symbol) <= 0) )
+	{
+	    ERRORF(context, Crsx, "Unrecognized symbol: %s\n", symbol);
+	    break;
+	}
+	SymbolDescriptor candidate = &table[x];
+	int compare = strcmp(symbol, candidate->symbol);
+	if (compare == 0)
+	    return candidate->descriptor;
+	if (compare < 0) // what we are searching for is in lower half
+	    hi = x-1;
+	else //if (compare > 0) // what we are searching for is in upper half
+	    lo = x+1;
     }
     return NULL;
 }
@@ -5573,15 +5452,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
             Construction construction = asConstruction(term);
             if (debug)
             {
-                if (construction->varfvs)
-                {
-                    if (getenv("free-var-annotation") && construction->fvs.varfvs)
-                        FPRINTF(context, out, "<%s>", construction->fvs.varfvs->name);
-                }
-                else
-                {
-                    fprintFreeVars(context, out, construction->fvs.hashfvs);
-                }
+                fprintFreeVars(context, out, construction->fvs);
                 fprintFreeVars(context, out, construction->nfvs);
                 fprintFreeVars(context, out, construction->vfvs);
             }

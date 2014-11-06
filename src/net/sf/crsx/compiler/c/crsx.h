@@ -18,9 +18,9 @@ extern "C" {
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 #include <assert.h>
 #include <sys/types.h>
-#include <sys/time.h>
 #include <alloca.h>
 #include <ctype.h>
 #include <math.h>
@@ -72,7 +72,9 @@ typedef struct _BufferSegment *BufferSegment;
 struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
+#ifndef OMIT_TIMESPEC
     struct timespec time; // time when compute started.
+#endif
     Hashset2 env;         // General environment.
 
     int poolRefCount;
@@ -568,11 +570,7 @@ struct _Construction
     VariablePropertyLink variableProperties; // variable properties. (may be null)
 
     // Keep all free variable sets separated in order to maximize reuse, and minimize merging.
-    union {
-        Hashset hashfvs;
-        Variable varfvs;
-    } fvs;  // free variables known to occur in subterms only (excluding properties)
-
+    Hashset fvs;  // free variables known to occur in subterms only (excluding properties)
     Hashset nfvs; // free variables known to occur in named properties (on this construction AND subterms)
     Hashset vfvs; // free variables known to occur in variable properties (on this construction AND subterms)
 

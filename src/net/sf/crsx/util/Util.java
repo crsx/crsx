@@ -252,14 +252,18 @@ public final class Util
 		{
 			if (used.containsKey(null))
 			{
-				String[] words = v.name().split("[-_0-9]", 2);
-				n = words[0];
-				n = n.replaceAll("__V[0-9]+¹", "");
-				if (n.isEmpty() || !n.matches("[a-z][A-Za-z0-9]*"))
-					n = "v";
-				int i = Integer.parseInt(used.get(null));
-				n = n + "__V" + i;
-				used.put(null, Integer.toString(i + 1));
+				String name = v.name();
+				if (name != null)
+				{
+					String[] words = name.split("[-_0-9]", 2);
+					n = words[0];
+					n = n.replaceAll("__V[0-9]+¹", "");
+					if (n.isEmpty() || !n.matches("[a-z][A-Za-z0-9]*"))
+						n = "v";
+					int i = Integer.parseInt(used.get(null));
+					n = n + "__V" + i;
+					used.put(null, Integer.toString(i + 1));
+				}
 				used.put(v, n);
 			}
 			else

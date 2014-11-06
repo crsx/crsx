@@ -2279,13 +2279,13 @@ public class Sorter
 							if (S == null && T == null)
 							{
 								// term has no function symbol sort set and term's sort has no data sort set...
-								warning("rule reference meta-variable " + ref + " is used where no sort sets have been defined (make sure the subexpressions of sort " + othersortcons + 
+								warning("in " + rulename + " rule reference meta-variable " + ref + " is used where no sort sets have been defined (make sure the subexpressions of sort " + othersortcons + 
 										" and " + sortcons + " have sorts sets defined).");
 							}
 							else if (T == null)
 							{
 								// term has no function symbol sort set and term's sort has no data sort set...
-								warning("rule reference meta-variable " + originalref + " causes unusual requirement [sort set for " + othersortcons + " = " + S  +
+								warning("in " + rulename + " rule reference meta-variable " + originalref + " causes unusual requirement [sort set for " + othersortcons + " = " + S  +
 										"] ⊆ [sort set for " + sortcons + " is undefined].  It is recommended to declare the data sort set for sort " + sortcons + ".\n" +
 								"Assuming equality of sort sets was intended.");
 							}

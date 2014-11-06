@@ -100,18 +100,17 @@ int printUsage(char* errmsg)
     printf ("  report <input.csv>                                         Analyzes profiling information and print report.\n");
     printf ("or:\n");
     printf ("  key=value...   Invoke raw rulecompiler with this environment setup.\n");
-    exit(1);
 #else
-    printf ("Usage: %s [key]... [key=value]...", getenv("execname"));
-    printf ("Where key is any of");
-    printf ("  term=TERM                        input term using term syntax.");
-    printf ("  wrapper=WRAPPER                  a single construction wrapping the input term (if any)");
-    printf ("  crsx-debug-steps                 print term before each step");
-    printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)");
-    printf ("  free-var-annotation              enable free variable annotation");
-    printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.");
-    printf ("Where");
+    printf ("Usage: %s [key]... [key=value]...\n", getenv("execname"));
+    printf ("Where key and key-value are any of\n");
+    printf ("  term=TERM                        input term using term syntax.\n");
+    printf ("  wrapper=WRAPPER                  a single construction wrapping the input term (if any)\n");
+    printf ("  crsx-debug-steps                 print term before each step\n");
+    printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)\n");
+    printf ("  free-var-annotation              enable free variable annotation\n");
+    printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.\n");
 #endif
+    exit(1);
 }
 
 static

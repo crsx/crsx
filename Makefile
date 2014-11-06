@@ -27,7 +27,7 @@ bin/crsxc:
 
 clean:
 	cd $(COMPILERSRC)/c && $(MAKE) clean
-	rm bin/crsxc
-	
+	rm -f bin/crsxc
+
 realclean: clean
 	rm -fr build $(COMPILERSRC)/c/build bin/crsxc crsx.jar
