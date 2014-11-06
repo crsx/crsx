@@ -8,6 +8,7 @@
 HEADER[(
 
 $Use["compiler/c/cdefs.crs"];
+$Use["compiler/c/sheader.crs"];
 
 $Lax;
 
@@ -63,8 +64,22 @@ H-Declaration[POLYMORPHIC[a.#Declaration[a]]]
 H-Declaration[#Declaration[arg]]
 ;
 
-Data                    : H-Declaration[DATA[#Sort, #Forms]                                     ]        → H-Data[#Sort, #Forms] ;
-Function                : H-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]] → H-Function[#name, #kind, #function, #Forms, #Sort, #Rules] ;
+Data
+: 
+H-Declaration[DATA[#Sort, #Forms]]        
+→ 
+H-Data[#Sort, #Forms] 
+;
+
+Function
+:
+H-Declaration[FUNCTION[#name, #kind, #path, #function, #Forms, #Sort, #Rules]]
+→
+$[IfDef, "STRICT",
+    SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules],
+     H-Function[#name, #kind, #function, #Forms, #Sort, #Rules] 
+]
+;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // DATA SORT HEADER DECLARATIONS.
@@ -124,6 +139,7 @@ H-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 « MapText[f.H-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
 ⟫
 ;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 )] //HEADER

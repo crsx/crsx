@@ -105,9 +105,9 @@ public interface CRS
 	/** Reify constructor for: LINEAR */
 	public static final String REIFY_LINEAR = "LINEAR";
 	/** Reify constructor for: BLOCK */
-	public static final String REIFY_BLOCK = "BLOCK";
+	public static final String REIFY_FUNCTION_KIND = "KFUNCTION";
 	/** Reify constructor for: PERMIT */
-	public static final String REIFY_PERMIT = "PERMIT";
+	public static final String REIFY_DATA_KIND = "KDATA";
 	/** Reify constructor for: SHALLOW */
 	public static final String REIFY_SHALLOW = "SHALLOW";
 	/** Reify constructor for: DEEP */

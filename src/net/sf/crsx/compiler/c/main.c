@@ -16,6 +16,7 @@
 
 #include "linter.h"
 #include "crsx.h"
+#include "prof.h"
 
 // Scanner definitions
 extern int readTerm(Sink sink, FILE *input);

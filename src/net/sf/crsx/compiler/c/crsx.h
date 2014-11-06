@@ -937,6 +937,23 @@ extern void normalize(Context context, Term *termp);
 extern Term compute(Context context, Term term);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+// CLOSURE
+
+typedef void** CEnv; // Closure environment. An array of pointers.
+typedef struct _Closure Closure;
+
+struct _Closure
+{
+   int (*f)(Sink, CEnv);
+   CEnv env; // Optional environment.
+};
+
+#ifndef CALL1
+# define CALL1(sink,closure,arg0) ((int (*)(Sink, CEnv, void*))closure->f)(sink, (closure)->env, (void*)arg0)
+#endif
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 // SUBSTITUTE
 //
 // Usage:

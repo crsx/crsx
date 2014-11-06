@@ -1098,6 +1098,8 @@ void crsxpBeforePropagateFV(Context context)
 {}
 void crsxpAfterPropagateFV(Context context)
 {}
+void crsxpMergeBacktrace(Context context, FILE* file)
+{}
 void crsxpInstrumentEnter(Context context, Variable id, char* name)
 {}
 void crsxpInstrumentExit(Context context, Variable id)
