@@ -329,14 +329,12 @@ void crsxpVSAdded(Context context, Hashset set)
 
 void crsxpVSContains(Hashset set)
 {
-    if (context->profiling && context->internal)
+    if (set && !set->marker)
     {
-        if (!set->marker)
-        {
-            pFVUsedCount++;
-            set->marker = 1;
-        }
+        pFVUsedCount++;
+        set->marker = 1;
     }
+
 }
 
 void crsxpVSRehashed(Context context)
