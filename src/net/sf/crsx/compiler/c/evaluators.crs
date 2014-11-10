@@ -221,10 +221,12 @@ $Meta[(
 :
 {#env}E-send-to-set[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-«{#env}E-send[#Primitive, #Args, #Options, buf]»«#variable» = BUFFER_TERM(«buf»);
-FREE_BUFFER(«buf»); ⟧}
-⟫
+%n⟪
+{⟦
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env}E-send[#Primitive, #Args, #Options, buf]»
+«#variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»); ⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-send-to-bool[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -244,7 +246,8 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-send-to-int[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ char* «str»;
+%n⟪
+{⟦ char* «str»;
 «{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-int[#sink, str, #variable]» ⟧}
 ⟫
 ;
@@ -255,7 +258,8 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-send-to-num[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ char* «str»;
+%n⟪
+{⟦ char* «str»;
 «{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-num[#sink, str, #variable]» ⟧}
 ⟫
 ;
@@ -266,7 +270,8 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-send-to-string[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ Term «term»;
+%n⟪
+{⟦ Term «term»;
 «{#env}E-send-to-set[#Primitive, #Args, #Options, #sink, term]»«{#env}E-term-to-string[#sink, term, #variable]»«T-unlink-ref[#sink, term]»⟧}
 ⟫
 ;
@@ -277,7 +282,8 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-send-to-local-string[#Primitive, #Args, #Options, #sink, s p.#[s,p]] 
 → 
-%n⟪{⟦ Term «term»;
+%n⟪
+{⟦ Term «term»;
 «{#env}E-send-to-set[#Primitive, #Args, #Options, #sink, term]»«{#env}E-term-to-local-string[#sink, term, s p.#[s,p]]»«T-unlink-ref[#sink, term]»⟧}
 ⟫
 ;
@@ -653,10 +659,12 @@ $Meta[(
 :
 {#env}E-set-ref-to-set[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-« {#env}E-set-ref-to-send[#Primitive, #Args, #Options, buf] »«#variable» = BUFFER_TERM(«buf»);
-FREE_BUFFER(«buf»); ⟧}
-⟫
+%n⟪
+{⟦ 
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}E-set-ref-to-send[#Primitive, #Args, #Options, buf] »
+«#variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»); ⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-ref-to-bool[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -842,10 +850,12 @@ else { START(«#sink», «MANGLE["$False"]»); END(«#sink», «MANGLE["$False"]
 :
 {#env}E-set-bool-to-set[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-«{#env}E-send-bool[#Primitive, #Args, #Options, buf]»«#variable» = BUFFER_TERM(«buf»);
-FREE_BUFFER(«buf»); ⟧}
-⟫
+%n⟪
+{⟦ 
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env}E-send-bool[#Primitive, #Args, #Options, buf]»
+«#variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»); ⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-bool-to-int[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -899,9 +909,11 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-set-bool-op[#Op, #Term1, #Term2, #sink, bool] 
 → 
-%n⟪{⟦ double «n1», «n2»;
-«{#env}T-set-num[#Term1, #sink, n1]»«{#env}T-set-num[#Term2, #sink, n2]»«bool» = («n1» «#Op» «n2»); ⟧}
-⟫
+%n⟪
+{⟦
+double «n1», «n2»;«{#env}T-set-num[#Term1, #sink, n1]»«{#env}T-set-num[#Term2, #sink, n2]»
+«bool» = («n1» «#Op» «n2»);⟧
+}⟫
 ;
 
 // $[SameVariable, #1, #2] test equality of #1, #2, as variables, result is boolean.
@@ -953,9 +965,11 @@ BOOL_PRIMITIVE[E_NumericEqual];
 Set-Bool-NumericEqual[Fresh[n1::Text,n2::Text]]:
 {#env}E-set-bool[E_NumericEqual, (#Name; #Term1; #Term2;), #Options, #sink, #bool]
 →
-%n⟪{⟦ double «n1», «n2»;
-«{#env}T-set-num[#Term1, #sink, n1]»«{#env}T-set-num[#Term2, #sink, n2]»«#bool» = (fabs(«n2» - «n1») < 1E-300); ⟧}
-⟫
+%n⟪
+{⟦
+double «n1», «n2»;«{#env}T-set-num[#Term1, #sink, n1]»«{#env}T-set-num[#Term2, #sink, n2]»
+«#bool» = (fabs(«n2» - «n1») < 1E-300);⟧
+}⟫
 ;
 
 // $[LessThan, #1, #2] for constant numbers #1, #2, result is boolean.
@@ -1134,10 +1148,12 @@ E1[(
 :
 {#env}E-set-int-to-set[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-«{#env}E-send-int[#Primitive, #Args, #Options, buf]»«#variable» = BUFFER_TERM(«buf»);
-FREE_BUFFER(«buf»); ⟧}
-⟫
+%n⟪
+{⟦
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env}E-send-int[#Primitive, #Args, #Options, buf]»
+«#variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»);⟧
+}⟫
 ;
 
 {$String:String}E-set-int-to-bool[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -1203,9 +1219,11 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-set-num-op[#Op, #Left, #Right, #sink, #num] 
 → 
-%n⟪{⟦ double «n1», «n2»;
-«{#env}T-set-num[#Left, #sink, n1]»«{#env}T-set-num[#Right, #sink, n2]»«#num» = «n1» «#Op» «n2»; ⟧}
-⟫
+%n⟪
+{⟦
+double «n1», «n2»;«{#env}T-set-num[#Left, #sink, n1]»«{#env}T-set-num[#Right, #sink, n2]»
+«#num» = «n1» «#Op» «n2»;⟧
+}⟫
 ;
 
 )];
@@ -1354,9 +1372,11 @@ $Meta[(
 :
 {#env}E-send-num[#Primitive, #Args, #Options, #sink] 
 → 
-%n⟪{⟦ double «num»;
-«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»LITERALNF(«#sink», (size_t) 31, "%G", «num»); ⟧}
-⟫
+%n⟪
+{⟦
+double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
+LITERALNF(«#sink», (size_t) 31, "%G", «num»);⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-num-to-set[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -1365,10 +1385,12 @@ $Meta[(
 :
 {#env}E-set-num-to-set[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-«{#env}E-send-num[#Primitive, #Args, #Options, buf]»«#variable» = BUFFER_TERM(«buf»);
-FREE_BUFFER(«buf»); ⟧}
-⟫
+%n⟪
+{⟦
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env}E-send-num[#Primitive, #Args, #Options, buf]»
+«#variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»);⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-num-to-bool[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -1377,9 +1399,11 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-set-num-to-bool[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ double «num»;
-«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»«#variable» = («num» != 0e0); ⟧}
-⟫
+%n⟪
+{⟦
+double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
+«#variable» = («num» != 0e0);⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-num-to-string[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -1388,9 +1412,11 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-set-num-to-string[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ double «num»;
-«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»«#variable» = ALLOCATENF(«#sink»->context, (size_t) 31, "%G", «num»); ⟧}
-⟫
+%n⟪
+{⟦
+double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
+«#variable» = ALLOCATENF(«#sink»->context, (size_t) 31, "%G", «num»);⟧
+}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-num-to-local-string[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, s::Text p::Text.Text] :: Text;
@@ -1399,10 +1425,11 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-set-num-to-local-string[#Primitive, #Args, #Options, #sink, s p.#[s, p]] 
 → 
-%n⟪{⟦ double «num»; char *«str»;
-«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
-« #[str, %n⟨⟩] »}⟧
-⟫
+%n⟪
+{⟦
+double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+« #[str, %n⟨⟩] »⟧
+}⟫
 ;
 
 // Helpers for n-ary operations.
@@ -1414,9 +1441,10 @@ FREE_BUFFER(«buf»); ⟧}
 :
 {#env}E-set-num-fold-op[#Op, (#Arg1;#Args), #sink, #num] 
 → 
-%n⟪{⟦ double «tmp»;
-«{#env}T-set-num[#Arg1, #sink, tmp]»«#num» «#Op» «tmp»; ⟧}
-«{#env}E-set-num-fold-op[#Op, #Args, #sink, #num]»⟫
+%n⟪
+{⟦
+double «tmp»;«{#env}T-set-num[#Arg1, #sink, tmp]»«#num» «#Op» «tmp»;⟧
+}«{#env}E-set-num-fold-op[#Op, #Args, #sink, #num]»⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-int-fold-op[Text, $List[Reified_Term], Text, Text] :: Text;
@@ -1822,10 +1850,12 @@ Set-String-FormatNumber[Fresh[num::Text, str::Text]]
 :
 {#env}E-local-string[E_FormatNumber, (#Name; #Number; #Format), #Options, #sink, s p.#[s, p]] 
 →
-%n⟪{⟦double «num»; char *«str»;
-« {#env}T-set-num[#Number, #sink, num] »snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
-« #[str,%n⟨⟩] » ⟧}
-⟫;
+%n⟪
+{⟦
+double «num»; char *«str»;« {#env}T-set-num[#Number, #sink, num] »
+snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+« #[str,%n⟨⟩] »⟧
+}⟫;
 
 // $[Format, #format[, #rest...]] printf-style formatting.
 //
@@ -2233,8 +2263,14 @@ Poly-If[Fresh[test::Text]]
 {#env}E-poly[E_If, (#Name; #Test; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
 → 
 %n⟪{⟦ int «test»;
-«{#env}T-set-bool[#Test, #sink, test]»if («test») { ⟦«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
-else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
+«{#env}T-set-bool[#Test, #sink, test]»
+if («test») 
+{⟦
+«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] »⟧
+}
+else
+{⟦
+«{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }
 ⟫;
 

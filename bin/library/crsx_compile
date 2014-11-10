@@ -27,7 +27,7 @@ function run_compile {
     local output=
     local debug=
     local strict=
-    local n=
+    local new=
 	while :
     do
    		case $1 in
@@ -70,7 +70,7 @@ function run_compile {
    			    shift
    			    ;;
    			-n)
-                n=Y
+                new="Y"
                 shift
                 ;;
 		    --strict)
@@ -97,13 +97,13 @@ function run_compile {
 	local inputname="${input%.*}"
 	local inputext="${input##*.}"
 	
-	if [ $n = "Y" ]
+	if [ "$new" = "Y" ]
 	then
 	    printf "Experimental"
 	    
 		make -f ${DIR}/library/compile.mk CRSFILE=${input}
 		
-	elif [ $inputext = "crs" ];
+	elif [ "$inputext" = "crs" ]
 	then
 	    # Compile .crs file
 		

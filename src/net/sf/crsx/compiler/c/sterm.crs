@@ -60,10 +60,12 @@ ST-Send-Property-Variable-Key[Fresh[value::Text]]
 {#env}
 ST-send[PROPERTY[VARIABLE-USE[#key], #Value, #Term], #sink]
 →
-%n⟪{⟦ Term «value»;
-« {#env} ST-set[#Value, #sink, value] »NORMALIZE(«#sink»->context, «value»);
-ADD_PROPERTY_VARIABLE(«#sink», linkVariable(«#sink»->context, «#key»), «value»); ⟧}
-« {#env} ST-send[#Term, #sink] »⟫
+%n⟪
+{⟦
+Term «value»;« {#env} ST-set[#Value, #sink, value] »
+NORMALIZE(«#sink»->context, «value»);
+ADD_PROPERTY_VARIABLE(«#sink», linkVariable(«#sink»->context, «#key»), «value»); ⟧
+}« {#env} ST-send[#Term, #sink] »⟫
 ;
 
 ST-Send-Property-Literal-Key[Free[sink::Text], Fresh[value::Text]]
@@ -71,10 +73,12 @@ ST-Send-Property-Literal-Key[Free[sink::Text], Fresh[value::Text]]
 {#env}
 ST-send[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], sink]
 →
-%n⟪{⟦ Term «value»;
-« {#env} ST-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
-ADD_PROPERTY_NAMED(«sink», « STRING[#Literal] », «value»); ⟧}
-« {#env} ST-send[#Term, sink] »⟫
+%n⟪
+{⟦
+Term «value»;« {#env} ST-set[#Value, sink, value] »
+NORMALIZE(«sink»->context, «value»);
+ADD_PROPERTY_NAMED(«sink», « STRING[#Literal] », «value»);⟧
+}« {#env} ST-send[#Term, sink] »⟫
 ;
 
 ST-Send-Property-other[Free[sink::Text], Fresh[key::Text, value::Text]]
@@ -104,9 +108,11 @@ ST-Send-Data
 {#env}
 ST-send[CONSTRUCTION[KDATA, #Symbol, #Binders], #sink] 
 →
-%n⟪{⟦ START(«#sink», «EventConstructor[#Symbol]»);
-« {#env} ST-send-Binders[#Binders, #sink] »END(«#sink», «EventConstructor[#Symbol]»); ⟧}
-⟫
+%n⟪
+{⟦
+START(«#sink», «EventConstructor[#Symbol]»);« {#env} ST-send-Binders[#Binders, #sink] »
+END(«#sink», «EventConstructor[#Symbol]»);⟧
+}⟫
 ;
 
 S-Send-Literal[Free[sink::Text]]
@@ -114,8 +120,8 @@ S-Send-Literal[Free[sink::Text]]
 {#env}
 ST-send[LITERAL[#Literal, #Sort], sink]
 →
-%n⟪LITERAL(«sink», «STRING[#Literal]»);
-⟫
+%n⟪
+LITERAL(«sink», «STRING[#Literal]»);⟫
 ;
 
 ST-Send-Variable[Free[sink::Text, variable::Reified_Variable]]
@@ -123,8 +129,8 @@ ST-Send-Variable[Free[sink::Text, variable::Reified_Variable]]
 {#env}
 ST-send[VARIABLE-USE[variable], sink]
 →
-%n⟪USE(«sink», linkVariable(«sink»->context, «variable»));
-⟫
+%n⟪
+USE(«sink», linkVariable(«sink»->context, «variable»));⟫
 ;
 
 ST-Send-MetaApplication
@@ -141,8 +147,7 @@ S-Send-Evaluator
 {#env}
 ST-send[EVALUATOR[#Primitive, #Terms, #Options], #sink] 
 →
-%n⟪«{#env}E-send[Primitive[#Primitive], #Terms, #Options, #sink]»
-⟫
+%n⟪«{#env}E-send[Primitive[#Primitive], #Terms, #Options, #sink]»⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -151,8 +156,8 @@ ST-EvalFunction[OK_SORT, $String, $List[Text], Text] :: Text;
 {#env}
 ST-EvalFunction[OK, #Symbol, #args, #sink] // arguments are in reversed order
 →
-%n⟪«MANGLE[#Symbol]»(«#sink»«{#env}ST-FunctionArgs[#args]»);
-⟫
+%n⟪
+«MANGLE[#Symbol]»(«#sink»«{#env}ST-FunctionArgs[#args]»);⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -205,10 +210,11 @@ ST-set-Binder[$Boolean, Reified_Binder, Text, ok¹::OK_SORT args¹::$List[Text].
 {#env}
 ST-set-Binder[#Has, ARGUMENT[#sort, #Term], #sink, ok¹ args¹.#[ok¹, args¹]]
 →
-%n⟪Term «arg»;«{#env}ST-set[#Term, #sink, arg]»«{#env}#[OK, (arg;)]»⟫
+%n⟪
+Term «arg»;«{#env}ST-set[#Term, #sink, arg]»«{#env}#[OK, (arg;)]»⟫
 ;
 
-// With functional binders : expect a closure
+// With functional binders : function argument is a closure
 {#env}
 ST-set-Binder[$True, #Binder, #sink, ok¹ args¹.#[ok¹, args¹]]
 →
@@ -235,7 +241,8 @@ ST-set-TermBinder[OK_SORT, Reified_Binder, $List[Reified_Variable], $List[Text],
 {#env}
 ST-set-TermBinder[OK, ARGUMENT[#Sort, #Term], (), #cargs, #sink, ok¹ args¹.#[ok¹, args¹]]
 →
-%n⟪Term «arg»;«{#env}ST-set[#Term, #sink, arg]»«{#env}#[OK, (arg; #cargs)]»⟫
+%n⟪
+Term «arg»;«{#env}ST-set[#Term, #sink, arg]»«{#env}#[OK, (arg; #cargs)]»⟫
 ;
 
 -[Free[reused::Text]]
@@ -243,8 +250,8 @@ ST-set-TermBinder[OK, ARGUMENT[#Sort, #Term], (), #cargs, #sink, ok¹ args¹.#[o
 {#env; reused: BOUNDREUSE}
 ST-set-TermBinder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], (reused; #args), #cargs, #sink, ok¹ args¹.#[ok¹, args¹]]
 →
-%n⟪REBIND(«reused»);
-« {#env}ST-set-TermBinder[OK, #Binder[reused], #args, #cargs, #sink, ok¹ args¹.#[ok¹, args¹]] »⟫
+%n⟪
+REBIND(«reused»);« {#env}ST-set-TermBinder[OK, #Binder[reused], #args, #cargs, #sink, ok¹ args¹.#[ok¹, args¹]] »⟫
 ;
 
 -[Free[new::Text]]
@@ -252,12 +259,13 @@ ST-set-TermBinder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]
 {#env; new: BOUND}
 ST-set-TermBinder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], (new; #args), #cargs, #sink, ok¹ args¹.#[ok¹, args¹]]
 →
-%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");
+%n⟪
+Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");
 « {#env}ST-set-TermBinder[OK, #Binder[new], #args, #cargs, #sink, ok¹ args¹.#[ok¹, args¹]] »⟫
 ;
 
 //--- Generate arguments of type Closure. 
-//    Either reuse Closure, call or curry.
+//    Either reuse Closure or Curry is less argument. 
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-ClosureBinder[OK_SORT, Reified_Binder, $List[Reified_Variable], Text, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
@@ -269,27 +277,37 @@ ST-set-ClosureBinder[OK, ARGUMENT[#Sort, #Term], #cargs, #sink, ok¹ args¹.#[ok
 ST-set-Closure[#Term, #cargs, #sink, ok¹ args¹.#[ok¹, args¹]]
 ;
 
-// TODO: currying/reuse
+// TODO: Reuse and Currying
+-[Fresh[b::Reified_Variable]]
+:
+{#env}
+ST-set-ClosureBinder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #cargs, #sink, ok¹ args¹.#[ok¹, args¹]]
+→
+{#env}
+ST-set-ClosureBinder[OK, #Binder[b], #cargs, #sink, ok¹ args¹.#[ok¹, args¹]]
+;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-Closure[Reified_Term, $List[Reified_Variable], Text, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
 
-// x...y.T[ ... ]
+// x...y.T[ ... ]. A new closure. Compute captured arg
 {#env;"$Function":STRING_VALUE[#Function]; "$ClosureCount":NUM_VALUE[#CCount]}
-ST-set-Closure[CONSTRUCTION[#Kind, #Symbol, #Binders], #Captured, #sink, ok¹ args¹.#[ok¹, args¹]] 
+ST-set-Closure[CONSTRUCTION[#Kind, #Symbol, #Binders], #cargs, #sink, ok¹ args¹.#[ok¹, args¹]] 
 →
 {#env;"$ClosureCount":NUM_VALUE[$[Plus, #CCount, 1]]}
-ST-set-Capture[OK, #Binders, #Captured, #sink, ok¹ captureds¹.
+ST-set-Capture[OK, #Binders, (), #sink, ok¹ captureds¹.
 ST-set-Closure2[ok¹, captureds¹, $[:, #Function, "$CC$", $[FormatNumber, #CCount]], #sink, ok¹ args¹.#[ok¹, args¹]]]
 ;
 
-// x...y.x
+// x...y.x. A new trivial closure
 {#env;"$Function":STRING_VALUE[#Function]; "$ClosureCount":NUM_VALUE[#CCount]}
-ST-set-Closure[VARIABLE-USE[#v], #Captured, #sink, ok¹ args¹.#[ok¹, args¹]] 
+ST-set-Closure[VARIABLE-USE[#v], #cargs, #sink, ok¹ args¹.#[ok¹, args¹]] 
 →
 {#env;"$ClosureCount":NUM_VALUE[$[Plus, #CCount, 1]]}
 ST-set-Closure2[OK, (), $[:, #Function, "$CC$", $[FormatNumber, #CCount]], #sink, ok¹ args¹.#[ok¹, args¹]]
 ;
+
+// TODO: META.
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-Closure2[OK_SORT, $List[Text], $String,  Text, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
@@ -300,9 +318,7 @@ ST-set-Closure2[OK_SORT, $List[Text], $String,  Text, ok¹::OK_SORT args¹::$Lis
 ST-set-Closure2[OK, #Captured, #ClosureName, #sink, ok¹ args¹.#[ok¹, args¹]]
 →
 %n⟪«ST-init-env[env, #Captured, #sink]»
-Closure c = { «MANGLE[#ClosureName]», «env» };
-«{#env}#[OK, (c;)]»
-⟫
+Closure c = { «MANGLE[#ClosureName]», «env» };«{#env}#[OK, (c;)]»⟫
 ;
 
 ST-init-env[Text, $List[Text], Text] :: Text;
@@ -320,6 +336,8 @@ ST-init-env2[#env, %n⟪⟫, 0, (#Captured1; #Captured), #sink]
 
 ST-init-env2[Text, Text, $Numeric, $List[Text], Text] :: Text;
 
+// TODO: optimize when #count = 1. No need to ALLOCATE
+
 ST-init-env2[#env, #suffix, #count, (), #sink]
 →
 %n⟪
@@ -329,8 +347,8 @@ CEnv «#env» = ALLOCATE(«#sink»->context, «INTEGER[#count]» * sizeof(void*)
 
 ST-init-env2[#env, #suffix, #count, (#Captured1; #Captured), #sink]
 →
-ST-init-env2[#env, %n⟪«#suffix»
-(*«#env»)[«INTEGER[#count]»] = «#Captured1»;⟫, $[Plus, #count, 1], #Captured, #sink]
+ST-init-env2[#env, %n⟪
+(*«#env»)[«INTEGER[#count]»] = «#Captured1»;«#suffix»⟫, $[Plus, #count, 1], #Captured, #sink]
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -381,31 +399,43 @@ ST-set-CaptureBinder2[OK, #args, #Captured,  #sink, ok¹ captured¹.#[ok¹, capt
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-CaptureArgument[Reified_Term, $List[Text], Text, ok¹::OK_SORT captured¹::$List[Text].Text] :: Text;
 
-// Capture Free Variable
-{#env; #v: FREE}
+{#env}
 ST-set-CaptureArgument[VARIABLE-USE[#v], #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
 →
 {#env}
-#[OK, (#v; #Captured)]
+ST-set-CaptureVariable[$[{#env}Get[VARIABLE_ENTRY], #v, BOUND], #v, #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
 ;
-//
-//// This must be a direct binder. No capture.
-//{#env; ¬#v}
-//ST-set-CaptureArgument[VARIABLE-USE[#v], #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]]  
-//→
-//{#env}
-//#[OK, #Captured]
-//;
 
 // Capture meta
 {#env}
 ST-set-CaptureArgument[META-APPLICATION[#MetaVar, (), USE[#Use]], #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
 →
 {#env}
-#[OK, ($[If, $[Equal, #Use, 1], {#env}MetaVar[#MetaVar], %n⟪LINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»)⟫];  #Captured)]
+#[OK, ($[If, $[Equal, #Use, 1], {#env}MetaVar[#MetaVar], %n⟪
+LINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»)⟫];  #Captured)]
 ;
 
-//--- Analyze binders and either mark as BOUND or BOUNDREUSE.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-CaptureVariable[VARIABLE_ENTRY, Reified_Variable, $List[Text], Text, ok¹::OK_SORT captured¹::$List[Text].Text] :: Text;
+
+// Capture Free Variable
+{#env}
+ST-set-CaptureVariable[FREE, #v, #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
+→
+{#env}
+#[OK, (#v; #Captured)]
+;
+
+// This is a direct binder. No capture.
+{#env}
+ST-set-CaptureVariable[BOUND, #v, #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]]  
+→
+{#env}
+#[OK, #Captured]
+;
+
+//--- Analyze binders and return a list of variables (bs) either mark as BOUND or BOUNDREUSE (in the environment).
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-AnalyzeBinder[OK_SORT, Reified_Binder, Text, ok¹::OK_SORT bs::$List[Reified_Variable].Text] :: Text;
@@ -553,9 +583,6 @@ ST-AnalyzeBinder6[#promisc, #kind, #depth, b.#Binder[b], sink, #index, #state, o
 {#env; new : BOUND; "$Binders":LIST_VARIABLE[Append[#binders, (new;)]]}
 ST-AnalyzeBinder1[#Binder[new], sink, $[Plus,#index,1], #state, ok¹ args.#[ok¹, args]]
 ;
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code for construction subterms, with binders.
@@ -1033,9 +1060,12 @@ $[If, $[Equal, #Count, 1],
 {#env}
 ST-set-buffer[#Term, #sink, #variable]
 →
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-« {#env} ST-send[#Term, buf] »«#variable» = BUFFER_TERM(«buf»); FREE_BUFFER(«buf»); ⟧}
-⟫;
+%n⟪
+{⟦
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}ST-send[#Term, buf] »
+«#variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»); ⟧
+}⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture term to an existing variable of type $Boolean
@@ -1051,15 +1081,16 @@ ST-set-bool[#Term, #sink, #variable]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-bool[Reified_Term, Text, Text] :: Text;
 
-{#env} ST-set-bool[LITERAL[#Literal, #Sort],              #sink, #bool] → ST-set-bool2[#bool, STRING[#Literal],%n⟪⟫] ;
-{#env} ST-set-bool[CONSTRUCTION[#kind, #Symbol, #Binders],       #sink, #bool] → ST-set-bool2[#bool, STRING[#Symbol],%n⟪⟫] ;
+{#env} ST-set-bool[LITERAL[#Literal, #Sort], #sink, #bool] → ST-set-bool2[#bool, STRING[#Literal],%n⟪⟫] ;
+{#env} ST-set-bool[CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #bool] → ST-set-bool2[#bool, STRING[#Symbol],%n⟪⟫] ;
 
 -[Free[v::Reified_Variable]]
 :  
 {#env}
 ST-set-bool[VARIABLE-USE[v], #sink, #bool] 
 → 
-ST-set-bool2[#bool, %n⟪«v»->name⟫, %n⟪⟫] // Error? 
+ST-set-bool2[#bool, %n⟪
+«v»->name⟫, %n⟪⟫] // Error? 
 ;
 
 {#env} 
@@ -1076,8 +1107,8 @@ ST-set-bool2[Text, Text, Text] :: Text;
 
 ST-set-bool2[#bool, #string, #suffix]
 →
-%n⟪«#bool» = !strcmp(«#string», True);«#suffix»
-⟫;
+%n⟪
+«#bool» = !strcmp(«#string», True);«#suffix»⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture term to an existing variable of type $Numeric where an integer is needed
@@ -1120,8 +1151,8 @@ ST-set-int2[Text, Text, Text] :: Text;
 
 ST-set-int2[#int, #integer, #suffix]
 →
-%n⟪«#int» = «#integer»;«#suffix»
-⟫;
+%n⟪
+«#int» = «#integer»;«#suffix»⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture term to an existing variable of type $Numeric when a double is needed
@@ -1137,15 +1168,27 @@ ST-set-num[#Term, #sink, #variable]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-num[Reified_Term, Text, Text] :: Text;
 
-{#env} ST-set-num[LITERAL[#Literal, #Sort],              #sink, #num] → ST-set-num2[#num, %n⟪(double) «TOKEN[#Literal]»⟫,%n⟪⟫] ;
-{#env} ST-set-num[CONSTRUCTION[#kind, #Symbol, #Binders],       #sink, #num] → ST-set-num2[#num, %n⟪(double) «TOKEN[#Symbol]»⟫,%n⟪⟫] ;
+{#env}
+ST-set-num[LITERAL[#Literal, #Sort], #sink, #num] 
+→ 
+ST-set-num2[#num, %n⟪
+(double) «TOKEN[#Literal]»⟫,%n⟪⟫] 
+;
+
+{#env}
+ST-set-num[CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #num] 
+→ 
+ST-set-num2[#num, %n⟪
+(double) «TOKEN[#Symbol]»⟫,%n⟪⟫]
+;
 
 -[Free[v::Text]]
 :
 {#env}
 ST-set-num[VARIABLE-USE[v], #sink, #num] 
 →
-ST-set-num2[#num, %n⟪DOUBLE(«v»->name)⟫,%n⟪⟫]
+ST-set-num2[#num, %n⟪
+DOUBLE(«v»->name)⟫,%n⟪⟫]
 ; // Error?
 
 {#env}
@@ -1163,8 +1206,8 @@ ST-set-num2[#num, %n⟪DOUBLE(« {#env}MetaVar[#MetaVar] »)⟫, {#env}ST-Unlink
 
 ST-set-num2[#num, #number, #suffix]
 →
-%n⟪«#num» = «#number»;«#suffix» 
-⟫;
+%n⟪
+«#num» = «#number»;«#suffix»⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture term to an existing allocated variable of type $String

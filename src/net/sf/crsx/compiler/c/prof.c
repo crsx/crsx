@@ -204,7 +204,7 @@ void crsxpBeforeStep(Context context, Term term)
 
 void crsxpAfterStep(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
 
         struct timespec nanoTime;
@@ -229,7 +229,7 @@ void crsxpAfterStep(Context context)
 
 void crsxpBeforeSubstitution(Context context, Term term)
 {
-    if (context->internal)
+    if (context->profiling &&  context->internal)
     {
         getrusage(RUSAGE_SELF, &crsxpSubstitutionUse);
 
@@ -320,7 +320,7 @@ void crsxpVSFreed(Context context)
 
 void crsxpVSAdded(Context context, Hashset set)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         if (set->nitems > pFVMaxSize)
             pFVMaxSize = set->nitems;
@@ -329,10 +329,13 @@ void crsxpVSAdded(Context context, Hashset set)
 
 void crsxpVSContains(Hashset set)
 {
-    if (!set->marker)
+    if (context->profiling && context->internal)
     {
-        pFVUsedCount++;
-        set->marker = 1;
+        if (!set->marker)
+        {
+            pFVUsedCount++;
+            set->marker = 1;
+        }
     }
 }
 
@@ -343,7 +346,7 @@ void crsxpVSRehashed(Context context)
 
 void crsxpReleasePools(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pKeyPoolSize = 0;
         if (context->keyPool)
@@ -353,7 +356,7 @@ void crsxpReleasePools(Context context)
 
 void crsxpBeforeMergeProperties(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pMergeClock);
     }
@@ -361,7 +364,7 @@ void crsxpBeforeMergeProperties(Context context)
 
 void crsxpAfterMergeProperties(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         struct timespec nanoTime;
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &nanoTime);
@@ -373,7 +376,7 @@ void crsxpAfterMergeProperties(Context context)
 }
 void crsxpNamedPropertiesMerged(Context context, int count)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pMergeCount += count;
     }
@@ -381,7 +384,7 @@ void crsxpNamedPropertiesMerged(Context context, int count)
 
 void crsxpMakeVariable(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pVarCount++;
         if (pVarCount > pPeakVarCount)
@@ -390,7 +393,7 @@ void crsxpMakeVariable(Context context)
 }
 void crsxpFreeVariable(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pVarCount--;
     }
@@ -398,7 +401,7 @@ void crsxpFreeVariable(Context context)
 
 void crsxpMakeConstruction(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pConsCount++;
         pTotalConsCount++;
@@ -407,7 +410,7 @@ void crsxpMakeConstruction(Context context)
 
 void crsxpFreeConstruction(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pConsCount--;
     }
