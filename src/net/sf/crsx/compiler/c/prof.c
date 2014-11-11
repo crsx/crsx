@@ -1107,7 +1107,5 @@ void crsxpInstrumentEnter(Context context, Variable id, char* name)
 {}
 void crsxpInstrumentExit(Context context, Variable id)
 {}
-void crsxpMergeBacktrace(Context context, FILE* file)
-{}
 
 #endif

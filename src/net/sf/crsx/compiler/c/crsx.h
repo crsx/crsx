@@ -939,6 +939,15 @@ extern Term compute(Context context, Term term);
 
 typedef void** CEnv; // Closure environment. An array of pointers.
 typedef struct _Closure Closure;
+typedef int (*FuncP)(Sink, CEnv);
+
+#define NO_CENV NULL
+
+// TODO: Extract closure from term.
+#define CLOSURE(term, subindex) { NULL, NULL }
+
+#define ID_CLOSURE { (FuncP) &idclosure, NO_CENV }
+extern int idclosure(Sink, CEnv, Term);
 
 struct _Closure
 {
@@ -947,7 +956,7 @@ struct _Closure
 };
 
 #ifndef CALL1
-# define CALL1(sink,closure,arg0) ((int (*)(Sink, CEnv, void*))closure->f)(sink, (closure)->env, (void*)arg0)
+# define CALL1(sink,closure,arg0) ((int (*)(Sink, CEnv, void*))closure.f)(sink, (closure).env, (void*)arg0)
 #endif
 
 

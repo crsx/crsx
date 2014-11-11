@@ -134,7 +134,7 @@ SF-ExtractClosure[Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text]
 :
 SF-ExtractClosure[#term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
 →
-%n⟪Closure «closure» = CLOSURE(«#term», «INTEGER[#subi]»)«#[OK, Append[#args, (closure;)]]»⟫
+%n⟪Closure «closure» = CLOSURE(«#term», «INTEGER[#subi]»);«#[OK, Append[#args, (closure;)]]»⟫
 ;
 
 SF-StepUnlinkTerm[OK_SORT, Text, Text, $List[Text], $String] :: Text;
@@ -384,7 +384,7 @@ SF-Create-Closure1[Text, $List[Reified_Binder], $List[Reified_Variable], $Numeri
 {#env}
 SF-Create-Closure1[#Name, #Arguments, #Binders, #Count, ok¹.#[ok¹]] 
 →
-%n⟪static void «#Name»(Sink sink, CEnv env«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫
+%n⟪static int «#Name»(Sink sink, CEnv env«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -520,8 +520,7 @@ SF-Closure-Values[$List[Text]<!-- Calls values -->] :: Text;
 SF-Closure-Values[#Values]
 →
 %n⟪
-
-«MANGLE[#Symbol]»(sink«ConcatText[#Values, %n⟨,⟩]»);⟫
+return «MANGLE[#Symbol]»(sink«ConcatText[#Values, %n⟨,⟩]»);⟫
 ;
 
 // Some helpers.

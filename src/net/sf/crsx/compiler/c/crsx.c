@@ -3489,6 +3489,13 @@ long elapsed(Context context)
 #endif
 }
 
+int idclosure(Sink sink, CEnv env, Term var)
+{
+    ASSERT(sink->context, env == NO_CENV);
+    COPY(sink, var);
+    return 1;
+}
+
 /////////////////////////////////////////////////////////////////////////////////
 // Substitution.
 //

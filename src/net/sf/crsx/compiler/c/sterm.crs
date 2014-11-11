@@ -157,7 +157,7 @@ ST-EvalFunction[OK_SORT, $String, $List[Text], Text] :: Text;
 ST-EvalFunction[OK, #Symbol, #args, #sink] // arguments are in reversed order
 →
 %n⟪
-«MANGLE[#Symbol]»(«#sink»«{#env}ST-FunctionArgs[#args]»);⟫
+return «MANGLE[#Symbol]»(«#sink»«{#env}ST-FunctionArgs[#args]»);⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -299,12 +299,14 @@ ST-set-Capture[OK, #Binders, (), #sink, ok¹ captureds¹.
 ST-set-Closure2[ok¹, captureds¹, $[:, #Function, "$CC$", $[FormatNumber, #CCount]], #sink, ok¹ args¹.#[ok¹, args¹]]]
 ;
 
-// x...y.x. A new trivial closure
-{#env;"$Function":STRING_VALUE[#Function]; "$ClosureCount":NUM_VALUE[#CCount]}
+// x...y.x. A identity closure. TODO: assert the term is x.x (should be simplified before code gen).
+-[Fresh[c::Text]]
+:
+{#env}
 ST-set-Closure[VARIABLE-USE[#v], #cargs, #sink, ok¹ args¹.#[ok¹, args¹]] 
 →
-{#env;"$ClosureCount":NUM_VALUE[$[Plus, #CCount, 1]]}
-ST-set-Closure2[OK, (), $[:, #Function, "$CC$", $[FormatNumber, #CCount]], #sink, ok¹ args¹.#[ok¹, args¹]]
+%n⟪
+Closure «c» = ID_CLOSURE;«{#env}#[OK, (c;)]»⟫
 ;
 
 // TODO: META.
@@ -318,7 +320,7 @@ ST-set-Closure2[OK_SORT, $List[Text], $String,  Text, ok¹::OK_SORT args¹::$Lis
 ST-set-Closure2[OK, #Captured, #ClosureName, #sink, ok¹ args¹.#[ok¹, args¹]]
 →
 %n⟪«ST-init-env[env, #Captured, #sink]»
-Closure c = { «MANGLE[#ClosureName]», «env» };«{#env}#[OK, (c;)]»⟫
+Closure «c» = { (FuncP) &«MANGLE[#ClosureName]», «env» };«{#env}#[OK, (c;)]»⟫
 ;
 
 ST-init-env[Text, $List[Text], Text] :: Text;
@@ -348,7 +350,7 @@ CEnv «#env» = ALLOCATE(«#sink»->context, «INTEGER[#count]» * sizeof(void*)
 ST-init-env2[#env, #suffix, #count, (#Captured1; #Captured), #sink]
 →
 ST-init-env2[#env, %n⟪
-(*«#env»)[«INTEGER[#count]»] = «#Captured1»;«#suffix»⟫, $[Plus, #count, 1], #Captured, #sink]
+«#env»[«INTEGER[#count]»] = (void*)«#Captured1»;«#suffix»⟫, $[Plus, #count, 1], #Captured, #sink]
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -399,6 +401,7 @@ ST-set-CaptureBinder2[OK, #args, #Captured,  #sink, ok¹ captured¹.#[ok¹, capt
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-CaptureArgument[Reified_Term, $List[Text], Text, ok¹::OK_SORT captured¹::$List[Text].Text] :: Text;
 
+// Argument is a variable: check if it is free (and capture) or bound (no capture)
 {#env}
 ST-set-CaptureArgument[VARIABLE-USE[#v], #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
 →
@@ -407,14 +410,14 @@ ST-set-CaptureVariable[$[{#env}Get[VARIABLE_ENTRY], #v, BOUND], #v, #Captured, #
 ;
 
 // Capture meta
+-[Fresh[capture::Text]]
+:
 {#env}
-ST-set-CaptureArgument[META-APPLICATION[#MetaVar, (), USE[#Use]], #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
+ST-set-CaptureArgument[META-APPLICATION[#MetaVar, #Binders, #Use], #Captured, #sink, ok¹ captured¹.#[ok¹, captured¹]] 
 →
-{#env}
-#[OK, ($[If, $[Equal, #Use, 1], {#env}MetaVar[#MetaVar], %n⟪
-LINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»)⟫];  #Captured)]
+%n⟪
+Term «capture»;«{#env}ST-set[META-APPLICATION[#MetaVar, #Binders, #Use], #sink, capture]»«#[OK, (capture; #Captured)]»⟫
 ;
-
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-CaptureVariable[VARIABLE_ENTRY, Reified_Variable, $List[Text], Text, ok¹::OK_SORT captured¹::$List[Text].Text] :: Text;
@@ -1043,6 +1046,15 @@ $[If, $[Equal, #Count, 1],
     %n⟪«#variable» = «{#env}MetaVar[#MetaVar]»;⟫,
     %n⟪«#variable» = LINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»);⟫
 ] 
+;
+
+-[Fallback]
+:
+{#env} 
+ST-set[META-APPLICATION[#MetaVar, #Binders, #Use], #sink, #variable] 
+→ 
+{#env} 
+ST-set-buffer[META-APPLICATION[#MetaVar, #Binders, #Use], #sink, #variable]
 ;
 
 // Proper term cases require buffering.
