@@ -5200,17 +5200,17 @@ int fprintVariable(Context context, FILE* out, Variable x)
         //z += FPRINTF(context, out, "%s%s", name, (IS_LINEAR(x) ? "\302\271" : ""));
     else
     {
-        z += FPRINTF(context, out, "v'");
+        z += FPRINTF(context, out, "v\"");
         int i;
         for (i = 0; (c = name[i]); ++i)
         {
-            if ((isgraph(c) || c == ' ') && c != '\'')
+            if ((isgraph(c) || c == ' ') && c != '\"')
                 z += FPRINTF(context, out, "%c", c);
             else
                 z += FPRINTF(context, out, "\\%03o", (int)c);
         }
         //z += FPRINTF(context, out, "%s'", (IS_LINEAR(x) ? "\302\271" : ""));
-        z += FPRINTF(context, out, "'");
+        z += FPRINTF(context, out, "\"");
     }
 #ifdef DEBUG
     if (getenv("include-annotations"))
