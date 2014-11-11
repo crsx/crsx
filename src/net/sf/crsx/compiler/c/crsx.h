@@ -1393,8 +1393,10 @@ extern int deepEqual(Context context, Term term1, Term term2, int compenv);
 extern int check(Context context, Term term);
 
 // Check free variable set is correct
-void checkFreeVariables(Context context, Term term);
+extern void checkFreeVariables(Context context, Term term);
 
+// Send a $Cons/$Nil-list of all keys in the passed properties to the sink.
+extern void sendPropertiesKeys(Sink sink, NamedPropertyLink named, VariablePropertyLink vard);
 
 // Truth values.
 extern const char *True;

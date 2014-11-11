@@ -4891,19 +4891,41 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-// Constructor search helpers.
+// Keys of properties.
 
-
-
-
-%n⟪{⟦ int «depth» = 0;
-{⟦ NamedPropertyLink «link»;
-for («link» = «#namedP»; «link»; «link» = «link»->link) if («link»->name) {⟦START(«#sink», «EventConstructor["$Cons"]»); LITERAL(«#sink», «link»->name); ++«depth»; ⟧}⟧}
-{⟦ VariablePropertyLink «link»;
-for («link» = «#varP»; «link»; «link» = «link»->link) if («link»->variable) {⟦START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); ++«depth»; ⟧}⟧}
-START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
-while («depth»-- > 0) END(«#sink», «EventConstructor["$Cons"]»);⟧}
-⟫;
+void sendPropertiesKeys(Sink sink, NamedPropertyLink named, VariablePropertyLink vard)
+{
+  int depth = 0;
+  for (; named; named = named->link) {
+    if (named->name) {
+      START(sink, _M__sCons); LITERAL(sink, named->name); ++depth;
+    }
+    else {
+      Iterator2 iter = iteratorHS2(sink->context, named->u.propset);
+      if (iter) {
+	do {
+	  START(sink, _M__sCons); LITERAL(sink, (char*)getKeyIHS2(iter)); ++depth;
+	} while (nextIHS2(iter));
+      }
+    }
+  }
+  for (; vard; vard = vard->link) {
+    if (vard->variable) {
+      START(sink, _M__sCons); USE(sink, vard->variable); ++depth;
+    }
+    else {
+      Iterator2 iter = iteratorHS2(sink->context, vard->u.propset);
+      if (iter) {
+	do {
+	  START(sink, _M__sCons); USE(sink, (Variable)getKeyIHS2(iter)); ++depth;
+	} while (nextIHS2(iter));
+      }
+    }
+  }
+  // Terminate and unravel list.
+  START(sink, _M__sNil); END(sink, _M__sNil);
+  while (depth-- > 0) END(sink, _M__sCons);
+}
 
 
 /////////////////////////////////////////////////////////////////////////////////
