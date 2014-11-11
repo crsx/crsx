@@ -98,7 +98,7 @@ public enum Primitive
     FROM_FIRST("FromFirst", 2, 3),
     /** $[DownCase, #string) is a lower case version of #string. */
     DOWN_CASE("DownCase", 1, 1),
-    /** $[UpCase, #string) is a lower case version of #string. */
+    /** $[UpCase, #string) is an upper case version of #string. */
     UP_CASE("UpCase", 1, 1),
     /** $[EncodePoint, #int] returns a Unicode string corresponding to the single character with code point #int. */
     ENCODE_POINT("EncodePoint", 1, 1),

@@ -5091,6 +5091,22 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
 /////////////////////////////////////////////////////////////////////////////////
 // Constructor search helpers.
 
+
+
+
+%n⟪{⟦ int «depth» = 0;
+{⟦ NamedPropertyLink «link»;
+for («link» = «#namedP»; «link»; «link» = «link»->link) if («link»->name) {⟦START(«#sink», «EventConstructor["$Cons"]»); LITERAL(«#sink», «link»->name); ++«depth»; ⟧}⟧}
+{⟦ VariablePropertyLink «link»;
+for («link» = «#varP»; «link»; «link» = «link»->link) if («link»->variable) {⟦START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); ++«depth»; ⟧}⟧}
+START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
+while («depth»-- > 0) END(«#sink», «EventConstructor["$Cons"]»);⟧}
+⟫;
+
+
+/////////////////////////////////////////////////////////////////////////////////
+// Constructor search helpers.
+
 // Helper to search the sorted table of symbol descriptors.
 ConstructionDescriptor lookupSymbolTableDescriptor(Context context, SymbolDescriptor table, size_t size, const char *symbol)
 {
