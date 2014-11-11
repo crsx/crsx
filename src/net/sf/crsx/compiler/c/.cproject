@@ -16,7 +16,7 @@
 					<folderInfo id="cdt.managedbuild.config.llvm.clang.macosx.exe.debug.2129038003." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.llvm.clang.macosx.exe.debug.2058998710" name="LLVM with Clang (MacOSX)" superClass="cdt.managedbuild.toolchain.llvm.clang.macosx.exe.debug">
 							<targetPlatform archList="all" id="cdt.managedbuild.target.llvm.clang.macosx.platform.exe.debug.1598707847" name="Debug Platform" osList="macosx" superClass="cdt.managedbuild.target.llvm.clang.macosx.platform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/crsx c runtime}/Debug" id="cdt.managedbuild.target.llvm.clang.macosx.builder.exe.debug.1988307766" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.target.llvm.clang.macosx.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/crsx c runtime}/Debug" id="org.eclipse.cdt.build.core.internal.builder.203823118" superClass="org.eclipse.cdt.build.core.internal.builder"/>
 							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.assembler.exe.debug.1920289222" name="LLVM assembler" superClass="cdt.managedbuild.tool.llvm.clang.macosx.assembler.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.llvm.archiver.base.2145399521" name="LLVM archiver" superClass="cdt.managedbuild.tool.llvm.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.llvm.clang.macosx.c.compiler.exe.debug.1145977258" name="LLVM Clang" superClass="cdt.managedbuild.tool.llvm.clang.macosx.c.compiler.exe.debug">

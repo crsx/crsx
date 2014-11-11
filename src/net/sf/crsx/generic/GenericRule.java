@@ -719,7 +719,7 @@ public class GenericRule implements Copyable
 						// Shallow variable use	
 						break;
 					case META_APPLICATION :
-						// This is a meta-closure, not a a deep closure;
+						// This is a meta-closure
 						break;
 					case CONSTRUCTION :
 					default :

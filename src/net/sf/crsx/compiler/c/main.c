@@ -16,6 +16,7 @@
 
 #include "linter.h"
 #include "crsx.h"
+#include "prof.h"
 
 // Scanner definitions
 extern int readTerm(Sink sink, FILE *input);
@@ -238,7 +239,6 @@ int runLinter(int argp, int argc, char* argv[])
 static
 int runReport(int argp, int argc, char* argv[])
 {
-    int flags = 0;
     char* input = (char*)0;
 
     int i;

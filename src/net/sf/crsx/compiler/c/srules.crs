@@ -1,0 +1,1485 @@
+// Copyright © 2012,2013 IBM Corporation
+// $Id: rules.crs,v 3.29 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C RULES FILE TEXT FROM REIFIED CRSX. STRICT MODE
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SRULES[(
+
+$Use["compiler/c/cdefs.crs"];
+$Use["compiler/c/sterm.crs"];
+
+$Lax;
+
+SF-Function[$String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+
+-[Fresh[sink::Text, term::Text]]
+:
+SF-Function[#kind, #function, (FORM[#name, #FormArguments]; #Forms), SORT[#SortName,#SortArgs], #Rules]
+→
+%n⟪«SF-Closures[#function, #Rules]»
+int « BinderOffsets[#function] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets[#FormArguments, 0]] »};
+char *« NameFun[#function] »(Term term) { return « STRING[#function] »; }
+struct _ConstructionDescriptor « Descriptor[#function] » = {« $[If, $[Contains, #SortName, "$"], %n⟨NULL⟩, %n⟨&‹Sort[#SortName]›⟩] », 0, « INTEGER[Length[#FormArguments,0]] », sizeof(STRUCT« Struct[#function] »), « BinderOffsets[#function] », &« NameFun[#function] », &« Step[#function] »};
+
+/* FUNCTION « COMMENT_TOKEN[#function] ». */
+int «Step[#function]»(Sink «sink», Term «term»)
+{⟦« SF-StepBody[#kind, sink, term, #function, (FORM[#name, #FormArguments]; #Forms), SORT[#SortName,#SortArgs], #Rules] »⟧
+}
+
+/* FUNCTION « COMMENT_TOKEN[#function] ». */
+int «MANGLE[#function]»(Sink «sink»« {"$Function":STRING_VALUE[#function]; 
+                                       "$ClosureCount": NUM_VALUE[0]; 
+                                       "$Sink":VARIABLE[sink]; 
+                                       "$Args":LIST_VARIABLE[()]}SF-Arg[(FORM[#name, #FormArguments]; #Forms), $False, ok¹.SF-Body[ok¹, #kind, #Rules]] »
+⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate step function. Extract subs and invokes C function.
+
+// TODO: determine whether Variable is shared.
+
+SF-StepBody[$String, Text, Text, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+
+SF-StepBody[#kind, #sink, #term, #function, #Forms, #Sort, #Rules]
+→
+%n⟪
+size_t « #term »_count = LINK_COUNT(« #term »); permitUnusedInt(« #term »_count);«SF-ExtractProps[#Forms, $False, #sink, #term, (), ok¹ args¹.SF-StepUnlinkTerm[ok¹, #sink, #term, args¹, #function]]»⟫
+;
+
+SF-ExtractProps[$List[Reified_Form], $Boolean<!-- Environment generated? -->, Text, Text, $List[Text], ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
+
+SF-ExtractProps[(), #hasSortSet, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] // Function with no argument and no environment. 
+→ 
+#[OK, #args]
+;
+
+SF-ExtractProps[(SORT-ALLOWS-VARIABLES; #Forms), #hasSortSet, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] 
+→ 
+SF-ExtractProps[#Forms, #hasSortSet, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]]
+;
+
+SF-ExtractProps[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $True, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] 
+→ 
+SF-ExtractProps[(#Form; #Forms), $True, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]]
+;
+
+-[Fresh[namedP::Text, varP::Text]]
+:
+SF-ExtractProps[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] 
+→ 
+%n⟪
+NamedPropertyLink «namedP» = NAMED_PROPERTIES(«#term»); VariablePropertyLink «varP» = VARIABLE_PROPERTIES(«#term»);«SF-ExtractProps[(#Form; #Forms), $True, #sink, #term, Append[#args, (namedP;varP;)], ok¹ args¹.#[ok¹, args¹]]»⟫
+;
+
+SF-ExtractProps[(FORM[#Constructor, #Args];), #hasSortSet, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] 
+→ 
+SF-ExtractSubs[OK, #Args, #sink, #term, #args, 0, ok¹ args¹.#[ok¹, args¹]]
+;
+
+// Go through the list of the function arguments
+
+SF-ExtractSubs[OK_SORT, $List[Reified_FormArgument], Text, Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
+
+SF-ExtractSubs[OK, (), #sink, #term, #args, #subi, ok¹ args¹.#[ok¹, args¹]] 
+→
+#[OK, #args]
+;
+
+SF-ExtractSubs[OK, (#Arg; #Args), #sink, #term, #args, #subi, ok¹ args¹.#[ok¹, args¹]] 
+→
+SF-ExtractSub[HasFunctionalFormBinders[#Arg], #Arg, #sink, #term, #args, #subi, ok¹ args¹.SF-ExtractSubs[ok¹, #Args, #sink, #term, args¹, $[Plus, #subi, 1], ok¹ args¹.#[ok¹, args¹]]]
+;
+
+// Apply same rule: if FormArgument contains at least one functional binder, generate
+// a Closure. Otherwise, generate variable + term
+
+SF-ExtractSub[$Boolean, Reified_FormArgument, Text, Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
+
+SF-ExtractSub[$True, #Arg, #sink, #term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
+→
+SF-ExtractClosure[#term, #args, #subi, ok¹ args¹.#[ok¹, args¹]] 
+;
+
+SF-ExtractSub[$False, #Arg, #sink, #term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
+→
+SF-ExtractTerm[#Arg, #sink, #term, #args, #subi, 0, ok¹ args¹.#[ok¹, args¹]] 
+;
+ 
+// The top level argument has no functional binders. Extract variables for each binder and a term
+SF-ExtractTerm[Reified_FormArgument, Text, Text, $List[Text], $Numeric, $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
+
+-[Fresh[var::Text]]
+:
+SF-ExtractTerm[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]], #sink, #term, #args, #subi, #binderi, ok¹ args¹.#[ok¹, args¹]] // Kind must be KDATA
+→
+%n⟪
+Variable «var» = linkVariable(«#sink»->context, BINDER(«#term»,«INTEGER[#subi]»,«INTEGER[#binderi]»));«SF-ExtractTerm[#FormArgument[var], #sink, #term, Append[#args, (var;)], #subi, $[Plus, #binderi, 1], ok¹ args¹.#[ok¹, args¹]]»⟫
+;
+
+-[Fresh[term::Text]]
+:
+SF-ExtractTerm[FORM-ARGUMENT[#Sort], #sink, #term, #args, #subi, #binderi, ok¹ args¹.#[ok¹, args¹]]
+→
+%n⟪
+Term «term» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (term;)]]»⟫
+;
+
+SF-ExtractClosure[Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
+
+-[Fresh[closure::Text]]
+:
+SF-ExtractClosure[#term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
+→
+%n⟪Closure «closure» = CLOSURE(«#term», «INTEGER[#subi]»);«#[OK, Append[#args, (closure;)]]»⟫
+;
+
+SF-StepUnlinkTerm[OK_SORT, Text, Text, $List[Text], $String] :: Text;
+
+SF-StepUnlinkTerm[OK, #sink, #term, #args, #function]
+→
+%n⟪
+UNLINK(«#sink»->context, «#term»);
+return «MANGLE[#function]»(«#sink»«ConcatText[#args,%n⟨,⟩]»);⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Generate closure invocation functions.
+// 
+// Traverses the contraction and generate C function for each closure.
+// These C functions extract the arguments from the environment (if any)
+// and call the closed function.
+//
+
+SF-Closures[$String, $List[Reified_Rule]] :: Text;
+
+SF-Closures[#function, ()] 
+→ 
+%n⟪⟫ 
+;
+
+SF-Closures[#function, (#Rule; #Rules)] 
+→ 
+%n⟪«SF-Closure-Rule[#function, #Rule]»«SF-Closures[#function, #Rules]»⟫
+;
+
+SF-Closure-Rule[$String, Reified_Rule] :: Text;
+
+SF-Closure-Rule[#function, RULE[#name, #Options, #Pattern, #Contractum]]
+→
+{
+    "$Function":STRING_VALUE[#function]; 
+    "$ClosureCount": NUM_VALUE[0]
+} 
+SF-Closure-Term[OK, #Contractum, ok¹.%n⟪⟫]
+;
+
+// Traverse the term and look for function with binders (functional or data).
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Term[OK_SORT, Reified_Term, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Closure-Term[OK, PROPERTY-REF[#Ref, #Use, #term], ok¹.#[ok¹]]  
+→
+{#env}
+SF-Closure-Term[OK, #term, ok¹.#[ok¹]]
+;
+
+{#env}
+SF-Closure-Term[OK, PROPERTY[#Key, #Value, #Scope], ok¹.#[ok¹]] 
+→
+{#env}
+SF-Closure-Term[OK, #Value, ok¹.SF-Closure-Term[ok¹, #Scope, ok¹.#[ok¹]]]
+; 
+
+{#env}
+SF-Closure-Term[OK, PROPERTY-NOT[#Key, #Scope], ok¹.#[ok¹]] 
+→
+{#env}
+SF-Closure-Term[OK, #Scope, ok¹.#[ok¹]]
+; 
+  
+{#env}
+SF-Closure-Term[OK,CONSTRUCTION[#kind, #Symbol, #Binders], ok¹.#[ok¹]] 
+→
+{#env}
+SF-Closure-Binders[OK, #Binders, ok¹.#[ok¹]]
+;
+
+{#env}
+SF-Closure-Term[OK, LITERAL[#Literal, #Sort], ok¹.#[ok¹]]
+→
+{#env}
+#[OK]
+;
+
+{#env}
+SF-Closure-Term[OK, VARIABLE-USE[#variable], ok¹.#[ok¹]]
+→
+{#env}
+#[OK]
+;
+
+{#env}
+SF-Closure-Term[OK, META-APPLICATION[#MetaVar, #Arguments, #Use], ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Binders[OK, #Arguments, ok¹.#[ok¹]]
+;
+
+{#env}
+SF-Closure-Term[OK, EVALUATOR[#Primitive, #Terms, #Options], ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Terms[OK, #Terms, ok¹.#[ok¹]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Terms[OK_SORT, $List[Reified_Term], ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Closure-Terms[OK, (), ok¹.#[ok¹]]
+→
+{#env}
+#[OK]
+;
+
+{#env}
+SF-Closure-Terms[OK, (#Term; #Terms), ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Term[OK, #Term, ok¹.SF-Closure-Terms[ok¹, #Terms, ok¹.#[ok¹]]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Binders[OK_SORT, $List[Reified_Binder], ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Closure-Binders[OK, (), ok¹.#[ok¹]]
+→
+{#env}
+#[OK]
+;
+
+{#env}
+SF-Closure-Binders[OK, (#Binder; #Binders), ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Binder[HasFunctionalBinders[#Binder], #Binder, ok¹.SF-Closure-Binders[ok¹, #Binders, ok¹.#[ok¹]]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Binder[$Boolean, Reified_Binder, ok¹::OK_SORT.Text] :: Text;
+
+// Subterm without function binders, not a candidate. Move on.
+{#env}
+SF-Closure-Binder[$False, #Binder, ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Term[OK, MoveToTerm[#Binder], ok¹.#[ok¹]]
+;
+
+// At least one functional binder. Generate closure invocation function (TODO: currying).
+{#env}
+SF-Closure-Binder[$True, #Binder, ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Function[#Binder, (), 0, ok¹.#[ok¹]]
+;
+
+// Just iterate over the binders, gather their kind (data vs functional) and count them.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Function[Reified_Binder, $List[Reified_Variable], $Numeric, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Closure-Function[ARGUMENT[#sort, #Term], #Binders, #Count, ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Arguments[#Term, #Binders, #Count, ok¹.#[ok¹]]
+;
+
+-[Fresh[b::Reified_Variable]]
+:
+{#env}
+SF-Closure-Function[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #Binders, #Count, ok¹.#[ok¹]]
+→
+{#env; b: SF-BoundKind[#kind]}
+SF-Closure-Function[#Binder[b], Append[#Binders, (b;)], $[Plus, #Count, 1], ok¹.#[ok¹]] // Preserve binder order.
+;
+
+// At that point we have a term with functional binders. 
+// Move to the subterm with binder. Error if subterm is of a wrong type.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Arguments[Reified_Term, $List[Reified_Variable], $Numeric, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Closure-Arguments[PROPERTY-REF[#Ref, #Use, #Term], #Binders, #Count, ok¹.#[ok¹]]  // TODO: should be counted as one of the arguments
+→
+{#env}
+SF-Closure-Arguments[#Term, #Binders, #Count, ok¹.#[ok¹]]
+;
+
+// x..y.T[...]. Good we found a closure. Create the function to invoke it.
+{#env}
+SF-Closure-Arguments[CONSTRUCTION[#Kind, #Symbol, #Arguments], #Binders, #Count, ok¹.#[ok¹]] 
+→
+{#env; "$Symbol":STRING_VALUE[#Symbol]}
+SF-Create-Closure[#Symbol, #Arguments, #Binders, #Count, ok¹.#[ok¹]]
+;
+
+// x..y.Literal. Just proceed.
+{#env}
+SF-Closure-Arguments[LITERAL[#Literal, #Sort], #Binders, #Count, ok¹.#[ok¹]]
+→
+{#env}
+#[OK]
+;
+
+// x...y.x: no need to generate a closure. Use builtin identity function.
+{#env}
+SF-Closure-Arguments[VARIABLE-USE[#variable], #Binders, #Count, ok¹.#[ok¹]]
+→
+{#env}
+#[OK]
+;
+
+// x...y.#[ ... ]. Potentially currying. TODO
+{#env}
+SF-Closure-Arguments[META-APPLICATION[#MetaVar, #Arguments, #Use], #Binders, #Count, ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Binders[OK, #Arguments, ok¹.#[ok¹]]
+;
+
+// x..y.$[ ... ]. Not a closure. Proceed to the primitive arguments.
+{#env}
+SF-Closure-Arguments[EVALUATOR[#Primitive, #Terms, #Options], #Binders, #Count, ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Terms[OK, #Terms, ok¹.#[ok¹]]
+;
+
+//------------ Here start the generation of the C function invoking the closure!
+
+// Simplifier ensures the binders order is preserved. 
+// x y.C[x,y  <== x is before y.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Create-Closure[$String, $List[Reified_Binder], $List[Reified_Variable], $Numeric, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Create-Closure[#Symbol, #Arguments, #Binders, #Count, ok¹.#[ok¹]] 
+→
+{#env}
+SF-ClosureName[name¹.SF-Create-Closure1[name¹, #Arguments, #Binders, #Count, ok¹.#[ok¹]]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Create-Closure1[Text, $List[Reified_Binder], $List[Reified_Variable], $Numeric, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Create-Closure1[#Name, #Arguments, #Binders, #Count, ok¹.#[ok¹]] 
+→
+%n⟪static int «#Name»(Sink sink, CEnv env«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Create-Params[$List[Reified_Variable], $List[Reified_Binder], ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Create-Params[(), #Arguments, ok¹.#[ok¹]]
+→
+{#env}
+SF-Closure-Body[#Arguments, ok¹.#[ok¹]]
+;
+
+{#env}
+SF-Create-Params[(#Binder;#Binders), #Arguments, ok¹.#[ok¹]]
+→
+%n⟪,«SF-ParamType[$[{#env}Get[VARIABLE_ENTRY], #Binder]]» «#Binder»«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Body[$List[Reified_Binder], ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Closure-Body[#Arguments, ok¹.#[ok¹]]
+→
+%n⟪) {⟦
+«{#env}SF-Closure-Env[#Arguments, (), (), 0]»
+⟧
+}
+«{#env}#[OK]»
+⟫
+;
+
+// Traverse the construction argument and identify captured values. Get them out of the environment.
+// Handle the case where there is no captured values (TODO: and only one captured value)
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Env[$List[Reified_Binder], $List[Text]<!-- Calls values -->, $List[Text]<!-- Environment assignments -->, $Numeric<!-- Capture count -->] :: Text;
+
+{#env}
+SF-Closure-Env[(), #Values, #Captured, #Count] 
+→
+{#env}
+SF-Closure-Assemble[#Values, #Captured, #Count]
+;
+
+// Argument is itself a closure
+{#env}
+SF-Closure-Env[(BINDER[#Promiscuity, #Kind, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]; #Binders), #Values, #Captured, #Count]
+→
+{#env}
+SF-Closure-Env[#Binders, (%n⟪v«INTEGER[#Count]»⟫;#Values), (%n⟪
+Closure v«INTEGER[#Count]» = (Closure) env[«INTEGER[#Count]»];⟫;#Captured), $[Plus, #Count, 1]]
+;
+
+// Argument is either a bound variable or free variable.
+{#env}
+SF-Closure-Env[(ARGUMENT[#Sort, VARIABLE-USE[#var]]; #Binders), #Values, #Captured, #Count]
+→
+{#env}
+SF-Closure-EnvVariable[$[{#env}Get[VARIABLE_ENTRY], #var, FREE], #var, #Binders, #Values, #Captured, #Count]
+;
+
+// In any other cases, we captured a term. 
+-[Fallback]
+:
+{#env}
+SF-Closure-Env[(#Arg; #Binders), #Values, #Captured, #Count]
+→
+{#env}
+SF-Closure-Env[#Binders, (%n⟪v«INTEGER[#Count]»⟫;#Values), (%n⟪
+Term v«INTEGER[#Count]» = (Term) env[«INTEGER[#Count]»];⟫;#Captured), $[Plus, #Count, 1]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-EnvVariable[VARIABLE_ENTRY, Reified_Variable, $List[Reified_Binder], $List[Text], $List[Text], $Numeric] :: Text;
+
+{#env}
+SF-Closure-EnvVariable[BOUND, #var, #Binders, #Values, #Captured, #Count]
+→
+{#env}
+SF-Closure-Env[#Binders, (%n⟪«#var»⟫;#Values), #Captured, #Count]
+;
+
+{#env}
+SF-Closure-EnvVariable[BOUND_DATA, #var, #Binders, #Values, #Captured, #Count]
+→
+{#env}
+SF-Closure-Env[#Binders, (%n⟪«#var»⟫;#Values), #Captured, #Count]
+;
+
+{#env}
+SF-Closure-EnvVariable[FREE, #var, #Binders, #Values, #Captured, #Count]
+→
+{#env}
+SF-Closure-Env[#Binders, (%n⟪v«INTEGER[#Count]»⟫;#Values), (%n⟪
+Variable v«INTEGER[#Count]» = (Variable) env[«INTEGER[#Count]»];⟫;#Captured), $[Plus, #Count, 1]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Assemble[$List[Text]<!-- Calls values -->, $List[Text]<!-- Environment assignments -->, $Numeric<!-- Capture count -->] :: Text;
+
+{#env}
+SF-Closure-Assemble[#Values, #Captured, #Count]
+→
+$[If, $[Equal, #Count, 0], 
+    {#env}SF-Closure-Values[#Values],
+    {#env}SF-Closure-Captured[#Captured, #Values]
+]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Captured[$List[Text]<!-- Environment assignments -->, $List[Text]<!-- Calls values -->] :: Text;
+
+{#env}
+SF-Closure-Captured[(), #Values]
+→
+%n⟪
+FREE(sink->context, env);
+«{#env}SF-Closure-Values[#Values]»⟫
+;
+
+{#env}
+SF-Closure-Captured[(#Captured;#Captureds), #Values]
+→
+%n⟪«#Captured»
+«{#env}SF-Closure-Captured[#Captureds, #Values]»⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Closure-Values[$List[Text]<!-- Calls values -->] :: Text;
+
+{#env; "$Symbol":STRING_VALUE[#Symbol]}
+SF-Closure-Values[#Values]
+→
+%n⟪
+return «MANGLE[#Symbol]»(sink«ConcatText[#Values, %n⟨,⟩]»);⟫
+;
+
+// Some helpers.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-ClosureName[name¹::Text.Text] :: Text;
+
+{#env; "$Function":STRING_VALUE[#Function];"$ClosureCount":NUM_VALUE[#Count]}
+SF-ClosureName[name¹.#[name¹]] 
+→ 
+{#env; "$ClosureCount":NUM_VALUE[$[Plus, #Count, 1]]}
+#[%n⟪« MANGLE[$[:, #Function, "$CC$"]]»«INTEGER[#Count]»⟫]
+;
+
+SF-ParamType[VARIABLE_ENTRY]:: Text;
+
+SF-ParamType[BOUND_DATA]  → %n⟪Variable⟫;
+SF-ParamType[BOUND]       → %n⟪Term⟫; 
+
+SF-BoundKind[Reified_Kind] :: VARIABLE_ENTRY;
+
+SF-BoundKind[KDATA]     → BOUND_DATA;
+SF-BoundKind[KFUNCTION] → BOUND;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE FUNCTION. STRICT MODE.
+//
+// First: Generate C function signature (starting with the argument).
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Arg[$List[Reified_Form], $Boolean<!-- Environment generated? -->, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Arg[(), #hasSortSet, ok¹.#[ok¹]] // Function with no argument and no environment. 
+→ 
+{#env}
+#[OK]
+;
+
+{#env}
+SF-Arg[(SORT-ALLOWS-VARIABLES; #Forms), #hasSortSet, ok¹.#[ok¹]] 
+→ 
+{#env}
+SF-Arg[#Forms, #hasSortSet, ok¹.#[ok¹]]
+;
+
+{#env}
+SF-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $True, ok¹.#[ok¹]] 
+→ 
+{#env}
+SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]
+;
+
+-[Fresh[namedP::Text, varP::Text]]
+:
+{#env}
+SF-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False, ok¹.#[ok¹]] 
+→ 
+%n⟪,NamedPropertyLink «namedP»,VariablePropertyLink «varP»«{#env;"$TopRef":PROPERTY_VARIABLE[namedP, varP]}SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]»⟫
+;
+
+{#env}
+SF-Arg[(FORM[#Constructor, #Args];), #hasSortSet, ok¹.#[ok¹]] 
+→ 
+{#env}
+SF-TopArgs[OK, #Args, 0, ok¹.#[ok¹]]
+;
+
+// Go through the list of the function arguments
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-TopArgs[OK_SORT, $List[Reified_FormArgument], $Numeric, ok¹::OK_SORT.Text] :: Text;
+
+{#env}
+SF-TopArgs[OK, (), #Index, ok¹.#[ok¹]] 
+→
+{#env}
+#[OK]
+;
+
+{#env}
+SF-TopArgs[OK, (#Arg; #Args), #Index, ok¹.#[ok¹]] 
+→
+{#env}
+SF-TopArg[HasFunctionalFormBinders[#Arg], #Arg, #Index, ok¹ index¹.SF-TopArgs[ok¹, #Args, index¹, ok¹.#[ok¹]]]
+;
+
+// Apply same rule: if FormArgument contains at least one functional binder, generate
+// a Closure. Otherwise, generate variable + term
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-TopArg[$Boolean, Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
+
+{#env}
+SF-TopArg[$True, #Arg, #Index, ok¹ index¹.#[ok¹, index¹]]
+→
+{#env}
+SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]] 
+;
+
+{#env}
+SF-TopArg[$False, #Arg, #Index, ok¹ index¹.#[ok¹, index¹]]
+→
+{#env}
+SF-TopTerm[#Arg, #Index, ok¹ index¹.#[ok¹, index¹]] 
+;
+ 
+// The top level argument has no functional binders. Generate variables for each binder and a term
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-TopTerm[Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
+
+-[Fresh[var::Text]]
+:
+{#env; "$Args":LIST_VARIABLE[#TopArgs]}
+SF-TopTerm[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]], #Index, ok¹ index¹.#[ok¹, index¹]] // Kind must be KDATA
+→
+%n⟪, Variable «var»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(var;)]]; var:ARG[#Index, $True]}SF-TopTerm[#FormArgument[var], $[Plus, #Index, 1], ok¹ index¹.#[ok¹, index¹]]»⟫
+;
+
+-[Fresh[term::Text]]
+:
+{#env; "$Args":LIST_VARIABLE[#TopArgs]}
+SF-TopTerm[FORM-ARGUMENT[#Sort], #Index, ok¹ index¹.#[ok¹, index¹]]
+→
+%n⟪, Term «term»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(term;)]]; term:ARG[#Index, $True]}#[OK, $[Plus, #Index, 1]]»⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-TopClosure[$Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
+
+-[Fresh[closure::Text]]
+:
+{#env; "$Args":LIST_VARIABLE[#TopArgs]}
+SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]]
+→
+%n⟪, Closure «closure»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(closure;)]];closure:ARG[#Index, $False]}#[OK, $[Plus, #Index, 1]]»⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Body[OK_SORT, $String, $List[Reified_Rule]] :: Text;
+
+{#env}
+SF-Body[OK, #kind, #Rules] 
+→
+%n⟪) {⟦  
+«
+$[If, $[Equal, #kind, "Contract"], {#env}SF-Contract[#Rules],
+$[If, $[Equal, #kind, "BinderDispatch"], SF-Contract[#Rules], 
+$[If, $[Equal, #kind, "Dispatch"], SF-Contract[#Rules], // TODO 
+$[If, $[Equal, #kind, "Shuffle" ], SF-Contract [#Rules],
+%n⟨⟩]]]]
+»⟧
+}⟫
+;
+
+//
+// Generate C function body. Contraction mode.
+//
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Contract[$List[Reified_Rule]] :: Text;
+
+{#env; "$Sink":VARIABLE[#sink]}
+SF-Contract[(RULE[#name, #Options, #Pattern, #Contractum]; #Rules)]
+→
+%n⟪do {⟦
+/* Contraction rule « COMMENT_TOKEN[#name] ». */
+« {#env;"$Binders":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()]; "$Vars": LIST_VARIABLE[()];"$Subs": LIST_VARIABLE[()]} 
+  F-Options[#Options, o3.
+  F-then-Fresh[o3, #sink, #Options, ok.
+  SF-then-Pattern[ok, FIRST, MATCH, #Pattern, #sink, %n⟨⟩, $False, $False, %n⟨⟩, o2.
+  SF-then-Send[o2, %n⟨⟩, #Contractum, #sink]]]] »⟧
+} while (0);
+« {#env}SF-Contract[#Rules] »⟫
+;
+
+SF-Contract[()]
+→
+%n⟪
+return 1;
+⟫ // TODO: FAIL TO PROCEED CONTRACTION. RECORD IN DELAYED TERM
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Match term against pattern. 
+//
+// Goes to some trouble to match the body of a pattern before the properties.
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Pattern[OK_SORT, PASS, Pattern-Stage, Reified_Term, Text, Text, $Boolean, $Boolean, Text, ok::OK_SORT.Text] :: Text;
+
+{#env}
+SF-then-Pattern[OK, #pass, #stage, #Pattern, #sink, #setup, #needed, #unique, #term, ok.#[ok]] 
+→ 
+{#env}
+SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern[PASS, Pattern-Stage, Reified_Term, Text, Text, $Boolean, $Boolean, Text, ok::OK_SORT.Text] :: Text;
+
+// Pattern {#REF} prefix: create reference variable (if used).
+SF-Pattern-PropertyRef-Discard
+:
+{#env}
+SF-Pattern[#pass, #stage, PROPERTY-REF[#Ref, DISCARD, #Pattern], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+$[{#env}IfDef, $[:,"Comparable$",#Ref],
+  {#env}SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, $True, #unique, #term, ok.SF-then-Pattern-Ref[ok, $[:,"MetaVar$",#Ref], #stage, DISCARD, #sink, #term, o2.#[o2]]],
+  {#env}SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, #needed, #unique, #term, ok.#[ok]]]
+;
+
+SF-Pattern-PropertyRef-Used
+:
+{#env}
+SF-Pattern[#pass, #stage, PROPERTY-REF[#Ref, USE[#Count], #Pattern], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+{#env} 
+SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, $True, #unique, #term, ok¹.
+SF-then-Pattern-Ref[ok¹, $[:,"MetaVar$",#Ref], #stage, USE[#Count], #sink, #term, ok¹.#[ok¹]]]
+;
+
+// Pattern {KEY:VALUE} prefix: extract property and match pattern.
+SF-Pattern-Property-all
+:
+{#env}
+SF-Pattern[#pass, #stage, PROPERTY[#Key, #Value, #Pattern], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+{#env}
+SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, $True, #unique, #term, ok¹.
+SF-then-Pattern-Property[ok¹, #pass, #sink, #term, #Key, #Value, ok¹.#[ok¹]]]
+;
+
+// Pattern {¬ KEY} prefix: extract property and check for absence.
+SF-Pattern-NotProperty-all 
+:
+{#env}
+SF-Pattern[#pass, #stage, PROPERTY-NOT[#Key, #Pattern], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+{#env}
+SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, $True, #unique, #term, ok¹.
+SF-then-Pattern-Not-Property[ok¹, #sink, #term, #Key, o2.#[o2]]]
+;
+
+// Pattern Symbol[Binders...]: advances the stage.
+
+// - DISPATCH stage: ignore function application itself (which is the function) and advance to case generation.
+SF-Pattern-Construction-Dispatch
+:
+{#env}
+SF-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#kind, #Symbol, (#Binder1;#Binders)], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder[#pass, CASE[#Name,#Options,#SortName], HasFunctionalBinders[#Binder1], #Binder1, #sink, #setup, #unique, #term, 0, 0, ok¹.
+SF-then-PatternBinders[ok¹, #pass, DISPATCH[#Name,#Options,#SortName], #Binders, #sink, #unique, #term, 1, ok¹.#[ok¹]]]
+;
+
+SF-Pattern-Construction-NoBinders-Dispatch 
+:
+{#env}
+SF-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#kind, #Symbol, ()], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+{#env}
+SF-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#kind, #Symbol, ()], #sink, #setup, $False, #unique, #term, ok.#[ok]]
+;
+
+// - CASE stage: emit case check and proceed normally.
+SF-Pattern-Construction-Case
+:
+{#env}
+SF-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+%n⟪« SF-Pattern-Open[#pass] »case « EnumTag[#Symbol] »: {⟦ /* Function «COMMENT_TOKEN[#Name]» case «COMMENT_TOKEN[#Symbol]» */
+«#setup»
+« {#env} F-Options[#Options, ok.SF-then-PatternBinders[ok, #pass, CASE[#Name,#Options,#SortName], #Binders, #sink, #unique, #term, 0, ok.#[ok]]] »
+return 1;⟧
+⟫
+;
+
+// -  MATCH stage: ignore construction itself and process Binders.
+SF-Pattern-Construction-Match
+:
+{#env}
+SF-Pattern[#pass, MATCH, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+%n⟪« #setup »« {#env}SF-PatternBinders[#pass, MATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »⟫
+;
+
+// - SUBMATCH stage: force, check, and process argument Binders.
+SF-Pattern-Construction-SubMatch-Sub
+:
+{#env; #term:SUB[#parent, #i, #linked]}
+SF-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+%n⟪« #setup »FORCE(«#sink»->context, «#term»); SUB(«#parent», «INTEGER[#i]») = «#term»;
+if (strcmp(SYMBOL(«#term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[#sink]» break;}
+« {#env} SF-then-PatternBinders[OK, #pass, SUBMATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »
+⟫
+;
+
+SF-Pattern-Construction-SubMatch-TermArg
+:
+{#env; #term:ARG[#i, $True]}
+SF-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+%n⟪« #setup »FORCE(«#sink»->context, «#term»); 
+if (strcmp(SYMBOL(«#term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[#sink]» break;}
+« {#env} SF-then-PatternBinders[OK, #pass, SUBMATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »
+⟫
+;
+
+SF-Pattern-Construction-SubMatch-ClosureArg
+:
+{#env; #term:ARG[#i, $False]}
+SF-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+$[Error, "Cannot submatch a closure"] // TODO: better error message
+;
+
+// Pattern "Literal": assume that the literal is there...
+D-Pattern-Literal
+:
+{#env}
+SF-Pattern[#pass, #stage, LITERAL[#Literal, #Type], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+%n⟪/* Ignoring literal «STRING[#Literal]» */
+« If[#needed,#setup,%n⟨⟩] »« {#env} #[OK] »⟫
+;
+
+// SUBMATCH stage, pattern is free variable (outside meta-application): record the variable.  
+D-Pattern-Variable-Free[Free[variable::Reified_Variable, sink::Text, term::Text, parent::Text]]
+:
+{#env; variable : FREE; term:SUB[parent, #i, #linked]}
+SF-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #unique, term, ok.#[ok]]
+→
+%n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»; Variable «variable» = linkVariable(«sink»->context, VARIABLE(«term»)); 
+« {#env} #[OK] »⟫
+;
+
+// SUBMATCH stage, Pattern is bound variable (outside meta-application).
+SF-Pattern-Variable-Bound[Free[variable,sink,term,parent]]
+:
+{#env; variable : $[NotMatch, FREE, #kind]; term:SUB[parent, #i, #linked]}
+SF-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #unique, term, ok.#[ok]]
+→
+%n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»; if («variable» != VARIABLE(«term»)) {«{#env}F-fail-cleanup[sink]» break;}
+« {#env} #[OK] »⟫
+;
+
+// Pattern is variable but before options have been processed.
+
+// - first variable.
+D-Pattern-Variable-Case1 
+:
+{#env}
+SF-Pattern[FIRST, CASE[#Name,#Options,#SortName], VARIABLE-USE[#variable], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+%n⟪case « EnumVar[#SortName] »: {⟦
+« {#env} SF-Pattern-Variable-Case[#Name, #Options, #variable, #sink, #setup, #term, ok.#[ok]] »⟧⟫
+;
+
+// - subsequent variable (always follows another variable).
+D-Pattern-Variable-Case2[Discard[#SortName,#needed,#unique]]
+:
+{#env}
+SF-Pattern[SECOND, CASE[#Name,#Options,#SortName], VARIABLE-USE[#variable], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→
+{#env}
+SF-Pattern-Variable-Case[#Name, #Options, #variable, #sink, #setup, #term, ok.#[ok]]
+;
+
+// Pattern $[...]: 
+D-Pattern-Evaluator[Free[sink::Text, term::Text]]
+:
+{#env}
+SF-Pattern[#pass, #stage, EVALUATOR[#Primitive, #Patterns, #Options], sink, #setup, #needed, #unique, term, ok.#[ok]]
+→
+%n⟪« #setup »« {#env} E-Pattern[Primitive[#Primitive], #Patterns, #pass, #stage, sink, term, ok.#[ok]] »⟫
+;
+
+// Pattern #MetaVar[MetaArg...]: store in meta-variable and record argument variables.
+
+// A meta SUBMATCH must be Data
+D-Pattern-MetaApplication
+:
+{#env}
+SF-Pattern[#pass, SUBMATCH, META-APPLICATION[#MetaVar, #MetaArgs, #Use], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
+→  
+{#env}
+SF-Pattern-MetaArgs-Norm[{#env}F-Pattern-NeedNorm[#MetaVar,#Use], #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[ok]]
+;
+
+// Helper for generating environment reference meta-variable.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Pattern-Ref[OK_SORT, $String, Pattern-Stage, Reified_Use, Text, Text, ok::OK_SORT.Text] :: Text;
+
+-[Data[#RefCookie]]
+:
+{#env; "$TopRef": #PropVars; "$Refs": LIST_STRING[#refs]}
+SF-then-Pattern-Ref[OK, #RefCookie, MATCH, DISCARD, #sink, #term, ok.#[ok]] // Top-level: no need to link and record for unlink
+→
+{#env; #RefCookie : #PropVars; "$Refs":LIST_STRING[(#RefCookie;#refs)]} 
+#[OK]
+;
+
+-[Data[#RefCookie]]
+:
+{#env; "$TopRef": #PropVars; "$Refs": LIST_STRING[#refs]}
+SF-then-Pattern-Ref[OK, #RefCookie, MATCH, USE[#Count], #sink, #term, ok.#[ok]] // Used at least once. Top-level: already linked
+→
+{#env; #RefCookie : #PropVars; "$Refs":LIST_STRING[(#RefCookie;#refs)]} 
+#[OK]
+;
+
+-[Fresh[namedP::Text, varP::Text], Data[#RefCookie]]
+:
+{#env; "$Refs": LIST_STRING[#refs]}
+SF-then-Pattern-Ref[OK, #RefCookie, SUBMATCH, DISCARD, #sink, #term, ok.#[ok]] // Only needed for comparable in the pattern. No need to link.
+→
+%n⟪
+NamedPropertyLink «namedP» = NAMED_PROPERTIES(«#term»);
+VariablePropertyLink «varP» = VARIABLE_PROPERTIES(«#term»);
+« {#env;  #RefCookie : PROPERTY_VARIABLE[namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
+;
+
+-[Fresh[namedP::Text, varP::Text], Data[#RefCookie]]
+:
+{#env; "$Refs": LIST_STRING[#refs]}
+SF-then-Pattern-Ref[OK, #RefCookie, SUBMATCH, USE[#Count], #sink, #term, ok.#[ok]] // Used at least once. Link.
+→
+%n⟪
+NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»));
+VariablePropertyLink «varP» = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));
+« {#env;  #RefCookie : PROPERTY_VARIABLE[namedP, varP]; "$Refs":LIST_STRING[(#RefCookie;#refs)]} #[OK] »⟫
+;
+
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Pattern-Property[OK_SORT, PASS, Text, Text, Reified_Term, Reified_Term, ok::OK_SORT.Text] :: Text;
+
+-[Free[sink::Text, term::Text], Fresh[value::Text]]
+:
+{#env}
+SF-then-Pattern-Property[OK, #pass, sink, term, #Key, #Value, ok.#[ok]]
+→
+%n⟪« {#env} F-set-value[#Key, sink, term, value] »if (!«value») {«{#env}F-fail-cleanup[sink]» break;} 
+LINK(«sink»->context, «value»);« {#env} F-Pattern[#pass, SUBMATCH, #Value, sink, %n⟨⟩, $False, $True, value, ok.#[ok]] »⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-set-value[Reified_Term, Text, Text, Text] :: Text;
+
+{#env}
+SF-set-value[META-APPLICATION[#MetaVar, #Args,#count], #sink, #term, #value] 
+→ 
+%n⟪Term «#value» = PROPERTY(«#sink»->context, «#term», « {#env}MetaVar[#MetaVar] »); permitUnusedTerm(«#value»);
+⟫
+;
+
+{#env}
+SF-set-value[LITERAL[#Literal, #Sort], #sink, #term, #value] 
+→ 
+%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Literal]»); permitUnusedTerm(«#value»);
+⟫
+;
+
+{#env}
+SF-set-value[CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #term, #value] 
+→ 
+%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Symbol]»); permitUnusedTerm(«#value»);
+⟫
+;
+
+-[Free[variable::Reified_Variable]]
+:
+{#env}
+SF-set-value[VARIABLE-USE[variable], #sink, #term, #value] 
+→ 
+%n⟪Term «#value» = VARIABLE_PROPERTY(«#term», «$[Show, variable]»); permitUnusedTerm(«#value»);
+⟫ 
+;
+
+SF-Pattern-Open[PASS] :: Text;
+
+SF-Pattern-Open[FIRST] → %n⟪⟫; 
+SF-Pattern-Open[SECOND] → %n⟪break;
+}
+⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Pattern-Not-Property[OK_SORT, Text, Text, Reified_Term, ok::OK_SORT.Text] :: Text;
+
+-[Fresh[value::Text]]
+:
+{#env}
+SF-then-Pattern-Not-Property[OK, sink, term, #Key, ok.#[ok]]
+→
+%n⟪« {#env} SF-set-value[#Key, sink, term, value] »if (!«value») {«{#env}F-fail-cleanup[sink]» break;}
+LINK(«sink»->context, «value»);« {#env} #[OK] »⟫
+;
+
+// Helper for processing construction subterms.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-PatternBinders[OK_SORT, PASS, Pattern-Stage, $List[Reified_Binder], Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+{#env}
+SF-then-PatternBinders[OK, #pass, #stage, #Binders, #sink, #unique, #term, #index, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternBinders[#pass, #stage, #Binders, #sink, #unique, #term, #index, ok.#[ok]]
+;
+
+// ------------ Process construction binders, for each stage
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternBinders[PASS, Pattern-Stage, $List[Reified_Binder], Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// Top-level: get the pattern arguments from the C function itself.
+{#env} //; "$Args" : LIST_VARIABLE[(#sub; #subs)] 
+SF-PatternBinders[#pass, MATCH, (#Binder;#Binders), #sink, #unique, #term, #index, ok.#[ok]]
+→
+{#env} // ; "$Arg": VARIABLE[#sub]; "$Args" : LIST_VARIABLE[#subs]// Navigate to the next argument.
+SF-PatternBinder[#pass, MATCH, HasFunctionalBinders[#Binder], #Binder, #sink, %n⟨⟩, #unique, #term, #index, 0, ok¹.
+SF-then-PatternBinders[ok¹, #pass, MATCH, #Binders, #sink, #unique, #term, $[Plus,#index,1], ok¹.#[ok¹]]]
+;
+
+// Submatch: just continue. Sub will be extracted later on.
+{#env}
+SF-PatternBinders[#pass, SUBMATCH, (#Binder;#Binders), #sink, #unique, #term, #index, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder[#pass, SUBMATCH, HasFunctionalBinders[#Binder], #Binder, #sink, %n⟨⟩, #unique, #term, #index, 0, ok¹.
+SF-then-PatternBinders[ok¹, #pass, SUBMATCH, #Binders, #sink, #unique, #term, $[Plus,#index,1], ok¹.#[ok¹]]]
+;
+
+// Pattern arguments []. Done.
+{#env}
+SF-PatternBinders[#pass, #stage, (), #sink, #unique, #term, #index, ok.#[ok]]
+→
+{#env}
+#[OK]
+;
+
+// ------------ Process construction binder, for each stage
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternBinder[PASS, Pattern-Stage, $Boolean, Reified_Binder, Text, Text, $Boolean, Text, $Numeric<!-- Sub Index -->, $Numeric<!-- Binder index -->, ok::OK_SORT.Text] :: Text;
+
+// Has at least one functional binder: hidden in Closure. Just Skip
+-[Fresh[b::Reified_Variable]]
+:
+{#env}
+SF-PatternBinder[#pass, #stage, $True, BINDER[#promisc, #kind, #depth, #sort, #occs, b . #Binder[b]], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder[#pass, #stage, $True, #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+// All binders are data. Represent as data
+{#env}
+SF-PatternBinder[#pass, #stage, $False, BINDER[#promisc, KDATA, #depth, #sort, #occs, b . #Binder[b]], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder1[#occs, NOTHING, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+// Just an argument. Move on to the sub.
+{#env}
+SF-PatternBinder[#pass, #stage, #Has, ARGUMENT[#sort,#Pattern], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternSub[#Pattern, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+//-------- Analyzes data binder for reuse and extract/record Variable 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternBinder1[$List[Reified_Occurrence], Meta-Occurrence, PASS, Pattern-Stage, Reified_Promiscuity, binder : Reified_Variable . Reified_Binder, Text, Text, $Boolean, Text, $Numeric, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// - if binder occurs in exactly one meta-application then record a BinderUnique$mv$k$promisc cookie for that meta-application position -
+{#env}
+SF-PatternBinder1[(META-USE[#mv,#k];#occs), NOTHING, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder1[#occs, UNIQUE[$[:,"BinderUnique$",#mv,"$",$[FormatNumber, #k],"$",PromiscuityString[#promisc]]], #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+{#env}
+SF-PatternBinder1[(OTHER;#occs), #state, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+{#env}
+SF-PatternBinder1[(), #cookie, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder2[#cookie, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+{#env}
+SF-PatternBinder1[(META-USE[#mv,#k];#occs), UNIQUE[#cookie], #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+-[Fallback]
+:
+{#env}
+SF-PatternBinder1[#occs, #cookie, #pass, #stage, #promisc, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+// - then generate and record cookie, binder name, and promiscuity (and recurse).
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternBinder2[Meta-Occurrence, PASS, Pattern-Stage, binder : Reified_Variable . Reified_Binder, Text, Text, $Boolean, Text, $Numeric, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// The variable is on the function. 
+{#env; "$Args":LIST_VARIABLE[(#var;#Args)]}
+SF-PatternBinder2[#cookie, #pass, MATCH, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env; "$Args":LIST_VARIABLE[#Args]}
+SF-PatternBinder3[#var, #cookie, #pass, MATCH, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+;
+
+// Get the variable from the term 
+-[Fresh[v::Text]]
+:
+{#env}
+SF-PatternBinder2[#cookie, #pass, SUBMATCH, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env}
+SF-PatternBinder3[v, #cookie, #pass, SUBMATCH, b.#Binder[b], #sink, %n⟪« #code »Variable «v» = linkVariable(«#sink»->context, BINDER(«#term»,«INTEGER[#i]»,«INTEGER[#j]»)); if (« #term »_count <= 1) UNBIND(«v»);
+⟫, #unique, #term, #i, $[Plus,#j,1], ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternBinder3[Reified_Variable, Meta-Occurrence, PASS, Pattern-Stage, binder : Reified_Variable . Reified_Binder, Text, Text, $Boolean, Text, $Numeric, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// The variable is use only once in the contraction 
+{#env; "$Vars":LIST_VARIABLE[#Vars]}
+SF-PatternBinder3[#var, UNIQUE[#cookie], #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env; #var : BOUND; #cookie : VARIABLE[#var]; "$Vars":LIST_VARIABLE[(#var; #Vars)]}
+SF-PatternBinder[#pass, #stage, $False, #Binder[#var], #sink, #code, #unique, #term, #i, $[Plus,#j,1], ok.#[ok]]
+;
+
+// The variable is use only more than once in the contraction
+-[Fresh[v::Text]]
+:
+{#env; "$Vars":LIST_VARIABLE[#Vars]}
+SF-PatternBinder3[#var, NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, #term, #i, #j, ok.#[ok]]
+→
+{#env; #var : BOUND; "$Vars":LIST_VARIABLE[(#var; #Vars)]}
+SF-PatternBinder[#pass, #stage, $False, #Binder[v], #sink, #code, #unique, #term, #i, $[Plus,#j,1], ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-Variable-Case[$String, $List[Reified_Option], Text, Text, Text, Text, ok::OK_SORT.Text] :: Text;
+
+// - use a do block so failed test can break out.
+-[Free[sink::Text, term::Text]]:
+{#env}
+SF-Pattern-Variable-Case[#Name, #Options, #variable, sink, #setup, term, ok.#[ok]]
+→
+%n⟪do {⟦
+« #setup »« {#env} F-Options[#Options, ok.SF-then-Pattern-Variable-Use[ok, #Name, sink, #variable, term, o2.#[o2]]] »
+return 1;⟧
+} while(0);
+⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Pattern-Variable-Use[OK_SORT, $String, Text, Text, Text, ok::OK_SORT.Text] :: Text;
+
+// - bound variable
+-[Free[sink::Text, variable::Reified_Variable, term::Text]]
+:
+{#env}
+SF-then-Pattern-Variable-Use[OK, #Name, sink, variable, term, ok.#[ok]]
+→
+{#env}
+SF-then-Pattern-Variable-Use2[$[{#env}Get[VARIABLE_ENTRY], variable, FREE], #Name, sink, variable, term, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Pattern-Variable-Use2[VARIABLE_ENTRY, $String, Text, Text, Text, ok::OK_SORT.Text] :: Text;
+
+// - bound variable
+-[Free[sink::Text, variable::Reified_Variable, term::Text]]
+:
+{#env}
+SF-then-Pattern-Variable-Use2[BOUND, #Name, sink, variable, term, ok.#[ok]]
+→
+%n⟪/* Function «COMMENT_TOKEN[#Name]» case for pattern bound variable. */
+if («variable» != VARIABLE(«term»)) { «{#env}F-fail-cleanup[sink]» break;}
+«{#env}#[OK]»⟫
+;
+
+// - free variable case is always last
+-[Free[sink::Text, variable::Reified_Variable, term::Text]]
+:
+{#env}
+SF-then-Pattern-Variable-Use2[FREE, #Name, sink, variable, term, ok.#[ok]]
+→
+%n⟪/* Function «COMMENT_TOKEN[#Name]» fall-back case for free variable */
+Variable «variable» = linkVariable(«sink»->context, VARIABLE(«term»)); 
+«{#env}#[OK]»⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-MetaArgs-Norm[$Boolean, $String, $List[Reified_Binder], Text, Text, Text, ok::OK_SORT.Text] :: Text;
+
+{#env; #term : SUB[#parent, #i, $True]}
+SF-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[ok]]
+→ 
+%n⟪« #setup »UNLINK_SUB(«#sink»->context, «#parent»,  «INTEGER[#i]»); NORMALIZE(«#sink»->context, «#term»); SUB(«#parent»,  «INTEGER[#i]») = LINK(«#sink»->context, «#term»);
+«{#env}SF-Pattern-MetaArgs-Copy[#MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]»⟫
+;
+
+{#env; #term : ARG[#i, $True]}
+SF-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[ok]]
+→ 
+%n⟪« #setup »NORMALIZE(«#sink»->context, «#term»); 
+«{#env}SF-Pattern-MetaArgs-Copy[#MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]»⟫
+;
+
+{#env; #term : ARG[#i, $False]}
+SF-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[ok]]
+→ 
+%n⟪« #setup » 
+«{#env}SF-Pattern-MetaArgs-Copy[#MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]»⟫
+;
+
+{#env}
+SF-Pattern-MetaArgs-Norm[$False, #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[ok]]
+→
+%n⟪« #setup »«{#env}SF-Pattern-MetaArgs-bind[$[:,"MetaVar$",#MetaVar], #MetaVar, #MetaArgs, #sink, #term, ok.#[ok]] »⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-MetaArgs-Copy[$String, $List[Reified_Binder], Text, Text, ok::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Pattern-MetaArgs-Copy[#MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]
+→ 
+{#env}
+SF-Pattern-MetaArgs-bind[$[:,"MetaVar$",#MetaVar], #MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-MetaArgs-bind[$String, $String, $List[Reified_Binder], Text, Text, ok::OK_SORT.Text] :: Text;
+
+{#env}
+SF-Pattern-MetaArgs-bind[#MetaVarCookie, #MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]
+→
+%n⟪/* «#term» = &« COMMENT_TOKEN[#MetaVar] » */
+« {#env; #MetaVarCookie : VARIABLE[#term]}SF-Pattern-MetaArgs[#MetaVar, #MetaArgs, 0, #sink, #term, ok.#[ok]] »⟫
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-MetaArgs[$String, $List[Reified_Binder], $Numeric, Text, Text, ok::OK_SORT.Text] :: Text;
+
+// Helper for meta-application variable .
+{#env}
+SF-Pattern-MetaArgs[#MetaVar, (), #index, #sink, #term, ok.#[ok]]
+→
+{#env}
+SF-Pattern-MetaArgs-arity[$[:,#MetaVar,"$arity"], #index, ok.#[ok]]
+;
+
+-[Free[sink::Text, term::Text, variable::Text]]
+:
+{#env}
+SF-Pattern-MetaArgs[#MetaVar, (ARGUMENT[#sort, VARIABLE-USE[variable]]; #MetaArgs), #index, sink, term, ok.#[ok]]
+→
+{#env}
+SF-Pattern-MetaArgs-variable[$[:,#MetaVar,"$",$[FormatNumber, #index]], $[:,"Reuse$",#MetaVar,"$",$[FormatNumber, #index]], variable, #MetaVar, #MetaArgs, #index, sink, term, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}SF-Pattern-MetaArgs-arity[$String, $Numeric, ok::OK_SORT.Text] :: Text;
+
+-[Data[#MetaVarArity]]
+:
+{#env}
+SF-Pattern-MetaArgs-arity[#MetaVarArity, #arity, ok.#[ok]]
+→
+{#env; #MetaVarArity : NUM_VALUE[#arity]}
+#[OK]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-MetaArgs-variable[$String, $String, Reified_Variable, $String, $List[Reified_Binder], $Numeric, Text, Text, ok::OK_SORT.Text] :: Text;
+
+-[Free[sink::Text, term::Text, variable::Text]]
+:
+{#env}
+SF-Pattern-MetaArgs-variable[#MetaVarIndex, #ReuseVar, variable, #MetaVar, #MetaArgs, #index, sink, term, ok.#[ok]]
+→
+{#env; #MetaVarIndex : VARIABLE[variable]}
+SF-Pattern-MetaArgs-variable2[$[{#env}Get[STRING_ENTRY], #ReuseVar, NO], variable, #MetaVar, #MetaArgs, #index, sink, term, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Pattern-MetaArgs-variable2[STRING_ENTRY, Reified_Variable, $String, $List[Reified_Binder], $Numeric, Text, Text, ok::OK_SORT.Text] :: Text;
+
+-[Free[sink::Text, term::Text, variable::Text]]
+:
+{#env}
+SF-Pattern-MetaArgs-variable2[NO, variable, #MetaVar, #MetaArgs, #index, sink, term, ok.#[ok]]
+→
+{#env}
+SF-Pattern-MetaArgs[#MetaVar, #MetaArgs, $[Plus,#index,1], sink, term, ok.#[ok]]
+;
+
+-[Free[reuse::Text, sink::Text, term::Text, variable::Text]]
+:
+{#env}
+SF-Pattern-MetaArgs-variable2[VARIABLE[reuse], variable, #MetaVar, #MetaArgs, #index, sink, term, ok.#[ok]]
+→
+%n⟪Variable «reuse» = «variable»; permitUnusedVariable(«reuse»);
+« {#env} SF-Pattern-MetaArgs[#MetaVar, #MetaArgs, $[Plus,#index,1], sink, term, ok.#[ok]] »⟫
+;
+
+// Extract sub. Determine if linking is needed when meta var is not just an intermediary construction.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternSub[Reified_Term, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+{#env}
+SF-PatternSub[PROPERTY-REF[#Ref, #Use, #Term], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub[#Term,  #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{#env}
+SF-PatternSub[PROPERTY[#Key, #Value, #Term], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub[#Term, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{#env}
+SF-PatternSub[PROPERTY-NOT[#Key, #Term], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub[#Term, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{#env}
+SF-PatternSub[CONSTRUCTION[#kind, #Symbol, #Binder], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{#env}
+SF-PatternSub[LITERAL[#Value, #Sort], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{#env}
+SF-PatternSub[VARIABLE-USE[#Variable], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+ 
+{#env}
+SF-PatternSub[META-APPLICATION[#MetaVar, #Binders, USE[#Count]], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→
+{#env}
+SF-PatternSub2[$True, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{#env}
+SF-PatternSub[META-APPLICATION[#MetaVar, #Binders, DISCARD], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→
+{#env}
+SF-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+ 
+{#env}
+SF-PatternSub[EVALUATOR[#Primitive, #Patterns, #Options], #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env}
+SF-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternSub2[$Boolean<!-- Whether to link sub -->, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// Get top-level arguments. No need to link as all top-level arguments have a reference (except when it's a closure)
+{#env; "$Args" : LIST_VARIABLE[(#sub; #subs)]} 
+SF-PatternSub2[#link, #pass, MATCH, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env; "$Args" : LIST_VARIABLE[#subs]} // Navigate to the next argument.
+SF-PatternSub3[#sub, $[{#env}Get[VARIABLE_ENTRY], #sub], #link, #pass, MATCH, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+;
+
+-[Fresh[sub::Text]]
+:
+{#env; "$Subs": LIST_VARIABLE[#subs]}
+SF-PatternSub2[$True, #pass, SUBMATCH, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env; sub: SUB[#term, #i, $True]; "$Subs":LIST_VARIABLE[(sub;#subs)]}
+SF-Pattern[#pass, SUBMATCH, #Pattern, #sink, %n⟪« #code »Term «sub» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#i]»)); int «sub»_count = «#term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);
+«D-check-sort[#sink, sub, #sort]»⟫, $True, #unique, sub, ok.#[ok]]
+;
+
+-[Fresh[sub::Text]]
+:
+{#env}
+SF-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→
+{#env; sub: SUB[#term, #i, $False]}
+SF-Pattern[#pass, SUBMATCH, #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«#term», «INTEGER[#i]»); int «sub»_count = «#term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);
+«D-check-sort[#sink, sub, #sort]»⟫, $False, #unique, sub, ok.#[ok]]
+;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternSub3[Text, VARIABLE_ENTRY, $Boolean<!-- Whether to link sub -->, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// All top-level arguments have a reference, except when it's a closure
+{#env; "$Subs":LIST_VARIABLE[#Subs]} 
+SF-PatternSub3[#arg, ARG[#Index, $True], #link, #pass, MATCH, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env; "$Subs":LIST_VARIABLE[(#arg;#Subs)]} // Record for cleanup
+SF-Pattern[#pass, SUBMATCH, #Pattern, #sink, %n⟪« #code »
+«D-check-sort[#sink, #arg, #sort]»⟫, $True, #unique, #arg, ok.#[ok]]
+;
+
+{#env} 
+SF-PatternSub3[#arg, ARG[#Index, $False], #link, #pass, MATCH, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
+→ 
+{#env} 
+SF-Pattern[#pass, SUBMATCH, #Pattern, #sink, #code, $True, #unique, #arg, ok.#[ok]]
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Done matching term against pattern. Move on to contraction.  
+//
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-then-Send[OK_SORT, Text, Reified_Term, Text] :: Text;
+
+{#env}
+SF-then-Send[OK, #term, #Contractum, #sink]
+→
+%n⟪« {#env} ST-send[#Contractum, #sink] »«{#env}F-unlink-refs[#sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]»«{#env}F-unlink-var[#sink, $[{#env}Get[STRING_ENTRY], "$Vars"]]»
+⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //SF

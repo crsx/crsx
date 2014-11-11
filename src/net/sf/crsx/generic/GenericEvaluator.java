@@ -3197,6 +3197,7 @@ public class GenericEvaluator extends FixedGenericConstruction
     
     final public void analyzeMetaUseContractum(Map<String, Integer> uses, Map<String, MetaAnalyzer> subAnalyzers)
 	{
+    	boolean mightHaveRef = false;
     	switch (primitive())
 		{
     		case IF:
@@ -3257,13 +3258,17 @@ public class GenericEvaluator extends FixedGenericConstruction
 					}
 					
 					// Test
-					sub(1).analyzeMetaUseContractum(uses, subAnalyzers);					
+					sub(1).analyzeMetaUseContractum(uses, subAnalyzers);	
+					
+					// Process first arg for environment
+					sub(0).analyzeMetaUseContractum(uses, subAnalyzers); 
     				break;
     			}
+    		
     		default:
-    			for (int i = arity() -1; i >= 1; --i)
+    			for (int i = arity() -1; i >= 0; --i)
     				sub(i).analyzeMetaUseContractum(uses, subAnalyzers);    				
-		}			
+		}
 	}
     
     final public static void removeAll(Map<String, Integer> map1, Map<String, Integer> map2)

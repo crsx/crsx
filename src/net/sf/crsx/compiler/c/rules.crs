@@ -9,6 +9,7 @@ RULES[(
 
 $Use["compiler/c/cdefs.crs"];
 $Use["compiler/c/term.crs"];
+$Use["compiler/c/srules.crs"];
 
 $Lax;
 
@@ -68,7 +69,12 @@ Function
 :
 F-Declaration[FUNCTION[#prefix, #kind, #path, #function, #Forms, #Sort, #Rules], #module]
 →
-$[If, $[StartsWith,#prefix, #module], F-Function[#kind, #function, #Forms, #Sort, #Rules], %n⟪⟫]
+$[If, $[StartsWith,#prefix, #module], 
+    $[IfDef, "STRICT",
+        SF-Function[#kind, #function, #Forms, #Sort, #Rules],
+         F-Function[#kind, #function, #Forms, #Sort, #Rules]
+    ],
+%n⟪⟫]
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +219,7 @@ F-Fresh2[Text, Reified_Term, ok::OK_SORT.Text] :: Text;
 -[Free[sink::Text]]	
 : 
 {#env}
-F-Fresh2[sink, CONSTRUCTION[#symbol, #binders], ok.#[ok]] 
+F-Fresh2[sink, CONSTRUCTION[#kind, #symbol, #binders], ok.#[ok]] 
 → 
 {#env}
 F-Fresh3[OK, sink, #binders, ok.#[ok]]
@@ -278,7 +284,7 @@ F-Dispatch-choice[$String, Reified_FormArgument, Reified_Variable, Reified_Varia
 
 -[Fresh[dummy::Text]]
 :
-F-Dispatch-choice[#function, FORM-BINDER[#BinderSort, v.#Form[v]], #sink, #term, #Rules]
+F-Dispatch-choice[#function, FORM-BINDER[#Kind, #BinderSort, v.#Form[v]], #sink, #term, #Rules]
 →
 F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #Rules]
 ;
@@ -308,7 +314,9 @@ F-Dispatch-cases[PASS, $String, $List[Reified_Rule], Text, Text, $String] :: Tex
 // Generate switch body for each dispatch rule: case+options+matching, then contraction, finally report success.
 F-Dispatch-cases[#pass, #function, (RULE[#name, #Options, #Pattern, #Contractum];#Rules), #sink, term, #SortName]
 →
-%n⟪« {"$Binders":LIST_VARIABLE[()]; "$Subs":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()];"$Vars": LIST_VARIABLE[()]}F-Pattern[#pass, DISPATCH[#name,#Options,#SortName], #Pattern, #sink, %n⟨⟩, $False, $False, term, ok.F-then-Send[ok, term, #Contractum, #sink]] »« F-Dispatch-cases[SECOND, #function, #Rules, #sink, term, #SortName] »⟫
+%n⟪« {"$Binders":LIST_VARIABLE[()]; "$Subs":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()];"$Vars": LIST_VARIABLE[()]}
+     F-Pattern[#pass, DISPATCH[#name,#Options,#SortName], #Pattern, #sink, %n⟨⟩, $False, $False, term, ok.
+     F-then-Send[ok, term, #Contractum, #sink]] »« F-Dispatch-cases[SECOND, #function, #Rules, #sink, term, #SortName] »⟫
 ;
 
 F-Dispatch-cases[FIRST, #function, (), #sink, #term, #SortName]
@@ -328,7 +336,8 @@ F-Dispatch-cases[SECOND, #function, (), #sink, #term, #SortName]
 // Options are recorded in the environment thus collected in a chained manner, where the final
 // invocation has mappings  variable : Free|Fresh  and  Discard$metavar | Copy$metavar |... : () .
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-then-Options[OK_SORT, $List[Reified_Option], ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+F-then-Options[OK_SORT, $List[Reified_Option], ok::OK_SORT.Text] :: Text;
 
 {#env}
 F-then-Options[OK, #Options, ok.#[ok]] 
@@ -337,12 +346,14 @@ F-then-Options[OK, #Options, ok.#[ok]]
 F-Options[#Options, ok.#[ok]]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-Options[$List[Reified_Option], ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+F-Options[$List[Reified_Option], ok::OK_SORT.Text] :: Text;
 
 {#env}F-Options[(OPTION[#option, #value] ; #Options), ok.#[ok]] → {#env}F-Option[#option, #value, o2.F-then-Options[o2, #Options, ok.#[ok]]] ;
 {#env}F-Options[()                                  , ok.#[ok]] → {#env}#[OK] ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-Option[$String, Reified_Term, ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} 
+F-Option[$String, Reified_Term, ok::OK_SORT.Text] :: Text;
 
 {#env}
 F-Option[#option, #value, ok.#[ok]]
@@ -354,7 +365,8 @@ $[If, $[Equal, #option, "FreshReuseOrigin"], {#env}F-variableFreshReuseOriginOpt
   {#env}F-metaOption[#option, #value, ok.#[ok]]]]]]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-variableOption[VARIABLE_ENTRY, Reified_Term, ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+F-variableOption[VARIABLE_ENTRY, Reified_Term, ok::OK_SORT.Text] :: Text;
 
 -[Free[key::Reified_Variable]]
 :
@@ -366,13 +378,14 @@ F-recordFreeOption[#option, key, ok.#[ok]]
 ;
 
 {#env}
-F-variableOption[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]] // Sorted variable
+F-variableOption[#option, CONSTRUCTION[#kind,#symbol, #binders], ok.#[ok]] // Sorted variable
 →
 {#env} 
 F-variableOption2[#option, #symbol, #binders, ok.#[ok]]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-then-VariableOption2[OK_SORT, VARIABLE_ENTRY, $String, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+F-then-VariableOption2[OK_SORT, VARIABLE_ENTRY, $String, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
 
 {#env}
 F-then-VariableOption2[OK, #option, #symbol, #binders, ok.#[ok]]
@@ -381,7 +394,8 @@ F-then-VariableOption2[OK, #option, #symbol, #binders, ok.#[ok]]
 F-variableOption2[#option, #symbol, #binders, ok.#[ok]]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-variableOption2[VARIABLE_ENTRY, $String, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+F-variableOption2[VARIABLE_ENTRY, $String, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
 
 {#env}
 F-variableOption2[#option, #symbol, (#binder;#binders), ok.#[ok]]
@@ -397,7 +411,8 @@ F-variableOption2[#option, #symbol, (), ok.#[ok]]
 #[OK]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-variableOption3[VARIABLE_ENTRY, Reified_Binder, ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+F-variableOption3[VARIABLE_ENTRY, Reified_Binder, ok::OK_SORT.Text] :: Text;
 
 {#env}
 F-variableOption3[#option, ARGUMENT[#sort,#term], ok.#[ok]]
@@ -406,7 +421,8 @@ F-variableOption3[#option, ARGUMENT[#sort,#term], ok.#[ok]]
 F-variableOption4[#option, #term, ok.#[ok]]
 ;
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-variableOption4[VARIABLE_ENTRY, Reified_Term, ok::OK_SORT.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+F-variableOption4[VARIABLE_ENTRY, Reified_Term, ok::OK_SORT.Text] :: Text;
 
 -[Free[key::Reified_Variable]]
 :
@@ -418,7 +434,7 @@ F-variableOption4[#option, VARIABLE-USE[key], ok.#[ok]]
 ;
 
 {#env}
-F-variableOption4[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]]
+F-variableOption4[#option, CONSTRUCTION[#kind,#symbol, #binders], ok.#[ok]]
 →
 {#env}
 #[OK]
@@ -454,7 +470,7 @@ F-metaOption2[$[:,#option,"$",#key], ok.#[ok]]
 ;
 
 {#env}
-F-metaOption[#option, CONSTRUCTION[#symbol, #binders], ok.#[ok]]
+F-metaOption[#option, CONSTRUCTION[#kind,#symbol, #binders], ok.#[ok]]
 →
 {#env}
 F-metaOption2[$[:,#option,"$",#symbol], ok.#[ok]]
@@ -499,17 +515,6 @@ F-recordFreeOption[$[NotMatch, FREE, #option], #key, ok.#[ok]] →
 //
 // Goes to some trouble to match the body of a pattern before the properties.
 
-// Sort for stages of pattern matching generation:
-Pattern-Stage ::=(
-  DISPATCH[$String,$List[Reified_Option],$String]; // processing common part of dispatch function
-  CASE[$String,$List[Reified_Option],$String];     // processing one pattern case of dispatch function
-  MATCH;                                    // processing top pattern for simple contraction rule
-  SUBMATCH;                                 // processing sub-component of pattern of either kind of function
-);
-
-// Sort for tracking meta variable occurrences
-Meta-Occurrence ::=( NOTHING; UNIQUE[$String]; );
-
 // Delayed variant.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 F-then-Pattern[OK_SORT, PASS, Pattern-Stage, Reified_Term, Text, Text, $Boolean, $Boolean, Text, ok::OK_SORT.Text] :: Text;
@@ -528,7 +533,7 @@ F-Pattern[PASS, Pattern-Stage, Reified_Term, Text, Text, $Boolean, $Boolean, Tex
 Pattern-PropertyRef[Free[sink::Text, term::Text]]
 :
 {#env}
-F-Pattern[#pass, #stage, PROPERTY-REF[#Ref, #Pattern], sink, #setup, #needed, #unique, term, ok.#[ok]]
+F-Pattern[#pass, #stage, PROPERTY-REF[#Ref, #Use, #Pattern], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 $[{#env}IfDef, $[:,"Discard$",#Ref],
  $[{#env}IfDef, $[:,"Comparable$",#Ref],
@@ -563,7 +568,7 @@ F-Pattern[#pass, #stage, #Pattern, sink, #setup, $True, #unique, term, ok.F-then
 Pattern-Construction-Dispatch[Free[sink::Text, term::Text]]
 :
 {#env}
-F-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, (#Binder1;#Binders)], sink, #setup, #needed, #unique, term, ok.#[ok]]
+F-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#kind,#Symbol, (#Binder1;#Binders)], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 {#env}
 F-PatternBinder[#pass, CASE[#Name,#Options,#SortName], #Binder1, sink, %n⟪« #setup »ASSERT(«sink»->context, !strcmp(SYMBOL(«term»), «STRING[#Symbol]»));
@@ -573,10 +578,10 @@ F-PatternBinder[#pass, CASE[#Name,#Options,#SortName], #Binder1, sink, %n⟪« #
 Pattern-Construction-NoBinders-Dispatch[Free[sink::Text, term::Text]]
 :
 {#env}
-F-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, ()], sink, #setup, #needed, #unique, term, ok.#[ok]]
+F-Pattern[#pass, DISPATCH[#Name,#Options,#SortName], CONSTRUCTION[#kind,#Symbol, ()], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 {#env}
-F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, ()], sink, %n⟪« #setup »ASSERT(«sink»->context, !strcmp(SYMBOL(«term»), «STRING[#Symbol]»));
+F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#kind,#Symbol, ()], sink, %n⟪« #setup »ASSERT(«sink»->context, !strcmp(SYMBOL(«term»), «STRING[#Symbol]»));
 ⟫, $False, #unique, term, ok.#[ok]]
 ;
 
@@ -584,7 +589,7 @@ F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, ()], sink
 Pattern-Construction-Case[Free[sink::Text, term::Text]]
 :
 {#env}
-F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
+F-Pattern[#pass, CASE[#Name,#Options,#SortName], CONSTRUCTION[#kind,#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« F-Pattern-Open[#pass] »case « EnumTag[#Symbol] »: {⟦ /* Function «COMMENT_TOKEN[#Name]» case «COMMENT_TOKEN[#Symbol]» */
 « #setup »ASSERT(«sink»->context, !strcmp(SYMBOL(«term»), «STRING[#Symbol]»));
@@ -597,7 +602,7 @@ return 1;⟧
 Pattern-Construction-Match[Free[sink::Text, term::Text]]
 :
 {#env}
-F-Pattern[#pass, MATCH, CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
+F-Pattern[#pass, MATCH, CONSTRUCTION[#kind,#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« #setup »ASSERT(«sink»->context, !strcmp(SYMBOL(«term»), «STRING[#Symbol]»));
 « {#env} F-then-PatternBinders[OK, #pass, #Binders, sink, #unique, term, 0, ok.#[ok]] »⟫
@@ -607,7 +612,7 @@ F-Pattern[#pass, MATCH, CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, 
 Pattern-Construction-SubMatch[Free[sink::Text, term::Text, parent::Text]]
 :
 {#env; term:SUB[parent, #i, #linked]}
-F-Pattern[#pass, SUBMATCH, CONSTRUCTION[#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
+F-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind,#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»;
 if (strcmp(SYMBOL(«term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[sink]» break;}
@@ -731,7 +736,7 @@ F-set-value[LITERAL[#Literal, #Sort], #sink, #term, #value]
 ;
 
 {#env}
-F-set-value[CONSTRUCTION[#Symbol, #Binders], #sink, #term, #value] 
+F-set-value[CONSTRUCTION[#kind,#Symbol, #Binders], #sink, #term, #value] 
 → 
 %n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Symbol]»); permitUnusedTerm(«#value»);
 ⟫
@@ -1070,7 +1075,7 @@ F-PatternSub[Reified_Term, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text
 -[Free[sink::Text, term::Text]]
 :
 {#env}
-F-PatternSub[PROPERTY-REF[#Ref, #Term], #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, #i, ok.#[ok]] 
+F-PatternSub[PROPERTY-REF[#Ref, #Use, #Term], #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, #i, ok.#[ok]] 
 → 
 {#env}
 F-PatternSub[#Term,  #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, #i, ok.#[ok]]
@@ -1097,7 +1102,7 @@ F-PatternSub[#Term, #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, 
 -[Free[sink::Text, term::Text]]
 :
 {#env}
-F-PatternSub[CONSTRUCTION[#Symbol, #Binder], #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, #i, ok.#[ok]] 
+F-PatternSub[CONSTRUCTION[#kind,#Symbol, #Binder], #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, #i, ok.#[ok]] 
 → 
 {#env}
 F-PatternSub2[$False, #pass, #stage, #sort, #Pattern, sink, #code, #unique, term, #i, ok.#[ok]]

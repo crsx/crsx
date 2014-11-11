@@ -509,10 +509,10 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 		for (Term t : metaPropertyConstraints.values())
 			if (t != null) t.analyzeMetaUseContractum(counts, subAnalyzers); 
 		
+		metaPropertyUses = new HashMap<String, Integer>(4);
+		
 		if (metaPropertyConstraints != null)
 		{
-			metaPropertyUses = new HashMap<String, Integer>();
-		
 			for (String m : metaPropertyConstraints.keySet()) 
 			{
 				counts.put(m, counts.containsKey(m) ? counts.get(m)+1 : 1);
@@ -527,11 +527,30 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 			if (t != null) t.analyzeMetaUseContractum(counts, subAnalyzers);  
 		
 		if (propertiesRef != null)
-			counts.put(propertiesRef, counts.containsKey(propertiesRef) ? counts.get(propertiesRef)+1 : 1);		
+		{
+			counts.put(propertiesRef, counts.containsKey(propertiesRef) ? counts.get(propertiesRef)+1 : 1);	
+			metaPropertyUses.put(propertiesRef,  counts.get(propertiesRef));
+		}
 	}
 	
 	public void analyzeMetaUsePattern(Map<String, Integer> counts)
 	{
+		if (propertiesRef != null)
+		{	
+			metaPropertyUses = new HashMap<String, Integer>(4);
+			
+			if (counts.get(propertiesRef) == null)
+			{
+				// Properties ref is discarded
+				metaPropertyUses.put(propertiesRef, 0);				
+			}
+			else
+			{
+				metaPropertyUses.put(propertiesRef, counts.get(propertiesRef)); // Total count
+			}
+
+		}
+		
 		for (Term t : namedPropertyConstraints.values())
 			if (t != null) t.analyzeMetaUsePattern(counts);
 		for (Term t : variablePropertyConstraints.values())
@@ -541,6 +560,8 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 		for (Term t : metaPropertyConstraints.values())
 			if (t != null) t.analyzeMetaUsePattern(counts);
 		term.analyzeMetaUsePattern(counts);
+		
+		
 	}
 
 	// @see net.sf.crsx.Term#checkNo(java.util.Collection)
@@ -2309,8 +2330,27 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 		if (ref != null)
 		{
     		sink = sink.start(sink.makeConstructor(CRS.REIFY_PROPERTY_REF)); // PROPERTY-REF[
-    		++ends;
     		sink = sink.start(sink.makeLiteral(ref, CRS.STRING_SORT)).end(); // ref
+    		
+    		if (metaUses != null && metaUses.get(ref) != null)
+    		{
+	    		int count = metaUses.get(ref);
+	    		if (count == -3)
+	    			sink = sink.start(sink.makeConstructor(CRS.REIFY_NA)).end(); // NA
+	    		else if (count == 0) // DISCARD
+	    			sink = sink.start(sink.makeConstructor(CRS.REIFY_DISCARD)).end(); // DISCARD
+	    		else
+	    		{
+	    			sink = sink.start(sink.makeConstructor(CRS.REIFY_USE)); // USE
+	    			sink = sink.start(sink.makeLiteral(Integer.toString(count), CRS.NUMERIC_SORT)).end();
+	    			sink = sink.end(); // ] of COPY
+	    		}
+	    	}
+    		else
+    		{
+    			sink = sink.start(sink.makeConstructor(CRS.REIFY_NA)).end(); // NA
+    		}
+    		++ends;
 		}
     	// Named properties.
     	SortedSet<String> propertyNames = new TreeSet<String>();
@@ -2362,6 +2402,8 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
     		String key = e.getKey();
     		Term value = e.getValue();
     		Integer use = metaUses == null ? Integer.valueOf(0) : metaUses.get(key);
+    		if (use == null)
+    			use = Integer.valueOf(0);
     		if (value == null)
     		{
     			sink = sink.start(sink.makeConstructor(CRS.REIFY_PROPERTY_NOT)); // PROPERTY-NOT[

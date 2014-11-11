@@ -701,6 +701,11 @@ public abstract class GenericConstruction extends GenericTerm
     		// Real construction...
     		sink = sink.start(sink.makeConstructor(CRS.REIFY_CONSTRUCTION)); // CONSTRUCTION[
     		++ends;
+    		if (factory.isFunction(constructor.symbol()))
+    			sink = sink.start(sink.makeConstructor(CRS.REIFY_FUNCTION_KIND)).end(); // KFUNCTION
+    		else
+    			sink = sink.start(sink.makeConstructor(CRS.REIFY_DATA_KIND)).end(); // KDATA
+    			
     		sink = sink.start(sink.makeLiteral(constructor.symbol(), CRS.STRING_SORT)).end(); // c
     		Term sort = factory.sortOf(constructor.symbol());
     		Term form = sort == null ? null : factory.formOf(Util.symbol(sort), constructor.symbol());
@@ -715,7 +720,7 @@ public abstract class GenericConstruction extends GenericTerm
     				Variable b = binders(i)[j];
     				sink = sink.start(sink.makeConstructor(CRS.REIFY_BINDER)); // BINDER[
     				sink = sink.start(sink.makeConstructor(b.promiscuous() ? CRS.REIFY_PROMISCUOUS : CRS.REIFY_LINEAR)).end(); // LINEAR/PROMISCUOUS
-    				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_BLOCK : CRS.REIFY_PERMIT)).end();
+    				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_FUNCTION_KIND : CRS.REIFY_DATA_KIND)).end();
     				sink = sink.start(sink.makeConstructor(b.shallow() ? CRS.REIFY_SHALLOW : CRS.REIFY_DEEP)).end();
     		    				Term binderSort = formSort == null ? factory.nil() : Util.propertiesHolder(formSort).getProperty(formBinders[j]);
     				sink = GenericCRS.reifySort(factory, sink, binderSort);

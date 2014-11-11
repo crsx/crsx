@@ -4,12 +4,13 @@
 
 function show_help {
 	echo "Usage : $0 compile help"
-	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] <input.[crs|hx]>"
+	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [-n] <input.crs>"
 	echo " where"
 	echo "   --cp <path>        colon-separated class paths"
     echo "   -p <parser>        colon-separated parser qualified name"   
     echo "   -o <output-dir>    directory where to store generated files"
     echo "   -d                 includes debugging information in generated executable"
+    echo "   --strict           generate code using strict mode."
 }
 
 function run_compile {
@@ -25,6 +26,8 @@ function run_compile {
 	local input=
     local output=
     local debug=
+    local strict=
+    local new=
 	while :
     do
    		case $1 in
@@ -66,6 +69,14 @@ function run_compile {
    			    debug=$2
    			    shift
    			    ;;
+   			-n)
+                new="Y"
+                shift
+                ;;
+		    --strict)
+                strict=STRICT
+                shift
+                ;;
    			-*)
                	printf >&2 "warning: unknown option: %s\n" "$1"
   	            shift
@@ -86,14 +97,13 @@ function run_compile {
 	local inputname="${input%.*}"
 	local inputext="${input##*.}"
 	
-	if [ $inputext = "hx" ]
+	if [ "$new" = "Y" ]
 	then
 	    printf "Experimental"
-		# Compile Hacs source file. First make the hxt file. 
-		local outputhxt="${output}/${inputname}.hxt"
-		[ $outputhxt -ot $1 ] && $RUNHACS grammar="('net.sf.crsx.hacs.bootstrap.Raw';'net.sf.crsx.text.Text';)" input=$1 category=rawModule output=${inputname}.hxt simple-terms max-indent=10 width=255
-
-	elif [ $inputext = "crs" ];
+	    
+		make -f ${DIR}/library/compile.mk CRSFILE=${input}
+		
+	elif [ "$inputext" = "crs" ]
 	then
 	    # Compile .crs file
 		
@@ -118,8 +128,8 @@ function run_compile {
 		local symbols="${output}/${inputname}_symbols.c"
 		
 		[ $data -ot $drfile ] && export HEADERS="${inputname}.h" && $CRSXC compile sorts $drfile > $data
-		[ $header -ot $drfile ] && export HEADERS=crsx.h && $CRSXC compile header $drfile > $header
-		[ $function -ot $drfile ] && export HEADERS="${inputname}.h" && $CRSXC compile rules $drfile > $function
+		[ $header -ot $drfile ] && $CRSXC $strict HEADERS=crsx.h wrapper=ComputeHeader input=$drfile > $header
+		[ $function -ot $drfile ] && $CRSXC HEADERS="${inputname}.h" CANONICAL_VARIABLES=1 wrapper=ComputeRules $strict input=$drfile > $function
 		
 		if [ $symbols -ot $drfile ] 
 		then
@@ -145,7 +155,7 @@ function run_compile {
 		local function_o="${output}/${inputname}_fun.o"
 		local symbols_o="${output}/${inputname}_symbols.o"
 		
-		[ -n "$debug" ] && CFLAGS="$CFLAGS -DDEBUG"
+		[ -n "$debug" ] && CFLAGS="$CFLAGS -DDEBUG -DCRSX_ENABLE_PROFILING"
 		
 		[ $function_o -ot $function ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $function -o $function_o
 		[ $data_o -ot $data ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $data -o $data_o

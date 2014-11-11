@@ -1,0 +1,93 @@
+// Copyright © 2012 IBM Corporation
+// $Id: header.crs,v 3.3 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C HEADER FILE TEXT FROM REIFIED CRSX.  MODE
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+SHEADER[(
+
+$Use["compiler/c/cdefs.crs"];
+
+$Lax;
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// FUNCTION SORT HEADER DECLARATIONS.
+
+SH-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
+
+SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
+→
+%n⟪« MapText[f.H-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
+extern int «MANGLE[#function]»(Sink« SH-Arg[#Forms, $False] »);
+⟫
+;
+
+SH-Arg[$List[Reified_Form], $Boolean] :: Text;
+
+SH-Arg[(), #hasSortSet] 
+→ 
+%n⟪⟫
+;
+
+SH-Arg[(SORT-ALLOWS-VARIABLES; #Forms), #hasSortSet] 
+→ 
+SH-Arg[#Forms, #hasSortSet]
+;
+
+SH-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $True] 
+→ 
+SH-Arg[(#Form; #Forms), $True]
+;
+
+SH-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False] 
+→ 
+%n⟪,NamedPropertyLink,VariablePropertyLink«SH-Arg[(#Form; #Forms), $True]»⟫
+;
+
+SH-Arg[(FORM[#Constructor, #Args];), #hasSortSet] 
+→ 
+SH-TopArgs[#Args]
+;
+
+SH-TopArgs[$List[Reified_FormArgument]] :: Text;
+
+SH-TopArgs[()] 
+→
+%n⟪⟫
+;
+
+SH-TopArgs[(#Arg; #Args)] 
+→
+%n⟪«SH-TopArg[HasFunctionalFormBinders[#Arg], #Arg]»«SH-TopArgs[#Args]»⟫
+;
+
+SH-TopArg[$Boolean, Reified_FormArgument] :: Text;
+
+SH-TopArg[$True, #FormArg]
+→
+%n⟪,Closure⟫
+;
+
+SH-TopArg[$False, #FormArg]
+→
+SH-TopDataArg[#FormArg]
+;
+
+SH-TopDataArg[Reified_FormArgument] :: Text;
+
+-[Fresh[v::Reified_Variable]]
+:
+SH-TopDataArg[FORM-BINDER[#Kind, #Sort, v.#FormArgument[v]]] 
+→
+%n⟪,Variable«SH-TopDataArg[#FormArgument[v]]»⟫
+;
+
+SH-TopDataArg[FORM-ARGUMENT[#Sort]] 
+→
+%n⟪,Term⟫
+;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+)] //HEADER

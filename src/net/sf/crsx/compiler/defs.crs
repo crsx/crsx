@@ -69,6 +69,7 @@ STRING_ENTRY ::=
 	LIST_STRING[$List[$String]];
 
 	NUM_VALUE[$Numeric];
+    TEXT[Text];
 
 	VARIABLE[Reified_Variable];
 	LIST_VARIABLE[$List[Reified_Variable]];
@@ -83,17 +84,32 @@ PASS ::= ( FIRST; SECOND; );
 VARIABLE_ENTRY ::= 
 ( 
 	SUB[Text<!-- Parent Variable -->, $Numeric<!-- Index in parent -->, $Boolean<!-- Linked? -->];
+    ARG[$Numeric<!-- Index -->,$Boolean<!-- Term? -->];
 
-    BOUND;       
+    BOUND_DATA;       
+    BOUND; // functional       
 	FREE;
 	BOUNDREUSE;
 	FRESH;	
 	FRESHREUSE;
 );
 
+// Sort for stages of pattern matching generation:
+Pattern-Stage ::=(
+  DISPATCH[$String,$List[Reified_Option],$String]; // processing common part of dispatch function
+  CASE[$String,$List[Reified_Option],$String];     // processing one pattern case of dispatch function
+  MATCH;                                           // processing top pattern for simple contraction rule
+  SUBMATCH;                                        // processing sub-component of pattern 
+);
+
+// Sort for tracking meta variable occurrences
+Meta-Occurrence ::=( NOTHING; UNIQUE[$String]; );
+
+// Sort helping in analyzing binder reuse. 
+Binder-State ::= ( OUTER; REUSING; COPYING; NO_REUSE; );
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generic utilities.
-
 
 ∀ a . Length[$List[a], $Numeric] :: $Numeric ;
 -             : Length[()    , #n] → #n ;
@@ -102,6 +118,7 @@ VARIABLE_ENTRY ::=
 ∀ a b . Map[x::a . $sort[b], $List[a]] :: $List[b] ;
 Map[x.#[x], ()] → () ;
 Map[x.#[x], (#1;#s)] → (#[#1]; Map[x.#[x], #s]) ;
+
 
 ∀ a . Concat[$List[$List[a]]] :: $List[a] ;
 Concat[()] → () ;
@@ -123,6 +140,15 @@ Append[(#1;#s), #tail] → (#1 ; Append[#s, #tail]) ;
 ∀ a . MapText1[x:a.Text, x:a.Text, $List[a]] :: Text ;
 -[Share[#x]]      : MapText1[t.#1[t], t.#2[t], (#x; #xs)] → %n⟪« #1[#x] »« MapText[t.#2[t], #xs] »⟫ ;
 -[Discard[#1,#2]] : MapText1[t.#1[t], t.#2[t], ()       ] → %n⟪⟫ ;
+
+ConcatText[$List[Text], Text] :: Text ;
+ConcatText[(), #sep] →  %n⟪⟫;
+ConcatText[(#Text;#Texts), #Sep] → %n⟪«#Sep»«#Text»«ConcatText[#Texts, #Sep]»⟫;
+
+
+ReverseConcatText[$List[Text], Text] :: Text ;
+ReverseConcatText[(), #sep] →  %n⟪⟫;
+ReverseConcatText[(#Text;#Texts), #Sep] → %n⟪«ReverseConcatText[#Texts, #Sep]»«#Sep»«#Text»⟫;
 
 ∀ a . IfZero[$Numeric, a, a] :: a ;
 -[Data[#n]] : IfZero[#n, #true, #false] → $[IfZero, #n, #true, #false] ;
@@ -155,6 +181,9 @@ SplitMapText[t.#[t], (), #Count, #PartCount, #PartSize, p.#BeginPartition[p], p.
 UnString[STRING_ENTRY] :: $String;
 UnString[STRING_VALUE[#Str]] → #Str;
 
+UnNumeric[STRING_ENTRY] :: $Numeric;
+UnNumeric[NUM_VALUE[#Num]] → #Num;
+
 UnVariable[STRING_ENTRY] :: Reified_Variable;
 UnVariable[VARIABLE[#Var]] → #Var;
 
@@ -178,7 +207,7 @@ Forms-Constructors[$List[Reified_Form]] :: $List[$String];
 
 FormArguments-binder-count[$List[Reified_FormArgument], $Numeric] :: $Numeric;
 
--[Fresh[dummy::Reified_Variable]] : FormArguments-binder-count[(FORM-BINDER[#Sort, b.#[b]]; #rest), #n] → FormArguments-binder-count[(#[dummy]; #rest), $[Plus,1,#n]] ;
+-[Fresh[dummy::Reified_Variable]] : FormArguments-binder-count[(FORM-BINDER[#Kind, #Sort, b.#[b]]; #rest), #n] → FormArguments-binder-count[(#[dummy]; #rest), $[Plus,1,#n]] ;
 -              			   : FormArguments-binder-count[(FORM-ARGUMENT[#Sort]          ; #rest), #n] → FormArguments-binder-count[#rest, #n] ;
 -                          : FormArguments-binder-count[(                                     ), #n] → #n ;
 
@@ -186,7 +215,7 @@ FormArguments-binder-offsets[$List[Reified_FormArgument], $Numeric] :: $List[$Nu
 
 -[Fresh[dummy::Reified_Variable]] 
 : 
-FormArguments-binder-offsets[(FORM-BINDER[#Sort, b.#Form[b]]; #rest), #n] → FormArguments-binder-offsets[(#Form[dummy]; #rest), $[Plus,1,#n]] ;
+FormArguments-binder-offsets[(FORM-BINDER[#Kind, #Sort, b.#Form[b]]; #rest), #n] → FormArguments-binder-offsets[(#Form[dummy]; #rest), $[Plus,1,#n]] ;
 
 FormArguments-binder-offsets[(FORM-ARGUMENT[#Sort]          ; #rest), #n] → (#n; FormArguments-binder-offsets[#rest, #n]) ;
 FormArguments-binder-offsets[(                                     ), #n] → () ;
@@ -245,6 +274,7 @@ Step[#name] → %n⟪step« MANGLE[#name] »⟫ ;
 Var[$String] :: Text;
 Var[#name] → %n⟪v« MANGLE[#name] »⟫ ;
 
+
 {$String:String}MetaVar[$String] :: Text;
 
 -[Data[#name]]
@@ -256,10 +286,63 @@ MetaVar2[STRING_ENTRY] :: Text;
 -[Free[var::Reified_Variable]]: MetaVar2[VARIABLE[var]] → %n⟪«var»⟫;
 MetaVar2[STRING_VALUE[#Str]] → TOKEN[#Str];
 
+{$String:String}MetaVarArity[$String] :: Text;
+
+-[Data[#name]]
+:
+{#E}MetaVarArity[#name] → INTEGER[UnNumeric[$[{#E}Get[STRING_ENTRY], $[:,#name, "$arity"], NUM_VALUE[0]]]];
+
 
 {$String:String}EventConstructor[$String] :: Text;
 
 EventConstructor[#name] → MANGLE[#name] ;
+
+// Test whether one of the binders is functional
+HasFunctionalBinders[Reified_Binder] :: $Boolean;
+
+HasFunctionalBinders[BINDER[#Promiscuity, KFUNCTION, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] →
+    $True
+;
+
+-[Fresh[binder::Reified_Variable]]
+:
+HasFunctionalBinders[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] →
+    HasFunctionalBinders[#Binder[binder]]
+;
+
+HasFunctionalBinders[ARGUMENT[#Sort, #Term]] →
+    $False
+;
+
+// Test whether one of the form argument binders  is functional
+HasFunctionalFormBinders[Reified_FormArgument] :: $Boolean;
+
+HasFunctionalFormBinders[FORM-BINDER[KFUNCTION, #Sort, v.#FormArgument[v]]] →
+    $True
+;
+
+-[Fresh[v::Reified_Variable]]
+:
+HasFunctionalFormBinders[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]]] →
+    HasFunctionalFormBinders[#FormArgument[v]]
+;
+
+HasFunctionalFormBinders[FORM-ARGUMENT[#Sort]] →
+    $False
+;
+
+// Move to the argument term
+MoveToTerm[Reified_Binder] :: Reified_Term;
+
+-[Fresh[binder::Reified_Variable]]
+:
+MoveToTerm[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] →
+    MoveToTerm[#Binder[binder]]
+;
+
+MoveToTerm[ARGUMENT[#Sort, #Term]] →
+    #Term
+;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Check Reuse Utilities
@@ -421,13 +504,12 @@ MissingPrimitive[$String] :: SPrimitive;
 
 MissingPrimitive[#Primitive] → $[Error, $[:, "$[",#Primitive,"] not supported"]] ;
 
-
-// TODO: this rule is OK. The editor does not support this construct yet.
-∀ a . DelayMapText[k::OK_SORT x::a.Text , $List[a]] :: Text ;
-
 -[Share[#x],Copy[#]] : DelayMapText[k t.#[k, t], (#x; #xs)] → %n⟪« #[OK, #x] »« DelayMapText[k t.#[k, t], #xs] »⟫ ;
 -[Discard[#]]        : DelayMapText[k t.#[k, t], ()       ] → %n⟪⟫ ;
 
+
+// TODO: this rule is OK. The editor does not support this construct yet.
+∀ a . DelayMapText[k::OK_SORT x::a.Text , $List[a]] :: Text ;
 
 
 )] // CD
