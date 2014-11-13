@@ -4680,12 +4680,26 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
             for (; nlink; nlink = nlink->link)
                 if (nlink->name)
                     computeFreeVariables2(freevars, nlink->u.term, boundLink);
-        }
+		else {
+		  Iterator2 iter = iteratorHS2(freevars->context, nlink->u.propset);
+		  if (iter)
+		    do {
+		      computeFreeVariables2(freevars, (Term)getValueIHS2(iter), boundLink);
+		    } while (nextIHS2(iter));
+		}
+	}
         {
             VariablePropertyLink vlink = asConstruction(term)->variableProperties;
             for (; vlink; vlink = vlink->link)
                 if (vlink->variable)
                     computeFreeVariables2(freevars, vlink->u.term, boundLink);
+		else {
+		  Iterator2 iter = iteratorHS2(freevars->context, vlink->u.propset);
+		  if (iter)
+		    do {
+		      computeFreeVariables2(freevars, (Term)getValueIHS2(iter), boundLink);
+		    } while (nextIHS2(iter));
+		}
         }
     }
 }
