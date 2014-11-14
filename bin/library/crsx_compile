@@ -11,6 +11,7 @@ function show_help {
     echo "   -o <output-dir>    directory where to store generated files"
     echo "   -d                 includes debugging information in generated executable"
     echo "   --strict           generate code using strict mode."
+    echo "   --clean            clean all intermediate files."
 }
 
 function run_compile {
@@ -28,6 +29,7 @@ function run_compile {
     local debug=
     local strict=
     local new=
+    local clean=N
 	while :
     do
    		case $1 in
@@ -70,11 +72,15 @@ function run_compile {
    			    shift
    			    ;;
    			-n)
-                new="Y"
+                new=Y
                 shift
                 ;;
 		    --strict)
                 strict=STRICT
+                shift
+                ;;
+            --clean)
+                clean=Y
                 shift
                 ;;
    			-*)
@@ -100,6 +106,11 @@ function run_compile {
 	if [ "$new" = "Y" ]
 	then
 	    printf "Experimental"
+	    
+	    if [ "$clean" = Y ]
+	    then
+	      make -f ${DIR}/library/compile.mk CRSFILE=${input} clean
+        fi
 	    
 		make -f ${DIR}/library/compile.mk CRSFILE=${input}
 		
@@ -154,8 +165,12 @@ function run_compile {
 		local data_o="${output}/${inputname}_data.o"
 		local function_o="${output}/${inputname}_fun.o"
 		local symbols_o="${output}/${inputname}_symbols.o"
+                
+        CFLAGS="$CFLAGS -O3"
 		
 		[ -n "$debug" ] && CFLAGS="$CFLAGS -DDEBUG -DCRSX_ENABLE_PROFILING"
+		
+		echo "$CFLAGS"
 		
 		[ $function_o -ot $function ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $function -o $function_o
 		[ $data_o -ot $data ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $data -o $data_o
