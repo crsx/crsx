@@ -1682,11 +1682,16 @@ public class GenericEvaluator extends FixedGenericConstruction
                 	break;
         		return rewrapWithProperties(factory.literal(s));
             }
-            
+
             case SHOW :
             	// $[Show, term]
 ///            	contractArgument(1);
                 return rewrapWithProperties(factory.literal(sub(1).toString()));
+
+            case SYMBOL :
+            	// $[Symbol, term]
+///            	contractArgument(1);
+                return rewrapWithProperties(factory.literal(Util.symbol(sub(1))));
 
             case COMPUTE :
             	// $[Compute, term]
@@ -1702,7 +1707,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 return rewrapWithProperties(arity() == 2 ? factory.nil() : sub(2));
 
             case HASH_CODE :
-            	// $[HashCode, #term] is hex string of a hash code.
+            	// $[HashCode, #term] is numeric hash code.
             	return rewrapWithProperties(factory.literal((long) sub(1).hashCode()));
                 
             case DUMP :

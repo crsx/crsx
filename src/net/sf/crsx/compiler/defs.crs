@@ -387,7 +387,7 @@ SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; 
 				 E_Substring; E_Escape; E_Mangle; E_BeforeFirst; E_AfterFirst; E_Plus; E_Minus; E_Times; E_Absolute; E_Decimal;
 				 E_Div; E_Mod; E_Hex; E_BitAnd; E_BitOr; E_BitXOr; E_BitNot; E_BitMinus; E_BitSubSetEq;
 				 E_LoadTerm; E_SaveTerm; E_IsZero; E_IsEmpty; E_NumericEqual; E_Dump; E_Error; E_Trace; E_FormatNumber; E_PassLocationProperties; E_EncodePoint; E_Get; E_GetRef;
-				 E_IfDef; E_Show; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
+				 E_IfDef; E_Show; E_Symbol; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
 				 E_Match; E_Call; E_TryCall; E_Cast; E_Pick; E_ReversePick; E_ListLength; E_Null; E_Nil; E_ForgivableError; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
                  E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_ParseText; E_Echo; E_DeepEqual; E_HashCode; E_ElapsedTime;
                  E_ProfileEnter; E_ProfileExit;
@@ -428,7 +428,8 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "FormatNumber"],			E_FormatNumber,
 	$[If, $[Equal, #Primitive, "Format"],				E_Format,
 	$[If, $[Equal, #Primitive, "Show"],					E_Show,
-	$[If, $[Equal, #Primitive, "PassLocationProperties"], E_PassLocationProperties,
+	$[If, $[Equal, #Primitive, "Symbol"],					E_Symbol,
+		$[If, $[Equal, #Primitive, "PassLocationProperties"], E_PassLocationProperties,
 	$[If, $[Equal, #Primitive, "EncodePoint"],			E_EncodePoint,
 
 	$[If, $[Equal, #Primitive, "Plus"], 				E_Plus,  
@@ -498,7 +499,7 @@ Primitive[#Primitive] →
 	
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 

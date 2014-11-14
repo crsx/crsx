@@ -1355,7 +1355,8 @@ public class Sorter
 				sort = freshForm(CRS.STRING_SORT, 0);
 				break;
 			}
-			case SHOW : {
+			case SHOW :
+			case SYMBOL : {
 				// generate string from anything
 				argumentsorts[0] = freshSortVariableUse();
 				sort = freshForm(CRS.STRING_SORT, 0);

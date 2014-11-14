@@ -1898,6 +1898,17 @@ Set-String-Show-Local
 «{#env}T-local-string[#Term, #sink, s p.#[s,p]]»⟧}
 ⟫;
 
+// $[Symbol, #var] is the symbol (root constructor or variable name).
+//
+STRING_PRIMITIVE[E_Symbol];
+
+Set-String-Symbol
+:
+{#env}E-set-string[E_Symbol, (#Name; #Var;), #Options, #sink, #str] 
+→ 
+%n⟪«#str» = SYMBOL(«#Var»);
+⟫;
+
 // TODO: should be polymorphic.
 
 // $[Call[$ResultSort, $Arg1Sort, ...], Name, ...]

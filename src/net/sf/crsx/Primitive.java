@@ -286,6 +286,8 @@ public enum Primitive
 	ECHO("Echo", 1, 2),
 	/** $[Show, #term] is a constant with the textual representation of #term as the string value. */
 	SHOW("Show", 1, 1),
+	/** $[Symbol, #term] is a constant with the textual representation of the root of #term as the string value. */
+	SYMBOL("Symbol", 1, 1),
 	/** $[FormatNumber, #number [,#format]] is a string representing the number. */
 	FORMAT_NUMBER("FormatNumber", 1, 2),
 	/** $[Format, #format [,#argument...]] generates a string from the #format string and the #arguments... strings. */
@@ -319,7 +321,7 @@ public enum Primitive
     /** Type unification */
     UNIFY("Unify", 2, 2),
     
-    /** Hash code. */
+    /** Hash code (numeric). */
     HASH_CODE("HashCode", 1, 1),
     
     /** Dummy value with no values. */
