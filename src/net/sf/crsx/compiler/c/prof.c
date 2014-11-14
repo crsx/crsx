@@ -238,7 +238,7 @@ void crsxpBeforeSubstitution(Context context, Term term)
 }
 void crsxpAfterSubstitution(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         pMetaSubstituteCount++;
 
@@ -276,7 +276,7 @@ void crsxpAfterSubstitution(Context context)
 
 void crsxpBeforePropagateFV(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pPropagateClock);
     }
@@ -284,7 +284,7 @@ void crsxpBeforePropagateFV(Context context)
 
 void crsxpAfterPropagateFV(Context context)
 {
-    if (context->internal)
+    if (context->profiling && context->internal)
     {
         struct timespec nanoTime;
         clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &nanoTime);
