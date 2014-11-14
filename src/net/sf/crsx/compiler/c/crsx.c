@@ -4684,12 +4684,26 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
             for (; nlink; nlink = nlink->link)
                 if (nlink->name)
                     computeFreeVariables2(freevars, nlink->u.term, boundLink);
-        }
+		else {
+		  Iterator2 iter = iteratorHS2(freevars->context, nlink->u.propset);
+		  if (iter)
+		    do {
+		      computeFreeVariables2(freevars, (Term)getValueIHS2(iter), boundLink);
+		    } while (nextIHS2(iter));
+		}
+	}
         {
             VariablePropertyLink vlink = asConstruction(term)->variableProperties;
             for (; vlink; vlink = vlink->link)
                 if (vlink->variable)
                     computeFreeVariables2(freevars, vlink->u.term, boundLink);
+		else {
+		  Iterator2 iter = iteratorHS2(freevars->context, vlink->u.propset);
+		  if (iter)
+		    do {
+		      computeFreeVariables2(freevars, (Term)getValueIHS2(iter), boundLink);
+		    } while (nextIHS2(iter));
+		}
         }
     }
 }
@@ -4893,6 +4907,44 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
     }
     return 1;
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+// Keys of properties.
+
+void sendPropertiesKeys(Sink sink, NamedPropertyLink named, VariablePropertyLink vard)
+{
+  int depth = 0;
+  for (; named; named = named->link) {
+    if (named->name) {
+      START(sink, _M__sCons); LITERAL(sink, named->name); ++depth;
+    }
+    else {
+      Iterator2 iter = iteratorHS2(sink->context, named->u.propset);
+      if (iter) {
+	do {
+	  START(sink, _M__sCons); LITERAL(sink, (char*)getKeyIHS2(iter)); ++depth;
+	} while (nextIHS2(iter));
+      }
+    }
+  }
+  for (; vard; vard = vard->link) {
+    if (vard->variable) {
+      START(sink, _M__sCons); USE(sink, vard->variable); ++depth;
+    }
+    else {
+      Iterator2 iter = iteratorHS2(sink->context, vard->u.propset);
+      if (iter) {
+	do {
+	  START(sink, _M__sCons); USE(sink, (Variable)getKeyIHS2(iter)); ++depth;
+	} while (nextIHS2(iter));
+      }
+    }
+  }
+  // Terminate and unravel list.
+  START(sink, _M__sNil); END(sink, _M__sNil);
+  while (depth-- > 0) END(sink, _M__sCons);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 // Constructor search helpers.
@@ -5166,17 +5218,17 @@ int fprintVariable(Context context, FILE* out, Variable x)
         //z += FPRINTF(context, out, "%s%s", name, (IS_LINEAR(x) ? "\302\271" : ""));
     else
     {
-        z += FPRINTF(context, out, "v'");
+        z += FPRINTF(context, out, "v\"");
         int i;
         for (i = 0; (c = name[i]); ++i)
         {
-            if ((isgraph(c) || c == ' ') && c != '\'')
+            if ((isgraph(c) || c == ' ') && c != '\"')
                 z += FPRINTF(context, out, "%c", c);
             else
                 z += FPRINTF(context, out, "\\%03o", (int)c);
         }
         //z += FPRINTF(context, out, "%s'", (IS_LINEAR(x) ? "\302\271" : ""));
-        z += FPRINTF(context, out, "'");
+        z += FPRINTF(context, out, "\"");
     }
 #ifdef DEBUG
     if (getenv("include-annotations"))
