@@ -1,17 +1,26 @@
-# Makefile for compiling crsx file.
+# Makefile for compiling crsx files.
+# Arguments are
+# CRSXFILE : name of the file to compile
+
 
 CRSXHOME = $(abspath ../../)
-MAKEFILE_CC=$(CRSXHOME)/Env.mk
+makefile_cc=$(CRSXHOME)/Env.mk
 
-include $(MAKEFILE_CC)
+include $(makefile_cc)
 
-BASENAME = $(patsubst %.crs,%,$(CRSFILE))
+crsabs = $(abspath $(CRSFILE))
+crspath = $(dir $(crsabs))
+crsbasename = $(patsubst %.crs,%,$(CRSFILE))
 
-all: $(BASENAME)
+crsdrfile = $(crsbasename).dr
+crsbinfile = $(crsbasename)
 
-$(BASENAME) : $(BASENAME).dr
+all: $(crsbinfile)
+clean:
+	rm -r $(crsdrfile) $(crsbinfile)
 
-$(BASENAME).dr: $(CRSFILE)
+$(crsbasename) : $(crsbasename).dr
+
+$(crsbasename).dr: $(CRSFILE)
 	$(RUNCRSXRC) 'grammar=("net.sf.crsx.text.Text";)' rules="$<" simple-terms sortify dispatchify reify="$@" 
 	
-

@@ -781,7 +781,12 @@ Sink bufferPropertiesReset(Sink sink)
 Sink makeBuffer(Context context)
 {
     if (context->bufferPoolSize > 0)
-        return (Sink) context->bufferPool[--context->bufferPoolSize];
+    {
+        Sink sink = (Sink) context->bufferPool[--context->bufferPoolSize];
+        Buffer buffer = (Buffer) sink;
+        ASSERT(sink->context, buffer->lastTop < 0);
+        return sink;
+    }
 
     return initBuffer(context, (Buffer) ALLOCATE(context, sizeof(struct _Buffer)));
 }
@@ -839,6 +844,7 @@ void freeBuffer(Sink sink)
     if (sink->context->bufferPoolSize < MAX_BUFFER_POOL_SIZE)
     {
         Buffer buffer = (Buffer) sink;
+        ASSERT(sink->context, buffer->lastTop < 0);
         sink->context->bufferPool[sink->context->bufferPoolSize ++ ] = buffer;
 
         // Reset
@@ -3535,8 +3541,6 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
     assert(!substitution || (substitution && !substitution->parent));
 
     const int substitutionCount = (substitution ? substitution->parentCount + substitution->count : 0);
-    const Buffer buffer = (Buffer) sink;
-
 
     // Prepare helper bitsets.
     BitSet unexhausted; MAKE_SET_LBITS(sink->context, &unexhausted, substitutionCount);
