@@ -58,7 +58,7 @@ public class FormattingAppendable extends Writer
 		if (level > maxindent)
 			level = maxindent;
 		
-		if (level < 0)
+		if (level <= 0)
 			return "";
 		else if (level < SPACES.length())
 	        return SPACES.substring(0, level);

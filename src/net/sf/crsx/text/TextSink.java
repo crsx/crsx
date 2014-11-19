@@ -143,18 +143,25 @@ public class TextSink extends ManagedSink implements Sinker
     					f.append("\u2020"); // † prefix denoting non-trivial character term
     				}
     			}
-    			else if (s.equals("$TextBreak") && text.arity() == 1)
+    			else if (s.equals("$TextBreak"))
     			{
-    				Term sub = text.sub(0);
-    				if (Util.isConstant(sub) && isSafe(sub.constructor()))
+    				if (text.arity() == 1)
     				{
-    					String brk = Util.symbol(sub);
-    					f.append(brk.isEmpty() ? "\n" : brk);
-    					break;
+    					Term sub = text.sub(0);
+    					if (Util.isConstant(sub) && isSafe(sub.constructor()))
+    					{
+    						String brk = Util.symbol(sub);
+    						f.append(brk.isEmpty() ? "\n" : brk);
+    						break;
+    					}
+    					else
+    					{
+    						f.append("\u2021"); // ‡ prefix denoting non-trivial break term
+    					}
     				}
     				else
     				{
-    					f.append("\u2021"); // ‡ prefix denoting non-trivial break term
+    					f.append("\n");
     				}
     			}
     			else if (s.equals("$TextTerm") && text.arity() == 1)
