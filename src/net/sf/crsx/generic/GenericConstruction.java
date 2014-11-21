@@ -378,11 +378,11 @@ public abstract class GenericConstruction extends GenericTerm
 		return true;
 	}
 
-	final public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	final public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
 		if (full)
 		{
-			appendSimpleTo(writer, used, noLinear, depth, full, namedProps, variableProps, omitProps);
+			appendSimpleTo(writer, used, noLinear, depth, full, namedProps, variableProps, omitProps, sortProps);
 			return;
 		}
 		
@@ -399,7 +399,7 @@ public abstract class GenericConstruction extends GenericTerm
 		{
 			writer.open(outer ? "" : "(");
 			opened = true;
-			constructor().appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps);
+			constructor().appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 			omitProps = null;
 			Variable coloned;
 			do
@@ -413,7 +413,7 @@ public abstract class GenericConstruction extends GenericTerm
 				if (Util.hasProperty(t, v))
 				{
 					writer.append(" : ");
-					Util.getProperty(t, coloned = v).appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps);
+					Util.getProperty(t, coloned = v).appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 				}
 			}
 			while (t.arity() == 1 && constructor().equals(t.constructor()) && t.binders(0).length == 1 && Util.hasAtMostVariableProperty(t, coloned));
@@ -448,9 +448,9 @@ public abstract class GenericConstruction extends GenericTerm
 				
 				writer.open("");
 				 if (t.sub(0) instanceof GenericConstruction)
-					((GenericConstruction) t.sub(0)).appendRuleTo(writer, used, noLinear, depth, full, namedProps, variableProps, omitProps, true);
+					((GenericConstruction) t.sub(0)).appendRuleTo(writer, used, noLinear, depth, full, namedProps, variableProps, omitProps, sortProps, true);
 				else
-					t.sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps);
+					t.sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 				
 				if (t.sub(1).arity() == 0 && Util.isNull(t.sub(1).constructor()))
 				{
@@ -472,9 +472,9 @@ public abstract class GenericConstruction extends GenericTerm
 		if (t != null)
 		{
 			if (t instanceof GenericConstruction)
-				((GenericConstruction) t).appendRuleTo(writer, used, noLinear, depth, full, namedProps, variableProps, omitProps, opened); // always applied if t==this
+				((GenericConstruction) t).appendRuleTo(writer, used, noLinear, depth, full, namedProps, variableProps, omitProps, sortProps, opened); // always applied if t==this
 			else
-				t.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps);
+				t.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps, sortProps);
 		}
 
 		if (opened)
@@ -493,10 +493,11 @@ public abstract class GenericConstruction extends GenericTerm
 	 * @param namedProps whether to include named properties in the output
 	 * @param variableProps whether to include variable properties in the output
 	 * @param omitProps specific variable properties to exclude
+	 * @param sortProps TODO
 	 * @param nested whether in parentheses
 	 * @throws IOException if the writing fails
 	 */
-	private void appendRuleTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean nested) throws IOException
+	private void appendRuleTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps, boolean nested) throws IOException
 	{
 		if (Util.isRule(this.constructor()))
 		{
@@ -504,19 +505,19 @@ public abstract class GenericConstruction extends GenericTerm
 			{
 				case 2 :
 					writer.open(nested ? "" : "(");
-					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.append("\n→\n");
-					sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.close(nested ? "" : ")");
 					writer.append("\n");
 					return;
 				case 3 :
 					writer.open(nested ? "" : "(");
-					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.append(" :\n");
-					sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.append("\n→\n");
-					sub(2).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(2).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.close(nested ? "" : ")");
 					writer.append("\n");
 					return;
@@ -528,7 +529,7 @@ public abstract class GenericConstruction extends GenericTerm
 			{
 				case 2 :
 					writer.open(nested ? "\n" : "(\n");
-					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					Variable[] params = binders(1);
 					if (params.length > 0)
 					{
@@ -538,7 +539,7 @@ public abstract class GenericConstruction extends GenericTerm
 						writer.append("]");
 					}
 					writer.append("\n::=\n");
-					sub(1).appendTo(writer, used, depth-1,full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(1).appendTo(writer, used, depth-1,full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.close(nested ? "" : ")");
 					writer.append("\n");
 					return;
@@ -550,15 +551,15 @@ public abstract class GenericConstruction extends GenericTerm
 			{
 				case 2 :
 					writer.open(nested ? "" : "(");
-					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.append("\n::\n");
-					sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 					writer.close(nested ? "" : ")");
 					writer.append("\n");
 					return;
 			}
 		}
-		appendFunctionTo(writer, used, noLinear, depth, nested, full, namedProps, variableProps, omitProps);
+		appendFunctionTo(writer, used, noLinear, depth, nested, full, namedProps, variableProps, omitProps, sortProps);
 	}
 	
 	/**
@@ -570,9 +571,10 @@ public abstract class GenericConstruction extends GenericTerm
 	 * @param namedProps whether to include named properties in the output
 	 * @param variableProps whether to include variable properties in the output
 	 * @param omitProps specific variable properties to exclude
+	 * @param sortProps TODO
 	 * @throws IOException if the writing fails
 	 */
-	private void appendFunctionTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean nested, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	private void appendFunctionTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean nested, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
 		if (Util.isApply(this.constructor()) && arity() == 2)
 		{
@@ -580,19 +582,19 @@ public abstract class GenericConstruction extends GenericTerm
 				writer.open("(");
 			// Special case for binary application...
 			if (sub(0) instanceof GenericConstruction)
-				((GenericConstruction) sub(0)).appendFunctionTo(writer, used, noLinear, depth, true, full, namedProps, variableProps, omitProps);
+				((GenericConstruction) sub(0)).appendFunctionTo(writer, used, noLinear, depth, true, full, namedProps, variableProps, omitProps, sortProps);
 			else
-				sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+				sub(0).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 
 			writer.append("\n");
-			sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			sub(1).appendTo(writer, used, depth-1, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 			if (!nested)
 				writer.close(")");
 		}
 		else if (nested)
-			appendTermTo(writer, used, noLinear, depth-1, false, full, namedProps, variableProps, omitProps); // retry top-level print
+			appendTermTo(writer, used, noLinear, depth-1, false, full, namedProps, variableProps, omitProps, sortProps); // retry top-level print
 		else
-			appendSimpleTo(writer, used, noLinear, depth-1, full, namedProps, variableProps, omitProps);
+			appendSimpleTo(writer, used, noLinear, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 	}
 
 	/**
@@ -604,16 +606,17 @@ public abstract class GenericConstruction extends GenericTerm
 	 * @param namedProps whether to include named properties in the output
 	 * @param variableProps whether to include variable properties in the output
 	 * @param omitProps specific variable properties to exclude
+	 * @param sortProps TODO
 	 * @throws IOException if the writing fails
 	 */
-	private void appendSimpleTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	private void appendSimpleTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
 		final int arity = arity();
 		if (arity == 0)
-			constructor().appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps);
+			constructor().appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 		else
 		{
-			constructor().appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps);
+			constructor().appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 			writer.open(arity == 1 && sub(0) != null && Util.isCons(sub(0).constructor()) ? "[" : "[\0");
 			for (int i = 0; i < arity; ++i)
 			{
@@ -630,16 +633,16 @@ public abstract class GenericConstruction extends GenericTerm
 						if (Util.hasProperty(sub(i), v))
 						{
 							writer.append(" : ");
-							Util.getProperty(sub(i), v).appendTo(writer, used, depth+1, full, namedProps, variableProps, null);
+							Util.getProperty(sub(i), v).appendTo(writer, used, depth+1, full, namedProps, variableProps, null, sortProps);
 							coloned.add(v);
 						}
 					}
 					writer.open(" .\n");
 				}
 				if (sub(i) instanceof GenericTerm)
-					((GenericTerm) sub(i)).appendTermTo(writer, used, noLinear, depth-1, false, full, namedProps, variableProps, coloned);
+					((GenericTerm) sub(i)).appendTermTo(writer, used, noLinear, depth-1, false, full, namedProps, variableProps, coloned, sortProps);
 				else if (sub(i) != null)
-					sub(i).appendTo(writer, used, depth-1, full, namedProps, variableProps, coloned);
+					sub(i).appendTo(writer, used, depth-1, full, namedProps, variableProps, coloned, sortProps);
                 if (binders(i) != null && binders(i).length > 0)
                     writer.close("");
 			}

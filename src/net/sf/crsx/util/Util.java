@@ -1820,7 +1820,7 @@ public final class Util
 		StringBuilder b = new StringBuilder();
 		try
 		{
-			term.appendTo(b, new HashMap<Variable, String>(), depth, false, true, true, null);
+			term.appendTo(b, new HashMap<Variable, String>(), depth, false, true, true, null, false);
 		}
 		catch (IOException e)
 		{}

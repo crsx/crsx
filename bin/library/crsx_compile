@@ -6,12 +6,12 @@ function show_help {
 	echo "Usage : $0 compile help"
 	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [-n] <input.crs>"
 	echo " where"
-	echo "   --cp <path>        colon-separated class paths"
-    echo "   -p <parser>        colon-separated parser qualified name"   
-    echo "   -o <output-dir>    directory where to store generated files"
+ #	echo "   --cp <path>        colon-separated class paths"
+ #   echo "   -p <parser>        colon-separated parser qualified name"   
+ #   echo "   -o <output-dir>    directory where to store generated files"
     echo "   -d                 includes debugging information in generated executable"
     echo "   --strict           generate code using strict mode."
-    echo "   --clean            clean all intermediate files."
+    echo "   --clean            clean all intermediate files before compiling."
 }
 
 function run_compile {
@@ -93,6 +93,12 @@ function run_compile {
 		esac
  	done
 	
+	if [ "$1" = "" ]
+	then
+	   echo "Missing file name"
+       exit
+    fi
+	
 	if [ ! -f $1 ]
 	then
 		echo "Filename given \"$1\" doesn't exist"
@@ -103,89 +109,11 @@ function run_compile {
 	local inputname="${input%.*}"
 	local inputext="${input##*.}"
 	
-	if [ "$new" = "Y" ]
+	if [ "$clean" = Y ]
 	then
-	    printf "Experimental"
+	   make -f ${DIR}/library/compile.mk CRSFILE=${input} clean
+    fi
 	    
-	    if [ "$clean" = Y ]
-	    then
-	      make -f ${DIR}/library/compile.mk CRSFILE=${input} clean
-        fi
-	    
-		make -f ${DIR}/library/compile.mk CRSFILE=${input}
-		
-	elif [ "$inputext" = "crs" ]
-	then
-	    # Compile .crs file
-		
-		# FIRST: Generate dr file.
-        [ ! -n "$output" ] && output="."
-        
-		local drfile="${output}/${inputname}.dr"
-	  	local cmd="$CRSXS dispatch -o $drfile"
-
-	  	[ -n "$grammar" ] && cmd="$cmd -p $grammar"
-		[ -n "$classpath" ] && cmd="$cmd --cp $classpath"
-
-		[ $drfile -ot $1 ] && $cmd $1 
-		
-		[ ! -f $drfile ] && exit
-		
-		# THEN: Generate all C files
-		
-		local header="${output}/${inputname}.h"
-		local data="${output}/${inputname}_data.c"
-		local function="${output}/${inputname}_fun.c"
-		local symbols="${output}/${inputname}_symbols.c"
-		
-		[ $data -ot $drfile ] && export HEADERS="${inputname}.h" && $CRSXC compile sorts $drfile > $data
-		[ $header -ot $drfile ] && $CRSXC $strict HEADERS=crsx.h wrapper=ComputeHeader input=$drfile > $header
-		[ $function -ot $drfile ] && $CRSXC HEADERS="${inputname}.h" CANONICAL_VARIABLES=1 wrapper=ComputeRules $strict input=$drfile > $function
-		
-		if [ $symbols -ot $drfile ] 
-		then
-			$CRSXC compile symbols $drfile > $symbols
-		
-		    # Sort symbol
-		
-			LC_ALL=C sort -bu $symbols | sed 1d  > ${symbols}.tmp
-    			
-    		# and make proper C file.
-    		echo "/* ${inputname}ing symbols. */" > $symbols
-	   	 	echo "#include \"${inputname}.h\"" >> $symbols
-	  		echo "size_t symbolDescriptorCount = `wc -l < ${symbols}.tmp`;" >> $symbols
-	  		echo "struct _SymbolDescriptor symbolDescriptorTable[] = {" >> $symbols
-	   	 	cat ${symbols}.tmp >> $symbols
-	   	 	echo "{NULL, NULL}};" >> $symbols
-	   	 	
-	   		rm ${symbols}.tmp
-		fi
-		
-		# FINALLY: Compile C code and link.
-		local data_o="${output}/${inputname}_data.o"
-		local function_o="${output}/${inputname}_fun.o"
-		local symbols_o="${output}/${inputname}_symbols.o"
-                
-        CFLAGS="$CFLAGS -O3"
-		
-		[ -n "$debug" ] && CFLAGS="$CFLAGS -DDEBUG -DCRSX_ENABLE_PROFILING"
-		
-		echo "$CFLAGS"
-		
-		[ $function_o -ot $function ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $function -o $function_o
-		[ $data_o -ot $data ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $data -o $data_o
-		[ $symbols_o -ot $symbols ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $symbols -o $symbols_o
-		
-		# Link
-		$CC $LDFLAGS $ICU4CLIB $function_o $symbols_o $data_o $CRSXC_O_FILES $CRSXC_O_MAIN 
-		
-		# Explicit exit as maybe no command has been executed.
-		exit 0 
-								
-	else
-		echo "Invalid input file extension: ${inputext}"
-		show_help
-	fi
-			
+	make -f ${DIR}/library/compile.mk CRSFILE=${input} MODE=${strict}			
 }
 	

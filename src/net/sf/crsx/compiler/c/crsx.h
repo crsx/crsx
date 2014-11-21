@@ -925,8 +925,12 @@ extern void freeBuffer(Sink sink);
 #ifndef NORMALIZE
 # define NORMALIZE(CONTEXT,T) normalize(CONTEXT, &T)
 #endif
+#ifndef NORMALIZEP
+# define NORMALIZEP(CONTEXT,T) normalizep(CONTEXT, T)
+#endif
 extern Term force(Context context, Term term);
 extern void normalize(Context context, Term *termp);
+extern Term normalizep(Context context, Term term);
 
 // Obsolete:
 #ifndef COMPUTE

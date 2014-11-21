@@ -885,7 +885,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						Term t = b.term(false);
 						assert t != null : "Generated dumped rules term is not buffered!";
 						Appendable a = output(directive.sub(0));
-						t.appendTo(a, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+						t.appendTo(a, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
 						if (a instanceof Flushable)
 							((Flushable) a).flush();
 						if (a instanceof Closeable)
@@ -1614,7 +1614,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		return verbosity;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 	        throws IOException
 	{
 		if (depth <= 0)

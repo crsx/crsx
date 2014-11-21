@@ -43,6 +43,9 @@ public class SimpleTermSink extends DelegatingMaker implements Sink
 	
 	/** Omit linearity markers. */
 	private boolean noLinear;
+	
+	/** Sort properties? */
+	private boolean sortProps;
 
 	// Constructor.
 	
@@ -62,6 +65,7 @@ public class SimpleTermSink extends DelegatingMaker implements Sink
 		if (canonicalVariables)
 			used.put(null, "1");
 		noLinear = factory.defined(GenericFactory.NO_LINEAR_VARIABLES);
+		sortProps = factory.defined(Factory.SORT_PROPERTIES);
 	}
 	
 	// Methods.
@@ -104,7 +108,7 @@ public class SimpleTermSink extends DelegatingMaker implements Sink
 		try
 		{
 			next();
-			constructor.appendTo(appendable, used, Integer.MAX_VALUE, true, true, true, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			constructor.appendTo(appendable, used, Integer.MAX_VALUE, true, true, true, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 			enter();
 		}
 		catch (IOException e)

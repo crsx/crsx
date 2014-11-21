@@ -111,7 +111,7 @@ final public class JokerConstructor implements Constructor
 		return this;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)
@@ -211,7 +211,7 @@ final public class JokerConstructor implements Constructor
 		{
 			appendTo(
 					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true,
-					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 		}
 		catch (IOException e)
 		{}

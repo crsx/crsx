@@ -1159,7 +1159,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             		try
             		{
             			WriterAppender w = new WriterAppender(new FileWriter(resource));
-            			sub(2).appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+            			sub(2).appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
             			w.close();
             		}
             		catch (IOException e)
@@ -1652,7 +1652,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 computeArguments();
                 try
                 {
-                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null); // TODO: allow depth?
+                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES)); // TODO: allow depth?
                     System.out.println();
                     System.out.flush();
                     return rewrapWithProperties(arity() == 2 ? factory.nil() : sub(2));
@@ -1715,9 +1715,9 @@ public class GenericEvaluator extends FixedGenericConstruction
                 {
                 	Map<Variable, String> used = new HashMap<Variable, String>();
                     boolean full = factory.defined(Factory.SIMPLE_TERMS);
-                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                     System.out.print(" ");
-                    sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                    sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                     System.out.println();
                     System.out.flush();
                     return rewrapWithProperties(sub(2));
@@ -1732,7 +1732,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             	computeArguments();
                 try
                 {
-                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
                     System.err.println();
                     System.err.flush();
                     return rewrapWithProperties(arity() == 2 ? sub(1) : sub(2));
@@ -2613,7 +2613,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             case PRINT :
                 try
                 {
-                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
                     System.out.println();
                     System.out.flush();
                 }
@@ -2630,12 +2630,12 @@ public class GenericEvaluator extends FixedGenericConstruction
                         throw new UnsupportedOperationException(toString());
                     boolean full = factory.defined(Factory.SIMPLE_TERMS);
                     Map<Variable, String> used = new HashMap<Variable, String>();
-                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                     System.out.print(" ");
                     if (((Pattern) sub(2)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
                     {
-                        match.getSubstitute(sub(2).metaVariable()).getBody().appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
-                        sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                        match.getSubstitute(sub(2).metaVariable()).getBody().appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
+                        sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                         System.out.println();
                         System.out.flush();
                         return true;
@@ -2655,7 +2655,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             case TRACE :
                 try
                 {
-                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
                     System.err.println();
                     System.err.flush();
                 }

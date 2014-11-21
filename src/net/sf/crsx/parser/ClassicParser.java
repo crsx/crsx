@@ -75,6 +75,10 @@ public class ClassicParser implements Parser, ClassicParserConstants {
         /** Whether this parser has been used. */
         private boolean used;
 
+    /** Whether to ignore property duplicates */
+    private boolean ignoreDuplicates;
+
+
         /** Whether location properties are added to constructors. */
         private boolean captureLocations;
         private Constructor makeConstructor(Sink sink, Token t, String s, String sort)
@@ -221,16 +225,12 @@ public class ClassicParser implements Parser, ClassicParserConstants {
 
         public Parser parser(Factory<? extends Term> f)
         {
-                //if (factory != null)
-                //{
-                //	Parser parser = new ClassicParser().parser(factory);
-                //	return parser;
-                //}
-                //else
-                //{
-                        factory = f;
-                        return this;
-                //}
+           factory = f;
+
+       ignoreDuplicates = f.defined(Factory.IGNORE_DUPLICATE);
+
+           return this;
+
         }
 
         private Sink realParse(Sink sink, String unit, ExtensibleMap<String, Variable> bound) throws CRSException, IOException
@@ -1052,9 +1052,8 @@ public class ClassicParser implements Parser, ClassicParserConstants {
             jj_consume_token(-1);
             throw new ParseException();
           }
-//			if (properties.containsKey(p))
-//				throw oops("CRS error: Cannot explicitly repeat property name in property pattern!", t, null);
-                        properties.put(p, null);
+                        if (!ignoreDuplicates || !properties.containsKey(p))
+                           properties.put(p, null);
           break;
         case VARIABLE:
         case QUOTED_VARIABLE:
@@ -1075,9 +1074,8 @@ public class ClassicParser implements Parser, ClassicParserConstants {
                  {
                         Variable v = bound.get(s);
                         if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
-//			if (varProperties.containsKey(v))
-//				throw oops("CRS error: Cannot explicitly repeat property variable in property pattern!", t, null);
-                        varProperties.put(v, null);
+                        if (!ignoreDuplicates || !varProperties.containsKey(v))
+                            varProperties.put(v, null);
                 }
           break;
         case METAVARIABLE:
@@ -1183,9 +1181,8 @@ public class ClassicParser implements Parser, ClassicParserConstants {
           jj_la1[26] = jj_gen;
           ;
         }
-//			if (properties.containsKey(p))
-//				throw oops("CRS error: Cannot explicitly repeat property name!", t, null);
-                properties.put(p, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
+        if (!ignoreDuplicates || !properties.containsKey(p))
+                  properties.put(p, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
         break;
       case VARIABLE:
       case QUOTED_VARIABLE:
@@ -1215,9 +1212,8 @@ public class ClassicParser implements Parser, ClassicParserConstants {
          {
                 Variable v = bound.get(s);
                 if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
-//		if (varProperties.containsKey(v))
-//			throw oops("CRS error: Cannot explicitly repeat property variable!", t, null);
-                varProperties.put(v, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
+                if (!ignoreDuplicates || !varProperties.containsKey(v))
+                  varProperties.put(v, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
         }
         break;
       case PERCENT_NAME:

@@ -268,7 +268,7 @@ public class GenericMetaApplication extends GenericTerm
 		return true;
 	}
 
-	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)
@@ -281,7 +281,7 @@ public class GenericMetaApplication extends GenericTerm
 		if (arity > 0)
 		{
 			writer.open("[");
-			sub[0].appendTo(writer, used, depth - 1, full, namedProps, variableProps, null);
+			sub[0].appendTo(writer, used, depth - 1, full, namedProps, variableProps, null, sortProps);
 			for (int i = 1; i < arity; ++i)
 			{
 				writer.close(",\n");
@@ -289,9 +289,9 @@ public class GenericMetaApplication extends GenericTerm
 				if (sub[i] instanceof GenericTerm)
 					((GenericTerm) sub[i]).appendTermTo(
 							writer, used, noLinear, depth - 1, false, full, namedProps, variableProps,
-							LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+							LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 				else
-					sub[i].appendTo(writer, used, depth - 1, full, namedProps, variableProps, null);
+					sub[i].appendTo(writer, used, depth - 1, full, namedProps, variableProps, null, sortProps);
 			}
 			writer.close("]");
 		}

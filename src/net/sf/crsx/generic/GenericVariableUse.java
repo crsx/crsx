@@ -230,7 +230,7 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		visitor.visitUse(this, false, bound);
 	}
 
-	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)
@@ -239,7 +239,7 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 			return;
 		}
 		if (properties != null)
-			properties.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps);
+			properties.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps, sortProps);
 		if (variable == null)
 			writer.append("null");
 		else

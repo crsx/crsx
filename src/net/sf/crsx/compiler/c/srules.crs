@@ -3,7 +3,6 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERATE C RULES FILE TEXT FROM REIFIED CRSX. STRICT MODE
-//
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SRULES[(
@@ -47,7 +46,7 @@ SF-StepBody[$String, Text, Text, $String, $List[Reified_Form], Reified_Sort, $Li
 SF-StepBody[#kind, #sink, #term, #function, #Forms, #Sort, #Rules]
 →
 %n⟪
-size_t « #term »_count = LINK_COUNT(« #term »); permitUnusedInt(« #term »_count);«SF-ExtractProps[#Forms, $False, #sink, #term, (), ok¹ args¹.SF-StepUnlinkTerm[ok¹, #sink, #term, args¹, #function]]»⟫
+size_t « #term »_count = LINK_COUNT(« #term »); «SF-ExtractProps[#Forms, $False, #sink, #term, (), ok¹ args¹.SF-StepUnlinkTerm[ok¹, #sink, #term, args¹, #function]]»⟫
 ;
 
 SF-ExtractProps[$List[Reified_Form], $Boolean<!-- Environment generated? -->, Text, Text, $List[Text], ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
@@ -1250,7 +1249,7 @@ SF-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[
 {#env; #term : ARG[#i, $True]}
 SF-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, #sink, #setup, #term, ok.#[ok]]
 → 
-%n⟪« #setup »NORMALIZE(«#sink»->context, «#term»); 
+%n⟪« #setup »«#term» = NORMALIZEP(«#sink»->context, «#term»); 
 «{#env}SF-Pattern-MetaArgs-Copy[#MetaVar, #MetaArgs, #sink, #term, ok.#[ok]]»⟫
 ;
 

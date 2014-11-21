@@ -29,6 +29,8 @@ ICU4CDIR=/usr/local/opt/icu4c/lib
 endif
 endif
 
+ICU4CLIB=-licui18n -licuuc -licudata
+
 CCFLAGS+=-g -Wall
 INCLUDES = /usr/include
 
@@ -36,4 +38,5 @@ INCLUDES = /usr/include
 
 BUILD = $(CRSXHOME)/build
 RUNCRSXRC = $(JAVA) -Dfile.encoding=UTF-8 -Xss20000K -Xmx2000m -cp $(BUILD) net.sf.crsx.run.Crsx allow-unnamed-rules allow-missing-cases
-COMPILERSRC = src/net/sf/crsx/compiler
+COMPILERSRC = $(CRSXHOME)/src/net/sf/crsx/compiler
+CRSXC = $(CRSXHOME)/bin/crsxc

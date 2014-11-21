@@ -118,7 +118,7 @@ final public class ObjectConstructor implements Constructor
 		return this;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)

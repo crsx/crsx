@@ -1712,7 +1712,7 @@ public class GenericRule implements Copyable
 					if (sort != null)
 					{
 						w.append(" : ");
-						sort.appendTo(w, used, depth, false, namedProps, variableProps, null);
+						sort.appendTo(w, used, depth, false, namedProps, variableProps, null, false);
 					}
 					innerSep = ", ";
 				}
@@ -1731,7 +1731,7 @@ public class GenericRule implements Copyable
 					if (sort != null)
 					{
 						w.append(" : ");
-						sort.appendTo(w, used, depth, false, namedProps, variableProps, null);
+						sort.appendTo(w, used, depth, false, namedProps, variableProps, null, false);
 					}
 					innerSep = ", ";
 				}
@@ -1748,7 +1748,7 @@ public class GenericRule implements Copyable
 					for (Term t : options.get(o))
 					{
 						w.append(innerSep);
-						t.appendTo(w, used, depth, false, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+						t.appendTo(w, used, depth, false, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 						innerSep = ",";
 					}
 					w.append("]");
@@ -1772,11 +1772,11 @@ public class GenericRule implements Copyable
 		w.append("\n");
 
 		// Pattern.
-		pattern.appendTo(w, used, depth - 1, false, namedProps, variableProps, null);
+		pattern.appendTo(w, used, depth - 1, false, namedProps, variableProps, null, false);
 		// Arrow.
 		w.append("\n→\n");
 		// Contraction.
-		contractum.appendTo(w, used, depth - 1, false, namedProps, variableProps, null);
+		contractum.appendTo(w, used, depth - 1, false, namedProps, variableProps, null, false);
 
 		if (w instanceof FormattingAppendable)
 			((FormattingAppendable) w).close("");

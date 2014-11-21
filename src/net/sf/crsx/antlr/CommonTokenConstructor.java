@@ -299,7 +299,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	public void normalize(CRS crs) throws CRSException
 	{}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)
@@ -310,7 +310,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		if (writer instanceof FormattingAppendable)
 			((FormattingAppendable) writer).open("");
 		if (namedProps)
-			PropertiesConstructor.appendPropertiesTo(this, writer, used, depth - 1, full, namedProps, variableProps, omitProps);
+			PropertiesConstructor.appendPropertiesTo(this, writer, used, depth - 1, full, namedProps, variableProps, omitProps, sortProps);
 		writer.append(literalSort() != null
 				? Util.quoteJava(symbol())
 				: Util.externalizeConstructor(text != null ? text : symbol()));
@@ -459,7 +459,7 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 		{
 			appendTo(
 					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false,
-					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 		}
 		catch (IOException e)
 		{

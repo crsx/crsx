@@ -189,10 +189,11 @@ public interface CRS
  	 * @param namedProps whether to include properties
  	 * @param variableProps TODO
  	 * @param omitProps TODO
+ 	 * @param sortProps TODO
  	 * @param w to append the text to
  	 * @throws IOException if an i/o error occurs
  	 */
-	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException;
+	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException;
 	
 	
 }

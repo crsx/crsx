@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import net.sf.crsx.CRS;
@@ -18,6 +19,7 @@ import net.sf.crsx.CRSException;
 import net.sf.crsx.Constructor;
 import net.sf.crsx.Contractum;
 import net.sf.crsx.Copyable;
+import net.sf.crsx.Factory;
 import net.sf.crsx.Kind;
 import net.sf.crsx.Match;
 import net.sf.crsx.MetaAnalyzer;
@@ -2146,7 +2148,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	}
 
 	@Override
-	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -2155,10 +2157,10 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 		}
 		if (namedProps || variableProps)
 		{
-			appendTo(writer, used, depth, propertiesRef, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints, full, namedProps, variableProps, omitProps);
+			appendTo(writer, used, depth, propertiesRef, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints, full, namedProps, variableProps, omitProps, sortProps);
 			writer.append("\0");
 		}
-		term.appendTo(writer, used, depth, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+		term.appendTo(writer, used, depth, full, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, sortProps);
 	}
 
     public Sink reify(Sink sink, Map<String, Term> metaArgSort, Map<Variable, Term> freeSort, Map<String, Reifier> subReifiers)
@@ -2191,9 +2193,10 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	 * @param namedProps
 	 * @param variableProps
 	 * @param omitProps
+	 * @param sortProps whether to sort properties
 	 * @throws IOException
 	 */
-	static void appendTo(Appendable writer, Map<Variable, String> used, int depth, String ref, Map<String, Term> constraints, Map<Variable, Term> varConstraints, Map<String, Term> metaConstraints, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	static void appendTo(Appendable writer, Map<Variable, String> used, int depth, String ref, Map<String, Term> constraints, Map<Variable, Term> varConstraints, Map<String, Term> metaConstraints, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
 		if (omitProps == null) omitProps = LinkedExtensibleSet.EMPTY_VARIABLE_SET;
 		
@@ -2225,7 +2228,11 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 
 				if (constraints != null)
 				{
-					for (Map.Entry<String, Term> entry : constraints.entrySet())
+					Map<String, Term> map = constraints;
+					if (sortProps)
+						map = new TreeMap<String, Term>(constraints);
+					
+					for (Map.Entry<String, Term> entry : map.entrySet())
 					{
 						String key = entry.getKey();
 						if (key.length() >= 2 && key.substring(0,2).equals("$$"))
@@ -2249,14 +2256,18 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 						else
 						{
 							writer.append(sep + Util.externalizeLiteral(key) + " : ");
-							entry.getValue().appendTo(writer, used, depth-1, full, namedProps, variableProps, null);
+							entry.getValue().appendTo(writer, used, depth-1, full, namedProps, variableProps, null, sortProps);
 						}
 						sep = (writer instanceof FormattingAppendable ? sep = ";\n" : "; ");
 					}
 				}
 				if (varConstraints != null)
 				{
-					for (Map.Entry<Variable, Term> entry : varConstraints.entrySet())
+					Map<Variable, Term> map = varConstraints;
+					if (sortProps)
+						map = new TreeMap<Variable, Term>(varConstraints);
+					
+					for (Map.Entry<Variable, Term> entry : map.entrySet())
 					{
 						Variable key = entry.getKey();
 						if (!omitProps.contains(key))
@@ -2273,7 +2284,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 							else
 							{
 								writer.append(sep + Util.safeVariableName(key, used, false, false) + " : ");
-								entry.getValue().appendTo(writer, used, depth-1, full, namedProps, variableProps, null);
+								entry.getValue().appendTo(writer, used, depth-1, full, namedProps, variableProps, null, sortProps);
 							}
 							sep = (writer instanceof FormattingAppendable ? sep = ";\n" : "; ");
 						}
@@ -2281,7 +2292,11 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 				}
 				if (metaConstraints != null)
 				{
-					for (Map.Entry<String, Term> p : metaConstraints.entrySet())
+					Map<String, Term> map = metaConstraints;
+					if (sortProps)
+						map = new TreeMap<String, Term>(metaConstraints);
+					
+					for (Map.Entry<String, Term> p : map.entrySet())
 					{
 						String key = Util.externalizeMetaVariable(p.getKey());
 						Term value = p.getValue();
@@ -2296,7 +2311,7 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 						else
 						{
 							writer.append(sep + key + " : ");
-							value.appendTo(writer, used, depth-1, full, true, variableProps, null);
+							value.appendTo(writer, used, depth-1, full, true, variableProps, null, sortProps);
 						}
 						sep = (writer instanceof FormattingAppendable ? sep = ";\n" : "; ");
 					}

@@ -251,7 +251,7 @@ class GenericMatch implements Match, Cloneable
             w.append(") => ");
             try
             {
-                getBody().appendTo(w, used, Integer.MAX_VALUE, false, true, true, null);
+                getBody().appendTo(w, used, Integer.MAX_VALUE, false, true, true, null, false);
             }
             catch (IOException e)
             {
@@ -350,7 +350,7 @@ class GenericMatch implements Match, Cloneable
 			w.append(") => ");
 			try
 			{
-				getBody().appendTo(w, used, Integer.MAX_VALUE, false, true, true, null);
+				getBody().appendTo(w, used, Integer.MAX_VALUE, false, true, true, null, false);
 			}
 			catch (IOException e)
 			{

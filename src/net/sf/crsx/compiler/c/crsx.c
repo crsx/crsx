@@ -34,6 +34,7 @@ void enableProfiling(Context context)
 {
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 1;
+    context->internal = 0;
     crsxpInit(context);
 #endif
 }
@@ -531,16 +532,15 @@ Sink bufferBinds(Sink sink, int size, Variable binds[])
 #   endif
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     const Buffer buffer = (Buffer) sink;
-    const Context context = sink->context;
 
-    ASSERT(context, buffer->lastTop >= 0); // can only have binders on proper construction subterms
+    ASSERT(sink->context, buffer->lastTop >= 0); // can only have binders on proper construction subterms
 
     BufferEntry entry = bufferTop(buffer);
     int index = entry->index;
     Term term = entry->term;
-    ASSERT(context, term->descriptor);
-    ASSERT(context, 0 <= index && index < ARITY(term));
-    ASSERT(context, size == RANK(term,index));
+    ASSERT(sink->context, term->descriptor);
+    ASSERT(sink->context, 0 <= index && index < ARITY(term));
+    ASSERT(sink->context, size == RANK(term,index));
 
     int i;
     for (i = 0; i < size; ++i)
@@ -3277,6 +3277,12 @@ static int step(Sink sink, Term term); // helper
 long computeCount = 0l;
 #endif
 
+Term normalizep(Context context, Term term)
+{
+    normalize(context, &term);
+    return term;
+}
+
 void normalize(Context context, Term *termp)
 {
     // Work term.
@@ -3452,15 +3458,11 @@ void initCRSXContext(Context context)
     context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 
     context->fv_enabled = getenv("crsx-disable-fv") == NULL;
-//
-//    context->noProperties = ALLOCATE(context, sizeof(struct _Properties));
-//    context->noProperties->namedFreeVars = NULL;
-//    context->noProperties->variableFreeVars = NULL;
-//    context->noProperties->namedProperties = NULL;
-//    context->noProperties->variableProperties = NULL;
+
 
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 0;
+    context->internal = 0;
 #endif
 }
 

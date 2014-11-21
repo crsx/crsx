@@ -285,7 +285,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 
 	abstract public boolean equalsModulo(Term that, ExtensibleMap<Variable, Variable> renamings);
 	
-	final public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	final public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
 		if (depth <= 0)
 		{
@@ -306,7 +306,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 				false,
 				factory.defined(Factory.SIMPLE_TERMS),
 				! factory.defined(Factory.OMIT_PROPERTIES) && ! factory.defined(Factory.OMIT_NAMED_PROPERTIES),
-				! factory.defined(Factory.OMIT_PROPERTIES) && ! factory.defined(Factory.OMIT_VARIABLE_PROPERTIES), omitProps);
+				! factory.defined(Factory.OMIT_PROPERTIES) && ! factory.defined(Factory.OMIT_VARIABLE_PROPERTIES), omitProps, factory.defined(Factory.SORT_PROPERTIES));
 		if (writer instanceof Flushable)
 			((Flushable) writer).flush();
 	}
@@ -322,9 +322,10 @@ abstract public class GenericTerm implements Pattern, Contractum
 	 * @param namedProps whether to include named properties in the output
 	 * @param variableProps whether to include variable properties in the output
 	 * @param omitProps specific variable properties to exclude
+	 * @param sortProps TODO
 	 * @throws IOException if the i/o fails
 	 */
-	abstract public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException;
+	abstract public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException;
 
 	public SortedSet<Path> paths(Path base)
 	{
@@ -488,7 +489,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 		{
 			FormattingAppendable f = FormattingAppendable.format(w, Integer.MAX_VALUE, 0, Integer.MAX_VALUE);
 			Map<Variable,String> variableNames = new HashMap<Variable, String>();
-			appendTermTo(f, variableNames, factory.defined(GenericFactory.NO_LINEAR_VARIABLES), Integer.MAX_VALUE, false, false, true, true, new HashSet<Variable>());
+			appendTermTo(f, variableNames, factory.defined(GenericFactory.NO_LINEAR_VARIABLES), Integer.MAX_VALUE, false, false, true, true, new HashSet<Variable>(), false);
 		}
 		catch (IOException e)
 		{
