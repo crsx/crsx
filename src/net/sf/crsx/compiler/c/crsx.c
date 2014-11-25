@@ -34,7 +34,7 @@ void enableProfiling(Context context)
 {
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 1;
-    context->internal = 0;
+    context->internal = 1;
     crsxpInit(context);
 #endif
 }
@@ -4504,148 +4504,60 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
 
 void freeNamedPropertyLink(Context context, NamedPropertyLink link)
 {
-    if (link->name)
+    while (link)
     {
-        UNLINK(context, link->u.term);
-    }
-    else
-    {
-        unlinkHS2(context, link->u.propset);
-        link->u.propset = NULL;
-    }
-    UNLINK_Hashset(context, link->fvs);
-    
-    NamedPropertyLink next = link->link;
+        if (link->name)
+        {
+            UNLINK(context, link->u.term);
+        }
+        else
+        {
+            unlinkHS2(context, link->u.propset);
+            link->u.propset = NULL;
+        }
+        UNLINK_Hashset(context, link->fvs);
 
-    link->link = NULL;
-    link->fvs = NULL;
-    link->name = NULL; // No need to free name as it is stored in the pool.
-    FREE(context, link);
+        NamedPropertyLink next = link->link;
 
-    if (next && --next->nr == 0)
-        freeNamedPropertyLink(context, next); // tail.
+        link->link = NULL;
+        link->fvs = NULL;
+        link->name = NULL; // No need to free name as it is stored in the pool.
+        FREE(context, link);
+        link = NULL;
+
+        if (next && --next->nr == 0)
+            link = next;
+    }
 }
 
 void freeVariablePropertyLink(Context context, VariablePropertyLink link)
 {
-    if (link->variable)
+    while (link)
     {
-        unuseVariable(context, link->variable);
-        unlinkVariable(context, link->variable);
-        link->variable = NULL; // Not strictly needed
-        UNLINK(context, link->u.term);
-    }
-    else
-    {
-        unlinkHS2(context, link->u.propset);
-        link->u.propset = NULL;
-    }
-    UNLINK_Hashset(context, link->fvs);
-    
-    VariablePropertyLink next = link->link;
-    link->link = NULL;
-    link->fvs = NULL;
-    FREE(context, link);
+        if (link->variable)
+        {
+            unuseVariable(context, link->variable);
+            unlinkVariable(context, link->variable);
+            link->variable = NULL; // Not strictly needed
+            UNLINK(context, link->u.term);
+        }
+        else
+        {
+            unlinkHS2(context, link->u.propset);
+            link->u.propset = NULL;
+        }
+        UNLINK_Hashset(context, link->fvs);
 
-    if (next && --next->nr == 0)
-        freeVariablePropertyLink(context, next); // tail
+        VariablePropertyLink next = link->link;
+        link->link = NULL;
+        link->fvs = NULL;
+        FREE(context, link);
+        link = NULL;
+
+        if (next && --next->nr == 0)
+            link = next;
+    }
 }
-//
-//Properties allocateProperties(Context context, VARIABLESET namedFreeVars, VARIABLESET variableFreeVars,
-//                                 NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
-//{
-//    if (!namedFreeVars && !variableFreeVars && !namedProperties && !variableProperties)
-//        return context->noProperties;
-//
-//    Properties env = ALLOCATE(context, sizeof(struct _Properties));
-//    env->nr = 1;
-//    env->namedFreeVars = namedFreeVars;
-//    env->variableFreeVars = variableFreeVars;
-//    env->namedProperties = namedProperties;
-//    env->variableProperties = variableProperties;
-//    ASSERT_VARIABLE_PROPERTIES(context, env);
-//    return env;
-//}
-//
-//Properties setProperties(Context context, Properties props, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties)
-//{
-//    if (context->noProperties == props)
-//        return allocateProperties(context, NULL, NULL, namedProperties, variableProperties);
-//
-//    props->namedProperties = namedProperties;
-//    props->variableProperties = variableProperties;
-//    return props;
-//}
-//
-//Properties setNamedFreeVars(Context context, Properties props, VARIABLESET namedFreeVars)
-//{
-//    if (context->noProperties == props)
-//        return allocateProperties(context, namedFreeVars, NULL, NULL, NULL);
-//
-//    props->namedFreeVars = namedFreeVars;
-//    return props;
-//}
-//
-//Properties setVariableFreeVars(Context context, Properties props, VARIABLESET variableFreeVars)
-//{
-//    if (context->noProperties == props)
-//        return allocateProperties(context, NULL, variableFreeVars, NULL, NULL);
-//
-//    props->variableFreeVars = variableFreeVars;
-//    return props;
-//}
-//
-//Properties setNamedProperties(Context context, Properties props, NamedPropertyLink namedProperties)
-//{
-//    if (context->noProperties == props)
-//        return allocateProperties(context, NULL, NULL, namedProperties, NULL);
-//
-//    props->namedProperties = namedProperties;
-//    return props;
-//}
-//
-//Properties setVariableProperties(Context context, Properties props,
-//        VariablePropertyLink variableProperties)
-//{
-//    if (context->noProperties == props)
-//        return allocateProperties(context, NULL, NULL, NULL, NULL);
-//
-//    props->variableProperties = variableProperties;
-//    return props;
-//}
-//
-//inline Properties linkProperties(Context context, Properties env)
-//{
-//    env->nr++;
-//    return env;
-//}
-//
-//Properties unlinkProperties(Context context, Properties env)
-//{
-//    if (env && env != context->noProperties)
-//    {
-//        ASSERT(context, env->nr > 0);
-//
-//        if (--env->nr == 0)
-//        {
-//            UNLINK_VARIABLESET(context, env->namedFreeVars);
-//            env->namedFreeVars = NULL;
-//
-//            UNLINK_VARIABLESET(context, env->variableFreeVars);
-//            env->variableFreeVars = NULL;
-//
-//            UNLINK_NamedPropertyLink(context, env->namedProperties);
-//            env->namedProperties = NULL;
-//
-//            UNLINK_VariablePropertyLink(context, env->variableProperties);
-//            env->variableProperties = NULL;
-//
-//            FREE(context, env);
-//            return NULL;
-//        }
-//    }
-//    return env;
-//}
 
 
 //

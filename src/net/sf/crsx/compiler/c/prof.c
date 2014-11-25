@@ -631,6 +631,7 @@ void crsxpMergeBacktrace(Context context, FILE* file)
             ProfCSVEntry start = *topProfCSVEntry(entries);
             popProfCSVEntry(entries);
 
+            assert(!emptyProfReportStack(report));
             ProfReport current = *topProfReport(report);
             popProfReport(report);
 
@@ -652,6 +653,10 @@ void crsxpMergeBacktrace(Context context, FILE* file)
                     top->step);
         }
     }
+
+
+    freeProfCSVEntryStack(entries);
+    freeProfReportStack(report);
 
     printReport(context, root, maxLength + 1 + maxNesting, time - start);
 }

@@ -858,7 +858,7 @@ struct _Sink
 
 #define SINK_IS_BUFFER(sink) (((Sink)(sink))->kind == SINK_IS_BUFFER)
 
-#define BUFFER_SEGMENT_SIZE 127
+#define BUFFER_SEGMENT_SIZE 7
 
 struct _Buffer
 {
