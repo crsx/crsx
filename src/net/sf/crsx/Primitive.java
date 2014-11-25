@@ -106,6 +106,9 @@ public enum Primitive
     DECODE_POINT("DecodePoint", 1, 1),
     /** $[Trim, #string) has extreme spaces removed. */
     TRIM("Trim", 1, 1),
+
+    /** $[Literal, #p] is condition to check that #p is a literal. */
+    LITERAL("Literal", 1, 2),
     
     // Sequence operations.
 
@@ -213,7 +216,7 @@ public enum Primitive
     /** $[MatchRegex, #regex, #p], for constant #regex, is match pattern that only matches constants that fit the regular expression #regex and also match #p.
      *   Can also be used as evaluator where it returns the boolean result of whether */
     MATCH_REGEX("MatchRegex", 1, 2),
-    /** $[IsInteger, #p] is match pattern that only matches constants that both fit the regular expression "[-+]*[0-9]+" and also match #p. */
+    /** $[IsInteger, #p] is condition to check that #p fits the regular expression "[-+]*[0-9]+"; as a match pattern the redex must fit and also match #p. */
     IS_INTEGER("IsInteger", 1, 2),
     
 	/** TODO. */

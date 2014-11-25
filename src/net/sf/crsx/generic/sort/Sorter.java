@@ -1274,6 +1274,12 @@ public class Sorter
 				sort = freshForm(CRS.BOOLEAN_SORT, 0);
 				break;
 			}
+			case LITERAL : {
+				// Test one value...
+				argumentsorts[0] = factory.newVariableUse(freshSortVariable());
+				sort = freshForm(CRS.BOOLEAN_SORT, 0);
+				break;
+			}
 			case MATCH :
 			case NOT_MATCH : {
 				// match has two arguments and is of the same type
@@ -1498,7 +1504,7 @@ public class Sorter
 				for (int i = 1; i < argumentsorts.length; i ++)
 					argumentsorts[i] = (GenericTerm) term.sub(0).sub(i); 
 				break;
-				
+
 			case VARIABLE_NAME_IS : {
 				Variable alpha = freshSortVariable();
 				sort = factory.newVariableUse(alpha);
@@ -1534,6 +1540,7 @@ public class Sorter
 			case PROPERTY_VARIABLE_NOT :
 			case PROPERTY_COLLECT :
 			case IGNORE :
+			default :
 				for (int i = 0; i < argumentsorts.length; i++)
 					argumentsorts[i] = freshSortVariableUse();
 				sort = freshSortVariableUse();
