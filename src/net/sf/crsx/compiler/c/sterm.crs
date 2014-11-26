@@ -51,6 +51,7 @@ S-Send-PropertyRef
 {#env}
 ST-send[PROPERTY-REF[#Ref, #Use, #term], #sink]  
 →
+{#env}
 ST-send[#term, #sink] // TODO
 //%n⟪«{#env}ST-send-property-ref[$[:,"MetaVar$",#Ref], #Use, #sink]»« {#env}ST-send-property-ref2[$[{#env}Get[STRING_ENTRY], "$Binders", LIST_VARIABLE[()]], #term, #sink] »⟫
 ;

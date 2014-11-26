@@ -2820,9 +2820,9 @@ public class Completer
 		if (rs.size() == 1)
 			relevantRules = rs;
 		
-		//String rulename = rs.iterator().next().getName().symbol();
-		//if (rulename.contains("Code-lift-13"))
-		//	System.out.println("Have rule.");
+		String rulename = rs.iterator().next().getName().symbol();
+		if (rulename.contains("R-R4-R4a-Form-for-at2-1"))
+			System.out.println("Have rule.");
 		
 		// STEP 1: find a position where we can split, and decide what to split on
 		final Pair<Integer,Object> splitPos = getSplitPosition(relevantRules);
@@ -3509,12 +3509,12 @@ public class Completer
 		Constructor c = factory.makeConstructor(F);
 		GenericTerm ret = factory.newConstruction(c, binders, subterms);
 		
-		boolean includePropertyReference = Util.hasProperties(example);
-		if (!includePropertyReference)
-		{
-			factory.formsOf(F);
-			includePropertyReference = true;
-		}
+		boolean includePropertyReference = Util.hasNoStandardProperties(example);
+//		if (!includePropertyReference)
+//		{
+//			factory.formsOf(F);
+//			includePropertyReference = true;
+//		}
 		if (!includePropertyReference)
 		{
 			Term sort = factory.sortOf(F);
@@ -4749,6 +4749,9 @@ public class Completer
 					pcw.setProperties((PropertiesConstraintsWrapper) pattern);
 					alteredPattern = pcw;
 				}
+				if (Util.hasPropertyRef(exampleForm) && !Util.hasProperties(exampleForm))
+					System.out.println("ISSUE??");
+					
 				if (Util.hasProperties(exampleForm))
 				{
 					alteredForm = alteredForm.wrapWithPropertiesOf(exampleForm); // we cannot use exampleForm any more!

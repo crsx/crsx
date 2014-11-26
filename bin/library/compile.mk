@@ -1,10 +1,9 @@
 # Makefile for compiling crsx files.
 # Arguments are
+# CRSXHOME  : crsx root directory
 # CRSXFILE  : name of the file to compile
 # OUTPUTDIR : where to put generated files
 # MODE      : crsx compilation mode. STRICT or empty  
-
-CRSXHOME = $(abspath ../../)
 
 ifndef MAKEFILE_CC
 MAKEFILE_CC=$(CRSXHOME)/Env.mk
@@ -21,8 +20,8 @@ ifndef OUTPUTDIR
 OUTPUTDIR=$(crspath)
 endif
 
-crsdrfile = $(crsbasename).dr
-crsbinfile = $(crsbasename)
+crsdrfile = $(OUTPUTDIR)/$(crsbasename).dr
+crsbinfile = $(OUTPUTDIR)/$(crsbasename)
 
 objs=
 
@@ -42,22 +41,25 @@ LDFLAGS+=-L$(ICU4CDIR)
 
 all: $(crsbinfile)
 clean::
-	@rm -f $(crsdrfile) $(crsbinfile)
+	@rm -f $(crsdrfile) $(crsbinfile) $(header) $(data) $(function) $(symbols)
+
+prereq:
+	mkdir -p $(OUTPUTDIR)
 
 # Generate C files
 
-$(crsbasename) : $(crsbasename).dr
+$(OUTPUTDIR)/$(crsbasename) : $(crsbasename).dr
 
-$(crsdrfile): $(CRSFILE)
+$(crsdrfile): $(CRSFILE) prereq
 	@$(RUNCRSXRC) 'grammar=("net.sf.crsx.text.Text";)' rules="$<" simple-terms sortify dispatchify reify="$@" 
 
-$(data): $(crsdrfile)
+$(data): $(crsdrfile) prereq
 	@export HEADERS="$(crsbasename).h" && $(CRSXC) compile sorts "$<" > "$@"
 
-$(header): $(crsdrfile)
+$(header): $(crsdrfile) prereq
 	@$(CRSXC) HEADERS=crsx.h $(MODE) wrapper=ComputeHeader input="$<" > "$@"
 
-$(function): $(crsdrfile)
+$(function): $(crsdrfile) prereq
 	@$(CRSXC) HEADERS="$(crsbasename).h" $(MODE) CANONICAL_VARIABLES=1 wrapper=ComputeRules input="$<" > "$@"
 		
 # Compile C files
@@ -90,12 +92,12 @@ $(OUTPUTDIR)/main.o: $(COMPILERSRC)/c/main.c $(COMPILERSRC)/c/linter.h $(COMPILE
 $(OUTPUTDIR)/invariant.o: $(COMPILERSRC)/c/invariant.c $(COMPILERSRC)/c/invariant.h $(COMPILERSRC)/c/crsx.h
 $(OUTPUTDIR)/prof.o: $(COMPILERSRC)/c/prof.c $(COMPILERSRC)/c/prof.h $(COMPILERSRC)/c/crsx.h
 
-$(OUTPUTDIR)/%.o: $(COMPILERSRC)/c/%.c   
+$(OUTPUTDIR)/%.o: $(COMPILERSRC)/c/%.c prereq 
 	$(CC) $(CCFLAGS) -c "$<" -o "$@"
 
-$(OUTPUTDIR)/%.o: $(OUTPUTDIR)/%.c   
+$(OUTPUTDIR)/%.o: $(OUTPUTDIR)/%.c $(header) prereq  
 	$(CC) $(CCFLAGS) -c "$<" -o "$@"
 
-$(crsbasename): $(objs) 
+$(OUTPUTDIR)/$(crsbasename): $(objs) 
 	$(CXX) $(objs) $(ICU4CLIB) $(RTLIB) $(LDFLAGS) -o "$@"
 		

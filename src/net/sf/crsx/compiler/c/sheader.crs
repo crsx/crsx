@@ -20,7 +20,7 @@ SH-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[
 SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 →
 %n⟪« MapText[f.H-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
-extern int «MANGLE[#function]»(Sink« SH-Arg[#Forms, $False] »);
+extern int «MANGLE[#function]»(Sink, ssize_t« SH-Arg[#Forms, $False] »);
 ⟫
 ;
 

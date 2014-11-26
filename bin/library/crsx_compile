@@ -8,7 +8,7 @@ function show_help {
 	echo " where"
  #	echo "   --cp <path>        colon-separated class paths"
  #   echo "   -p <parser>        colon-separated parser qualified name"   
- #   echo "   -o <output-dir>    directory where to store generated files"
+    echo "   -o <output-dir>    directory where to store generated files"
     echo "   -d                 includes debugging information in generated executable"
     echo "   --strict           generate code using strict mode."
     echo "   --clean            clean all intermediate files before compiling."
@@ -29,7 +29,7 @@ function run_compile {
     local debug=
     local strict=
     local new=
-    local clean=N
+    local clean=
 	while :
     do
    		case $1 in
@@ -80,7 +80,7 @@ function run_compile {
                 shift
                 ;;
             --clean)
-                clean=Y
+                clean=clean
                 shift
                 ;;
    			-*)
@@ -109,11 +109,6 @@ function run_compile {
 	local inputname="${input%.*}"
 	local inputext="${input##*.}"
 	
-	if [ "$clean" = Y ]
-	then
-	   make -f ${DIR}/library/compile.mk CRSFILE=${input} clean
-    fi
-	    
-	make -f ${DIR}/library/compile.mk CRSFILE=${input} MODE=${strict}			
+    make -f ${DIR}/library/compile.mk CRSXHOME=${ROOT} CRSFILE=${input} OUTPUTDIR=${output} MODE=${strict} ${clean} all			
 }
 	

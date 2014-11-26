@@ -76,6 +76,8 @@ STRING_ENTRY ::=
     ARG_SORT[Reified_Sort];    
 	PROPERTY_VARIABLE[Reified_Variable, Reified_Variable];
 
+    TOPARGS[$List[Reified_FormArgument]]; // Key: $TopArgs
+
 	NO; YES;
 );
 
@@ -97,7 +99,8 @@ VARIABLE_ENTRY ::=
 // Sort for stages of pattern matching generation:
 Pattern-Stage ::=(
   DISPATCH[$String,$List[Reified_Option],$String]; // processing common part of dispatch function
-  CASE[$String,$List[Reified_Option],$String];     // processing one pattern case of dispatch function
+  CASE[$String,$List[Reified_Option],$String];     // processing top pattern case of dispatch function
+  SUBCASE[$String,$List[Reified_Option],$String];  // processing sub-component of pattern case of dispatch function
   MATCH;                                           // processing top pattern for simple contraction rule
   SUBMATCH;                                        // processing sub-component of pattern 
 );
