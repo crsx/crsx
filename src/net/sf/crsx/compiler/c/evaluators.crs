@@ -402,7 +402,7 @@ Send-IntersectVariables[Fresh[list::Text,vs::Text,size::Text,v::Text,next::Text]
 {#env} E-send[E_IntersectVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
-« {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
+« {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",<OL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
 addVariable(«vs», linkVariable(«#sink»->context, «v»));
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
 UNLINK(«#sink»->context, «list»);
@@ -1105,6 +1105,17 @@ E-set-deep-equal[(CONSTRUCTION[#kind, #Value, #Sort];), #sink, #term1, #term2, #
 E-set-deep-equal[(#BoolTerm;), #sink, #term1, #term2, #bool]
 →
 %n⟪int «checkenv»; «{#env} T-set-bool[#BoolTerm, #sink, checkenv]»«#bool» = deepEqual(«#sink»->context, «#term1», «#term2», «checkenv»);⟫
+;
+
+// $[Literal, #] check whether # is a literal
+//
+BOOL_PRIMITIVE[E_Literal];
+
+Set-Bool-Literal[Fresh[term::Text]]:
+{#env}E-set-bool[E_Literal, (#Name; #Term;), #Options, #sink, #bool]
+→
+%n⟪{ ⟦Term «term»; «{#env}T-set[#Term, #sink, term]»«#bool» = IS_LITERAL(«term»);⟧
+}⟫
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1902,11 +1913,12 @@ Set-String-Show-Local
 //
 STRING_PRIMITIVE[E_Symbol];
 
-Set-String-Symbol
+Set-String-Symbol[Fresh[term::Text]]
 :
-{#env}E-set-string[E_Symbol, (#Name; #Var;), #Options, #sink, #str] 
-→ 
-%n⟪«#str» = SYMBOL(«#Var»);
+{#env}E-set-string[E_Symbol, (#Name; #Term;), #Options, #sink, #str] 
+→
+%n⟪{⟦ Term «term»;
+« {#env} T-set[#Term, #sink, term] »«#str» = SYMBOL(«term»);⟧}
 ⟫;
 
 // TODO: should be polymorphic.

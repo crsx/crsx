@@ -837,11 +837,16 @@ public class GenericEvaluator extends FixedGenericConstruction
 				// $[EmptySequence, sequence]
                 computeArguments();
                 if (sub(1).kind() == Kind.CONSTRUCTION)
-                {
                     return rewrapWithProperties(factory.literal(Util.isNull(sub(1))));
-                }
                 break;
 			}
+
+            case LITERAL :
+            	// $[Literal, literal]
+            	computeArguments();
+                if (sub(1).kind() == Kind.CONSTRUCTION)
+                	return rewrapWithProperties(factory.literal(Util.isLiteral(sub(1))));
+                break;
 			
 			case CONSTRUCTION : {
                 // $[C[sort?], constructor, (argument1; ...; argumentN;)]
@@ -1692,7 +1697,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             	// $[Symbol, term]
 ///            	contractArgument(1);
                 return rewrapWithProperties(factory.literal(Util.symbol(sub(1))));
-
+                
             case COMPUTE :
             	// $[Compute, term]
             	computeArguments();
