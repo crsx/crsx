@@ -282,7 +282,7 @@ static inline void freeSegment(Context context, BufferSegment segment)
     if (context->segmentPoolSize < MAX_SEGMENT_POOL_SIZE)
     {
         segment->next = context->segmentPool;
-        context->segmentPool = segment->next;
+        context->segmentPool = segment;
         context->segmentPoolSize ++;
     }
     else
