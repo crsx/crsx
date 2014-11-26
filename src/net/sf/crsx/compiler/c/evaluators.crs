@@ -402,7 +402,7 @@ Send-IntersectVariables[Fresh[list::Text,vs::Text,size::Text,v::Text,next::Text]
 {#env} E-send[E_IntersectVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
-« {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",<OL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
+« {#env} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
 addVariable(«vs», linkVariable(«#sink»->context, «v»));
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
 UNLINK(«#sink»->context, «list»);
