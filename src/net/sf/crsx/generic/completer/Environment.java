@@ -119,9 +119,7 @@ final public class Environment
 		{
 			nextNewSymbol.put(base, number + 1);
 			newc = factory.makeConstructor(base + "$" + number);
-		}
-				if (newc.symbol().contains("CC-Procedure-Producer1$4"))
-					factory.message("karma");
+		}		
 		return newc;
 	}
 

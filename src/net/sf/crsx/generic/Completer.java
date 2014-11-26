@@ -2820,10 +2820,10 @@ public class Completer
 		if (rs.size() == 1)
 			relevantRules = rs;
 		
-		String rulename = rs.iterator().next().getName().symbol();
-		if (rulename.contains("R-R4-R4a-Form-for-at2-1"))
-			System.out.println("Have rule.");
-		
+//		String rulename = rs.iterator().next().getName().symbol();
+//		if (rulename.contains("R-R4-R4a-Form-for-at2-1"))
+//			System.out.println("Have rule.");
+//		
 		// STEP 1: find a position where we can split, and decide what to split on
 		final Pair<Integer,Object> splitPos = getSplitPosition(relevantRules);
 		if (splitPos == null)
@@ -2960,9 +2960,9 @@ public class Completer
 	 */
     protected StandardizedRule createNormalRule(StandardizedRule rule) throws CRSException
     {
-	    if (Util.symbol(rule.getPattern()).contains("CRSX2Text"))
-	    	warning("karma");
-	    
+//	    if (Util.symbol(rule.getPattern()).contains("CRSX2Text"))
+//	    	warning("karma");
+//	    
 	    Map<String,String> metaRename = new HashMap<String,String>();
 	    Map<String,Variable> varChange = new HashMap<String,Variable>();
 	    lookupFreeVariablesAndMetas(rule.getPattern(), varChange, metaRename);
