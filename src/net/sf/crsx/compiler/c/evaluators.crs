@@ -1332,8 +1332,26 @@ Set-Int-BitMinus[Fresh[i1::Text,i2::Text]]:
 «{#env}T-set-int[#Left, #sink, i1]»«{#env}T-set-int[#Right, #sink, i2]»«#num» = «i1» &(~«i2»); ⟧}
 ⟫;
 
+// $[BitShiftLeft, #i1, #i2] is the integer with the bits in #i1 shifted left by #2
+//
+INT_PRIMITIVE[E_BitShiftLeft];
+
+Set-Int-BitShiftLeft[Fresh[i1::Text,i2::Text]]:
+{#env}E-set-int[E_BitShiftLeft, (#Name; #Left; #Right;), #Options, #sink, #num] → %n⟪{⟦ long long «i1», «i2»;
+«{#env}T-set-int[#Left, #sink, i1]»«{#env}T-set-int[#Right, #sink, i2]»«#num» = «i1» << «i2»; ⟧}
+⟫;
+
+// $[BitShiftRight, #i1, #i2] is the integer with the bits in #i1 shifted Right by #2
+//
+INT_PRIMITIVE[E_BitShiftRight];
+
+Set-Int-BitShiftRight[Fresh[i1::Text,i2::Text]]:
+{#env}E-set-int[E_BitShiftRight, (#Name; #Left; #Right;), #Options, #sink, #num] → %n⟪{⟦ long long «i1», «i2»;
+«{#env}T-set-int[#Left, #sink, i1]»«{#env}T-set-int[#Right, #sink, i2]»«#num» = «i1» >> «i2»; ⟧}
+⟫;
+
 // $[HashCode, #term[, #bool]] returns a hash code for #term. When #bool is true, returns hashcode for term and environment.
-// TODO:
+//
 INT_PRIMITIVE[E_HashCode];
 
 Set-Int-HashCode[Fresh[term::Text]]

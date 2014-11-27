@@ -475,6 +475,34 @@ public class GenericEvaluator extends FixedGenericConstruction
 				{}
 				break;
 
+			case BIT_SHIFT_LEFT :
+				// $[BitMinus, n1, n2]
+				computeArguments();
+				if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break;
+				try
+				{
+					long left = Long.decode(Util.symbol(sub(1)));
+					long right = Long.decode(Util.symbol(sub(2)));
+					return rewrapWithProperties(factory.literal(left << right));
+				}
+				catch (NumberFormatException e)
+				{}
+				break;
+
+			case BIT_SHIFT_RIGHT:
+				// $[BitMinus, n1, n2]
+				computeArguments();
+				if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break;
+				try
+				{
+					long left = Long.decode(Util.symbol(sub(1)));
+					long right = Long.decode(Util.symbol(sub(2)));
+					return rewrapWithProperties(factory.literal(left >> right));
+				}
+				catch (NumberFormatException e)
+				{}
+				break;
+
 			case BIT_SUB_SET_EQ : {
 				// $[BitSubSetEq, small, large]
 				computeArguments();

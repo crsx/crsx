@@ -1222,6 +1222,8 @@ public class Sorter
 			case BIT_OR :
 			case BIT_XOR :
 			case BIT_MINUS :
+			case BIT_SHIFT_LEFT :
+			case BIT_SHIFT_RIGHT :
 			case BIT_NOT : {
 				// generate number from number(s)
 				for (int i = 0; i < argumentsorts.length; i++)

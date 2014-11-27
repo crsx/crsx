@@ -147,6 +147,10 @@ public enum Primitive
 	BIT_NOT("BitNot", 1, 1),
 	/** $[BitMinus, #i1, #i2] is the integer with the bits in #i1 which are not in #i2. */
 	BIT_MINUS("BitMinus", 2, 2),
+	/** $[BitShiftLeft, #i1, #i2] is the integer with the bits in #i1 shifted left the amount in #i2 (as unsigned division by a power of 2). */
+	BIT_SHIFT_LEFT("BitShiftLeft", 2, 2),
+	/** $[BitShiftRight, #i1, #i2] is the integer with the bits in #i1 shifted right the amount in #i2 (with no sign magic). */
+	BIT_SHIFT_RIGHT("BitShiftRight", 2, 2),
 	
 	// Logical operators.
 	
