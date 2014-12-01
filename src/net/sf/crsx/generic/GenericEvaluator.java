@@ -2701,6 +2701,40 @@ public class GenericEvaluator extends FixedGenericConstruction
 			case ERROR :
 				error();
 				break;
+
+			case LT :
+			case GT :
+			case GE :
+			case LE :
+			case NE :	
+			case EQ :
+			case NUMEQ :
+				if (sub(1).kind() == Kind.META_APPLICATION && sub(1).arity() == 0
+					&& Util.isNumeric(sub(2))
+					&& ((Pattern) sub(1)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
+				{
+					Term result = match.getSubstitute(sub(1).metaVariable()).getBody();
+					int other = Util.integer(sub(2));
+					if (Util.isNumeric(result))
+						switch (what)
+						{
+						case LT :
+							return Util.integer(result ) < other;
+						case GT :
+							return Util.integer(result ) > other;
+						case GE :
+							return Util.integer(result ) >= other;
+						case LE :
+							return Util.integer(result ) <= other;
+						case EQ :
+						case NUMEQ :
+							return Util.integer(result ) == other;
+						case NE :
+							return Util.integer(result ) != other;
+						default :
+						}
+				}
+				break;
 		}
 		// Fall back to plain literate matching.
 		return super.match(match, term, bound, contractionCount, promiscuous, once, onceSeen);
