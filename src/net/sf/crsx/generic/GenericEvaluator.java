@@ -571,6 +571,14 @@ public class GenericEvaluator extends FixedGenericConstruction
                 double right = Double.parseDouble(Util.symbol(sub(2)));
                 return rewrapWithProperties(factory.literal(left == right));
             }
+            case NUMNE : {
+            	// $[NumericNotEqual, t1, t2]
+                computeArguments();
+                if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break; // "Can only compare two constant values!"
+                double left = Double.parseDouble(Util.symbol(sub(1)));
+                double right = Double.parseDouble(Util.symbol(sub(2)));
+                return rewrapWithProperties(factory.literal(left != right));
+            }
             case ELAPSED : {
             	return rewrapWithProperties(factory.literal(System.currentTimeMillis())); // TODO
             }
@@ -2709,30 +2717,46 @@ public class GenericEvaluator extends FixedGenericConstruction
 			case NE :	
 			case EQ :
 			case NUMEQ :
-				if (sub(1).kind() == Kind.META_APPLICATION && sub(1).arity() == 0
-					&& Util.isNumeric(sub(2))
-					&& ((Pattern) sub(1)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
+				if (Util.isMetaApplication(sub(1)) && sub(1).arity() == 0 && ((Pattern) sub(1)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
 				{
-					Term result = match.getSubstitute(sub(1).metaVariable()).getBody();
-					int other = Util.integer(sub(2));
-					if (Util.isNumeric(result))
-						switch (what)
-						{
-						case LT :
-							return Util.integer(result ) < other;
-						case GT :
-							return Util.integer(result ) > other;
-						case GE :
-							return Util.integer(result ) >= other;
-						case LE :
-							return Util.integer(result ) <= other;
-						case EQ :
-						case NUMEQ :
-							return Util.integer(result ) == other;
-						case NE :
-							return Util.integer(result ) != other;
-						default :
-						}
+					Term candidateTerm = match.getSubstitute(sub(1).metaVariable()).getBody();
+					if (!Util.isNumeric(candidateTerm))
+						return false;
+					int candidate = Util.integer(candidateTerm);
+					int base;
+					if (Util.isNumeric(sub(2)))
+					{
+						base = Util.integer(sub(2));
+					}
+					else if (Util.isMetaApplication(sub(2))&& sub(2).arity() == 0 && ((Pattern) sub(2)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
+					{
+						Term baseTerm = match.getSubstitute(sub(2).metaVariable()).getBody();
+						if (baseTerm == null || !Util.isNumeric(baseTerm))
+							return false;
+						base = Util.integer(baseTerm);
+					}
+					else 
+					{
+						break;
+					}
+					switch (what)
+					{
+					case LT :
+						return candidate < base;
+					case GT :
+						return candidate > base;
+					case GE :
+						return candidate >= base;
+					case LE :
+						return candidate <= base;
+					case EQ :
+					case NUMEQ :
+						return candidate == base;
+					case NE :
+					case NUMNE :
+						return candidate != base;
+					default :
+					}
 				}
 				break;
 		}

@@ -129,6 +129,8 @@ public enum Primitive
 	MODULO("Modulo", 2, 2),
 	/** $[NumericEqual, #1, #2]  test equality of #1, #2, result is boolean. */
 	NUMEQ("NumericEqual", 2, 2),
+	/** $[NumericNotEqual, #1, #2]  test non-equality of #1, #2, result is boolean. */
+	NUMNE("NumericNotEqual", 2, 2),
 	/** $[Absolute, #1]  gives the absolute value. */
 	ABSOLUTE("Absolute", 1, 1),
 
@@ -291,9 +293,9 @@ public enum Primitive
 	PRINT("Print", 1, 2),
 	/** $[Echo, #constant[, #result]] echoes #constant (unquoted and without adding a newline) and otherwise acts like #result (defaults to ()). */
 	ECHO("Echo", 1, 2),
-	/** $[Show, #term] is a constant with the textual representation of #term as the string value. */
+	/** $[Show, #term] is a constant with the textual representation of #term as a string value. */
 	SHOW("Show", 1, 1),
-	/** $[Symbol, #term] is a constant with the textual representation of the root of #term as the string value. */
+	/** $[Symbol, #term] is a constant with the textual representation of the root of #term as a string value. */
 	SYMBOL("Symbol", 1, 1),
 	/** $[FormatNumber, #number [,#format]] is a string representing the number. */
 	FORMAT_NUMBER("FormatNumber", 1, 2),

@@ -1269,7 +1269,8 @@ public class Sorter
 			case GT :
 			case LE :
 			case GE :
-			case NUMEQ : {
+			case NUMEQ :
+			case NUMNE : {
 				// Test two numeric values
 				argumentsorts[0] = freshForm(CRS.NUMERIC_SORT, 0);
 				argumentsorts[1] = freshForm(CRS.NUMERIC_SORT, 0);
