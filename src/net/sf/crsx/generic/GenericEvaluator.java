@@ -388,7 +388,10 @@ public class GenericEvaluator extends FixedGenericConstruction
 				if (!Util.isConstant(sub(1))) break; // "Can only parse constant values!"
 				try
 				{
-					return rewrapWithProperties(factory.literal(Long.parseLong(Util.symbol(sub(1)), 10)));
+					String sym = Util.symbol(sub(1));
+					if (sym.startsWith("0x") || sym.startsWith("0X"))
+						return rewrapWithProperties(factory.literal(Long.parseLong(sym.substring(2), 16)));
+					return rewrapWithProperties(factory.literal(Long.parseLong(sym, 10)));
 				}
 				catch (NumberFormatException e)
 				{}
@@ -400,7 +403,9 @@ public class GenericEvaluator extends FixedGenericConstruction
 				if (!Util.isConstant(sub(1))) break; // "Can only hex constant values!"
 				try
 				{
-					return rewrapWithProperties(factory.literal(Long.parseLong(Util.symbol(sub(1)), 16)));
+					String hex = Util.symbol(sub(1));
+					if (hex.startsWith("0x") || hex.startsWith("0X")) hex = hex.substring(2);
+					return rewrapWithProperties(factory.literal(Long.parseLong(hex, 16)));
 				}
 				catch (NumberFormatException e)
 				{}
