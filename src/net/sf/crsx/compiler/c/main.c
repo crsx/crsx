@@ -53,9 +53,9 @@ readTermFromString(Context context, const char* text)
 }
 
 static Term
-normalizeTerm (Context context, Term term, const char* wrapper)
+normalizeTerm (Context context, Term term, char* wrapper)
 {
-    assert (context && term);
+    assert (context);
 
     Sink sink = MAKE_BUFFER (context);
     assert (sink);
@@ -71,7 +71,8 @@ normalizeTerm (Context context, Term term, const char* wrapper)
         }
         PROPERTIES_RESET (sink);
         sink->start(sink, dtor);
-        COPY (sink, term);
+        if (term)
+            COPY (sink, term);
         sink->end(sink, dtor);
         redex = BUFFER_TERM (sink);
     }
@@ -135,11 +136,13 @@ int run(void)
 			term = readTermFromString(context, interm);
 		}
 	}
-	if (!term)
-        return printUsage("No input/term specified?");
+	char* wrapper = getenv("wrapper");
+
+	if (!term && !wrapper)
+        return printUsage("No input and no wrapper specified.");
 
     // eval: term -> term
-    term = normalizeTerm(context, term, getenv("wrapper"));
+    term = normalizeTerm(context, term, wrapper);
     if (term == NULL)
     	return 1;
 

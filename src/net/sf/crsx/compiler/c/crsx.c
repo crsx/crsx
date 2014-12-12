@@ -228,7 +228,7 @@ struct _ConstructionDescriptor literalConstructionDescriptor =
     0,                                          //.arity
     sizeof(struct _Literal),                    //.size
     noBinderOffsets,                            //.binderoffset
-    (char *(*)(Term term))&literalName,         //.name  (ugly cast added by sboag... Kris will have to evaluate doing the right fix.)
+    (char *(*)(Term term))&literalName,         //.name
     &dataStep                                   //.step
 };
 
@@ -3285,7 +3285,7 @@ Term normalizep(Context context, Term term)
 
 void normalize(Context context, Term *termp)
 {
-    // Work term.
+    ASSERT(context, (*termp)->nr > 0);
 #ifdef DEBUG
     Term topTerm = *termp;
     DEBUGCOND(context->debugtrace, DEBUGF(context, "//%*sNORMALIZING\n", stepNesting+1, ""));
@@ -3497,12 +3497,64 @@ long elapsed(Context context)
 #endif
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+// Closure.
+
+int closureStep(Sink sink, Term term)
+{
+    return 0; // no computation possible
+}
+
+const char *closureName(Term term)
+{
+    return "$CLOSURE$";
+}
+
+struct _ConstructionDescriptor closureConstructionDescriptor =
+{
+    NULL,                                       //.sort
+    1,                                          //.sortoffset
+    0,                                          //.arity
+    sizeof(struct _ClosureTerm),                //.size
+    noBinderOffsets,                            //.binderoffset
+    (char *(*)(Term term))&closureName,         //.name
+    &closureStep                                   //.step
+};
+
+Term makeClosureTerm(Context context, Closure c)
+{
+    ClosureTerm term = ALLOCATE(context, sizeof(struct _ClosureTerm));
+    term->construction.term.descriptor = &closureConstructionDescriptor;
+    term->construction.term.nr = 1;
+#ifdef CRSX_ENABLE_PROFILING
+    term->construction.term.marker = 0;
+#endif
+    term->construction.nf = 1;
+    term->construction.nostep = 1;
+
+    term->construction.namedProperties = NULL;
+    term->construction.variableProperties = NULL;
+
+    term->construction.fvs = NULL;
+    term->construction.nfvs = NULL;
+    term->construction.vfvs = NULL;
+
+    term->closure = c;
+    return (Term) term;
+}
+
 int idclosure(Sink sink, CEnv env, Term var)
 {
     ASSERT(sink->context, env == NO_CENV);
     COPY(sink, var);
     return 1;
 }
+
+void freeCEnv(Context context, CEnv env)
+{
+    FREE(context, env);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 // Substitution.
@@ -5015,7 +5067,7 @@ void fprintTermWithIndent(Context context, FILE* out, Term term)
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
-    fprintTermTop(context, out, term, INT16_MAX, set, used, 1, &pos, getenv("omit-properties") ? 0 : 10, 0);
+    fprintTermTop(context, out, term, INT16_MAX, set, used, 0, &pos, getenv("omit-properties") ? 0 : 10, 0);
     FPRINTF(context, out, "\n");
     freeVariableSet(set);
     fprintCookies(context);
@@ -5058,7 +5110,7 @@ void fprintTermFullWithIndent (Context context, FILE* out, Term term)
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
-    fprintTermTop(context, out, term, INT32_MAX, set, used, 1, &pos, INT32_MAX, 0);
+    fprintTermTop(context, out, term, INT32_MAX, set, used, 0, &pos, INT32_MAX, 0);
     FPRINTF(context, out, "\n");
     freeVariableSet(set);
     fprintCookies_new (context, out);

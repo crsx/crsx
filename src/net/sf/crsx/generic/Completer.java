@@ -3475,16 +3475,25 @@ public class Completer
 		{
 			// determine which group of binders is considered
 			int Nbinds;
-			//boolean[] promisc = null;
+			boolean[] block = null;
 			if (flattenFirst)
 			{
 				if (i < firstSubArgs)
 				{
 					Nbinds = example.binders(0).length + example.sub(0).binders(i).length;
+					block = new boolean[Nbinds];
+					int k = 0;
+					for (int j = 0; j <  example.binders(0).length; j++)
+						block[k++] = example.binders(0)[j].blocking();
+					for (int j = 0; j <  example.sub(0).binders(i).length; j++)
+						block[k++] = example.sub(0).binders(i)[j].blocking();
 				}
 				else if (i-firstSubArgs+1 < example.arity())
 				{
 					Nbinds = example.binders(i-firstSubArgs+1).length;
+					block = new boolean[Nbinds];
+					for (int j = 0; j <  Nbinds; j++)
+						block[j] = example.binders(i-firstSubArgs+1)[j].blocking();
 				}
 				else Nbinds = 0;	// might occur when extra is true
 			}
@@ -3492,6 +3501,9 @@ public class Completer
 			else
 			{
 				Nbinds = example.binders(i).length;
+				block = new boolean[Nbinds];
+				for (int j = 0; j <  Nbinds; j++)
+					block[j] = example.binders(i)[j].blocking();
 			}
 
 			// create the relevant x1...xn.#k[x1,...,xn]
@@ -3499,7 +3511,7 @@ public class Completer
 			GenericTerm[] args = new GenericTerm[Nbinds];
 			for (int j = 0; j < Nbinds; j++)
 			{
-				binders[i][j] = env.makeVariable("x" + j, true); // TODO: binders! 
+				binders[i][j] = env.makeVariable("x" + j, true, block[j], false); // TODO: binders! 
 				args[j] = factory.newVariableUse(binders[i][j]);
 			}
 			subterms[i] = standardPatternMetaApplication("#" + (metaIndexStart + i), args);

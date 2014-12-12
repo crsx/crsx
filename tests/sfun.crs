@@ -1,0 +1,13 @@
+SFun[(
+
+$Lax;
+
+∀ a b . Map[xᵇ::a . $sort[b], $List[a]] :: $List[b] ;
+Map[xᵇ.#[xᵇ], ()]       → () ;
+Map[xᵇ.#[xᵇ], (#1; #s)] → (#[#1]; Map[xᵇ.#[x], #s]) ;
+
+∀ a b . Fold[xᵇ::a yᵇ::b. $sort[a], a, $List[b]] :: a ;
+Fold[xᵇ yᵇ.#[x, y], #x, ()]       → #x ;
+Fold[xᵇ yᵇ.#[x, y], #x, (#1; #s)] → Fold[xᵇ yᵇ.#[x, y], #[#x, #1], #s];
+
+)]

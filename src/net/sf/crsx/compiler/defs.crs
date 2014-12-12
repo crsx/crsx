@@ -210,9 +210,22 @@ Forms-Constructors[$List[Reified_Form]] :: $List[$String];
 
 FormArguments-binder-count[$List[Reified_FormArgument], $Numeric] :: $Numeric;
 
--[Fresh[dummy::Reified_Variable]] : FormArguments-binder-count[(FORM-BINDER[#Kind, #Sort, b.#[b]]; #rest), #n] → FormArguments-binder-count[(#[dummy]; #rest), $[Plus,1,#n]] ;
--              			   : FormArguments-binder-count[(FORM-ARGUMENT[#Sort]          ; #rest), #n] → FormArguments-binder-count[#rest, #n] ;
--                          : FormArguments-binder-count[(                                     ), #n] → #n ;
+-[Fresh[dummy::Reified_Variable]]
+: 
+FormArguments-binder-count[(FORM-BINDER[#Kind, #Sort, b.#[b]]; #rest), #n] 
+→ 
+FormArguments-binder-count[(#[dummy]; #rest), $[Plus,1,#n]]
+;
+
+FormArguments-binder-count[(FORM-ARGUMENT[#Sort]; #rest), #n] 
+→ 
+FormArguments-binder-count[#rest, #n]
+;
+
+FormArguments-binder-count[( ), #n] 
+→ 
+#n 
+;
 
 FormArguments-binder-offsets[$List[Reified_FormArgument], $Numeric] :: $List[$Numeric];
 
@@ -222,6 +235,55 @@ FormArguments-binder-offsets[(FORM-BINDER[#Kind, #Sort, b.#Form[b]]; #rest), #n]
 
 FormArguments-binder-offsets[(FORM-ARGUMENT[#Sort]          ; #rest), #n] → (#n; FormArguments-binder-offsets[#rest, #n]) ;
 FormArguments-binder-offsets[(                                     ), #n] → () ;
+
+FormArguments-binder-count-strict[$List[Reified_FormArgument], $Numeric, $Numeric] :: $Numeric;
+
+-[Fresh[dummy::Reified_Variable]]
+: 
+FormArguments-binder-count-strict[(FORM-BINDER[KDATA, #Sort, b.#[b]]; #rest), #c, #n] 
+→ 
+FormArguments-binder-count-strict[(#[dummy]; #rest), $[Plus,1,#c], #n]
+;
+
+FormArguments-binder-count-strict[(FORM-BINDER[KFUNCTION, #Sort, b.#[b]]; #rest), #c, #n] 
+→ 
+FormArguments-binder-count-strict[#rest, 0, #n]
+;
+
+FormArguments-binder-count-strict[(FORM-ARGUMENT[#Sort]; #rest), #c, #n] 
+→ 
+FormArguments-binder-count-strict[#rest, 0, $[Plus, #c, #n]]
+;
+
+FormArguments-binder-count-strict[( ), #c, #n] 
+→ 
+$[Plus, #c, #n]
+;
+
+FormArguments-binder-offsets-strict[$List[Reified_FormArgument], $Numeric] :: $List[$Numeric];
+
+-[Fresh[dummy::Reified_Variable]] 
+: 
+FormArguments-binder-offsets-strict[(FORM-BINDER[KDATA, #Sort, b.#Form[b]]; #rest), #n] 
+→ 
+FormArguments-binder-offsets-strict[(#Form[dummy]; #rest), $[Plus,1,#n]] 
+;
+
+FormArguments-binder-offsets-strict[(FORM-BINDER[KFUNCTION, #Sort, b.#Form[b]]; #rest), #n] 
+→ 
+(0; FormArguments-binder-offsets-strict[#rest, #n]) 
+;
+
+FormArguments-binder-offsets-strict[(FORM-ARGUMENT[#Sort]; #rest), #n] 
+→ 
+(#n; FormArguments-binder-offsets-strict[#rest, #n])
+;
+
+FormArguments-binder-offsets-strict[(), #n] 
+→ 
+() 
+;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Identifiers.

@@ -1,0 +1,21 @@
+Factorial[(
+
+$Lax;
+
+Test :: $Numeric;
+
+Test → Fact[5];
+
+Fact[$Numeric] :: $Numeric;
+
+-[Data[#v]]
+:
+Fact[#v] →
+    $[If, $[Equal, #v, 1], #v, Times[#v, Fact[$[Minus, #v, 1]]]]
+;
+ 
+Times[$Numeric, $Numeric] :: $Numeric;
+
+-[Data[#v1, #v2]] : Times[#v1, #v2]    → $[Times,#v1,#v2];
+
+)]

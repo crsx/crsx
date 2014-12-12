@@ -34,6 +34,7 @@ typedef struct _Construction *Construction;
 typedef struct _Literal *Literal;
 typedef struct _ConstructionDescriptor *ConstructionDescriptor;
 typedef struct _SortDescriptor *SortDescriptor;
+typedef struct _ClosureTerm *ClosureTerm;
 typedef struct _Sink *Sink;
 typedef struct _SubstitutionFrame *SubstitutionFrame;
 typedef struct _Properties *Properties;
@@ -941,17 +942,31 @@ extern Term compute(Context context, Term term);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // CLOSURE
 
-typedef void** CEnv; // Closure environment. An array of pointers.
-typedef struct _Closure Closure;
-typedef int (*FuncP)(Sink, CEnv);
+// Closure environment.
+struct _CEnv
+{
+    size_t refcount;
+    void** values;  // Size known statically.
+};
+
+
+typedef struct _CEnv* CEnv;
 
 #define NO_CENV NULL
 
-// TODO: Extract closure from term.
-#define CLOSURE(term, subindex) { NULL, NULL }
+extern void freeCEnv(Context, CEnv);
 
-#define ID_CLOSURE { (FuncP) &idclosure, NO_CENV }
+static inline void unlinkCEnv(Context context, CEnv env)
+{
+    if (--env->refcount == 0)
+        freeCEnv(context, env);
+}
+
+typedef struct _Closure Closure;
+typedef int (*FuncP)(Sink, CEnv);
+
 extern int idclosure(Sink, CEnv, Term);
+#define ID_CLOSURE { (FuncP) idclosure, NO_CENV }
 
 struct _Closure
 {
@@ -959,10 +974,38 @@ struct _Closure
    CEnv env; // Optional environment.
 };
 
+static inline Closure linkClosure(Closure c)
+{
+    if (c.env)
+        c.env->refcount++;
+    return c;
+}
+
+// Term wrapping a closure
+// TODO: should not override construction (too heavy)
+struct _ClosureTerm
+{
+    struct _Construction construction; // extends _Term with term.descriptor==ClosureDescriptor
+    Closure closure;
+};
+
+// Make a term closure. The closure reference is consumed.
+extern Term makeClosureTerm(Context context, Closure c);
+
+#define SUBCLOSURE(t,i) subClosure(t, i)
+static inline Closure subClosure(Term term, int i)
+{
+    return ((ClosureTerm) SUB(term, i))->closure;
+}
+
+
 #ifndef CALL1
 # define CALL1(sink,closure,arg0) ((int (*)(Sink, CEnv, void*))closure.f)(sink, (closure).env, (void*)arg0)
 #endif
 
+#ifndef CALL2
+# define CALL2(sink,closure,arg0,arg1) ((int (*)(Sink, CEnv, void*, void*))closure.f)(sink, (closure).env, (void*)arg0, (void*)arg1)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // SUBSTITUTE

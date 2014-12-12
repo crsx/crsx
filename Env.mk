@@ -40,3 +40,4 @@ BUILD = $(CRSXHOME)/build
 RUNCRSXRC = $(JAVA) -Dfile.encoding=UTF-8 -Xss20000K -Xmx2000m -cp $(BUILD) net.sf.crsx.run.Crsx allow-unnamed-rules allow-missing-cases
 COMPILERSRC = $(CRSXHOME)/src/net/sf/crsx/compiler
 CRSXC = $(CRSXHOME)/bin/crsxc
+CRSX = $(CRSXHOME)/bin/crsx

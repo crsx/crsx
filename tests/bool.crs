@@ -1,0 +1,27 @@
+Bool[(
+
+Boolean ::= ( True; False; );
+
+And[Boolean, Boolean] :: Boolean;
+
+And[False, #] → False; 
+And[True, #]  → #; 
+
+Or[Boolean, Boolean] :: Boolean;
+
+Or[False, #]  → #; 
+Or[True, #]   → True; 
+
+Not[Boolean] :: Boolean;
+
+Not[True]     → False;
+Not[False]    → True; 
+
+EqualBool[Boolean, Boolean] :: Boolean;
+
+EqualBool[False, False]  → True;
+EqualBool[True,  True]   → True;
+EqualBool[False, True]   → False;
+EqualBool[True,  False]  → False;
+
+)]

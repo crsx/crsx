@@ -1,0 +1,17 @@
+TestIf[(
+
+$Lax;
+
+$Use["bool.crs"];
+
+Test :: Boolean;
+
+Test → $[If, $True, $[If, $True, TrueBranch, FalseBranch], FalseBranch];
+
+TrueBranch :: Boolean;
+TrueBranch → True;
+
+FalseBranch :: Boolean;
+FalseBranch → False;
+
+)]

@@ -6,6 +6,7 @@
 //
 // Every PRIMITIVE evaluator $Primitive in ../defs.crs needs several variants: 
 //
+// * {#env} E-eval[PRIMITIVE, ARGUMENT_TERMS, OPTIONS, sink] - evaluate primitive and send result to sink
 // * {#env} E-send[PRIMITIVE, ARGUMENT_TERMS, OPTIONS, sink] - send computed term to sink
 // * {#env} E-set[PRIMITIVE, ARGUMENT_TERMS, OPTIONS, sink, variable] - set Term variable
 // * {#env} E-set-ref[PRIMITIVE, ARGUMENT_TERMS, OPTIONS, sink, variable] - set Term reference variable. Variable owns a term reference.
@@ -164,6 +165,17 @@ E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#namedP, #varP]]
 %n⟪ ⟫
 ; // property refs are unlink at the end of the step function
 
+// Strict evaluation helpers
+
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-SendTail :: Text;
+
+{#env}
+E-SendTail 
+→
+$[IfDef, "STRICT", ST-send-tail[$[{#env}Get[STRING_ENTRY], "$Tail", NO]], %n⟪⟫] 
+;
 
 )];
 
@@ -1399,12 +1411,13 @@ $Meta[(
 
 -[Fresh[num::Text]]
 :
-{#env}E-send-num[#Primitive, #Args, #Options, #sink] 
+{#env}
+E-send-num[#Primitive, #Args, #Options, #sink] 
 → 
 %n⟪
 {⟦
 double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
-LITERALNF(«#sink», (size_t) 31, "%G", «num»);⟧
+LITERALNF(«#sink», (size_t) 31, "%G", «num»);«{#env}E-SendTail»⟧
 }⟫
 ;
 
@@ -2634,6 +2647,15 @@ Poly-Echo:
 ;
 
 )];
+
+E3[(
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-eval[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text] :: Text;
+
+Null-eval:             {#env}E-eval[E_Null, (#Name;), #Options, #sink] → %n⟪⟫ ;
+
+)];
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 )] //E

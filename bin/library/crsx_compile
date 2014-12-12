@@ -4,7 +4,7 @@
 
 function show_help {
 	echo "Usage : $0 compile help"
-	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [-n] <input.crs>"
+	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [--clean] [--nocompile] <input.crs>"
 	echo " where"
  #	echo "   --cp <path>        colon-separated class paths"
  #   echo "   -p <parser>        colon-separated parser qualified name"   
@@ -12,6 +12,7 @@ function show_help {
     echo "   -d                 includes debugging information in generated executable"
     echo "   --strict           generate code using strict mode."
     echo "   --clean            clean all intermediate files before compiling."
+    echo "   --nocompile        turn off compilation."
 }
 
 function run_compile {
@@ -30,6 +31,7 @@ function run_compile {
     local strict=
     local new=
     local clean=
+    local all=all
 	while :
     do
    		case $1 in
@@ -64,7 +66,7 @@ function run_compile {
    			    	show_help
    			    	exit 0
    			    fi
-   			    output=$2
+   			    output="OUTPUTDIR=$2"
    			    shift 2
    			    ;;
    			-d)
@@ -81,6 +83,10 @@ function run_compile {
                 ;;
             --clean)
                 clean=clean
+                shift
+                ;;
+            --nocompile)
+                all=
                 shift
                 ;;
    			-*)
@@ -109,6 +115,15 @@ function run_compile {
 	local inputname="${input%.*}"
 	local inputext="${input##*.}"
 	
-    make -f ${DIR}/library/compile.mk CRSXHOME=${ROOT} CRSFILE=${input} OUTPUTDIR=${output} MODE=${strict} ${clean} all			
+	# Execute clean then all.
+	if [ "$clean" = "clean" ]
+	then
+	   make -f ${DIR}/library/compile.mk CRSXHOME=${ROOT} CRSFILE=${1} ${output} clean  
+	fi
+	
+	if [ "$all" = "all" ]
+    then
+        make -f ${DIR}/library/compile.mk CRSXHOME=${ROOT} CRSFILE=${1} ${output} MODE=${strict} all
+    fi	
 }
 	

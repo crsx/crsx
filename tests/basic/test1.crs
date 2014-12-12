@@ -1,0 +1,13 @@
+Test1[(
+
+$Lax;
+
+$Use["bool.crs"];
+$Use["fun.crs"];
+
+Test :: Boolean;
+
+Test → Fold[x y.And[x, y], True, (True; True; False;)];
+
+
+)]
