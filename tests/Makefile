@@ -27,7 +27,7 @@ test:
 	@rm -f $(got)
 	@printf $(TEST) 2>&1 | tee -a $(log)
 	@echo >> $(log)
-	@$(CRSX) compile --clean --strict -o $(outputdir) $(TEST) 2>&1 | tee -a $(log)
+	@$(CRSX) compile --clean --strict -o $(outputdir) $(TEST) >> $(log) 2>&1
 	@$(exec) wrapper=Test output=$(got) CANONICAL_VARIABLES=1
 	@if diff -s $(got) $(ref) > /dev/null;  \
      then echo ..PASSED | tee -a $(log)  ; \

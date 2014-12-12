@@ -548,7 +548,7 @@ SF-Closure-Values[$List[Text]<!-- Calls values -->] :: Text;
 SF-Closure-Values[#Values]
 →
 %n⟪
-return «MANGLE[#Symbol]»(sink«ConcatText[#Values, %n⟨,⟩]»);⟫
+return «MANGLE[#Symbol]»(sink, 1«ConcatText[#Values, %n⟨,⟩]»);⟫
 ;
 
 // Some helpers.
@@ -923,10 +923,9 @@ SF-Pattern-Construction-SubMatch-Sub
 {#env; #term:SUB[#parent, #i, #linked]}
 SF-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
 →
-%n⟪« #setup »FORCE(«#sink»->context, «#term»); SUB(«#parent», «INTEGER[#i]») = «#term»;
-if (strcmp(SYMBOL(«#term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[#sink]» break;}
-« {#env} SF-then-PatternBinders[OK, #pass, SUBMATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »
-⟫
+%n⟪« #setup »
+FORCE(«#sink»->context, «#term»); SUB(«#parent», «INTEGER[#i]») = «#term»;
+if (strcmp(SYMBOL(«#term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[#sink]» break;}« {#env} SF-then-PatternBinders[OK, #pass, SUBMATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »⟫
 ;
 
 SF-Pattern-Construction-SubMatch-TermArg
@@ -934,10 +933,9 @@ SF-Pattern-Construction-SubMatch-TermArg
 {#env; #term:ARG[#i, $True]}
 SF-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
 →
-%n⟪« #setup »FORCE(«#sink»->context, «#term»); 
-if (strcmp(SYMBOL(«#term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[#sink]» break;}
-« {#env} SF-then-PatternBinders[OK, #pass, SUBMATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »
-⟫
+%n⟪« #setup »
+FORCE(«#sink»->context, «#term»); 
+if (strcmp(SYMBOL(«#term»), «STRING[#Symbol]»)) {«{#env}F-fail-cleanup[#sink]» break;}« {#env} SF-then-PatternBinders[OK, #pass, SUBMATCH, #Binders, #sink, #unique, #term, 0, ok.#[ok]] »⟫
 ;
 
 SF-Pattern-Construction-SubMatch-ClosureArg
@@ -973,8 +971,10 @@ SF-Pattern-Variable-Bound
 {#env; #variable : $[NotMatch, FREE, #kind]; #term:SUB[#parent, #i, #linked]}
 SF-Pattern[#pass, SUBMATCH, VARIABLE-USE[#variable], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
 →
-%n⟪« #setup »FORCE(«#sink»->context, «#term»); SUB(«#parent», «INTEGER[#i]») = «#term»; if («#variable» != VARIABLE(«#term»)) {«{#env}F-fail-cleanup[#sink]» break;}
-« {#env} #[OK] »⟫
+%n⟪« #setup »
+FORCE(«#sink»->context, «#term»); 
+SUB(«#parent», «INTEGER[#i]») = «#term»; 
+if («#variable» != VARIABLE(«#term»)) {«{#env}F-fail-cleanup[#sink]» break;}« {#env} #[OK] »⟫
 ;
 
 // Pattern is variable but before options have been processed.

@@ -44,90 +44,92 @@ E1[(
 
 E-term-to-string[Text, Text, Text] :: Text;
 
-E-term-to-string[#sink, #term, #variable] → %n⟪«#variable» = SYMBOL(«#term»);
-⟫;
+E-term-to-string[#sink, #term, #variable] → %n⟪
+«#variable» = SYMBOL(«#term»);⟫;
 
 E-term-to-local-string[Text, Text, s::Text p::Text.Text] :: Text;
 
 -[Fresh[variable::Text]]:
-E-term-to-local-string[#sink, #term, s p.#[s,p]] → %n⟪{char* «variable» = SYMBOL(«#term»); «#[variable, %n⟨⟩]»}⟫;
+E-term-to-local-string[#sink, #term, s p.#[s,p]] → %n⟪
+{char* «variable» = SYMBOL(«#term»); «#[variable, %n⟨⟩]»}⟫;
 
 E-term-to-int[Text, Text, Text] :: Text;
 
-E-term-to-int[#sink, #term, #variable] → %n⟪«#variable» = LONGLONG(«#term»);
-⟫;
+E-term-to-int[#sink, #term, #variable] → %n⟪
+«#variable» = LONGLONG(«#term»);⟫;
 
 E-term-to-num[Text, Text, Text] :: Text;
 
-E-term-to-num[#sink, #term, #variable] → %n⟪«#variable» = DOUBLE(«#term»);
-⟫;
+E-term-to-num[#sink, #term, #variable] → %n⟪
+«#variable» = DOUBLE(«#term»);⟫;
 
 // Simple casts from string.
 //
 E-string-to-set[Text, Text, Text] :: Text;
 
-E-string-to-set[#sink, #str, #variable] → %n⟪«#variable» = makeStringLiteral(«#sink»->context, «#str»);
-⟫;
+E-string-to-set[#sink, #str, #variable] → %n⟪
+«#variable» = makeStringLiteral(«#sink»->context, «#str»);⟫;
 
 E-string-to-bool[Text, Text, Text] :: Text;
 
-E-string-to-bool[#sink, #str, #variable] → %n⟪«#variable» = (int) «#str»[0];
-⟫;
+E-string-to-bool[#sink, #str, #variable] → %n⟪
+«#variable» = (int) «#str»[0];⟫;
 
 E-string-to-int[Text, Text, Text] :: Text;
 
-E-string-to-int[#sink, #str, #variable] → %n⟪«#variable» = atoll(«#str»);
-⟫;
+E-string-to-int[#sink, #str, #variable] → %n⟪
+«#variable» = atoll(«#str»);⟫;
 
 E-string-to-num[Text, Text, Text] :: Text;
 
-E-string-to-num[#sink, #str, #variable] → %n⟪«#variable» = atof(«#str»);
-⟫;
+E-string-to-num[#sink, #str, #variable] → %n⟪
+«#variable» = atof(«#str»);⟫;
 
 // Simple casts from bool.
 //
 E-bool-to-int[Text, Text, Text] :: Text;
 
-E-bool-to-int[#sink, #bool, #variable] → %n⟪«#variable» = (long long) «#bool»;
-⟫;
+E-bool-to-int[#sink, #bool, #variable] → %n⟪
+«#variable» = (long long) «#bool»;⟫;
 
 E-bool-to-num[Text, Text, Text] :: Text;
 
-E-bool-to-num[#sink, #bool, #variable] → %n⟪«#variable» = (double) «#bool»;
-⟫;
+E-bool-to-num[#sink, #bool, #variable] → %n⟪
+«#variable» = (double) «#bool»;⟫;
 
 E-bool-to-string[Text, Text, Text] :: Text;
 
-E-bool-to-string[#sink, #bool, #variable] → %n⟪«#variable» = («#bool» ? "$True" : "");
-⟫;
+E-bool-to-string[#sink, #bool, #variable] → %n⟪
+«#variable» = («#bool» ? "$True" : "");⟫;
 
 // Simple casts from integers.
 //
 E-int-to-bool[Text, Text, Text] :: Text;
 
-E-int-to-bool[#sink, #int, #variable] → %n⟪«#variable» = («#int» != 0);
-⟫;
+E-int-to-bool[#sink, #int, #variable] → %n⟪
+«#variable» = («#int» != 0);⟫;
 
 E-int-to-num[Text, Text, Text] :: Text;
 
-E-int-to-num[#sink, #int, #variable] → %n⟪«#variable» = (double) «#int»;
-⟫;
+E-int-to-num[#sink, #int, #variable] → %n⟪
+«#variable» = (double) «#int»;⟫;
 
 // Simple casts from numeric.
 //
 E-num-to-bool[Text, Text, Text] :: Text;
 
-E-num-to-bool[#sink, #num, #variable] → %n⟪«#variable» = («#num» != 0e0);
-⟫;
+E-num-to-bool[#sink, #num, #variable] → %n⟪
+«#variable» = («#num» != 0e0);⟫;
 
 E-num-to-num[Text, Text, Text] :: Text;
 
-E-num-to-num[#sink, #num, #variable] → %n⟪«#variable» = («#num» != 0ll); // TODO: incorrect?
-⟫;
+E-num-to-num[#sink, #num, #variable] → %n⟪
+«#variable» = («#num» != 0ll);⟫; // TODO: incorrect?
 
 // Optional argument.
 //
-{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-optional[$List[Reified_Term], $List[$List[Reified_Option]], Text, ok:OK_SORT arg::Reified_Term.Text] :: Text;
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-optional[$List[Reified_Term], $List[$List[Reified_Option]], Text, ok:OK_SORT arg::Reified_Term.Text] :: Text;
 
 {#env}E-optional[(),      #Option, #sink, ok arg.#Tail[ok,arg]] → {#env}#Tail[OK, EVALUATOR["Null", (LITERAL["Null", SORT["$String", ()]];), ()]] ;
 {#env}E-optional[(#Arg;), (#Option;), #sink, ok arg.#Tail[ok,arg]] → %n⟪«{#env}E-OptionsUnlink[#sink, #Option] »«{#env}#Tail[OK, #Arg]»⟫;
@@ -247,9 +249,9 @@ FREE_BUFFER(«buf»); ⟧
 :
 {#env}E-send-to-bool[#Primitive, #Args, #Options, #sink, #variable] 
 → 
-%n⟪{⟦ char* «str»;
-«{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-bool[#sink, str, #variable]» ⟧}
-⟫
+%n⟪
+{⟦
+char* «str»;«{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-bool[#sink, str, #variable]» ⟧}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-send-to-int[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -259,9 +261,8 @@ FREE_BUFFER(«buf»); ⟧
 {#env}E-send-to-int[#Primitive, #Args, #Options, #sink, #variable] 
 → 
 %n⟪
-{⟦ char* «str»;
-«{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-int[#sink, str, #variable]» ⟧}
-⟫
+{⟦ 
+char* «str»;«{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-int[#sink, str, #variable]» ⟧}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-send-to-num[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -271,9 +272,8 @@ FREE_BUFFER(«buf»); ⟧
 {#env}E-send-to-num[#Primitive, #Args, #Options, #sink, #variable] 
 → 
 %n⟪
-{⟦ char* «str»;
-«{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-num[#sink, str, #variable]» ⟧}
-⟫
+{⟦
+char* «str»;«{#env}E-send-to-string[#Primitive, #Args, #Options, #sink, str]»«{#env}E-string-to-num[#sink, str, #variable]» ⟧}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-send-to-string[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -283,9 +283,8 @@ FREE_BUFFER(«buf»); ⟧
 {#env}E-send-to-string[#Primitive, #Args, #Options, #sink, #variable] 
 → 
 %n⟪
-{⟦ Term «term»;
-«{#env}E-send-to-set[#Primitive, #Args, #Options, #sink, term]»«{#env}E-term-to-string[#sink, term, #variable]»«T-unlink-ref[#sink, term]»⟧}
-⟫
+{⟦ 
+Term «term»;«{#env}E-send-to-set[#Primitive, #Args, #Options, #sink, term]»«{#env}E-term-to-string[#sink, term, #variable]»«T-unlink-ref[#sink, term]»⟧}⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-send-to-local-string[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, s::Text p::Text.Text] :: Text;
@@ -295,9 +294,8 @@ FREE_BUFFER(«buf»); ⟧
 {#env}E-send-to-local-string[#Primitive, #Args, #Options, #sink, s p.#[s,p]] 
 → 
 %n⟪
-{⟦ Term «term»;
-«{#env}E-send-to-set[#Primitive, #Args, #Options, #sink, term]»«{#env}E-term-to-local-string[#sink, term, s p.#[s,p]]»«T-unlink-ref[#sink, term]»⟧}
-⟫
+{⟦ 
+Term «term»;«{#env}E-send-to-set[#Primitive, #Args, #Options, #sink, term]»«{#env}E-term-to-local-string[#sink, term, s p.#[s,p]]»«T-unlink-ref[#sink, term]»⟧}⟫
 ;
 
 // $[LoadTerm, #url] parses the URL and returns the term.
@@ -307,8 +305,8 @@ SEND_PRIMITIVE[E_LoadTerm];
 Send-LoadTerm:
 {#env} E-send[E_LoadTerm, (#Name; #Url;), #Options, #sink]
 →
-{#env} T-local-string[#Url, #sink, url p.%n⟪LOAD_TERM(«#sink», "", «url»);
-«p»⟫]
+{#env} T-local-string[#Url, #sink, url p.%n⟪
+LOAD_TERM(«#sink», "", «url»);«p»⟫]
 ;
 
 // $[Nil] is synonymous with sending nothing.
@@ -330,15 +328,16 @@ Send-FreeVariables-Raw[Fresh[term::Text, fvs::Text, link::Text]]
 :
 {#env} E-send[E_FreeVariables, (LITERAL[#Name, SORT[#SortName, ()]]; #Term;), #Options, #sink]
 →
-%n⟪{⟦ Term «term»;
-« {#env} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
+%n⟪
+{⟦ 
+Term «term»;« {#env} T-set[#Term, #sink, term] »
+VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
 VariableSetLink «link»;
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
 freeVariableSet(«fvs»);⟧
-}
-⟫
+}⟫
 ;
 
 // Without environment with sort.
@@ -346,15 +345,16 @@ Send-FreeVariables-Unconstrained[Fresh[term::Text, fvs::Text, link::Text]]
 :
 {#env} E-send[E_FreeVariables, (CONSTRUCTION[#kind, #Name, (ARGUMENT[#Sort1, CONSTRUCTION[#kind, #SortName, ()]]; )]; #Term;), #Options, #sink]
 →
-%n⟪{⟦ Term «term»;
-« {#env} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
+%n⟪
+{⟦
+Term «term»;« {#env} T-set[#Term, #sink, term] »
+VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
 VariableSetLink «link»;
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { END(«#sink», «EventConstructor["$Cons"]»); }
 freeVariableSet(«fvs»);⟧
-}
-⟫
+}⟫
 ;
 
 // With environment and sort.
@@ -2316,17 +2316,15 @@ Poly-If[Fresh[test::Text]]
 :
 {#env}E-poly[E_If, (#Name; #Test; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
 → 
-%n⟪{⟦ int «test»;
-«{#env}T-set-bool[#Test, #sink, test]»
-if («test») 
+%n⟪
 {⟦
-«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] »⟧
+int «test»;«{#env}T-set-bool[#Test, #sink, test]»
+if («test») 
+{⟦«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] »⟧
 }
 else
-{⟦
-«{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
-}
-⟫;
+{⟦«{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
+}⟫;
 
 // $[IfZero, #int, #true[, #false]] with constant integer #int evaluates as either #true or #false depending on whether #i is zero.
 //

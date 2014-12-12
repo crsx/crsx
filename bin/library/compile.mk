@@ -4,6 +4,7 @@
 # CRSXFILE  : name of the file to compile
 # OUTPUTDIR : where to put generated files
 # MODE      : crsx compilation mode. STRICT or empty  
+# OPTFLAG   : C compiler optimization flag  
 
 ifndef MAKEFILE_CC
 MAKEFILE_CC=$(CRSXHOME)/Env.mk
@@ -39,7 +40,7 @@ objs+=$(OUTPUTDIR)/$(crsbasename)_fun.o
 symbols=$(OUTPUTDIR)/$(crsbasename)_symbols.c
 objs+=$(OUTPUTDIR)/$(crsbasename)_symbols.o
 
-CCFLAGS+=-I$(ICU4CDIR)/../include -I$(COMPILERSRC)/c
+CCFLAGS+=-I$(ICU4CDIR)/../include -I$(COMPILERSRC)/c $(OPTFLAG)
 LDFLAGS+=-L$(ICU4CDIR)
 
 all: $(crsbinfile)

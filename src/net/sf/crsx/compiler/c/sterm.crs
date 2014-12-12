@@ -263,7 +263,8 @@ ST-send-tail2[STRING_ENTRY] :: Text;
 
 ST-send-tail2[YES] 
 →
-%n⟪return ⟫
+%n⟪
+return ⟫
 ;
 
 ST-send-tail2[NO] 
@@ -684,11 +685,11 @@ ST-set-Binders[OK, #Binders, #sink, ok¹ args¹.ST-call2[ok¹, #closure, args¹,
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-call2[OK_SORT, Text, $List[Text], $String, Text] :: Text;
 
-{#env}
+{#env; "$Tail":#Tail}
 ST-call2[OK, #closure, #Args, #MetaVar, #sink]
 →
 %n⟪
-CALL«{#env}MetaVarArity[#MetaVar]»(«#sink», «#closure»«ReverseConcatText[#Args,%n⟨,⟩]»);⟫
+«ST-send-tail2[#Tail]»CALL«{#env}MetaVarArity[#MetaVar]»(«#sink», «#closure»«ReverseConcatText[#Args,%n⟨,⟩]»);⟫
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

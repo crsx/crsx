@@ -946,7 +946,7 @@ extern Term compute(Context context, Term term);
 struct _CEnv
 {
     size_t refcount;
-    void** values;  // Size known statically.
+    void* values[];  // Size known statically.
 };
 
 

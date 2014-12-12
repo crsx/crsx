@@ -4,7 +4,7 @@
 
 function show_help {
 	echo "Usage : $0 compile help"
-	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [--clean] [--nocompile] <input.crs>"
+	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [--clean] [--opt] [--nocompile] <input.crs>"
 	echo " where"
  #	echo "   --cp <path>        colon-separated class paths"
  #   echo "   -p <parser>        colon-separated parser qualified name"   
@@ -13,6 +13,7 @@ function show_help {
     echo "   --strict           generate code using strict mode."
     echo "   --clean            clean all intermediate files before compiling."
     echo "   --nocompile        turn off compilation."
+    echo "   --opt              turn on optimizations."
 }
 
 function run_compile {
@@ -32,6 +33,7 @@ function run_compile {
     local new=
     local clean=
     local all=all
+    local cflags=
 	while :
     do
    		case $1 in
@@ -89,6 +91,10 @@ function run_compile {
                 all=
                 shift
                 ;;
+            --opt)
+                cflags="OPTFLAG=-O3"
+                shift
+                ;;
    			-*)
                	printf >&2 "warning: unknown option: %s\n" "$1"
   	            shift
@@ -123,7 +129,7 @@ function run_compile {
 	
 	if [ "$all" = "all" ]
     then
-        make -f ${DIR}/library/compile.mk CRSXHOME=${ROOT} CRSFILE=${1} ${output} MODE=${strict} all
+        make -f ${DIR}/library/compile.mk ${cflags} CRSXHOME=${ROOT} CRSFILE=${1} ${output} MODE=${strict} all
     fi	
 }
 	
