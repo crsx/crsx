@@ -5,6 +5,7 @@
 # OUTPUTDIR : where to put generated files
 # MODE      : crsx compilation mode. STRICT or empty  
 # OPTFLAG   : C compiler optimization flag  
+# DEBUG     : debug flags
 
 ifndef MAKEFILE_CC
 MAKEFILE_CC=$(CRSXHOME)/Env.mk
@@ -84,7 +85,7 @@ $(symbols): $(symlist)
 
 # Compile C files
 
-CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING -DGENERIC_LOADER 
+CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING -DGENERIC_LOADER $(DEBUG) 
 ifdef ICU4CDIR
 LDFLAGS+=-L$(ICU4CDIR)
 CCFLAGS+=-I$(ICU4CDIR)/../include

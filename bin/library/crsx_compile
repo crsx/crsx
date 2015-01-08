@@ -72,14 +72,10 @@ function run_compile {
    			    shift 2
    			    ;;
    			-d)
-   			    debug=$2
+   			    debug="DEBUG=-DDEBUG"
    			    shift
    			    ;;
-   			-n)
-                new=Y
-                shift
-                ;;
-		    --strict)
+   			--strict)
                 strict=STRICT
                 shift
                 ;;
@@ -129,7 +125,7 @@ function run_compile {
 	
 	if [ "$all" = "all" ]
     then
-        make -f ${DIR}/library/compile.mk ${cflags} CRSXHOME=${ROOT} CRSFILE=${1} ${output} MODE=${strict} all
+        make -f ${DIR}/library/compile.mk ${cflags} CRSXHOME=${ROOT} CRSFILE=${1} ${output} MODE=${strict} ${debug} all
     fi	
 }
 	

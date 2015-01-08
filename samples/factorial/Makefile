@@ -12,7 +12,7 @@ clean:
 	
 	
 fact: fact.crs
-	@$(CRSX) compile --clean --opt --strict $<
+	@$(CRSX) compile --clean --opt -d --strict $<
 	
 fact2: fact2.crs
-	@$(CRSX) compile --clean --opt --strict $<
+	@$(CRSX) compile --clean --opt -d --strict $<
