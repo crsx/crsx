@@ -41,8 +41,7 @@ objs+=$(OUTPUTDIR)/$(crsbasename)_fun.o
 symbols=$(OUTPUTDIR)/$(crsbasename)_symbols.c
 objs+=$(OUTPUTDIR)/$(crsbasename)_symbols.o
 
-CCFLAGS+=-I$(ICU4CDIR)/../include -I$(COMPILERSRC)/c $(OPTFLAG)
-LDFLAGS+=-L$(ICU4CDIR)
+CCFLAGS+=-I$(COMPILERSRC)/c $(OPTFLAG)
 
 all: $(crsbinfile)
 clean::

@@ -3,7 +3,7 @@ include $(CRSXHOME)/Env.mk
 
 all: fact fact2
 	@echo "compilation done."
-	@echo "try ./Fact wrapper=Fact term=5"
+	@echo "try ./fact wrapper=Fact term=5"
 	
 clean:
 	@rm -f fact fact2
