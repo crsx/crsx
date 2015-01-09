@@ -6,7 +6,7 @@ all: peano peano-strict
 	@echo "try ./peano term=\"Multiply[Plus[S[Z],S[Z]],S[S[S[Z]]]]\""
 
 clean:
-	@rm -f peano
+	@rm -rf peano peano-strict
 	@$(CRSX) compile --clean --nocompile peano.crs
 
 peano: peano.crs
