@@ -1,0 +1,6 @@
+peano
+peano-strict
+*.o
+*.h
+*.c
+*.symlist
