@@ -3,4 +3,5 @@ peano-strict
 *.o
 *.h
 *.c
+*.crsD
 *.symlist
