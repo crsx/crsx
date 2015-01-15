@@ -1,0 +1,6 @@
+hello-world
+*.o
+*.h
+*.c
+*.crsD
+*.symlist
