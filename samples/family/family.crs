@@ -1,0 +1,43 @@
+Family[(
+
+// $Lax;
+
+// Syntax.
+$CheckGrammar['net.sf.crsx.text.Text'] ;
+$Use["net/sf/crsx/text/Text.crs"];
+
+
+Person ::=( Me ;
+            Husband[Person] ; Wife[Person] ;
+            Father[Person] ; Mother[Person] ;
+            Son[Person] ; Daughter[Person] ;
+            Brother[Person] ; Sister[Person] ;
+            Friend[Person] ; );
+
+// Return the string describing this person's
+// relationship to me
+Relationship[Person] :: Text;
+Relationship[Me] → %n⟪Me.⟫;
+Relationship[Husband[#person]] → Relationship1[#person, %n⟪husband.⟫];
+Relationship[Wife[#person]] → Relationship1[#person, %n⟪wife.⟫];
+Relationship[Father[#person]] → Relationship1[#person, %n⟪father.⟫];
+Relationship[Mother[#person]] → Relationship1[#person, %n⟪mother.⟫];
+Relationship[Son[#person]] → Relationship1[#person, %n⟪son.⟫];
+Relationship[Daughter[#person]] → Relationship1[#person, %n⟪daughter.⟫];
+Relationship[Brother[#person]] → Relationship1[#person, %n⟪brother.⟫];
+Relationship[Sister[#person]] → Relationship1[#person, %n⟪sister.⟫];
+Relationship[Friend[#person]] → Relationship1[#person, %n⟪friend.⟫];
+
+Relationship1[Person, Text] :: Text;
+Relationship1[Me, #] → %n⟪My « # »⟫ ;
+Relationship1[Husband[#person], #] → Relationship1[#person, %n⟪husband's « # »⟫];
+Relationship1[Wife[#person], #] → Relationship1[#person, %n⟪wife's « # »⟫];
+Relationship1[Father[#person], #] → Relationship1[#person, %n⟪father's « # »⟫];
+Relationship1[Mother[#person], #] → Relationship1[#person, %n⟪mother's « # »⟫];
+Relationship1[Son[#person], #] → Relationship1[#person, %n⟪son's « # »⟫];
+Relationship1[Daughter[#person], #] → Relationship1[#person, %n⟪daughter's « # »⟫];
+Relationship1[Brother[#person], #] → Relationship1[#person, %n⟪brother's « # »⟫];
+Relationship1[Sister[#person], #] → Relationship1[#person, %n⟪sister's « # »⟫];
+Relationship1[Friend[#person], #] → Relationship1[#person, %n⟪friend's « # »⟫];
+
+)]

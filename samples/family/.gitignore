@@ -1,0 +1,6 @@
+family
+*.o
+*.h
+*.c
+*.crsD
+*.symlist
