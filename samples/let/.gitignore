@@ -1,0 +1,6 @@
+let
+*.o
+*.h
+*.c
+*.crsD
+*.symlist
