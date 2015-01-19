@@ -3427,6 +3427,8 @@ void normalize(Context context, Term *termp)
 
                 DEBUGCOND(context->debugsteps, DEBUGT(sink->context, stepNesting+5, term));
                 DEBUGCOND(context->debugsteps, DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
+                DEBUGCOND(context->debugviz,   DEBUGT(sink->context, stepNesting+5, term));
+                DEBUGCOND(context->debugviz,   DEBUGF(sink->context, "\n"));
             }
             else
             {
@@ -3484,6 +3486,8 @@ Term force(Context context, Term term)
             term =  BUFFER_TERM(sink); // reload and try again...
             DEBUGCOND(context->debugsteps, DEBUGT(sink->context, stepNesting+5, term));
             DEBUGCOND(context->debugsteps, DEBUGF(sink->context, "//%*s========\n", stepNesting+3, ""));
+            DEBUGCOND(context->debugviz,   DEBUGT(sink->context, stepNesting+5, term));
+            DEBUGCOND(context->debugviz,   DEBUGF(sink->context, "\n" ));
             FREE_BUFFER(sink);
         }
     }
@@ -3501,10 +3505,13 @@ static int step(Sink sink, Term term)
 
     DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGCOND(sink->context->debugsteps, DEBUGT(sink->context, stepNesting+4, term));
+    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugviz,   DEBUGT(sink->context, stepNesting+4, term));
 
     int step = term->descriptor->step(sink, term);
 
     DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
 
     crsxpAfterStep(sink->context);
 
@@ -3517,6 +3524,7 @@ void initCRSXContext(Context context)
 
     context->debugsteps = getenv("crsx-debug-steps") != NULL;
     context->debugtrace = getenv("crsx-trace") != NULL;
+    context->debugviz   = getenv("crsxviz") != NULL;
     context->debugliterals = getenv("crsx-debug-literals") != NULL;
 
     context->env = NULL;

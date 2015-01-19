@@ -100,6 +100,7 @@ struct _Context
     unsigned int fv_enabled : 1; // Whether the free variable optimization is on.
     unsigned int debugsteps : 1;
     unsigned int debugtrace : 1;
+    unsigned int debugviz   : 1;
     unsigned int debugliterals :1;
 
 
