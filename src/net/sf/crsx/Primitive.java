@@ -98,7 +98,7 @@ public enum Primitive
     FROM_FIRST("FromFirst", 2, 3),
     /** $[DownCase, #string) is a lower case version of #string. */
     DOWN_CASE("DownCase", 1, 1),
-    /** $[UpCase, #string) is a lower case version of #string. */
+    /** $[UpCase, #string) is an upper case version of #string. */
     UP_CASE("UpCase", 1, 1),
     /** $[EncodePoint, #int] returns a Unicode string corresponding to the single character with code point #int. */
     ENCODE_POINT("EncodePoint", 1, 1),
@@ -106,6 +106,9 @@ public enum Primitive
     DECODE_POINT("DecodePoint", 1, 1),
     /** $[Trim, #string) has extreme spaces removed. */
     TRIM("Trim", 1, 1),
+
+    /** $[Literal, #p] is condition to check that #p is a literal. */
+    LITERAL("Literal", 1, 2),
     
     // Sequence operations.
 
@@ -126,6 +129,8 @@ public enum Primitive
 	MODULO("Modulo", 2, 2),
 	/** $[NumericEqual, #1, #2]  test equality of #1, #2, result is boolean. */
 	NUMEQ("NumericEqual", 2, 2),
+	/** $[NumericNotEqual, #1, #2]  test non-equality of #1, #2, result is boolean. */
+	NUMNE("NumericNotEqual", 2, 2),
 	/** $[Absolute, #1]  gives the absolute value. */
 	ABSOLUTE("Absolute", 1, 1),
 
@@ -144,6 +149,10 @@ public enum Primitive
 	BIT_NOT("BitNot", 1, 1),
 	/** $[BitMinus, #i1, #i2] is the integer with the bits in #i1 which are not in #i2. */
 	BIT_MINUS("BitMinus", 2, 2),
+	/** $[BitShiftLeft, #i1, #i2] is the integer with the bits in #i1 shifted left the amount in #i2 (as unsigned division by a power of 2). */
+	BIT_SHIFT_LEFT("BitShiftLeft", 2, 2),
+	/** $[BitShiftRight, #i1, #i2] is the integer with the bits in #i1 shifted right the amount in #i2 (with no sign magic). */
+	BIT_SHIFT_RIGHT("BitShiftRight", 2, 2),
 	
 	// Logical operators.
 	
@@ -183,11 +192,16 @@ public enum Primitive
 	/** $[VariableNameIs, v, #name, #result] the variable name associated with v is #name and return as result. */
 	VARIABLE_NAME_IS("VariableNameIs", 3, 3),
 	
-	// Time
+	// Time/Profiling
 	
 	// $[ElapsedTime]
-	ELASPED("ElapsedTime", 0, 0),
-	
+	ELAPSED("ElapsedTime", 0, 0),
+	   
+	// $[ProfileEnter, #id, #name, #result]
+	PROFILE_ENTER("ProfileEnter", 3, 3),
+	// $[ProfileExit, #id, #result]
+	PROFILE_EXIT("ProfileExit", 2, 2),
+		
 	// Matching.
 	
 	/**
@@ -208,7 +222,7 @@ public enum Primitive
     /** $[MatchRegex, #regex, #p], for constant #regex, is match pattern that only matches constants that fit the regular expression #regex and also match #p.
      *   Can also be used as evaluator where it returns the boolean result of whether */
     MATCH_REGEX("MatchRegex", 1, 2),
-    /** $[IsInteger, #p] is match pattern that only matches constants that both fit the regular expression "[-+]*[0-9]+" and also match #p. */
+    /** $[IsInteger, #p] is condition to check that #p fits the regular expression "[-+]*[0-9]+"; as a match pattern the redex must fit and also match #p. */
     IS_INTEGER("IsInteger", 1, 2),
     
 	/** TODO. */
@@ -250,7 +264,7 @@ public enum Primitive
 	IF_DEF("IfDef", 2, 3),
 	/** $[IfLinear, v, #true[, #false]] is #true if v is a linear variable (¹v) otherwise #false or (). */
 	IF_LINEAR("IfLinear", 2, 3),
-	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, oherwise #false or (). */
+	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, otherwise #false or (). */
 	IF_DATA("IfData", 2, 3),
 
 	// Environment operations.
@@ -279,8 +293,10 @@ public enum Primitive
 	PRINT("Print", 1, 2),
 	/** $[Echo, #constant[, #result]] echoes #constant (unquoted and without adding a newline) and otherwise acts like #result (defaults to ()). */
 	ECHO("Echo", 1, 2),
-	/** $[Show, #term] is a constant with the textual representation of #term as the string value. */
+	/** $[Show, #term] is a constant with the textual representation of #term as a string value. */
 	SHOW("Show", 1, 1),
+	/** $[Symbol, #term] is a constant with the textual representation of the root of #term as a string value. */
+	SYMBOL("Symbol", 1, 1),
 	/** $[FormatNumber, #number [,#format]] is a string representing the number. */
 	FORMAT_NUMBER("FormatNumber", 1, 2),
 	/** $[Format, #format [,#argument...]] generates a string from the #format string and the #arguments... strings. */
@@ -314,7 +330,7 @@ public enum Primitive
     /** Type unification */
     UNIFY("Unify", 2, 2),
     
-    /** Hash code. */
+    /** Hash code (numeric). */
     HASH_CODE("HashCode", 1, 1),
     
     /** Dummy value with no values. */

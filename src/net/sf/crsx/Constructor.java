@@ -139,9 +139,10 @@ public interface Constructor extends PropertiesHolder
 	 * @param namedProps whether named properties are printed
 	 * @param variableProps whether variable properties are printed
 	 * @param omitProps specific variable properties to omit
+	 * @param sortProps TODO
 	 * @throws IOException
 	 */
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException;
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException;
 	
 	/**
 	 * Whether this constructor is identical to that constructor.

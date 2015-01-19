@@ -72,7 +72,7 @@ public class GenericFactory implements Factory<GenericTerm>
 
 	/** If set then all variable names are given canonical names. */
 	final public static String CANONICAL_VARIABLES = "canonical-variables";
-
+	
 	/** If set then linear variable names do not include a linear marker. */
 	final public static String NO_LINEAR_VARIABLES = "omit-linear-variables";
 
@@ -866,7 +866,7 @@ public class GenericFactory implements Factory<GenericTerm>
 								Map<Variable, String> variableNames = new HashMap<Variable, String>();
 								if (defined(CANONICAL_VARIABLES))
 									variableNames.put(null, "1");
-								term.appendTo(a, variableNames, Integer.MAX_VALUE, false, true, true, null);
+								term.appendTo(a, variableNames, Integer.MAX_VALUE, false, true, true, null, false);
 								if (a instanceof Flushable)
 									((Flushable) a).flush();
 							}

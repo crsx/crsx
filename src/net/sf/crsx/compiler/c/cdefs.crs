@@ -16,7 +16,8 @@ D-check-sort[Text, Text, Reified_Sort] :: Text;
 
 D-check-sort[#sink, #termp, SORT-PROPERTY[#1,#2,#sort]] → D-check-sort[#sink, #termp, #sort] ;
 D-check-sort[#sink, #termp, SORT-VARIABLE[#var]] → %n⟪⟫ ;
-D-check-sort[#sink, #termp, SORT[#sort, #args]] → $[If, $[Contains, #sort, "$"], %n⟪⟫, %n⟪CRSX_CHECK_SORT(«#sink»->context, «#termp», &« Sort[#sort] »); ⟫] ;
+D-check-sort[#sink, #termp, SORT[#sort, #args]] → $[If, $[Contains, #sort, "$"], %n⟪⟫, %n⟪
+CRSX_CHECK_SORT(«#sink»->context, «#termp», &« Sort[#sort] »); ⟫] ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 )] //D

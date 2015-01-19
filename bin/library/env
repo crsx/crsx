@@ -7,7 +7,6 @@ BUILD=$ROOT/build
 JAVA=java
 JAVAC=javac
 
-
 # CRSX configuration
 
 CRSXJAR=$ROOT/crsx.jar

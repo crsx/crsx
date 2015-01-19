@@ -11,10 +11,8 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -104,13 +102,15 @@ public class GenericEvaluator extends FixedGenericConstruction
     /**
      * The string with quotes.
      * @param s string to quote
-     * @param quote 
+     * @param quote to surround with and prefix with \ inside.
      */
 	public static String quoteWith(String s, String quote)
 	{
 		StringBuilder b = new StringBuilder();
-		Util.quotedJavaChars(quote, b);
-		return quote + s.replace(quote, b.toString()) + quote;
+		Util.quotedJavaChars(s, b);
+		if (! ("\'".equals(quote) || "\"".equals(quote)))
+		    s = s.replace(quote, "\\"+quote);
+		return quote + b + quote;
 	}
 	
 	/**
@@ -388,7 +388,10 @@ public class GenericEvaluator extends FixedGenericConstruction
 				if (!Util.isConstant(sub(1))) break; // "Can only parse constant values!"
 				try
 				{
-					return rewrapWithProperties(factory.literal(Long.parseLong(Util.symbol(sub(1)), 10)));
+					String sym = Util.symbol(sub(1));
+					if (sym.startsWith("0x") || sym.startsWith("0X"))
+						return rewrapWithProperties(factory.literal(Long.parseLong(sym.substring(2), 16)));
+					return rewrapWithProperties(factory.literal(Long.parseLong(sym, 10)));
 				}
 				catch (NumberFormatException e)
 				{}
@@ -400,7 +403,9 @@ public class GenericEvaluator extends FixedGenericConstruction
 				if (!Util.isConstant(sub(1))) break; // "Can only hex constant values!"
 				try
 				{
-					return rewrapWithProperties(factory.literal(Long.parseLong(Util.symbol(sub(1)), 16)));
+					String hex = Util.symbol(sub(1));
+					if (hex.startsWith("0x") || hex.startsWith("0X")) hex = hex.substring(2);
+					return rewrapWithProperties(factory.literal(Long.parseLong(hex, 16)));
 				}
 				catch (NumberFormatException e)
 				{}
@@ -475,6 +480,34 @@ public class GenericEvaluator extends FixedGenericConstruction
 				{}
 				break;
 
+			case BIT_SHIFT_LEFT :
+				// $[BitMinus, n1, n2]
+				computeArguments();
+				if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break;
+				try
+				{
+					long left = Long.decode(Util.symbol(sub(1)));
+					long right = Long.decode(Util.symbol(sub(2)));
+					return rewrapWithProperties(factory.literal(left << right));
+				}
+				catch (NumberFormatException e)
+				{}
+				break;
+
+			case BIT_SHIFT_RIGHT:
+				// $[BitMinus, n1, n2]
+				computeArguments();
+				if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break;
+				try
+				{
+					long left = Long.decode(Util.symbol(sub(1)));
+					long right = Long.decode(Util.symbol(sub(2)));
+					return rewrapWithProperties(factory.literal(left >> right));
+				}
+				catch (NumberFormatException e)
+				{}
+				break;
+
 			case BIT_SUB_SET_EQ : {
 				// $[BitSubSetEq, small, large]
 				computeArguments();
@@ -543,8 +576,22 @@ public class GenericEvaluator extends FixedGenericConstruction
                 double right = Double.parseDouble(Util.symbol(sub(2)));
                 return rewrapWithProperties(factory.literal(left == right));
             }
-            case ELASPED : {
+            case NUMNE : {
+            	// $[NumericNotEqual, t1, t2]
+                computeArguments();
+                if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break; // "Can only compare two constant values!"
+                double left = Double.parseDouble(Util.symbol(sub(1)));
+                double right = Double.parseDouble(Util.symbol(sub(2)));
+                return rewrapWithProperties(factory.literal(left != right));
+            }
+            case ELAPSED : {
             	return rewrapWithProperties(factory.literal(System.currentTimeMillis())); // TODO
+            }
+            case PROFILE_ENTER:{
+            	return rewrapWithProperties(sub(3));
+            }
+            case PROFILE_EXIT:{
+            	return rewrapWithProperties(sub(2));
             }
             case STRING_LT : {
             	// $[StringLessThan, t1, t2]
@@ -750,6 +797,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 computeArguments();
                 if (!Util.isConstant(sub(1))) break;
 				// $[Escape, string]
+				// $[Escape[Q], string]
                 String string = sub(0).arity() == 0 ? Util.quoteJava(Util.symbol(sub(1))) : quoteWith(Util.symbol(sub(1)), Util.symbol(sub(0).sub(0)));
                 return rewrapWithProperties(factory.literal(string));
 			}
@@ -830,11 +878,16 @@ public class GenericEvaluator extends FixedGenericConstruction
 				// $[EmptySequence, sequence]
                 computeArguments();
                 if (sub(1).kind() == Kind.CONSTRUCTION)
-                {
                     return rewrapWithProperties(factory.literal(Util.isNull(sub(1))));
-                }
                 break;
 			}
+
+            case LITERAL :
+            	// $[Literal, literal]
+            	computeArguments();
+                if (sub(1).kind() == Kind.CONSTRUCTION)
+                	return rewrapWithProperties(factory.literal(Util.isLiteral(sub(1))));
+                break;
 			
 			case CONSTRUCTION : {
                 // $[C[sort?], constructor, (argument1; ...; argumentN;)]
@@ -983,6 +1036,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             	return rewrapWithProperties(Util.listifyVariableSet(factory, vs));
             }
 			
+            
 			case MATCH :
 				// $[Match,...] does not evaluate at all!
 				break;
@@ -1150,8 +1204,9 @@ public class GenericEvaluator extends FixedGenericConstruction
             		String resource = Util.quoteJavaIdentifierPart(Util.symbol(sub(1)));
             		try
             		{
-            			Appendable w = new WriterAppender(new FileWriter(resource));
-            			sub(2).appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+            			WriterAppender w = new WriterAppender(new FileWriter(resource));
+            			sub(2).appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
+            			w.close();
             		}
             		catch (IOException e)
             		{
@@ -1643,7 +1698,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 computeArguments();
                 try
                 {
-                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null); // TODO: allow depth?
+                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES)); // TODO: allow depth?
                     System.out.println();
                     System.out.flush();
                     return rewrapWithProperties(arity() == 2 ? factory.nil() : sub(2));
@@ -1673,12 +1728,17 @@ public class GenericEvaluator extends FixedGenericConstruction
                 	break;
         		return rewrapWithProperties(factory.literal(s));
             }
-            
+
             case SHOW :
             	// $[Show, term]
 ///            	contractArgument(1);
                 return rewrapWithProperties(factory.literal(sub(1).toString()));
 
+            case SYMBOL :
+            	// $[Symbol, term]
+///            	contractArgument(1);
+                return rewrapWithProperties(factory.literal(Util.symbol(sub(1))));
+                
             case COMPUTE :
             	// $[Compute, term]
             	computeArguments();
@@ -1693,7 +1753,7 @@ public class GenericEvaluator extends FixedGenericConstruction
                 return rewrapWithProperties(arity() == 2 ? factory.nil() : sub(2));
 
             case HASH_CODE :
-            	// $[HashCode, #term] is hex string of a hash code.
+            	// $[HashCode, #term] is numeric hash code.
             	return rewrapWithProperties(factory.literal((long) sub(1).hashCode()));
                 
             case DUMP :
@@ -1701,9 +1761,9 @@ public class GenericEvaluator extends FixedGenericConstruction
                 {
                 	Map<Variable, String> used = new HashMap<Variable, String>();
                     boolean full = factory.defined(Factory.SIMPLE_TERMS);
-                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                     System.out.print(" ");
-                    sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                    sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                     System.out.println();
                     System.out.flush();
                     return rewrapWithProperties(sub(2));
@@ -1718,7 +1778,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             	computeArguments();
                 try
                 {
-                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
                     System.err.println();
                     System.err.flush();
                     return rewrapWithProperties(arity() == 2 ? sub(1) : sub(2));
@@ -2599,7 +2659,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             case PRINT :
                 try
                 {
-                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+                    sub(1).appendTo(System.out, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
                     System.out.println();
                     System.out.flush();
                 }
@@ -2616,12 +2676,12 @@ public class GenericEvaluator extends FixedGenericConstruction
                         throw new UnsupportedOperationException(toString());
                     boolean full = factory.defined(Factory.SIMPLE_TERMS);
                     Map<Variable, String> used = new HashMap<Variable, String>();
-                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                    sub(1).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                     System.out.print(" ");
                     if (((Pattern) sub(2)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
                     {
-                        match.getSubstitute(sub(2).metaVariable()).getBody().appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
-                        sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null);
+                        match.getSubstitute(sub(2).metaVariable()).getBody().appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
+                        sub(2).appendTo(System.out, used, Integer.MAX_VALUE, full, true, true, null, false);
                         System.out.println();
                         System.out.flush();
                         return true;
@@ -2641,7 +2701,7 @@ public class GenericEvaluator extends FixedGenericConstruction
             case TRACE :
                 try
                 {
-                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+                    sub(1).appendTo(System.err, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
                     System.err.println();
                     System.err.flush();
                 }
@@ -2653,6 +2713,56 @@ public class GenericEvaluator extends FixedGenericConstruction
 
 			case ERROR :
 				error();
+				break;
+
+			case LT :
+			case GT :
+			case GE :
+			case LE :
+			case NE :	
+			case EQ :
+			case NUMEQ :
+				if (Util.isMetaApplication(sub(1)) && sub(1).arity() == 0 && ((Pattern) sub(1)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
+				{
+					Term candidateTerm = match.getSubstitute(sub(1).metaVariable()).getBody();
+					if (!Util.isNumeric(candidateTerm))
+						return false;
+					int candidate = Util.integer(candidateTerm);
+					int base;
+					if (Util.isNumeric(sub(2)))
+					{
+						base = Util.integer(sub(2));
+					}
+					else if (Util.isMetaApplication(sub(2))&& sub(2).arity() == 0 && ((Pattern) sub(2)).match(match, term, bound, contractionCount, promiscuous, once, onceSeen))
+					{
+						Term baseTerm = match.getSubstitute(sub(2).metaVariable()).getBody();
+						if (baseTerm == null || !Util.isNumeric(baseTerm))
+							return false;
+						base = Util.integer(baseTerm);
+					}
+					else 
+					{
+						break;
+					}
+					switch (what)
+					{
+					case LT :
+						return candidate < base;
+					case GT :
+						return candidate > base;
+					case GE :
+						return candidate >= base;
+					case LE :
+						return candidate <= base;
+					case EQ :
+					case NUMEQ :
+						return candidate == base;
+					case NE :
+					case NUMNE :
+						return candidate != base;
+					default :
+					}
+				}
 				break;
 		}
 		// Fall back to plain literate matching.
@@ -3188,6 +3298,7 @@ public class GenericEvaluator extends FixedGenericConstruction
     
     final public void analyzeMetaUseContractum(Map<String, Integer> uses, Map<String, MetaAnalyzer> subAnalyzers)
 	{
+    	boolean mightHaveRef = false;
     	switch (primitive())
 		{
     		case IF:
@@ -3248,13 +3359,17 @@ public class GenericEvaluator extends FixedGenericConstruction
 					}
 					
 					// Test
-					sub(1).analyzeMetaUseContractum(uses, subAnalyzers);					
+					sub(1).analyzeMetaUseContractum(uses, subAnalyzers);	
+					
+					// Process first arg for environment
+					sub(0).analyzeMetaUseContractum(uses, subAnalyzers); 
     				break;
     			}
+    		
     		default:
-    			for (int i = arity() -1; i >= 1; --i)
+    			for (int i = arity() -1; i >= 0; --i)
     				sub(i).analyzeMetaUseContractum(uses, subAnalyzers);    				
-		}			
+		}
 	}
     
     final public static void removeAll(Map<String, Integer> map1, Map<String, Integer> map2)

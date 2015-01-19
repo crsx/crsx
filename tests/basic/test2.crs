@@ -1,0 +1,12 @@
+Test2[(
+
+$Lax;
+
+$Use["bool.crs"];
+$Use["sfun.crs"];
+
+Test :: $List[Boolean];
+
+Test → Map[xᵇ.x, (False;True;)];
+
+)]

@@ -4,12 +4,16 @@
 
 function show_help {
 	echo "Usage : $0 compile help"
-	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] <input.[crs|hx]>"
+	echo "        $0 [--cp <path>] [-p <parser>] [-o <output-dir>] [-d] [--strict] [--clean] [--opt] [--nocompile] <input.crs>"
 	echo " where"
-	echo "   --cp <path>        colon-separated class paths"
-    echo "   -p <parser>        colon-separated parser qualified name"   
+ #	echo "   --cp <path>        colon-separated class paths"
+ #   echo "   -p <parser>        colon-separated parser qualified name"   
     echo "   -o <output-dir>    directory where to store generated files"
     echo "   -d                 includes debugging information in generated executable"
+    echo "   --strict           generate code using strict mode."
+    echo "   --clean            clean all intermediate files before compiling."
+    echo "   --nocompile        turn off compilation."
+    echo "   --opt              turn on optimizations."
 }
 
 function run_compile {
@@ -25,6 +29,11 @@ function run_compile {
 	local input=
     local output=
     local debug=
+    local strict=
+    local new=
+    local clean=
+    local all=all
+    local cflags=
 	while :
     do
    		case $1 in
@@ -59,13 +68,29 @@ function run_compile {
    			    	show_help
    			    	exit 0
    			    fi
-   			    output=$2
+   			    output="OUTPUTDIR=$2"
    			    shift 2
    			    ;;
    			-d)
-   			    debug=$2
+   			    debug="DEBUG=-DDEBUG"
    			    shift
    			    ;;
+   			--strict)
+                strict=STRICT
+                shift
+                ;;
+            --clean)
+                clean=clean
+                shift
+                ;;
+            --nocompile)
+                all=
+                shift
+                ;;
+            --opt)
+                cflags="OPTFLAG=-O3"
+                shift
+                ;;
    			-*)
                	printf >&2 "warning: unknown option: %s\n" "$1"
   	            shift
@@ -75,6 +100,12 @@ function run_compile {
   	            ;;    
 		esac
  	done
+	
+	if [ "$1" = "" ]
+	then
+	   echo "Missing file name"
+       exit
+    fi
 	
 	if [ ! -f $1 ]
 	then
@@ -86,81 +117,15 @@ function run_compile {
 	local inputname="${input%.*}"
 	local inputext="${input##*.}"
 	
-	if [ $inputext = "hx" ]
+	# Execute clean then all.
+	if [ "$clean" = "clean" ]
 	then
-	    printf "Experimental"
-		# Compile Hacs source file. First make the hxt file. 
-		local outputhxt="${output}/${inputname}.hxt"
-		[ $outputhxt -ot $1 ] && $RUNHACS grammar="('net.sf.crsx.hacs.bootstrap.Raw';'net.sf.crsx.text.Text';)" input=$1 category=rawModule output=${inputname}.hxt simple-terms max-indent=10 width=255
-
-	elif [ $inputext = "crs" ];
-	then
-	    # Compile .crs file
-		
-		# FIRST: Generate dr file.
-        [ ! -n "$output" ] && output="."
-        
-		local drfile="${output}/${inputname}.dr"
-	  	local cmd="$CRSXS dispatch -o $drfile"
-
-	  	[ -n "$grammar" ] && cmd="$cmd -p $grammar"
-		[ -n "$classpath" ] && cmd="$cmd --cp $classpath"
-
-		[ $drfile -ot $1 ] && $cmd $1 
-		
-		[ ! -f $drfile ] && exit
-		
-		# THEN: Generate all C files
-		
-		local header="${output}/${inputname}.h"
-		local data="${output}/${inputname}_data.c"
-		local function="${output}/${inputname}_fun.c"
-		local symbols="${output}/${inputname}_symbols.c"
-		
-		[ $data -ot $drfile ] && export HEADERS="${inputname}.h" && $CRSXC compile sorts $drfile > $data
-		[ $header -ot $drfile ] && export HEADERS=crsx.h && $CRSXC compile header $drfile > $header
-		[ $function -ot $drfile ] && export HEADERS="${inputname}.h" && $CRSXC compile rules $drfile > $function
-		
-		if [ $symbols -ot $drfile ] 
-		then
-			$CRSXC compile symbols $drfile > $symbols
-		
-		    # Sort symbol
-		
-			LC_ALL=C sort -bu $symbols | sed 1d  > ${symbols}.tmp
-    			
-    		# and make proper C file.
-    		echo "/* ${inputname}ing symbols. */" > $symbols
-	   	 	echo "#include \"${inputname}.h\"" >> $symbols
-	  		echo "size_t symbolDescriptorCount = `wc -l < ${symbols}.tmp`;" >> $symbols
-	  		echo "struct _SymbolDescriptor symbolDescriptorTable[] = {" >> $symbols
-	   	 	cat ${symbols}.tmp >> $symbols
-	   	 	echo "{NULL, NULL}};" >> $symbols
-	   	 	
-	   		rm ${symbols}.tmp
-		fi
-		
-		# FINALLY: Compile C code and link.
-		local data_o="${output}/${inputname}_data.o"
-		local function_o="${output}/${inputname}_fun.o"
-		local symbols_o="${output}/${inputname}_symbols.o"
-		
-		[ -n "$debug" ] && CFLAGS="$CFLAGS -DDEBUG"
-		
-		[ $function_o -ot $function ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $function -o $function_o
-		[ $data_o -ot $data ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $data -o $data_o
-		[ $symbols_o -ot $symbols ] && $CC -c $CFLAGS -I$CRSXC_INCLUDES $symbols -o $symbols_o
-		
-		# Link
-		$CC $LDFLAGS $ICU4CLIB $function_o $symbols_o $data_o $CRSXC_O_FILES $CRSXC_O_MAIN 
-		
-		# Explicit exit as maybe no command has been executed.
-		exit 0 
-								
-	else
-		echo "Invalid input file extension: ${inputext}"
-		show_help
+	   make -f ${DIR}/library/compile.mk CRSXHOME=${ROOT} CRSFILE=${1} ${output} clean  
 	fi
-			
+	
+	if [ "$all" = "all" ]
+    then
+        make -f ${DIR}/library/compile.mk ${cflags} CRSXHOME=${ROOT} CRSFILE=${1} ${output} MODE=${strict} ${debug} all
+    fi	
 }
 	

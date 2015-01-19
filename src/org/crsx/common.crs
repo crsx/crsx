@@ -5,6 +5,8 @@ Common[(
 
 $Lax;
 
+OK_SORT ::= ( OK; );
+
 // TODO: cleaner way to handle the sort set
 
 ANY_SORT ::= ( ANY; );
@@ -40,6 +42,22 @@ ANY_SORT ::= ( ANY; );
 ∀ s0 s1 s2 s3 s4 s5 s6 s7 s8 s9 r.{$String : ANY_SORT}Delay10[s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, b0::s0 b1::s1 b2::s2 b3::s3 b4::s4 b5::s5 b6::s6 b7::s7 b8::s8 b9::s9.$sort[r]] :: r;
 {#E}Delay10[#a0, #a1, #a2, #a3, #a4, #a5, #a6, #a7, #a8, #a9, a0 a1 a2 a3 a4 a5 a6 a7 a8 a9.#[a0, a1, a2, a3, a4, a5, a6, a7, a8, a9]] → {#E}#[#a0, #a1, #a2, #a3, #a4, #a5, #a6, #a7, #a8, #a9];
 
+// Instrumentation
 
+// Enter new profiling scope.
+∀ a. CI-Enter[$Numeric, $String, a] :: a;
+CI-Enter[#id, #name, #] → $[ProfileEnter, #id, #name, #]; 
+
+// Delay variant.
+∀ a. CI-ThenEnter[OK_SORT, $Numeric, $String, ok¹::OK_SORT.$sort[a]] :: a;
+CI-ThenEnter[OK, #id, #name, ok¹.#[ok¹]] → $[ProfileEnter, #id, #name, #[OK]]; 
+
+// Exit profiling scope.
+∀ a. CI-Exit[$Numeric, a] :: a;
+CI-Exit[#id, #] → $[ProfileExit, #id, #]; 
+
+// Delay variant 
+∀ a. CI-ThenExit[OK_SORT, $Numeric, ok¹::OK_SORT.$sort[a]] :: a;
+CI-ThenExit[OK, #id, ok¹.#[ok¹]] → $[ProfileExit, #id, #[OK]]; 
 
 )]

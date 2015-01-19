@@ -68,7 +68,7 @@ Reified_Form ::=(
 Reified_FormArgument ::=(
 
 	// v:Sort . FormArgument
-	FORM-BINDER[ Reified_Sort, v:Reified_Variable . Reified_FormArgument ];
+	FORM-BINDER[ Reified_Kind, Reified_Sort, v:Reified_Variable . Reified_FormArgument ];
 
 	// Sort
 	FORM-ARGUMENT[ Reified_Sort ];
@@ -97,7 +97,7 @@ Reified_Option ::=(
 Reified_Term ::=(
 
 	// {MetaVariable} Term
-	PROPERTY-REF[ $String<!--Reference-->, Reified_Term<!--Scope--> ];
+	PROPERTY-REF[ $String<!--Reference-->, Reified_Use, Reified_Term<!--Scope--> ];
 
 	// {Term : Term} Term
 	PROPERTY[ Reified_Term<!--Key-->, Reified_Term<!--Value-->, Reified_Term<!--Scope--> ];
@@ -106,7 +106,7 @@ Reified_Term ::=(
 	PROPERTY-NOT[ Reified_Term<!--Key-->, Reified_Term<!--Scope--> ];
 
 	// Constructor [ Binder* ]
-	CONSTRUCTION[ $String<!--Constructor-->, $List[Reified_Binder] ];
+	CONSTRUCTION[Reified_Kind, $String<!--Constructor-->, $List[Reified_Binder] ];
 
 	// Literal (of Type)
 	LITERAL[ $String<!--Value-->, Reified_Sort ];
@@ -130,7 +130,7 @@ Reified_Variable ::=( variable; );
 Reified_Binder ::=(
 
 	// b Binder (not as meta-application arguments)
-	BINDER[ Reified_Promiscuity, Reified_Guard, Reified_Depth, Reified_Sort, $List[Reified_Occurrence], binder : Reified_Variable . Reified_Binder ];
+	BINDER[ Reified_Promiscuity, Reified_Kind, Reified_Depth, Reified_Sort, $List[Reified_Occurrence], binder : Reified_Variable . Reified_Binder ];
 
 	// . Term
 	ARGUMENT[ Reified_Sort, Reified_Term ]; // note: Reified_Sort only instantiated in constructions
@@ -142,16 +142,16 @@ Reified_Binder ::=(
 
 Reified_Promiscuity ::=( LINEAR; PROMISCUOUS; );
 
-Reified_Guard ::=( BLOCK; PERMIT; ); // Whether binder blocks reduction or permits it.
+Reified_Kind ::=( KDATA; KFUNCTION; ); // Whether binder/construction is data or function.
 
 Reified_Depth ::=( SHALLOW; DEEP; ); // Whether binder occurrence is shallow or deep
 
 Reified_Occurrence ::=( META-USE[$String<!--MetaVar-->, $Numeric<!--Count-->]; OTHER; );
 
 Reified_Use ::=( NA;
-   <!-- For Pattern -->
-   LINK; NOLINK; DISCARD;
-   <!-- For Contractum --> 
+   <!-- For Pattern Only -->
+   DISCARD;
+   <!-- For Contractum and Pattern --> 
    USE[$Numeric<!-- counter -->]; ); 
 
 )]

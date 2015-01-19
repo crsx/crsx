@@ -92,7 +92,7 @@ public abstract class AbstractLiteralConstructor implements Constructor
 		return this;
 	}
 
-	final public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	final public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)
@@ -100,7 +100,8 @@ public abstract class AbstractLiteralConstructor implements Constructor
 			writer.append("...");
 			return;
 		}
-		writer.append(CRS.STRING_SORT.equals(literalSort()) ? Util.quoteJava(symbol()) : symbol());
+		String symbol = symbol();
+		writer.append(CRS.STRING_SORT.equals(literalSort()) ? Util.quoteJava(symbol) : Util.externalizeConstructor(symbol));
 	}
 
 	final public SortedSet<Path> paths(Path base)
@@ -193,7 +194,7 @@ public abstract class AbstractLiteralConstructor implements Constructor
 		{
 			appendTo(
 					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true,
-					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 		}
 		catch (IOException e)
 		{}

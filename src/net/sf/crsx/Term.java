@@ -136,10 +136,11 @@ public interface Term extends Stub
      * @param namedProps whether properties are included
      * @param variableProps TODO
      * @param omitProps variable properties that correspond to binder sort declarations (and should be omitted) 
+     * @param sortProps TODO
      * @param w to append the text to
      * @throws IOException if an i/o error occurs
 	 */
-	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException;
+	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException;
 
 	/**
 	 * Send term representing this term using the sorts of reify.crs.

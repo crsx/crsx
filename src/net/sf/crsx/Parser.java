@@ -41,7 +41,7 @@ public interface Parser
 	
 	/**
 	 * Read complete term from text and send it to a sink.
-	 * Should parse terms created with {@link Term#appendTo(Appendable, Map, int, boolean, boolean, boolean, Set)}.
+	 * Should parse terms created with {@link Term#appendTo(Appendable, Map, int, boolean, boolean, boolean, Set, boolean)}.
 	 * @param sink to send the term that is read to
 	 * @param category to parse (or null for the default or "?xml" for CRSX/XML)
 	 * @param reader with term to parse - left ready to read text after the term

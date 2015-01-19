@@ -239,12 +239,12 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		PropertiesConstraintsWrapper.appendTo(
 				writer, used, depth, propertiesRef, namedPropertyConstraints, variablePropertyConstraints, metaPropertyConstraints,
-				full, namedProps, variableProps, omitProps);
+				full, namedProps, variableProps, omitProps, sortProps);
 	}
 
 	final public SortedSet<Path> paths(Path base)
@@ -322,7 +322,7 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		{
 			appendTo(
 					b, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false,
-					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 		}
 		catch (IOException e)
 		{}

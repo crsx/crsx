@@ -719,7 +719,7 @@ public class GenericRule implements Copyable
 						// Shallow variable use	
 						break;
 					case META_APPLICATION :
-						// This is a meta-closure, not a a deep closure;
+						// This is a meta-closure
 						break;
 					case CONSTRUCTION :
 					default :
@@ -1258,8 +1258,13 @@ public class GenericRule implements Copyable
 					if (start)
 					{
 						Variable[] binders = construction.binders(index);
-						for (int i = 0; i < binders.length; i ++)
-							maybeShallow.put(binders[i], true);
+				
+						// Binders on meta cannot be shallow 
+						if 	(construction.sub(index).kind() != Kind.META_APPLICATION)
+						{
+							for (int i = 0; i < binders.length; i ++)
+								maybeShallow.put(binders[i], true);
+						}
 						
 						scopedBinders.push(binders);
 					}	
@@ -1468,11 +1473,16 @@ public class GenericRule implements Copyable
 						{
 							linearSubstitutionContexts.add(false);
 						}
+						
+						// meta does not define binders
+						scopedBinders.push(GenericTerm.NO_BIND);
 					}
 					else
 					{
 						// Pop linearity of this meta-application argument.
 						linearSubstitutionContexts.remove(linearSubstitutionContexts.size() - 1);
+						
+						scopedBinders.pop();
 					}
 				}
 
@@ -1702,7 +1712,7 @@ public class GenericRule implements Copyable
 					if (sort != null)
 					{
 						w.append(" : ");
-						sort.appendTo(w, used, depth, false, namedProps, variableProps, null);
+						sort.appendTo(w, used, depth, false, namedProps, variableProps, null, false);
 					}
 					innerSep = ", ";
 				}
@@ -1721,7 +1731,7 @@ public class GenericRule implements Copyable
 					if (sort != null)
 					{
 						w.append(" : ");
-						sort.appendTo(w, used, depth, false, namedProps, variableProps, null);
+						sort.appendTo(w, used, depth, false, namedProps, variableProps, null, false);
 					}
 					innerSep = ", ";
 				}
@@ -1738,7 +1748,7 @@ public class GenericRule implements Copyable
 					for (Term t : options.get(o))
 					{
 						w.append(innerSep);
-						t.appendTo(w, used, depth, false, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+						t.appendTo(w, used, depth, false, namedProps, variableProps, LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 						innerSep = ",";
 					}
 					w.append("]");
@@ -1762,11 +1772,11 @@ public class GenericRule implements Copyable
 		w.append("\n");
 
 		// Pattern.
-		pattern.appendTo(w, used, depth - 1, false, namedProps, variableProps, null);
+		pattern.appendTo(w, used, depth - 1, false, namedProps, variableProps, null, false);
 		// Arrow.
 		w.append("\n→\n");
 		// Contraction.
-		contractum.appendTo(w, used, depth - 1, false, namedProps, variableProps, null);
+		contractum.appendTo(w, used, depth - 1, false, namedProps, variableProps, null, false);
 
 		if (w instanceof FormattingAppendable)
 			((FormattingAppendable) w).close("");

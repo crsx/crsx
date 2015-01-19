@@ -54,6 +54,12 @@ public interface Factory<T extends Term> extends Maker, Parser, Sorting, ErrorHa
 	/** Name of environment variable that omits all variable properties from full form printout of standard CRSX terms. */
 	public final static String OMIT_VARIABLE_PROPERTIES= "omit-variable-properties";
 
+	/** If set then redefinition of properties during parsing is ignored. */
+	final public static String IGNORE_DUPLICATE = "ignore-duplicate-properties";
+
+	/** If set then properties are sorted when printed out. */
+	final public static String SORT_PROPERTIES = "sort-properties";
+
 	/** Name of environment variable that forces full form printout (with no abbreviations) of standard CRSX terms. */
 	public final static String SIMPLE_TERMS = "simple-terms";
 	

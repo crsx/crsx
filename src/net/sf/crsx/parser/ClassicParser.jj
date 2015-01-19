@@ -51,7 +51,7 @@ import net.sf.crsx.Sink;
 import net.sf.crsx.Stub;
 import net.sf.crsx.Term;
 import net.sf.crsx.Variable;
-import net.sf.crsx.generic.PropertiesWrapperConstructor;
+import net.sf.crsx.generic.PropertiesWrapperConstructor; 
 import net.sf.crsx.util.Buffer;
 import net.sf.crsx.util.ExtensibleMap;
 import net.sf.crsx.util.LinkedExtensibleMap;
@@ -99,6 +99,10 @@ public class ClassicParser implements Parser
 
 	/** Whether this parser has been used. */
 	private boolean used;
+
+    /** Whether to ignore property duplicates */
+    private boolean ignoreDuplicates;
+
 
 	/** Whether location properties are added to constructors. */
 	private boolean captureLocations;
@@ -245,16 +249,12 @@ public class ClassicParser implements Parser
 	
 	public Parser parser(Factory<? extends Term> f)
 	{
-		//if (factory != null)
-		//{
-		//	Parser parser = new ClassicParser().parser(factory);
-		//	return parser;
-		//}
-		//else
-		//{
-			factory = f;
-			return this;
-		//}
+	   factory = f;
+
+       ignoreDuplicates = f.defined(Factory.IGNORE_DUPLICATE);
+	   
+	   return this;
+	
 	}
 
 	private Sink realParse(Sink sink, String unit, ExtensibleMap<String, Variable> bound) throws CRSException, IOException
@@ -771,9 +771,8 @@ void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Te
 		// ¬ C
 		( t=<CONSTRUCTOR> {p = t.toString();} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
 		{
-//			if (properties.containsKey(p))
-//				throw oops("CRS error: Cannot explicitly repeat property name in property pattern!", t, null);
-			properties.put(p, null);
+			if (!ignoreDuplicates || !properties.containsKey(p))
+			   properties.put(p, null);
 		}
 	|
 		// ¬ v
@@ -781,9 +780,8 @@ void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Te
 		{{
 			Variable v = bound.get(s);
 			if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
-//			if (varProperties.containsKey(v))
-//				throw oops("CRS error: Cannot explicitly repeat property variable in property pattern!", t, null);
-			varProperties.put(v, null);
+			if (!ignoreDuplicates || !varProperties.containsKey(v))
+			    varProperties.put(v, null);
 		}}
 	|
 		// ¬ #
@@ -827,9 +825,8 @@ void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Te
 	( t=<CONSTRUCTOR> {p = t.toString();} | t=<ATOM> {p = unquote(t.toString());} | t=<NUMERIC> {p = t.toString();} | t=<STRING> {p = unquote(t.toString());} )
 	[ <COLON> term=BufferedSimple(maker, bound) ]
 	{
-//			if (properties.containsKey(p))
-//				throw oops("CRS error: Cannot explicitly repeat property name!", t, null);
-		properties.put(p, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
+        if (!ignoreDuplicates || !properties.containsKey(p))
+		  properties.put(p, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
 	}
 |
     ( t=<VARIABLE> {s=t.toString();  shallow = isShallow(s); s = unShallow(s); blocking = isBlocking(s); s = unBlocking(s); linear = isLinear(s); s = unLinear(s);} | t=<QUOTED_VARIABLE> {s=unvar(t.toString());  shallow = isShallow(s); s = unShallow(s); blocking = isBlocking(s); s = unBlocking(s);  linear = isLinear(s); s = unLinear(s);} )
@@ -837,9 +834,8 @@ void Property(Maker maker, ExtensibleMap<String, Variable> bound, Map<String, Te
 	{{
 		Variable v = bound.get(s);
 		if (v == null) v = factory.freeVariable(s, !linear, blocking, shallow, true);
-//		if (varProperties.containsKey(v))
-//			throw oops("CRS error: Cannot explicitly repeat property variable!", t, null);
-		varProperties.put(v, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
+		if (!ignoreDuplicates || !varProperties.containsKey(v))
+		  varProperties.put(v, term != null ? term : sequenceNull.copy(false, LinkedExtensibleMap.EMPTY_RENAMING));
 	}}
 |
 	// %category{{text}} : t

@@ -2,66 +2,17 @@ Factorial[(
 
 $Lax;
 
-∀ a .Start[$Numeric] :: a;
-Start[#] → Fact[#, ok¹ r¹. r¹];
+Fact[$Numeric] :: $Numeric;
 
-OK_SORT ::= (OK;);
-∀ t1 t2 t3 a . CONT3[t1,t2,t3,a] ::= (CONT3[ok¹ :: OK_SORT r1¹ :: t1 r2¹ :: t2 r3¹ :: t3 . $sort[a]];);
-
-∀ a . Fact[$Numeric, ok¹ :: OK_SORT r¹ :: C[$Numeric] . $sort[a]] :: a;
-
-Fact[#v, ok¹ r¹. #return[ok¹, r¹]] →    
-   While2[OK, $True, @[#v], @[1], 
-      ok¹ᵇ v1¹ᵇ v2¹ᵇ cont¹ᵇ.
-         ShareCVal[v1¹, v1_ᵇ . 
-         LetCValThenOK[v2¹, ok¹ᵇ v2¹ᵇ . 
-         Goto3[ok¹, CVal[CNotEqual[v1_, @[1]]], CMinus[v1_,@[1]], CTimes[v1_,v2¹], cont¹]]],
-      ok¹ v1¹ v2¹ . 
-   #return[ok¹, v2¹]]
+-[Data[#v]]
+:
+Fact[#v] →
+    $[If, $[Equal, #v, 1], #v, Times[#v, Fact[$[Minus, #v, 1]]]]
 ;
 
-∀ a b c .While2[OK_SORT, $Boolean, b, c, 
-   ok¹ :: OK_SORT v1¹ :: b v2¹ :: c cont¹ :: CONT3[$Boolean, b,c,a]. $sort[a], 
-   ok¹ :: OK_SORT v1¹ :: b v2¹ :: c . $sort[a]] :: a;
+Times[$Numeric, $Numeric] :: $Numeric;
 
--[Data[#body, #rest]]:
-While2[OK, $True, #v1, #v2, 
-   ok¹ v1¹ v2¹ cont¹ . #body[ok¹, v1¹, v2¹, cont¹], 
-   ok¹ v1¹ v2¹ . #rest[ok¹, v1¹, v2¹]]
-   → 
-   #body[OK, #v1, #v2, 
-      CONT3[ok¹ v0¹ v1¹ v2¹. 
-         While2[ok¹, v0¹, v1¹, v2¹, 
-            ok¹ v1¹ v2¹ cont¹ . #body[ok¹, v1¹, v2¹, cont¹], 
-            ok¹ v1¹ v2¹ . #rest[ok¹, v1¹, v2¹]]]]
-;
-            
-While2[OK, $False, #v1, #v2, 
-   ok¹ v1¹ v2¹ cont¹ . #body[ok¹, v1¹, v2¹, cont¹], 
-   ok¹ v1¹ v2¹ . #rest[ok¹, v1¹, v2¹]]
-   → 
-   #rest[OK, #v1, #v2]
-;
-
-∀a . C[a] ::= (@[a];); 
-∀a . CVal[C[a]] :: a;
-∀a . CNotEqual[C[a],C[a]] :: C[$Boolean];
-
-CMinus[@[#v1],@[#v2]]    → @[$[Minus,#v1,#v2]];
-CTimes[@[#v1],@[#v2]]    → @[$[Times,#v1,#v2]];
-CNotEqual[@[#v1],@[#v2]] → @[$[NotEqual,#v1,#v2]];
-CVal[@[#v1]]             → #v1;
-
-∀ t1 t2 t3 a . Goto3[OK_SORT, t1, t2, t3, CONT3[t1, t2, t3, a]] ::a;
-Goto3[OK, #1, #2, #3, CONT3[ok¹ r1¹ r2¹ r3¹ . #[ok¹, r1¹, r2¹, r3¹]]] → #[OK, #1, #2, #3];
-
-∀ a b . ShareCVal[C[a], t::C[a] . $sort[b]] :: b;
--[Data[#return, #v]] :ShareCVal[$[Match,#v,@[#v_]], t.#return[t]] → #return[#v];
-
-∀ a b . LetCValThenOK[C[a], ok¹::OK_SORT r¹::C[a] . $sort[b]] :: b;
--[Discard[#v_], Data[#return]] :LetCValThenOK[$[Match,#v,@[#v_]], ok¹ r¹.#return[ok¹, r¹]] → #return[OK, #v];
-
-∀ s0 s1 s2 s3 r.{$String : ANY_SORT}Delay4[s0, s1, s2, s3, b0::s0 b1::s1 b2::s2 b3::s3.$sort[r]] :: r;
--[Data[#]]: {#E}Delay4[#a0, #a1, #a2, #a3, a0 a1 a2 a3.#[a0, a1, a2, a3]] → {#E}#[#a0, #a1, #a2, #a3];
+ 
+-[Data[#v1, #v2]] : Times[#v1, #v2]    → $[Times,#v1,#v2];
 
 )]

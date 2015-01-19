@@ -1627,15 +1627,15 @@ Reverser.Builder Inline(String productionName, Map<String, String> decls, Source
 {
 	"{"
 	(
-		( t=Name() { inline += t.toString(); } )+		"}"
-		{
+		( t=Name() { inline += t.toString(); } )+		{
 			inline = q(inline);
 		}
-	| t=<STRING> "}"
+	| t=<STRING>
 		{
 			inline = q(unq(t.toString()));
 		}
 	)
+	"}"
 	{		html.append(HTML_START_A+"{"+t+"}"+HTML_END_A);
 	}
 	use=Use(t.toString(), inline, html, false)

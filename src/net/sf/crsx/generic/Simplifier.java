@@ -34,23 +34,23 @@ import net.sf.crsx.util.Util;
  * <p>
  * A simplify contraction as the following characteristics:
  * <ul>
- * <li>Deep binders are transformed into shallow binders and blocked reduction (see below)
+ * <li>Deep binders are transformed into shallow binders  (see below)
  * <li>Bound meta substitution are transformed into bound construction and unbound substitution (see below)
  * </ul>
  * 
  * <p>
  * Here an illustrative example of a deep binder occurrence:
  * 
- * <pre>... → F[b.{#E}F[C[b]]]</pre>
+ * <pre>... → {#E1}C1[b.{#E2}C2[C3[b]]]</pre>
  * 
  * It is simplified as follows:
  * 
  * <pre>
- * ...                → F[bᵇ.F$C[{#E}Prop, b]] 
- * F$C[{#E}#Prop, #b] → {#E}F[#b]];
+ * ...                  → {#E1}C1[b.C1$C[b, {#E2}Prop]] 
+ * C1$C[#b, {#E2}#Prop] → {#E2}C2[C3[#b]];
  * </pre>
  * 
- * Where b occurs at the top-level and block the reduction of F$C (as b has the ᵇ marker)
+ * Where b occurs at the top-level.
  * 
  * <p>
  * A bound meta substitution is a contraction on the form: 
@@ -335,12 +335,12 @@ public class Simplifier
 			Pair<Term, Term> sortDeclaration = getSortDeclaration(rulename, term.constructor.symbol());
 			Term[] binderSorts = getBindersSort(rulename, sortDeclaration.tail(), i);
 
-			boolean hasBlockingMarker = false;
-			for (int j = 0; j < binders.length; j++)
-				hasBlockingMarker |= binders[j].blocking();
+//			boolean hasBlockingMarker = false;
+//			for (int j = 0; j < binders.length; j++)
+//				hasBlockingMarker |= binders[j].blocking();
 
 			final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
-			if (hasBlockingMarker && hasDeepBinders)
+			if (hasDeepBinders) // hasBlockingMarker && 
 			{
 				// The sub is a deep binder so eliminate...only if has marker
 				ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);

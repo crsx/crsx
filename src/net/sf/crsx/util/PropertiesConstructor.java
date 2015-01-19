@@ -4,7 +4,9 @@ package net.sf.crsx.util;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -132,9 +134,10 @@ public class PropertiesConstructor extends DelegateConstructor
 	 * @param namedProps whether named properties are printed
 	 * @param variableProps whether variable properties are printed
 	 * @param omitProps specific variable properties to omit
+	 * @param sortProps TODO
 	 * @throws IOException
 	 */
-	public static void appendPropertiesTo(PropertiesHolder properties, Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public static void appendPropertiesTo(PropertiesHolder properties, Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		Iterator<String> namedPropertyIterator = properties.propertyNames().iterator();
@@ -179,6 +182,17 @@ public class PropertiesConstructor extends DelegateConstructor
 			}
 			if (namedProps)
 			{
+				if (sortProps)
+				{
+					ArrayList<String> list = new ArrayList<String>();
+
+					while (namedPropertyIterator.hasNext())
+						list.add(namedPropertyIterator.next());
+					
+					Collections.sort(list);
+					namedPropertyIterator = list.iterator();
+				}
+				
 				while (namedPropertyIterator.hasNext())
 				{
 					String key = namedPropertyIterator.next();
@@ -192,13 +206,25 @@ public class PropertiesConstructor extends DelegateConstructor
 					else
 					{
 						writer.append(sep + (full ? Util.quoteJava(key) : Util.externalizeLiteral(key)) + " : ");
-						value.appendTo(writer, used, depth - 1, full, namedProps, variableProps, null);
+						value.appendTo(writer, used, depth - 1, full, namedProps, variableProps, null, sortProps);
 					}
 					sep = semi;
 				}
 			}
 			if (variableProps)
 			{
+				if (sortProps)
+				{
+					ArrayList<Variable> list = new ArrayList<Variable>();
+
+					while (variablePropertyIterator.hasNext())
+						list.add(variablePropertyIterator.next());
+					
+					Collections.sort(list);
+					variablePropertyIterator = list.iterator();
+				}
+				
+				
 				while (variablePropertyIterator.hasNext())
 				{
 					Variable key = variablePropertyIterator.next();
@@ -212,7 +238,7 @@ public class PropertiesConstructor extends DelegateConstructor
 						else
 						{
 							writer.append(sep + Util.safeVariableName(key, used, false, false) + " : ");
-							value.appendTo(writer, used, depth - 1, full, true, variableProps, null);
+							value.appendTo(writer, used, depth - 1, full, true, variableProps, null, sortProps);
 						}
 						sep = semi;
 					}
@@ -634,7 +660,7 @@ public class PropertiesConstructor extends DelegateConstructor
 		}
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{
 		if (depth <= 0)
@@ -645,8 +671,8 @@ public class PropertiesConstructor extends DelegateConstructor
 		if (writer instanceof FormattingAppendable)
 			((FormattingAppendable) writer).open("");
 		if (namedProps || variableProps)
-			appendPropertiesTo(this, writer, used, depth - 1, full, namedProps, variableProps, omitProps);
-		constructor.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps); //TODO: will omit nested properties...does this happen?
+			appendPropertiesTo(this, writer, used, depth - 1, full, namedProps, variableProps, omitProps, sortProps);
+		constructor.appendTo(writer, used, depth, full, namedProps, variableProps, omitProps, sortProps); //TODO: will omit nested properties...does this happen?
 		if (writer instanceof FormattingAppendable)
 			((FormattingAppendable) writer).close("");
 	}
@@ -846,7 +872,7 @@ public class PropertiesConstructor extends DelegateConstructor
 		{
 			appendTo(
 					w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, true, true,
-					LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+					LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 		}
 		catch (IOException e)
 		{

@@ -2820,10 +2820,10 @@ public class Completer
 		if (rs.size() == 1)
 			relevantRules = rs;
 		
-		//String rulename = rs.iterator().next().getName().symbol();
-		//if (rulename.contains("Code-lift-13"))
-		//	System.out.println("Have rule.");
-		
+//		String rulename = rs.iterator().next().getName().symbol();
+//		if (rulename.contains("R-R4-R4a-Form-for-at2-1"))
+//			System.out.println("Have rule.");
+//		
 		// STEP 1: find a position where we can split, and decide what to split on
 		final Pair<Integer,Object> splitPos = getSplitPosition(relevantRules);
 		if (splitPos == null)
@@ -2960,9 +2960,9 @@ public class Completer
 	 */
     protected StandardizedRule createNormalRule(StandardizedRule rule) throws CRSException
     {
-	    if (Util.symbol(rule.getPattern()).contains("CRSX2Text"))
-	    	warning("karma");
-	    
+//	    if (Util.symbol(rule.getPattern()).contains("CRSX2Text"))
+//	    	warning("karma");
+//	    
 	    Map<String,String> metaRename = new HashMap<String,String>();
 	    Map<String,Variable> varChange = new HashMap<String,Variable>();
 	    lookupFreeVariablesAndMetas(rule.getPattern(), varChange, metaRename);
@@ -3475,16 +3475,25 @@ public class Completer
 		{
 			// determine which group of binders is considered
 			int Nbinds;
-			//boolean[] promisc = null;
+			boolean[] block = null;
 			if (flattenFirst)
 			{
 				if (i < firstSubArgs)
 				{
 					Nbinds = example.binders(0).length + example.sub(0).binders(i).length;
+					block = new boolean[Nbinds];
+					int k = 0;
+					for (int j = 0; j <  example.binders(0).length; j++)
+						block[k++] = example.binders(0)[j].blocking();
+					for (int j = 0; j <  example.sub(0).binders(i).length; j++)
+						block[k++] = example.sub(0).binders(i)[j].blocking();
 				}
 				else if (i-firstSubArgs+1 < example.arity())
 				{
 					Nbinds = example.binders(i-firstSubArgs+1).length;
+					block = new boolean[Nbinds];
+					for (int j = 0; j <  Nbinds; j++)
+						block[j] = example.binders(i-firstSubArgs+1)[j].blocking();
 				}
 				else Nbinds = 0;	// might occur when extra is true
 			}
@@ -3492,6 +3501,9 @@ public class Completer
 			else
 			{
 				Nbinds = example.binders(i).length;
+				block = new boolean[Nbinds];
+				for (int j = 0; j <  Nbinds; j++)
+					block[j] = example.binders(i)[j].blocking();
 			}
 
 			// create the relevant x1...xn.#k[x1,...,xn]
@@ -3499,7 +3511,7 @@ public class Completer
 			GenericTerm[] args = new GenericTerm[Nbinds];
 			for (int j = 0; j < Nbinds; j++)
 			{
-				binders[i][j] = env.makeVariable("x" + j, true); // TODO: binders! 
+				binders[i][j] = env.makeVariable("x" + j, true, block[j], false); // TODO: binders! 
 				args[j] = factory.newVariableUse(binders[i][j]);
 			}
 			subterms[i] = standardPatternMetaApplication("#" + (metaIndexStart + i), args);
@@ -3509,12 +3521,12 @@ public class Completer
 		Constructor c = factory.makeConstructor(F);
 		GenericTerm ret = factory.newConstruction(c, binders, subterms);
 		
-		boolean includePropertyReference = Util.hasProperties(example);
-		if (!includePropertyReference)
-		{
-			factory.formsOf(F);
-			includePropertyReference = true;
-		}
+		boolean includePropertyReference = Util.hasNoStandardProperties(example);
+//		if (!includePropertyReference)
+//		{
+//			factory.formsOf(F);
+//			includePropertyReference = true;
+//		}
 		if (!includePropertyReference)
 		{
 			Term sort = factory.sortOf(F);
@@ -4749,6 +4761,9 @@ public class Completer
 					pcw.setProperties((PropertiesConstraintsWrapper) pattern);
 					alteredPattern = pcw;
 				}
+				if (Util.hasPropertyRef(exampleForm) && !Util.hasProperties(exampleForm))
+					System.out.println("ISSUE??");
+					
 				if (Util.hasProperties(exampleForm))
 				{
 					alteredForm = alteredForm.wrapWithPropertiesOf(exampleForm); // we cannot use exampleForm any more!

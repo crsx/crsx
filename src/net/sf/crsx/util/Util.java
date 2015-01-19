@@ -39,6 +39,7 @@ import net.sf.crsx.Stub;
 import net.sf.crsx.Term;
 import net.sf.crsx.Variable;
 import net.sf.crsx.Visitor;
+import net.sf.crsx.generic.Completer;
 import net.sf.crsx.generic.GenericFactory;
 import net.sf.crsx.generic.GenericTerm;
 import net.sf.crsx.generic.PropertiesConstraintsWrapper;
@@ -252,14 +253,18 @@ public final class Util
 		{
 			if (used.containsKey(null))
 			{
-				String[] words = v.name().split("[-_0-9]", 2);
-				n = words[0];
-				n = n.replaceAll("__V[0-9]+¹", "");
-				if (n.isEmpty() || !n.matches("[a-z][A-Za-z0-9]*"))
-					n = "v";
-				int i = Integer.parseInt(used.get(null));
-				n = n + "__V" + i;
-				used.put(null, Integer.toString(i + 1));
+				String name = v.name();
+				if (name != null)
+				{
+					String[] words = name.split("[-_0-9]", 2);
+					n = words[0];
+					n = n.replaceAll("__V[0-9]+¹", "");
+					if (n.isEmpty() || !n.matches("[a-z][A-Za-z0-9]*"))
+						n = "v";
+					int i = Integer.parseInt(used.get(null));
+					n = n + "__V" + i;
+					used.put(null, Integer.toString(i + 1));
+				}
 				used.put(v, n);
 			}
 			else
@@ -1014,16 +1019,41 @@ public final class Util
 		return term instanceof PropertiesConstraintsWrapper && ((PropertiesConstraintsWrapper) term).hasNotProperty(name);
 	}
 
-	/** Whether term has any properties at all.  A properties reference does not count. */
+	/** Whether term has any properties at all. The standard property does not count. */
+	public static boolean hasNoStandardProperties(Term term)
+	{
+		return hasProperties(term, false);	
+	}
+	
+	/** Whether term has any properties at all.  A properties reference does not count */
 	public static boolean hasProperties(Term term)
+	{
+		return hasProperties(term, true);
+	}
+	
+	/** Whether term has any properties at all.  A properties reference does not count, as well as standard properties is includeStandard is false */
+	private static boolean hasProperties(Term term, boolean includeStandard)
 	{
 		if (term == null)
 			return false;
 		PropertiesHolder ph = propertiesHolder(term);
 		if (ph == null)
 			return false;
-		if (ph.propertyNames().iterator().hasNext())
-			return true; // succeed because named properties
+		if (includeStandard)
+		{
+			if (ph.propertyNames().iterator().hasNext())
+				return true; // succeed because named properties
+		}
+		else
+		{
+			Iterator<String> names = ph.propertyNames().iterator();
+			while (names.hasNext())
+			{
+				String name = names.next();
+				if (!name.equals(Completer.STANDARDIZED))
+					return true;
+			}
+		}
 		if (ph.propertyVariables().iterator().hasNext())
 			return true; // succeed because variable properties
 		if (ph.isMeta())
@@ -1816,7 +1846,7 @@ public final class Util
 		StringBuilder b = new StringBuilder();
 		try
 		{
-			term.appendTo(b, new HashMap<Variable, String>(), depth, false, true, true, null);
+			term.appendTo(b, new HashMap<Variable, String>(), depth, false, true, true, null, false);
 		}
 		catch (IOException e)
 		{}

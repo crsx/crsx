@@ -885,7 +885,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						Term t = b.term(false);
 						assert t != null : "Generated dumped rules term is not buffered!";
 						Appendable a = output(directive.sub(0));
-						t.appendTo(a, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null);
+						t.appendTo(a, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
 						if (a instanceof Flushable)
 							((Flushable) a).flush();
 						if (a instanceof Closeable)
@@ -1614,7 +1614,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		return verbosity;
 	}
 
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps)
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 	        throws IOException
 	{
 		if (depth <= 0)
@@ -2707,6 +2707,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 					int ends = 0;
 		    		sink = sink.start(sink.makeConstructor(CRS.REIFY_CONSTRUCTION)); // CONSTRUCTION[
 		    		++ends;
+		    		sink = sink.start(sink.makeConstructor(CRS.REIFY_FUNCTION_KIND)).end(); // KFUNCTION
 		    		sink = sink.start(sink.makeLiteral(constructor.symbol(), CRS.STRING_SORT)).end(); // c
 		    		Term sort = factory.sortOf(constructor.symbol());
 		    		Term form = sort == null ? null : factory.formOf(Util.symbol(sort), constructor.symbol()); // form of target symbol
@@ -2722,7 +2723,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		    				Variable b = original.binders(source)[j];
 		    				sink = sink.start(sink.makeConstructor(CRS.REIFY_BINDER)); // BINDER[
 		    				sink = sink.start(sink.makeConstructor(b.promiscuous() ? CRS.REIFY_PROMISCUOUS : CRS.REIFY_LINEAR)).end(); // LINEAR/PROMISCUOUS
-		    				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_BLOCK : CRS.REIFY_PERMIT)).end(); // BLOCK/PERMIT
+		    				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_FUNCTION_KIND : CRS.REIFY_DATA_KIND)).end(); // BLOCK/PERMIT
 		    				sink = sink.start(sink.makeConstructor(b.shallow() ? CRS.REIFY_SHALLOW : CRS.REIFY_DEEP)).end();
 			    				Term binderSort = formSort == null ? factory.nil() : Util.propertiesHolder(formSort).getProperty(formBinders[j]);
 		    				sink = GenericCRS.reifySort(factory, sink, binderSort);
@@ -3076,6 +3077,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			{
 				sink = sink.start(sink.makeConstructor(CRS.REIFY_FORM_BINDER)); // FORM-BINDER[
 				++innerEnds;
+				sink = sink.start(sink.makeConstructor(b.blocking() ? CRS.REIFY_FUNCTION_KIND : CRS.REIFY_DATA_KIND)).end();
 				sink = reifySort(sink, Util.getProperty(arg, b));
 				Variable[] bs = {b};
 				sink = sink.binds(bs);

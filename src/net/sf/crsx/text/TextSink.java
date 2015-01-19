@@ -143,23 +143,30 @@ public class TextSink extends ManagedSink implements Sinker
     					f.append("\u2020"); // † prefix denoting non-trivial character term
     				}
     			}
-    			else if (s.equals("$TextBreak") && text.arity() == 1)
+    			else if (s.equals("$TextBreak"))
     			{
-    				Term sub = text.sub(0);
-    				if (Util.isConstant(sub) && isSafe(sub.constructor()))
+    				if (text.arity() == 1)
     				{
-    					String brk = Util.symbol(sub);
-    					f.append(brk.isEmpty() ? "\n" : brk);
-    					break;
+    					Term sub = text.sub(0);
+    					if (Util.isConstant(sub) && isSafe(sub.constructor()))
+    					{
+    						String brk = Util.symbol(sub);
+    						f.append(brk.isEmpty() ? "\n" : brk);
+    						break;
+    					}
+    					else
+    					{
+    						f.append("\u2021"); // ‡ prefix denoting non-trivial break term
+    					}
     				}
     				else
     				{
-    					f.append("\u2021"); // ‡ prefix denoting non-trivial break term
+    					f.append("\n");
     				}
     			}
     			else if (s.equals("$TextTerm") && text.arity() == 1)
     			{
-    				text.sub(0).appendTo(f, namings, Integer.MAX_VALUE, false, true, true, null);
+    				text.sub(0).appendTo(f, namings, Integer.MAX_VALUE, false, true, true, null, false);
     				break;
     			}
     			else if (s.equals("$TextSeparator") && text.arity() == 0)
@@ -194,7 +201,7 @@ public class TextSink extends ManagedSink implements Sinker
     		
     		default : // META_APPLICATION and complex constructions
     			f.append("\u00ab ");
-    			text.appendTo(f, namings, Integer.MAX_VALUE, false, true, true, null);
+    			text.appendTo(f, namings, Integer.MAX_VALUE, false, true, true, null, false);
     			f.append(" \u00bb");
     			break;
 

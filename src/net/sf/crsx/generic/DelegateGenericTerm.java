@@ -167,9 +167,9 @@ abstract class DelegateGenericTerm extends GenericTerm
 		return term().equalsModulo(that, renamings);
 	}
 	
-	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
-		term().appendTermTo(writer, used, noLinear, depth, outer, full, namedProps, variableProps, omitProps);
+		term().appendTermTo(writer, used, noLinear, depth, outer, full, namedProps, variableProps, omitProps, sortProps);
 	}
 
     public Sink reify(Sink sink, Map<String, Term> metaArgSort, Map<Variable, Term> freeSort, Map<String, Reifier> subReifiers)

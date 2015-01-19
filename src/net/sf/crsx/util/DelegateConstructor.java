@@ -116,9 +116,9 @@ public abstract class DelegateConstructor implements Constructor
 	}
 
 	// @see net.sf.crsx.Constructor#appendTo(java.lang.Appendable)
-	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps) throws IOException
+	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{
-		constructor.appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps);
+		constructor.appendTo(writer, used, depth-1, full, namedProps, variableProps, omitProps, sortProps);
 	}
 
 	/* @see net.sf.crsx.Constructor#paths(net.sf.crsx.Path)*/
@@ -202,7 +202,7 @@ public abstract class DelegateConstructor implements Constructor
 		StringWriter w = new StringWriter();
 		try
 		{
-			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+			appendTo(w, new HashMap<Variable, String>(), Integer.MAX_VALUE, false, false, false, LinkedExtensibleSet.EMPTY_VARIABLE_SET, false);
 		}
 		catch (IOException e)
 		{}

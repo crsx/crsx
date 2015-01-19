@@ -34,13 +34,13 @@ clean::
 TARGETS=CRSXC
 
 # CRSX rule families
-CRSXCFAMILIES=EVAL-E1 EVAL-E2 RULE TERM HEADER SORTS SYMBOLS D CD Reified Text
+CRSXCFAMILIES=EVAL-E1 EVAL-E2 EVAL-E3 RULE TERM HEADER SORTS SYMBOLS D CD Reified Text SRULE STERM SHEADER
 
 # Same as FAMILIES but as CRSX list format
 CRSXCMODULES=( $(patsubst %,'%';,$(CRSXCFAMILIES)) )
 
 # The crsxc rules files.
-CRSXCRULESFILES =  ../crsxc.crs rules.crs evaluators.crs term.crs header.crs sorts.crs symbols.crs ../defs.crs ../reify.crs cdefs.crs 
+CRSXCRULESFILES =  ../crsxc.crs rules.crs srules.crs sterm.crs evaluators.crs term.crs sterm.crs header.crs sorts.crs symbols.crs ../defs.crs ../reify.crs cdefs.crs 
 
 # We need a second expansion: the first expansion generates target rules and the second expansion processes automatic variables	    
 .SECONDEXPANSION:

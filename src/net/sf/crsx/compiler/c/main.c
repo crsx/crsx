@@ -16,6 +16,7 @@
 
 #include "linter.h"
 #include "crsx.h"
+#include "prof.h"
 
 // Scanner definitions
 extern int readTerm(Sink sink, FILE *input);
@@ -52,9 +53,9 @@ readTermFromString(Context context, const char* text)
 }
 
 static Term
-normalizeTerm (Context context, Term term, const char* wrapper)
+normalizeTerm (Context context, Term term, char* wrapper)
 {
-    assert (context && term);
+    assert (context);
 
     Sink sink = MAKE_BUFFER (context);
     assert (sink);
@@ -70,7 +71,8 @@ normalizeTerm (Context context, Term term, const char* wrapper)
         }
         PROPERTIES_RESET (sink);
         sink->start(sink, dtor);
-        COPY (sink, term);
+        if (term)
+            COPY (sink, term);
         sink->end(sink, dtor);
         redex = BUFFER_TERM (sink);
     }
@@ -96,21 +98,21 @@ int printUsage(char* errmsg)
     printf ("The commands are:\n");
     printf ("  compile <header|rules|sorts|symbols|opt1> <rules.dr>   Compile reified rules to c code.\n");
     printf ("  lint [-c] <input>                                      Check term lexical form.\n");
+    printf ("  report <input.csv>                                         Analyzes profiling information and print report.\n");
     printf ("or:\n");
     printf ("  key=value...   Invoke raw rulecompiler with this environment setup.\n");
-    exit(1);
 #else
-    printf ("Usage: %s [key]... [key=value]...", getenv("execname"));
-    printf ("Where key is any of");
-    printf ("  term=TERM                        input term using term syntax.");
-    printf ("  wrapper=WRAPPER                  a single construction wrapping the input term (if any)");
-    printf ("  crsx-debug-steps                 print term before each step");
+    printf ("Usage: %s [key]... [key=value]...\n", getenv("execname"));
+    printf ("Where key and key-value are any of\n");
+    printf ("  term=TERM                        input term using term syntax.\n");
+    printf ("  wrapper=WRAPPER                  a single construction wrapping the input term (if any)\n");
+    printf ("  crsx-debug-steps                 print term before each step\n");
     printf ("  crsxviz                          print debug trace that is used as input for crsxviz tool");
-    printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)");
-    printf ("  free-var-annotation              enable free variable annotation");
-    printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.");
-    printf ("Where");
+    printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)\n");
+    printf ("  free-var-annotation              enable free variable annotation\n");
+    printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.\n");
 #endif
+    exit(1);
 }
 
 static
@@ -135,11 +137,13 @@ int run(void)
 			term = readTermFromString(context, interm);
 		}
 	}
-	if (!term)
-        return printUsage("No input/term specified?");
+	char* wrapper = getenv("wrapper");
+
+	if (!term && !wrapper)
+        return printUsage("No input and no wrapper specified.");
 
     // eval: term -> term
-    term = normalizeTerm(context, term, getenv("wrapper"));
+    term = normalizeTerm(context, term, wrapper);
     if (term == NULL)
     	return 1;
 
@@ -235,6 +239,43 @@ int runLinter(int argp, int argc, char* argv[])
     return 0;
 }
 
+
+static
+int runReport(int argp, int argc, char* argv[])
+{
+    char* input = (char*)0;
+
+    int i;
+    for (i = argp; i < argc; ++i)
+    {
+        const char *arg = argv[i];
+        if (input)
+            return printUsage("Too many arguments.");
+        input = (char*)arg;
+    }
+
+    if (!input)
+        return printUsage("Missing input argument.");
+
+
+    Context context = (Context) calloc(1, sizeof(struct _Context));
+    initCRSXContext(context);
+
+    FILE *fp = fopen(input, "r");
+    if (!fp)
+    {
+        printf("Fatal: Cannot read file %s (%s)\n", input, strerror(errno));
+        exit(3);
+    }
+
+    crsxpMergeBacktrace(context, fp);
+
+    fclose(fp);
+
+    return 0;
+}
+
+
 #endif
 
 static void
@@ -267,7 +308,10 @@ main (int argc, char* argv[])
         return runCompile(2, argc, argv);
 
     if (strcmp(command, "lint") == 0)
-        return runLinter(2, argc, argv);
+           return runLinter(2, argc, argv);
+
+    if (strcmp(command, "report") == 0)
+           return runReport(2, argc, argv);
 
 #endif
     // "manual" loading.
