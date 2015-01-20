@@ -4986,12 +4986,13 @@ static void fprintCookies(Context context)
 {
     if (printCookieNameList)
     {
-        PRINTF(context, "//Cookies found:\n");
+        PRINTF(context, "\n//Cookies found:\n");
         NamedPropertyLink cookie = printCookieNameList;
         for (; cookie; cookie = cookie->link)
         {
             PRINTF(context, "//   %s\n", cookie->name);
         }
+        PRINTF(context, "\n");
     }
 }
 
@@ -4999,12 +5000,13 @@ static void fprintCookies_new (Context context, FILE* out)
 {
     if (printCookieNameList)
     {
-        FPRINTF(context, out, "//Cookies found:\n");
+        FPRINTF(context, out, "\n//Cookies found:\n");
         NamedPropertyLink cookie = printCookieNameList;
         for (; cookie; cookie = cookie->link)
         {
             FPRINTF(context, out, "//   %s\n", cookie->name);
         }
+        PRINTF(context, "\n");
     }
 }
 
