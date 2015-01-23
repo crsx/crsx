@@ -1,0 +1,12 @@
+Let[(
+
+$Lax;
+
+Statement ::=( Literal[$Number] ; Variable[$String] ; Let[$String, $Number, Statement] ; ) ;
+
+{$String:$Number}Compile[Statement] :: $Number;
+{#E}Compile[Literal[#num]] → #num;
+{#E ; #str:#num}Compile[Variable[#str]] → #num;
+{#E}Compile[Let[#str, #num, #body]] → {#E; #str:#num} Compile[#body];
+
+)]

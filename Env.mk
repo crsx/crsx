@@ -41,3 +41,8 @@ RUNCRSXRC = $(JAVA) -Dfile.encoding=UTF-8 -Xss20000K -Xmx2000m -cp $(BUILD) net.
 COMPILERSRC = $(CRSXHOME)/src/net/sf/crsx/compiler
 CRSXC = $(CRSXHOME)/bin/crsxc
 CRSX = $(CRSXHOME)/bin/crsx
+
+# X.crsD is the "simplified and dispatchified rules" file equivalent to X.crs.
+%.crsD: %.crs
+	$(RUNCRSXRC) rules="$<" sortify dispatchify dump-rules="$@"
+	@[ -s $@ ] || rm -f $@ || false

@@ -107,6 +107,7 @@ int printUsage(char* errmsg)
     printf ("  term=TERM                        input term using term syntax.\n");
     printf ("  wrapper=WRAPPER                  a single construction wrapping the input term (if any)\n");
     printf ("  crsx-debug-steps                 print term before each step\n");
+    printf ("  crsxviz                          print debug trace that is used as input for crsxviz tool");
     printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)\n");
     printf ("  free-var-annotation              enable free variable annotation\n");
     printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.\n");
