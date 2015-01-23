@@ -1,0 +1,1 @@
+Search.setIndex({envversion:46,terms:{content:0},objtypes:{},objnames:{},filenames:["index"],titles:["Welcome to crsx&#8217;s documentation!"],objects:{},titleterms:{crsx:0,document:0,welcom:0,introduct:0}})
