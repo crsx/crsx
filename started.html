@@ -1,0 +1,223 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; crsx 3.2.1.6 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="crsx 3.2.1.6 documentation" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> crsx</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#system-requirements">System requirements</a></li>
+<li><a class="reference internal" href="#download">Download</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#running-a-sample">Running a sample</a></li>
+</ul>
+</li>
+</ul>
+</div>
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">crsx</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/started.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="system-requirements">
+<h2>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<p>CRSX has been tested on OSX and Ubuntu.</p>
+<p>git must be installed on your system, as well as make.</p>
+<p>ICU is required to compile CRSX. You can install it as follows:</p>
+<ul class="simple">
+<li>on OS X: either use macport or homebrew.</li>
+<li>on Ubuntu:
+- type sudo apt-get install libicu52 (or older/newer version)
+- type sudo apt-get install libicu-dev</li>
+</ul>
+</div>
+<div class="section" id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>CRSX is hosted on github.com. To download and enter the directory, type the following commands in a terminal:</p>
+<div class="highlight-sh"><div class="highlight"><pre>git clone https://github.com/crsx/crsx.git
+<span class="nb">cd </span>crsx
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The code needs to be compile using this command :</p>
+<div class="highlight-sh"><div class="highlight"><pre>make -j1
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The -j1 to turn off parallel make is because of a temporary bug in the makefile that would build in the wrong order and error.
+It tends to only matter the first time you make, subsequent incremental makes should be fine parallel.]</p>
+</div>
+<p>This might take a few minutes.</p>
+<p>If you get this compilation error:</p>
+<div class="highlight-sh"><div class="highlight"><pre>gcc -g -Wall -I. -DCRSX_ENABLE_PROFILING -DDEBUG -g -c crsx.c -o build/crsx.o
+crsx.c:11:30: fatal error: unicode/umachine.h: No such file or directory
+<span class="c">#include &lt;unicode/umachine.h&gt;</span>
+                      ^
+compilation terminated.
+</pre></div>
+</div>
+<p>it means ICU hasn&#8217;t been installed on your system. See above for instructions.</p>
+</div>
+<div class="section" id="running-a-sample">
+<h2>Running a sample<a class="headerlink" href="#running-a-sample" title="Permalink to this headline">¶</a></h2>
+<p>Advanced: If you would like to understand this program as you compile and run it, see CRSX Sample Program: Hello World.</p>
+<p>From the CRSX root directory, type the following commands in a terminal:</p>
+<div class="highlight-sh"><div class="highlight"><pre><span class="nb">cd </span>samples/hello-world
+make -j1
+./hello-world <span class="nv">wrapper</span><span class="o">=</span>Go
+</pre></div>
+</div>
+<p>You should see &#8220;Hello-World&#8221;</p>
+<p>Now you have CRSX running on your machine - to understand more about it see the tutorials.</p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Lionel Villard.
+      Last updated on Jan 22, 2015.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'3.2.1.6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
