@@ -28,7 +28,8 @@
   
 
   
-    <link rel="top" title="crsx 3.2.1.6 documentation" href="index.html"/> 
+    <link rel="top" title="crsx 3.2.1.6 documentation" href="index.html"/>
+        <link rel="prev" title="Welcome to CRSX!" href="index.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -59,17 +60,16 @@
         
           
           
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Getting Started</a><ul>
-<li><a class="reference internal" href="#system-requirements">System requirements</a></li>
-<li><a class="reference internal" href="#download">Download</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#running-a-sample">Running a sample</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#system-requirements">System requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#download">Download</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-a-sample">Running a sample</a></li>
 </ul>
 </li>
 </ul>
-</div>
+
           
         
       </div>
@@ -95,8 +95,6 @@
     <li>Getting Started</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/started.txt" rel="nofollow"> View page source</a>
-        
       </li>
   </ul>
   <hr/>
@@ -108,13 +106,15 @@
 <div class="section" id="system-requirements">
 <h2>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
 <p>CRSX has been tested on OSX and Ubuntu.</p>
-<p>git must be installed on your system, as well as make.</p>
+<p><code class="docutils literal"><span class="pre">git</span></code> must be installed on your system, as well as <code class="docutils literal"><span class="pre">make</span></code>.</p>
 <p>ICU is required to compile CRSX. You can install it as follows:</p>
 <ul class="simple">
 <li>on OS X: either use macport or homebrew.</li>
-<li>on Ubuntu:
-- type sudo apt-get install libicu52 (or older/newer version)
-- type sudo apt-get install libicu-dev</li>
+<li>on Ubuntu:<ul>
+<li>type sudo apt-get install libicu52 (or older/newer version)</li>
+<li>type sudo apt-get install libicu-dev</li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="section" id="download">
@@ -165,13 +165,20 @@ make -j1
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome to CRSX!"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Lionel Villard.
-      Last updated on Jan 22, 2015.
+      Last updated on Jan 24, 2015.
     </p>
   </div>
 

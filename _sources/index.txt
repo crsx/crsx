@@ -3,8 +3,6 @@
 Welcome to CRSX!
 ################
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
 
