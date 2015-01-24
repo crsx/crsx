@@ -70,4 +70,11 @@ From the CRSX root directory, type the following commands in a terminal:
 
 You should see "Hello-World"
 
-Now you have CRSX running on your machine - to understand more about it see the tutorials.
+Now you have CRSX running on your machine.
+
+How to continue
+===============
+
+For a hands-on introduction to CRSX, see the `tutorials <https://github.com/crsx/crsx/wiki/Tutorials>`_.
+
+For the reference manual, jump to the :doc:`intro` .

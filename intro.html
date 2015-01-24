@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to CRSX! &mdash; crsx 3.2.1.6 documentation</title>
+  <title>Introduction &mdash; crsx 3.2.1.6 documentation</title>
   
 
   
@@ -28,8 +28,8 @@
   
 
   
-    <link rel="top" title="crsx 3.2.1.6 documentation" href="#"/>
-        <link rel="next" title="Getting Started" href="started.html"/> 
+    <link rel="top" title="crsx 3.2.1.6 documentation" href="index.html"/>
+        <link rel="prev" title="Getting Started" href="started.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -44,7 +44,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
         
-          <a href="#" class="fa fa-home"> crsx</a>
+          <a href="index.html" class="fa fa-home"> crsx</a>
         
         
 <div role="search">
@@ -60,7 +60,7 @@
         
           
           
-              <ul>
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="started.html#system-requirements">System requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="started.html#download">Download</a></li>
@@ -69,7 +69,7 @@
 <li class="toctree-l2"><a class="reference internal" href="started.html#how-to-continue">How to continue</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a></li>
 </ul>
 
           
@@ -83,7 +83,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">crsx</a>
+        <a href="index.html">crsx</a>
       </nav>
 
 
@@ -92,9 +92,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
+    <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Welcome to CRSX!</li>
+    <li>Introduction</li>
       <li class="wy-breadcrumbs-aside">
         
       </li>
@@ -103,29 +103,14 @@
 </div>
           <div role="main" class="document">
             
-  <div class="section" id="welcome-to-crsx">
-<h1>Welcome to CRSX!<a class="headerlink" href="#welcome-to-crsx" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="started.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="started.html#system-requirements">System requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="started.html#download">Download</a></li>
-<li class="toctree-l2"><a class="reference internal" href="started.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="started.html#running-a-sample">Running a sample</a></li>
-<li class="toctree-l2"><a class="reference internal" href="started.html#how-to-continue">How to continue</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
-</ul>
-</div>
-<p>The purpose of CRSX is to implement an extended higher-order rewriting formalism to facilitate writing compilers
-and other syntax-directed transformation systems, specifically:</p>
-<ul class="simple">
-<li>Special notations for using embedded syntax, even higher order abstract syntax.</li>
-<li>Special support for symbol tables, environments, and attributes, as used in compilers.</li>
-<li>A polymorphic sort system (which in practice means that CRSX systems are contraction schemes).</li>
-<li>CRSX systems can be compiled directly to native code (so far in C or Java (experimental)) for effective execution.</li>
-</ul>
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>CRS stands for Combinatory Reduction Systems, which is a powerful rewriting formalism invented by P. Aczel and J. W. Klop.
+The idea of CRS is to allow rewrite rules that support matching of variable binding constructs and substitution as
+part of rewrite steps, collectively known as higher-order rewriting.</p>
+<p>CRSX implements CRS with a number of extension borrowed from functional programming and semantics,
+to facilitate using CRS for writing compilers and similar “real world” transformation systems.</p>
+<p>The current version, described in this manual is CRSX 3, written in Java with run-time support for C.</p>
 </div>
 
 
@@ -134,8 +119,8 @@ and other syntax-directed transformation systems, specifically:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="started.html" class="btn btn-neutral float-right" title="Getting Started">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+        <a href="started.html" class="btn btn-neutral" title="Getting Started"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
