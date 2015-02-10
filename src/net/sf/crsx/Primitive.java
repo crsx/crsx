@@ -182,6 +182,8 @@ public enum Primitive
 	GE("GreaterThanOrEqual", 2, 2),
 	 /** $[StringLessThan, #1, #2] for strings #1, #2, result is boolean. */
 	STRING_LT("StringLessThan", 2, 2),
+	 /** $[StringEqual, #1, #2] for strings #1, #2, result is boolean. */
+	STRING_EQ("StringEqual", 2, 2),
 	
 	/** $[DeepEqual, #1, #2 [, #3]]  test equality of #1, #2 as terms, result is boolean. If #3 is $True, also compare environment (default) */
 	DEEP_EQ("DeepEqual", 2, 3),
