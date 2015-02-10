@@ -293,8 +293,9 @@ F-Dispatch-choice[#function, #Form[dummy], #sink, #term, #Rules]
 :
 F-Dispatch-choice[#function, FORM-ARGUMENT[SORT[#SortName, #SortParams]], #sink, #term, #Rules]  
 → 
+%n⟪
 DEBUGCOND(«#sink»->context->debugviz, DEBUGF(«#sink»->context, "//CHILD\n"));
-%n⟪Term «sub» = FORCE(«#sink»->context, SUB(«#term», 0));
+Term «sub» = FORCE(«#sink»->context, SUB(«#term», 0));
 « Enum[#SortName] » «choice» = (IS_VARIABLE_USE(«sub») ? « EnumVar[#SortName] » : (« Enum[#SortName] ») TAG(«sub»));
 DEBUGCOND(«#sink»->context->debugviz, DEBUGF(«#sink»->context, "//PARENT\n"));
 switch («choice»)
