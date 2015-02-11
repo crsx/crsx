@@ -3430,13 +3430,13 @@ static int step(Sink sink, Term term)
 
     DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGCOND(sink->context->debugsteps, DEBUGT(sink->context, stepNesting+4, term));
-    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld) ============\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld)\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGCOND(sink->context->debugviz,   DEBUGT(sink->context, stepNesting+4, term));
 
     int step = term->descriptor->step(sink, term);
 
     DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
-    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld)\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
 
     crsxpAfterStep(sink->context);
 
@@ -4986,12 +4986,13 @@ static void fprintCookies(Context context)
 {
     if (printCookieNameList)
     {
-        PRINTF(context, "//Cookies found:\n");
+        PRINTF(context, "\n//Cookies found:\n");
         NamedPropertyLink cookie = printCookieNameList;
         for (; cookie; cookie = cookie->link)
         {
             PRINTF(context, "//   %s\n", cookie->name);
         }
+        PRINTF(context, "\n");
     }
 }
 
@@ -4999,12 +5000,13 @@ static void fprintCookies_new (Context context, FILE* out)
 {
     if (printCookieNameList)
     {
-        FPRINTF(context, out, "//Cookies found:\n");
+        FPRINTF(context, out, "\n//Cookies found:\n");
         NamedPropertyLink cookie = printCookieNameList;
         for (; cookie; cookie = cookie->link)
         {
             FPRINTF(context, out, "//   %s\n", cookie->name);
         }
+        PRINTF(context, "\n");
     }
 }
 

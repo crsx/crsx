@@ -1,0 +1,17 @@
+Peano[(
+	$Lax;
+
+	// Numbers
+	Peano ::= ( Z ; S[Peano] ;);
+
+	// Plus by induction
+    Plus[Peano, Peano] :: Peano;
+	Plus[Z,     #2] → #2;
+	Plus[S[#1], #2] → S[Plus[#1, #2]];
+
+	// Multiply by double induction
+    Multiply[Peano, Peano] :: Peano;
+	Multiply[Z,     #2] → Z ;
+	Multiply[S[#1], #2] → Plus[Multiply[#1,#2], #2] ;
+
+)]

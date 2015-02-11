@@ -1,0 +1,13 @@
+Butterfly[(
+
+// $Lax;
+
+Stage ::=( Egg ; Larva ; Pupa ; Adult ; );
+Metamorphosis[Stage] :: Stage;
+
+Metamorphosis[Egg] → Metamorphosis[Larva];
+Metamorphosis[Larva] → Metamorphosis[Pupa];
+Metamorphosis[Pupa] → Metamorphosis[Adult];
+Metamorphosis[Adult] → Adult;
+
+)]

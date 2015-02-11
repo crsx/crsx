@@ -1,0 +1,8 @@
+Hello-World[(
+
+$Lax;
+
+Go :: State;
+Go  → Hello-World;
+
+)]

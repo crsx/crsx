@@ -1,0 +1,37 @@
+Let[(
+
+$Lax;
+
+InputStatement ::=( Literal[$Number] ; Variable[$String] ; Let[$String, InputStatement, InputStatement] ; ) ;
+
+Register ::= ( reg ; BadVariable[$String];);   // Register is a CRSX variable
+OutputStatement ::=( Load[Register, $Number];  // Load into register #1, constant value #2
+                     Move[Register, Register]; // Load into register #1, value in register #2
+                     Return[Register];         // Return value in register #1
+                   ) ;
+OutputStatements ::= ( Statements[OutputStatement, OutputStatements] ; NoStatements ; ) ;
+
+Continuation ::= (Continuation[os:OutputStatements.OutputStatements] ;);
+
+Compile[InputStatement] :: OutputStatements;
+-[Fresh[ret::Register]]:Compile[#] → Compile-Finish[Compile-Helper[#, ret, os.os], ret];
+
+{$String:Register}Compile-Finish[Continuation, Register] :: OutputStatements;
+Compile-Finish[Continuation[os.#out[os]], #ret] → #out[Statements[Return[#ret], NoStatements]];
+
+
+{$String:Register}Compile-Helper[InputStatement, Register, os:OutputStatements.OutputStatements] :: Continuation;
+{#E}Compile-Helper[Literal[#num], ret, os.#out[os]] → Continuation[os.#out[Statements[Load[ret, #num], os]]];
+{#E}Compile-Helper[Variable[#str], #ret, os.#out[os]] → {#E} Compile-Variable[$[{#E}Get[Register], #str, BadVariable[#str]], #ret, os.#out[os]];
+-[Fresh[reg::Register]]:{#E}Compile-Helper[Let[#str, #val, #body], #ret, os.#out[os]] → {#E; #str:reg} Compile-Let[reg, #ret, #val, #body, os.#out[os]];
+
+{$String:Register}Compile-Variable[Register, Register, os:OutputStatements.OutputStatements] :: Continuation;
+{#E}Compile-Variable[#reg, #ret, os.#out[os]] → Continuation[os.#out[Statements[Move[#ret, #reg], os]]];
+
+{$String:Register}Compile-Let[Register, Register, InputStatement, InputStatement, os:OutputStatements.OutputStatements] :: Continuation;
+{#E}Compile-Let[#reg, #ret, #val, #body, os.#out[os]] → {#E}Compile-Let-Body[#ret, #body, {#E}Compile-Helper[#val, #reg, os.#out[os]]];
+
+{$String:Register}Compile-Let-Body[Register, InputStatement, Continuation] :: Continuation;
+{#E}Compile-Let-Body[#ret, #body, Continuation[os.#out[os]]] → {#E}Compile-Helper[#body, #ret, os.#out[os]];
+
+)]
