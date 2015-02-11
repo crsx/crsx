@@ -1157,6 +1157,7 @@ public class Sorter
 			case STARTS_WITH :
 			case ENDS_WITH :
 			case MATCH_REGEX :
+			case STRING_EQ :
 			case STRING_LT :
 			case HAS_URL : {
 				// test of string(s)

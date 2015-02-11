@@ -1012,6 +1012,18 @@ BOOL_PRIMITIVE[E_GreaterThanOrEqual];
 Set-Bool-GreaterThanOrEqual:
 {#env}E-set-bool[E_GreaterThanOrEqual, (#Name; #Term1; #Term2;), #Options, #sink, #bool] → {#env}E-set-bool-op[%n⟪ >= ⟫, #Term1, #Term2, #sink, #bool];
 
+// $[StringEqual, #1, #2] for constant strings #1, #2, result is boolean.
+//
+BOOL_PRIMITIVE[E_StringEqual];
+
+Set-Bool-E_StringEqual
+:
+{#env}E-set-bool[E_StringEqual, (#Name; #String1; #String2;), #Options, #sink, bool]
+→
+{#env} T-local-string[#String1, #sink, s1 p1.{#env} T-local-string[#String2, #sink, s2 p2.%n⟪«bool» = (strcmp(«s1»,«s2») == 0);
+«p1»«p2»⟫]]
+;
+
 // $[StringLessThan, #1, #2] for constant strings #1, #2, result is boolean.
 //
 BOOL_PRIMITIVE[E_StringLessThan];

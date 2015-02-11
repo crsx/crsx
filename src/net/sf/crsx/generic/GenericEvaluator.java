@@ -593,6 +593,12 @@ public class GenericEvaluator extends FixedGenericConstruction
             case PROFILE_EXIT:{
             	return rewrapWithProperties(sub(2));
             }
+            case STRING_EQ : {
+            	// $[StringEqual, t1, t2]
+                computeArguments();
+                if (!Util.isConstant(sub(1)) || !Util.isConstant(sub(2))) break; // "Can only compare two constant values!"
+                return rewrapWithProperties(factory.literal(Util.symbol(sub(1)).compareTo(Util.symbol(sub(2))) == 0));
+            }
             case STRING_LT : {
             	// $[StringLessThan, t1, t2]
                 computeArguments();
