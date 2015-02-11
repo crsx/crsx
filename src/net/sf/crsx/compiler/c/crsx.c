@@ -2768,6 +2768,7 @@ void rescape(char **sourcep, char **targetp, char *endsource, char *endtarget)
             case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : { // octal escape \OOO
                 c = (*s - '0'); unsigned char *e = s + 3;
                 while (++s < e && '0' <= *s && *s <= '7') c = (c<<3) + (*s - '0');
+                s--;
                 break;
             }
             case 'u' :
