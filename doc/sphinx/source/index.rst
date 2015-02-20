@@ -3,12 +3,11 @@
 Welcome to CRSX!
 ################
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
 
    started
+   intro
 
 
 The purpose of CRSX is to implement an extended higher-order rewriting formalism to facilitate writing compilers

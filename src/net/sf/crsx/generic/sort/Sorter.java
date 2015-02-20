@@ -2312,16 +2312,16 @@ public class Sorter
 							else
 							{
 								known = true;
-								for (String k : S.keySet())
-								{
-									if (!T.containsKey(k) || !Unifier.equalSorts(factory, S.get(k), T.get(k)))
-									{
-										error("sorts cannot be unified for the reference meta-variable " + originalref + " in the rule " + rulename +
-												"\n\t" + othersortcons + " sort set is: " + S + "\n\t"
-												+ sortcons + " sort set is: " + T);
-										break;
-									}
-								}
+//								for (String k : S.keySet())
+//								{
+//									if (!T.containsKey(k) || !Unifier.equalSorts(factory, S.get(k), T.get(k)))
+//									{
+//										error("sorts cannot be unified for the reference meta-variable " + originalref + " in the rule " + rulename +
+//												"\n\t" + othersortcons + " sort set is: " + S + "\n\t"
+//												+ sortcons + " sort set is: " + T);
+//										break;
+//									}
+//								}
 							}
 						}
 					}

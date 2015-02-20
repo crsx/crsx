@@ -403,6 +403,8 @@ public class GenericRule implements Copyable
 		// Repair basic options.
 		if (lax)
 		{
+			reused = null;
+
 			// Free.
 			Set<Variable> patternFree = new HashSet<Variable>(4);
 			pattern.addFree(patternFree, LinkedExtensibleSet.EMPTY_VARIABLE_SET, true, null);
@@ -475,7 +477,7 @@ public class GenericRule implements Copyable
 		{
 			if (!nonExplicit.contains(m))
 			{
-				// Only occurs in explict configuration - record count, if useful!
+				// Only occurs in explicit configuration - record count, if useful!
 				Integer count = ((shared != null && shared.contains(m)) ? Integer.valueOf(1) : contractumOccurrences.get(m));
 				if (count != null && count > 0)
 					explicitCount.put(m, count);
@@ -746,17 +748,21 @@ public class GenericRule implements Copyable
 	 * @param metavar 
 	 * @return true when the metavar requires substitution. False otherwise or if term is not meta
 	 */
-	public boolean requireSubstitution(Term meta)
+	public boolean requireSubstitution(Term meta, Set<Variable> bound)
 	{
 		if (meta.kind() == Kind.META_APPLICATION)
 		{
-			// TODO: THIS SEEMS NOT QUITE RIGHT. Maybe we should keep the explicits somewhere.
 			for (int i = meta.arity() - 1; i >= 0; i--)
 			{
-				Term sub = meta.sub(0);
+				Term sub = meta.sub(i);
 				if (sub.kind() != Kind.VARIABLE_USE)
 					return true;
 				Variable var = sub.variable();
+				
+				// If the variable is fresh, then always assume substitution is needed, even when it can be reused.
+				if (bound.contains(var))
+					return true;
+				
 				if (getReused(var) == null)
 					return true;
 			}
@@ -775,7 +781,7 @@ public class GenericRule implements Copyable
 	{
 		if (meta.kind() == Kind.META_APPLICATION)
 		{
-			if (requireSubstitution(meta))
+			if (requireSubstitution(meta, bound))
 			{
 				Set<Variable> usedBoundVariables = ((GenericMetaApplication) meta).freeVariables();
 				usedBoundVariables.retainAll(bound);

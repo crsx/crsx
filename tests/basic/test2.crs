@@ -9,4 +9,5 @@ Test :: $List[Boolean];
 
 Test → Map[xᵇ.x, (False;True;)];
 
+
 )]

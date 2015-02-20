@@ -2430,6 +2430,44 @@ Term c_variableProperty(VariablePropertyLink link, Variable variable)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
+// Property construction.
+
+NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, char *key, Term term)
+{
+    Hashset nfvs = NULL;
+    if (context->fv_enabled)
+    {
+        nfvs = link ? LINK_Hashset(context, link->fvs) : NULL;
+        nfvs = freeVars(context, term, nfvs);
+    }
+
+    return ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), term, link, nfvs, 1); // transfer refs for term and old link
+}
+
+VariablePropertyLink addVariableProperty(Context context, VariablePropertyLink link, Variable variable, Term term)
+{
+    Hashset vfvs = NULL;
+    if (context->fv_enabled)
+    {
+        vfvs = link ? LINK_Hashset(context, link->fvs) : NULL;
+        vfvs = freeVars(context, term, vfvs);
+        vfvs = addVariableHS(context, vfvs, linkVariable(context, variable));
+    }
+
+    VariablePropertyLink nlink = ALLOCATE(context, sizeof(struct _VariablePropertyLink));
+    nlink->link = link; // transfer ref
+    nlink->nr = 1;
+#ifdef CRSX_ENABLE_PROFILING
+    nlink->marker = 0;
+#endif
+    nlink->variable = useVariable(context, variable); // Transfer ref. Account for use
+    nlink->u.term = term; // Transfer ref
+    nlink->fvs = vfvs;
+
+    return nlink;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
 // Global Environement accessor.
 
 char* getEnvValue(Context context, const char *name)

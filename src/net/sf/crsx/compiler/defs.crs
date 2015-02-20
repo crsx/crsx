@@ -71,6 +71,7 @@ STRING_ENTRY ::=
 	NUM_VALUE[$Numeric];
     TEXT[Text];
 
+    TERM[Reified_Term];
 	VARIABLE[Reified_Variable];
 	LIST_VARIABLE[$List[Reified_Variable]];
     ARG_SORT[Reified_Sort];    

@@ -7,12 +7,13 @@ System requirements
 
 CRSX has been tested on OSX and Ubuntu.
 
-git must be installed on your system, as well as make.
+``git`` must be installed on your system, as well as ``make``.
 
 ICU is required to compile CRSX. You can install it as follows:
 
 - on OS X: either use macport or homebrew.
 - on Ubuntu:
+
   - type sudo apt-get install libicu52 (or older/newer version)
   - type sudo apt-get install libicu-dev
 
@@ -69,4 +70,11 @@ From the CRSX root directory, type the following commands in a terminal:
 
 You should see "Hello-World"
 
-Now you have CRSX running on your machine - to understand more about it see the tutorials.
+Now you have CRSX running on your machine.
+
+How to continue
+===============
+
+For a hands-on introduction to CRSX, see the `tutorials <https://github.com/crsx/crsx/wiki/Tutorials>`_.
+
+For the reference manual, jump to the :doc:`intro` .

@@ -470,7 +470,9 @@ typedef struct _BitSet* BitSetP;
 
 #define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
 #define PROPERTY(C,T,P) DPROPERTY(C, asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
+#define DNAMED_PROPERTY(C,N,K)  c_namedProperty((N), GLOBAL(C,K))
 #define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->namedProperties, GLOBAL(C,N))
+#define DVARIABLE_PROPERTY(V,K)  c_variableProperty((V), K)
 #define VARIABLE_PROPERTY(T,V)  c_variableProperty(asConstruction(T)->variableProperties, V)
 #define NAMED_PROPERTIES(T) (asConstruction(T)->namedProperties)
 #define VARIABLE_PROPERTIES(T) (asConstruction(T)->variableProperties)
@@ -1037,6 +1039,16 @@ static inline Term c_property(Context context, NamedPropertyLink namedProperties
 {
     return (IS_VARIABLE_USE(key) ? c_variableProperty(varProperties, VARIABLE(key)) : c_namedProperty(namedProperties, GLOBAL(context,SYMBOL(key))));
 }
+
+/**
+ * Extend named environment with given key/value pair. All refs are transferred.
+ */
+extern NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, char *key, Term value);
+
+/**
+ * Extend variable environment with given key/value pair. All refs are transferred.
+ */
+extern VariablePropertyLink addVariableProperty(Context context, VariablePropertyLink link, Variable variable, Term value);
 
 struct _NamedPropertyLink
 {

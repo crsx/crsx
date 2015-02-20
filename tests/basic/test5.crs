@@ -1,0 +1,25 @@
+Test5[(
+
+// Basic environment test
+
+$Lax;
+
+{$String:$String}
+Statement ::=( Literal[$Numeric] ; Variable[$String] ; Let[$String, $Numeric, Statement] ; ) ;
+
+
+{$String:$String}
+Test :: $Numeric;
+
+{#E}Test → {#E}Compile[{"line":"1"}Let["v", 4, {"line":"2"}Variable["v"]]];
+
+
+{$String:$Numeric}
+Compile[Statement] :: $Numeric;
+
+{#E}            Compile[{#L}Literal[#num]]       → #num;
+{#E ; #str:#num}Compile[Variable[#str]]          → #num;
+{#E}            Compile[Let[#str, #num, #body]]  → {#E; #str:#num} Compile[#body];
+
+
+)]

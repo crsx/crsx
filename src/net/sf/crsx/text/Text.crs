@@ -30,7 +30,7 @@ AsText[#text] → #text ;
 
 Text-ReverseConcat[$List[Text]] :: Text;
 Text-ReverseConcat[()]       → %n⟨⟩;
-Text-ReverseConcat[(#1;#s)]  → %n⟨«Text-ReverseConcat[#s]»«#1»⟩;
+Text-ReverseConcat[(#1;#s)]  → %n⟨«Text-ReverseConcat[#s]» «#1»⟩;
 
 // Fragment denoting term embedded in user language text.
 //
