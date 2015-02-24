@@ -319,18 +319,43 @@ public class GenericEvaluator extends FixedGenericConstruction
 				computeArguments();
 				try
 				{
-					double doubleProduct = 1;
+					long longProduct = 1L;
+					double doubleProduct = 1.0;
 					for (int i = 1; i <arity(); ++i)
 					{
 						Term a = sub(i);
 						if (!Util.isConstant(a)) return null; // "Product requires constant arguments?"
-						doubleProduct *= Double.parseDouble(a.toString());
+						Object o = a.constructor().object();
+						if (o instanceof Long)
+							longProduct *= (Long) o;
+						else if (o instanceof Double)
+							doubleProduct *= (Double) o;
+						else
+							doubleProduct *= Double.parseDouble(Util.symbol(a));
 					}
-					return rewrapWithProperties(factory.literal(doubleProduct));
+					if (doubleProduct == 1.0)
+						return rewrapWithProperties(factory.literal(longProduct));
+					else
+						return rewrapWithProperties(factory.literal(doubleProduct * (double) longProduct));
 				}
 				catch (NumberFormatException e)
 				{}
 				break;
+				
+				///try
+				///{
+				///	double doubleProduct = 1;
+				///	for (int i = 1; i <arity(); ++i)
+				///	{
+				///		Term a = sub(i);
+				///		if (!Util.isConstant(a)) return null; // "Product requires constant arguments?"
+				///		doubleProduct *= Double.parseDouble(Util.symbol(a));
+				///	}
+				///	return rewrapWithProperties(factory.literal(doubleProduct));
+				///}
+				///catch (NumberFormatException e)
+				///{}
+				///break;
 			
 			case DIVIDE :
 				// $[Div, n1, n2]
