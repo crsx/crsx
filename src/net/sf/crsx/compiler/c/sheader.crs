@@ -17,11 +17,13 @@ $Lax;
 
 SH-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
 
+// Generate step and strict function signature
+// Note: since CRSX is not handling very well the environment, always add it.
 SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 →
 %n⟪/* FUNCTION « COMMENT_TOKEN[#name] » HEADER DECLARATIONS. */
 « MapText[f.SH-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
-extern int «MANGLE[#function]»(Sink, ssize_t« SH-Arg[#Forms, $False] »);
+extern int «MANGLE[#function]»(Sink, ssize_t,NamedPropertyLink,VariablePropertyLink« SH-Arg[#Forms, $True] »);
 ⟫
 ;
 

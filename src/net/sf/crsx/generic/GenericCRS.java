@@ -2670,7 +2670,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 				{
 					sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL)); // CONS[
 					++dataEnds;
-					sink = reifyForm(sink, form);
+					sink = reifyForm(sink, form, false);
 				}
 			}
 			sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()
@@ -2865,6 +2865,16 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			sink = sink.start(sink.makeLiteral(function, CRS.STRING_SORT)).end(); // function
 			// - Forms.
 			{
+				// The dispatchifier does not compute sortset properly. Try to fix the forms here.
+				boolean mustHaveSortset = false;
+				
+				if (functionRules.size() > 0)
+				{
+					Term pattern = functionRules.get(0).getPattern();
+					mustHaveSortset = Util.hasPropertyRef(pattern);
+				}
+				
+				
 				int innerEnds = 0;
 				for (Pair<Term, Term> p : functionForms.multiGet(function))
 				{
@@ -2876,7 +2886,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 					Term form = p.tail();
 					sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL)); // CONS[
 					++innerEnds;
-					sink = reifyForm(sink, form); // form
+					sink = reifyForm(sink, form, mustHaveSortset); // form
 				}
 				sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()
 				while (innerEnds-- > 0)
@@ -3051,9 +3061,10 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 	}
 
 	/** Emit reified term for one non-variable form. */
-	private Sink reifyForm(Sink sink, Term form)
+	private Sink reifyForm(Sink sink, Term form, boolean dummySortSet)
 	{
 		int ends = 0;
+		boolean hasSortSet = false;
 		for (String name : Util.propertiesHolder(form).propertyNames())
 		{
 			sink = sink.start(sink.makeConstructor(CRS.REIFY_SORT_SET)); // SORT-SET[
@@ -3063,7 +3074,20 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()
 			sink = sink.end(); // ] of SORT
 			sink = reifySort(sink, Util.getProperty(form, name)); // sort
+			hasSortSet = true;
 		}
+		
+		if (!hasSortSet && dummySortSet)
+		{
+			sink = sink.start(sink.makeConstructor(CRS.REIFY_SORT_SET)); // SORT-SET[
+			++ends;
+			sink = sink.start(sink.makeConstructor(CRS.REIFY_SORT)); // SORT[
+			sink = sink.start(sink.makeLiteral("$String", CRS.STRING_SORT)).end(); // name
+			sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()
+			sink = sink.end(); // ] of SORT
+			sink = reifySort(sink, null); // sort
+		}
+		
 		sink = sink.start(sink.makeConstructor(CRS.REIFY_FORM)); // FORM[
 		++ends;
 		sink = sink.start(sink.makeLiteral(Util.symbol(form), CRS.STRING_SORT)).end();

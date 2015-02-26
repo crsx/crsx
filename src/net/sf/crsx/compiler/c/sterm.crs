@@ -40,7 +40,7 @@ ST-then-send[OK_SORT, Reified_Term, Text] :: Text;
 {#env}
 ST-then-send[OK, #term, #sink] 
 → 
-{#env}
+{#env; "$PendingProps": TERM[#term]}
 ST-send[#term, #sink]
 ; 
 
@@ -115,16 +115,17 @@ END(«#sink», «EventConstructor[#Symbol]»);«ST-send-tail[#Tail]»⟧
 
 ST-Send-Literal
 :
-{#env;"$Tail": #Tail}
+{#env;"$Tail": #Tail; "$PendingProps": #Pending}  
 ST-send[LITERAL[#Literal, #Sort], #sink]
 →
 %n⟪
+«{#env}ST-send-properties[#Pending, #sink]»
 LITERAL(«#sink», «STRING[#Literal]»);«ST-send-tail[#Tail]»⟫
 ;
 
 ST-Send-Variable
 :
-{#env;"$Tail": #Tail}
+{#env;"$Tail": #Tail} // TODO: check $PendingProps is NO
 ST-send[VARIABLE-USE[#variable], #sink]
 →
 %n⟪
@@ -133,19 +134,17 @@ USE(«#sink», linkVariable(«#sink»->context, «#variable»));«ST-send-tail[#
 
 ST-Send-MetaApplication
 :
-{#env}
+{#env; "$Tail": #Tail; "$PendingProps": #Pending}
 ST-send[META-APPLICATION[#MetaVar, #Arguments, #Occ], #sink]
 →
-{#env}
-ST-substitute[#MetaVar, #Arguments, #Occ, #sink]
-;
+%n⟪«{#env}ST-send-properties[#Pending, #sink]»«{#env; "$Tail":NO; "$PendingProps": NO}ST-substitute[#MetaVar, #Arguments, #Occ, #sink]»«ST-send-tail[#Tail]»⟫;
 
-ST-Send-Evaluator
+ST-Send-Evaluator // TODO: check $PendingProps is NO
 :
 {#env}
 ST-send[EVALUATOR[#Primitive, #Terms, #Options], #sink] 
 →
-%n⟪«{#env}E-send[Primitive[#Primitive], #Terms, #Options, #sink]»⟫
+%n⟪«{#env; "$PendingProps": NO}E-send[Primitive[#Primitive], #Terms, #Options, #sink]»⟫
 ;
 
 ST-send-tail[STRING_ENTRY] :: Text;
@@ -181,7 +180,7 @@ ST-EvalFunction[OK_SORT, STRING_ENTRY, $String, $List[Text], $List[Text], Text] 
 ST-EvalFunction[OK, #Tail, #Symbol, #props, #vars, #sink] // arguments are in reversed order
 →
 %n⟪
-«ST-send-tail2[#Tail]»«MANGLE[#Symbol]»(«#sink», 1«{#env}ST-FunctionArgs[#props]»«{#env}ST-FunctionArgs[#vars]»);⟫
+«ST-send-tail2[#Tail]»«MANGLE[#Symbol]»(«#sink», 1«{#env}ST-FunctionArgs-Props[#props]»«{#env}ST-FunctionArgs[#vars]»);⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -197,6 +196,23 @@ ST-FunctionArgs[()]
 ST-FunctionArgs[(#Arg;#Args)]
 →
 %n⟪«{#env}ST-FunctionArgs[#Args]»,«#Arg»⟫
+;
+
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-FunctionArgs-Props[$List[Text]] :: Text;
+
+{#env}
+ST-FunctionArgs-Props[()]
+→
+%n⟪, NULL, NULL⟫
+;
+
+{#env}
+ST-FunctionArgs-Props[(#Arg;#Args)]
+→
+{#env}
+ST-FunctionArgs[(#Arg;#Args)]
 ;
 
 //------------
@@ -342,6 +358,17 @@ ST-set-properties-term[PROPERTY-REF[#Ref, #Use, #term], #props, #sink, ok¹ prop
 ST-set-properties-ref[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #Ref]], #Use, #term, #sink, ok¹ props¹.#[ok¹, props¹]]
 ;
 
+-[Fresh[varP::Text, namedP::Text]]
+:
+{#env}
+ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #Value, #Term], (), #sink, ok¹ props¹.#[ok¹, props¹]]
+→
+%n⟪
+NamedPropertyLink «namedP» = NULL; 
+VariablePropertyLink «varP» = NULL;« {#env} ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #Value, #Term], (varP; namedP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫
+;
+
+
 ST-set-property-Variable-Key[Fresh[value::Text]]
 :
 {#env}
@@ -352,6 +379,16 @@ Term «value»;{⟦« {#env} ST-set[#Value, #sink, value] »⟧
 }
 NORMALIZE(«#sink»->context, «value»);
 «#varP» = addVariableProperty(«#sink»->context, «#varP», linkVariable(«#sink»->context, «#key»), «value»);« {#env} ST-set-properties-term[#Term, (#varP; #namedP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫
+;
+
+-[Fresh[varP::Text, namedP::Text]]
+:
+{#env}
+ST-set-properties-term[PROPERTY[LITERAL[#Literal, #Sort],  #Value, #Term], (), #sink, ok¹ props¹.#[ok¹, props¹]]
+→
+%n⟪
+NamedPropertyLink «namedP» = NULL; 
+VariablePropertyLink «varP» = NULL;« {#env} ST-set-properties-term[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], (varP; namedP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫
 ;
 
 ST-set-property-Literal-Key[Fresh[value::Text]]
@@ -365,6 +402,8 @@ Term «value»;{⟦« {#env} ST-set[#Value, #sink, value] »⟧
 NORMALIZE(«#sink»->context, «value»);
 «#namedP» = addNamedProperty(«#sink»->context, «#namedP», « STRING[#Literal] », «value»);« {#env} ST-set-properties-term[#Term,  (#varP; #namedP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫
 ;
+
+
 
 ST-set-property-other[Fresh[key::Text, value::Text]]
 :
@@ -449,7 +488,7 @@ ST-AnalyzeBinder[OK_SORT, Reified_Binder, Text, ok¹::OK_SORT vars::$List[Reifie
 {#env}
 ST-AnalyzeBinder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
+{#env; "$Binders":LIST_VARIABLE[()]}
 ST-AnalyzeBinder1[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, 0, OUTER, ok¹ vars.#[ok¹, vars]]
 ;
 
@@ -1265,7 +1304,7 @@ ST-set-buffer[#Term, #sink, #variable]
 →
 %n⟪
 {⟦
-Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env; "$PendingProps":TERM[#Term]}ST-send[#Term, buf] »
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}ST-then-send[OK, #Term, buf] »
 «#variable» = BUFFER_TERM(«buf»);
 FREE_BUFFER(«buf»); ⟧
 }⟫;

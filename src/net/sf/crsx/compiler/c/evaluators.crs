@@ -2250,10 +2250,11 @@ E2[(
 SET_REF_PRIMITIVE[E_PassLocationProperties];
 
 Set-PassLocationProperties[Fresh[extra::Text]]:
-{#env}E-set-ref[E_PassLocationProperties, (#Name; #Result;), #Options, #sink, result]
+{#env; "$Tail": #Tail}
+E-set-ref[E_PassLocationProperties, (#Name; #Result;), #Options, #sink, result]
 →
 %n⟪{⟦ Term «extra»;
-« {#env} T-set[#Name, #sink, extra] »« {#env} T-set[#Result, #sink, result] »passLocationProperties(«#sink»->context, «extra», «result»);⟧
+«  {#env; "$Tail": NO} T-set[#Name, #sink, extra] »« {#env; "$Tail": NO} T-set[#Result, #sink, result] »passLocationProperties(«#sink»->context, «extra», «result»);«T-send-tail[#Tail]»⟧
 }
 ⟫;
 
