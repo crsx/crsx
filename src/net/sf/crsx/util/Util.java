@@ -686,8 +686,6 @@ public final class Util
 					b.append("\\" + octal((int) c, "000"));
 				else if (c <= '~')
 					b.append(c);
-				else if (c <= '\377')
-					b.append("\\" + octal((int) c, "000"));
 				else
 					b.append("\\u" + hex((int) c, "0000"));
 		}
