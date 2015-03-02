@@ -212,11 +212,6 @@ T-send[EVALUATOR[#Primitive, #Terms, #Options], #sink]
 E-send[Primitive[#Primitive], #Terms, #Options, #sink]
 ;
 
-
-T-send-tail[STRING_ENTRY] :: Text;
-T-send-tail[#Tail] → $[IfDef, "STRICT", ST-send-tail[#Tail], %n⟪⟫];
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code for construction subterms, with binders.
 
@@ -607,7 +602,7 @@ E-set[Primitive[#Primitive], #Args, #Options, #sink, #variable]
 T-set-buffer[#Term, #sink, #variable]
 →
 %n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-« $[IfDef, "STRICT", {#env} ST-then-send[OK, #Term, buf], {#env} T-send[#Term, buf]] »«#variable» = BUFFER_TERM(«buf»); FREE_BUFFER(«buf»); ⟧}
+« $[IfDef, "STRICT", {#env; "$Tail": NO} ST-then-send[OK, #Term, buf], {#env} T-send[#Term, buf]] »«#variable» = BUFFER_TERM(«buf»); FREE_BUFFER(«buf»); ⟧}
 ⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

@@ -100,11 +100,12 @@ struct _Context
     char *str_linelocation;
     char *str_columnlocation;
 
-    unsigned int fv_enabled : 1; // Whether the free variable optimization is on.
-    unsigned int debugsteps : 1;
-    unsigned int debugtrace : 1;
-    unsigned int debugviz   : 1;
-    unsigned int debugliterals :1;
+    unsigned int fv_enabled    : 1; // Whether the free variable optimization is on.
+    unsigned int debugsteps    : 1;
+    unsigned int debugtrace    : 1;
+    unsigned int debugviz      : 1;
+    unsigned int debugliterals : 1;
+    unsigned int strict        : 1; // Execute in strict mode?
 
 #ifdef CRSX_ENABLE_PROFILING
     unsigned int profiling : 1; // user-defined program profiling
@@ -623,6 +624,7 @@ struct _ConstructionDescriptor
 };
 
 //#define CRSX_CHECK_SORT(CONTEXT,T,SORT) ASSERT(CONTEXT, IS_VARIABLE_USE(T) || !(T)->descriptor->sort  ||  (T)->descriptor->sort == (SORT))
+//#define CRSX_CHECK_SORT(CONTEXT,T,SORT) (ASSERT(CONTEXT, (T)->nr > 0))
 #define CRSX_CHECK_SORT(CONTEXT,T,SORT) noop()
 
 // Casting helpers.
@@ -941,6 +943,12 @@ extern Term normalizep(Context context, Term term);
 # define COMPUTE(CONTEXT,T) (T = (IS_NF(T) ? (T) : compute(CONTEXT,T)))
 #endif
 extern Term compute(Context context, Term term);
+
+
+// Send bound term to sink. If binders can be reused, then just copy term,
+// otherwise substitute.
+// Note: testing for the first binder is enough
+extern void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // CLOSURE

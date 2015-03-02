@@ -37,7 +37,9 @@ int «MANGLE[#function]»(Sink «sink», ssize_t «shared»,NamedPropertyLink «
                                         "$Sink"        : VARIABLE[sink]; 
                                         "$Shared"      : VARIABLE[shared]; 
                                         "$Args"        : LIST_VARIABLE[()];
-                                        "$TopRef"      : PROPERTY_VARIABLE[namedP, varP]
+                                        "$TopRef"      : PROPERTY_VARIABLE[namedP, varP];
+										"$Strict"      : YES;
+										"$Unstep"      : TEXT[%n⟨⟩];         // The unstep code. Built by SF-Arg.
                                      }SF-Arg[#Forms, $True, ok¹.SF-Body[ok¹, #kind, #Rules]] »
 ⟫
 ;
@@ -87,8 +89,8 @@ SF-StepBody[#kind, #sink, #term, #function, #Forms, #Sort, #Rules]
 →
 %n⟪
 ssize_t shared = LINK_COUNT(« #term »); 
-NamedPropertyLink namedP = NAMED_PROPERTIES(«#term»); 
-VariablePropertyLink varP = VARIABLE_PROPERTIES(«#term»);«SF-ExtractProps[#Forms, $True, #sink, #term, (), ok¹ args¹.SF-StepUnlinkTerm[ok¹, #sink, #term, args¹, #function]]»⟫
+NamedPropertyLink namedP = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»)); 
+VariablePropertyLink varP = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));«SF-ExtractProps[#Forms, $True, #sink, #term, (), ok¹ args¹.SF-StepUnlinkTerm[ok¹, #sink, #term, args¹, #function]]»⟫
 ;
 
 SF-ExtractProps[$List[Reified_Form], $Boolean<!-- Environment generated? -->, Text, Text, $List[Text], ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
@@ -113,7 +115,7 @@ SF-ExtractProps[(#Form; #Forms), $True, #sink, #term, #args, ok¹ args¹.#[ok¹,
 SF-ExtractProps[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] 
 → 
 %n⟪
-NamedPropertyLink «namedP» = NAMED_PROPERTIES(«#term»); VariablePropertyLink «varP» = VARIABLE_PROPERTIES(«#term»);«SF-ExtractProps[(#Form; #Forms), $True, #sink, #term, Append[#args, (namedP;varP;)], ok¹ args¹.#[ok¹, args¹]]»⟫
+NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»)); VariablePropertyLink «varP» = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));«SF-ExtractProps[(#Form; #Forms), $True, #sink, #term, Append[#args, (namedP;varP;)], ok¹ args¹.#[ok¹, args¹]]»⟫
 ;
 
 SF-ExtractProps[(FORM[#Constructor, #Args];), #hasSortSet, #sink, #term, #args, ok¹ args¹.#[ok¹, args¹]] 
@@ -618,10 +620,13 @@ SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]
 
 -[Fresh[namedP::Text, varP::Text]]
 :
-{#env}
+{#env; "$Unstep": TEXT[#unstep]; "$Sink": VARIABLE[#sink];}
 SF-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False, ok¹.#[ok¹]] 
 → 
-%n⟪,NamedPropertyLink «namedP»,VariablePropertyLink «varP»«{#env;"$TopRef":PROPERTY_VARIABLE[namedP, varP]}SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]»⟫
+%n⟪,NamedPropertyLink «namedP»,VariablePropertyLink «varP»«
+		{#env; "$TopRef":PROPERTY_VARIABLE[namedP, varP]; 
+               "$Unstep": TEXT[ConcatText[(#unstep; %n⟨
+ADD_PROPERTIES(‹#sink›, ‹namedP›, ‹varP›);⟩;), %n⟨⟩]]}SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]»⟫
 ;
 
 {#env}
@@ -666,7 +671,7 @@ SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]]
 {#env}
 SF-TopArg[$False, #Arg, #Index, ok¹ index¹.#[ok¹, index¹]]
 →
-{#env}
+{#env; "$UnstepBinders": LIST_VARIABLE[()]}
 SF-TopTerm[#Arg, #Index, ok¹ index¹.#[ok¹, index¹]] 
 ;
  
@@ -676,18 +681,24 @@ SF-TopTerm[Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text]
 
 -[Fresh[var::Text]]
 :
-{#env; "$Args":LIST_VARIABLE[#TopArgs]}
+{#env; "$Args":LIST_VARIABLE[#TopArgs];"$UnstepBinders": LIST_VARIABLE[#binders]}
 SF-TopTerm[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]], #Index, ok¹ index¹.#[ok¹, index¹]] // Kind must be KDATA
 →
-%n⟪, Variable «var»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(var;)]]; var:ARG[#Index, $True]}SF-TopTerm[#FormArgument[var], $[Plus, #Index, 1], ok¹ index¹.#[ok¹, index¹]]»⟫
+%n⟪, Variable «var»«{#env;  "$Args":LIST_VARIABLE[Append[#TopArgs,(var;)]]; var:ARG[#Index, $True]; "$UnstepBinders":LIST_VARIABLE[(var; #binders)]}SF-TopTerm[#FormArgument[var], $[Plus, #Index, 1], ok¹ index¹.#[ok¹, index¹]]»⟫
 ;
 
 -[Fresh[term::Text]]
 :
-{#env; "$Args":LIST_VARIABLE[#TopArgs]}
+{#env; "$Args":LIST_VARIABLE[#TopArgs];"$Unstep": TEXT[#unstep]; "$Sink": VARIABLE[#sink]}
 SF-TopTerm[FORM-ARGUMENT[#Sort], #Index, ok¹ index¹.#[ok¹, index¹]]
 →
-%n⟪, Term «term»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(term;)]]; term:ARG[#Index, $True]}#[OK, $[Plus, #Index, 1]]»⟫
+%n⟪, Term «term»« 
+		{#env; 
+			"$Args":LIST_VARIABLE[Append[#TopArgs,(term;)]]; 
+			term:ARG[#Index, $True];
+			"$Unstep": TEXT[ConcatText[(#unstep; {#env}SF-UnstepBinders; %n⟨
+COPY(‹#sink›, ‹term›);⟩;), %n⟨⟩]]
+		}#[OK, $[Plus, #Index, 1]]»⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -700,6 +711,18 @@ SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]]
 →
 %n⟪, Closure «closure»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(closure;)]];closure:ARG[#Index, $False]}#[OK, $[Plus, #Index, 1]]»⟫
 ;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-UnstepBinders :: Text;
+
+{#env; "$UnstepBinders": LIST_VARIABLE[()]}
+SF-UnstepBinders → %n⟪⟫;
+
+-[Fresh[binders::Text]]
+:
+{#env; "$UnstepBinders": LIST_VARIABLE[(#binder;#binders)]; "$Sink": VARIABLE[#sink]}
+SF-UnstepBinders → %n⟪
+Variable «binders»[«INTEGER[Length[(#binder;#binders), 0]]»] = {«#binder»«ConcatText[#binders, %n⟨, ⟩]»}; BINDS(«#sink», «INTEGER[Length[(#binder;#binders), 0]]», «binders»);⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Body[OK_SORT, $String, $List[Reified_Rule]] :: Text;
@@ -739,11 +762,13 @@ SF-Contract[(RULE[#name, #Options, #Pattern, #Contractum]; #Rules)]
 « {#env}SF-Contract[#Rules] »⟫
 ;
 
+{#env; "$Unstep":TEXT[#unstep]; "$Function": STRING_VALUE[#function]; "$Sink": VARIABLE[#sink]}
 SF-Contract[()]
 →
 %n⟪
-return 0;
-⟫ // TODO: FAIL TO PROCEED CONTRACTION. RECORD IN DELAYED TERM
+START(«#sink», «EventConstructor[#function]»);«#unstep»
+END(«#sink», «EventConstructor[#function]»); 
+return 0;⟫
 ;
 
 //
@@ -782,7 +807,7 @@ SF-Dispatch-choice[#Form[dummy], #args, #Rules]
 
 -[Fresh[choice::Text]]
 :
-{#env; "$Sink":VARIABLE[#sink]} 
+{#env; "$Sink":VARIABLE[#sink];"$Unstep":TEXT[#unstep]; "$Function": STRING_VALUE[#function];} 
 SF-Dispatch-choice[FORM-ARGUMENT[SORT[#SortName, #SortParams]], (#arg; #args), #Rules]  
 →
 // TODO: also call FORCE in the step function where the result can be saved  
@@ -794,7 +819,11 @@ switch («choice»)
 default: 
 break;⟧
 }
+
+START(«#sink», «EventConstructor[#function]»);«#unstep»
+END(«#sink», «EventConstructor[#function]»); 
 return 0;⟫
+;
 ;
 // TODO: Create delayed term.
 
@@ -1579,8 +1608,8 @@ SF-PatternSub3[#sub, $[{#env}Get[VARIABLE_ENTRY], #sub], #link, #pass, #stage, #
 SF-PatternSub2[$True, $False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
 → 
 {#env; sub: SUB[#term, #i, $True]; "$Subs":LIST_VARIABLE[(sub;#subs)];"$Shared": VARIABLE[shared]}
-SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »Term «sub» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#i]»)); int «shared» = «#shared»*LINK_COUNT(«sub»); permitUnusedInt(«shared»);
-«D-check-sort[#sink, sub, #sort]»⟫, $True, #unique, sub, ok.#[ok]]
+SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »
+Term «sub» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#i]»)); int «shared» = «#shared»*LINK_COUNT(«sub»); permitUnusedInt(«shared»);«D-check-sort[#sink, sub, #sort]»⟫, $True, #unique, sub, ok.#[ok]]
 ;
 
 -[Fresh[sub::Text, shared::Text]]
@@ -1589,8 +1618,7 @@ SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »Te
 SF-PatternSub2[$False, $False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
 →
 {#env; sub: SUB[#term, #i, $False]; "$Shared": VARIABLE[shared]}
-SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«#term», «INTEGER[#i]»); int «shared» = «#shared»*LINK_COUNT(«sub»); permitUnusedInt(«shared»);
-«D-check-sort[#sink, sub, #sort]»⟫, $False, #unique, sub, ok.#[ok]]
+SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«#term», «INTEGER[#i]»); int «shared» = «#shared»*LINK_COUNT(«sub»); permitUnusedInt(«shared»);«D-check-sort[#sink, sub, #sort]»⟫, $False, #unique, sub, ok.#[ok]]
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -1601,8 +1629,7 @@ SF-PatternSub3[Text, VARIABLE_ENTRY, $Boolean<!-- Whether to link sub -->, PASS,
 SF-PatternSub3[#arg, ARG[#Index, $True], #link, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, #term, #i, ok.#[ok]] 
 → 
 {#env; "$Subs":LIST_VARIABLE[(#arg;#Subs)]} // Record for cleanup
-SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »
-«D-check-sort[#sink, #arg, #sort]»⟫, $True, #unique, #arg, ok.#[ok]]
+SF-Pattern[#pass, SF-MoveToSubStage[#stage], #Pattern, #sink, %n⟪« #code »«D-check-sort[#sink, #arg, #sort]»⟫, $True, #unique, #arg, ok.#[ok]]
 ;
 
 {#env} 

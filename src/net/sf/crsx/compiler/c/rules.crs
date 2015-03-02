@@ -155,7 +155,7 @@ F-Contract[#sink, #term, #function, (RULE[#name, #Options, #Pattern, #Contractum
 →
 %n⟪do {⟦
 /* Contraction rule « COMMENT_TOKEN[#name] ». */
-« {"$Binders":LIST_VARIABLE[()];"$Subs": LIST_VARIABLE[()]; "$Refs": LIST_STRING[()]; "$Vars": LIST_VARIABLE[()]} F-Options[#Options, o3.F-then-Fresh[o3, #sink, #Options, ok.F-then-Pattern[ok, FIRST, MATCH, #Pattern, #sink, %n⟨⟩, $False, $False, #term, o2.F-then-Send[o2, #term, #Contractum, #sink]]]] »return 1;⟧
+« {"$Binders":LIST_VARIABLE[()];"$Subs": LIST_VARIABLE[()]; "$Refs": LIST_STRING[()]; "$Vars": LIST_VARIABLE[()]; "$Strict":NO} F-Options[#Options, o3.F-then-Fresh[o3, #sink, #Options, ok.F-then-Pattern[ok, FIRST, MATCH, #Pattern, #sink, %n⟨⟩, $False, $False, #term, o2.F-then-Send[o2, #term, #Contractum, #sink]]]] »return 1;⟧
 } while (0);
 « F-Contract[#sink, #term, #function, #Rules] »⟫
 ;
@@ -314,7 +314,7 @@ F-Dispatch-cases[PASS, $String, $List[Reified_Rule], Text, Text, $String] :: Tex
 // Generate switch body for each dispatch rule: case+options+matching, then contraction, finally report success.
 F-Dispatch-cases[#pass, #function, (RULE[#name, #Options, #Pattern, #Contractum];#Rules), #sink, term, #SortName]
 →
-%n⟪« {"$Binders":LIST_VARIABLE[()]; "$Subs":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()];"$Vars": LIST_VARIABLE[()]}
+%n⟪« {"$Binders":LIST_VARIABLE[()]; "$Subs":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()];"$Vars": LIST_VARIABLE[()]; "$Strict":NO}
      F-Pattern[#pass, DISPATCH[#name,#Options,#SortName], #Pattern, #sink, %n⟨⟩, $False, $False, term, ok.
      F-then-Send[ok, term, #Contractum, #sink]] »« F-Dispatch-cases[SECOND, #function, #Rules, #sink, term, #SortName] »⟫
 ;

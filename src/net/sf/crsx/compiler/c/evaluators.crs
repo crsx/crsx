@@ -171,13 +171,10 @@ E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#namedP, #varP]]
 
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
-E-SendTail :: Text;
+E-send-tail :: Text;
 
-{#env}
-E-SendTail 
-→
-$[IfDef, "STRICT", ST-send-tail[$[{#env}Get[STRING_ENTRY], "$Tail", NO]], %n⟪⟫] 
-;
+{#env; "$Strict": YES}E-send-tail → ST-send-tail[$[{#env}Get[STRING_ENTRY], "$Tail", NO]];
+{#env; "$Strict": NO} E-send-tail → %n⟪⟫;
 
 )];
 
@@ -199,7 +196,7 @@ E2[(
 // NULL PRIMITIVE
 //
 
-Null-send:             {#env}E-send[E_Null, (#Name;), #Options, #sink] → %n⟪⟫ ;
+Null-send:             {#env}E-send[E_Null, (#Name;), #Options, #sink] → {#env}E-send-tail ;
 Null-set:              {#env}E-set[E_Null, (#Name;), #Options,  #sink, #variable] → %n⟪«#variable» = (Term)0;⟫;
 Null-set-ref:          {#env}E-set-ref[E_Null, (#Name;), #Options,  #sink, #variable] → %n⟪«#variable» = (Term)0;⟫;
 Null-set-bool:         {#env}E-set-bool[E_Null, (#Name;), #Options,  #sink, #variable] → %n⟪«#variable» = 0;⟫;
@@ -237,7 +234,7 @@ $Meta[(
 → 
 %n⟪
 {⟦
-Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env}E-send[#Primitive, #Args, #Options, buf]»
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env; "$Tail":NO}E-send[#Primitive, #Args, #Options, buf]»
 «#variable» = BUFFER_TERM(«buf»);
 FREE_BUFFER(«buf»); ⟧
 }⟫
@@ -305,8 +302,8 @@ SEND_PRIMITIVE[E_LoadTerm];
 Send-LoadTerm:
 {#env} E-send[E_LoadTerm, (#Name; #Url;), #Options, #sink]
 →
-{#env} T-local-string[#Url, #sink, url p.%n⟪
-LOAD_TERM(«#sink», "", «url»);«p»⟫]
+{#env; "$Tail":NO} T-local-string[#Url, #sink, url p.%n⟪
+LOAD_TERM(«#sink», "", «url»);«p»«{#env}E-send-tail»⟫]
 ;
 
 // $[Nil] is synonymous with sending nothing.
@@ -316,7 +313,7 @@ SEND_PRIMITIVE[E_Nil];
 Send-Nil:
 {#env} E-send[E_Nil, (#Name;), #Options, #sink]
 →
-%n⟪⟫
+{#env}E-send-tail
 ;
 
 // $[FreeVariables[sortname], t]
@@ -658,10 +655,11 @@ $Meta[(
 
 -[Fresh[term::Text]]
 :
-{#env}E-set-ref-to-send[#Primitive, #Args, #Options, #sink] 
+{#env}
+E-set-ref-to-send[#Primitive, #Args, #Options, #sink] 
 → 
 %n⟪{⟦ Term «term»;
-«{#env}E-set-ref[#Primitive, #Args, #Options, #sink, term]»COPY(«#sink», «term»); /*CONSERVATIVE*/ ⟧}
+«{#env}E-set-ref[#Primitive, #Args, #Options, #sink, term]»COPY(«#sink», «term»);«{#env}E-send-tail»⟧}
 ⟫
 ;
 
@@ -673,10 +671,10 @@ $Meta[(
 → 
 %n⟪
 {⟦ 
-Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}E-set-ref-to-send[#Primitive, #Args, #Options, buf] »
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env; "$Tail":NO}E-set-ref-to-send[#Primitive, #Args, #Options, buf] »
 «#variable» = BUFFER_TERM(«buf»);
 FREE_BUFFER(«buf»); ⟧
-}⟫
+}«{#env}E-send-tail»⟫
 ;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-ref-to-bool[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
@@ -1429,7 +1427,7 @@ E-send-num[#Primitive, #Args, #Options, #sink]
 %n⟪
 {⟦
 double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
-LITERALNF(«#sink», (size_t) 31, "%G", «num»);«{#env}E-SendTail»⟧
+LITERALNF(«#sink», (size_t) 31, "%G", «num»);«{#env}E-send-tail»⟧
 }⟫
 ;
 
@@ -2250,11 +2248,11 @@ E2[(
 SET_REF_PRIMITIVE[E_PassLocationProperties];
 
 Set-PassLocationProperties[Fresh[extra::Text]]:
-{#env; "$Tail": #Tail}
+{#env}
 E-set-ref[E_PassLocationProperties, (#Name; #Result;), #Options, #sink, result]
 →
 %n⟪{⟦ Term «extra»;
-«  {#env; "$Tail": NO} T-set[#Name, #sink, extra] »« {#env; "$Tail": NO} T-set[#Result, #sink, result] »passLocationProperties(«#sink»->context, «extra», «result»);«T-send-tail[#Tail]»⟧
+«  {#env} T-set[#Name, #sink, extra] »« {#env} T-set[#Result, #sink, result] »passLocationProperties(«#sink»->context, «extra», «result»);⟧
 }
 ⟫;
 

@@ -3399,6 +3399,12 @@ void normalize(Context context, Term *termp)
                 // (5) If term is a function invocation that is not marked as nostep and that we can in fact not step then mark it as nostep.
                 // (Note: failed step has not output anything to buffer)
                 asConstruction(term)->nostep = 1;
+
+                if (context->strict)
+                {
+                	// When strict mode is set, the step function always consumes the term and output a new term in the sink
+                	term = BUFFER_TERM(sink);
+                }
             }
             FREE_BUFFER(sink); // always free buffer, even when not actually used!
         }
@@ -3445,6 +3451,12 @@ Term force(Context context, Term term)
             {
                 //DEBUGF(context, "//NF DATA %s\n", SYMBOL(term));
                 asConstruction(term)->nostep = 1;
+                if (context->strict)
+                {
+                	// When strict mode is set, the step function always consumes the term and output a new term in the sink
+                	term = BUFFER_TERM(sink);
+                }
+                FREE_BUFFER(sink);
                 break;
             }
             term =  BUFFER_TERM(sink); // reload and try again...
@@ -3490,6 +3502,7 @@ void initCRSXContext(Context context)
     context->debugtrace = getenv("crsx-trace") != NULL;
     context->debugviz   = getenv("crsxviz") != NULL;
     context->debugliterals = getenv("crsx-debug-literals") != NULL;
+    context->strict = getenv("crsx-strict") != NULL;
 
     context->env = NULL;
 
@@ -3542,6 +3555,37 @@ long elapsed(Context context)
 #else
     return (long)0;
 #endif
+}
+
+void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
+{
+	const Context context;
+	if (!IS_BOUND(binders[0]))
+	{
+		int i;
+		for (i = 0; i < rank; i ++)
+			REBIND(linkVariable(context, binders[i]));
+
+		BINDS(sink, rank, binders);
+	    COPY(sink, term);
+	}
+	else
+	{
+		// Need to substitute.
+		Variable* newbinders = ALLOCA(context, rank * sizeof(Variable*));
+		VariableUse* newuses = ALLOCA(context, rank * sizeof(VariableUse*));
+		int i;
+		for (i = 0; i < rank; i ++)
+		{
+			newbinders[i] = MAKE_BOUND_PROMISCUOUS_VARIABLE(context, binders[i]->name);
+			newuses[i] = makeVariableUse(context, linkVariable(context, newbinders[i]));
+		}
+
+		BINDS(sink, rank, newbinders);
+
+		struct _SubstitutionFrame frame = {NULL, 0, rank, binders, (Term *) newuses};
+	    SUBSTITUTE(sink, term, &frame);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -5679,17 +5723,20 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
 
 static char *fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
 {
-    int i;
-    for (i = 0 ; i < set->nslots ; i++)
-    {
-        LinkedList2 slot = set->entries[i];
-        while (slot)
-        {
-            Term term = (Term) slot->value;
-            sep = fprintProperty(context, out, isNamed, set->nr, slot->key, term, sep, depth, encountered, used, indent, posp, debug, max);
-            slot = slot->next;
-        }
-    }
+	if (set)
+	{
+		int i;
+		for (i = 0 ; i < set->nslots ; i++)
+		{
+			LinkedList2 slot = set->entries[i];
+			while (slot)
+			{
+				Term term = (Term) slot->value;
+				sep = fprintProperty(context, out, isNamed, set->nr, slot->key, term, sep, depth, encountered, used, indent, posp, debug, max);
+				slot = slot->next;
+			}
+		}
+	}
     return sep;
 }
 
