@@ -99,7 +99,7 @@ X-Form[SORT-ALLOWS-VARIABLES]
 X-Form[FORM[#name, ()]]
 →
 %n⟪
-{«STRING[#name]», &« Descriptor[#name] »},⟫
+{ (char *) «STRING[#name]», &« Descriptor[#name] »},⟫
 ;
 
 -[Copy[#name], Discard[#FormArgument1, #FormArguments]]
@@ -107,7 +107,7 @@ X-Form[FORM[#name, ()]]
 X-Form[FORM[#name, (#FormArgument1;#FormArguments)]]
 →
 %n⟪
-{«STRING[#name]», &« Descriptor[#name] »},⟫
+{ (char *) «STRING[#name]», &« Descriptor[#name] »},⟫
 ;
 
 // TODO: TOKEN must escape */ combination!
