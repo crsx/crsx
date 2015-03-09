@@ -156,7 +156,21 @@ int run(void)
 		if (!out)
 			perror(outfile), exit(1);
     }
-    fprintTermWithIndent (context, out, term);
+
+    Hashset2 used = NULL;
+    if (getenv("CANONICAL_VARIABLES"))
+    	used = makeHS2(context, 10, NULL, equalsPtr, hashPtr);
+
+    VariableSet set = makeVariableSet(context);
+    int pos = 0;
+    fprintTermTop(context, out, term, 32768, set, used, 0, &pos, getenv("omit-properties") ? 0 : 10, 0);
+    fprintf(out, "\n");
+    freeVariableSet(set);
+
+    if (getenv("CANONICAL_VARIABLES"))
+    	unlinkHS2(context, used);
+
+    //fprintTermWithIndent (context, out, term);
 
     // Cleanup
     unlinkTerm(context, term);

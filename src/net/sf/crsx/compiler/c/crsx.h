@@ -76,6 +76,7 @@ struct _Context
 #ifndef OMIT_TIMESPEC
     struct timespec time; // time when compute started.
 #endif
+    unsigned int depth;   // monitor recursion depth
     Hashset2 env;         // General environment.
 
     int poolRefCount;
@@ -487,6 +488,8 @@ static inline void permitUnusedTermP(Term *p) {}
 static inline void permitUnusedInt(int i) {}
 static inline void permitUnusedLong(long l) {}
 static inline void permitUnusedVariable(Variable v) {}
+static inline void permitUnusedNLink(NamedPropertyLink v) {}
+static inline void permitUnusedVLink(VariablePropertyLink v) {}
 
 // Representation.
 

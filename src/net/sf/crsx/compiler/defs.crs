@@ -43,7 +43,7 @@ MANGLE[$String] :: Text;
 -[Data[#t]] : TOKEN[#t] → %n⟪†« #t »⟫ ; 
 -[Data[#t]] : COMMENT_TOKEN[#t] → %n⟪†« $[Replace,#t,"*/","*_/"] »⟫ ; 
 -[Data[#t]] : INTEGER[#t] → %n⟪†« $[FormatNumber, #t] »⟫ ;
--[Data[#t]] : STRING[#t] → %n⟪ “†« $[Escape,#t] »” ⟫ ;
+-[Data[#t]] : STRING[#t] → %n⟪ “†« $[Escape,#t] »”⟫ ;
 -[Data[#t]] : MANGLE[#t] → %n⟪†« $[Mangle,#t] »⟫ ;
 
 DTOKEN[OK_SORT, $String] :: Text;

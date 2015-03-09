@@ -15,7 +15,7 @@
 // * {#env} ST-set-num[TERM, sink, variable] - set generic numeric (double) variable
 // * {#env} ST-set-string[TERM, sink, variable] - set allocated string (char*) variable
 // * {#env} ST-local-string[TERM, sink, s p.#[s,p]] - invoke # with either local (volatile!) variable name
-//				or literal argument string, with post-processing p
+//                or literal argument string, with post-processing p
 //
 // * {#env} ST-then-*[OK, ...] - delayed variant of each of the above.
 //
@@ -37,10 +37,12 @@ $Lax;
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-then-send[OK_SORT, Reified_Term, Text] :: Text;
 
-{#env}
-ST-then-send[OK, #term, #sink] 
+{#env}ST-then-send[OK, #term, #sink] 
 → 
-{#env; "$PendingProps": TERM[#term]}
+{
+    #env; 
+    "$PendingProps" : TERM[#term]
+}
 ST-send[#term, #sink]
 ; 
 
@@ -49,122 +51,128 @@ ST-send[Reified_Term, Text] :: Text;
  
 // Skip the environment
 
-{#env}ST-send[PROPERTY-REF[#ref, #use, #term], #sink] →
-	{#env}ST-send[#term, #sink];
-
-{#env}ST-send[PROPERTY[VARIABLE-USE[#key], #value, #term], #sink] →
-	{#env}ST-send[#term, #sink];
-
-{#env}ST-send[PROPERTY[LITERAL[#literal, #sort], #value, #term], #sink] →
-	{#env}ST-send[#term, #sink];
-
-{#env}ST-send[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#Key]], #value, #term], #sink] →
-	{#env}ST-send[#term, #sink];
+{#env}ST-send[PROPERTY-REF[#ref, #use, #term], #sink]                                                       → {#env}ST-send[#term, #sink];
+{#env}ST-send[PROPERTY[VARIABLE-USE[#key], #value, #term], #sink]                                           → {#env}ST-send[#term, #sink];
+{#env}ST-send[PROPERTY[LITERAL[#literal, #sort], #value, #term], #sink]                                     → {#env}ST-send[#term, #sink];
+{#env}ST-send[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#Key]], #value, #term], #sink] → {#env}ST-send[#term, #sink];
 
 // TODO: the choice between or lazy should be done by placing a marker.
 // Currently only use strict evaluation for the top-level construction.
 
 ST-Send-Construction-Function-Strict:
-{#env; "$Tail":YES; "$PendingProps": #Pending}
-ST-send[CONSTRUCTION[KFUNCTION, #Symbol, #Binders], #sink] → 
-	{#env; "$Tail":NO; "$PendingProps": NO}
-	ST-set-properties[#Pending, (), #sink, ok¹ props¹.ST-set-binders[ok¹, #Binders, #sink, ok¹ vars¹.ST-EvalFunction[ok¹, YES, #Symbol, props¹, vars¹, #sink]]]
+{
+    #env; 
+    "$Tail"         : YES; 
+    "$PendingProps" : #Pending
+}
+ST-send[CONSTRUCTION[KFUNCTION, #Symbol, #Binders], #sink] 
+→ 
+{#env; "$Tail" : NO; "$PendingProps" : NO}
+ST-set-properties[#Pending, (), #sink, ok¹ props¹.
+ST-set-binders[ok¹, #Binders, #sink, ok¹ vars¹.
+ST-eval-function[ok¹, YES, #Symbol, props¹, vars¹, #sink]]]
 ;
 
-ST-Send-Construction-Function-Lazy:
-{#env; "$Tail":NO; "$PendingProps": #pending}
-ST-send[CONSTRUCTION[KFUNCTION, #symbol, #binders], #sink] → // TODO: add a marker to force strict evaluation.
-	%n⟪¶{⟦
-«{#env}ST-send-properties[#pending, #sink]»
-START(«#sink», «EventConstructor[#symbol]»);« {#env; "$PendingProps": NO} ST-send-binders[#binders, #sink] »
-END(«#sink», «EventConstructor[#symbol]»);⟧
-}⟫;
+ST-Send-Construction-Function-Lazy
+:
+{
+    #env; 
+    "$Tail"         : NO; 
+    "$PendingProps" : #pending
+}
+ST-send[CONSTRUCTION[KFUNCTION, #symbol, #binders], #sink]  // TODO: add a marker to force strict evaluation.
+→
+%n⟪« 
+{#env; "$Tail": NO; "$PendingProps" : NO}ST-send-properties[#pending, #sink]  »
+START(«#sink», «EventConstructor[#symbol]»);⟦« 
+{#env; "$Tail": NO; "$PendingProps" : NO}ST-send-binders[#binders, #sink] »⟧
+END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[NO]»⟫
+;
 
-ST-Send-Construction-Data:
-{#env; "$Tail": #Tail; "$PendingProps": #Pending}
-ST-send[CONSTRUCTION[KDATA, #Symbol, #Binders], #sink] →
-	%n⟪¶{⟦¶«{#env}ST-send-properties[#Pending, #sink]»
-START(«#sink», «EventConstructor[#Symbol]»);« {#env; "$Tail":NO; "$PendingProps": NO} ST-send-binders[#Binders, #sink] »
-END(«#sink», «EventConstructor[#Symbol]»);«ST-send-tail[#Tail]»⟧
-}⟫;
+ST-Send-Construction-Data
+:
+{
+    #env; 
+    "$Tail"         : #tail; 
+    "$PendingProps" : #pending
+}
+ST-send[CONSTRUCTION[KDATA, #symbol, #binders], #sink] 
+→
+%n⟪«
+{#env; "$Tail": NO; "$PendingProps": NO}ST-send-properties[#pending, #sink]»
+START(«#sink», «EventConstructor[#symbol]»);⟦« 
+{#env; "$Tail": NO; "$PendingProps": NO}ST-send-binders[#binders, #sink] »⟧
+END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[#tail]»⟫
+;
 
-ST-Send-Literal:
-{#env;"$Tail": #Tail; "$PendingProps": #Pending}  
-ST-send[LITERAL[#Literal, #Sort], #sink] →
-	%n⟪¶«{#env}ST-send-properties[#Pending, #sink]»¶LITERAL(«#sink», «STRING[#Literal]»);«ST-send-tail[#Tail]»⟫;
+ST-Send-Literal
+:
+{
+    #env;
+    "$Tail"         : #tail; 
+    "$PendingProps" : #pending
+}  
+ST-send[LITERAL[#literal, #sort], #sink] 
+→
+%n⟪«{#env; "$Tail": NO; "$PendingProps": NO}ST-send-properties[#pending, #sink]»¶LITERAL(«#sink», «STRING[#literal]»);«ST-send-tail[#tail]»⟫
+;
 
-ST-Send-Variable:
-{#env;"$Tail": #Tail} // TODO: check $PendingProps is NO
-ST-send[VARIABLE-USE[#variable], #sink] →
-	%n⟪¶USE(«#sink», linkVariable(«#sink»->context, «#variable»));«ST-send-tail[#Tail]»⟫;
+ST-Send-Variable
+:
+{#env; "$Tail": #tail} // TODO: assert $PendingProps is NO
+ST-send[VARIABLE-USE[#variable], #sink] 
+→
+%n⟪¶USE(«#sink», linkVariable(«#sink»->context, «#variable»));«ST-send-tail[#tail]»⟫
+;
 
-ST-Send-MetaApplication:
-{#env; "$Tail": #Tail; "$PendingProps": #Pending}
-ST-send[META-APPLICATION[#metavar, #Arguments, #Occ], #sink] →
-	%n⟪«{#env}ST-send-properties[#Pending, #sink]»«{#env; "$Tail":NO; "$PendingProps": NO}ST-substitute[#metavar, #Arguments, #Occ, #sink]»«ST-send-tail[#Tail]»⟫;
+ST-Send-MetaApplication
+:
+{   
+    #env; 
+    "$Tail"         : #tail; 
+    "$PendingProps" : #pending
+}
+ST-send[META-APPLICATION[#metavar, #arguments, #occ], #sink]
+→
+%n⟪«{#env; "$Tail": NO; "$PendingProps": NO}ST-send-properties[#pending, #sink]»«
+    {#env; "$Tail": NO; "$PendingProps": NO}ST-substitute[#metavar, #arguments, #occ, #sink]»«
+    ST-send-tail[#tail]»⟫;
 
 ST-Send-Evaluator // TODO: check $PendingProps is NO
 :
-{#env}
-ST-send[EVALUATOR[#Primitive, #Terms, #Options], #sink] 
+{#env}ST-send[EVALUATOR[#primitive, #terms, #options], #sink] 
 →
-%n⟪«{#env; "$PendingProps": NO}E-send[Primitive[#Primitive], #Terms, #Options, #sink]»⟫
+{#env; "$PendingProps": NO}E-send[Primitive[#primitive], #terms, #options, #sink]
 ;
 
 ST-send-tail[STRING_ENTRY] :: Text;
 
-ST-send-tail[YES]
-→
-%n⟪
-return 1;⟫
-;
-
-ST-send-tail[NO]
-→
-%n⟪⟫
-;
+ST-send-tail[YES]   → %n⟪¶return 1;⟫;
+ST-send-tail[NO]    → %n⟪⟫;
 
 ST-send-tail2[STRING_ENTRY] :: Text;
 
-ST-send-tail2[YES] 
-→
-%n⟪
-return ⟫
-;
-
-ST-send-tail2[NO] 
-→
-%n⟪⟫
-;
+ST-send-tail2[YES]  → %n⟪¶return ⟫;
+ST-send-tail2[NO]   → %n⟪¶⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-EvalFunction[OK_SORT, STRING_ENTRY, $String, $List[Text], $List[Text], Text] :: Text;
+ST-eval-function[OK_SORT, STRING_ENTRY, $String, $List[Text], $List[Text], Text] :: Text;
 
 {#env}
-ST-EvalFunction[OK, #tail, #symbol, #props, #vars, #sink] → // vars  are in order 
-	%n⟪«ST-send-tail2[#tail]»«MANGLE[#symbol]»(«#sink», 1«{#env}ST-FunctionArgs-Props[#props]»«{#env}ST-function-args[#vars]»);⟫;
+ST-eval-function[OK, #tail, #symbol, #props, #vars, #sink] → // vars  are in order 
+    %n⟪«ST-send-tail2[#tail]»«MANGLE[#symbol]»(«#sink», 1«{#env}ST-function-args-props[#props]»«{#env}ST-function-args[#vars]»);⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-function-args[$List[Text]] :: Text;
 
-{#env}ST-function-args[()]           → %n⟪⟫ ;
-{#env}ST-function-args[(#Arg;#Args)] → %n⟪,«#Arg»«{#env}ST-function-args[#Args]»⟫;
+{#env}ST-function-args[()]            → %n⟪⟫ ;
+{#env}ST-function-args[(#Arg; #Args)] → %n⟪, «#Arg»«{#env}ST-function-args[#Args]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-FunctionArgs-Props[$List[Text]] :: Text;
+ST-function-args-props[$List[Text]] :: Text;
 
-{#env}
-ST-FunctionArgs-Props[()]
-→
-%n⟪, NULL, NULL⟫
-;
-
-{#env}
-ST-FunctionArgs-Props[(#Arg;#Args)]
-→
-{#env}
-ST-function-args[(#Arg;#Args)]
-;
+{#env}ST-function-args-props[()]            → %n⟪, NULL, NULL⟫;
+{#env}ST-function-args-props[(#Arg;#Args)]  → {#env}ST-function-args[(#Arg;#Args)];
 
 //------------
 // Send the properties to a sink
@@ -172,97 +180,51 @@ ST-function-args[(#Arg;#Args)]
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-properties[STRING_ENTRY, Text] :: Text;
  
-{#env}
-ST-send-properties[NO, #sink]  
-→
-%n⟨⟩
-;
-
-{#env}
-ST-send-properties[TERM[#term], #sink]  
-→
-{#env}
-ST-send-properties-term[#term, #sink]
-;
-
+{#env}ST-send-properties[NO, #sink]             → %n⟨⟩;
+{#env}ST-send-properties[TERM[#term], #sink]      → {#env}ST-send-properties-term[#term, #sink];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-properties-term[Reified_Term, Text] :: Text;
 
-{#env}
-ST-send-properties-term[PROPERTY-REF[#Ref, #Use, #term], #sink]
-→
-{#env}
-ST-send-property-ref[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #Ref]], #Use, #sink, #term]
-;
+{#env}ST-send-properties-term[PROPERTY-REF[#ref, #use, #term], #sink] →
+    {#env}ST-send-property-ref[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #ref]], #use, #sink, #term];
 
 ST-Send-Property-Variable-Key[Fresh[value::Text]]
 :
-{#env}
-ST-send-properties-term[PROPERTY[VARIABLE-USE[#key], #Value, #Term], #sink]
-→
-%n⟪
-{⟦
-Term «value»;« {#env} ST-set[#Value, #sink, value] »
-NORMALIZE(«#sink»->context, «value»);
+{#env}ST-send-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], #sink] →
+    %n⟪¶{⟦
+Term «value»;« {#env} ST-set[#value, #sink, value] »
+«value» = NORMALIZEP(«#sink»->context, «value»);
 ADD_PROPERTY_VARIABLE(«#sink», linkVariable(«#sink»->context, «#key»), «value»); ⟧
-}« {#env} ST-send-properties-term[#Term, #sink] »⟫
-;
+}« {#env} ST-send-properties-term[#term, #sink] »⟫;
 
 ST-Send-Property-Literal-Key[Fresh[value::Text]]
 :
-{#env}
-ST-send-properties-term[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], #sink]
+{#env}ST-send-properties-term[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], #sink] 
 →
-%n⟪
-{⟦
+%n⟪¶{⟦
 Term «value»;« {#env} ST-set[#Value, #sink, value] »
-NORMALIZE(«#sink»->context, «value»);
+«value» = NORMALIZEP(«#sink»->context, «value»);
 ADD_PROPERTY_NAMED(«#sink», « STRING[#Literal] », «value»);⟧
 }« {#env} ST-send-properties-term[#Term, #sink] »⟫
 ;
 
 ST-Send-Property-other[Fresh[key::Text, value::Text]]
 :
-{#env}
-ST-send-properties-term[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#Key]], #Value, #Term], #sink]
+{#env}ST-send-properties-term[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#Key]], #Value, #Term], #sink] 
 →
-%n⟪{⟦ Term «key», «value»;
-« {#env} ST-set-ref[#Key, #sink, key] »« {#env} ST-set[#Value, #sink, value] »NORMALIZE(«#sink»->context, «value»);
-ADD_PROPERTY(«#sink», «key», «value»);«ST-unlink-ref[#sink, key] »
-« {#env} ST-send-properties-term[#Term, #sink] »⟧}
-⟫
+%n⟪¶{⟦ 
+Term «key», «value»;« {#env} ST-set-ref[#Key, #sink, key] »« {#env} ST-set[#Value, #sink, value] »
+«value» = NORMALIZEP(«#sink»->context, «value»);
+ADD_PROPERTY(«#sink», «key», «value»);«ST-unlink-ref[#sink, key] »« {#env} ST-send-properties-term[#Term, #sink] »⟧}⟫
 ;
 
-{#env}
-ST-send-properties-term[CONSTRUCTION[#Kind, #Symbol, #Binders], #sink]
-→
-%n⟨⟩
-;
-
-{#env}
-ST-send-properties-term[LITERAL[#Value, #Sort], #sink]
-→
-%n⟨⟩
-;
-
-{#env}
-ST-send-properties-term[VARIABLE-USE[#Variable ], #sink]
-→
-%n⟨⟩
-;
-
-{#env}
-ST-send-properties-term[META-APPLICATION[#metavar, #Binders, #Use ], #sink]
-→
-%n⟨⟩
-;
-
-{#env}
-ST-send-properties-term[EVALUATOR[#Name, #Terms, #Options], #sink]
-→
-%n⟨⟩
-;
+// Ignore all other cases.
+{#env}ST-send-properties-term[CONSTRUCTION[#Kind, #Symbol, #Binders], #sink]        → %n⟨⟩;
+{#env}ST-send-properties-term[LITERAL[#Value, #Sort], #sink]                        → %n⟨⟩;
+{#env}ST-send-properties-term[VARIABLE-USE[#Variable ], #sink]                      → %n⟨⟩;
+{#env}ST-send-properties-term[META-APPLICATION[#metavar, #Binders, #Use ], #sink]   → %n⟨⟩;
+{#env}ST-send-properties-term[EVALUATOR[#Name, #Terms, #Options], #sink]            → %n⟨⟩;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-property-ref[STRING_ENTRY, Reified_Use, Text, Reified_Term] :: Text;
@@ -285,69 +247,74 @@ ADD_PROPERTIES(‹#sink›, LINK_NamedPropertyLink(‹#sink›->context, ‹#nam
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-properties[STRING_ENTRY, $List[Reified_Variable], Text, ok¹::OK_SORT props¹::$List[Reified_Variable].Text] :: Text;
 
-{#env}ST-set-properties[NO, #props, #sink, ok¹ props.#[ok¹, props]] →
-	{#env}#[OK, #props];
+{#env}ST-set-properties[NO, #props, #sink, ok¹ props.#[ok¹, props]] → {#env}#[OK, #props];
 
-{#env}ST-set-properties[TERM[#term], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}ST-set-properties-term[#term, #props,  #sink, ok¹ props¹.#[ok¹, props¹]];
+{#env}ST-set-properties[TERM[#term], #props, #sink, ok¹ props¹.#[ok¹, props¹]] 
+→
+{#env}ST-set-properties-term[#term, #props,  #sink, ok¹ props¹.#[ok¹, props¹]];
  
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-properties-term[Reified_Term, $List[Reified_Variable], Text, ok¹::OK_SORT props¹::$List[Reified_Variable].Text] :: Text;
 
-{#env}ST-set-properties-term[PROPERTY-REF[#ref, #use, #term], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}ST-set-properties-ref[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #ref]], #use, #term, #sink, ok¹ props¹.#[ok¹, props¹]];
+{#env}ST-set-properties-term[PROPERTY-REF[#ref, #use, #term], #props, #sink, ok¹ props¹.#[ok¹, props¹]] 
+→
+{#env}ST-set-properties-ref[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #ref]], #use, #term, #sink, ok¹ props¹.#[ok¹, props¹]];
 
--[Fresh[varP::Text, namedP::Text]]:
-{#env}ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], (), #sink, ok¹ props¹.#[ok¹, props¹]] →
-	%n⟪¶NamedPropertyLink «namedP» = NULL;
-VariablePropertyLink «varP» = NULL;« {#env} ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
+-[Fresh[varP::Text, namedP::Text]]
+:
+{#env}ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], (), #sink, ok¹ props¹.#[ok¹, props¹]] 
+→
+%n⟪¶NamedPropertyLink «namedP» = NULL;
+VariablePropertyLink «varP» = NULL;« 
+{#env} ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫
+;
 
 
-ST-set-property-Variable-Key[Fresh[value::Text]]:
-{#env}ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] →
-	%n⟪¶Term «value»;{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
-NORMALIZE(«#sink»->context, «value»);
+ST-set-property-Variable-Key[Fresh[value::Text]]
+:
+{#env}ST-set-properties-term[PROPERTY[VARIABLE-USE[#key], #value, #term], (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] 
+→
+%n⟪¶Term «value»;{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
+«value» = NORMALIZEP(«#sink»->context, «value»);
 «#varP» = addVariableProperty(«#sink»->context, «#varP», linkVariable(«#sink»->context, «#key»), «value»);« {#env}ST-set-properties-term[#term, (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
--[Fresh[varP::Text, namedP::Text]]:
-{#env}ST-set-properties-term[PROPERTY[LITERAL[#literal, #sort],  #value, #term], (), #sink, ok¹ props¹.#[ok¹, props¹]] →
-	%n⟪¶NamedPropertyLink «namedP» = NULL; 
-VariablePropertyLink «varP» = NULL;« {#env} ST-set-properties-term[PROPERTY[LITERAL[#literal, #sort], #value, #term], (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
+-[Fresh[varP::Text, namedP::Text]]
+:
+{#env}ST-set-properties-term[PROPERTY[LITERAL[#literal, #sort],  #value, #term], (), #sink, ok¹ props¹.#[ok¹, props¹]]
+→
+%n⟪¶NamedPropertyLink «namedP» = NULL; 
+VariablePropertyLink «varP» = NULL;« 
+{#env} ST-set-properties-term[PROPERTY[LITERAL[#literal, #sort], #value, #term], (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
-ST-set-property-Literal-Key[Fresh[value::Text]]:
-{#env}ST-set-properties-term[PROPERTY[LITERAL[#literal, #sort], #value, #term], (#namedP;#varP;), #sink, ok¹ props¹.#[ok¹, props¹]] →
-	%n⟪¶Term «value»;¶{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
-NORMALIZE(«#sink»->context, «value»);
-«#namedP» = addNamedProperty(«#sink»->context, «#namedP», « STRING[#literal] », «value»);« {#env}ST-set-properties-term[#term,  (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
+ST-set-property-Literal-Key[Fresh[value::Text]]
+:
+{#env}ST-set-properties-term[PROPERTY[LITERAL[#literal, #sort], #value, #term], (#namedP;#varP;), #sink, ok¹ props¹.#[ok¹, props¹]] 
+→
+%n⟪¶Term «value»;¶{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
+«value» = NORMALIZEP(«#sink»->context, «value»);
+«#namedP» = addNamedProperty(«#sink»->context, «#namedP», « STRING[#literal] », «value»);« 
+{#env}ST-set-properties-term[#term,  (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
-ST-set-property-other[Fresh[key::Text, value::Text]]:
+ST-set-property-other[Fresh[key::Text, value::Text]]
+:
 {#env}
-ST-set-properties-term[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#key]], #value, #term],  (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]]→
-	%n⟪¶Term «key», «value»;{⟦« {#env} ST-set-ref[#key, #sink, key] »« {#env} ST-set[#value, #sink, value] »⟧¶}
-NORMALIZE(«#sink»->context, «value»);
+ST-set-properties-term[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#key]], #value, #term], (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]]
+→
+%n⟪¶Term «key», «value»;{⟦« {#env} ST-set-ref[#key, #sink, key] »« {#env} ST-set[#value, #sink, value] »⟧¶}
+«value» = NORMALIZEP(«#sink»->context, «value»);
 if (IS_VARIABLE_USE(«key»))
     «#varP» = addVariableProperty(«#sink»->context, «#varP», linkVariable(«#sink»->context, VARIABLE(«key»)), «value»);
 else
     «#namedP» = addNamedProperty(«#sink»->context, «#namedP», SYMBOL(« key »), «value»);
 «ST-unlink-ref[#sink, key] »« {#env} ST-set-properties-term[#term, (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
-{#env}ST-set-properties-term[CONSTRUCTION[#kind, #symbol, #binders], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}#[OK, #props];
 
-{#env}ST-set-properties-term[CONSTRUCTION[#kind, #symbol, #binders], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}#[OK, #props];
-
-{#env}ST-set-properties-term[LITERAL[#value, #sort], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}#[OK, #props];
-
-{#env}ST-set-properties-term[VARIABLE-USE[#variable], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}#[OK, #props];
-
-{#env}ST-set-properties-term[META-APPLICATION[#metavar, #binders, #use], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}#[OK, #props];
-
-{#env}ST-set-properties-term[EVALUATOR[#name, #terms, #options], #props, #sink, ok¹ props¹.#[ok¹, props¹]] →
-	{#env}#[OK, #props];
+{#env}ST-set-properties-term[CONSTRUCTION[#kind, #symbol, #binders], #props, #sink, ok¹ props¹.#[ok¹, props¹]]      → {#env}#[OK, #props];
+{#env}ST-set-properties-term[CONSTRUCTION[#kind, #symbol, #binders], #props, #sink, ok¹ props¹.#[ok¹, props¹]]      → {#env}#[OK, #props];
+{#env}ST-set-properties-term[LITERAL[#value, #sort], #props, #sink, ok¹ props¹.#[ok¹, props¹]]                      → {#env}#[OK, #props];
+{#env}ST-set-properties-term[VARIABLE-USE[#variable], #props, #sink, ok¹ props¹.#[ok¹, props¹]]                     → {#env}#[OK, #props];
+{#env}ST-set-properties-term[META-APPLICATION[#metavar, #binders, #use], #props, #sink, ok¹ props¹.#[ok¹, props¹]]  → {#env}#[OK, #props];
+{#env}ST-set-properties-term[EVALUATOR[#name, #terms, #options], #props, #sink, ok¹ props¹.#[ok¹, props¹]]          → {#env}#[OK, #props];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-properties-ref[STRING_ENTRY, Reified_Use, Reified_Term, Text, ok¹::OK_SORT props¹::$List[Reified_Variable].Text] :: Text;
@@ -357,14 +324,12 @@ ST-set-properties-ref[STRING_ENTRY, Reified_Use, Reified_Term, Text, ok¹::OK_SO
 {#env}
 ST-set-properties-ref[PROPERTY_VARIABLE[#namedP, #varP], USE[#count], #term, #sink, ok¹ props¹.#[ok¹, props¹]]
 →   
-%n⟪«$[If, $[Equal, #count, 1], // Last use?
-    %n⟨
-NamedPropertyLink ‹namedP › = ‹#namedP ›;
-VariablePropertyLink ‹varP› = ‹#varP›;⟩,
-    %n⟨
+$[If, $[Equal, #count, 1], // Last use?
+    {#env}ST-set-properties-term[#term, (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]],
+    %n⟪
 NamedPropertyLink ‹namedP›  = LINK_NamedPropertyLink(‹#sink›->context, ‹#namedP›);
-VariablePropertyLink ‹varP› = LINK_VariablePropertyLink(‹#sink›->context, ‹ #varP›);⟩
-]»«{#env}ST-set-properties-term[#term, (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]]»⟫
+VariablePropertyLink ‹varP› = LINK_VariablePropertyLink(‹#sink›->context, ‹#varP›);«
+{#env}ST-set-properties-term[#term, (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]]»⟫]
 ;
 
 
@@ -377,25 +342,32 @@ ST-send-binders[$List[Reified_Binder], Text] :: Text;
 
 {#env}ST-send-binders[(), #sink] → %n⟪⟫;
 
-{#env}ST-send-binders[(#Binder; #Binders), #sink] →
-	%n⟪« {#env}ST-send-binder[HasFunctionalBinders[#Binder], #Binder, #sink] »« {#env}ST-send-binders[#Binders, #sink] »⟫;
+{#env}ST-send-binders[(#Binder; #Binders), #sink] 
+→
+%n⟪« {#env}ST-send-binder[HasFunctionalBinders[#Binder], #Binder, #sink] »« {#env}ST-send-binders[#Binders, #sink] »⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-binder[$Boolean, Reified_Binder, Text] :: Text;
 
 // Subterm without binders. This is just a term to send
-{#env}ST-send-binder[#has, ARGUMENT[#sort, #term], #sink] →
-	{#env}ST-then-send[OK, #term, #sink];
+{#env}ST-send-binder[#has, ARGUMENT[#sort, #term], #sink] 
+→
+{#env}ST-then-send[OK, #term, #sink];
 
 // Has functional binders : function argument is a closure
-{#env}ST-send-binder[$True, #binder, #sink] → $[Error, "Not implemented yet"];
-	// {#env}ST-set-ClosureBinder[OK, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]];
+{#env}ST-send-binder[$True, #binder, #sink] 
+→ 
+$[Error, "Not implemented yet"];
+// {#env}ST-set-ClosureBinder[OK, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]];
 
 // Has no functional binders : expect Variables and a Term  
 // First analyze the binders for potential reuse
-{#env}ST-send-binder[$False, #binder, #sink] →
-	{#env}ST-analyze-binders[OK, #binder, #sink, ok¹ vars.ST-send-binder1[OK, #binder, vars, #sink]];
+{#env}ST-send-binder[$False, #binder, #sink] 
+→
+{#env}ST-analyze-binders[OK, #binder, #sink, ok¹ vars.ST-send-binder1[OK, #binder, vars, #sink]];
 
+// TODO: Consolidate ST-send-binder and ST-set-term-binder.
+// TODO: Factor out redundant code if BOUND and !BOUND case.
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-binder1[OK_SORT, Reified_Binder, $List[Text], Text] :: Text;
@@ -403,49 +375,60 @@ ST-send-binder1[OK_SORT, Reified_Binder, $List[Text], Text] :: Text;
 // Since all binders can be reused, generate a case rebinding them. 
 // Note that binders can't be reused if shared.
 {#env; "$all_reused": YES}
-ST-send-binder1[OK, #binder, (#var; #vars), #sink] →
-	%n⟪¶if (!IS_BOUND(«#var»)) {⟦ «{#env}ST-send-binder2[#binder, (#var; #vars), (), #sink, $True]» ⟧} ¶else {⟦ « {#env}ST-send-binder2[#binder, (#var; #vars), (), #sink, $False] » ⟧   }⟫;
+ST-send-binder1[OK, #binder, (#var; #vars), #sink] 
+→
+%n⟪¶if (!IS_BOUND(«#var»))¶{ /* Reuse */⟦ «{#env}ST-send-binder2[#binder, (#var; #vars), (), #sink, $True]» ⟧¶} ¶else¶{ /* Substitute */⟦« {#env}ST-send-binder2[#binder, (#var; #vars), (), #sink, $False] » ⟧¶}⟫;
 
 // Can't be reused. Just generate the no rebind case.
 {#env; "$all_reused": NO}
-ST-send-binder1[OK, #binder, #vars, #sink] →
-	{#env}ST-send-binder2[#binder, #vars, (), #sink, $False];
+ST-send-binder1[OK, #binder, #vars, #sink] 
+→
+{#env}ST-send-binder2[#binder, #vars, (), #sink, $False];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-binder2[Reified_Binder, $List[Text], $List[Text], Text, $Boolean /* true: reuse, false: copy */] :: Text;
 
--[Fresh[binds::Text]]:
-{#env}ST-send-binder2[ARGUMENT[#sort, #term], (), (#binder; #binders), #sink, #reuse] →
-	%n⟪¶Variable «binds»[«INTEGER[Length[#binders, 1]]»] = {«#binder»«ConcatText[#binders, %n⟨, ⟩]»};
+-[Fresh[binds::Text]]
+:
+{#env}ST-send-binder2[ARGUMENT[#sort, #term], (), (#binder; #binders), #sink, #reuse] 
+→
+%n⟪¶Variable «binds»[«INTEGER[Length[#binders, 1]]»] = {«#binder»«ConcatText[#binders, %n⟨, ⟩]»};
 BINDS(«#sink», «INTEGER[Length[#binders, 1]]», «binds»);«{#env}ST-then-send[OK, #term, #sink]»⟫;
 
--[Free[reused::Text]]:
+-[Free[reused::Text]]
+:
 {#env; reused: BOUNDREUSE}
-ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (reused; #vars), #binders, #sink, $True] → 
-	%n⟪¶REBIND(«reused»);« {#env}ST-send-binder2[#binder[reused], #vars, Append[#binders,(reused;)], #sink, $True] »⟫;
+ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (reused; #vars), #binders, #sink, $True] 
+→ 
+%n⟪¶REBIND(«reused»);« {#env}ST-send-binder2[#binder[reused], #vars, Append[#binders,(reused;)], #sink, $True] »⟫;
 
--[Free[noreuse], Fresh[new::Text]]:
+-[Free[noreuse], Fresh[new::Text]]
+:
 {#env; noreuse: BOUNDREUSE}
-ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (noreuse; #vars), #binders, #sink, $False] →
-	%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
+ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (noreuse; #vars), #binders, #sink, $False]
+→
+%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
 
--[Free[noreuse::Text], Fresh[new::Text]]:
+-[Free[noreuse::Text], Fresh[new::Text]]
+:
 {#env; noreuse: BOUND}
-ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (noreuse; #vars), #binders, #sink, $False] →
-	%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
+ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (noreuse; #vars), #binders, #sink, $False] 
+→
+%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
 
 
+// TODO: REVIVE
 //{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 //ST-send-binder2[OK_SORT, $Boolean /* Has functional binders? */ , $List[Text], Text] :: Text;
 //
 //{#env}ST-send-binder2[OK, $True, (#term;), #sink] →
-//	%n⟪¶COPY(«#sink», makeClosureTerm(«#sink»->context, «#term»));⟫;
+//    %n⟪¶COPY(«#sink», makeClosureTerm(«#sink»->context, «#term»));⟫;
 //
 //{#env}ST-send-binder2[OK, $False, (#term;), #sink] →
-//	%n⟪¶COPY(«#sink», «#term»);⟫;
+//    %n⟪¶COPY(«#sink», «#term»);⟫;
 //
 //{#env}ST-send-binder2[OK, #Has, (#term; #var; #vars), #sink] → // vars are in reverse order 
-//	{#env}ST-send-binder3[Length[(#var; #vars), 0], #Has, #term, #var, #vars, #sink];
+//    {#env}ST-send-binder3[Length[(#var; #vars), 0], #Has, #term, #var, #vars, #sink];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to substitute what was matched by meta-application, with substitutions. 
@@ -459,98 +442,99 @@ ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (no
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute[$String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
-{#env}ST-substitute[#metavar, #binders, #use, #sink] →
-	{#env}ST-substitute0[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #metavar]], #metavar, #binders, #use, #sink];
+{#env}ST-substitute[#metavar, #binders, #use, #sink] 
+→
+{#env}ST-substitute0[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #metavar]], #metavar, #binders, #use, #sink];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute0[STRING_ENTRY, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
 // Case 1: top-level meta-variable. Copy or Substitute
--[Free[var::Reified_Variable]]:
-{#env; var:ARG[#Index, $True]}   
-ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] →
-	{#env}ST-substitute1[#metavar, #Binders, #Use, #sink];
+-[Free[var::Reified_Variable]]
+:
+{#env; var: ARG[#Index, $True]}   
+ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] 
+→
+{#env}ST-substitute1[#metavar, #Binders, #Use, #sink];
 
 // Case 2: top-level closure. Either invoke or copy.
--[Free[var::Reified_Variable]]:
-{#env; var:ARG[#Index, $False]} 
-ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] →
-	{#env}ST-call[var, #metavar, #Binders, #Use, #sink];
+-[Free[var::Reified_Variable]]
+:
+{#env; var: ARG[#Index, $False]} 
+ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] 
+→
+{#env}ST-call[var, #metavar, #Binders, #Use, #sink];
 
 // Case 3: sub meta-variable.. 
 -[Free[var::Reified_Variable]]:
 {#env; var:SUB[#parent, #i, $True]} // Sub data term. Copy or Substitute
 ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] →
-	{#env}ST-substitute1[#metavar, #Binders, #Use, #sink];
+    {#env}ST-substitute1[#metavar, #Binders, #Use, #sink];
 
 // Case 4: sub closure
--[Free[var::Reified_Variable]]:
-{#env; var:SUB[#parent, #i, $True]} // Sub function term. Should not occur
-ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] →
-	$[Error, "Cannot have sub-function with binders"];
+-[Free[var::Reified_Variable]]
+:
+{#env; var: SUB[#parent, #i, $True]} // Sub function term. Should not occur
+ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink]
+→
+$[Error, "Cannot have sub-function with binders"];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute1[$String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
 // The meta variable has no argument. Just copy.
 {#env; "$Tail": #Tail}
-ST-substitute1[#metavar, (), USE[#Count], #sink] →
-	$[If, $[Equal, #Count, 1],
-		%n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#Tail] »⟫, // Give up the reference own by the step function 
-		%n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »)); « ST-send-tail[#Tail] »⟫];
+ST-substitute1[#metavar, (), USE[#Count], #sink] 
+→
+$[If, $[Equal, #Count, 1],
+    %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#Tail] »⟫, // Give up the reference own by the step function 
+    %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »)); « ST-send-tail[#Tail] »⟫];
 
 // The meta variable has arguments. Analyze whether substitution is needed.
-{#env}ST-substitute1[#metavar, (#argument1; #arguments), #occ, #sink] →
-	{#env}ST-substitute2[#metavar, (#argument1; #arguments), #occ, #sink, 0, %n⟪⟫, %n⟪⟫, %n⟪⟫, %n⟪⟫, $True, 0];
+{#env}ST-substitute1[#metavar, (#argument1; #arguments), #occ, #sink] 
+→
+{#env}ST-substitute2[#metavar, (#argument1; #arguments), #occ, #sink, 0, %n⟪⟫, %n⟪⟫, %n⟪⟫, %n⟪⟫, $True, 0];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute2[$String, $List[Reified_Binder], Reified_Use, Text, $Numeric, Text, Text, Text, Text, $Boolean, $Numeric] :: Text;
 
 // Process substitution argument.
-{#env}ST-substitute2[#metavar, (ARGUMENT[#sort, #term]; #arguments), #occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used] →
-	{#env}ST-substitute3[{#env} T-CheckReuse[#term], #metavar, #term, $[:,#metavar,"$",$[FormatNumber, #index]], #arguments, #occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used];
+{#env}ST-substitute2[#metavar, (ARGUMENT[#sort, #term]; #arguments), #occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used] 
+→
+{#env}ST-substitute3[{#env} T-CheckReuse[#term], #metavar, #term, $[:,#metavar,"$",$[FormatNumber, #index]], #arguments, #occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used];
 
 // Generate COPY instruction for explicit substitution.
 {#env; "$Tail": #Tail}
-ST-substitute2[#metavar, (), USE[#Count], #sink, #arity, #prefix, #vars, #args, #sep, $True, #used] →
-	$[If, $[Equal, #Count, 1],
-	  %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »); /* REUSED SUBSTITUTION */« ST-send-tail[#Tail] »⟫,
-	  %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »)); /* REUSED SUBSTITUTION */« ST-send-tail[#Tail] »⟫];
+ST-substitute2[#metavar, (), USE[#Count], #sink, #arity, #prefix, #vars, #args, #sep, $True, #used] 
+→
+$[If, $[Equal, #Count, 1],
+  %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#Tail] »⟫,
+  %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »));« ST-send-tail[#Tail] »⟫];
 
 // Generate full SUBSTITUTE instruction for non-explicit substitution.
--[Free[sink],Discard[#sep,#arity],Copy[#metavar,#used], Fresh[substitution::Text, vars::Text, args::Text]]
+-[Fresh[substitution::Text, vars::Text, args::Text]]
 :
 {#env; "$Tail": #Tail}
-ST-substitute2[#metavar, (), USE[#Count], sink, #arity, #prefix, #vars, #args, #sep, $False, #used]
+ST-substitute2[#metavar, (), USE[#Count], #sink, #arity, #prefix, #vars, #args, #sep, $False, #used]
 →
-%n⟪
-{⟦
-« #prefix »Variable «vars»[«INTEGER[#used]»] = {«#vars»};
+%n⟪« #prefix »
+Variable «vars»[«INTEGER[#used]»] = {«#vars»};
 Term «args»[«INTEGER[#used]»] = {«#args»};
 struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args»};
-SUBSTITUTE(«sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, ST-link-prefix[sink]]»«{#env}MetaVar[#metavar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», &«substitution»); ⟧}« ST-send-tail[#Tail] »⟫
-;
+SUBSTITUTE(«#sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, ST-link-prefix[#sink]]»«{#env}MetaVar[#metavar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», &«substitution»);« ST-send-tail[#Tail] »⟫;
 
 // Skip reusable substitution component.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute3[T_REUSE_SORT, $String, Reified_Term, $String, $List[Reified_Binder], Reified_Use, Text, $Numeric, Text, Text, Text, Text, $Boolean, $Numeric] :: Text;
 
-{#env}
-ST-substitute3[T_REUSE, #metavar, #Term, #metavarIndex, #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+{#env}ST-substitute3[T_REUSE, #metavar, #Term, #metavarIndex, #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
 →
-{#env}
-ST-substitute2[#metavar, #Arguments, #Occ, #sink, $[Plus,#index,1], #prefix, #vars, #args, #sep, #explicit, #used]
-;
+{#env}ST-substitute2[#metavar, #Arguments, #Occ, #sink, $[Plus,#index,1], #prefix, #vars, #args, #sep, #explicit, #used];
 
 // Generate non-explicit substitution setup for argument.
--[Free[sink::Text]]
-:
-{#env}
-ST-substitute3[T_NO_REUSE, #metavar, #Term, #metavarIndex, #Arguments, #Occ, sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
+{#env}ST-substitute3[T_NO_REUSE, #metavar, #Term, #metavarIndex, #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
 →
-{#env}
-ST-substitute4[$[{#env}Get[STRING_ENTRY], #metavarIndex],#metavar, #Term, #metavarIndex, #Arguments, #Occ, sink, #index, #prefix, #vars, #args, #sep, #explicit, #used]
-;
+{#env}ST-substitute4[$[{#env}Get[STRING_ENTRY], #metavarIndex],#metavar, #Term, #metavarIndex, #Arguments, #Occ, #sink, #index, #prefix, #vars, #args, #sep, #explicit, #used];
  
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute4[STRING_ENTRY, $String, Reified_Term, $String, $List[Reified_Binder], Reified_Use, Text, $Numeric, Text, Text, Text, Text, $Boolean, $Numeric] :: Text;
@@ -563,19 +547,15 @@ ST-substitute4[VARIABLE[#var], #metavar, #Term, #metavarIndex, #Arguments, #Occ,
 {#env}
 ST-substitute2[#metavar, #Arguments, #Occ, #sink, $[Plus,#index,1],
   // prefix extended with reference to argument term.  TODO: linear arguments.
-  %n⟪« #prefix »Term «arg»;
-« {#env; "$Tail": NO} ST-set[#Term, #sink, arg] »⟫,
+  %n⟪« #prefix »
+Term «arg»;« {#env; "$Tail": NO}ST-set[#Term, #sink, arg] »⟫,
   // vars and args recorded; separator now known to be comma.
   %n⟪«#vars»«#sep»«#var»⟫, %n⟪«#args»«#sep»«arg»⟫, %n⟪,⟫,
   // explicitness property now lost.
-  $False, $[Plus,#used,1]]
-;
+  $False, $[Plus,#used,1]];
 
 ST-link-prefix[Text] :: Text;
-
-ST-link-prefix[#sink]
-→
-%n⟪LINK(«#sink»->context,⟫;
+ST-link-prefix[#sink] → %n⟪LINK(«#sink»->context,⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-UnlinkLastMetaUse[$String, Reified_Use, Text] :: Text;
 
@@ -624,20 +604,25 @@ ST-unlink-ref[#sink, #variable] → %n⟪¶UNLINK(«#sink»->context, «#variabl
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-binders[OK_SORT, $List[Reified_Binder], Text, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
 
-{#env}ST-set-binders[OK, #Binders, #sink, ok¹ vars¹.#[ok¹, vars¹]] → 
-	{#env}ST-set-binders2[OK, #Binders, (), #sink, ok¹ vars¹.#[ok¹, vars¹]] ;
+{#env}ST-set-binders[OK, #Binders, #sink, ok¹ vars¹.#[ok¹, vars¹]] 
+→ 
+{#env}ST-set-binders2[OK, #Binders, (), #sink, ok¹ vars¹.#[ok¹, vars¹]] ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-binders2[OK_SORT, $List[Reified_Binder], $List[Text], Text, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
 
 // Done. 
-{#env}ST-set-binders2[OK, (), #vars, #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	{#env}#[OK, #vars];
+{#env}ST-set-binders2[OK, (), #vars, #sink, ok¹ vars¹.#[ok¹, vars¹]] 
+→ 
+{#env}#[OK, #vars];
 
-{#env}
-ST-set-binders2[OK, (#binder; #binders), #vars, #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	{#env}ST-set-binder[HasFunctionalBinders[#binder], #binder, #sink, 
-		ok¹ vars¹.ST-set-binders2[ok¹, #binders, Append[#vars, vars¹], #sink, ok¹ vars¹.#[ok¹, vars¹]]];
+// Process each arguments, one at a time. Each arguments produces a list of variables
+// (of type Variable/Term/Closure) to then be used for calling the function.
+{#env}ST-set-binders2[OK, (#binder; #binders), #vars, #sink, ok¹ vars¹.#[ok¹, vars¹]]
+→
+{#env}ST-set-binder[HasFunctionalBinders[#binder], #binder, #sink, ok¹ vars¹.
+      ST-set-binders2[ok¹, #binders, Append[#vars, vars¹], #sink, ok¹ vars¹.
+      #[ok¹, vars¹]]];
 
 // If at least one binder is functional, then generate a closure. 
 // Otherwise generate Variable for each binder.
@@ -646,43 +631,126 @@ ST-set-binders2[OK, (#binder; #binders), #vars, #sink, ok¹ vars¹.#[ok¹, vars�
 ST-set-binder[$Boolean, Reified_Binder, Text, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
 
 // Subterm without binders. This is a term.
--[Fresh[arg::Text]]:
-{#env}ST-set-binder[#Has, ARGUMENT[#sort, #term], #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	%n⟪¶Term «arg»;«{#env}ST-set[#term, #sink, arg]»«{#env}#[OK, (arg;)]»⟫;
+{#env}ST-set-binder[#has, ARGUMENT[#sort, #term], #sink, ok¹ vars¹.#[ok¹, vars¹]] 
+→
+{#env}ST-set-to[#term, #sink, var.#[OK, (var;)]];
 
 // With functional binders : function argument is a closure
-{#env}ST-set-binder[$True, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	{#env}ST-set-ClosureBinder[OK, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]];
+{#env}ST-set-binder[$True, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]]
+→
+{#env}ST-set-ClosureBinder[OK, #binder, #sink, ok¹ vars¹.
+      #[ok¹, vars¹]];
 
 // Without functional binders : expect Variables and a Term  
-// First analyze the binders for potential reuse
-{#env}ST-set-binder[$False, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	{#env}ST-analyze-binders[OK, #binder, #sink, ok¹ vars.ST-set-term-binder[OK, #binder, vars, vars, #sink, ok¹ vars¹.#[ok¹, vars¹]]];
+// First analyze the binders for potential reuse and then compute the arguments.
+{#env}ST-set-binder[$False, #binder, #sink, ok¹ vars¹.#[ok¹, vars¹]] 
+→
+{#env}ST-analyze-binders[OK, #binder, #sink, ok¹ vars.
+      ST-set-term-binder[OK, #binder, vars, #sink, ok¹ vars¹.
+      #[ok¹, vars¹]]];
 
 //------- 
 // Generate arguments of type Variable for binders and Term. 
 //
 // When all binders can be reused, and not bound (not shared) then just rebind them and copy term  
 //  
-
-// TODO: REVISIT TO USE $all_reused
+// In the more general form, the generated code looks like this:
+//     
+//      Variable b1, ... bn;
+//      Term term; 
+//      if (!IS_BOUND(ob1))
+//      { // Reused
+//          b1 = ob1; REBIND(b1);
+//          ...
+//          term = ... // COPY
+//      }
+//      else
+//      { // Substitute
+//          b1 = new Variable ....
+//          ...
+//              
+//          term = ... // SUBSTITUTE
+//      }
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-set-term-binder[OK_SORT, Reified_Binder, $List[Reified_Variable], $List[Text], Text, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
+ST-set-term-binder[OK_SORT, Reified_Binder /* The argument */, $List[Reified_Variable] /* The analyzed binders */, Text /* sink */, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
 
--[Fresh[arg::Text]]:
-{#env}ST-set-term-binder[OK, ARGUMENT[#Sort, #Term], (), #cvars, #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	%n⟪¶Term «arg»;«{#env}ST-set[#Term, #sink, arg]»«{#env}#[OK, Append[#cvars, (arg;)]]»⟫;
+{#env}
+ST-set-term-binder[OK, #binder, #binders, #sink, ok¹ vars¹.#[ok¹, vars¹]] 
+→
+{#env}
+ST-set-term-binder-decls[#binders, (), ok¹ decls.ST-set-term-binder1[ok¹, #binder, #binders, decls, #sink, ok¹ vars¹.#[ok¹, vars¹]]];
 
--[Free[reused::Text]]:
+// First pass: generate declarations. 
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-term-binder-decls[$List[Reified_Variable] /* The analyzed binders */, $List[Text] /* The resulting var decls */, ok¹::OK_SORT decls::$List[Text].Text] :: Text;
+
+-[Fresh[term::Text]]
+:
+{#env}ST-set-term-binder-decls[(), #decls, ok¹ decls.#[ok¹, decls]]
+→
+%n⟪¶Term «term»; «{#env}#[OK, Append[#decls, (term;)]]»⟫;
+
+-[Fresh[b::Text]]
+:
+{#env}ST-set-term-binder-decls[(#binder; #binders), #decls, ok¹ decls.#[ok¹, decls]]
+→
+%n⟪¶Variable «b»;«{#env}ST-set-term-binder-decls[#binders, Append[#decls, (b;)], ok¹ decls.#[ok¹, decls]]»⟫;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-term-binder1[OK_SORT, Reified_Binder /* The argument */, $List[Reified_Variable] /* The analyzed binders */, 
+                    $List[Text] /* The variable declarations */, Text /* sink */, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
+
+
+{#env}ST-set-term-binder1[OK, #binder, #binders, #decls, #sink, ok¹ vars¹.#[ok¹, vars¹]] 
+→
+%n⟪«{#env}ST-set-term-binder2[#binder, #binders, #decls, #sink]»«{#env}#[OK, #decls]»⟫;
+
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-term-binder2[Reified_Binder /* The argument */, $List[Reified_Variable] /* The analyzed binders */, $List[Text] /* The variable declarations */, Text /* sink */] :: Text;
+
+// Since all binders can be reused, generate a case rebinding them. 
+// Note that binders can't be reused if shared.
+{#env; "$all_reused": YES}
+ST-set-term-binder2[#binder, (#var; #binders), #decls, #sink] 
+→
+%n⟪¶if (!IS_BOUND(«#var»))¶{ /* Reuse */⟦ «{#env}ST-set-term-binder3[#binder, (#var; #binders), #decls, #sink, $True]» ⟧¶} ¶else¶{ /* Substitute */⟦« {#env}ST-set-term-binder3[#binder, (#var; #binders), #decls, #sink, $False] »⟧¶}⟫;
+
+// Can't be reused. Just generate the no rebind case.
+{#env; "$all_reused": NO}
+ST-set-term-binder2[#binder, #binders, #decls, #sink] 
+→
+{#env}ST-set-term-binder3[#binder, #binders, #decls, #sink, $False];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-term-binder3[Reified_Binder, $List[Reified_Variable], $List[Text], Text, $Boolean /* Enable Reuse */] :: Text;
+
+{#env}ST-set-term-binder3[ARGUMENT[#sort, #term], (), (#vterm;), #sink, #reuse] 
+→
+{#env}ST-set[#term, #sink, #vterm];
+
+-[Free[reused::Text]]
+:
 {#env; reused: BOUNDREUSE}
-ST-set-term-binder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], (reused; #vars), #cvars, #sink, ok¹ vars¹.#[ok¹, vars¹]] → 
-	%n⟪¶REBIND(«reused»);« {#env}ST-set-term-binder[OK, #Binder[reused], #vars, #cvars, #sink, ok¹ vars¹.#[ok¹, vars¹]] »⟫;
+ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (reused; #binders), (#decl; #decls), #sink, $True] 
+→ 
+%n⟪¶«#decl» = «reused»; REBIND(«reused»);« {#env}ST-set-term-binder3[#binder[reused], #binders, #decls, #sink, $True] »⟫
+;
 
--[Free[new::Text]]:
+-[Free[reuse::Text]]
+:
+{#env; reused: BOUNDREUSE}
+ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (reused; #binders), (#decl; #decls), #sink, $False] 
+→ 
+%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«#decl»");« {#env; #decl: BOUND}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
+
+-[Free[new::Text]]
+:
 {#env; new: BOUND}
-ST-set-term-binder[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], (new; #vars), #cvars, #sink, ok¹ vars¹.#[ok¹, vars¹]] →
-	%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env}ST-set-term-binder[OK, #Binder[new], #vars, #cvars, #sink, ok¹ vars¹.#[ok¹, vars¹]] »⟫;
+ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (new; #binders), (#decl; #decls), #sink, $False] 
+→
+%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«#decl»");« {#env}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
 
 //---------
 // Analyze binders and return a list of variables corresponding to the binder.
@@ -1020,61 +1088,109 @@ ST-set-CaptureVariable[BOUND, #v, #Captured, #sink, ok¹ captured¹.#[ok¹, capt
 #[OK, #Captured]
 ;
 
+//---------
+// Generate code to capture copy of term to new variable.
+//
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-to[Reified_Term, Text, var::Text.Text] :: Text;
+
+// Literals can be created directly.
+-[Fresh[literal::Text]]
+:
+{#env}ST-set-to[LITERAL[#literal, #sort], #sink, var.#[var]]
+→
+%n⟪¶Term «literal» = makeStringLiteral(«#sink»->context, «STRING[#literal]»);« {#env}#[literal] »⟫
+;
+
+// Evaluators are handled separately...
+-[Fresh[variable::Text]]
+:
+{#env}ST-set-to[EVALUATOR[#primitive, #args, #options], #sink, var.#[var]]
+→
+%n⟪¶Term «variable»;« {#env}E-set[Primitive[#primitive], #args, #options, #sink, variable] »« {#env}#[variable] »⟫
+;
+
+// Meta-Application  
+-[Fresh[variable::Text]]
+:
+{#env}ST-set-to[META-APPLICATION[#metavar, (), USE[#count]], #sink, var.#[var]]
+→ 
+$[If, $[Equal, #count, 1], 
+    {#env}#[{#env}MetaVar[#metavar]],
+    %n⟨¶Term «variable» = LINK(«#sink»->context, «{#env}MetaVar[#metavar]»);« {#env}#[variable] »⟩]
+;
+
+{#env}ST-set-to[META-APPLICATION[#metavar, (#binder; #binders), #use], #sink, var.#[var]] 
+→ 
+{#env}ST-set-buffer-to[META-APPLICATION[#metavar, (#binder; #binders), #use], #sink, var.#[var]]
+;
+
+// Proper term cases require buffering.
+{#env}ST-set-to[PROPERTY-REF[#Ref, #Use, #Term],       #sink, var.#[var]] → {#env}ST-set-buffer-to[PROPERTY-REF[#Ref, #Use, #Term],       #sink, var.#[var]];
+{#env}ST-set-to[PROPERTY[#Key, #Value, #Term],         #sink, var.#[var]] → {#env}ST-set-buffer-to[PROPERTY[#Key, #Value, #Term],         #sink, var.#[var]];
+{#env}ST-set-to[PROPERTY-NOT[#Key, #Term],             #sink, var.#[var]] → {#env}ST-set-buffer-to[PROPERTY-NOT[#Key, #Term],             #sink, var.#[var]];
+{#env}ST-set-to[VARIABLE-USE[#Variable],               #sink, var.#[var]] → {#env}ST-set-buffer-to[VARIABLE-USE[#Variable],               #sink, var.#[var]];
+{#env}ST-set-to[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, var.#[var]] → {#env}ST-set-buffer-to[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, var.#[var]];
+
+// Helper to set term variable using temporary buffer.   
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-buffer-to[Reified_Term, Text, var::Text.Text] :: Text;
+
+-[Fresh[buf::Text, variable::Text]]
+:
+{#env}
+ST-set-buffer-to[#term, #sink, var.#[var]]
+→
+%n⟪
+Term «variable»;
+{⟦
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}ST-then-send[OK, #term, buf] »
+«variable» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»);⟧
+}«{#env}#[variable]»⟫
+;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Generate code to capture copy of term to an existing variable.
+// Generate code to capture copy of term (actual copy or by reference) to an existing variable.
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-then-set[OK_SORT, Reified_Term, Text, Text] :: Text;
 
-{#env}
-ST-then-set[OK, #Term, #sink, #variable] 
-→ 
-{#env} 
-ST-set[#Term, #sink, #variable]
-;
+{#env}ST-then-set[OK, #Term, #sink, #variable] → {#env}ST-set[#Term, #sink, #variable];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set[Reified_Term, Text, Text] :: Text;
 
 // Literals can be created directly.
-{#env}
-ST-set[LITERAL[#Literal, #Sort], #sink, #variable]
+{#env}ST-set[LITERAL[#Literal, #Sort], #sink, #variable]
 →
-%n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
-⟫
-;
+%n⟪¶«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);⟫;
 
 // Evaluators are handled separately...
-{#env}
-ST-set[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable]
+{#env}ST-set[EVALUATOR[#primitive, #args, #options], #sink, #variable]
 →
-{#env}
-E-set[Primitive[#Primitive], #Args, #Options, #sink, #variable]
-;
+{#env}E-set[Primitive[#primitive], #args, #options, #sink, #variable];
 
 // Meta-Application  
 {#env} 
-ST-set[META-APPLICATION[#metavar, (), USE[#Count]], #sink, #variable] 
+ST-set[META-APPLICATION[#metavar, (), USE[#count]], #sink, #variable] 
 → 
-$[If, $[Equal, #Count, 1], 
-    %n⟪«#variable» = «{#env}MetaVar[#metavar]»;⟫,
-    %n⟪«#variable» = LINK(«#sink»->context, «{#env}MetaVar[#metavar]»);⟫
+$[If, $[Equal, #count, 1], 
+    %n⟪¶«#variable» = «{#env}MetaVar[#metavar]»;⟫,
+    %n⟪¶«#variable» = LINK(«#sink»->context, «{#env}MetaVar[#metavar]»);⟫
 ] 
 ;
 
 -[Fallback]
 :
-{#env} 
-ST-set[META-APPLICATION[#metavar, #Binders, #Use], #sink, #variable] 
+{#env}ST-set[META-APPLICATION[#metavar, #binders, #use], #sink, #variable] 
 → 
-{#env} 
-ST-set-buffer[META-APPLICATION[#metavar, #Binders, #Use], #sink, #variable]
+{#env}ST-set-buffer[META-APPLICATION[#metavar, #binders, #use], #sink, #variable]
 ;
 
 // Proper term cases require buffering.
-{#env} ST-set[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] → {#env} ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] ;
-{#env} ST-set[PROPERTY[#Key, #Value, #Term],         #sink, #variable] → {#env} ST-set-buffer[PROPERTY[#Key, #Value, #Term],         #sink, #variable] ;
-{#env} ST-set[PROPERTY-NOT[#Key, #Term],             #sink, #variable] → {#env} ST-set-buffer[PROPERTY-NOT[#Key, #Term],             #sink, #variable] ;
-{#env} ST-set[VARIABLE-USE[#Variable],               #sink, #variable] → {#env} ST-set-buffer[VARIABLE-USE[#Variable],               #sink, #variable] ;
-{#env} ST-set[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, #variable] → {#env} ST-set-buffer[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, #variable] ;
+{#env}ST-set[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] → {#env}ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] ;
+{#env}ST-set[PROPERTY[#Key, #Value, #Term],         #sink, #variable] → {#env}ST-set-buffer[PROPERTY[#Key, #Value, #Term],         #sink, #variable] ;
+{#env}ST-set[PROPERTY-NOT[#Key, #Term],             #sink, #variable] → {#env}ST-set-buffer[PROPERTY-NOT[#Key, #Term],             #sink, #variable] ;
+{#env}ST-set[VARIABLE-USE[#Variable],               #sink, #variable] → {#env}ST-set-buffer[VARIABLE-USE[#Variable],               #sink, #variable] ;
+{#env}ST-set[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, #variable] → {#env}ST-set-buffer[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, #variable] ;
 
 // Helper to set term variable using temporary buffer.   
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-buffer[Reified_Term, Text, Text] :: Text;
@@ -1086,10 +1202,11 @@ ST-set-buffer[#Term, #sink, #variable]
 →
 %n⟪
 {⟦
-Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}ST-then-send[OK, #Term, buf] »
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env; "$Tail":NO}ST-then-send[OK, #Term, buf] »
 «#variable» = BUFFER_TERM(«buf»);
-FREE_BUFFER(«buf»); ⟧
-}⟫;
+FREE_BUFFER(«buf»);⟧
+}⟫
+;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1097,46 +1214,33 @@ FREE_BUFFER(«buf»); ⟧
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-then-set-ref[OK_SORT, Reified_Term, Text, Text] :: Text;
 
-{#env}
-ST-then-set-ref[OK, #Term, #sink, #variable] 
-→ 
-{#env}
-ST-set-ref[#Term, #sink, #variable]
-;
+{#env}ST-then-set-ref[OK, #term, #sink, #variable] → {#env}ST-set-ref[#term, #sink, #variable];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-ref[Reified_Term, Text, Text] :: Text;
 
 // Literals can be created directly.
-{#env}
-ST-set-ref[LITERAL[#Literal, #Sort], #sink, #variable]
+{#env}ST-set-ref[LITERAL[#Literal, #Sort], #sink, #variable]
 →
-%n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
-⟫
-;
+%n⟪¶«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);⟫;
 
 // Most term cases require buffering (like ST-set).
-{#env} ST-set-ref[PROPERTY-REF[#Ref, #Use, #Term],   #sink, #variable] → {#env} ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],   #sink, #variable] ;
-{#env} ST-set-ref[PROPERTY[#Key, #Value, #Term],     #sink, #variable] → {#env} ST-set-buffer[PROPERTY[#Key, #Value, #Term],     #sink, #variable] ;
-{#env} ST-set-ref[PROPERTY-NOT[#Key, #Term],         #sink, #variable] → {#env} ST-set-buffer[PROPERTY-NOT[#Key, #Term],         #sink, #variable] ;
-{#env} ST-set-ref[VARIABLE-USE[#Variable],           #sink, #variable] → {#env} ST-set-buffer[VARIABLE-USE[#Variable],           #sink, #variable] ;
-{#env} ST-set-ref[CONSTRUCTION[#Kind, #Symbol, #Binders],   #sink, #variable] → {#env} ST-set-buffer[CONSTRUCTION[#Kind, #Symbol, #Binders],   #sink, #variable] ;
-
+{#env}ST-set-ref[PROPERTY-REF[#Ref, #Use, #Term],        #sink, #variable] → {#env}ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],        #sink, #variable] ;
+{#env}ST-set-ref[PROPERTY[#Key, #Value, #Term],          #sink, #variable] → {#env}ST-set-buffer[PROPERTY[#Key, #Value, #Term],          #sink, #variable] ;
+{#env}ST-set-ref[PROPERTY-NOT[#Key, #Term],              #sink, #variable] → {#env}ST-set-buffer[PROPERTY-NOT[#Key, #Term],              #sink, #variable] ;
+{#env}ST-set-ref[VARIABLE-USE[#Variable],                #sink, #variable] → {#env}ST-set-buffer[VARIABLE-USE[#Variable],                #sink, #variable] ;
+{#env}ST-set-ref[CONSTRUCTION[#Kind, #Symbol, #Binders], #sink, #variable] → {#env}ST-set-buffer[CONSTRUCTION[#Kind, #Symbol, #Binders], #sink, #variable] ;
 
 // Existing reference used directly.
-{#env}
-ST-set-ref[META-APPLICATION[#metavar, #Args, USE[#Count]], #sink, #variable] 
+{#env}ST-set-ref[META-APPLICATION[#metavar, #args, USE[#count]], #sink, #variable] 
 →
-$[If, $[Equal, #Count, 1], 
-	%n⟪«#variable» = « {#env}MetaVar[#metavar] »;⟫,
-	%n⟪«#variable» = LINK(«#sink»->context, « {#env}MetaVar[#metavar] »);⟫];
+$[If, $[Equal, #count, 1], 
+    %n⟪¶«#variable» = « {#env}MetaVar[#metavar] »;⟫,
+    %n⟪¶«#variable» = LINK(«#sink»->context, « {#env}MetaVar[#metavar] »);⟫];
 
 // Evaluators are handled separately...
-{#env}
-ST-set-ref[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable]
+{#env}ST-set-ref[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable]
 →
-{#env}
-E-set-ref[Primitive[#Primitive], #Args, #Options, #sink, #variable]
-;
+{#env}E-set-ref[Primitive[#Primitive], #Args, #Options, #sink, #variable];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture term to an existing variable of type $Boolean
@@ -1259,7 +1363,7 @@ ST-set-num2[#num, %n⟪
 ST-set-num[VARIABLE-USE[v], #sink, #num] 
 →
 ST-set-num2[#num, %n⟪
-DOUBLE(«v»->name)⟫,%n⟪⟫]
+DOUBLE(«v»->name)⟫, %n⟪⟫]
 ; // Error?
 
 {#env}
@@ -1285,35 +1389,27 @@ ST-set-num2[#num, #number, #suffix]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-then-set-string[OK_SORT, Reified_Term, Text, Text] :: Text;
 
-{#env}
-ST-then-set-string[OK, #Term, #sink, #variable]
-→ 
-{#env}
-ST-set-string[#Term, #sink, #variable]
-;
+{#env}ST-then-set-string[OK, #Term, #sink, #variable] → {#env}ST-set-string[#Term, #sink, #variable];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-set-string[Reified_Term, Text, Text] :: Text;
 
-{#env}ST-set-string[LITERAL[#Literal, #Sort],              #sink, #string] → ST-set-string2[#string, STRING[#Literal], %n⟪⟫] ;
-{#env}ST-set-string[CONSTRUCTION[#kind, #Symbol, #Binders],       #sink, #string] → ST-set-string2[#string, STRING[#Symbol], %n⟪⟫] ;
+{#env}ST-set-string[LITERAL[#Literal, #Sort],               #sink, #string] → ST-set-string2[#string, STRING[#Literal], %n⟪⟫] ;
+{#env}ST-set-string[CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #string] → ST-set-string2[#string, STRING[#Symbol], %n⟪⟫] ;
 
 -[Free[v::Text]]
 : 
-{#env}
-ST-set-string[VARIABLE-USE[v], #sink, #string] 
+{#env}ST-set-string[VARIABLE-USE[v], #sink, #string] 
 → 
-ST-set-string2[#string, %n⟪makeString(«#sink»->context, «v»->name)⟫, %n⟪⟫]
-;
+ST-set-string2[#string, %n⟪makeString(«#sink»->context, «v»->name)⟫, %n⟪⟫];
 
-{#env} 
-ST-set-string[META-APPLICATION[#metavar, #Args, #Use], #sink, #string] 
+{#env}ST-set-string[META-APPLICATION[#metavar, #Args, #Use], #sink, #string] 
 → 
-ST-set-string2[#string, %n⟪SYMBOL(« {#env}MetaVar[#metavar] »)⟫, {#env}ST-UnlinkLastMetaUse[#metavar, #Use, #sink]] ; 
+ST-set-string2[#string, %n⟪SYMBOL(« {#env}MetaVar[#metavar] »)⟫, {#env}ST-UnlinkLastMetaUse[#metavar, #Use, #sink]]; 
 
-{#env}ST-set-string[PROPERTY-REF[#Ref, #Use, #Term],   #sink, #string] → {#env} ST-set-string[#Term, #sink, #string] ;
-{#env}ST-set-string[PROPERTY[#Key, #Value, #Term],     #sink, #string] → {#env} ST-set-string[#Term, #sink, #string] ;
-{#env}ST-set-string[PROPERTY-NOT[#Key, #Term],         #sink, #string] → {#env} ST-set-string[#Term, #sink, #string] ;
+{#env}ST-set-string[PROPERTY-REF[#Ref, #Use, #Term],   #sink, #string] → {#env} ST-set-string[#Term, #sink, #string];
+{#env}ST-set-string[PROPERTY[#Key, #Value, #Term],     #sink, #string] → {#env} ST-set-string[#Term, #sink, #string];
+{#env}ST-set-string[PROPERTY-NOT[#Key, #Term],         #sink, #string] → {#env} ST-set-string[#Term, #sink, #string];
 
 {#env}ST-set-string[EVALUATOR[#Primitive, #Args, #Options], #sink, #string] → {#env} E-set-string[Primitive[#Primitive], #Args, #Options, #sink, #string] ;
 
@@ -1321,8 +1417,8 @@ ST-set-string2[Text, Text, Text] :: Text;
 
 ST-set-string2[#str, #string, #suffix]
 →
-%n⟪«#str» = «#string»;«#suffix»
-⟫;
+%n⟪
+«#str» = «#string»;«#suffix»⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to insert one instance of a string value.
@@ -1349,15 +1445,14 @@ ST-local-string[LITERAL[#Literal, #Sort], #sink, s p.#[s,p]]
 {#env}
 ST-local-string[META-APPLICATION[#metavar, #Args, #Use], sink, s p.#[s,p]] 
 → 
-%n⟪FORCE(«sink»->context, « {#env}MetaVar[#metavar] »); LINK(«sink»->context, « {#env}MetaVar[#metavar] »);
-« #[%n⟨SYMBOL(‹ {#env}MetaVar[#metavar] ›)⟩, %n⟨ UNLINK(‹sink›->context, ‹ {#env}MetaVar[#metavar] ›); ‹{#env}ST-UnlinkLastMetaUse[#metavar, #Use, sink]› ⟩]»⟫
-;
+%n⟪
+FORCE(«sink»->context, « {#env}MetaVar[#metavar] »); LINK(«sink»->context, « {#env}MetaVar[#metavar] »);« 
+#[%n⟨SYMBOL(‹ {#env}MetaVar[#metavar] ›)⟩, %n⟨UNLINK(‹sink›->context, ‹ {#env}MetaVar[#metavar] ›);‹{#env}ST-UnlinkLastMetaUse[#metavar, #Use, sink]›⟩]»⟫;
 
 {#env}
 ST-local-string[VARIABLE-USE[v], #sink, s p.#[s, p]]
 →
-#[%n⟪«v»->name⟫, %n⟪⟫]
-;
+#[%n⟪«v»->name⟫, %n⟪⟫];
 
 {#env}
 ST-local-string[EVALUATOR[#Primitive, #Args, #Options], #sink, s p.#[s,p]]
@@ -1377,11 +1472,9 @@ E-local-string[Primitive[#Primitive], #Args, #Options, #sink, s p.#[s,p]]
 :
 {#env}ST-local-string2[#Term, #sink, s p.#[s,p]]
 →
-%n⟪{⟦ Term «t»;
-« {#env} ST-set-ref[#Term, #sink, t] »FORCE(«#sink»->context, «t»);
-« #[%n⟨SYMBOL(‹t›)⟩, ST-unlink-ref[#sink, t]] »⟧
-}⟫
-;
+%n⟪
+Term «t»;« {#env} ST-set-ref[#Term, #sink, t] »
+FORCE(«#sink»->context, «t»);« #[%n⟨SYMBOL(‹t›)⟩, ST-unlink-ref[#sink, t]] »⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 )] //ST
