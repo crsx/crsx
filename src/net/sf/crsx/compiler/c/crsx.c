@@ -3361,6 +3361,9 @@ void normalize(Context context, Term *termp)
                 if (++parentIndex < parentArity)
                 {
                     // (2) If term is marked as nf (or a variable) with a parent and a following sibling then advance to the following sibling.
+
+                    DEBUGCOND(context->debugviz, DEBUGF(context, "//SIBLING\n"));
+
                     topContextEntry(stack)->index = parentIndex;
 
                     //term = LINK(context, SUB(parent, parentIndex)); // Transfer sub reference to local term
@@ -3372,6 +3375,9 @@ void normalize(Context context, Term *termp)
                 else
                 {
                     // (3) If term is marked as nf (or a variable) with a parent but no following sibling then pop to parent.
+
+                    DEBUGCOND(context->debugviz, DEBUGF(context, "//PARENT\n"));
+
                     term = parent; // transfer parent reference to term
                     UNLINK(context, (topContextEntry(stack)->term));
                     popContextEntry(stack);
@@ -3418,6 +3424,12 @@ void normalize(Context context, Term *termp)
             if (index < arity)
             {
                 // (6) If term is a non-nf data term or a nostep function application with a non-nf child then clear nostep if it is a function, push term, and switch to that child.
+
+                int i;
+                DEBUGCOND(context->debugviz, DEBUGF(context, "//CHILD\n"));
+                for (i = index ; i >= 1 ; --i)
+                  DEBUGCOND(context->debugviz, DEBUGF(context, "//SIBLING\n"));
+
                 if (IS_FUNCTION(term))
                     asConstruction(term)->nostep = 0;
 
