@@ -573,23 +573,25 @@ T-set[#Term, #sink, #variable]
 {#env}
 T-set[LITERAL[#Literal, #Sort], #sink, #variable]
 →
-%n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
-⟫
+$[IfDef, "STRICT",
+    {#env}ST-set[LITERAL[#Literal, #Sort], #sink, #variable],
+    %n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
+⟫]
 ;
 
 // Evaluators are handled separately...
 {#env}
 T-set[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable]
 →
-{#env}
-E-set[Primitive[#Primitive], #Args, #Options, #sink, #variable]
-;
+$[IfDef, "STRICT",
+    {#env}ST-set[EVALUATOR[#Primitive, #Args, #Options], #sink, #variable],
+    {#env}E-set[Primitive[#Primitive], #Args, #Options, #sink, #variable]];
 
 // Proper term cases require buffering.
 {#env} T-set[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] → {#env} T-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],   #sink, #variable] ;
 {#env} T-set[PROPERTY[#Key, #Value, #Term],         #sink, #variable] → {#env} T-set-buffer[PROPERTY[#Key, #Value, #Term],     #sink, #variable] ;
 {#env} T-set[PROPERTY-NOT[#Key, #Term],             #sink, #variable] → {#env} T-set-buffer[PROPERTY-NOT[#Key, #Term],         #sink, #variable] ;
-{#env} T-set[CONSTRUCTION[#kind, #Symbol, #Binders],       #sink, #variable] → {#env} T-set-buffer[CONSTRUCTION[#kind, #Symbol, #Binders],   #sink, #variable] ;
+{#env} T-set[CONSTRUCTION[#kind, #Symbol, #Binders],#sink, #variable] → {#env} T-set-buffer[CONSTRUCTION[#kind, #Symbol, #Binders],   #sink, #variable] ;
 {#env} T-set[VARIABLE-USE[#Variable],               #sink, #variable] → {#env} T-set-buffer[VARIABLE-USE[#Variable],           #sink, #variable] ;
 {#env} T-set[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] → {#env} T-set-buffer[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] ;
 
@@ -598,12 +600,13 @@ E-set[Primitive[#Primitive], #Args, #Options, #sink, #variable]
 
 -[Fresh[buf::Text]]
 :
-{#env}
-T-set-buffer[#Term, #sink, #variable]
+{#env}T-set-buffer[#Term, #sink, #variable] 
 →
-%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
-« $[IfDef, "STRICT", {#env; "$Tail": NO} ST-then-send[OK, #Term, buf], {#env} T-send[#Term, buf]] »«#variable» = BUFFER_TERM(«buf»); FREE_BUFFER(«buf»); ⟧}
-⟫;
+$[IfDef, "STRICT",
+    {#env}ST-set-buffer[#Term, #sink, #variable], 
+	%n⟪{⟦ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);
+« {#env} T-send[#Term, buf]»«#variable» = BUFFER_TERM(«buf»); FREE_BUFFER(«buf»); ⟧}
+⟫];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture term to an existing variable of type $Boolean

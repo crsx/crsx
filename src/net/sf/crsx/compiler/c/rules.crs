@@ -94,7 +94,7 @@ F-Function[#kind, #function, (FORM[#name, #FormArguments]; #Forms), SORT[#SortNa
 %n⟪
 /* FUNCTION « COMMENT_TOKEN[#function] ». */
 int « BinderOffsets[#function] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets[#FormArguments, 0]] »};
-char *« NameFun[#function] »(Term term) { return « STRING[#function] »; }
+char *« NameFun[#function] »(Term term) { return (char *) « STRING[#function] »; }
 struct _ConstructionDescriptor « Descriptor[#function] » = {« $[If, $[Contains, #SortName, "$"], %n⟨NULL⟩, %n⟨&‹Sort[#SortName]›⟩] », 0, « INTEGER[Length[#FormArguments,0]] », sizeof(STRUCT« Struct[#function] »), « BinderOffsets[#function] », &« NameFun[#function] », &« Step[#function] »};
 
 int «Step[#function]»(Sink «sink», Term «term»)
@@ -111,7 +111,7 @@ F-Function[#kind, #function, (FORM[#name, #FormArguments]; #Forms), SORT-VARIABL
 %n⟪
 /* FUNCTION « COMMENT_TOKEN[#function] ». */
 int « BinderOffsets[#function] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets[#FormArguments, 0]] »};
-char *« NameFun[#function] »(Term term) { return « STRING[#function] »; }
+char *« NameFun[#function] »(Term term) { return (char *) « STRING[#function] »; }
 struct _ConstructionDescriptor « Descriptor[#function] » = {NULL, 0, « INTEGER[Length[#FormArguments,0]] », sizeof(STRUCT« Struct[#function] »), « BinderOffsets[#function] », &« NameFun[#function] », &« Step[#function] »};
 
 int «Step[#function]»(Sink «sink», Term «term»)
@@ -230,8 +230,8 @@ F-Fresh3[OK, sink, #binders, ok.#[ok]]
 {#env; "$Vars": LIST_VARIABLE[#Vars]}
 F-Fresh2[sink, VARIABLE-USE[key], ok.#[ok]]	 
 → 
-%n⟪Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$Vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»
-⟫;
+%n⟪
+Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$Vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 F-Fresh3[OK_SORT, Text, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;

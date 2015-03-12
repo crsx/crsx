@@ -3397,14 +3397,15 @@ void normalize(Context context, Term *termp)
             else
             {
                 // (5) If term is a function invocation that is not marked as nostep and that we can in fact not step then mark it as nostep.
-                // (Note: failed step has not output anything to buffer)
-                asConstruction(term)->nostep = 1;
+                // (Note: failed step has not output anything to buffer, except in strict mode)
 
-                if (context->strict)
-                {
-                	// When strict mode is set, the step function always consumes the term and output a new term in the sink
-                	term = BUFFER_TERM(sink);
-                }
+            	if (context->strict)
+				{
+					// When strict mode is set, the step function always consumes the term and output a new term in the sink
+					term = BUFFER_TERM(sink);
+				}
+
+            	asConstruction(term)->nostep = 1;
             }
             FREE_BUFFER(sink); // always free buffer, even when not actually used!
         }
@@ -3449,13 +3450,15 @@ Term force(Context context, Term term)
             Sink sink = ALLOCA_BUFFER(context);
             if (!step(sink, term)) // Reference is transferred and consume only when succeed
             {
-                //DEBUGF(context, "//NF DATA %s\n", SYMBOL(term));
-                asConstruction(term)->nostep = 1;
                 if (context->strict)
                 {
                 	// When strict mode is set, the step function always consumes the term and output a new term in the sink
                 	term = BUFFER_TERM(sink);
                 }
+
+                //DEBUGF(context, "//NF DATA %s\n", SYMBOL(term));
+                asConstruction(term)->nostep = 1;
+
                 FREE_BUFFER(sink);
                 break;
             }
@@ -3497,6 +3500,7 @@ static int step(Sink sink, Term term)
 void initCRSXContext(Context context)
 {
     context->stamp = 0;
+    context->depth = 0;
 
     context->debugsteps = getenv("crsx-debug-steps") != NULL;
     context->debugtrace = getenv("crsx-trace") != NULL;
@@ -3559,7 +3563,7 @@ long elapsed(Context context)
 
 void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
 {
-	const Context context;
+	const Context context = sink->context;
 	if (!IS_BOUND(binders[0]))
 	{
 		int i;
@@ -5102,7 +5106,7 @@ void fprintTerm(Context context, FILE* out, Term term)
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
-    fprintTermTop(context, out, term, -1, set, used, 1, &pos, getenv("omit-properties") ? 0 : 10, 0);
+    fprintTermTop(context, out, term, -1, set, used, 0, &pos, getenv("omit-properties") ? 0 : 10, 0);
     FPRINTF(context, out, "\n");
     freeVariableSet(set);
 
@@ -5124,7 +5128,7 @@ void ppt(Context context, int nesting, Term term)
     char *depthString = getenv("depth");
     int depth = depthString ? atoi(depthString) : 10;
     int pos = 0;
-    fprintTermTop(context, STDOUT, term, depth, set, NULL, nesting, &pos, getenv("omit-properties") ? 0 : 10, getenv("include-annotations") ? 1 : 0);
+    fprintTermTop(context, STDOUT, term, depth, set, 0, nesting, &pos, getenv("omit-properties") ? 0 : 10, getenv("include-annotations") ? 1 : 0);
     PRINTF(context, "\n");
     freeVariableSet(set);
     fprintCookies(context);
@@ -5160,7 +5164,7 @@ void fprintTermWithIndent(Context context, FILE* out, Term term)
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
-    fprintTermTop(context, out, term, INT16_MAX, set, used, 0, &pos, getenv("omit-properties") ? 0 : 10, 0);
+    fprintTermTop(context, out, term, INT16_MAX, set, used, 1, &pos, getenv("omit-properties") ? 0 : 10, 0);
     FPRINTF(context, out, "\n");
     freeVariableSet(set);
     fprintCookies(context);
@@ -5203,7 +5207,7 @@ void fprintTermFullWithIndent (Context context, FILE* out, Term term)
 
     VariableSet set = makeVariableSet(context);
     int pos = 0;
-    fprintTermTop(context, out, term, INT32_MAX, set, used, 0, &pos, INT32_MAX, 0);
+    fprintTermTop(context, out, term, INT32_MAX, set, used, 1, &pos, INT32_MAX, 0);
     FPRINTF(context, out, "\n");
     freeVariableSet(set);
     fprintCookies_new (context, out);
@@ -5518,7 +5522,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                         *posp += FPRINTF(context, out, "%s", text);
                         char *nl = strrchr(text, '\n');
                         if (nl)
-                            *posp = (int) ((text + strlen(text)) - nl);
+                            *posp = (int) ((text + strlen(text) - 1) - nl);
                     }
                     else
                     {

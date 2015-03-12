@@ -4,6 +4,7 @@ package net.sf.crsx.generic;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -522,11 +523,32 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 			}
 		}
 		
-		for (Term t : variablePropertyConstraints.values())
-			if (t != null) t.analyzeMetaUseContractum(counts, subAnalyzers); 
+		SortedSet<Variable> propertyVariables = new TreeSet<Variable>(new Comparator<Variable>() {
+
+			@Override
+			public int compare(Variable o1, Variable o2) {
+				return o2.compareTo(o1);
+			}
+		});
+    	for (Variable v : variablePropertyConstraints.keySet())
+    		propertyVariables.add(v);
+    	
+		for (Variable v : propertyVariables)
+			variablePropertyConstraints.get(v).analyzeMetaUseContractum(counts, subAnalyzers); 
+
+		// Sort in reverse order
+		SortedSet<String> propertyNames = new TreeSet<String>(new Comparator<String>() {
+			@Override
+			public int compare(String o1, String o2) {
+				return o2.compareTo(o1);
+			}
+		});
 		
-		for (Term t : namedPropertyConstraints.values())
-			if (t != null) t.analyzeMetaUseContractum(counts, subAnalyzers);  
+    	for (String p : namedPropertyConstraints.keySet())
+    		propertyNames.add(p);
+    	
+		for (String p : propertyNames)
+			namedPropertyConstraints.get(p).analyzeMetaUseContractum(counts, subAnalyzers);  
 		
 		if (propertiesRef != null)
 		{
