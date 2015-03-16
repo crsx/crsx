@@ -55,7 +55,7 @@ SF-function-extern[#function, (SORT-SET[#Key, #Value, #Form]; #Forms), #Sort]   
 SF-function-extern[#function, (FORM[#Constructor, #FormArguments]; #Forms), #Sort]
 →
 %n⟪¶¶int « BinderOffsets[#function] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets-strict[#FormArguments, 0]] »};
-char *« NameFun[#function] »(Term term) { return « STRING[#function] »; }«SF-function-desc[#function, #Sort, #FormArguments]»⟫;
+char *« NameFun[#function] »(Term term) { return (char *) « STRING[#function] »; }«SF-function-desc[#function, #Sort, #FormArguments]»⟫;
 
 SF-function-desc[$String, Reified_Sort, $List[Reified_FormArgument]] :: Text;
 
