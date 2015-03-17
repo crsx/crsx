@@ -292,7 +292,7 @@ ST-set-property-Literal-Key[Fresh[value::Text]]
 →
 %n⟪¶Term «value»;¶{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
 «value» = NORMALIZEP(«#sink»->context, «value»);
-«#namedP» = addNamedProperty(«#sink»->context, «#namedP», « STRING[#literal] », «value»);« 
+«#namedP» = addNamedProperty(«#sink»->context, «#namedP», (char *) « STRING[#literal] », «value»);« 
 {#env}ST-set-properties-term[#term,  (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
 ST-set-property-other[Fresh[key::Text, value::Text]]
