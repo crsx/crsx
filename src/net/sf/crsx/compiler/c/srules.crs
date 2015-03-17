@@ -1168,14 +1168,14 @@ Term «#value» = PROPERTY(«#sink»->context, «#term», « {#env}MetaVar[#Meta
 SF-set-value[$True, LITERAL[#Literal, #Sort], #sink, #term, #value] 
 → 
 %n⟪
-Term «#value» = DNAMED_PROPERTY(«#sink»->context, «#namedP», «STRING[#Literal]»); permitUnusedTerm(«#value»);⟫
+Term «#value» = DNAMED_PROPERTY(«#sink»->context, «#namedP», (char *) «STRING[#Literal]»); permitUnusedTerm(«#value»);⟫
 ;
 
 {#env}
 SF-set-value[$False, LITERAL[#Literal, #Sort], #sink, #term, #value] 
 → 
 %n⟪
-Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Literal]»); permitUnusedTerm(«#value»);⟫
+Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», (char *) «STRING[#Literal]»); permitUnusedTerm(«#value»);⟫
 ;
 
 {#env; "$TopRef":PROPERTY_VARIABLE[#namedP, #varP]}
