@@ -1506,8 +1506,8 @@ extern const char *Nil;
 #define AINDEX(index) (index / BITS_MAX_SIZE)
 #define BINDEX(index) (index % BITS_MAX_SIZE)
 
-#define MAKE_SET_LBITS(context, bitset, size) (bitset)->bits = ALLOCA(context, ASIZE(size)*sizeof(BITS)); makeSetBits(bitset, size)
-#define COPY_LBITS(context, dst, size, src) (dst)->bits = ALLOCA(context, ASIZE(size)*sizeof(BITS)); copyBits(context, dst, size, src)
+#define MAKE_SET_LBITS(context, bitset, size) (bitset)->bits = (BITS *) ALLOCA(context, ASIZE(size)*sizeof(BITS)); makeSetBits(bitset, size)
+#define COPY_LBITS(context, dst, size, src) (dst)->bits = (BITS *) ALLOCA(context, ASIZE(size)*sizeof(BITS)); copyBits(context, dst, size, src)
 #define MASK_LBITS(bitset,bitset2) maskBits(bitset,bitset2)
 #define LBIT(bitset,index) lbit(bitset, index)
 #define ANY_LBITS(bitset) anyBits(bitset)
@@ -1618,7 +1618,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
                                                                                                         \
   static TYPE##Stack make##TYPE##Stack(Context context)                                                 \
   {                                                                                                     \
-      TYPE##Stack stack = ALLOCATE(context, sizeof(struct _##TYPE##Stack));                             \
+      TYPE##Stack stack = (TYPE##Stack) ALLOCATE(context, sizeof(struct _##TYPE##Stack)); \
       stack->context = context;                                                                         \
       stack->last = NULL;                                                                               \
       stack->top = -1;                                                                                  \
@@ -1635,7 +1635,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       ++stack->top;                                                                                     \
       if (!stack->last || stack->top >= STACK_SEGMENT_SIZE)                                             \
       {                                                                                                 \
-          TYPE##StackSegment segment = ALLOCATE(stack->context, sizeof(struct _##TYPE##StackSegment));  \
+          TYPE##StackSegment segment = (TYPE##StackSegment) ALLOCATE(stack->context, sizeof(struct _##TYPE##StackSegment)); \
           segment->previous = stack->last;                                                              \
           stack->last = segment;                                                                        \
           stack->top = 0;                                                                               \
@@ -1702,7 +1702,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
                                                                                                           \
   static TYPE##Queue make##TYPE##Queue(Context context)                                                   \
   {                                                                                                       \
-      TYPE##Queue q = ALLOCATE(context, sizeof(struct _##TYPE##Queue));                                   \
+      TYPE##Queue q = (TYPE##Queue) ALLOCATE(context, sizeof(struct _##TYPE##Queue)); \
       q->context = context;                                                                               \
       q->first = q->last = NULL;                                                                          \
       q->hd = q->tl = -1;                                                                                 \
@@ -1719,7 +1719,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       ++queue->tl;                                                                                        \
       if (!queue->first || queue->tl >= QUEUE_SEGMENT_SIZE)                                               \
       {                                                                                                   \
-          TYPE##QueueSegment segment = ALLOCATE(queue->context, sizeof(struct _##TYPE##QueueSegment));    \
+          TYPE##QueueSegment segment = (TYPE##QueueSegment) ALLOCATE(queue->context, sizeof(struct _##TYPE##QueueSegment)); \
           if (!queue->first)                                                                              \
           {                                                                                               \
               queue->first = segment;                                                                     \

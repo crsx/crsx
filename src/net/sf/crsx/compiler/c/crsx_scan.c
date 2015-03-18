@@ -2812,11 +2812,14 @@ static int yy_flex_strlen (yyconst char * s , yyscan_t yyscanner)
 
 /* State stack. */
 
+enum StateLinkTag {LINK_UNDEFINED_TAG, LINK_BASE_TAG, LINK_CONSTRUCTION_TAG, LINK_NAMED_PROPERTY_TAG, LINK_VARIABLE_PROPERTY_TAG, LINK_STRING_TAG, LINK_FIRST_BINDER_TAG, LINK_FOLLOWING_BINDER_TAG};
+
+
 struct _StateLink
 {
     StateLink parent; /* links form a stack */
     Sink sink; /* the term accumulator at this level */
-    enum {LINK_UNDEFINED_TAG, LINK_BASE_TAG, LINK_CONSTRUCTION_TAG, LINK_NAMED_PROPERTY_TAG, LINK_VARIABLE_PROPERTY_TAG, LINK_STRING_TAG, LINK_FIRST_BINDER_TAG, LINK_FOLLOWING_BINDER_TAG} tag;
+    enum StateLinkTag tag;
     union {
         ConstructionDescriptor descriptor; /* for LINK_CONSTRUCTION_TAG */
         char *string;                      /* for LINK_NAMED_PROPERTY_TAG and LINK_STRING_TAG */

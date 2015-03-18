@@ -1212,7 +1212,7 @@ FREE_BUFFER(«buf»);⟧
 {#env}E-set-int-to-local-string[#Primitive, #Args, #Options, #sink, s p .#[s, p]] 
 → 
 %n⟪{⟦ long long «num»; char *«string»;
-«{#env}E-set-int[#Primitive, #Args, #Options, #sink, num]»snprintf(«string» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%lld", «num»);
+«{#env}E-set-int[#Primitive, #Args, #Options, #sink, num]»snprintf(«string» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%lld", «num»);
 « #[string, %n⟨⟩] » }⟧
 ⟫
 ;
@@ -1462,7 +1462,7 @@ double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
 → 
 %n⟪
 {⟦
-double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
 « #[str, %n⟨⟩] »⟧
 }⟫
 ;
@@ -1649,7 +1649,7 @@ $Meta[(
 -[Fresh[z::Text]]:
 {#env}E-local-string-to-string[#Primitive, #Args, #Options, #sink, #str]
 →
-{#env}E-local-string[#Primitive, #Args, #Options, #sink, s p. %n⟪{⟦ size_t «z» = strlen(«s») + 1; memcpy(«#str» = ALLOCATE(«#sink»->context, «z»), «s», «z»); «p»⟧}
+{#env}E-local-string[#Primitive, #Args, #Options, #sink, s p. %n⟪{⟦ size_t «z» = strlen(«s») + 1; memcpy(«#str» = (char *) ALLOCATE(«#sink»->context, «z»), «s», «z»); «p»⟧}
 ⟫]
 ;
 
@@ -1805,7 +1805,7 @@ Set-String-Substring2[Fresh[start::Text, length::Text]]
 « {#env} T-set-int[#start, #sink, start]
 »long long «length» = (long long) strlen(«string»);
 if («start» >= «length») «#substring» = "";
-else memcpy(«#substring» = ALLOCATE(«#sink»->context, «length»-«start»+1), «string»+«start», «length»-«start»+1);
+else memcpy(«#substring» = (char *) ALLOCATE(«#sink»->context, «length»-«start»+1), «string»+«start», «length»-«start»+1);
 «p»}⟧
 ⟫];
 
@@ -1887,7 +1887,7 @@ Set-String-FormatNumber[Fresh[num::Text, str::Text]]
 %n⟪
 {⟦
 double «num»; char *«str»;« {#env}T-set-num[#Number, #sink, num] »
-snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
 « #[str,%n⟨⟩] »⟧
 }⟫;
 
