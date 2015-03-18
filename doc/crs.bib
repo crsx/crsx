@@ -1,4 +1,3 @@
-% $Id: crs.bib,v 3.6 2013/08/23 07:12:31 krisrose Exp $
 % Bibliography of CRS related papers...
 
 % Strings.
@@ -48,10 +47,17 @@
 @Misc{crsx,
   author =       {Kristoffer Rose},
   title =        {Combinatory Reduction Systems with Extensions},
-  howpublished = {SourceForge project \url{http://crsx.sf.net}},
-  edition =      3,
-  month =        oct,
-  year =         2012
+  howpublished = {GitHub},
+  url = {https://github.com/crsx/hacs},
+  year =         2014
+}
+
+@Misc{Rose:nyu2014,
+  author = 	 {Kristoffer Rose},
+  title = 	 {Compiler Construction},
+  howpublished = {NYU Capstone Class},
+  year = 	 2014,
+  url =          {http://cs.nyu.edu/courses/spring14/CSCI-GA.2130-001/}
 }
 
 @Misc{hoacs-ug,
@@ -73,7 +79,8 @@
 @Misc{Rose:hor2007,
   author =    {Kristoffer H. Rose},
   title =     {{CRSX} -- An Open Source Platform for Experimenting with Higher Order Rewriting},
-  howpublished = {Presented in absentia at HOR 2007---\url{http://www.krisrose.net/papers}},
+  howpublished = {Presented at HOR 2007},
+  url = {http://www.irit.fr/~Ralph.Matthes/HOR/ProceedingsHOR2007.pdf},
   month =     jun,
   year =      2007}
 
@@ -138,7 +145,128 @@
   pages		= {1-116}
 }
 
-% Research references.
+% Other meta-programming systems.
+
+@Article{CameronIto:toplas1984,
+  author = 	{Robert D. Cameron and M. Robert Ito},
+  title = 		{Grammar-Based Definition of Metaprogramming Systems},
+  journal = 	{ACM Trans. on Progr. Lang. and Syst.},
+  year =		1984,
+  volume =	6,
+  number =	1,
+  pages =		{20-54},
+  month =	jan,
+  doi =		{10.1145/357233.357235}
+}
+
+@InProceedings{Bos+:eptcs2011,
+  author = 	 {Bos, J. van den and Hills, M. A. and Klint, P. and Storm, T. van der and Vinju, J. J.},
+  title = 	 {{Rascal}: From Algebraic Specification to Meta-Programming},
+  booktitle = {{AMMSE 2011}---Second International Workshop on Algebraic Methods in Model-based Software Engineering},
+  year = 	 2011,
+  editor = 	 {Rusu, V. and Durán, F.},
+  volume = 	 56,
+  series = 	 {Electronic Proceedings in Theoretical Computer Science},
+  pages = 	 {15-32}}
+
+@Article{Brand+:toplas2002,
+ author = "Brand, {M.G.J. van den} and J. Heering and P. Klint and P. A. Olivier",
+ title = "Compiling Language Definitions: The {ASF+SDF} Compiler",
+ journal = toplas,
+ year = 2002,
+ volume = 24,
+ number = 4,
+ pages = {334-368},
+ doi = {10.1145/567097.567099}
+}
+
+@InProceedings{Borras+:sde1988,
+  author =       {P. Borras and D. Clément and Th. Despeyroux and J. Incerpi and G. Kahn and B. Lang and V. Pascual},
+  title =        {Centaur: the system},
+  booktitle = {{SIGSOFT'88}---Third Annual Symposium on Software Development Environments},
+  year =      1988,
+  address =   {Boston, USA}
+}
+
+@InProceedings{Chlipala:icfp2008,
+  author =       {Adam Chlipala},
+  title =        {Parametric Higher-Order Abstract Syntax for Mechanized Semantics},
+  booktitle = {Proceedings of the 13th ACM SIGPLAN International Conference on Functional Programming ({ICFP}'08)},
+  year =      2008,
+  editor =    {James Hook and Peter Thiemann},
+  address =   {Victoria, BC, Canada},
+  month =     sep,
+  organization = {ACM},
+  doi = {10.1145/1411204.1411226}
+}
+
+@inproceedings{GilbertMcLellan:sjcp1967,
+ author = {Gilbert, Philip and McLellan, William G.},
+ title = {Compiler generation using formal specification of procedure-oriented and machine languages},
+ booktitle = {Proceedings of the April 18-20, 1967, spring joint computer conference},
+ series = {AFIPS '67 (Spring)},
+ year = 1967,
+ location = {Atlantic City, New Jersey},
+ pages = {447-455},
+ numpages = 9,
+ doi = {10.1145/1465482.1465553},
+ acmid = 1465553,
+ publisher = {ACM},
+ address = {New York, NY, USA},
+}
+
+@incollection {Gaudel:fpc1981,
+   author = {Gaudel, M.},
+   affiliation = {Inria France Inria France},
+   title = {Compiler generation from formal definition of programming languages: A survey},
+   booktitle = {Formalization of Programming Concepts},
+   series = {Lecture Notes in Computer Science},
+   editor = {Díaz, J. and Ramos, I.},
+   publisher = {Springer Berlin / Heidelberg},
+   pages = {96-114},
+   volume = 107,
+   doi = {10.1007/3-540-10699-5\_94},
+   year = 1981
+}
+
+@article{Wand:sn1984,
+ author = {Wand, Mitchell},
+ title = {A semantic prototyping system},
+ journal = {SIGPLAN Not.},
+ volume = {19},
+ issue = {6},
+ month = {June},
+ year = {1984},
+ issn = {0362-1340},
+ pages = {213-221},
+ numpages = {9},
+ doi = {10.1145/502949.502895},
+ acmid = {502895},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+}
+
+@TechReport{Mosses:daimi1979,
+  author = 	{Peter Mosses},
+  title = 	 	{{SIS} -- Semantics Implementation System, Reference Manual and User's Guide},
+  institution =	{DAIMI (Computer Science Department), Aarhus University},
+  year = 	 	1979,
+  number =	{MD-30},
+  month =	aug
+}
+
+@Book{BjornerJones:1982,
+  author =       {Bjørner, D. and Jones, C.B.},
+  title =        {Formal Specification and Software Development},
+  publisher =    {Prentice Hall International},
+  year =         1982,
+  isbn = {0-13-880733-7}
+}
+
+    
+
+
+
 
 @Article{Barendregt+:ic1987,
   author	= {H. P. Barendregt and J. R. Kennaway and J. W. Klop and M. R. Sleep},
@@ -256,37 +384,6 @@
   number =    {1999-30},
   month =     jun,
   url = {http://hdl.handle.net/2332/731}
-}
-
-@Article{Brand+:toplas2002,
- author = "Brand, {M.G.J. van den} and J. Heering and P. Klint and P. A. Olivier",
- title = "Compiling Language Definitions: The {ASF+SDF} Compiler",
- journal = toplas,
- year = 2002,
- volume = 24,
- number = 4,
- pages = {334-368},
- doi = {10.1145/567097.567099}
-}
-
-@InProceedings{Borras+:sde1988,
-  author =       {P. Borras and D. Clément and Th. Despeyroux and J. Incerpi and G. Kahn and B. Lang and V. Pascual},
-  title =        {Centaur: the system},
-  booktitle = {{SIGSOFT'88}---Third Annual Symposium on Software Development Environments},
-  year =      1988,
-  address =   {Boston, USA}
-}
-
-@InProceedings{Chlipala:icfp2008,
-  author =       {Adam Chlipala},
-  title =        {Parametric Higher-Order Abstract Syntax for Mechanized Semantics},
-  booktitle = {Proceedings of the 13th ACM SIGPLAN International Conference on Functional Programming ({ICFP}'08)},
-  year =      2008,
-  editor =    {James Hook and Peter Thiemann},
-  address =   {Victoria, BC, Canada},
-  month =     sep,
-  organization = {ACM},
-  doi = "10.1145/1411204.1411226"
 }
 
 @InProceedings{DespeyrouxEtal:tlca1995,
@@ -545,6 +642,16 @@
  address = {Berlin, Heidelberg},
 }
 
+@Manual{ICU,
+  title =        {{ICU} -- International Components for Unicode},
+  key =       {ICU},
+  organization = {ICU Project Management Committee},
+  edition =   {54},
+  month =     oct,
+  year =      2014,
+  url = {http://site.icu-project.org/home}
+}
+
 @Manual{JavaCC,
   title =        {{Java} Compiler Compiler ({JavaCC}) - The {Java} Parser Generator},
   key =       {JavaCC},
@@ -579,6 +686,15 @@
   year =	 1986
 }
 
+@Book{Aho+:2006,
+  author =	 {Alfred V. Aho and Monica S. Lam and Ravi Sethi and and Jeffrey D. Ullman},
+  title =	 {Compilers: Principles, Techniques and Tools},
+  publisher =	 {Pearson Education, Inc},
+  edition = {second},
+  year =	 2006,
+  url = {http://dragonbook.stanford.edu/}
+}
+
 @Book{Appel:1998,
   author =	 {Andrew Appel},
   title =	 {Modern Compiler Implementation in Java},
@@ -592,7 +708,8 @@
   journal = 	 cacm,
   year = 	 1960,
   volume = 	 3,
-  pages = 	 {299-314}
+  pages = 	 {299-314},
+  doi = {10.1145/367236.367262}
 }
 
 @TechReport{ScottStrachey:1971,
@@ -646,6 +763,13 @@
   url = {http://www.haskell.org/definition/}
 }
 
+@Misc{Marlow:haskell2010,
+  author = 	 {Simon Marlow (editor)},
+  title = 	 {{Haskell} 2010 Language Report},
+  year = 	 2010,
+  url = 	 {https://www.haskell.org/onlinereport/haskell2010/}
+}
+
 @book{Haskell98Book
      ,editor={Simon Peyton Jones}
      ,title={Haskell 98 Language and Libraries -- The Revised Report}
@@ -653,6 +777,19 @@
      ,address={Cambridge, England}
      ,year=2003
      }
+
+@InCollection{MarlowPeyton-Jones:2010,
+  author = 	 {Simon Marlow and Peyton-Jones, Simon},
+  title = 	 {The Glasgow Haskell Compiler},
+  booktitle = 	 {Structure, Scale, and a Few More Fearless Hacks},
+  publisher = {Lulu.com},
+  year = 	 2012,
+  volume = 	 {II},
+  series = 	 {The Architecture of Open Source Applications},
+  chapter = 	 5,
+  month = 	 may,
+  url = {http://www.aosabook.org/en/ghc.html}
+}
 
 @TechReport{w3c:xmlnamespaces,
   author =       {Tim Bray and Dave Hollander and Andrew Layman and Richard Tobin and Henry S. Thompson},
@@ -758,71 +895,6 @@
   doi =       {10.1007/978-3-642-03816-7_40}
 }
 
-@inproceedings{GilbertMcLellan:sjcp1967,
- author = {Gilbert, Philip and McLellan, William G.},
- title = {Compiler generation using formal specification of procedure-oriented and machine languages},
- booktitle = {Proceedings of the April 18-20, 1967, spring joint computer conference},
- series = {AFIPS '67 (Spring)},
- year = {1967},
- location = {Atlantic City, New Jersey},
- pages = {447-455},
- numpages = {9},
- doi = {10.1145/1465482.1465553},
- acmid = {1465553},
- publisher = {ACM},
- address = {New York, NY, USA},
-}
-
-@incollection {Gaudel:fpc1981,
-   author = {Gaudel, M.},
-   affiliation = {Inria France Inria France},
-   title = {Compiler generation from formal definition of programming languages : A survey},
-   booktitle = {Formalization of Programming Concepts},
-   series = {Lecture Notes in Computer Science},
-   editor = {Díaz, J. and Ramos, I.},
-   publisher = {Springer Berlin / Heidelberg},
-   isbn = {},
-   pages = {96-114},
-   volume = {107},
-   doi = {10.1007/3-540-10699-5\_94},
-   year = {1981}
-}
-
-@article{Wand:sn1984,
- author = {Wand, Mitchell},
- title = {A semantic prototyping system},
- journal = {SIGPLAN Not.},
- volume = {19},
- issue = {6},
- month = {June},
- year = {1984},
- issn = {0362-1340},
- pages = {213-221},
- numpages = {9},
- doi = {10.1145/502949.502895},
- acmid = {502895},
- publisher = {ACM},
- address = {New York, NY, USA},
-}
-
-@TechReport{Mosses:daimi1979,
-  author = 	 {Peter Mosses},
-  title = 	 {{SIS} -- Semantics Implementation System, Reference
-		  Manual and User's Guide},
-  institution =  {DAIMI (Computer Science Department), Aarhus University},
-  year = 	 1979,
-  number =	 {MD-30},
-  month =	 aug
-}
-
-@Book{BjornerJones:1982,
-  author =       {Bjørner, D. and Jones, C.B.},
-  title =        {Formal Specification and Software Development},
-  publisher =    {Prentice Hall International},
-  year =         1982,
-  isbn = {0-13-880733-7}
-}
-
 @Article{BrandEtal:toplas2002,
  author = "Brand, {M. G. J. van den} and J. Heering and P. Klint and P. A. Olivier",
  title = "{C}ompiling {R}ewrite {S}ystems: {T}he {A}{S}{F}+{S}{D}{F} {C}ompiler",
@@ -879,6 +951,14 @@
   url =       {http://www.ida.liu.se/~pelab/rml/}
 }
 
+@InProceedings{KlintvandDerStormVinju:scam2009,
+  author = 	 {KlintVinjuvanderStorm:scam2009},
+  title = 	 {{\textsc{Rascal}}: A Domain Specific Language for Source Code Analysis and Manipulation},
+  booktitle =    {International Workshop on Source Code Analysis and Manipulation},
+  year = 	 2009,
+  pages = 	 {168-177},
+  organization = {IEEE Computer Society}}
+
 @Book{Stoy:1977,
   author = 	 {J. E. Stoy},
   title = 	 {Denotational Semantics: The Scott-Strachey Approach
@@ -915,13 +995,31 @@
   number = 	 {RUU-CS-89-4}
 }
 
+@inproceedings{VogtSwierstraKuiper:pldi1989,
+ author = {Vogt, H. H. and Swierstra, S. D. and Kuiper, M. F.},
+ title = {Higher Order Attribute Grammars},
+ booktitle = {Proceedings of the ACM SIGPLAN 1989 Conference on Programming Language Design and Implementation},
+ series = {PLDI '89},
+ year = {1989},
+ isbn = {0-89791-306-X},
+ location = {Portland, Oregon, USA},
+ pages = {131--145},
+ numpages = {15},
+ url = {http://doi.acm.org/10.1145/73141.74830},
+ doi = {10.1145/73141.74830},
+ acmid = {74830},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
 @PhdThesis{Kop:2012,
-  author = 	 {Cynthia Kop},
+  author = 	 {Cynthia L. M. Kop},
   title = 	 {Higher Order Termination},
   school = 	 {Institute for Programming research and Algorithmics, Vrije Universiteit Amsterdam},
   year = 	 2012,
-  note = 	 {IPA Dissertation Series 2012-14, \url{http://www.cs.vu.nl/en/Images/dissertation%20Cynthia%20Kop%2013-11-2012_tcm75-319712.pdf}},
-  isbn =         {978-94-6203-164-7}
+  note = 	 {IPA Dissertation Series 2012-14},
+  isbn =         {978-94-6203-164-7},
+  url = {http://hdl.handle.net/1871/39346}
 }
 
 @Article{BlanquiJouannaudOkada:tcs2002,
@@ -947,5 +1045,123 @@
   editor = {Krzysztof Czarnecki and Görel Hedin},
   volume = 7745,
   series = {Lecture Notes in Computer Science},
-  publisher = {Springer},
+  publisher = {Springer}
+}
+
+@Article{DouenceFradet:hosc2007,
+  author = 	 {Rémi Douence and Pascal Fradet},
+  title = 	 {The next 700 {K}rivine machines},
+  journal = 	 {Higher-Order and Symbolic Computation},
+  year = 	 2007,
+  volume = 	 20,
+  number = 	 3,
+  pages = 	 {237-255},
+  doi = {10.1007/s10990-007-9016-y}
+}
+
+@Book{GruneJacobs:2008,
+  author = 	 {Dick Grune and Ceriel J.H. Jacobs},
+  title = 	 {Parsing Techniques: A Practical Guide},
+  edition = {second},
+  publisher = 	 {Springer},
+  year = 	 2008,
+  isbn = {978-1-4419-1901-4},
+  note = {Additional references at \url{http://dickgrune.com/Books/PTAPG_2nd_Edition/Additional.html}.}
+}
+
+@InProceedings{Jouannaud:klop2005,
+    author = {Jouannaud, Jean-Pierre},
+    title = {Higher-Order rewriting: Framework, Confluence and termination},
+    booktitle = {Processes, Terms and Cycles: Steps on the road to infinity---Essays Dedicated to {Jan Willem Klop} on the occasion of his 60th Birthday},
+    volume =    3838,
+    series =    lncs,
+    year = {2005},
+    pages = {224--250},
+    publisher = {Springer Verlag},
+    url = {http://www.lix.polytechnique.fr/~jouannaud/articles/hor-fct.pdf}
+}
+
+@Manual{man:regex,
+  title = 	 {POSIX.2 regular expressions},
+  organization = {POSIX},
+  year = 	 2009,
+  url = {http://man7.org/linux/man-pages/man7/regex.7.html}
+}
+
+
+@Misc{git:hacsel,
+  author = 	 {John Downs},
+  title = 	 {{hacsel} {Emacs} mode for {HACS}},
+  url = {https://github.com/jdowns/hacsel},
+  howpublished = {Github},
+  month = 	 feb,
+  year = 	 2015}
+
+@Misc{git:hacs-sublime,
+  author = 	 {Tyler Palsulich},
+  title = 	 {Sublime Text mode for {HACS}},
+  howpublished = {GitHub},
+  month = 	 dec,
+  year = 	 2014,
+  url = {https://github.com/tpalsulich/hacs_sublime_text_theme}
+}
+
+@Book{Quine:1940,
+  editor = 	 {Quine, W. V.},
+  title = 	 {Mathematical Logic},
+  publisher = 	 {Harvard University Press, Cambridge, MA},
+  year = 	 1940,
+  edition = 	 {Revised},
+  note = 	 {Reprinted 2003 (ISBN 0-674-55451-5)}
+}
+
+@Misc{RoseRose:cims2015,
+  author = 	 {Eva Rose and Kristoffer H. Rose},
+  title = 	 {Compiler Construction},
+  howpublished = {The graduate school computer science Compiler
+                  Construction class (CSCI-GA.2130) at the Courant
+                  Institute for the Mathematical Sciences, New York
+                  University},
+  year = 	 2015,
+  url = {http://cs.nyu.edu/courses/spring15/CSCI-GA.2130-001/}
+}
+
+@article{FeldmanGries:cacm1968,
+ author = {Feldman, Jerome and Gries, David},
+ title = {Translator Writing Systems},
+ journal = {Commun. ACM},
+ issue_date = {Feb. 1968},
+ volume = 11,
+ number = 2,
+ month = feb,
+ year = 1968,
+ issn = {0001-0782},
+ pages = {77--113},
+ numpages = 37,
+ url = {http://doi.acm.org/10.1145/362896.362902},
+ doi = {10.1145/362896.362902},
+ acmid = 362902,
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {compiler compiler-compiler, generator, macroprocessor, meta-assembler, metacompiler, parser, semantics, syntactic analysis, syntax, syntax-directed, translator, translator writing system},
+}
+
+@TechReport{Rose:mit2014,
+  author = 	 {Eva Rose},
+  title = 	 {Constraint Generation for the Jeeves Privacy Language},
+  institution =  {MIT},
+  year = 	 2014,
+  type = 	 {CSAIL Technical Report},
+  number = 	 {MIT-CSAIL-TR-2014-020},
+  month = 	 oct,
+  url = {http://hdl.handle.net/1721.1/90560}
+}
+
+@InProceedings{Morrisett+:popl1998,
+  author = 	 {Greg Morrisett and David Walker and Karl Crary and Neal Glew},
+  title = 	 {From System F to Typed Assembly Language},
+  booktitle = {Twenty-Fifth ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+  year = 	 1998,
+  pages = 	 {85-97},
+  month = 	 {San Diego, CA, USA}
 }
