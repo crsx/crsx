@@ -10,7 +10,6 @@
 #include "crsx.h"
 #include <string.h>
 #include <stdio.h>
-extern int fileno (FILE* file);
 
 // State stack.
 
@@ -51,7 +50,7 @@ char* strdup_local (Context c, const char* s);
 
 
 
-#line 55 "<stdout>"
+#line 54 "<stdout>"
 
 #define  YY_INT_ALIGNED short int
 
@@ -990,7 +989,7 @@ static yyconst flex_int16_t yy_chk[1616] =
 /* Variable name, and quoted form. */
 /* STATES. */
 
-#line 86 "crsx_scan.l"
+#line 85 "crsx_scan.l"
 #ifdef FLEX_DEBUG
   static char *stateNames[] = {"INITIAL", "Before", "BeforeWithBinders", "AfterSimple", "BeforeKey", "AfterProperties", "AfterConstructor", "BeforeArgument", "AfterArguments", "AfterKey", "AfterFirstVariable", "AfterBinder"};
 # define B(STATE) ((yy_flex_debug ? (b_state(state, STATE), 0) : 0), BEGIN(STATE))
@@ -1051,7 +1050,7 @@ a  ::=
                 )* '.' <BeforeWithBinders>
                        )? t <AfterSimple,AfterFirstVariable,AfterArgument>
 */
-#line 1055 "<stdout>"
+#line 1054 "<stdout>"
 
 #define INITIAL 0
 #define Before 1
@@ -1285,7 +1284,7 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 150 "crsx_scan.l"
+#line 149 "crsx_scan.l"
 
 
     // INITIALIZE.
@@ -1293,7 +1292,7 @@ YY_DECL
     B(Before);
 
     /* V as top level t or property value t. */
-#line 1297 "<stdout>"
+#line 1296 "<stdout>"
 
 	if ( !yyg->yy_init )
 		{
@@ -1378,332 +1377,332 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 157 "crsx_scan.l"
+#line 156 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, yytext)); B(AfterSimple); }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 158 "crsx_scan.l"
+#line 157 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, unquote(topSink(state)->context, yytext+1))); B(AfterSimple); }
 	YY_BREAK
 /* V as t in a without binders or as first binder in a. */
 case 3:
 YY_RULE_SETUP
-#line 160 "crsx_scan.l"
+#line 159 "crsx_scan.l"
 { pushString(&state, yytext); B(AfterFirstVariable); }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 161 "crsx_scan.l"
+#line 160 "crsx_scan.l"
 { pushString(&state, unquote(topSink(state)->context, yytext+1)); B(AfterFirstVariable); }
 	YY_BREAK
 /* V as t in a after binders. */
 case 5:
 YY_RULE_SETUP
-#line 163 "crsx_scan.l"
+#line 162 "crsx_scan.l"
 { Variable variable = lookupName(state, yytext); popBinders(&state); USEL(topSink(state), variable); B(AfterSimple); }
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 164 "crsx_scan.l"
+#line 163 "crsx_scan.l"
 { Variable variable = lookupName(state, unquote(topSink(state)->context, yytext+1)); popBinders(&state); USEL(topSink(state), variable); B(AfterSimple); }
 	YY_BREAK
 /* V as key in p. */
 case 7:
 YY_RULE_SETUP
-#line 166 "crsx_scan.l"
+#line 165 "crsx_scan.l"
 { pushVariableProperty(&state, yytext); B(AfterKey); }
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 167 "crsx_scan.l"
+#line 166 "crsx_scan.l"
 { pushVariableProperty(&state, unquote(topSink(state)->context, yytext+1)); B(AfterKey); }
 	YY_BREAK
 /* V as second binder in a. */
 case 9:
 YY_RULE_SETUP
-#line 169 "crsx_scan.l"
+#line 168 "crsx_scan.l"
 { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); pushFollowingBinder(&state, yytext); B(AfterBinder); }
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 170 "crsx_scan.l"
+#line 169 "crsx_scan.l"
 { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); pushFollowingBinder(&state, unquote(topSink(state)->context, yytext+1)); B(AfterBinder); }
 	YY_BREAK
 /* V as third or subsequent binder in a. */
 case 11:
 YY_RULE_SETUP
-#line 172 "crsx_scan.l"
+#line 171 "crsx_scan.l"
 { pushFollowingBinder(&state, yytext); }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 173 "crsx_scan.l"
+#line 172 "crsx_scan.l"
 { pushFollowingBinder(&state, unquote(topSink(state)->context, yytext+1)); }
 	YY_BREAK
 /* L as top level t or property value t. */
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 176 "crsx_scan.l"
+#line 175 "crsx_scan.l"
 { LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L as t in a without binders. */
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 178 "crsx_scan.l"
+#line 177 "crsx_scan.l"
 { LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L as t in a after binders. */
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 180 "crsx_scan.l"
+#line 179 "crsx_scan.l"
 { popBinders(&state); LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L is t after a property set. */
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 182 "crsx_scan.l"
+#line 181 "crsx_scan.l"
 { LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L as key in p. */
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 184 "crsx_scan.l"
+#line 183 "crsx_scan.l"
 { pushNamedProperty(&state, unquote(topSink(state)->context, yytext)); B(AfterKey); }
 	YY_BREAK
 /* L in illegal places. */
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 186 "crsx_scan.l"
+#line 185 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected %s literal where binder expected!\n", yytext); }
 	YY_BREAK
 /* C starts or is top level t or property value t. */
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 189 "crsx_scan.l"
+#line 188 "crsx_scan.l"
 { pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); }
 	YY_BREAK
 /* C starts or is t in a without binders. */
 case 20:
 /* rule 20 can match eol */
 YY_RULE_SETUP
-#line 191 "crsx_scan.l"
+#line 190 "crsx_scan.l"
 { pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); }
 	YY_BREAK
 /* C starts or is t in a after binders. */
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 193 "crsx_scan.l"
+#line 192 "crsx_scan.l"
 { VariableNameMapLink scope = popBinders(&state); pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); setNames(state, scope); }
 	YY_BREAK
 /* C starts part of t after a property set. */
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 195 "crsx_scan.l"
+#line 194 "crsx_scan.l"
 { pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); }
 	YY_BREAK
 /* C as key in p. */
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 197 "crsx_scan.l"
+#line 196 "crsx_scan.l"
 { pushNamedProperty(&state, unquote(topSink(state)->context, yytext)); B(AfterKey); }
 	YY_BREAK
 /* C in illegal places. */
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 199 "crsx_scan.l"
+#line 198 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected constructor where binder expected!\n"); }
 	YY_BREAK
 /* "{" starts top level t or property value t. */
 case 25:
 YY_RULE_SETUP
-#line 202 "crsx_scan.l"
+#line 201 "crsx_scan.l"
 { B(BeforeFirstKey); }
 	YY_BREAK
 /* '{' starts t in a without binders. */
 case 26:
 YY_RULE_SETUP
-#line 204 "crsx_scan.l"
+#line 203 "crsx_scan.l"
 { B(BeforeFirstKey); }
 	YY_BREAK
 /* '{' starts t in a after binders. */
 case 27:
 YY_RULE_SETUP
-#line 206 "crsx_scan.l"
+#line 205 "crsx_scan.l"
 { VariableNameMapLink scope = popBinders(&state); B(BeforeFirstKey); setNames(state, scope); }
 	YY_BREAK
 /* "{" in illegal places. */
 case 28:
 YY_RULE_SETUP
-#line 208 "crsx_scan.l"
+#line 207 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected '{' where property key expected!\n"); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 209 "crsx_scan.l"
+#line 208 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected '{' where binder expected!\n"); }
 	YY_BREAK
 /* ":" */
 case 30:
 YY_RULE_SETUP
-#line 212 "crsx_scan.l"
+#line 211 "crsx_scan.l"
 { B(Before); }
 	YY_BREAK
 /* ":" errors */
 case 31:
 YY_RULE_SETUP
-#line 214 "crsx_scan.l"
+#line 213 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Expected ':' after property key!\n"); }
 	YY_BREAK
 /* ";" */
 case 32:
 YY_RULE_SETUP
-#line 217 "crsx_scan.l"
+#line 216 "crsx_scan.l"
 { popProperty(&state); B(BeforeKey); }
 	YY_BREAK
 /* ";" */
 case 33:
 YY_RULE_SETUP
-#line 219 "crsx_scan.l"
+#line 218 "crsx_scan.l"
 { popConstruction(&state); popProperty(&state); B(BeforeKey); }
 	YY_BREAK
 /* ";" */
 case 34:
 YY_RULE_SETUP
-#line 221 "crsx_scan.l"
+#line 220 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "';' only allowed after finished property mapping!\n"); }
 	YY_BREAK
 /* "}" */
 case 35:
 YY_RULE_SETUP
-#line 224 "crsx_scan.l"
+#line 223 "crsx_scan.l"
 { B(AfterProperties); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 225 "crsx_scan.l"
+#line 224 "crsx_scan.l"
 { popProperty(&state); B(AfterProperties); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 226 "crsx_scan.l"
+#line 225 "crsx_scan.l"
 { popConstruction(&state); popProperty(&state); B(AfterProperties); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 227 "crsx_scan.l"
+#line 226 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "'}' only allowed after finished property mapping!\n"); }
 	YY_BREAK
 /* "[" */
 case 39:
 YY_RULE_SETUP
-#line 230 "crsx_scan.l"
+#line 229 "crsx_scan.l"
 { B(BeforeArgument); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 231 "crsx_scan.l"
+#line 230 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "'[' only allowed after constructor!\n"); }
 	YY_BREAK
 /* "," */
 case 41:
 YY_RULE_SETUP
-#line 234 "crsx_scan.l"
+#line 233 "crsx_scan.l"
 { B(BeforeArgument); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 235 "crsx_scan.l"
+#line 234 "crsx_scan.l"
 { popConstruction(&state); B(BeforeArgument); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 236 "crsx_scan.l"
+#line 235 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); B(BeforeArgument); }
 	YY_BREAK
 /* "]" */
 case 44:
 YY_RULE_SETUP
-#line 239 "crsx_scan.l"
+#line 238 "crsx_scan.l"
 { B(AfterArguments); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 240 "crsx_scan.l"
+#line 239 "crsx_scan.l"
 { popConstruction(&state); B(AfterArguments); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 241 "crsx_scan.l"
+#line 240 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); B(AfterArguments); }
 	YY_BREAK
 /* "." */
 case 47:
 YY_RULE_SETUP
-#line 244 "crsx_scan.l"
+#line 243 "crsx_scan.l"
 { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); B(BeforeWithBinders); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 245 "crsx_scan.l"
+#line 244 "crsx_scan.l"
 { B(BeforeWithBinders); }
 	YY_BREAK
 /* EOF */
 case YY_STATE_EOF(AfterSimple):
-#line 248 "crsx_scan.l"
+#line 247 "crsx_scan.l"
 { yyterminate(); }
 	YY_BREAK
 case YY_STATE_EOF(AfterConstructor):
 case YY_STATE_EOF(AfterArguments):
-#line 249 "crsx_scan.l"
+#line 248 "crsx_scan.l"
 { popConstruction(&state); yyterminate(); }
 	YY_BREAK
 case YY_STATE_EOF(AfterFirstVariable):
-#line 250 "crsx_scan.l"
+#line 249 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); yyterminate(); }
 	YY_BREAK
 /* Skip spaces. */
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 253 "crsx_scan.l"
+#line 252 "crsx_scan.l"
 {}
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 254 "crsx_scan.l"
+#line 253 "crsx_scan.l"
 {}
 	YY_BREAK
 /* Everything else is an error... */
 case 51:
 YY_RULE_SETUP
-#line 257 "crsx_scan.l"
+#line 256 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected symbol in term (%s)\n", yytext); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 259 "crsx_scan.l"
+#line 258 "crsx_scan.l"
 ECHO;
 	YY_BREAK
-#line 1707 "<stdout>"
+#line 1706 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(Before):
 case YY_STATE_EOF(BeforeWithBinders):
@@ -2806,7 +2805,7 @@ static int yy_flex_strlen (yyconst char * s , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 259 "crsx_scan.l"
+#line 258 "crsx_scan.l"
 
 
 

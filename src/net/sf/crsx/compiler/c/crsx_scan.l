@@ -11,7 +11,6 @@
 #include "crsx.h"
 #include <string.h>
 #include <stdio.h>
-extern int fileno (FILE* file);
 
 // State stack.
 
