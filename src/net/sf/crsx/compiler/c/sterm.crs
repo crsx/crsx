@@ -992,7 +992,7 @@ ST-init-env2[Text, Text, $Numeric, $List[Text], Text] :: Text;
 ST-init-env2[#env, #suffix, #count, (), #sink]
 →
 %n⟪
-CEnv «#env» = ALLOCATE(«#sink»->context, (1 + «INTEGER[#count]») * sizeof(void*));
+CEnv «#env» = (CEnv) ALLOCATE(«#sink»->context, (1 + «INTEGER[#count]») * sizeof(void*));
 «#env»->refcount = 1;
 «#suffix»⟫
 ;
