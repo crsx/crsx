@@ -783,8 +783,7 @@ Sink makeBuffer(Context context)
     if (context->bufferPoolSize > 0)
     {
         Sink sink = (Sink) context->bufferPool[--context->bufferPoolSize];
-        Buffer buffer = (Buffer) sink;
-        ASSERT(sink->context, buffer->lastTop < 0);
+        ASSERT(sink->context, ((Buffer) sink)->lastTop < 0);
         return sink;
     }
 
