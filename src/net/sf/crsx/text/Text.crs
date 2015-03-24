@@ -34,13 +34,13 @@ Text-ReverseConcat[(#1;#s)]  → %n⟨«Text-ReverseConcat[#s]» «#1»⟩;
 
 // Fragment denoting term embedded in user language text.
 //
-Text-Embed[Text<!--Term-->] :: Text ;
-Text-Embed[#TermText] → %n⟪†«"\u00ab\u00ab"»« #TermText »†«"\u00bb\u00bb"»⟫ ;
+// Text-Embed[Text<!--Term-->] :: Text ;
+// Text-Embed[#TermText] → %n⟪†«"\u00ab\u00ab"»« #TermText »†«"\u00bb\u00bb"»⟫ ;
 
 // Fragment denoting string embedded in user language text.
 //
-Text-String[Text<!--String-->] :: Text ;
-Text-String[#TermText] → %n⟪†«"\u2020\u2020"»†«"\u00ab\u00ab"»« #TermText »†«"\u00bb\u00bb"»⟫ ;
+// Text-String[Text<!--String-->] :: Text ;
+// Text-String[#TermText] → %n⟪†«"\u2020\u2020"»†«"\u00ab\u00ab"»« #TermText »†«"\u00bb\u00bb"»⟫ ;
 
 
 // Fragment to be parsed as generated text (to be printed).
@@ -50,8 +50,8 @@ Text-Text[#content] → Text-User["n", #content] ;
 
 // Fragment to be parsed as user language text.
 //
-Text-User[$String<!--ParsePrefix-->, Text<!-- Unparsed -->] :: Text ;
-Text-User[#ParsePrefix, #Unparsed] →  %n⟪%†«#ParsePrefix»†«"\u27ea"»« #Unparsed »†«"\u27eb"»⟫ ;
+// Text-User[$String<!--ParsePrefix-->, Text<!-- Unparsed -->] :: Text ;
+// Text-User[#ParsePrefix, #Unparsed] →  %n⟪%†«#ParsePrefix»†«"\u27ea"»« #Unparsed »†«"\u27eb"»⟫ ;
 
 
 Text-Print[Text] :: $String ;
