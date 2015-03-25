@@ -45,8 +45,8 @@ Text-ReverseConcat[(#1;#s)]  → %n⟨«Text-ReverseConcat[#s]» «#1»⟩;
 
 // Fragment to be parsed as generated text (to be printed).
 //
-Text-Text[Text] :: Text ;
-Text-Text[#content] → Text-User["n", #content] ;
+// Text-Text[Text] :: Text ;
+// Text-Text[#content] → Text-User["n", #content] ;
 
 // Fragment to be parsed as user language text.
 //
