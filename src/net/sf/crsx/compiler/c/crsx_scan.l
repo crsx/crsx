@@ -316,7 +316,7 @@ Variable lookupName(StateLink state, char *name)
     }
     // Allocate as fresh variable.
     assert (s->tag == LINK_BASE_TAG);
-    Variable v = (strstr(name, "\302\271") ? MAKE_FRESH_LINEAR_VARIABLE(s->sink->context, name) : MAKE_FRESH_PROMISCUOUS_VARIABLE(s->sink->context, name));
+    Variable v = (strstr(name, "\302\271") ? MAKE_FRESH_LINEAR_VARIABLE_TRUSTY(s->sink->context, name) : MAKE_FRESH_PROMISCUOUS_VARIABLE_TRUSTY(s->sink->context, name));
     s->variableNames = addNameMapLink(s->sink->context, s->variableNames, strdup_local(topSink(state)->context, name), v);
     return v;
 }
@@ -502,7 +502,7 @@ void pushFirstBinder(StateLink *statep, char *name)
     state->parent = *statep;
     state->sink = (*statep)->sink;
     state->tag = LINK_FIRST_BINDER_TAG;
-    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE(topSink(state)->context, name));
+    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE_TRUSTY(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE_TRUSTY(topSink(state)->context, name));
     state->stored.variable = variable;
     state->variableNames = addNameMapLink(topSink(state)->context, (*statep)->variableNames, strdup_local(state->sink->context, name), variable);
     //
@@ -520,7 +520,7 @@ void pushFollowingBinder(StateLink *statep, char *name)
     state->parent = *statep;
     state->sink = (*statep)->sink;
     state->tag = LINK_FOLLOWING_BINDER_TAG;
-    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE(topSink(state)->context, name));
+    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE_TRUSTY(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE_TRUSTY(topSink(state)->context, name));
     state->stored.variable = variable;
     state->variableNames = addNameMapLink(topSink(state)->context, (*statep)->variableNames, strdup_local(state->sink->context, name), variable);
     //

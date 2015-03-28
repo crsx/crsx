@@ -675,10 +675,14 @@ struct _SortDescriptor
 //
 // Variables are compared as pointers with ==.  The name is a guideline and may be ignored.
 //
-#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,1,0)
-#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0)
-#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1)
-#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1)
+#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariableTrusty(context,v,1,0,0)
+#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariableTrusty(context,v,0,0,0)
+#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariableTrusty(context,v,1,1,0)
+#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariableTrusty(context,v,0,1,0)
+#define MAKE_BOUND_PROMISCUOUS_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,1,0,1)
+#define MAKE_FRESH_PROMISCUOUS_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,0,0,1)
+#define MAKE_BOUND_LINEAR_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,1,1,1)
+#define MAKE_FRESH_LINEAR_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,0,1,1)
 
 //
 struct _Variable
@@ -694,6 +698,11 @@ struct _Variable
  * @Brief Make new variable. Reference count is 1, use count is 0
  */
 extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear);
+
+/**
+ * @Brief Make new variable (possibly trusting the name). Reference count is 1, use count is 0
+ */
+extern Variable makeVariableTrusty(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int trustname);
 
 /**
  * @Brief Free variable

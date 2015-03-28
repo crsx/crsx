@@ -42,27 +42,36 @@ void enableProfiling(Context context)
 /////////////////////////////////////////////////////////////////////////////////
 // Variable allocation and utilities
 
-Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear)
+Variable makeVariableTrusty(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int trustname)
 {
     ASSERT(context, context && name);
     Variable v = (Variable) ALLOCATE(context, sizeof(struct _Variable));
     v->nr = 1;
     v->uses = 0;
 
-    // TODO: too expensive.
-    int len = strlen(name);
-    char *nameu = name;
-    while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
-    if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
+    if (trustname)
     {
-        if (nameu < name+len)
-            v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
-        else
-            v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
+      	size_t z = strlen(name)+1;
+	v->name = (char*) ALLOCATE(context, z);
+	memcpy(v->name, name, z);
     }
     else
     {
-        v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
+    	// TODO: too expensive.
+    	int len = strlen(name);
+    	char *nameu = name;
+    	while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
+    	if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
+	{
+	    if (nameu < name+len)
+	      v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
+	    else
+	      v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
+	}
+    	else
+	{
+	    v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
+	}
     }
 
     v->bound = bound;
@@ -71,6 +80,11 @@ Variable makeVariable(Context context, char *name, unsigned int bound, unsigned 
     crsxpMakeVariable(context);
 
     return v;
+}
+
+Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear)
+{
+	return makeVariableTrusty(context, name, bound, linear, 0);
 }
 
 void freeVariable(Context context, Variable variable)
