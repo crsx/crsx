@@ -760,7 +760,7 @@ public class GenericRule implements Copyable
 				Variable var = sub.variable();
 				
 				// If the variable is fresh, then always assume substitution is needed, even when it can be reused.
-				if (bound.contains(var))
+				if (!bound.contains(var))
 					return true;
 				
 				if (getReused(var) == null)

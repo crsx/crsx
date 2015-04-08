@@ -173,7 +173,7 @@ E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#namedP, #varP]]
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
 E-send-tail :: Text;
 
-{#env; "$Strict": YES}E-send-tail → ST-send-tail[$[{#env}Get[STRING_ENTRY], "$Tail", NO]];
+{#env; "$Strict": YES}E-send-tail → ST-send-tail[$[{#env}Get[STRING_ENTRY], "$tail", NO]];
 {#env; "$Strict": NO} E-send-tail → %n⟪⟫;
 
 )];
@@ -301,7 +301,7 @@ SEND_PRIMITIVE[E_LoadTerm];
 
 Send-LoadTerm:
 {#env}E-send[E_LoadTerm, (#name; #url;), #options, #sink] →
-	{#env; "$Tail":NO}T-local-string[#url, #sink, url p.%n⟪
+	{#env; "$tail":NO}T-local-string[#url, #sink, url p.%n⟪
 LOAD_TERM(«#sink», "", «url»);«p»«{#env}E-send-tail»⟫];
 
 // $[Nil] is synonymous with sending nothing.
@@ -323,7 +323,7 @@ Send-FreeVariables-Raw[Fresh[term::Text, fvs::Text, link::Text]]
 →
 %n⟪
 {⟦ 
-Term «term»;« {#env; "$Tail": NO} T-set[#Term, #sink, term] »
+Term «term»;« {#env; "$tail": NO} T-set[#Term, #sink, term] »
 VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
 VariableSetLink «link»;
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
@@ -340,7 +340,7 @@ Send-FreeVariables-Unconstrained[Fresh[term::Text, fvs::Text, link::Text]]
 →
 %n⟪
 {⟦
-Term «term»;« {#env; "$Tail":NO} T-set[#Term, #sink, term] »
+Term «term»;« {#env; "$tail":NO} T-set[#Term, #sink, term] »
 VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 0, NULL);
 VariableSetLink «link»;
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
@@ -355,7 +355,7 @@ Send-FreeVariables-Constrained[Fresh[term::Text, fvs::Text, link::Text]]
 {#env}E-send[E_FreeVariables, (PROPERTY-REF[#Ref, #Use, CONSTRUCTION[#kind, #Name, (ARGUMENT[#Sort1, CONSTRUCTION[#kind, #SortName, ()]]; )]]; #Term;), #Options, #sink] 
 →
 %n⟪{⟦ Term «term»;
-« {#env; "$Tail":NO} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 1, «{#env}E-VariableProperties[$[:,"MetaVar$",#Ref]]»);
+« {#env; "$tail":NO} T-set[#Term, #sink, term] »VariableSet «fvs» = makeFreeVariableSet(«#sink»->context, «term», NULL, 1, «{#env}E-VariableProperties[$[:,"MetaVar$",#Ref]]»);
 VariableSetLink «link»;
 for («link» = «fvs»->u.link; «link»; «link» = «link»->link) { START(«#sink», «EventConstructor["$Cons"]»); USE(«#sink», linkVariable(«#sink»->context, «link»->variable)); }
 START(«#sink», «EventConstructor["$Nil"]»); END(«#sink», «EventConstructor["$Nil"]»);
@@ -372,7 +372,7 @@ Send-UnionVariables[Fresh[list::Text,vs::Text,link::Text,v::Text,next::Text]]
 {#env}E-send[E_UnionVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); VariableSetLink «link»;
-« {#env; "$Tail":NO} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
+« {#env; "$tail":NO} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
 if (addVariable(«vs», linkVariable(«#sink»->context, «v»))) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
 USE(«#sink», linkVariable(«#sink»->context, «v»));⟧
 } 
@@ -381,7 +381,7 @@ UNLINK(«#sink»->context, «list»);
 «list» = «next»;⟧
 }
 UNLINK(«#sink»->context, «list»);
-« {#env; "$Tail":NO} T-set[#List2, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0));
+« {#env; "$tail":NO} T-set[#List2, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0));
 if (addVariable(«vs»,linkVariable(«#sink»->context, «v»))) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
 USE(«#sink», linkVariable(«#sink»->context, «v»));⟧
 }
@@ -404,14 +404,14 @@ Send-IntersectVariables[Fresh[list::Text,vs::Text,size::Text,v::Text,next::Text]
 {#env}E-send[E_IntersectVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
-« {#env; "$Tail":NO} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
+« {#env; "$tail":NO} T-set[#List1, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
 addVariable(«vs», linkVariable(«#sink»->context, «v»));
 Term «next» = LINK(«#sink»->context, SUB(«list»,1));
 UNLINK(«#sink»->context, «list»);
 «list» = «next»;⟧
 }
 UNLINK(«#sink»->context, «list»);
-« {#env; "$Tail":NO} T-set[#List2, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
+« {#env; "$tail":NO} T-set[#List2, #sink, list] »while (!strcmp("$Cons",SYMBOL(«list»))) {⟦ Variable «v» = VARIABLE(SUB(«list»,0)); 
 if (containsVariable(«vs», «v»)) {⟦ START(«#sink», «EventConstructor["$Cons"]»); 
 USE(«#sink», linkVariable(«#sink»->context, «v»)); 
 ++«size»;⟧
@@ -436,7 +436,7 @@ Send-ExceptVariables[Fresh[list1::Text,list2::Text,vs::Text,size::Text,v::Text,n
 E-send[E_ExceptVariables, (#Name; #List1; #List2;), #Options, #sink]
 →
 %n⟪{⟦ Term «list1», «list2»; VariableSet «vs» = makeVariableSet(«#sink»->context); int «size» = 0;
-« {#env; "$Tail":NO} T-set[#List1, #sink, list1] »« {#env; "$Tail":NO} T-set[#List2, #sink, list2] »while (!strcmp("$Cons",SYMBOL(«list2»))) {⟦ Variable «v» = VARIABLE(SUB(«list2»,0)); 
+« {#env; "$tail":NO} T-set[#List1, #sink, list1] »« {#env; "$tail":NO} T-set[#List2, #sink, list2] »while (!strcmp("$Cons",SYMBOL(«list2»))) {⟦ Variable «v» = VARIABLE(SUB(«list2»,0)); 
 addVariable(«vs»,linkVariable(«#sink»->context, «v»));
 Term «next» = LINK(«#sink»->context, SUB(«list2»,1));
 UNLINK(«#sink»->context, «list2»);
@@ -467,9 +467,9 @@ Send-split[Fresh[str::Text, regex::Text]]
 :
 {#env}E-send[E_Split, (#Name; #String; #Regex;), #Options, #sink] 
 → 
-%n⟪{⟦char* «str»;«{#env;"$Tail":NO}T-set-string[#String, #sink, str]»
+%n⟪{⟦char* «str»;«{#env;"$tail":NO}T-set-string[#String, #sink, str]»
 char* «regex»;
-«{#env;"$Tail":NO}T-set-string[#Regex, #sink, regex]»SEND_SPLIT(«str», «regex», «#sink»);⟧
+«{#env;"$tail":NO}T-set-string[#Regex, #sink, regex]»SEND_SPLIT(«str», «regex», «#sink»);⟧
 }«{#env}E-send-tail»⟫;
 
 // $[TryCall[$ResultSort, $Arg1Sort, ...], Name, ...]
@@ -511,10 +511,10 @@ E-call-compute-typed-args[(), (), #cargs, #sep, #sink, args.#[args]]
 E-call-compute-typed-args[(#ArgType;#ArgTypes), (#Arg;#Args), #cargs, #sep, #sink, args.#[args]]
 →
 %n⟪«E-call-cbinding[#ArgType]» «arg»;
-« $[If, $[Equal, "$String", #ArgType], {#env; "$Tail":NO}T-set-string[#Arg, #sink, arg],
-  $[If, $[Equal, "$Boolean", #ArgType], {#env; "$Tail":NO}T-set-bool[#Arg, #sink, arg],
-  $[If, $[Equal, "$Numeric", #ArgType], {#env; "$Tail":NO}T-set-num[#Arg, #sink, arg],
-  {#env; "$Tail":NO}T-set[#Arg, #sink, arg]]]] »
+« $[If, $[Equal, "$String", #ArgType], {#env; "$tail":NO}T-set-string[#Arg, #sink, arg],
+  $[If, $[Equal, "$Boolean", #ArgType], {#env; "$tail":NO}T-set-bool[#Arg, #sink, arg],
+  $[If, $[Equal, "$Numeric", #ArgType], {#env; "$tail":NO}T-set-num[#Arg, #sink, arg],
+  {#env; "$tail":NO}T-set[#Arg, #sink, arg]]]] »
 «{#env}E-call-compute-typed-args[#ArgTypes, #Args, %n⟪⟨#cargs⟩⟨#sep⟩⟨arg⟩⟫, %n⟪,⟫, #sink, args.#[args]]»
 ⟫
 ;
@@ -644,7 +644,7 @@ $Meta[(
 E-set-ref-to-send[#Primitive, #Args, #Options, #sink] 
 → 
 %n⟪{⟦ Term «term»;
-«{#env; "$Tail":NO}E-set-ref[#Primitive, #Args, #Options, #sink, term]»COPY(«#sink», «term»);«{#env}E-send-tail»⟧}
+«{#env; "$tail":NO}E-set-ref[#Primitive, #Args, #Options, #sink, term]»COPY(«#sink», «term»);«{#env}E-send-tail»⟧}
 ⟫
 ;
 
@@ -656,7 +656,7 @@ E-set-ref-to-send[#Primitive, #Args, #Options, #sink]
 → 
 %n⟪
 {⟦ 
-Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env; "$Tail":NO}E-set-ref-to-send[#Primitive, #Args, #Options, buf] »
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env; "$tail":NO}E-set-ref-to-send[#Primitive, #Args, #Options, buf] »
 «#variable» = BUFFER_TERM(«buf»);
 FREE_BUFFER(«buf»); ⟧
 }«{#env}E-send-tail»⟫
@@ -832,7 +832,7 @@ $Meta[(
 {#env}E-send-bool[#Primitive, #Args, #Options, #sink] 
 → 
 %n⟪{⟦ int «bool»;
-«{#env;"$Tail":NO}E-set-bool[#Primitive, #Args, #Options, #sink, bool]»if («bool») { START(«#sink», «MANGLE["$True"]»); END(«#sink», «MANGLE["$True"]»); }
+«{#env;"$tail":NO}E-set-bool[#Primitive, #Args, #Options, #sink, bool]»if («bool») { START(«#sink», «MANGLE["$True"]»); END(«#sink», «MANGLE["$True"]»); }
 else { START(«#sink», «MANGLE["$False"]»); END(«#sink», «MANGLE["$False"]»); } ⟧
 }«{#env}E-send-tail»⟫;
 
@@ -1156,7 +1156,7 @@ E1[(
 → 
 %n⟪
 {⟦ long long «num»;
-«{#env; "$Tail":NO}E-set-int[#Primitive, #Args, #Options, #sink, num]»LITERALNF(«#sink», (size_t) 31, "%lld", «num»); ⟧}«{#env}E-send-tail»⟫;
+«{#env; "$tail":NO}E-set-int[#Primitive, #Args, #Options, #sink, num]»LITERALNF(«#sink», (size_t) 31, "%lld", «num»); ⟧}«{#env}E-send-tail»⟫;
 
 {$String:String}E-set-int-to-set[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
 
@@ -1409,7 +1409,7 @@ E-send-num[#Primitive, #Args, #Options, #sink]
 → 
 %n⟪
 {⟦
-double «num»;«{#env; "$Tail":NO}E-set-num[#Primitive, #Args, #Options, #sink, num]»
+double «num»;«{#env; "$tail":NO}E-set-num[#Primitive, #Args, #Options, #sink, num]»
 LITERALNF(«#sink», (size_t) 31, "%G", «num»);«{#env}E-send-tail»⟧
 }⟫
 ;
@@ -2078,8 +2078,8 @@ Poly-SaveTerm[Fresh[term::Text]]
 :
 {#env}E-poly[E_SaveTerm, (#Name; #Url; #Term; #Result), (#O1;#O2;#O3;#O4), #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO} T-local-string[#Url, #sink, url p.%n⟪{⟦ Term «term»;
-«{#env; "$Tail":NO} T-set[#Term, #sink, term]»SAVE_TERM(«#sink»->context, «url», «term»); UNLINK(«#sink»->context, «term»);«p» ⟧}
+{#env; "$tail":NO} T-local-string[#Url, #sink, url p.%n⟪{⟦ Term «term»;
+«{#env; "$tail":NO} T-set[#Term, #sink, term]»SAVE_TERM(«#sink»->context, «url», «term»); UNLINK(«#sink»->context, «term»);«p» ⟧}
 «{#env} E-optional[#Result, #O4, #sink, ok r.#Tail[ok,r]]»⟫]
 ;
 
@@ -2091,7 +2091,7 @@ Poly-Dump[Fresh[str::Text]]
 {#env}E-poly[E_Dump, (#Name; #Prefix; #Term;), #Options, #sink, ok result.#Tail[ok,result]]
 →
 %n⟪
-char* «str»;«{#env; "$Tail":NO}T-set-string[#Prefix, #sink, str]»
+char* «str»;«{#env; "$tail":NO}T-set-string[#Prefix, #sink, str]»
 ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «str»);
 «{#env}#Tail[OK, #Term]»⟫;
 
@@ -2101,7 +2101,7 @@ Poly-ProfileEnter
 :
 {#env}E-poly[E_ProfileEnter, (#Name; META-APPLICATION[#MetaVar, #Args, #Use]; #name; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO}T-local-string[#name, #sink, s p.%n⟪
+{#env; "$tail":NO}T-local-string[#name, #sink, s p.%n⟪
 PROFILE_ENTER(«#sink»->context, VARIABLE(«{#env}MetaVar[#MetaVar]»), «s»);«p»
 «{#env}#Tail[OK, #cont]»
 ⟫]
@@ -2124,23 +2124,23 @@ Poly-ProfileExit
 Poly-Error-None:
 {#env} E-poly[E_Error, (#Name; #String;), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO} T-local-string[#String, #sink, arg p. %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «arg»);
+{#env; "$tail":NO} T-local-string[#String, #sink, arg p. %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «arg»);
 «p»« {#env} E-optional[(), (), #sink, ok r.#Tail[ok,r]] »⟫]
 ;
 
 Poly-Error-Kind:
 {#env} E-poly[E_Error, (#Name; #Format; LITERAL[#Msg, #MsgSort]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO} T-local-string[#Format, #sink, arg p.
- {#env; "$Tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
+{#env; "$tail":NO} T-local-string[#Format, #sink, arg p.
+ {#env; "$tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
 «p»« {#env} E-optional[(), (), #sink, ok r.#Tail[ok,r]] »⟫]]
 ;
 
 Poly-Error-Other:
 {#env} E-poly[E_Error, (#Name; #Format; $[NotMatch,LITERAL[#Msg, #MsgSort],#Arg1]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO} T-local-string[#Format, #sink, arg p.
- {#env; "$Tail":NO} E-flatten-strings[(), (#Arg1; #Args), #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]»⟫, %n⟪);
+{#env; "$tail":NO} T-local-string[#Format, #sink, arg p.
+ {#env; "$tail":NO} E-flatten-strings[(), (#Arg1; #Args), #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]»⟫, %n⟪);
 «p»« {#env} E-optional[(), (), #sink, ok r.#Tail[ok,r]] »⟫]]
 ;
 
@@ -2168,7 +2168,7 @@ Poly-ForgivableError-None[Fallback]
 {#env}
 E-poly[E_ForgivableError, (#Name; #String; #Result; ), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO}
+{#env; "$tail":NO}
 T-local-string[#String, #sink, arg p. %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg»);
 «p»«{#env}#Tail[OK,#Result] »⟫]
 ;
@@ -2178,9 +2178,9 @@ T-local-string[#String, #sink, arg p. %n⟪FORGIVABLEERRORF(«#sink»->context, 
 {#env}
 E-ForgivableError[#Name, #Format, #Msg, (#Result; #Args), #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO}
+{#env; "$tail":NO}
 T-local-string[#Format, #sink, arg p.
- {#env; "$Tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
+ {#env; "$tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
 «p»«{#env}#Tail[OK, #Result] »⟫]]
 ;
 
@@ -2209,7 +2209,7 @@ E-Head[(#A;#B;#C)] → (#A; E-Head[(#B;#C)]);
 Poly-Trace-Message:
 {#env} E-poly[E_Trace, (#Name; #String; #Result;), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO} T-local-string[#String, #sink, arg p. %n⟪TRACEF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «arg»);
+{#env; "$tail":NO} T-local-string[#String, #sink, arg p. %n⟪TRACEF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «arg»);
 «p»«{#env}#Tail[OK,#Result] »⟫]
 ;
 
@@ -2310,7 +2310,7 @@ Poly-If[Fresh[test::Text]]
 → 
 %n⟪
 {⟦
-int «test»;«{#env; "$Tail":NO}T-set-bool[#Test, #sink, test]»
+int «test»;«{#env; "$tail":NO}T-set-bool[#Test, #sink, test]»
 if («test») 
 {⟦«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] »⟧
 }
@@ -2326,7 +2326,7 @@ Poly-IfZero[Fresh[intt::Text]]
 {#env}E-poly[E_IfZero, (#Name; #Int; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
 → 
 %n⟪{⟦ long long «intt»;
-«{#env;"$Tail":NO}T-set-int[#Int, #sink, intt]»if («intt» == 0ll) { ⟦«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
+«{#env;"$tail":NO}T-set-int[#Int, #sink, intt]»if («intt» == 0ll) { ⟦«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
 else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }⟫;
 
@@ -2337,7 +2337,7 @@ Poly-IfEmpty
 :
 {#env}E-poly[E_IfEmpty, (#Name; #Str; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
 → 
-{#env; "$Tail":NO}T-local-string[#Str, #sink, str p.%n⟪
+{#env; "$tail":NO}T-local-string[#Str, #sink, str p.%n⟪
 if (!«str»[0]) { ⟦«p»«{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] »⟧}
 else {⟦ «p»«{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}
 ⟫];
@@ -2352,7 +2352,7 @@ Poly-IfDef[Fresh[key::Text, value::Text]]
 → 
 %n⟪
 {⟦ Term «key»;
-«{#env; "$Tail":NO}T-set[#Key, #sink, key]»Term «value» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #sink, key]»;
+«{#env; "$tail":NO}T-set[#Key, #sink, key]»Term «value» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #sink, key]»;
 if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
 else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }⟫;
@@ -2361,7 +2361,7 @@ Poly-IfDef-Global[Fresh[value::Text]]
 :
 {#env}E-poly[E_IfDef, ($[NotMatch,PROPERTY-REF[#_Ref, #_Use, #_Name],#Name]; #Key; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$Tail":NO} T-local-string[#Key, #sink, key p.%n⟪{⟦ char *«value» = getenv(«key»);
+{#env; "$tail":NO} T-local-string[#Key, #sink, key p.%n⟪{⟦ char *«value» = getenv(«key»);
 «p»if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
 else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }⟫];
@@ -2373,7 +2373,7 @@ Poly-VariableNameIs[Fresh[name::Text]]
 :
 {#env}E-poly[E_VariableNameIs, (#Name; VARIABLE-USE[var]; #name; #Result;), #Options, #sink, ok result.#Tail[ok,result]]
 →
-%n⟪{⟦ char *«name»; « {#env; "$Tail":NO} T-set-string[#name, #sink, name] »setVariableBaseName(«#sink»->context, «var», «name»);⟧ }
+%n⟪{⟦ char *«name»; « {#env; "$tail":NO} T-set-string[#name, #sink, name] »setVariableBaseName(«#sink»->context, «var», «name»);⟧ }
 « {#env}#Tail[OK,#Result] »⟫
 ;
 
@@ -2381,9 +2381,9 @@ Poly-VariableNameIsComputed[Fresh[term::Text, name::Text]]
 :
 {#env}E-poly[E_VariableNameIs, (#Name; $[NotMatch,VARIABLE-USE[#var],#varterm]; #name; #Result;), #Options, #sink, ok result.#Tail[ok,result]]
 →
-%n⟪{⟦ Term «term»; « {#env;; "$Tail":NO}T-set[#varterm, #sink, term] »
+%n⟪{⟦ Term «term»; « {#env;; "$tail":NO}T-set[#varterm, #sink, term] »
 if (IS_VARIABLE_USE(«term»)) {⟦ char *«name»;
-« {#env; "$Tail":NO} T-set-string[#name, #sink, name] »setVariableBaseName(«#sink»->context, VARIABLE(«term»), «name»);⟧
+« {#env; "$tail":NO} T-set-string[#name, #sink, name] »setVariableBaseName(«#sink»->context, VARIABLE(«term»), «name»);⟧
 } ⟧ }
 « {#env}#Tail[OK,#Result] »⟫
 ;
@@ -2570,7 +2570,7 @@ SEND_PRIMITIVE[E_ParseURL];
 Send-ParseURL:
 {#env} E-send[E_ParseURL, (#Name; #Category; #Url;), #Options, sink]
 →
-{#env; "$Tail":NO} T-local-string[#Category, sink, cat post1.{#env; "$Tail":NO}T-local-string[#Url, sink, url post2.%n⟪LOAD_TERM(«sink», «cat», «url»);
+{#env; "$tail":NO} T-local-string[#Category, sink, cat post1.{#env; "$tail":NO}T-local-string[#Url, sink, url post2.%n⟪LOAD_TERM(«sink», «cat», «url»);
 «post1»«post2»«{#env}E-send-tail»⟫]]
 ;
 
@@ -2581,7 +2581,7 @@ SEND_PRIMITIVE[E_ParseText];
 Send-ParseText:
 {#env} E-send[E_ParseText, (#Name; #Category; #Text;), #Options, sink]
 →
-{#env;"$Tail":NO} T-local-string[#Category, sink, cat post1.{#env;"$Tail":NO}T-local-string[#Text, sink, text post2.%n⟪SCAN_TERM(«sink», «cat», «text»);
+{#env;"$tail":NO} T-local-string[#Category, sink, cat post1.{#env;"$tail":NO}T-local-string[#Text, sink, text post2.%n⟪SCAN_TERM(«sink», «cat», «text»);
 «post1»«post2»«{#env}E-send-tail»⟫]]
 ;
 
@@ -2592,7 +2592,7 @@ STRING_PRIMITIVE[E_Rescape] ;
 
 {#env}E-set-string[E_Rescape, (#Name; #String;), #Options, #sink, #str] 
 → 
-{#env;"$Tail":NO}T-local-string[#String, #sink, s p.%n⟪{⟦«#str» = makeRescaped(«#sink»->context, «s»);
+{#env;"$tail":NO}T-local-string[#String, #sink, s p.%n⟪{⟦«#str» = makeRescaped(«#sink»->context, «s»);
 «p»⟧}«{#env}E-send-tail»⟫]
 ;
 
@@ -2634,7 +2634,7 @@ sendPropertiesKeys(«#sink», «#namedP», «#varP»);«{#env}E-send-tail»⟫;
 Poly-Echo:
 {#env} E-poly[E_Echo, (#Name; #String;), #Options, sink, ok result.#Tail[ok,result]]
 →
-{#env;"$Tail":NO} T-local-string[#String, sink, arg p. %n⟪TRACEF(«sink»->context, «FormatKindOf[#Name]», "%s\n", «arg»);
+{#env;"$tail":NO} T-local-string[#String, sink, arg p. %n⟪TRACEF(«sink»->context, «FormatKindOf[#Name]», "%s\n", «arg»);
 «p»« {#env}E-optional[(), #Options, sink, ok arg.#Tail[ok,arg]] »⟫]
 ;
 

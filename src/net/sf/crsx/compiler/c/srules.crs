@@ -21,11 +21,13 @@ $Lax;
 //
 SF-Function[$String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
 
+//«SF-closures[#function, #Rules]»
+
 -[Fresh[sink::Text, term::Text, count::Text, namedP::Text, varP::Text]]
 :
 SF-Function[#kind, #function, #Forms, #Sort, #Rules]
 →
-%n⟪«SF-Closures[#function, #Rules]»«SF-function-extern[#function, #Forms, #Sort]»
+%n⟪«SF-function-extern[#function, #Forms, #Sort]»
 
 /* STEP FUNCTION « COMMENT_TOKEN[#function] ». */
 int «Step[#function]»(Sink «sink», Term «term»)
@@ -119,7 +121,7 @@ SF-ExtractSub[$Boolean, Reified_FormArgument, Text, Text, $List[Text], $Numeric,
 
 SF-ExtractSub[$True, #Arg, #sink, #term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
 →
-SF-ExtractClosure[#term, #args, #subi, ok¹ args¹.#[ok¹, args¹]] 
+SF-ExtractClosure[#term, #sink, #args, #subi, ok¹ args¹.#[ok¹, args¹]] 
 ;
 
 SF-ExtractSub[$False, #Arg, #sink, #term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
@@ -146,14 +148,14 @@ SF-ExtractTerm[FORM-ARGUMENT[#Sort], #sink, #term, #args, #subi, #binderi, ok¹ 
 Term «term» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (term;)]]»⟫
 ;
 
-SF-ExtractClosure[Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
+SF-ExtractClosure[Text, Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
 
 -[Fresh[closure::Text]]
 :
-SF-ExtractClosure[#term, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
+SF-ExtractClosure[#term, #sink, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
 →
 %n⟪
-Closure «closure» = SUBCLOSURE(«#term», «INTEGER[#subi]»);«#[OK, Append[#args, (closure;)]]»⟫
+Term «closure» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (closure;)]]»⟫
 ;
 
 SF-StepUnlinkTerm[OK_SORT, Text, Text, $List[Text], $String] :: Text;
@@ -166,7 +168,7 @@ return «MANGLE[#function]»(«#sink»,shared, namedP, varP«ConcatText[#args,%n
 ;
 
 // 
-// Generate closure invocation functions.
+// Generate closure invocation functions, as well as associated descriptor.
 // 
 // Traverses the contraction and generate C function for each closure.
 // These C functions extract the arguments from the environment (if any)
@@ -174,28 +176,25 @@ return «MANGLE[#function]»(«#sink»,shared, namedP, varP«ConcatText[#args,%n
 //
 // TODO: give example
 
-SF-Closures[$String, $List[Reified_Rule]] :: Text;
+SF-closures[$String, $List[Reified_Rule]] :: Text;
 
-SF-Closures[#function, ()] 
+SF-closures[#function, ()] 
 → 
-%n⟪⟫ 
-;
+%n⟪⟫;
 
-SF-Closures[#function, (#Rule; #Rules)] 
+SF-closures[#function, (#rule; #rules)] 
 → 
-%n⟪«SF-Closure-Rule[#function, #Rule]»«SF-Closures[#function, #Rules]»⟫
-;
+%n⟪«SF-closure-rule[#function, #rule]»«SF-closures[#function, #rules]»⟫;
 
-SF-Closure-Rule[$String, Reified_Rule] :: Text;
+SF-closure-rule[$String, Reified_Rule] :: Text;
 
-SF-Closure-Rule[#function, RULE[#name, #Options, #Pattern, #Contractum]]
+SF-closure-rule[#function, RULE[#name, #options, #pattern, #contractum]]
 →
 {
-    "$Function":STRING_VALUE[#function]; 
-    "$ClosureCount": NUM_VALUE[0]
+    "$Function"     : STRING_VALUE[#function]; 
+    "$ClosureCount" : NUM_VALUE[0]
 } 
-SF-Closure-Term[OK, #Contractum, ok¹.%n⟪⟫]
-;
+SF-Closure-Term[OK, #contractum, ok¹.%n⟪⟫];
 
 // Traverse the term and look for function with binders (functional or data).
 
@@ -401,41 +400,32 @@ SF-ClosureName[name¹.SF-Create-Closure1[name¹, #Arguments, #Binders, #Count, o
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Create-Closure1[Text, $List[Reified_Binder], $List[Reified_Variable], $Numeric, ok¹::OK_SORT.Text] :: Text;
 
-{#env}
-SF-Create-Closure1[#Name, #Arguments, #Binders, #Count, ok¹.#[ok¹]] 
+{#env}SF-Create-Closure1[#Name, #Arguments, #Binders, #Count, ok¹.#[ok¹]] 
 →
-%n⟪static int «#Name»(Sink sink, CEnv env«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫
-;
+%n⟪¶static int «#Name»(Sink sink, CEnv env«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Create-Params[$List[Reified_Variable], $List[Reified_Binder], ok¹::OK_SORT.Text] :: Text;
 
-{#env}
-SF-Create-Params[(), #Arguments, ok¹.#[ok¹]]
+{#env}SF-Create-Params[(), #Arguments, ok¹.#[ok¹]]
 →
-{#env}
-SF-Closure-Body[#Arguments, ok¹.#[ok¹]]
-;
+{#env}SF-Closure-Body[#Arguments, ok¹.#[ok¹]];
 
-{#env}
-SF-Create-Params[(#Binder;#Binders), #Arguments, ok¹.#[ok¹]]
+{#env}SF-Create-Params[(#Binder;#Binders), #Arguments, ok¹.#[ok¹]]
 →
-%n⟪,«SF-ParamType[$[{#env}Get[VARIABLE_ENTRY], #Binder]]» «#Binder»«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫
-;
+%n⟪,«SF-ParamType[$[{#env}Get[VARIABLE_ENTRY], #Binder]]» «#Binder»«{#env}SF-Create-Params[#Binders, #Arguments, ok¹.#[ok¹]]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Closure-Body[$List[Reified_Binder], ok¹::OK_SORT.Text] :: Text;
 
-{#env}
-SF-Closure-Body[#Arguments, ok¹.#[ok¹]]
+{#env}SF-Closure-Body[#Arguments, ok¹.#[ok¹]]
 →
 %n⟪) {⟦
 «{#env}SF-Closure-Env[#Arguments, (), (), 0]»
 ⟧
 }
 «{#env}#[OK]»
-⟫
-;
+⟫;
 
 // Traverse the construction argument and identify captured values. Get them out of the environment.
 // Handle the case where there is no captured values (TODO: and only one captured value)
@@ -687,7 +677,7 @@ SF-TopClosure[$Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
 {#env; "$Args":LIST_VARIABLE[#TopArgs]}
 SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]]
 →
-%n⟪, Closure «closure»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(closure;)]];closure:ARG[#Index, $False]}#[OK, $[Plus, #Index, 1]]»⟫
+%n⟪, Term «closure»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(closure;)]];closure:ARG[#Index, $False]}#[OK, $[Plus, #Index, 1]]»⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -1061,7 +1051,7 @@ SF-Pattern-Variable-Case[#Name, #Options, #variable, #sink, #setup, #term, ok.#[
 {#env}
 SF-Pattern[#pass, #stage, EVALUATOR[#Primitive, #Patterns, #Options], #sink, #setup, #needed, #unique, #term, ok.#[ok]]
 →
-%n⟪« #setup »« {#env; "$Tail":NO}E-Pattern[Primitive[#Primitive], #Patterns, #pass, #stage, #sink, #term, ok.#[ok]] »⟫
+%n⟪« #setup »« {#env; "$tail":NO}E-Pattern[Primitive[#Primitive], #Patterns, #pass, #stage, #sink, #term, ok.#[ok]] »⟫
 ;
 
 // Pattern #MetaVar[MetaArg...]: store in meta-variable and record argument variables.
@@ -1667,7 +1657,7 @@ SF-then-eval[OK, #term, #contractum, #sink]
 →
 %n⟪«SF-unlink-comment[#refs, #terms]»«{#env}SF-unlink-refs[#sink, #refs]»«{#env}SF-unlink-terms[#sink, #terms]»
 
-/* -- Contraction -- */«{#env; "$Tail": YES}ST-then-send[OK, #contractum, #sink]»⟫;
+/* -- Contraction -- */«{#env; "$tail": YES}ST-then-send[OK, #contractum, #sink]»⟫;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

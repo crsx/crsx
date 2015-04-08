@@ -24,59 +24,49 @@ SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 %n⟪/* FUNCTION « COMMENT_TOKEN[#name] » HEADER DECLARATIONS. */
 « MapText[f.SH-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
 extern int « MANGLE[#function] »(Sink, ssize_t,NamedPropertyLink,VariablePropertyLink« SH-Arg[#Forms, $True] »);
-⟫
-;
+⟫;
 
 SH-Arg[$List[Reified_Form], $Boolean] :: Text;
 
 SH-Arg[(), #hasSortSet] 
 → 
-%n⟪⟫
-;
+%n⟪⟫;
 
 SH-Arg[(SORT-ALLOWS-VARIABLES; #Forms), #hasSortSet] 
 → 
-SH-Arg[#Forms, #hasSortSet]
-;
+SH-Arg[#Forms, #hasSortSet];
 
 SH-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $True] 
 → 
-SH-Arg[(#Form; #Forms), $True]
-;
+SH-Arg[(#Form; #Forms), $True];
 
 SH-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False] 
 → 
-%n⟪,NamedPropertyLink,VariablePropertyLink«SH-Arg[(#Form; #Forms), $True]»⟫
-;
+%n⟪,NamedPropertyLink,VariablePropertyLink«SH-Arg[(#Form; #Forms), $True]»⟫;
 
 SH-Arg[(FORM[#Constructor, #Args];), #hasSortSet] 
 → 
-SH-TopArgs[#Args]
-;
+SH-TopArgs[#Args];
 
 SH-TopArgs[$List[Reified_FormArgument]] :: Text;
 
 SH-TopArgs[()] 
 →
-%n⟪⟫
-;
+%n⟪⟫;
 
 SH-TopArgs[(#Arg; #Args)] 
 →
-%n⟪«SH-TopArg[HasFunctionalFormBinders[#Arg], #Arg]»«SH-TopArgs[#Args]»⟫
-;
+%n⟪«SH-TopArg[HasFunctionalFormBinders[#Arg], #Arg]»«SH-TopArgs[#Args]»⟫;
 
 SH-TopArg[$Boolean, Reified_FormArgument] :: Text;
 
 SH-TopArg[$True, #FormArg]
 →
-%n⟪,Closure⟫
-;
-
+%n⟪,Term⟫; // A closure term
+ 
 SH-TopArg[$False, #FormArg]
 →
-SH-TopDataArg[#FormArg]
-;
+SH-TopDataArg[#FormArg];
 
 SH-TopDataArg[Reified_FormArgument] :: Text;
 
@@ -84,41 +74,34 @@ SH-TopDataArg[Reified_FormArgument] :: Text;
 :
 SH-TopDataArg[FORM-BINDER[#Kind, #Sort, v.#FormArgument[v]]] 
 →
-%n⟪,Variable«SH-TopDataArg[#FormArgument[v]]»⟫
-;
+%n⟪,Variable«SH-TopDataArg[#FormArgument[v]]»⟫;
 
 SH-TopDataArg[FORM-ARGUMENT[#Sort]] 
 →
-%n⟪,Term⟫
-;
+%n⟪,Term⟫;
 
 SH-Form[Reified_Form] :: Text;
 
 SH-Form[SORT-SET[#Sort1, #Sort2, #Form]]
 →
-SH-Form[#Form]
-;
+SH-Form[#Form];
 
 SH-Form[SORT-ALLOWS-VARIABLES]
 →
-%n⟪⟫
-;
+%n⟪⟫;
 
 SH-Form[FORM[#name, ()]]
 →
 %n⟪#define STRUCT« Struct[#name] » struct _ConstantConstruction
 extern struct _ConstructionDescriptor « Descriptor[#name] »;
-⟫
-;
+⟫;
 
 SH-Form[FORM[#name, (#FormArgument1;#FormArguments)]]
 →
 %n⟪#define STRUCT« Struct[#name] » struct « Struct[#name] »
 struct « Struct[#name] » {struct _Construction construction; Term sub[« INTEGER[Length[#FormArguments, 1]] »]; Variable binder[« INTEGER[FormArguments-binder-count-strict[(#FormArgument1;#FormArguments), 0, 0]] »];};
 extern struct _ConstructionDescriptor « Descriptor[#name] »;
-⟫
-;
-
+⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 )] //HEADER

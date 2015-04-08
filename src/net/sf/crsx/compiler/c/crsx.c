@@ -512,12 +512,25 @@ Sink bufferUse(Sink sink, Variable variable)
     ++eventCount;
 #   endif
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
-    
     const Buffer buffer = (Buffer) sink;
-    
-    VariableUse use = makeVariableUse(sink->context, variable); // No need to link variable
+
+    VariableUse use;
+    if (variable == sink->context->functional)
+    	use = (VariableUse) LINK(sink->context, (Term) sink->context->functionalUse);
+    else
+    	use = makeVariableUse(sink->context, variable); // No need to link variable
 
     bufferInsert(buffer, (Term) use);
+
+    if (variable == sink->context->functional)
+    {
+    	// Construction with functional binders cannot be normalized, only called.
+    	if (buffer->lastTop >= 0)
+    	{
+    		BufferEntry entry = &buffer->last->entry[buffer->lastTop];
+    		asConstruction(entry->term)->nostep = 1;
+    	}
+    }
 
     // Fresh context for next child.
     buffer->pendingNamedProperties = NULL;
@@ -3523,6 +3536,8 @@ void initCRSXContext(Context context)
 
     context->fv_enabled = getenv("crsx-disable-fv") == NULL;
 
+    context->functional = makeVariable(context, "f", 1, 0);
+    context->functionalUse = makeVariableUse(context, context->functional);
 
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 0;
@@ -3594,62 +3609,119 @@ void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
 
 /////////////////////////////////////////////////////////////////////////////////
 // Closure.
+//
+//int closureStep(Sink sink, Term term)
+//{
+//    return 0; // no computation possible
+//}
+//
+//const char *closureName(Term term)
+//{
+//    return "$CLOSURE$";
+//}
+//
+//struct _ConstructionDescriptor closureConstructionDescriptor =
+//{
+//    NULL,                                       //.sort
+//    1,                                          //.sortoffset
+//    0,                                          //.arity
+//    sizeof(struct _ClosureTerm),                //.size
+//    noBinderOffsets,                            //.binderoffset
+//    (char *(*)(Term term))&closureName,         //.name
+//    &closureStep                                   //.step
+//};
+//
+//Term makeClosureTerm(Context context, Closure c)
+//{
+//    ClosureTerm term = ALLOCATE(context, sizeof(struct _ClosureTerm));
+//    term->construction.term.descriptor = &closureConstructionDescriptor;
+//    term->construction.term.nr = 1;
+//#ifdef CRSX_ENABLE_PROFILING
+//    term->construction.term.marker = 0;
+//#endif
+//    term->construction.nf = 1;
+//    term->construction.nostep = 1;
+//
+//    term->construction.namedProperties = NULL;
+//    term->construction.variableProperties = NULL;
+//
+//    term->construction.fvs = NULL;
+//    term->construction.nfvs = NULL;
+//    term->construction.vfvs = NULL;
+//
+//    term->closure = c;
+//    return (Term) term;
+//}
+//
+//int idclosure(Sink sink, CEnv env, Term var)
+//{
+//    ASSERT(sink->context, env == NO_CENV);
+//    COPY(sink, var);
+//    return 1;
+//}
+//
+//void freeCEnv(Context context, CEnv env)
+//{
+//    FREE(context, env);
+//}
 
-int closureStep(Sink sink, Term term)
+int call(Sink sink, Term term, int nargs, ...)
 {
-    return 0; // no computation possible
+	ASSERT(sink->context, LINK_COUNT(term) == 1);
+
+	// term of the forms x y.x are not allowed in core crsx.
+	ASSERT(sink->context, IS_CONSTRUCTION(term));
+
+	va_list ap;
+	va_start(ap, nargs);
+
+	const VariableUse functional = sink->context->functionalUse;
+
+	const int arity = ARITY(term);
+	int i = 0;
+	for (i = 0; i < arity; i ++)
+	{
+		Term sub = SUB(term, i);
+		if (IS_VARIABLE_USE(sub) && ((VariableUse) sub) == functional)
+		{
+			unlinkTerm(sink->context, (Term) functional);
+			SUB(term, i) = va_arg(ap, Term);
+			if (--nargs == 0)
+				break;
+		}
+	}
+
+	va_end(ap);
+	return term->descriptor->step(sink, term);
 }
 
-const char *closureName(Term term)
+
+int call1(Sink sink, Term term, Term arg0)
 {
-    return "$CLOSURE$";
+	if (IS_VARIABLE_USE(term))
+	{
+		COPY(sink, arg0);
+		UNLINK(sink->context, term);
+		return 1;
+	}
+
+	ASSERT(sink->context, LINK_COUNT(term) == 1);
+
+	const VariableUse functional = sink->context->functionalUse;
+	const int arity = ARITY(term);
+	int i = 0;
+	for (i = 0; i < arity; i ++)
+	{
+		Term sub = SUB(term, i);
+		if (IS_VARIABLE_USE(sub) && ((VariableUse) sub) == functional)
+		{
+			unlinkTerm(sink->context, (Term) functional);
+			SUB(term, i) = arg0; // Transfer ref
+			break;
+		}
+	}
+	return term->descriptor->step(sink, term);
 }
-
-struct _ConstructionDescriptor closureConstructionDescriptor =
-{
-    NULL,                                       //.sort
-    1,                                          //.sortoffset
-    0,                                          //.arity
-    sizeof(struct _ClosureTerm),                //.size
-    noBinderOffsets,                            //.binderoffset
-    (char *(*)(Term term))&closureName,         //.name
-    &closureStep                                   //.step
-};
-
-Term makeClosureTerm(Context context, Closure c)
-{
-    ClosureTerm term = ALLOCATE(context, sizeof(struct _ClosureTerm));
-    term->construction.term.descriptor = &closureConstructionDescriptor;
-    term->construction.term.nr = 1;
-#ifdef CRSX_ENABLE_PROFILING
-    term->construction.term.marker = 0;
-#endif
-    term->construction.nf = 1;
-    term->construction.nostep = 1;
-
-    term->construction.namedProperties = NULL;
-    term->construction.variableProperties = NULL;
-
-    term->construction.fvs = NULL;
-    term->construction.nfvs = NULL;
-    term->construction.vfvs = NULL;
-
-    term->closure = c;
-    return (Term) term;
-}
-
-int idclosure(Sink sink, CEnv env, Term var)
-{
-    ASSERT(sink->context, env == NO_CENV);
-    COPY(sink, var);
-    return 1;
-}
-
-void freeCEnv(Context context, CEnv env)
-{
-    FREE(context, env);
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////
 // Substitution.

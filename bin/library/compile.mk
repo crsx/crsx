@@ -55,7 +55,7 @@ prereq:
 $(OUTPUTDIR)/$(crsbasename) : $(crsdrfile)
 
 $(crsdrfile): $(CRSFILE) prereq
-	@$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules="$<" simple-terms sortify dispatchify reify="$@" 
+	@$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules="$<" simple-terms sortify dispatchify simplify reify="$@" 
 	
 $(data): $(crsdrfile) prereq
 	@export HEADERS="$(crsbasename).h" && $(CRSXC) compile sorts "$<" > "$@"

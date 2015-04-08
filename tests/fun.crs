@@ -1,5 +1,7 @@
 Fun[(
 
+$Use["org/crsx/common.crs"];
+
 ∀ a b . Map[x::a . $sort[b], $List[a]] :: $List[b] ;
 Map[x.#[x], ()]       → () ;
 Map[x.#[x], (#1; #s)] → (#[#1]; Map[x.#[x], #s]) ;

@@ -32,9 +32,10 @@ typedef struct _Term *Term;
 typedef struct _VariableUse *VariableUse;
 typedef struct _Construction *Construction;
 typedef struct _Literal *Literal;
+//typedef struct _Construction *Closure;
 typedef struct _ConstructionDescriptor *ConstructionDescriptor;
+//typedef struct _ClosureDescriptor *ClosureDescriptor;
 typedef struct _SortDescriptor *SortDescriptor;
-typedef struct _ClosureTerm *ClosureTerm;
 typedef struct _Sink *Sink;
 typedef struct _SubstitutionFrame *SubstitutionFrame;
 typedef struct _Properties *Properties;
@@ -101,6 +102,9 @@ struct _Context
     char *str_linelocation;
     char *str_columnlocation;
 
+    Variable functional;       // unique global bound variable representing all functional binders.
+    VariableUse functionalUse; // Variable use of the functional variable.
+
     unsigned int fv_enabled    : 1; // Whether the free variable optimization is on.
     unsigned int debugsteps    : 1;
     unsigned int debugtrace    : 1;
@@ -161,6 +165,9 @@ extern void initCRSXContext(Context context);
 
 
 #ifdef CRSX_ENABLE_PROFILING
+
+extern void crsxpInstrumentEnter(Context context, Variable id, char* name);
+extern void crsxpInstrumentExit(Context context, Variable id);
 
 #ifndef PROFILE_ENTER
 #define PROFILE_ENTER(CONTEXT,ID,NAME) crsxpInstrumentEnter(CONTEXT,ID,NAME)
@@ -450,7 +457,6 @@ typedef struct _BitSet* BitSetP;
 // Tests: normal form and function that cannot currently step.
 #define IS_NF(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nf)
 #define IS_NOSTEP(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nostep)
-#define IS_BLOCKED(T) (!IS_VARIABLE_USE(T) && asConstruction(T)->blocked)
 #define IS_CLOSED(T) (!IS_VARIABLE_USE(T) && !asConstruction(T)->fvs);
 
 // For variable use terms.
@@ -496,7 +502,7 @@ static inline void permitUnusedVLink(VariablePropertyLink v) {}
 // All term structures start with a pointer to a descriptor.
 struct _Term
 {
-    ConstructionDescriptor descriptor; // of the term or NULL for variables
+    ConstructionDescriptor descriptor;  // of the term or NULL for variables
     ssize_t nr;                         // number of references to this term (node)
 #ifdef CRSX_ENABLE_PROFILING
     size_t marker; // counter helper for graph traversal.
@@ -570,7 +576,7 @@ struct _Construction
 {
     struct _Term term; // extends _Term with term.descriptor!=NULL
 
-    unsigned int nf : 1; // whether subterm known to be normal form
+    unsigned int nf : 1;     // whether subterm known to be normal form
     unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
     unsigned int varfvs : 1; // whether fvs is a Variable or a Hashset
 
@@ -820,6 +826,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 #define END(sink,c) ((sink) ? ((Sink)(sink))->end(sink, &descriptor##c) : NULL)
 #define USE(sink,variable) ((sink) ? ((Sink)(sink))->use(sink, variable) : NULL)
 #define USEL(sink,variable) ((sink) ? ((Sink)(sink))->use(sink, linkVariable(((Sink)sink)->context, variable)) : NULL)
+#define USE_FUNCTIONAL(sink) (USEL((sink), (sink)->context->functional))
 #define BINDS(sink,rank,binders) ((sink) ? ((Sink)(sink))->binds(sink, rank, binders) : NULL)
 
 #define COPY(sink,term) ((sink) ? ((Sink)(sink))->copy(sink, term) : NULL)
@@ -953,73 +960,40 @@ extern Term compute(Context context, Term term);
 // Note: testing for the first binder is enough
 extern void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// CLOSURE
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+//// CLOSURE
+////
+//// A closure is a function term encapsulating binders.
+////
+//
+//// No env
+//#define NO_CENV NULL
+//
+//typedef Term* CEnv;   // Closure environment.
+//typedef int (*FuncP)(Sink, CEnv);
+//
+//struct _ClosureDescriptor
+//{
+//	struct _ConstructionDescriptor construction;
+//	FuncP function;         // the closure function
+//};
+//
+//extern int idclosure(Sink, CEnv, Term);
+////#define ID_CLOSURE { (FuncP) idclosure, NO_CENV }
+//
+//#define CLOSURE_FUN(closure)  (((ClosureDescriptor) ((Term) closure)->descriptor))->function)
+//#define CLOSURE_ENV(closure)  ((closure)->sub)
 
-// Closure environment.
-struct _CEnv
-{
-    size_t refcount;
-    void* values[];  // Size known statically.
-};
+extern int call1(Sink sink, Term term, Term arg0);
+extern int call(Sink sink, Term term, int nargs, ...);
 
-
-typedef struct _CEnv* CEnv;
-
-#define NO_CENV NULL
-
-extern void freeCEnv(Context, CEnv);
-
-static inline void unlinkCEnv(Context context, CEnv env)
-{
-    if (--env->refcount == 0)
-        freeCEnv(context, env);
-}
-
-typedef struct _Closure Closure;
-typedef int (*FuncP)(Sink, CEnv);
-
-extern int idclosure(Sink, CEnv, Term);
-#define ID_CLOSURE { (FuncP) idclosure, NO_CENV }
-
-struct _Closure
-{
-   int (*f)(Sink, CEnv);
-   CEnv env; // Optional environment.
-};
-
-static inline Closure linkClosure(Closure c)
-{
-    if (c.env)
-        c.env->refcount++;
-    return c;
-}
-
-// Term wrapping a closure
-// TODO: should not override construction (too heavy)
-struct _ClosureTerm
-{
-    struct _Construction construction; // extends _Term with term.descriptor==ClosureDescriptor
-    Closure closure;
-};
-
-// Make a term closure. The closure reference is consumed.
-extern Term makeClosureTerm(Context context, Closure c);
-
-#define SUBCLOSURE(t,i) subClosure(t, i)
-static inline Closure subClosure(Term term, int i)
-{
-    return ((ClosureTerm) SUB(term, i))->closure;
-}
-
-
-#ifndef CALL1
-# define CALL1(sink,closure,arg0) ((int (*)(Sink, CEnv, void*))closure.f)(sink, (closure).env, (void*)arg0)
-#endif
-
-#ifndef CALL2
-# define CALL2(sink,closure,arg0,arg1) ((int (*)(Sink, CEnv, void*, void*))closure.f)(sink, (closure).env, (void*)arg0, (void*)arg1)
-#endif
+//#ifndef CALL1
+//# define CALL1(sink, closure, arg0) ((int (*)(Sink, CEnv, Term)) CLOSUREFUN(closure))(sink, CLOSURE_ENV(closure), arg0)
+//#endif
+//
+//#ifndef CALL2
+//# define CALL2(sink,closure, arg0, arg1) ((int (*)(Sink, CEnv, Term, Term)) CLOSUREFUN(closure))(sink, CLOSURE_ENV(closure), arg0, arg1)
+//#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // SUBSTITUTE

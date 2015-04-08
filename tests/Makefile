@@ -21,7 +21,7 @@ log = tests.log
 all:
 	@rm -f $(log)
 	@echo `date` >> $(log)
-	@$(foreach t, $(tests), $(MAKE) TEST="$t" test;)
+	@$(foreach t, $(tests), $(MAKE) --no-print-directory TEST="$t" test;)
 	
 test:
 	@rm -f $(got)
