@@ -1074,7 +1074,7 @@ BOOL_PRIMITIVE[E_MatchRegex];
 Set-Bool-MatchRegex:
 {#env}E-set-bool[E_MatchRegex, (#Name; #Regex; #Str;), #Options, #sink, bool]
 →
-{#env} T-local-string[#Regex, #sink, s1 p1. {#env} T-local-string[#Str, #sink, s2 p2. %n⟪«bool» = MATCHREGEX(«s1», «s2»);
+{#env} T-local-string[#Regex, #sink, s1 p1. {#env} T-local-string[#Str, #sink, s2 p2. %n⟪«bool» = MATCHREGEX((char *) «s1», «s2»);
 «p1»«p2»⟫]]
 ;
 
@@ -1212,7 +1212,7 @@ FREE_BUFFER(«buf»);⟧
 {#env}E-set-int-to-local-string[#Primitive, #Args, #Options, #sink, s p .#[s, p]] 
 → 
 %n⟪{⟦ long long «num»; char *«string»;
-«{#env}E-set-int[#Primitive, #Args, #Options, #sink, num]»snprintf(«string» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%lld", «num»);
+«{#env}E-set-int[#Primitive, #Args, #Options, #sink, num]»snprintf(«string» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%lld", «num»);
 « #[string, %n⟨⟩] » }⟧
 ⟫
 ;
@@ -1462,7 +1462,7 @@ double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
 → 
 %n⟪
 {⟦
-double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
 « #[str, %n⟨⟩] »⟧
 }⟫
 ;
@@ -1649,7 +1649,7 @@ $Meta[(
 -[Fresh[z::Text]]:
 {#env}E-local-string-to-string[#Primitive, #Args, #Options, #sink, #str]
 →
-{#env}E-local-string[#Primitive, #Args, #Options, #sink, s p. %n⟪{⟦ size_t «z» = strlen(«s») + 1; memcpy(«#str» = ALLOCATE(«#sink»->context, «z»), «s», «z»); «p»⟧}
+{#env}E-local-string[#Primitive, #Args, #Options, #sink, s p. %n⟪{⟦ size_t «z» = strlen(«s») + 1; memcpy(«#str» = (char *) ALLOCATE(«#sink»->context, «z»), «s», «z»); «p»⟧}
 ⟫]
 ;
 
@@ -1693,14 +1693,14 @@ E1[(
 // Helper to collect string fragments and concatenate.
 {#env}E-concat[(#Term; #Terms), #length, #sub, #sublength, #Index, #sink, #alloc, s p.#[s, p]]
 →
-{#env} T-local-string[#Term, #sink, s p.%n⟪«#length» += («#sublength»[«INTEGER[#Index]»] = strlen(«#sub»[«INTEGER[#Index]»] = «s»));
+{#env} T-local-string[#Term, #sink, s p.%n⟪«#length» += («#sublength»[«INTEGER[#Index]»] = strlen(«#sub»[«INTEGER[#Index]»] = (char *) «s»));
 «p»«{#env}E-concat[#Terms, #length, #sub, #sublength, $[Plus,#Index,1], #sink, #alloc, s2 p2.#[s2,p2]]»⟫]
 ;
 
 -[Fresh[str::Text, p::Text]]:
 {#env}E-concat[(), #length, #sub, #sublength, #Index, #sink, #alloc, s p.#[s, p]]
 → 
-%n⟪{⟦ char *«str» = «TOKEN[#alloc]»(«#sink»->context, «#length»+1), *«p» = «str»;
+%n⟪{⟦ char *«str» = (char *) «TOKEN[#alloc]»(«#sink»->context, «#length»+1), *«p» = «str»;
 int i; for (i = 0; i < «INTEGER[#Index]»; ++i) {⟦ memcpy(«p», «#sub»[i], «#sublength»[i]); «p» += «#sublength»[i];⟧ }
 *«p» = '\0';
 ASSERT(«#sink»->context, strlen(«str») == «#length»);
@@ -1721,12 +1721,12 @@ Set-String-BeforeFirst[Fresh[substring::Text, p::Text, z::Text]]
 {#env}E-local-string[E_BeforeFirst, (#Name; #String; #Sep;), #Options, #sink, sub sp.#[sub,sp]]
 →
 {#env}T-local-string[#String, #sink, string p1. {#env}T-local-string[#Sep, #sink, sep p2. %n⟪{⟦char *«substring»;
-if (!«sep»[0]) «substring» = "";
+if (!«sep»[0]) «substring» = (char *) "";
 else {⟦char *«p» = strstr(«string», «sep»);
-if (!«p»)  {⟦size_t «z» = strlen(«string»); memcpy(«substring» = ALLOCA(«#sink»->context, «z»+1), «string», «z»+1);⟧}
-else if («p»==«string») «substring» = "";
+if (!«p»)  {⟦size_t «z» = strlen(«string»); memcpy(«substring» = (char *) ALLOCA(«#sink»->context, «z»+1), «string», «z»+1);⟧}
+else if («p»==«string») «substring» = (char *) "";
 else {⟦size_t «z» = (size_t)(«p» - «string»);
-memcpy(«substring» = ALLOCA(«#sink»->context, «z»+1), «string», «z»);
+memcpy(«substring» = (char *) ALLOCA(«#sink»->context, «z»+1), «string», «z»);
 «substring»[«z»] = '\0';}⟧}⟧
 «p1»«p2»« #[substring,%n⟨⟩] »⟧}
 ⟫]]
@@ -1742,11 +1742,11 @@ Set-String-ToFirst[Fresh[substring::Text, p::Text, z::Text]]
 {#env}E-local-string[E_ToFirst, (#Name; #String; #Sep;), #Options, #sink, sub sp.#[sub,sp]]
 →
 {#env}T-local-string[#String, #sink, string p1. {#env}T-local-string[#Sep, #sink, sep p2. %n⟪{⟦char *«substring»;
-if (!«sep»[0]) «substring» = "";
+if (!«sep»[0]) «substring» = (char *) "";
 else {⟦char *«p» = strstr(«string», «sep»);
-if (!«p») {⟦size_t «z» = strlen(«string»); memcpy(«substring» = ALLOCA(«#sink»->context, «z»+1), «string», «z»+1);⟧}
+if (!«p») {⟦size_t «z» = strlen(«string»); memcpy(«substring» = (char *) ALLOCA(«#sink»->context, «z»+1), «string», «z»+1);⟧}
 else {⟦size_t «z» = (size_t)(«p» - «string» + strlen(«sep»));
-memcpy(«substring» = ALLOCA(«#sink»->context, «z»+1), «string», «z»);
+memcpy(«substring» = (char *) ALLOCA(«#sink»->context, «z»+1), «string», «z»);
 «substring»[«z»] = '\0';}⟧}⟧
 «p1»«p2»« #[substring,%n⟨⟩] »⟧}
 ⟫]]
@@ -1763,7 +1763,7 @@ Set-String-AfterFirst[Fresh[substring::Text, p::Text]]
 →
 {#env}T-local-string[#String, #sink, string p1. {#env}T-local-string[#Sep, #sink, sep p2. %n⟪{⟦char *«substring»;
 char *«p» = strstr(«string», «sep»);
-«substring» = («p» ? «p»+strlen(«sep») : "");
+«substring» = («p» ? «p»+strlen(«sep») : (char *) "");
 «p2»« #[substring, p1] »⟧}
 ⟫]]
 ;
@@ -1776,7 +1776,7 @@ STRING_LOCAL_PRIMITIVE[E_FromFirst] ;
 Set-String-FromFirst[Fresh[p::Text]]:
 {#env}E-local-string[E_FromFirst, (#Name; #String; #Sep;), #Options, #sink, sub sp.#[sub, sp]]
 →
-{#env}T-local-string[#String, #sink, string p1. {#env}T-local-string[#Sep, #sink, sep p2. %n⟪{⟦ char *«p» = strstr(«string», «sep»); if (!«p») «p» = "";
+{#env}T-local-string[#String, #sink, string p1. {#env}T-local-string[#Sep, #sink, sep p2. %n⟪{⟦ char *«p» = strstr(«string», «sep»); if (!«p») «p» = (char *) "";
 «p2»« #[p,p1] »⟧}
 ⟫]]
 ;
@@ -1791,7 +1791,7 @@ Set-String-Substring2-Local[Fresh[substring::Text, start::Text]]:
 →
 {#env}T-local-string[#String, #sink, string p. %n⟪{⟦ char *«substring»; long long «start»;
 « {#env} T-set-int[#start, #sink, start]
-»if («start» >= (long long) strlen(«string»)) «substring» = "";
+»if («start» >= (long long) strlen(«string»)) «substring» = (char *) "";
 else «substring» = «string»+«start»;
 « #[substring, p] »⟧}
 ⟫]
@@ -1804,8 +1804,8 @@ Set-String-Substring2[Fresh[start::Text, length::Text]]
 {#env}T-local-string[#String, #sink, string p. %n⟪{⟦ long long «start»;
 « {#env} T-set-int[#start, #sink, start]
 »long long «length» = (long long) strlen(«string»);
-if («start» >= «length») «#substring» = "";
-else memcpy(«#substring» = ALLOCATE(«#sink»->context, «length»-«start»+1), «string»+«start», «length»-«start»+1);
+if («start» >= «length») «#substring» = (char *) "";
+else memcpy(«#substring» = (char *) ALLOCATE(«#sink»->context, «length»-«start»+1), «string»+«start», «length»-«start»+1);
 «p»}⟧
 ⟫];
 
@@ -1816,9 +1816,9 @@ Set-String-Substring3-Local[Fresh[substring::Text, start::Text, end::Text, lengt
 {#env}T-local-string[#String, #sink, string p. %n⟪{⟦ char *«substring»; long long «start», «end»;
 « {#env} T-set-int[#start, #sink, start] »« {#env} T-set-int[#end, #sink, end]
 »long long «length» = (long long) strlen(«string»);
-if («start» >= «length» || «start» >= «end») «substring» = "";
+if («start» >= «length» || «start» >= «end») «substring» = (char *) "";
 else if («end» < «length») {
-⟦memcpy(«substring»=ALLOCA(«#sink»->context, «end»-«start»+1), «string»+«start», «end»-«start»);
+⟦memcpy(«substring» = (char *) ALLOCA(«#sink»->context, «end»-«start»+1), «string»+«start», «end»-«start»);
 «substring»[«end»-«start»]='\0';⟧
 } else «substring» = «string»+«start»;
 « #[substring,p] » ⟧}
@@ -1887,7 +1887,7 @@ Set-String-FormatNumber[Fresh[num::Text, str::Text]]
 %n⟪
 {⟦
 double «num»; char *«str»;« {#env}T-set-num[#Number, #sink, num] »
-snprintf(«str» = ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
 « #[str,%n⟨⟩] »⟧
 }⟫;
 
@@ -2460,7 +2460,7 @@ Set-String-UpCase[Fresh[s::Text]]:
 {#env}E-local-string[E_UpCase, (#Name; #String;), #Options, sink, sub sp.#[sub,sp]]
 →
 {#env}T-local-string[#String, sink, string post . %n⟪{⟦ size_t z = (size_t) strlen(«string»);
-char *«s» = memcpy(ALLOCA(«sink»->context, z+1), «string», z+1);
+char *«s» = memcpy((char *) ALLOCA(«sink»->context, z+1), «string», z+1);
 «post»{ char *p; for (p = «s»; *p; ++p) *p = toupper(*p); }
 « #[s, %n⟨⟩] »⟧}
 ⟫]
@@ -2475,7 +2475,7 @@ Set-String-DownCase[Fresh[s::Text]]:
 {#env}E-local-string[E_DownCase, (#Name; #String;), #Options, sink, sub sp.#[sub,sp]]
 →
 {#env}T-local-string[#String, sink, string post . %n⟪{⟦ size_t z = (size_t) strlen(«string»);
-char *«s» = memcpy(ALLOCA(«sink»->context, z+1), «string», z+1);
+char *«s» = memcpy((char *) ALLOCA(«sink»->context, z+1), «string», z+1);
 «post»{ char *p; for (p = «s»; *p; ++p) *p = tolower(*p); }
 « #[s, %n⟨⟩] »⟧}
 ⟫]
@@ -2497,7 +2497,7 @@ size_t limitz;
 if (oldz==newz) {⟦ limitz = z; ⟧}
 else {⟦ limitz = z; size_t growz = (oldz < newz ? newz - oldz : 0);
 if (growz > 0) { char *p = «string»; while ((p = strstr(p, «olds»))) { limitz += growz; p += oldz; } } ⟧}
-«replaced» = ALLOCA(«sink»->context, limitz+1);
+«replaced» = (char *) ALLOCA(«sink»->context, limitz+1);
 if (oldz==newz) {⟦ memcpy(«replaced», «string», z+1);
 char *r = «replaced»; while ((r = strstr(r, «olds»))) { memcpy(r, «news», newz); r += oldz; } ⟧}
 else {⟦ char *s = «string», *ends = s+z, *r = «replaced», *next;
@@ -2508,7 +2508,7 @@ s = next+oldz;⟧}
 if (s < ends) { memcpy(r, s, ends-s); r += ends-s; }
 *r = '\0';⟧}
 ⟧}
-else {⟦ «replaced» = memcpy(ALLOCA(«sink»->context, z+1), «string», z+1); ⟧}
+else {⟦ «replaced» = memcpy((char *) ALLOCA(«sink»->context, z+1), «string», z+1); ⟧}
 «post1»«post2»«post3»« #[replaced, %n⟨⟩] »⟧
 }⟫]]]
 ;
@@ -2523,7 +2523,7 @@ Set-String-Trim[Fresh[trimmed::Text]]:
 {#env}T-local-string[#String, sink, string post . %n⟪{⟦char *p1; for (p1 = «string»; *p1 && isspace(*p1); ++p1);
 char *p2; for (p2 = «string»+strlen(«string»); p1 < p2 && isspace(*(p2-1)); --p2);
 size_t z = p2 - p1;
-char *«trimmed» = memcpy(ALLOCA(«sink»->context, z+1), p1, z); «trimmed»[z] = '\0';
+char *«trimmed» = memcpy((char *) ALLOCA(«sink»->context, z+1), p1, z); «trimmed»[z] = '\0';
 «post»« #[trimmed, %n⟨⟩] »⟧}
 ⟫]
 ;
@@ -2536,7 +2536,7 @@ Set-String-Squash[Fresh[squashed::Text]]:
 {#env}E-local-string[E_Squash, (#Name; #String;), #Options, sink, sub sp.#[sub,sp]]
 →
 {#env}T-local-string[#String, sink, string post . %n⟪{⟦
-char *«squashed»=ALLOCA(«sink»->context, strlen(«string»)+1);
+char *«squashed» = (char *) ALLOCA(«sink»->context, strlen(«string»)+1);
 char *p1=«string», *p2=«squashed»;
 int wasspace=0;
 for (; *p1; ++p1) {

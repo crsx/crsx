@@ -681,10 +681,14 @@ struct _SortDescriptor
 //
 // Variables are compared as pointers with ==.  The name is a guideline and may be ignored.
 //
-#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,1,0)
-#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariable(context,v,0,0)
-#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariable(context,v,1,1)
-#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariable(context,v,0,1)
+#define MAKE_BOUND_PROMISCUOUS_VARIABLE(context,v) makeVariableTrusty(context,v,1,0,0)
+#define MAKE_FRESH_PROMISCUOUS_VARIABLE(context,v) makeVariableTrusty(context,v,0,0,0)
+#define MAKE_BOUND_LINEAR_VARIABLE(context,v) makeVariableTrusty(context,v,1,1,0)
+#define MAKE_FRESH_LINEAR_VARIABLE(context,v) makeVariableTrusty(context,v,0,1,0)
+#define MAKE_BOUND_PROMISCUOUS_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,1,0,1)
+#define MAKE_FRESH_PROMISCUOUS_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,0,0,1)
+#define MAKE_BOUND_LINEAR_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,1,1,1)
+#define MAKE_FRESH_LINEAR_VARIABLE_TRUSTY(context,v) makeVariableTrusty(context,v,0,1,1)
 
 //
 struct _Variable
@@ -700,6 +704,11 @@ struct _Variable
  * @Brief Make new variable. Reference count is 1, use count is 0
  */
 extern Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear);
+
+/**
+ * @Brief Make new variable (possibly trusting the name). Reference count is 1, use count is 0
+ */
+extern Variable makeVariableTrusty(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int trustname);
 
 /**
  * @Brief Free variable
@@ -1480,8 +1489,8 @@ extern const char *Nil;
 #define AINDEX(index) (index / BITS_MAX_SIZE)
 #define BINDEX(index) (index % BITS_MAX_SIZE)
 
-#define MAKE_SET_LBITS(context, bitset, size) (bitset)->bits = ALLOCA(context, ASIZE(size)*sizeof(BITS)); makeSetBits(bitset, size)
-#define COPY_LBITS(context, dst, size, src) (dst)->bits = ALLOCA(context, ASIZE(size)*sizeof(BITS)); copyBits(context, dst, size, src)
+#define MAKE_SET_LBITS(context, bitset, size) (bitset)->bits = (BITS *) ALLOCA(context, ASIZE(size)*sizeof(BITS)); makeSetBits(bitset, size)
+#define COPY_LBITS(context, dst, size, src) (dst)->bits = (BITS *) ALLOCA(context, ASIZE(size)*sizeof(BITS)); copyBits(context, dst, size, src)
 #define MASK_LBITS(bitset,bitset2) maskBits(bitset,bitset2)
 #define LBIT(bitset,index) lbit(bitset, index)
 #define ANY_LBITS(bitset) anyBits(bitset)
@@ -1592,7 +1601,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
                                                                                                         \
   static TYPE##Stack make##TYPE##Stack(Context context)                                                 \
   {                                                                                                     \
-      TYPE##Stack stack = ALLOCATE(context, sizeof(struct _##TYPE##Stack));                             \
+      TYPE##Stack stack = (TYPE##Stack) ALLOCATE(context, sizeof(struct _##TYPE##Stack)); \
       stack->context = context;                                                                         \
       stack->last = NULL;                                                                               \
       stack->top = -1;                                                                                  \
@@ -1609,7 +1618,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       ++stack->top;                                                                                     \
       if (!stack->last || stack->top >= STACK_SEGMENT_SIZE)                                             \
       {                                                                                                 \
-          TYPE##StackSegment segment = ALLOCATE(stack->context, sizeof(struct _##TYPE##StackSegment));  \
+          TYPE##StackSegment segment = (TYPE##StackSegment) ALLOCATE(stack->context, sizeof(struct _##TYPE##StackSegment)); \
           segment->previous = stack->last;                                                              \
           stack->last = segment;                                                                        \
           stack->top = 0;                                                                               \
@@ -1676,7 +1685,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
                                                                                                           \
   static TYPE##Queue make##TYPE##Queue(Context context)                                                   \
   {                                                                                                       \
-      TYPE##Queue q = ALLOCATE(context, sizeof(struct _##TYPE##Queue));                                   \
+      TYPE##Queue q = (TYPE##Queue) ALLOCATE(context, sizeof(struct _##TYPE##Queue)); \
       q->context = context;                                                                               \
       q->first = q->last = NULL;                                                                          \
       q->hd = q->tl = -1;                                                                                 \
@@ -1693,7 +1702,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       ++queue->tl;                                                                                        \
       if (!queue->first || queue->tl >= QUEUE_SEGMENT_SIZE)                                               \
       {                                                                                                   \
-          TYPE##QueueSegment segment = ALLOCATE(queue->context, sizeof(struct _##TYPE##QueueSegment));    \
+          TYPE##QueueSegment segment = (TYPE##QueueSegment) ALLOCATE(queue->context, sizeof(struct _##TYPE##QueueSegment)); \
           if (!queue->first)                                                                              \
           {                                                                                               \
               queue->first = segment;                                                                     \

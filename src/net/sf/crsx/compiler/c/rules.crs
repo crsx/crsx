@@ -231,7 +231,7 @@ F-Fresh3[OK, sink, #binders, ok.#[ok]]
 F-Fresh2[sink, VARIABLE-USE[key], ok.#[ok]]	 
 → 
 %n⟪
-Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$Vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»⟫;
+Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, (char *) «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$Vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 F-Fresh3[OK_SORT, Text, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
@@ -731,7 +731,7 @@ F-set-value[META-APPLICATION[#MetaVar, #Args,#count], #sink, #term, #value]
 {#env}
 F-set-value[LITERAL[#Literal, #Sort], #sink, #term, #value] 
 → 
-%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Literal]»); permitUnusedTerm(«#value»);
+%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», (char *) «STRING[#Literal]»); permitUnusedTerm(«#value»);
 ⟫
 ;
 

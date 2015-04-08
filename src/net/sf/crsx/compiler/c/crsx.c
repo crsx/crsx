@@ -42,27 +42,36 @@ void enableProfiling(Context context)
 /////////////////////////////////////////////////////////////////////////////////
 // Variable allocation and utilities
 
-Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear)
+Variable makeVariableTrusty(Context context, char *name, unsigned int bound, unsigned int linear, unsigned int trustname)
 {
     ASSERT(context, context && name);
-    Variable v = ALLOCATE(context, sizeof(struct _Variable));
+    Variable v = (Variable) ALLOCATE(context, sizeof(struct _Variable));
     v->nr = 1;
     v->uses = 0;
 
-    // TODO: too expensive.
-    int len = strlen(name);
-    char *nameu = name;
-    while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
-    if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
+    if (trustname)
     {
-        if (nameu < name+len)
-            v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
-        else
-            v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
+      	size_t z = strlen(name)+1;
+	v->name = (char*) ALLOCATE(context, z);
+	memcpy(v->name, name, z);
     }
     else
     {
-        v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
+    	// TODO: too expensive.
+    	int len = strlen(name);
+    	char *nameu = name;
+    	while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
+    	if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
+	{
+	    if (nameu < name+len)
+	      v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
+	    else
+	      v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
+	}
+    	else
+	{
+	    v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
+	}
     }
 
     v->bound = bound;
@@ -71,6 +80,11 @@ Variable makeVariable(Context context, char *name, unsigned int bound, unsigned 
     crsxpMakeVariable(context);
 
     return v;
+}
+
+Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear)
+{
+	return makeVariableTrusty(context, name, bound, linear, 0);
 }
 
 void freeVariable(Context context, Variable variable)
@@ -95,7 +109,7 @@ void setVariableBaseName(Context context, Variable variable, char *newbase)
         {
             size_t basez = strlen(newbase);
             size_t extz = strlen(oldext);
-            variable->name = ALLOCATE(context, basez + extz + 1);
+            variable->name = (char *) ALLOCATE(context, basez + extz + 1);
             memcpy(variable->name, newbase, basez);
             memcpy(variable->name+basez, oldext, extz);
             variable->name[basez + extz] = '\0';
@@ -107,7 +121,7 @@ VariableUse makeVariableUse(Context context, Variable variable)
 {
     ASSERT(context, variable->nr > 0);
 
-    VariableUse use = ALLOCATE(context, sizeof(struct _VariableUse));
+    VariableUse use = (VariableUse) ALLOCATE(context, sizeof(struct _VariableUse));
     use->term.nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
     use->term.marker = 0;
@@ -130,7 +144,7 @@ Construction makeConstruction(Context context, ConstructionDescriptor descriptor
     if (poolIndex < CONS_POOL_MAX_SIZE_SIZE && context->consPoolSize[poolIndex] > 0)
         construction = context->consPool[poolIndex][--context->consPoolSize[poolIndex]];
     else
-        construction = ALLOCATE(context, descriptor->size);
+        construction = (Construction) ALLOCATE(context, descriptor->size);
 
     construction->term.descriptor = descriptor;
     construction->term.nr = 1;
@@ -237,7 +251,7 @@ struct _ConstructionDescriptor literalConstructionDescriptor =
 
 Term makeStringLiteral(Context context, const char *text)
 {
-    Literal literal = ALLOCATE(context, sizeof(struct _Literal));
+    Literal literal = (Literal) ALLOCATE(context, sizeof(struct _Literal));
     literal->construction.term.descriptor = &literalConstructionDescriptor;
     literal->construction.term.nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
@@ -274,7 +288,7 @@ static BufferSegment makeSegment(Context context)
         return segment;
     }
 
-    return ALLOCATE(context, sizeof(struct _BufferSegment));
+    return (BufferSegment) ALLOCATE(context, sizeof(struct _BufferSegment));
 }
 
 static inline void freeSegment(Context context, BufferSegment segment)
@@ -640,7 +654,7 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
                     // Rename binders and substitute..
 
                     Variable *oldBinders = BINDERS(term, i);
-                    Variable *subBinders = ALLOCA(context, rank*sizeof(Variable)); // does not escapes
+                    Variable *subBinders = (Variable *) ALLOCA(context, rank*sizeof(Variable)); // does not escapes
                     VariableUse subUses[rank]; // does not escape
                     struct _SubstitutionFrame _subSubstitution = {NULL, 0, rank, oldBinders, (Term *) subUses}; // does not escape
                     SubstitutionFrame subSubstitution = &_subSubstitution;
@@ -655,7 +669,7 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
                         if (baseendp)
                         {
                             const int z = baseendp - oldname;
-                            basename = ALLOCA(context, z+1); // does not escape
+                            basename = (char *) ALLOCA(context, z+1); // does not escape
                             memcpy(basename, oldname, z);
                             basename[z] = '\0';
                         }
@@ -759,7 +773,7 @@ Sink bufferPropertyVariable(Sink sink, Variable variable, Term term)
         vfvs = addVariableHS(context, vfvs, linkVariable(context, variable));
     }
 
-    VariablePropertyLink link = ALLOCATE(context, sizeof(struct _VariablePropertyLink));
+    VariablePropertyLink link = (VariablePropertyLink) ALLOCATE(context, sizeof(struct _VariablePropertyLink));
     link->link = buffer->pendingVariableProperties; // transfer ref
     link->nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
@@ -796,8 +810,7 @@ Sink makeBuffer(Context context)
     if (context->bufferPoolSize > 0)
     {
         Sink sink = (Sink) context->bufferPool[--context->bufferPoolSize];
-        Buffer buffer = (Buffer) sink;
-        ASSERT(sink->context, buffer->lastTop < 0);
+        ASSERT(sink->context, ((Buffer) sink)->lastTop < 0);
         return sink;
     }
 
@@ -909,7 +922,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (link == construction->namedProperties) // guard above ensures false on first iteration
                     break; // avoid deep duplication of lists
 
-                NamedPropertyLink newLink = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+                NamedPropertyLink newLink = (NamedPropertyLink) ALLOCATE(context, sizeof(struct _NamedPropertyLink));
 
                 newLink->link = NULL;
                 newLink->nr = 0;
@@ -994,7 +1007,7 @@ void bufferMergeProperties(Context context, Buffer buffer, Construction construc
                 if (link == construction->variableProperties)
                     break;
 
-                VariablePropertyLink newLink = ALLOCATE(context, sizeof(struct _VariablePropertyLink));
+                VariablePropertyLink newLink = (VariablePropertyLink) ALLOCATE(context, sizeof(struct _VariablePropertyLink));
 
                 newLink->variable = useVariable(context, linkVariable(context, link->variable));
 #ifdef CRSX_ENABLE_PROFILING
@@ -1059,7 +1072,7 @@ static int containsVariableLL(VariableSet set, Variable variable);
 
 VariableSet makeVariableSet(Context context)
 {
-    VariableSet set = ALLOCATE(context, sizeof(struct _VariableSet));
+    VariableSet set = (VariableSet) ALLOCATE(context, sizeof(struct _VariableSet));
     set->context = context;
     set->u.link = NULL;
 
@@ -1126,7 +1139,7 @@ int addVariableLL(VariableSet set, Variable variable) // Variable ref is transfe
         }
     }
 
-    link = ALLOCATE(set->context, sizeof(struct _VariableSetLink));
+    link = (VariableSetLink) ALLOCATE(set->context, sizeof(struct _VariableSetLink));
     link->nr = 1;
     link->variable = variable; // Transfer reference.
     link->link = set->u.link;
@@ -1173,7 +1186,7 @@ VariableSetLink copyL(Context context, VariableSetLink set)
 
     while (link)
     {
-        VariableSetLink copy = ALLOCATE(context, sizeof(struct _VariableSetLink));
+        VariableSetLink copy = (VariableSetLink) ALLOCATE(context, sizeof(struct _VariableSetLink));
         copy->link = NULL;
         copy->nr = 1;
         copy->variable = linkVariable(context, link->variable);
@@ -1202,7 +1215,7 @@ VariableSetLink addVariableL(Context context, VariableSetLink set, Variable vari
 
     if (set == NULL)
     {
-        set = ALLOCATE(context, sizeof(struct _VariableSetLink));
+        set = (VariableSetLink) ALLOCATE(context, sizeof(struct _VariableSetLink));
         set->nr = 1;
         set->variable = variable; // Transfer ref
         set->link = NULL;
@@ -1218,7 +1231,7 @@ VariableSetLink addVariableL(Context context, VariableSetLink set, Variable vari
             set = copyL(context, set);
         }
 
-        VariableSetLink link = ALLOCATE(context, sizeof(struct _VariableSetLink));
+        VariableSetLink link = (VariableSetLink) ALLOCATE(context, sizeof(struct _VariableSetLink));
         link->nr = 1;
         link->variable = variable; // Transfer Ref.
         link->link = set; // Transfer ref
@@ -1251,12 +1264,12 @@ void printfL(Context context, FILE* out, VariableSetLink set)
         return;
 
     VariableSetLink link = set;
-    char* sep = "";
+    char* sep = (char*) "";
     while (link)
     {
         FPRINTF(context, out, "%s", sep);
         fprintVariable(context, out, link->variable);
-        sep = ",";
+        sep = (char*) ",";
         link = link->link;
     }
 }
@@ -1522,7 +1535,7 @@ static void maybeRehashHS(Context context, Hashset set)
 
         set->nbits = set->nbits + 1;
         size_t capacity = capacityHS(set->nbits);
-        set->items = ALLOCATE(context, capacity * sizeof(size_t));
+        set->items = (size_t *) ALLOCATE(context, capacity * sizeof(size_t));
         memset(set->items, 0, capacity * sizeof(size_t));
         set->nitems = 0;
         assert(set->items);
@@ -1541,14 +1554,14 @@ Hashset makeHS(Context context, unsigned nbits)
 //    if (nbits < HASHSET_MAX_NBITS && context->hashsetPoolSize[nbits] > 0)
 //        return context->hashsetPool[nbits][--context->hashsetPoolSize[nbits]];
 
-    Hashset set = ALLOCATE(context, sizeof(struct _Hashset));
+    Hashset set = (Hashset) ALLOCATE(context, sizeof(struct _Hashset));
     set->nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
     set->marker = 0;
 #endif
     set->nbits = nbits;
     size_t capacity = capacityHS(nbits);
-    set->items = ALLOCATE(context, capacity * sizeof(size_t));
+    set->items = (size_t *) ALLOCATE(context, capacity * sizeof(size_t));
     memset(set->items, 0, capacity * sizeof(size_t));
     set->nitems = 0;
 
@@ -1600,13 +1613,13 @@ Hashset copyHS(Context context, Hashset set, unsigned nbits)
 //    }
 //    else
 //    {
-        newset = ALLOCATE(context, sizeof(struct _Hashset));
+        newset = (Hashset) ALLOCATE(context, sizeof(struct _Hashset));
         newset->nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
          newset->marker = 0;
 #endif
         newset->nbits = nbits;
-        newset->items = ALLOCATE(context, capacityHS(newset->nbits) * sizeof(size_t));
+        newset->items = (size_t *) ALLOCATE(context, capacityHS(newset->nbits) * sizeof(size_t));
         newset->nitems = 0;
 //        reset = 1;
     //}
@@ -1786,7 +1799,7 @@ Hashset mergeAllHS(Context context, Hashset first, Hashset second)
         second = t;
     }
 
-    int newnbits = neededNBitsHS(first->nbits, first->nitems, second->nitems);
+    unsigned newnbits = neededNBitsHS(first->nbits, first->nitems, second->nitems);
     if (first->nr > 1 || newnbits > first->nbits)
     {
         Hashset copy = copyHS(context, first, newnbits);
@@ -1879,14 +1892,14 @@ void printfHS(Context context, FILE* out, Hashset set)
 
     int i = capacityHS(set->nbits) - 1;
     int r = set->nitems;
-    char* sep = "";
+    char* sep = (char *) "";
     for (; i >= 0; i --)
     {
         size_t item = set->items[i];
         if (item != 0 && item != 1)
         {
             FPRINTF(context, out, "%s%s", sep, ((Variable) item)->name);
-            sep = ",";
+            sep = (char *) ",";
             r --;
             if (r == 0)
                 break;
@@ -1956,7 +1969,7 @@ void freeValue(Context context, const void* key, void* value)
 
 static LinkedList2 makeLL2(Context context, const void* key, void* value)
 {
-    LinkedList2 ll = ALLOCATE(context, sizeof(struct _LinkedList2));
+    LinkedList2 ll = (LinkedList2) ALLOCATE(context, sizeof(struct _LinkedList2));
     ll->key = key;
     ll->value = value;
     ll->next = NULL;
@@ -2038,12 +2051,12 @@ size_t hashPtr(const void* entry)
 
 static Hashset2 growHS2(Context context, Hashset2 set)
 {
-    int oldsize = set->nslots;
+    size_t oldsize = set->nslots;
     LinkedList2 *oldentries = set->entries;
 
     set->nbits++;
     set->nslots *= 2;
-    set->entries = CALLOCATE(context, set->nslots * sizeof(LinkedList2));
+    set->entries = (LinkedList2 *) CALLOCATE(context, set->nslots * sizeof(LinkedList2));
 
     size_t i;
     for (i = 0; i < oldsize; i++)
@@ -2091,13 +2104,13 @@ void unlinkHS2(Context context, Hashset2 set)
 
 Hashset2 makeHS2(Context context, unsigned int numbits, void (*unlink)(Context, const void*,void*), int (*equals)(const void*,const void*), size_t (*hash)(const void*))
 {
-    Hashset2 set = ALLOCATE(context, sizeof(struct _Hashset2));
+    Hashset2 set = (Hashset2) ALLOCATE(context, sizeof(struct _Hashset2));
     set->nr = 1;
     set->nbits = numbits;
     set->nslots = 1 << set->nbits;
     set->size = 0;
 
-    set->entries = CALLOCATE(context, set->nslots * sizeof(LinkedList2));
+    set->entries = (LinkedList2 *) CALLOCATE(context, set->nslots * sizeof(LinkedList2));
 
     set->unlink = unlink;
     set->equals = equals;
@@ -2227,7 +2240,7 @@ Hashset2 clearHS2(Context context, Hashset2 set)
 
 Iterator2 iteratorHS2(Context context, Hashset2 set)
 {
-    Iterator2 iter = ALLOCATE(context, sizeof(struct _Iterator2));
+    Iterator2 iter = (Iterator2) ALLOCATE(context, sizeof(struct _Iterator2));
     iter->set = set; // No ref.
     iter->index = -1;
     iter->slot = NULL;
@@ -2289,16 +2302,16 @@ toArrayHS2(Context context, Hashset2 set)
     if (set->size == 0)
         return NULL;
 
-    Pair* array = ALLOCATE(context, sizeof(struct _Pair)* set->size);
+    Pair* array = (Pair *) ALLOCATE(context, sizeof(struct _Pair)* set->size);
 
     int j = 0;
-    int i;
+    unsigned i;
     for (i = 0 ; i < set->nslots ; i++)
     {
         LinkedList2 slot = set->entries[i];
         while (slot)
         {
-            Pair pair = ALLOCATE(context, sizeof(struct _Pair));
+            Pair pair = (Pair) ALLOCATE(context, sizeof(struct _Pair));
             pair->key = slot->key;
             pair->value = slot->value;
             array[j ++] = pair;
@@ -2316,7 +2329,7 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
 
 VariableMap makeVariableMap(Context context)
 {
-    VariableMap map = ALLOCATE(context, sizeof(struct _VariableMap));
+    VariableMap map = (VariableMap) ALLOCATE(context, sizeof(struct _VariableMap));
     map->link = NULL;
     map->context = context;
     return map;
@@ -2349,7 +2362,7 @@ Variable lookupVariableLink(VariableMapLink link, Variable variable)
 void addVariableMap(VariableMap map, Variable key, Variable value)
 {
     ASSERT(map->context, key->name);
-    VariableMapLink link = ALLOCATE(map->context, sizeof(struct _VariableMapLink));
+    VariableMapLink link = (VariableMapLink) ALLOCATE(map->context, sizeof(struct _VariableMapLink));
     link->link = map->link;
     link->key = key;
     link->value = value;
@@ -2383,7 +2396,7 @@ void freeVariableMap(VariableMap map)
 
 VariableNameMapLink addNameMapLink(Context context, VariableNameMapLink parent, char *name, Variable variable)
 {
-    VariableNameMapLink link = ALLOCATE(context, sizeof(struct _VariableNameMapLink));
+    VariableNameMapLink link = (VariableNameMapLink) ALLOCATE(context, sizeof(struct _VariableNameMapLink));
     link->key = name;
     link->value = variable;
     link->link = parent;
@@ -2467,7 +2480,7 @@ VariablePropertyLink addVariableProperty(Context context, VariablePropertyLink l
         vfvs = addVariableHS(context, vfvs, linkVariable(context, variable));
     }
 
-    VariablePropertyLink nlink = ALLOCATE(context, sizeof(struct _VariablePropertyLink));
+    VariablePropertyLink nlink = (VariablePropertyLink) ALLOCATE(context, sizeof(struct _VariablePropertyLink));
     nlink->link = link; // transfer ref
     nlink->nr = 1;
 #ifdef CRSX_ENABLE_PROFILING
@@ -2560,19 +2573,19 @@ void crsxAddPools(Context context)
         context->stringPool = makeHS2(context, 16, freeValue, equalsChars, hashChars);
         context->keyPool = makeHS2(context, 16, freeValue, equalsChars, hashChars);
 
-        context->consPool = ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(Construction));
-        context->consPoolSize = ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(ssize_t));
+        context->consPool = (Construction **) ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(Construction));
+        context->consPoolSize = (ssize_t *) ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(ssize_t));
         int i;
         for (i = 0; i < CONS_POOL_MAX_SIZE_SIZE; i ++)
         {
-            context->consPool[i] = ALLOCATE(context, CONS_POOL_MAX_SIZE * sizeof(Construction));
+            context->consPool[i] = (Construction *) ALLOCATE(context, CONS_POOL_MAX_SIZE * sizeof(Construction));
             context->consPoolSize[i] = 0;
         }
         context->bufferPoolSize = 0;
 
         for (i = 0; i < HASHSET_MAX_NBITS; i ++)
         {
-            context->hashsetPool[i] = ALLOCATE(context, HASHSET_MAX_PER_NBITS * sizeof(Hashset));
+            context->hashsetPool[i] = (Hashset *) ALLOCATE(context, HASHSET_MAX_PER_NBITS * sizeof(Hashset));
             context->hashsetPoolSize[i] = 0;
         }
 
@@ -2632,7 +2645,7 @@ void crsxReleasePools(Context context)
 char *makeString(Context context, const char *src)
 {
     size_t length = strlen(src);
-    char *dest = ALLOCATE(context, length+1);
+    char *dest = (char *) ALLOCATE(context, length+1);
     memcpy(dest, src, length);
     dest[length] = '\0';
     ///PRINTF(context, "String<%s>\n", dest);
@@ -2659,7 +2672,7 @@ char *makeSubstring(Context context, const char *src, size_t first, size_t lengt
     size_t src_length = strlen(src);
     if (src_length < first+length)
         length = src_length - first;
-    char *dest = ALLOCATE(context, length+1);
+    char *dest = (char *) ALLOCATE(context, length+1);
     memcpy(dest, src+first, length);
     dest[length] = '\0';
     ///PRINTF(context, "Substring<%s>=<%s>\n", src, dest);
@@ -2680,7 +2693,7 @@ void mangle(int length, const char *original, char *mangled)
 //char* makeMangle(Context context, const char* src)
 //{
 //    size_t l = strlen(src);
-//    char* mangled = ALLOCATE(context, l + 1);
+//    char* mangled = (char *) ALLOCATE(context, l + 1);
 //    mangle(l, src, mangled);
 //    return mangled;
 //}
@@ -2903,7 +2916,7 @@ char *makeEscaped(Context context, const char *src)
 {
     size_t src_length = strlen(src);
     size_t tmp_length = src_length*10+3; // enough space even if all are quotes!
-    char *tmp = ALLOCA(context, tmp_length+1);
+    char *tmp = (char *) ALLOCA(context, tmp_length+1);
     char *s = (char*)src;
     char *t = tmp;
     *(t++) = '"';
@@ -2911,7 +2924,7 @@ char *makeEscaped(Context context, const char *src)
     *(t++) = '"';
     *(t++) = '\0';
     size_t dstz = t - tmp;
-    char *dst = ALLOCATE(context, dstz);
+    char *dst = (char *) ALLOCATE(context, dstz);
     memcpy(dst, tmp, dstz);
     ///PRINTF(context, "Escaped<%s>\n", dst);
     return dst;
@@ -2924,13 +2937,13 @@ char *makeRescaped(Context context, const char *src)
     if ((*s1 == '"' || *s1 == '\'') && *s1 == *(s2-1) && s1+2 <= s2) { ++s1; --s2; } // trim quotes
     size_t z = s2 - s1;
     if (z == 0)
-        return "";
-    char *tmp = ALLOCA(context, z+1);
+        return (char *) "";
+    char *tmp = (char *) ALLOCA(context, z+1);
     char *t = tmp;
     rescape(&s1, &t, s2, tmp+z);
     *(t++) = '\0';
     size_t dstz = t - tmp;
-    char *dst = ALLOCATE(context, dstz);
+    char *dst = (char *) ALLOCATE(context, dstz);
     memcpy(dst, tmp, dstz);
     ///PRINTF(context, "Rescaped<%s>\n", dst);
     return dst;
@@ -2939,10 +2952,10 @@ char *makeRescaped(Context context, const char *src)
 char *makeMangled(Context context, const char *src)
 {
     size_t srcz = strlen(src);
-    if (!strncmp(src, "_M_", 3)) return memcpy(ALLOCATE(context, srcz+1), src, srcz+1);
+    if (!strncmp(src, "_M_", 3)) return (char *) memcpy(ALLOCATE(context, srcz+1), src, srcz+1);
 
     size_t tmp_length = srcz*3+5; // enough space even if all are special!
-    char *tmp = ALLOCA(context, tmp_length);
+    char *tmp = (char *) ALLOCA(context, tmp_length);
     char *t = tmp;
     *(t++) = '_'; *(t++) = 'M'; *(t++) = '_';
 
@@ -2985,7 +2998,7 @@ char *makeMangled(Context context, const char *src)
     }
     (*t++) = '\0';
     size_t dstz = t - tmp;
-    char *dst = ALLOCATE(context, dstz);
+    char *dst = (char *) ALLOCATE(context, dstz);
     memcpy(dst, tmp, dstz);
     return dst;
 }
@@ -2994,22 +3007,22 @@ char * makeEncodePoint(Context context, unsigned int c)
 {
   unsigned char *res;
   if (c<0x80) {
-    res = ALLOCATE(context, 2);
+    res = (unsigned char *)ALLOCATE(context, 2);
     res[0] = (c>>0  & 0x7F) | 0x00;
     res[1] = 0;
   } else if (c<0x0800) {
-    res = ALLOCATE(context, 3);
+    res = (unsigned char *) ALLOCATE(context, 3);
     res[0] = (c>>6  & 0x1F) | 0xC0;
     res[1] = (c>>0  & 0x3F) | 0x80;
     res[2] = 0;
   } else if (c<0x010000) {
-    res = ALLOCATE(context, 4);
+    res = (unsigned char *) ALLOCATE(context, 4);
     res[0] = (c>>12 & 0x0F) | 0xE0;
     res[1] = (c>>6  & 0x3F) | 0x80;
     res[2] = (c>>0  & 0x3F) | 0x80;
     res[3] = 0;
   } else if (c<0x110000) {
-    res = ALLOCATE(context, 5);
+    res = (unsigned char *) ALLOCATE(context, 5);
     res[0] = (c>>18 & 0x07) | 0xF0;
     res[1] = (c>>12 & 0x3F) | 0x80;
     res[2] = (c>>6  & 0x3F) | 0x80;
@@ -3028,11 +3041,11 @@ char *stringnf(Context context, size_t size, const char *format, ...)
     char buffer[size]; // temporary on stack...
     va_list ap;
     va_start(ap,format);
-    int bytes = vsnprintf(buffer, size, format, ap);
+    size_t bytes = vsnprintf(buffer, size, format, ap);
     va_end(ap);
     if (bytes < size)
     {
-        char *string = ALLOCATE(context, bytes+1);
+        char *string = (char *) ALLOCATE(context, bytes+1);
         memcpy(string, buffer, bytes);
         string[bytes] = '\0';
         return string;
@@ -3040,7 +3053,7 @@ char *stringnf(Context context, size_t size, const char *format, ...)
     else
     {
         // Overflow...repair as best possible.
-        char *string = ALLOCATE(context, size+4);
+        char *string = (char *) ALLOCATE(context, size+4);
         memcpy(string, buffer, size);
         memcpy(string+size, "...", 3);
         string[size+3] = '\0';
@@ -3080,7 +3093,7 @@ long long termHashCode(Context context, Term term, VariableLink deBruijn)
         const size_t rank = RANK(term, index);
         struct _VariableLink binders[rank];
         VariableLink local = deBruijn;
-        int bx;
+        size_t bx;
         for (bx = 0; bx < rank; ++bx)
         {
             binders[bx].variable = BINDER(term, index, bx);
@@ -3591,8 +3604,8 @@ void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
 	else
 	{
 		// Need to substitute.
-		Variable* newbinders = ALLOCA(context, rank * sizeof(Variable*));
-		VariableUse* newuses = ALLOCA(context, rank * sizeof(VariableUse*));
+		Variable* newbinders = (Variable *) ALLOCA(context, rank * sizeof(Variable*));
+		VariableUse* newuses = (VariableUse *) ALLOCA(context, rank * sizeof(VariableUse*));
 		int i;
 		for (i = 0; i < rank; i ++)
 		{
@@ -3610,60 +3623,7 @@ void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
 /////////////////////////////////////////////////////////////////////////////////
 // Closure.
 //
-//int closureStep(Sink sink, Term term)
-//{
-//    return 0; // no computation possible
-//}
-//
-//const char *closureName(Term term)
-//{
-//    return "$CLOSURE$";
-//}
-//
-//struct _ConstructionDescriptor closureConstructionDescriptor =
-//{
-//    NULL,                                       //.sort
-//    1,                                          //.sortoffset
-//    0,                                          //.arity
-//    sizeof(struct _ClosureTerm),                //.size
-//    noBinderOffsets,                            //.binderoffset
-//    (char *(*)(Term term))&closureName,         //.name
-//    &closureStep                                   //.step
-//};
-//
-//Term makeClosureTerm(Context context, Closure c)
-//{
-//    ClosureTerm term = ALLOCATE(context, sizeof(struct _ClosureTerm));
-//    term->construction.term.descriptor = &closureConstructionDescriptor;
-//    term->construction.term.nr = 1;
-//#ifdef CRSX_ENABLE_PROFILING
-//    term->construction.term.marker = 0;
-//#endif
-//    term->construction.nf = 1;
-//    term->construction.nostep = 1;
-//
-//    term->construction.namedProperties = NULL;
-//    term->construction.variableProperties = NULL;
-//
-//    term->construction.fvs = NULL;
-//    term->construction.nfvs = NULL;
-//    term->construction.vfvs = NULL;
-//
-//    term->closure = c;
-//    return (Term) term;
-//}
-//
-//int idclosure(Sink sink, CEnv env, Term var)
-//{
-//    ASSERT(sink->context, env == NO_CENV);
-//    COPY(sink, var);
-//    return 1;
-//}
-//
-//void freeCEnv(Context context, CEnv env)
-//{
-//    FREE(context, env);
-//}
+
 
 int call(Sink sink, Term term, int nargs, ...)
 {
@@ -3917,7 +3877,7 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                 const int subSubstitutionCount = substitutionCount + rank; // new substitution size
                 // --- allocate substitution
                 Variable *oldBinders = BINDERS(term, i);
-                Variable *subBinders = ALLOCATE(context, rank*sizeof(Variable)); // does not escapes (ALLOCA?)
+                Variable *subBinders = (Variable *) ALLOCATE(context, rank*sizeof(Variable)); // does not escapes (ALLOCA?)
                 VariableUse subUses[rank]; // does not escape
                 struct _SubstitutionFrame _subSubstitution = {substitution, substitutionCount, rank, oldBinders, (Term *) subUses}; // does not escape
                 SubstitutionFrame subSubstitution = &_subSubstitution;
@@ -3938,14 +3898,14 @@ void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, in
                     if (baseendp)
                     {
                         const int z = baseendp - oldname;
-                        basename = ALLOCA(context, z+1); // does not escape
+                        basename = (char *) ALLOCA(context, z+1); // does not escape
                         memcpy(basename, oldname, z);
                         basename[z] = '\0';
                     }
                     int isLinear = IS_LINEAR(oldBinders[j]);
                     subBinders[j] = makeVariable(context, oldBinders[j]->name, 1, isLinear); // escapes
 
-                    subUses[j] = ALLOCATE(context, sizeof(struct _VariableUse)); // escapes
+                    subUses[j] = (VariableUse) ALLOCATE(context, sizeof(struct _VariableUse)); // escapes
                     subUses[j]->term.descriptor = NULL;
                     subUses[j]->term.nr = 1;
                     subUses[j]->variable = useVariable(context, linkVariable(context, subBinders[j]));
@@ -4161,7 +4121,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
             VariableInsert:
                 {
                     // Mapped variable not (further) renamed - include in prefix after value substitution.
-                    VariablePropertyLink newLink = ALLOCATE(sink->context, sizeof(struct _VariablePropertyLink));
+                    VariablePropertyLink newLink = (VariablePropertyLink) ALLOCATE(sink->context, sizeof(struct _VariablePropertyLink));
                     newLink->link = NULL;
                     newLink->variable = useVariable(sink->context, linkVariable(sink->context, key));
                     newLink->nr = 1;
@@ -4624,7 +4584,7 @@ void unlinkValueTerm(Context context, const void* key, void* value)
 
 static void addAllTerms(Context context, Hashset2 to_set, Hashset2 from_set)
 {
-    int i;
+    size_t i;
     for (i = 0 ; i < from_set->nslots ; i++)
     {
         LinkedList2 slot = from_set->entries[i];
@@ -4685,7 +4645,7 @@ NamedPropertyLink indexNamedProperties(Context context, const char *name, Term t
     UNLINK_NamedPropertyLink(context, nlink);
 
     // Just allocate one link for the whole hashset
-    NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+    NamedPropertyLink link = (NamedPropertyLink) ALLOCATE(context, sizeof(struct _NamedPropertyLink));
     link->link = NULL; // sets always include everything else
     link->name = NULL; // NULL means it is a hashset
     link->u.propset = set;
@@ -4708,7 +4668,7 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, 
     }
     
     // Just allocate one, link it, and return it
-    NamedPropertyLink link = ALLOCATE(context, sizeof(struct _NamedPropertyLink));
+    NamedPropertyLink link = (NamedPropertyLink) ALLOCATE(context, sizeof(struct _NamedPropertyLink));
     link->link = nlink;
     link->name = name;
     link->u.term = term; // Transfer ref
@@ -4798,7 +4758,7 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
             int j, rank = RANK(term, i);
             for (j = 0; j < rank; ++j)
             {
-                VariableSetLink newLink = ALLOCATE(freevars->context, sizeof(struct _VariableSetLink));
+                VariableSetLink newLink = (VariableSetLink) ALLOCATE(freevars->context, sizeof(struct _VariableSetLink));
                 newLink->nr = 1;
                 newLink->variable = linkVariable(freevars->context, BINDER(term, i, j));
                 newLink->link = subBoundLink;
@@ -5112,7 +5072,7 @@ ConstructionDescriptor lookupSymbolTableDescriptor(Context context, SymbolDescri
 FILE* fopen_in(Context context, char *name)
 {
     int l = strlen(name);
-    char *mangled = ALLOCATE(context, l+1);
+    char *mangled = (char *) ALLOCATE(context, l+1);
     mangle(l, name, mangled);
     return fopen(mangled, "r");
 }
@@ -5120,7 +5080,7 @@ FILE* fopen_in(Context context, char *name)
 FILE* fopen_out(Context context, char *name)
 {
     int l = strlen(name);
-    char *mangled = ALLOCATE(context, l+1);
+    char *mangled = (char *) ALLOCATE(context, l+1);
     mangle(l, name, mangled);
     return fopen(mangled, "w");
 }
@@ -5224,7 +5184,7 @@ void pwt(Context context, Term term)
     fprintCookies(context);
 }
 
-char *SPACES = "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ";
+char *SPACES = (char *) "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ";
 
 void fprintTermWithIndent(Context context, FILE* out, Term term)
 {
@@ -5306,7 +5266,7 @@ int fprintLiteral(Context context, FILE* out, const char* literal)
 {
     size_t literal_length = strlen(literal);
     size_t tmp_length = literal_length*10+3; // enough space even if all are quotes!
-    char *tmp = ALLOCA(context, tmp_length+1);
+    char *tmp = (char *) ALLOCA(context, tmp_length+1);
     char *s = (char*)literal;
     char *t = tmp;
     *(t++) = '"';
@@ -5592,7 +5552,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                     if (*text)
                     {
                         *posp += FPRINTF(context, out, "%s", text);
-                        char *nl = strrchr(text, '\n');
+                        const char *nl = strrchr(text, '\n');
                         if (nl)
                             *posp = (int) ((text + strlen(text) - 1) - nl);
                     }
@@ -5656,7 +5616,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
             if (construction->namedProperties || construction->variableProperties)
             {
                 *posp += FPRINTF(context, out, "{");
-                char *sep = "";
+                char *sep = (char *) "";
                 sep = fprintNamedProperties(context, out, construction->namedProperties, sep, depth==INT32_MAX?depth:depth-10, encountered, used, indent, posp, debug, includeprops);
                 sep = fprintVariableProperties(context, out, construction->variableProperties, sep, depth==INT32_MAX?depth:depth-10, encountered, used, indent, posp, debug, includeprops);
                 if (indent && depth > 1) { FPRINTF(context, out, "\n%.*s", indent, SPACES); *posp = indent; }
@@ -5681,7 +5641,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                     name = nm;
                 else
                 {
-                   char* cons = ALLOCATE(context, 500);
+                   char* cons = (char *) ALLOCATE(context, 500);
                    name = cons;
 
                    int sz = strlen(nm);
@@ -5793,7 +5753,7 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
     }
     *posp += FPRINTF(context, out, " : ");
     fprintTermTop(context, out, term, depth==INT32_MAX?depth:depth-2, encountered, used, (indent ? indent+4 : 0), posp, depth==INT32_MAX?depth:1, debug);
-    sep = ";\n";
+    sep = (char *) ";\n";
     return sep;
 }
 
@@ -5801,7 +5761,7 @@ static char *fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 se
 {
 	if (set)
 	{
-		int i;
+		size_t i;
 		for (i = 0 ; i < set->nslots ; i++)
 		{
 			LinkedList2 slot = set->entries[i];
@@ -5823,7 +5783,7 @@ void printPropsHS2(Context context, Hashset2 set)
     int pos = 0;
 
     fprintPropsHS2(context, STDOUT, 1 /* names, not variables */,
-                   set, ";\n", -1, encountered, used, 1, &pos, 0, 0);
+                   set, (char *) ";\n", -1, encountered, used, 1, &pos, 0, 0);
 }
 
 
@@ -5895,7 +5855,7 @@ void printCTerm(Context context, Term term)
     VariableSet set = makeVariableSet(context);
     PRINTF(context, "void sendCTerm(Sink sink)\n");
     PRINTF(context, "{\n");
-    printCTerm2(context, term, set, "sink", 1);
+    printCTerm2(context, term, set, (char *) "sink", 1);
     PRINTF(context, "}\n");
     freeVariableSet(set);
 }

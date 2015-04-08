@@ -114,7 +114,7 @@ ST-Send-Literal
 }  
 ST-send[LITERAL[#literal, #sort], #sink] 
 →
-%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»¶LITERAL(«#sink», «STRING[#literal]»);«ST-send-tail[#tail]»⟫
+%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»¶LITERAL(«#sink», (char *)«STRING[#literal]»);«ST-send-tail[#tail]»⟫
 ;
 
 ST-Send-Variable
@@ -220,7 +220,7 @@ ST-Send-Property-Literal-Key[Fresh[value::Text]]
 %n⟪¶{⟦
 Term «value»;« {#env} ST-set[#Value, #sink, value] »
 «value» = NORMALIZEP(«#sink»->context, «value»);
-ADD_PROPERTY_NAMED(«#sink», « STRING[#Literal] », «value»);⟧
+ADD_PROPERTY_NAMED(«#sink», (char *) « STRING[#Literal] », «value»);⟧
 }« {#env} ST-send-properties-term[#Term, #sink] »⟫
 ;
 
@@ -307,7 +307,7 @@ ST-set-property-Literal-Key[Fresh[value::Text]]
 %n⟪
 Term «value»;¶{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
 «value» = NORMALIZEP(«#sink»->context, «value»);
-«#namedP» = addNamedProperty(«#sink»->context, «#namedP», « STRING[#literal] », «value»);« 
+«#namedP» = addNamedProperty(«#sink»->context, «#namedP», (char *) « STRING[#literal] », «value»);« 
 {#env}ST-set-properties-term[#term,  (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
 ST-set-property-other[Fresh[key::Text, value::Text]]
@@ -422,14 +422,14 @@ ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (re
 {#env; noreuse: BOUNDREUSE}
 ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (noreuse; #vars), #binders, #sink, $False]
 →
-%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
+%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context, (char*) "«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
 
 -[Free[noreuse::Text], Fresh[new::Text]]
 :
 {#env; noreuse: BOUND}
 ST-send-binder2[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (noreuse; #vars), #binders, #sink, $False] 
 →
-%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
+%n⟪¶Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context, (char*) "«new»");« {#env; new: BOUND}ST-send-binder2[#binder[new], #vars, Append[#binders,(new;)], #sink, $False] »⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-closure-binder[Reified_Binder, Text] :: Text;
@@ -761,14 +761,14 @@ ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]],
 {#env; reused: BOUNDREUSE}
 ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (reused; #binders), (#decl; #decls), #sink, $False] 
 → 
-%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«#decl»");« {#env; #decl: BOUND}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
+%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context, (char*) "«#decl»");« {#env; #decl: BOUND}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
 
 -[Free[new::Text]]
 :
 {#env; new: BOUND}
 ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (new; #binders), (#decl; #decls), #sink, $False] 
 →
-%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context,"«#decl»");« {#env}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
+%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context, (char*) "«#decl»");« {#env}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
 
 //---------
 // Analyze binders and return a list of variables corresponding to the binder.
@@ -994,7 +994,7 @@ ST-init-env2[Text, Text, $Numeric, $List[Text], Text] :: Text;
 ST-init-env2[#env, #suffix, #count, (), #sink]
 →
 %n⟪
-CEnv «#env» = ALLOCATE(«#sink»->context, (1 + «INTEGER[#count]») * sizeof(void*));
+CEnv «#env» = (CEnv) ALLOCATE(«#sink»->context, (1 + «INTEGER[#count]») * sizeof(void*));
 «#env»->refcount = 1;«#suffix»⟫;
 
 ST-init-env2[#env, #suffix, #count, (#captured1; #captured), #sink]
@@ -1071,7 +1071,7 @@ ST-set-capture-variable[VARIABLE_ENTRY, Reified_Variable, $List[Text], Text, ok�
 :
 {#env}ST-set-to[LITERAL[#literal, #sort], #sink, var.#[var]]
 →
-%n⟪¶Term «literal» = makeStringLiteral(«#sink»->context, «STRING[#literal]»);« {#env}#[literal] »⟫
+%n⟪¶Term «literal» = makeStringLiteral(«#sink»->context, (char *) «STRING[#literal]»);« {#env}#[literal] »⟫
 ;
 
 // Evaluators are handled separately...
@@ -1133,7 +1133,7 @@ FREE_BUFFER(«buf»);⟧
 // Literals can be created directly.
 {#env}ST-set[LITERAL[#Literal, #Sort], #sink, #variable]
 →
-%n⟪¶«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);⟫;
+%n⟪¶«#variable» = makeStringLiteral(«#sink»->context, (char *) «STRING[#Literal]»);⟫;
 
 // Evaluators are handled separately...
 {#env}ST-set[EVALUATOR[#primitive, #args, #options], #sink, #variable]
@@ -1193,7 +1193,7 @@ FREE_BUFFER(«buf»);⟧
 // Literals can be created directly.
 {#env}ST-set-ref[LITERAL[#Literal, #Sort], #sink, #variable]
 →
-%n⟪¶«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);⟫;
+%n⟪¶«#variable» = makeStringLiteral(«#sink»->context, (char *) «STRING[#Literal]»);⟫;
 
 // Most term cases require buffering (like ST-set).
 {#env}ST-set-ref[PROPERTY-REF[#Ref, #Use, #Term],        #sink, #variable] → {#env}ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],        #sink, #variable] ;

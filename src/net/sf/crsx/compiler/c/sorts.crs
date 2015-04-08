@@ -63,9 +63,9 @@ S-Data[SORT[#name, #args], #Forms]
 %n⟪
 /* SORT « TOKEN[#name] » CONSTANTS. */
 « MapText[f.S-Data-Form[#name, f], #Forms] »ConstructionDescriptor « SortCons[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨&‹ DDescriptor[k, c] ›, ⟩, Forms-Constructors[#Forms]] » NULL};
-char *« SortNames[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨‹ DSTRING[k, c] ›, ⟩, Forms-Constructors[#Forms]] » NULL};
-char *« SortInternals[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨"‹ DMANGLE[k, c] ›", ⟩, Forms-Constructors[#Forms]] » NULL};
-struct _SortDescriptor « Sort[#name] » = {« STRING[#name] », « SortCons[#name] », « SortNames[#name] », « SortInternals[#name] », NULL};
+char *« SortNames[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨(char *) ‹ DSTRING[k, c] ›, ⟩, Forms-Constructors[#Forms]] » NULL};
+char *« SortInternals[#name] »[] = {NULL, NULL, « DelayMapText[k c.%n⟨(char *) "‹ DMANGLE[k, c] ›", ⟩, Forms-Constructors[#Forms]] » NULL};
+struct _SortDescriptor « Sort[#name] » = {(char *) « STRING[#name] », « SortCons[#name] », « SortNames[#name] », « SortInternals[#name] », NULL};
 ⟫
 ;
 
@@ -96,7 +96,7 @@ S-Data-Form[#sortname, SORT-ALLOWS-VARIABLES]
 :
 S-Data-Form[#sortname, FORM[#name, ()]]
 →
-%n⟪char *« Name[#name] » = « STRING[#name] »;
+%n⟪char *« Name[#name] » = (char *) « STRING[#name] »;
 char *« NameFun[#name] »(Term term) { return « Name[#name] »; }
 struct _ConstructionDescriptor « Descriptor[#name] » = {&« Sort[#sortname] », « EnumTag[#name] », 0, sizeof(STRUCT« Struct[#name] »), noBinderOffsets, &« NameFun[#name] », &dataStep};
 ⟫
@@ -107,7 +107,7 @@ struct _ConstructionDescriptor « Descriptor[#name] » = {&« Sort[#sortname] »
 S-Data-Form[#sortname, FORM[#name, (#FormArgument1;#FormArguments)]]
 →
 %n⟪int « BinderOffsets[#name] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets[(#FormArgument1;#FormArguments), 0]] »};
-char *« Name[#name] » = « STRING[#name] »;
+char *« Name[#name] » = (char *) « STRING[#name] »;
 char *« NameFun[#name] »(Term term) { return « Name[#name] »; }
 struct _ConstructionDescriptor « Descriptor[#name] » = {&« Sort[#sortname] », « EnumTag[#name] », « INTEGER[Length[#FormArguments,1]] », sizeof(STRUCT« Struct[#name] »), « BinderOffsets[#name] », &« NameFun[#name] », &dataStep};
 ⟫

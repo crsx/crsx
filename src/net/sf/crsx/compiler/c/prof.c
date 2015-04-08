@@ -61,7 +61,7 @@ long pMergeCount;
 long pCallCount; // Count total number of simple meta substitutions
 long pFVTotalCount; // Count total number of free variable sets
 long pFVCount; // Current number of free variable sets
-long pFVMaxSize; // Maximum free variable sets size
+size_t pFVMaxSize; // Maximum free variable sets size
 long pFVUsedCount; // Count total number of free variable set actually used
 long pFVRehashCount; // Count total number of time FV set has been rehashed
 long pVarCount; // Current number of live variables
@@ -133,7 +133,7 @@ void crsxpInit(Context context)
         pFVCount = 0l;
         pFVUsedCount = 0l;
         pFVRehashCount = 0l;
-        pFVMaxSize = 0l;
+        pFVMaxSize = 0;
         pVarCount = 0l;
         pPeakVarCount = 0l;
         pTotalConsCount = 0l;
@@ -452,7 +452,7 @@ void crsxpInstrumentEnter(Context context, Variable id, char* name)
             fprintf(out, "%ld,%s,%ld,%ld\n", pIdCounter, name, nano,
                     pStepCount);
 
-            long* p = ALLOCATE(context, sizeof(long));
+            long* p = (long *) ALLOCATE(context, sizeof(long));
             (*p) = pIdCounter;
             linkVariable(context, id);
             pVariableIds = addValueHS2(context, pVariableIds, (const void*) id,
@@ -475,7 +475,7 @@ void crsxpInstrumentExit(Context context, Variable id)
             clock_gettime(CLOCK_MONOTONIC_COARSE, &time);
             long nano = (time.tv_sec * 1000000000 + time.tv_nsec) - pBegin;
 
-            long* p = getValueHS2(pVariableIds, (const void*) id);
+            long* p = (long *) getValueHS2(pVariableIds, (const void*) id);
             long v = p ? *p : -1;
 
             fprintf(out, "%ld, ,%ld,%ld\n", v, nano, pStepCount);
@@ -503,6 +503,16 @@ struct _ProfReport {
     ProfReport nextSibling;
 };
 SETUP_STACK_TYPE(ProfReport)
+
+/* The macro just above - SETUP_STACK_TYPE(ProfReport) - defines a number of
+   functions including emptyProfReportStack.  This particular function is only
+   normally used inside an assert() and thus not used in a non-debug build.  To
+   avoid a c-compiler warning in a non-debug build, I've added this use, which
+   is of course in a call that is unused. */
+static void unusedCall(ProfReport report)
+{
+    emptyProfReportStack(report);
+}
 
 static void printChildReport(Context context, ProfReport report, int maxLength,
         int indent, long totalTime)
@@ -546,7 +556,7 @@ static void printReport(Context context, ProfReport report, int maxLength,
 static inline ProfCSVEntry makeCSVEntry(long id, char* name, long time,
         long step)
 {
-    ProfCSVEntry entry = malloc(sizeof(struct _ProfCSVEntry));
+    ProfCSVEntry entry = (ProfCSVEntry) malloc(sizeof(struct _ProfCSVEntry));
     entry->id = id;
     entry->name = strdup(name);
     entry->time = time;
@@ -556,7 +566,7 @@ static inline ProfCSVEntry makeCSVEntry(long id, char* name, long time,
 
 static inline ProfReport makeReport(char* name)
 {
-    ProfReport report = malloc(sizeof(struct _ProfReport));
+    ProfReport report = (ProfReport) malloc(sizeof(struct _ProfReport));
     report->name = strdup(name);
     report->count = 0;
     report->accutime = 0;
@@ -599,14 +609,14 @@ void crsxpMergeBacktrace(Context context, FILE* file)
     long time;
     long step;
     char name[512];
-    int maxLength = 0;
+    size_t maxLength = 0;
     int maxNesting = 0;
     int nesting = 0;
     long start = -1;
 
     ProfCSVEntryStack entries = makeProfCSVEntryStack(context);
     ProfReportStack report = makeProfReportStack(context);
-    ProfReport root = makeReport("Root");
+    ProfReport root = makeReport((char *) "Root");
     pushProfReport(report, root);
 
     while (fscanf(file, "%li,%512[^,],%li,%li\n", &id, name, &time, &step)
@@ -854,7 +864,7 @@ void printProfiling(Context context)
         PRINTF(context, "\n%-50s : %ld (%2.2f%%)",
                 "Free variable set usage count", pFVUsedCount,
                 (pFVUsedCount / (double ) pFVTotalCount) * 100.0);
-        PRINTF(context, "\n%-50s : %ld", "Free variable set maximum size",
+        PRINTF(context, "\n%-50s : %zu", "Free variable set maximum size",
                 pFVMaxSize);
         PRINTF(context, "\n%-50s : %ldms (%2.2f%%)",
                 "Time spent in step functions", nano2ms(pAccuStepTime),
