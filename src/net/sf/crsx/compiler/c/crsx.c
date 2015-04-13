@@ -538,7 +538,8 @@ Sink bufferUse(Sink sink, Variable variable)
 
     if (variable == sink->context->functional)
     {
-    	// Construction with functional binders cannot be normalized, only called.
+    	// A construction with functional binders cannot be normalized. Mark as nostep
+    	// TODO: should really be on the construction descriptor.
     	if (buffer->lastTop >= 0)
     	{
     		BufferEntry entry = &buffer->last->entry[buffer->lastTop];
@@ -4392,7 +4393,14 @@ static
 Hashset freeVars(Context context, Term term, Hashset set)
 {
     if (IS_VARIABLE_USE(term))
+    {
+    	// No need to keep track of functional variables as they
+        // are substituted in a special way.
+    	if ((VariableUse) term == context->functionalUse)
+    		return NULL;
+
         return addVariableHS(context, set, linkVariable(context, VARIABLE(term)));
+    }
 
     return mergeAllHS(context, set, LINK_Hashset(context, asConstruction(term)->fvs));
 }

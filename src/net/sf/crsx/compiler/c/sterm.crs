@@ -150,7 +150,7 @@ ST-send-variable[$Boolean, Reified_Variable, Text] :: Text;
 {#env; "$tail": #tail} 
 ST-send-variable[$True, #variable, #sink] 
 →
-%n⟪¶USE_FUNCTIONAL(«#sink»);«ST-send-tail[#tail]»⟫;
+%n⟪¶USEF(«#sink»);«ST-send-tail[#tail]»⟫;
 
 {#env; "$tail": #tail} 
 ST-send-variable[$False, #variable, #sink] 

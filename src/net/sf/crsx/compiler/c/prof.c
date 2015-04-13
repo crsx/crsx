@@ -509,7 +509,7 @@ SETUP_STACK_TYPE(ProfReport)
    normally used inside an assert() and thus not used in a non-debug build.  To
    avoid a c-compiler warning in a non-debug build, I've added this use, which
    is of course in a call that is unused. */
-static void unusedCall(ProfReport report)
+static void unusedCall(ProfReportStack report)
 {
     emptyProfReportStack(report);
 }

@@ -835,7 +835,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 #define END(sink,c) ((sink) ? ((Sink)(sink))->end(sink, &descriptor##c) : NULL)
 #define USE(sink,variable) ((sink) ? ((Sink)(sink))->use(sink, variable) : NULL)
 #define USEL(sink,variable) ((sink) ? ((Sink)(sink))->use(sink, linkVariable(((Sink)sink)->context, variable)) : NULL)
-#define USE_FUNCTIONAL(sink) (USEL((sink), (sink)->context->functional))
+#define USEF(sink) (USEL((sink), (sink)->context->functional))
 #define BINDS(sink,rank,binders) ((sink) ? ((Sink)(sink))->binds(sink, rank, binders) : NULL)
 
 #define COPY(sink,term) ((sink) ? ((Sink)(sink))->copy(sink, term) : NULL)
