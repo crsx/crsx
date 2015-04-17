@@ -3550,13 +3550,13 @@ void initCRSXContext(Context context)
 
     context->fv_enabled = getenv("crsx-disable-fv") == NULL;
 
-    context->functional = makeVariable(context, "f", 1, 0);
-    context->functionalUse = makeVariableUse(context, context->functional);
-
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 0;
     context->internal = 0;
 #endif
+
+    context->functional = makeVariable(context, "f", 1, 0);
+    context->functionalUse = makeVariableUse(context, context->functional);
 }
 
 Term compute(Context context, Term term)
