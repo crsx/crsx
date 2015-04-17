@@ -113,7 +113,7 @@ T-send[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], sink]
 →
 %n⟪{⟦ Term «value»;
 « {#env} T-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
-ADD_PROPERTY_NAMED(«sink», « STRING[#Literal] », «value»); ⟧}
+ADD_PROPERTY_NAMED(«sink», (char *) « STRING[#Literal] », «value»); ⟧}
 « {#env} T-send[#Term, sink] »⟫
 ;
 
@@ -144,7 +144,7 @@ Send-Literal[Free[sink::Text]]
 {#env}
 T-send[LITERAL[#Literal, #Sort], sink]
 →
-%n⟪LITERAL(«sink», «STRING[#Literal]»);
+%n⟪LITERAL(«sink», (char *) «STRING[#Literal]»);
 ⟫
 ;
 
@@ -370,7 +370,7 @@ T-send-Binder6[Reified_Promiscuity, Reified_Kind, Reified_Depth, binder : Reifie
 {#env; "$Binders":LIST_VARIABLE[#binders]}
 T-send-Binder6[#promisc, #kind, #depth, b.#Binder[b], sink, #index, #bs, #sep, #state]
 →
-%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«sink»->context,"«new»");
+%n⟪Variable «new» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«sink»->context, (char*) "«new»");
 « {#env; new : BOUND; "$Binders":LIST_VARIABLE[(new;#binders)]}T-send-Binder1[#Binder[new], sink, $[Plus,#index,1], %n⟨‹#bs›‹#sep›‹new›⟩, %n⟨,⟩, #state] »⟫
 ;
 
@@ -518,7 +518,7 @@ T-set-ref[#Term, #sink, #variable]
 {#env}
 T-set-ref[LITERAL[#Literal, #Sort], #sink, #variable]
 →
-%n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
+%n⟪«#variable» = makeStringLiteral(«#sink»->context, (char *) «STRING[#Literal]»);
 ⟫
 ;
 
@@ -575,7 +575,7 @@ T-set[LITERAL[#Literal, #Sort], #sink, #variable]
 →
 $[IfDef, "STRICT",
     {#env}ST-set[LITERAL[#Literal, #Sort], #sink, #variable],
-    %n⟪«#variable» = makeStringLiteral(«#sink»->context, «STRING[#Literal]»);
+    %n⟪«#variable» = makeStringLiteral(«#sink»->context, (char *) «STRING[#Literal]»);
 ⟫]
 ;
 

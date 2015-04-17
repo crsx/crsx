@@ -29,16 +29,10 @@ import net.sf.crsx.util.SimpleVariableSet;
 import net.sf.crsx.util.Util;
 
 /**
- * Simplify contractum.
+ * Performs closure conversion
  * 
  * <p>
- * A simplify contraction as the following characteristics:
- * <ul>
- * <li>Function: Deep binders are transformed into shallow binders  (see below)
- * <li>Substitution: Bound meta substitution are transformed into bound construction and unbound substitution (see below)
- * </ul>
- * 
- * <p>
+ * In CRSX, closure conversion is equivalent to transforming deep binder occurrences into shallow occurrences.
  * Here an illustrative example of a deep binder occurrence:
  * 
  * <pre>... → {#E1}C1[b.{#E2}C2[C3[b]]]</pre>
@@ -50,18 +44,22 @@ import net.sf.crsx.util.Util;
  * C1$C[#b, {#E2}#Prop] → {#E2}C2[C3[#b]];
  * </pre>
  * 
- * Where b occurs at the top-level.
+ * Where b occurs at the top-level, eliminating the need for meta-substitution. In addition, top-level binders don't have to be represented in the
+ * final generated code.
  * 
  * <p>
- * A bound meta substitution is a contraction on the form: 
+ * Bound meta substitution shoud be treated with special care. A bound meta substitution is a contraction on the form: 
  * 
  * <pre>  b<sub>1</sub>....b<sub>n</sub>....{#E}#[a<sub>1</sub> ... a<sub>n</sub>]</pre>
  * 
- * where the arguments are not all trivial binder references to <code>b<sub>1..n</sub></code>.
+ * where the arguments are not all trivial binder references to <code>b<sub>1..n</sub></code> (a deep occurrence occurs).
  * <p>
  * It is rewritten to a delayed unbound meta-substitution as follows:
  * 
  * <pre>  b<sub>1</sub>ᵇ....b<sub>n</sub>ᵇ.{#E}Delay<i>I</i>[a<sub>1</sub> ... a<sub>n</sub>, ba<sub>1</sub> ... ba<sub>n</sub>.#[ba<sub>1</sub> ... ba<sub>n</sub>]]</pre>
+ * 
+ * <p>
+ * The above closure conversion can then be applied.
  * 
  * <p>
  * Meta notes:
@@ -107,7 +105,7 @@ public class Simplifier
 
 			state.changed = false;
 			state.rule = rule;
-			GenericTerm newContractum = eliminateBoundMeta(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY);
+			GenericTerm newContractum = eliminateBoundMeta(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY, false);
 
 			if (state.changed)
 			{
@@ -168,10 +166,11 @@ public class Simplifier
 	 * @param state
 	 * @param term
 	 * @param bound
+	 * @param functional Whether the term is directly bound by at least one functional binders
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericTerm term, ExtensibleSet<Variable> bound) throws CRSException
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericTerm term, ExtensibleSet<Variable> bound, boolean functional) throws CRSException
 	{
 		if (term instanceof PropertiesConstraintsWrapper)
 		{
@@ -180,7 +179,7 @@ public class Simplifier
 
 			// TODO: simplify properties
 
-			props.term = eliminateBoundMeta(state, props.term, bound);
+			props.term = eliminateBoundMeta(state, props.term, bound, functional);
 			return props;
 		}
 		else
@@ -188,9 +187,9 @@ public class Simplifier
 			switch (term.kind())
 			{
 				case CONSTRUCTION :
-					return eliminateBoundMeta(state, (GenericConstruction) term, bound);
+					return eliminateBoundMeta(state, (GenericConstruction) term, bound, functional);
 				case META_APPLICATION :
-					return eliminateBoundMeta(state, (GenericMetaApplication) term, bound);
+					return eliminateBoundMeta(state, (GenericMetaApplication) term, bound, functional);
 				case VARIABLE_USE :
 				default :
 					return term;
@@ -204,15 +203,24 @@ public class Simplifier
 	 * @param state
 	 * @param term
 	 * @param bound
+	 * @param functional  
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound) throws CRSException
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound, boolean functional) throws CRSException
 	{
 		for (int i = term.arity() - 1; i >= 0; i--)
 		{
-			ExtensibleSet<Variable> subbound = bound.extend(term.binders(i));
-			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound);
+			Variable[] binders = term.binders(i);
+			
+			boolean hasFunctionalBinders = false;
+			for (int j = 0; j < binders.length; j++)
+				hasFunctionalBinders |= binders[j].blocking();
+			
+			boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
+
+			ExtensibleSet<Variable> subbound = bound.extend(binders);
+			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound, hasFunctionalBinders & hasDeepBinders);
 			term.replaceSub(i, term.binders(i), newsub);
 		}
 		return term;
@@ -224,20 +232,22 @@ public class Simplifier
 	 * @param state
 	 * @param term
 	 * @param bound
+	 * @param functional  
 	 * @return
 	 * @throws CRSException 
 	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericMetaApplication term, ExtensibleSet<Variable> bound)
+	private GenericTerm eliminateBoundMeta(Env1 state, GenericMetaApplication term, ExtensibleSet<Variable> bound, boolean functional)
 			throws CRSException
 	{
+		// Apply conversion on the meta arguments first.
 		for (int i = term.arity() - 1; i >= 0; i--)
 		{
 			ExtensibleSet<Variable> subbound = bound.extend(term.binders(i));
-			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound);
+			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound, false);
 			term.replaceSub(i, term.binders(i), newsub);
 		}
-
-		if (state.rule.metaClosure(term, bound))
+		
+		if (functional) 
 		{
 			// Replace meta by Delay 
 			Constructor delay = factory.makeConstructor("Delay" + term.arity());
@@ -336,14 +346,14 @@ public class Simplifier
 			Pair<Term, Term> sortDeclaration = getSortDeclaration(rulename, term.constructor.symbol());
 			Term[] binderSorts = getBindersSort(rulename, sortDeclaration.tail(), i);
 
-			//			boolean hasBlockingMarker = false;
-			//			for (int j = 0; j < binders.length; j++)
-			//				hasBlockingMarker |= binders[j].blocking();
+			boolean hasFunctionalBinders = false;
+			for (int j = 0; j < binders.length; j++)
+				hasFunctionalBinders |= binders[j].blocking();
 
 			final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
-			if (hasDeepBinders) // hasBlockingMarker && 
+			if (hasDeepBinders && hasFunctionalBinders)
 			{
-				// The sub is a deep binder so eliminate...only if has marker
+				// The sub has deep functional binders.. Perform conversion
 				ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
 
 				Env2 env = new Env2(state.rule, subbound, sub.arity());

@@ -10,7 +10,6 @@
 #include "crsx.h"
 #include <string.h>
 #include <stdio.h>
-extern int fileno (FILE* file);
 
 // State stack.
 
@@ -51,7 +50,7 @@ char* strdup_local (Context c, const char* s);
 
 
 
-#line 55 "<stdout>"
+#line 54 "<stdout>"
 
 #define  YY_INT_ALIGNED short int
 
@@ -60,7 +59,7 @@ char* strdup_local (Context c, const char* s);
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 35
+#define YY_FLEX_SUBMINOR_VERSION 39
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -230,11 +229,17 @@ typedef void* yyscan_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
+
 #define EOB_ACT_CONTINUE_SCAN 0
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
 
     #define YY_LESS_LINENO(n)
+    #define YY_LINENO_REWIND_TO(ptr)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -251,11 +256,6 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 	while ( 0 )
 
 #define unput(c) yyunput( c, yyg->yytext_ptr , yyscanner )
-
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -274,7 +274,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	int yy_n_chars;
+	yy_size_t yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -353,7 +353,7 @@ static void crsx_yy_init_buffer (YY_BUFFER_STATE b,FILE *file ,yyscan_t yyscanne
 
 YY_BUFFER_STATE crsx_yy_scan_buffer (char *base,yy_size_t size ,yyscan_t yyscanner );
 YY_BUFFER_STATE crsx_yy_scan_string (yyconst char *yy_str ,yyscan_t yyscanner );
-YY_BUFFER_STATE crsx_yy_scan_bytes (yyconst char *bytes,int len ,yyscan_t yyscanner );
+YY_BUFFER_STATE crsx_yy_scan_bytes (yyconst char *bytes,yy_size_t len ,yyscan_t yyscanner );
 
 void *crsx_yyalloc (yy_size_t ,yyscan_t yyscanner );
 void *crsx_yyrealloc (void *,yy_size_t ,yyscan_t yyscanner );
@@ -385,7 +385,7 @@ void crsx_yyfree (void * ,yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define crsx_yywrap(n) 1
+#define crsx_yywrap(yyscanner) 1
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -990,7 +990,7 @@ static yyconst flex_int16_t yy_chk[1616] =
 /* Variable name, and quoted form. */
 /* STATES. */
 
-#line 86 "crsx_scan.l"
+#line 85 "crsx_scan.l"
 #ifdef FLEX_DEBUG
   static char *stateNames[] = {"INITIAL", "Before", "BeforeWithBinders", "AfterSimple", "BeforeKey", "AfterProperties", "AfterConstructor", "BeforeArgument", "AfterArguments", "AfterKey", "AfterFirstVariable", "AfterBinder"};
 # define B(STATE) ((yy_flex_debug ? (b_state(state, STATE), 0) : 0), BEGIN(STATE))
@@ -1090,8 +1090,8 @@ struct yyguts_t
     size_t yy_buffer_stack_max; /**< capacity of stack. */
     YY_BUFFER_STATE * yy_buffer_stack; /**< Stack as an array. */
     char yy_hold_char;
-    int yy_n_chars;
-    int yyleng_r;
+    yy_size_t yy_n_chars;
+    yy_size_t yyleng_r;
     char *yy_c_buf_p;
     int yy_init;
     int yy_start;
@@ -1138,13 +1138,17 @@ FILE *crsx_yyget_out (yyscan_t yyscanner );
 
 void crsx_yyset_out  (FILE * out_str ,yyscan_t yyscanner );
 
-int crsx_yyget_leng (yyscan_t yyscanner );
+yy_size_t crsx_yyget_leng (yyscan_t yyscanner );
 
 char *crsx_yyget_text (yyscan_t yyscanner );
 
 int crsx_yyget_lineno (yyscan_t yyscanner );
 
 void crsx_yyset_lineno (int line_number ,yyscan_t yyscanner );
+
+int crsx_yyget_column  (yyscan_t yyscanner );
+
+void crsx_yyset_column (int column_no ,yyscan_t yyscanner );
 
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
@@ -1285,16 +1289,6 @@ YY_DECL
 	register int yy_act;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
-#line 150 "crsx_scan.l"
-
-
-    // INITIALIZE.
-    StateLink state = yyextra;
-    B(Before);
-
-    /* V as top level t or property value t. */
-#line 1297 "<stdout>"
-
 	if ( !yyg->yy_init )
 		{
 		yyg->yy_init = 1;
@@ -1321,6 +1315,17 @@ YY_DECL
 		crsx_yy_load_buffer_state(yyscanner );
 		}
 
+	{
+#line 149 "crsx_scan.l"
+
+
+    // INITIALIZE.
+    StateLink state = yyextra;
+    B(Before);
+
+    /* V as top level t or property value t. */
+#line 1328 "<stdout>"
+
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
 		yy_cp = yyg->yy_c_buf_p;
@@ -1337,7 +1342,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
 			if ( yy_accept[yy_current_state] )
 				{
 				yyg->yy_last_accepting_state = yy_current_state;
@@ -1378,332 +1383,332 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 157 "crsx_scan.l"
+#line 156 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, yytext)); B(AfterSimple); }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 158 "crsx_scan.l"
+#line 157 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, unquote(topSink(state)->context, yytext+1))); B(AfterSimple); }
 	YY_BREAK
 /* V as t in a without binders or as first binder in a. */
 case 3:
 YY_RULE_SETUP
-#line 160 "crsx_scan.l"
+#line 159 "crsx_scan.l"
 { pushString(&state, yytext); B(AfterFirstVariable); }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 161 "crsx_scan.l"
+#line 160 "crsx_scan.l"
 { pushString(&state, unquote(topSink(state)->context, yytext+1)); B(AfterFirstVariable); }
 	YY_BREAK
 /* V as t in a after binders. */
 case 5:
 YY_RULE_SETUP
-#line 163 "crsx_scan.l"
+#line 162 "crsx_scan.l"
 { Variable variable = lookupName(state, yytext); popBinders(&state); USEL(topSink(state), variable); B(AfterSimple); }
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 164 "crsx_scan.l"
+#line 163 "crsx_scan.l"
 { Variable variable = lookupName(state, unquote(topSink(state)->context, yytext+1)); popBinders(&state); USEL(topSink(state), variable); B(AfterSimple); }
 	YY_BREAK
 /* V as key in p. */
 case 7:
 YY_RULE_SETUP
-#line 166 "crsx_scan.l"
+#line 165 "crsx_scan.l"
 { pushVariableProperty(&state, yytext); B(AfterKey); }
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 167 "crsx_scan.l"
+#line 166 "crsx_scan.l"
 { pushVariableProperty(&state, unquote(topSink(state)->context, yytext+1)); B(AfterKey); }
 	YY_BREAK
 /* V as second binder in a. */
 case 9:
 YY_RULE_SETUP
-#line 169 "crsx_scan.l"
+#line 168 "crsx_scan.l"
 { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); pushFollowingBinder(&state, yytext); B(AfterBinder); }
 	YY_BREAK
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 170 "crsx_scan.l"
+#line 169 "crsx_scan.l"
 { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); pushFollowingBinder(&state, unquote(topSink(state)->context, yytext+1)); B(AfterBinder); }
 	YY_BREAK
 /* V as third or subsequent binder in a. */
 case 11:
 YY_RULE_SETUP
-#line 172 "crsx_scan.l"
+#line 171 "crsx_scan.l"
 { pushFollowingBinder(&state, yytext); }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 173 "crsx_scan.l"
+#line 172 "crsx_scan.l"
 { pushFollowingBinder(&state, unquote(topSink(state)->context, yytext+1)); }
 	YY_BREAK
 /* L as top level t or property value t. */
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 176 "crsx_scan.l"
+#line 175 "crsx_scan.l"
 { LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L as t in a without binders. */
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 178 "crsx_scan.l"
+#line 177 "crsx_scan.l"
 { LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L as t in a after binders. */
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 180 "crsx_scan.l"
+#line 179 "crsx_scan.l"
 { popBinders(&state); LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L is t after a property set. */
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 182 "crsx_scan.l"
+#line 181 "crsx_scan.l"
 { LITERALU(topSink(state), unquote(topSink(state)->context, yytext)); B(AfterSimple); }
 	YY_BREAK
 /* L as key in p. */
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 184 "crsx_scan.l"
+#line 183 "crsx_scan.l"
 { pushNamedProperty(&state, unquote(topSink(state)->context, yytext)); B(AfterKey); }
 	YY_BREAK
 /* L in illegal places. */
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 186 "crsx_scan.l"
+#line 185 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected %s literal where binder expected!\n", yytext); }
 	YY_BREAK
 /* C starts or is top level t or property value t. */
 case 19:
 /* rule 19 can match eol */
 YY_RULE_SETUP
-#line 189 "crsx_scan.l"
+#line 188 "crsx_scan.l"
 { pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); }
 	YY_BREAK
 /* C starts or is t in a without binders. */
 case 20:
 /* rule 20 can match eol */
 YY_RULE_SETUP
-#line 191 "crsx_scan.l"
+#line 190 "crsx_scan.l"
 { pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); }
 	YY_BREAK
 /* C starts or is t in a after binders. */
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 193 "crsx_scan.l"
+#line 192 "crsx_scan.l"
 { VariableNameMapLink scope = popBinders(&state); pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); setNames(state, scope); }
 	YY_BREAK
 /* C starts part of t after a property set. */
 case 22:
 /* rule 22 can match eol */
 YY_RULE_SETUP
-#line 195 "crsx_scan.l"
+#line 194 "crsx_scan.l"
 { pushConstruction(&state, LOOKUP_DESCRIPTOR(topSink(state)->context, unquote(topSink(state)->context, yytext))); B(AfterConstructor); }
 	YY_BREAK
 /* C as key in p. */
 case 23:
 /* rule 23 can match eol */
 YY_RULE_SETUP
-#line 197 "crsx_scan.l"
+#line 196 "crsx_scan.l"
 { pushNamedProperty(&state, unquote(topSink(state)->context, yytext)); B(AfterKey); }
 	YY_BREAK
 /* C in illegal places. */
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 199 "crsx_scan.l"
+#line 198 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected constructor where binder expected!\n"); }
 	YY_BREAK
 /* "{" starts top level t or property value t. */
 case 25:
 YY_RULE_SETUP
-#line 202 "crsx_scan.l"
+#line 201 "crsx_scan.l"
 { B(BeforeFirstKey); }
 	YY_BREAK
 /* '{' starts t in a without binders. */
 case 26:
 YY_RULE_SETUP
-#line 204 "crsx_scan.l"
+#line 203 "crsx_scan.l"
 { B(BeforeFirstKey); }
 	YY_BREAK
 /* '{' starts t in a after binders. */
 case 27:
 YY_RULE_SETUP
-#line 206 "crsx_scan.l"
+#line 205 "crsx_scan.l"
 { VariableNameMapLink scope = popBinders(&state); B(BeforeFirstKey); setNames(state, scope); }
 	YY_BREAK
 /* "{" in illegal places. */
 case 28:
 YY_RULE_SETUP
-#line 208 "crsx_scan.l"
+#line 207 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected '{' where property key expected!\n"); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 209 "crsx_scan.l"
+#line 208 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected '{' where binder expected!\n"); }
 	YY_BREAK
 /* ":" */
 case 30:
 YY_RULE_SETUP
-#line 212 "crsx_scan.l"
+#line 211 "crsx_scan.l"
 { B(Before); }
 	YY_BREAK
 /* ":" errors */
 case 31:
 YY_RULE_SETUP
-#line 214 "crsx_scan.l"
+#line 213 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Expected ':' after property key!\n"); }
 	YY_BREAK
 /* ";" */
 case 32:
 YY_RULE_SETUP
-#line 217 "crsx_scan.l"
+#line 216 "crsx_scan.l"
 { popProperty(&state); B(BeforeKey); }
 	YY_BREAK
 /* ";" */
 case 33:
 YY_RULE_SETUP
-#line 219 "crsx_scan.l"
+#line 218 "crsx_scan.l"
 { popConstruction(&state); popProperty(&state); B(BeforeKey); }
 	YY_BREAK
 /* ";" */
 case 34:
 YY_RULE_SETUP
-#line 221 "crsx_scan.l"
+#line 220 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "';' only allowed after finished property mapping!\n"); }
 	YY_BREAK
 /* "}" */
 case 35:
 YY_RULE_SETUP
-#line 224 "crsx_scan.l"
+#line 223 "crsx_scan.l"
 { B(AfterProperties); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 225 "crsx_scan.l"
+#line 224 "crsx_scan.l"
 { popProperty(&state); B(AfterProperties); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 226 "crsx_scan.l"
+#line 225 "crsx_scan.l"
 { popConstruction(&state); popProperty(&state); B(AfterProperties); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 227 "crsx_scan.l"
+#line 226 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "'}' only allowed after finished property mapping!\n"); }
 	YY_BREAK
 /* "[" */
 case 39:
 YY_RULE_SETUP
-#line 230 "crsx_scan.l"
+#line 229 "crsx_scan.l"
 { B(BeforeArgument); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 231 "crsx_scan.l"
+#line 230 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "'[' only allowed after constructor!\n"); }
 	YY_BREAK
 /* "," */
 case 41:
 YY_RULE_SETUP
-#line 234 "crsx_scan.l"
+#line 233 "crsx_scan.l"
 { B(BeforeArgument); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 235 "crsx_scan.l"
+#line 234 "crsx_scan.l"
 { popConstruction(&state); B(BeforeArgument); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 236 "crsx_scan.l"
+#line 235 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); B(BeforeArgument); }
 	YY_BREAK
 /* "]" */
 case 44:
 YY_RULE_SETUP
-#line 239 "crsx_scan.l"
+#line 238 "crsx_scan.l"
 { B(AfterArguments); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 240 "crsx_scan.l"
+#line 239 "crsx_scan.l"
 { popConstruction(&state); B(AfterArguments); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 241 "crsx_scan.l"
+#line 240 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); B(AfterArguments); }
 	YY_BREAK
 /* "." */
 case 47:
 YY_RULE_SETUP
-#line 244 "crsx_scan.l"
+#line 243 "crsx_scan.l"
 { char *firstName = topString(state); popString(&state); pushFirstBinder(&state, firstName); B(BeforeWithBinders); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 245 "crsx_scan.l"
+#line 244 "crsx_scan.l"
 { B(BeforeWithBinders); }
 	YY_BREAK
 /* EOF */
 case YY_STATE_EOF(AfterSimple):
-#line 248 "crsx_scan.l"
+#line 247 "crsx_scan.l"
 { yyterminate(); }
 	YY_BREAK
 case YY_STATE_EOF(AfterConstructor):
 case YY_STATE_EOF(AfterArguments):
-#line 249 "crsx_scan.l"
+#line 248 "crsx_scan.l"
 { popConstruction(&state); yyterminate(); }
 	YY_BREAK
 case YY_STATE_EOF(AfterFirstVariable):
-#line 250 "crsx_scan.l"
+#line 249 "crsx_scan.l"
 { USEL(topSink(state), lookupName(state, topString(state))); popString(&state); yyterminate(); }
 	YY_BREAK
 /* Skip spaces. */
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 253 "crsx_scan.l"
+#line 252 "crsx_scan.l"
 {}
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 254 "crsx_scan.l"
+#line 253 "crsx_scan.l"
 {}
 	YY_BREAK
 /* Everything else is an error... */
 case 51:
 YY_RULE_SETUP
-#line 257 "crsx_scan.l"
+#line 256 "crsx_scan.l"
 { ERRORF(topSink(state)->context, Scan, "Unexpected symbol in term (%s)\n", yytext); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 259 "crsx_scan.l"
+#line 258 "crsx_scan.l"
 ECHO;
 	YY_BREAK
-#line 1707 "<stdout>"
+#line 1712 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(Before):
 case YY_STATE_EOF(BeforeWithBinders):
@@ -1842,6 +1847,7 @@ case YY_STATE_EOF(AfterBinder):
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
+	} /* end of user's declarations */
 } /* end of crsx_yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -1898,21 +1904,21 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 
 	else
 		{
-			int num_to_read =
+			yy_size_t num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
 
 			int yy_c_buf_p_offset =
 				(int) (yyg->yy_c_buf_p - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				int new_size = b->yy_buf_size * 2;
+				yy_size_t new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1943,7 +1949,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			yyg->yy_n_chars, (size_t) num_to_read );
+			yyg->yy_n_chars, num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = yyg->yy_n_chars;
 		}
@@ -2040,6 +2046,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 365);
 
+	(void)yyg;
 	return yy_is_jam ? 0 : yy_current_state;
 }
 
@@ -2068,7 +2075,7 @@ static int yy_get_next_buffer (yyscan_t yyscanner)
 
 		else
 			{ /* need more input */
-			int offset = yyg->yy_c_buf_p - yyg->yytext_ptr;
+			yy_size_t offset = yyg->yy_c_buf_p - yyg->yytext_ptr;
 			++yyg->yy_c_buf_p;
 
 			switch ( yy_get_next_buffer( yyscanner ) )
@@ -2232,10 +2239,6 @@ static void crsx_yy_load_buffer_state  (yyscan_t yyscanner)
 	crsx_yyfree((void *) b ,yyscanner );
 }
 
-#ifndef __cplusplus
-extern int isatty (int );
-#endif /* __cplusplus */
-    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a crsx_yyrestart() or at EOF.
@@ -2352,7 +2355,7 @@ void crsx_yypop_buffer_state (yyscan_t yyscanner)
  */
 static void crsx_yyensure_buffer_stack (yyscan_t yyscanner)
 {
-	int num_to_alloc;
+	yy_size_t num_to_alloc;
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 	if (!yyg->yy_buffer_stack) {
@@ -2450,12 +2453,12 @@ YY_BUFFER_STATE crsx_yy_scan_string (yyconst char * yystr , yyscan_t yyscanner)
  * @param yyscanner The scanner object.
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE crsx_yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len , yyscan_t yyscanner)
+YY_BUFFER_STATE crsx_yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len , yyscan_t yyscanner)
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	int i;
+	yy_size_t i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -2565,7 +2568,7 @@ FILE *crsx_yyget_out  (yyscan_t yyscanner)
 /** Get the length of the current token.
  * @param yyscanner The scanner object.
  */
-int crsx_yyget_leng  (yyscan_t yyscanner)
+yy_size_t crsx_yyget_leng  (yyscan_t yyscanner)
 {
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
     return yyleng;
@@ -2601,7 +2604,7 @@ void crsx_yyset_lineno (int  line_number , yyscan_t yyscanner)
 
         /* lineno is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "crsx_yyset_lineno called with no buffer" , yyscanner); 
+           YY_FATAL_ERROR( "crsx_yyset_lineno called with no buffer" );
     
     yylineno = line_number;
 }
@@ -2616,7 +2619,7 @@ void crsx_yyset_column (int  column_no , yyscan_t yyscanner)
 
         /* column is only valid if an input buffer exists. */
         if (! YY_CURRENT_BUFFER )
-           yy_fatal_error( "crsx_yyset_column called with no buffer" , yyscanner); 
+           YY_FATAL_ERROR( "crsx_yyset_column called with no buffer" );
     
     yycolumn = column_no;
 }
@@ -2806,17 +2809,20 @@ static int yy_flex_strlen (yyconst char * s , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 259 "crsx_scan.l"
+#line 257 "crsx_scan.l"
 
 
 
 /* State stack. */
 
+enum StateLinkTag {LINK_UNDEFINED_TAG, LINK_BASE_TAG, LINK_CONSTRUCTION_TAG, LINK_NAMED_PROPERTY_TAG, LINK_VARIABLE_PROPERTY_TAG, LINK_STRING_TAG, LINK_FIRST_BINDER_TAG, LINK_FOLLOWING_BINDER_TAG};
+
+
 struct _StateLink
 {
     StateLink parent; /* links form a stack */
     Sink sink; /* the term accumulator at this level */
-    enum {LINK_UNDEFINED_TAG, LINK_BASE_TAG, LINK_CONSTRUCTION_TAG, LINK_NAMED_PROPERTY_TAG, LINK_VARIABLE_PROPERTY_TAG, LINK_STRING_TAG, LINK_FIRST_BINDER_TAG, LINK_FOLLOWING_BINDER_TAG} tag;
+    enum StateLinkTag tag;
     union {
         ConstructionDescriptor descriptor; /* for LINK_CONSTRUCTION_TAG */
         char *string;                      /* for LINK_NAMED_PROPERTY_TAG and LINK_STRING_TAG */
@@ -2866,7 +2872,7 @@ Variable lookupName(StateLink state, char *name)
     }
     // Allocate as fresh variable.
     assert (s->tag == LINK_BASE_TAG);
-    Variable v = (strstr(name, "\302\271") ? MAKE_FRESH_LINEAR_VARIABLE(s->sink->context, name) : MAKE_FRESH_PROMISCUOUS_VARIABLE(s->sink->context, name));
+    Variable v = (strstr(name, "\302\271") ? MAKE_FRESH_LINEAR_VARIABLE_TRUSTY(s->sink->context, name) : MAKE_FRESH_PROMISCUOUS_VARIABLE_TRUSTY(s->sink->context, name));
     s->variableNames = addNameMapLink(s->sink->context, s->variableNames, strdup_local(topSink(state)->context, name), v);
     return v;
 }
@@ -3052,7 +3058,7 @@ void pushFirstBinder(StateLink *statep, char *name)
     state->parent = *statep;
     state->sink = (*statep)->sink;
     state->tag = LINK_FIRST_BINDER_TAG;
-    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE(topSink(state)->context, name));
+    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE_TRUSTY(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE_TRUSTY(topSink(state)->context, name));
     state->stored.variable = variable;
     state->variableNames = addNameMapLink(topSink(state)->context, (*statep)->variableNames, strdup_local(state->sink->context, name), variable);
     //
@@ -3070,7 +3076,7 @@ void pushFollowingBinder(StateLink *statep, char *name)
     state->parent = *statep;
     state->sink = (*statep)->sink;
     state->tag = LINK_FOLLOWING_BINDER_TAG;
-    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE(topSink(state)->context, name));
+    Variable variable = (strstr(name, "\302\271") ? MAKE_BOUND_LINEAR_VARIABLE_TRUSTY(topSink(state)->context, name) : MAKE_BOUND_PROMISCUOUS_VARIABLE_TRUSTY(topSink(state)->context, name));
     state->stored.variable = variable;
     state->variableNames = addNameMapLink(topSink(state)->context, (*statep)->variableNames, strdup_local(state->sink->context, name), variable);
     //

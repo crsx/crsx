@@ -681,20 +681,21 @@ public class GenericRule implements Copyable
 		else
 			return sortform.head();
 	}
-
-	/**
-	 * Whether the sub is a construction and has binders
-	 * 
-	 * <p>The notion of closure only make sens when the term is part of
-	 * a contraction
-	 * 
-	 * @param index of the sub
-	 * @throws CRSException 
-	 */
-	public boolean hasBinders(Term term, int index) throws CRSException
-	{
-		return term.sub(index).kind() != Kind.META_APPLICATION && term.binders(index) != null;
-	}
+//
+//	/**
+//	 * Whether the sub is a construction and has binders
+//	 * 
+//	 * <p>The notion of closure only make sense when the term is part of
+//	 * a contraction
+//	 * 
+//	 * @param index of the sub
+//	 * @throws CRSException 
+//	 */
+//	public boolean hasBinders(Term term, int index) throws CRSException
+//	{
+//		//return term.sub(index).kind() != Kind.META_APPLICATION && term.binders(index) != null;
+//		return term.binders(index) != null;
+//	}
 
 	/**
 	 * Whether the sub is a construction with deep use of binders declared on the sub. Ignore properties.
@@ -703,13 +704,14 @@ public class GenericRule implements Copyable
 	 */
 	public boolean hasDeepBinderUses(Term term, int index) throws CRSException
 	{
-		if (hasBinders(term, index))
+		//if (hasBinders(term, index))
+		if (term.binders(index) != null)
 		{
 			Term sub = term.sub(index);
 			if (sub.kind() == Kind.VARIABLE_USE || sub.arity() == 0)
 				return false;
 
-			// sub is a construction with binders and optionally with properties.
+			// sub is a construction/meta application with binders and optionally with properties.
 			Variable[] binders = term.binders(index);
 			for (int i = 0; i < sub.arity(); i++)
 			{
@@ -720,9 +722,7 @@ public class GenericRule implements Copyable
 					case VARIABLE_USE :
 						// Shallow variable use	
 						break;
-					case META_APPLICATION :
-						// This is a meta-closure
-						break;
+					case META_APPLICATION:
 					case CONSTRUCTION :
 					default :
 						// Check if the subsub contains at least one binder use.
@@ -760,7 +760,7 @@ public class GenericRule implements Copyable
 				Variable var = sub.variable();
 				
 				// If the variable is fresh, then always assume substitution is needed, even when it can be reused.
-				if (bound.contains(var))
+				if (!bound.contains(var))
 					return true;
 				
 				if (getReused(var) == null)
@@ -771,7 +771,7 @@ public class GenericRule implements Copyable
 	}
 
 	/**
-	 * Determine whether the given term is a meta-application with binders 
+	 * Determine whether the given term is a meta-application with
 	 * 
 	 * <p>
 	 * A meta-application for which substitution is not required is

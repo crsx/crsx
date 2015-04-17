@@ -89,12 +89,13 @@ VARIABLE_ENTRY ::=
 	SUB[Text<!-- Parent Variable -->, $Numeric<!-- Index in parent -->, $Boolean<!-- Linked? -->];
     ARG[$Numeric<!-- Index -->,$Boolean<!-- Term? -->];
 
-    BOUND_DATA;       
-    BOUND; // functional       
+    BOUND_DATA; // TODO: remove      
+    BOUND;      // data binder
 	FREE;
 	BOUNDREUSE;
 	FRESH;	
 	FRESHREUSE;
+    BOUND_FUN; // functional binder.
 );
 
 // Sort for stages of pattern matching generation:
@@ -352,11 +353,14 @@ MetaVar2[STRING_ENTRY] :: Text;
 -[Free[var::Reified_Variable]]: MetaVar2[VARIABLE[var]] → %n⟪«var»⟫;
 MetaVar2[STRING_VALUE[#Str]] → TOKEN[#Str];
 
+{$String:String}MetaVarArityNum[$String] :: $Numeric;
+
+-[Data[#name]]:
+{#E}MetaVarArityNum[#name] → UnNumeric[$[{#E}Get[STRING_ENTRY], $[:,#name, "$arity"], NUM_VALUE[0]]];
+
 {$String:String}MetaVarArity[$String] :: Text;
 
--[Data[#name]]
-:
-{#E}MetaVarArity[#name] → INTEGER[UnNumeric[$[{#E}Get[STRING_ENTRY], $[:,#name, "$arity"], NUM_VALUE[0]]]];
+{#E}MetaVarArity[#name] → INTEGER[MetaVarArityNum[#name]];
 
 
 {$String:String}EventConstructor[$String] :: Text;
@@ -437,12 +441,22 @@ T_NO_REUSE
 
 T-CheckReuse-Variable[VARIABLE_ENTRY] :: T_REUSE_SORT;
 
-T-CheckReuse-Variable[FRESHREUSE] → T_REUSE;
-T-CheckReuse-Variable[BOUNDREUSE] → T_REUSE;
-T-CheckReuse-Variable[BOUND]      → T_NO_REUSE;
-T-CheckReuse-Variable[FREE]       → T_NO_REUSE;
-T-CheckReuse-Variable[FRESH]      → T_NO_REUSE;
- 
+T-CheckReuse-Variable[FRESHREUSE]  → T_REUSE;
+T-CheckReuse-Variable[BOUNDREUSE]  → T_REUSE;
+T-CheckReuse-Variable[BOUND]       → T_NO_REUSE;
+T-CheckReuse-Variable[FREE]        → T_NO_REUSE;
+T-CheckReuse-Variable[FRESH]       → T_NO_REUSE;
+T-CheckReuse-Variable[BOUND_FUN] → $[Error, "should not reached"];
+
+Check-bound-hidden[VARIABLE_ENTRY] :: $Boolean;
+
+Check-bound-hidden[FRESHREUSE]  → $False;
+Check-bound-hidden[BOUNDREUSE]  → $False;
+Check-bound-hidden[BOUND]       → $False;
+Check-bound-hidden[FREE]        → $False;
+Check-bound-hidden[FRESH]       → $False;
+Check-bound-hidden[BOUND_FUN]   → $True;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Primitives

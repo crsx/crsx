@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   int i; char key[20];
   for (i = 0; i < argc; ++i)
   {
-    snprintf(key, 20, "ARG%d", i);
+    snprintf(key, 20, (char *) "ARG%d", i);
     setenv(key, argv[i], 1);
   }
   struct _Context _context = {};
@@ -49,9 +49,9 @@ USE(sink, «#name»);⟧⟫;
 -[Fresh[x]]:
 LOADER-TERM[$B[var . #Term[var]]] → 
 %n⟪⟦
-Variable «x» = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink->context, "«x»");
+Variable «x» = MAKE_BOUND_PROMISCUOUS_VARIABLE(sink->context, (char *) "«x»");
 {⟦
-  Variable *binder = ALLOCATE(sink->context, 1*sizeof(Variable));
+  Variable *binder = (Variable *) ALLOCATE(sink->context, 1*sizeof(Variable));
   binder[0] = «x»;
   BINDS(sink, 1, binder);
 ⟧}⟧«LOADER-TERM[#Term[LOADER-VAR[x]]]»⟫;

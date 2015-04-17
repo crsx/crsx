@@ -2,6 +2,8 @@ SFun[(
 
 $Lax;
 
+$Use["org/crsx/common.crs"];
+
 ∀ a b . Map[xᵇ::a . $sort[b], $List[a]] :: $List[b] ;
 Map[xᵇ.#[xᵇ], ()]       → () ;
 Map[xᵇ.#[xᵇ], (#1; #s)] → (#[#1]; Map[xᵇ.#[x], #s]) ;
