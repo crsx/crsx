@@ -504,16 +504,6 @@ struct _ProfReport {
 };
 SETUP_STACK_TYPE(ProfReport)
 
-/* The macro just above - SETUP_STACK_TYPE(ProfReport) - defines a number of
-   functions including emptyProfReportStack.  This particular function is only
-   normally used inside an assert() and thus not used in a non-debug build.  To
-   avoid a c-compiler warning in a non-debug build, I've added this use, which
-   is of course in a call that is unused. */
-static void unusedCall(ProfReportStack report)
-{
-    emptyProfReportStack(report);
-}
-
 static void printChildReport(Context context, ProfReport report, int maxLength,
         int indent, long totalTime)
 {
