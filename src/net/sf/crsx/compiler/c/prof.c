@@ -222,18 +222,21 @@ void crsxpAfterStep(Context context)
         pAccuStepTime += dl;
 
         assert (!emptyCharpStack(pStepName));
-        const void* name = (const void*) *topCharp(pStepName);
-        CountTimeEntry entry = getValueHS2(pSteps, name);
-        if (!entry)
+        if (!emptyCharpStack(pStepName))
         {
-            entry = ALLOCATE(context, sizeof(struct _CountTimeEntry));
-            entry->count = 0;
-            entry->time = 0;
-            addValueHS2(context, pSteps, name, (void*) entry);
+			const void* name = (const void*) *topCharp(pStepName);
+			CountTimeEntry entry = getValueHS2(pSteps, name);
+			if (!entry)
+			{
+				entry = ALLOCATE(context, sizeof(struct _CountTimeEntry));
+				entry->count = 0;
+				entry->time = 0;
+				addValueHS2(context, pSteps, name, (void*) entry);
+			}
+			entry->count++;
+			entry->time += dl;
+			popCharp(pStepName);
         }
-        entry->count++;
-        entry->time += dl;
-        popCharp(pStepName);
     }
 }
 
@@ -638,19 +641,24 @@ void crsxpMergeBacktrace(Context context, FILE* file)
             nesting++;
             if (nesting > maxNesting)
                 maxNesting = nesting;
-        } else
+        }
+        else
         {
             // End event
             ProfCSVEntry start = *topProfCSVEntry(entries);
             popProfCSVEntry(entries);
 
             assert(!emptyProfReportStack(report));
-            ProfReport current = *topProfReport(report);
-            popProfReport(report);
+            if (!emptyProfReportStack(report)) // Just to avoid unused function warning.
+            {
+				ProfReport current = *topProfReport(report);
+				popProfReport(report);
 
-            current->count++;
-            current->accutime += (time - start->time);
-            nesting--;
+				current->count++;
+				current->accutime += (time - start->time);
+            }
+
+			nesting--;
         }
     }
 
