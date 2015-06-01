@@ -8,6 +8,7 @@ Welcome to CRSX!
 
    started
    intro
+   syntax
 
 
 The purpose of CRSX is to implement an extended higher-order rewriting formalism to facilitate writing compilers
