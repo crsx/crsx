@@ -481,8 +481,9 @@ ST-substitute0[VARIABLE[var], #metavar, #binders, #use, #sink]
 // Case 3: sub meta-variable.. 
 -[Free[var::Reified_Variable]]:
 {#env; var:SUB[#parent, #i, $True]} // Sub data term. Copy or Substitute
-ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] →
-    {#env}ST-substitute1[#metavar, #Binders, #Use, #sink];
+ST-substitute0[VARIABLE[var], #metavar, #binders, #use, #sink] 
+→
+{#env}ST-substitute1[#metavar, #binders, #use, #sink];
 
 // Case 4: sub closure
 -[Free[var::Reified_Variable]]
@@ -585,24 +586,79 @@ UNLINK(«#sink»->context, «{#env}MetaVar[#metavar]»);⟫, %n⟪⟫]
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-call[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
-{#env}ST-call[#closure, #metavar, #binders, #use, #sink] 
+// Closure without arguments. Not possible.
+{#env}ST-call[#closure, #metavar, (), #use, #sink] 
 →
-{#env}ST-set-binders[OK, #binders, #sink, ok¹ args¹.ST-call2[ok¹, May-link[#closure, #use, #sink], args¹, #metavar, {#env}MetaVarArityNum[#metavar], #sink]];
+$[Error, "Internal error: closure without arguments"];
+
+// The meta variable has arguments. Analyze whether call is needed.
+{#env}ST-call[#closure, #metavar, (#argument1; #arguments), #use, #sink] 
+→
+{#env}ST-call1[#closure, #metavar, (#argument1; #arguments), #use, #sink]; 
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-call2[OK_SORT, Text, $List[Text], $String, $Numeric, Text] :: Text;
+ST-call1[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
-{#env; "$tail":#Tail}
-ST-call2[OK, #closure, #args, #metavar, #arity, #sink]
+// Done. Can reuse.
+{#env}ST-call1[#closure, #metavar, (), #use, #sink] 
+→
+{#env}ST-call-copy[#metavar, #use, #sink];
+
+// Process substitution argument.
+{#env}ST-call1[#closure, #metavar, (ARGUMENT[#sort, VARIABLE-USE[#y]]; #arguments), #use, #sink] 
+→
+{#env}ST-call1-var[$[{#env}Get, #y], #closure, #metavar, #arguments, #use, #sink];
+
+// Not a variable: need to invoke closure
+-[Fallback]:
+{#env}ST-call1[#closure, #metavar, #arguments, #use, #sink] 
+→
+{#env}ST-invoke[#closure, #metavar, #arguments, #use, #sink]; 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-call-copy[$String, Reified_Use, Text] :: Text;
+
+{#env; "$tail": #tail}ST-call-copy[#metavar, USE[#count], #sink]
+→
+$[If, $[Equal, #count, 1],
+  %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#tail] »⟫,
+  %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »));« ST-send-tail[#tail] »⟫];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-call1-var[VARIABLE_ENTRY, Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+// A functional binder.. continue.
+{#env}ST-call1-var[BOUND_FUN, #closure, #metavar, #arguments, #use, #sink]
+→
+{#env}ST-call1[#closure, #metavar,  #arguments, #use, #sink];
+
+// Something else... invoke.
+-[Fallback]:
+{#env}ST-call1-var[#entry, #closure, #metavar, #arguments, #use, #sink]
+→
+{#env}ST-invoke[#closure, #metavar, #arguments, #use, #sink]; 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-invoke[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+{#env}ST-invoke[#closure, #metavar, #binders, #use, #sink]
+→ 
+{#env}ST-set-binders[OK, #binders, #sink, ok¹ args¹.
+                         ST-invoke2[ok¹, ST-may-link[#closure, #use, #sink], args¹, #metavar, {#env}MetaVarArityNum[#metavar], #sink]];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-invoke2[OK_SORT, Text, $List[Text], $String, $Numeric, Text] :: Text;
+
+{#env; "$tail": #tail}
+ST-invoke2[OK, #closure, #args, #metavar, #arity, #sink]
 →
 $[If, $[Equal, #arity, 1],
-  %n⟪«ST-send-tail2[#Tail]»¶call1(«#sink», «#closure»«ReverseConcatText[#args,%n⟨,⟩]»);⟫,
-  %n⟪«ST-send-tail2[#Tail]»¶call(«#sink», «#closure», «INTEGER[#arity]»«ReverseConcatText[#args,%n⟨,⟩]»);⟫];
+  %n⟪«ST-send-tail2[#tail]»¶call1(«#sink», «#closure»«ReverseConcatText[#args,%n⟨,⟩]»);⟫,
+  %n⟪«ST-send-tail2[#tail]»¶call(«#sink», «#closure», «INTEGER[#arity]»«ReverseConcatText[#args,%n⟨,⟩]»);⟫];
 
+ST-may-link[Text, Reified_Use, Text] :: Text;
 
-May-link[Text, Reified_Use, Text] :: Text;
-
-May-link[#term, USE[#count], #sink]
+ST-may-link[#term, USE[#count], #sink]
 → 
 $[If, $[Equal, #count, 1], 
     #term,

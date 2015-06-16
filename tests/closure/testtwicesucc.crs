@@ -1,0 +1,23 @@
+TestTwice[(
+
+$Lax;
+
+$Use["org/crsx/common.crs"];
+
+// Sum as continuation sample.
+Test :: $Numeric;
+Test → Twice-Succ[4];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+∀ a . Twice[xᵇ::a. $sort[a], a] :: a ;
+-[Copy[#]] : Twice[xᵇ. #[x], #v] → #[#[#v]];
+
+Twice-Succ[$Numeric] :: $Numeric ;
+Twice-Succ[#v] → Twice[xᵇ. Plus[x, 1], #v];
+
+//Twice-Double[$Numeric] :: $Numeric ;
+//Twice-Double[#v] → Twice[xᵇ. Plus[x, #v], 0];
+
+)]

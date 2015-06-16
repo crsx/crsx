@@ -419,8 +419,6 @@ public class Completer
 		for (StandardizedRule q : dispatchifyResult)
 		{
 			Constructor name = q.three();
-			//if (name.symbol().contains("Code-lift-13"))
-			//	System.out.println("Had rule");
 			GenericTerm pattern = unstandardize(q.one());
 			GenericTerm contraction = unstandardize(q.two());
 			Map<String,List<Term>> options = new HashMap<String, List<Term>>();
@@ -548,11 +546,16 @@ public class Completer
 	 */
     private void dispatchifyEntry(final Entry<String, List<StandardizedRule>> e) throws CRSException
     {
+     	if (e.getKey().contains("for-at4"))
+     			System.out.println("here");
+     		   
+    	
 	    final Set<StandardizedRule> relevantRules = new HashSet<StandardizedRule>(8);  
 	    final Map<Object,Term> sorts = new HashMap<Object,Term>();
 
 	    for (StandardizedRule q : e.getValue())
 	    {
+	    	
 	    	final GenericTerm l = q.getPattern();
 	    	final GenericTerm r = q.getContractum();
 	    	//Constructor n = q.three();
@@ -624,6 +627,9 @@ public class Completer
 	private void respectFunctionRule(final GenericRule rule) throws CRSException
 	{
 		final Constructor rulename = rule.getName();
+		
+		if (rulename.symbol().contains("for-at4"))
+			System.out.println("here");
 		
 		// check whether sort and form of the pattern are as expected (minimal)
 		final Pair<Term,Term> declaration = rule.getConstructorDeclaration(rule.getPattern());

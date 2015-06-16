@@ -3625,6 +3625,7 @@ void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
 // Closure.
 //
 
+// Generic closure calls. Not the most efficient.
 
 int call(Sink sink, Term term, int nargs, ...)
 {
@@ -3656,7 +3657,6 @@ int call(Sink sink, Term term, int nargs, ...)
 	return term->descriptor->step(sink, term);
 }
 
-
 int call1(Sink sink, Term term, Term arg0)
 {
 	if (IS_VARIABLE_USE(term))
@@ -3666,22 +3666,54 @@ int call1(Sink sink, Term term, Term arg0)
 		return 1;
 	}
 
-	ASSERT(sink->context, LINK_COUNT(term) == 1);
+	// Disallow merging properties.
+	ASSERT(sink->context, asConstruction(term)->namedProperties == NULL);
+	ASSERT(sink->context, asConstruction(term)->variableProperties == NULL);
 
-	const VariableUse functional = sink->context->functionalUse;
-	const int arity = ARITY(term);
-	int i = 0;
-	for (i = 0; i < arity; i ++)
+	if (LINK_COUNT(term) == 1)
 	{
-		Term sub = SUB(term, i);
-		if (IS_VARIABLE_USE(sub) && ((VariableUse) sub) == functional)
+		// Bind variable in-place.
+
+		const VariableUse functional = sink->context->functionalUse;
+		const int arity = ARITY(term);
+		int i = 0;
+		for (i = 0; i < arity; i ++)
 		{
-			unlinkTerm(sink->context, (Term) functional);
-			SUB(term, i) = arg0; // Transfer ref
-			break;
+			Term sub = SUB(term, i);
+			if (IS_VARIABLE_USE(sub) && ((VariableUse) sub) == functional)
+			{
+				unlinkTerm(sink->context, (Term) functional);
+				SUB(term, i) = arg0; // Transfer ref
+				break;
+			}
 		}
+		return term->descriptor->step(sink, term);
 	}
-	return term->descriptor->step(sink, term);
+	else
+	{
+		// Need to first copy the thunk.
+		Sink buffer = makeBuffer(sink->context);
+
+		buffer->start(sink, term->descriptor);
+
+		int a = ARITY(term);
+		int i;
+		for (i = 0; i < a; i ++)
+		{
+			const int rank = RANK(term, i);
+		    if (rank != 0)
+		    {
+		    	// TODO: rename.
+		    	BINDS(sink, rank, BINDERS(term, i));
+		    }
+		   	COPY(sink, LINK(sink->context, SUB(term, i)));
+		}
+	    sink->end(sink, term->descriptor);
+
+	    Term newthunk = buffer->term(sink);
+	    FREE_BUFFER(buffer);
+		return call1(sink, newthunk, arg0);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////

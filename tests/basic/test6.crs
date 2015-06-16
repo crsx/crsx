@@ -1,0 +1,36 @@
+Test6[(
+
+// Closure sharing
+
+$Lax;
+
+Statement ::=( Literal[$Numeric] ; Variable[$Numeric] ; Let[$Numeric, x::$Numeric.Statement] ; ) ;
+Wrapper ::= ( Wrap[$Numeric, x::$Numeric.Statement]; );
+
+Test :: $Numeric;
+
+Test → Compile[Let[4, v.Let[5, v2.Literal[v]]]];
+
+Compile[Statement] :: $Numeric;
+
+Compile[Literal[#num]]          → #num;
+Compile[Variable[#var]]         → #var;
+Compile[Let[#num, x.#body[x]]]  → Duplicate[Wrap[#num, x.#body[x]]];  
+
+Duplicate[Wrapper] :: $Numeric;
+
+Duplicate[#] → Plus[V[1, #], V[2, #]];
+
+V[$Numeric, Wrapper] :: $Numeric;
+
+V[#v, Wrap[#v2, x.#[x]]] → V2[Plus[#v, #v2], x.#[x]];
+
+V2[$Numeric, x::$Numeric.Statement] :: $Numeric;
+
+V2[#v, x.#[x]] → Compile[#[#v]];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+
+)]

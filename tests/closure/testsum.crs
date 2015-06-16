@@ -1,0 +1,18 @@
+TestSum[(
+
+$Lax;
+
+$Use["org/crsx/common.crs"];
+
+// Sum as continuation sample.
+Test :: $Numeric;
+Test → ContSum[(1; 4; 10; 4; 2; 6;), vᵇ.vᵇ];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+∀ a . ContSum[$List[$Numeric], vᵇ::$Numeric . $sort[a]] :: a ;
+ContSum[(#1; #s), vᵇ. #[v]] → ContSum[#s, vᵇ. #[Plus[#1, v]]];
+ContSum[(), vᵇ. #[v]]       → #[0];
+
+)]

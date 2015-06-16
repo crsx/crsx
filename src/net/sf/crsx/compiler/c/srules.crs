@@ -896,9 +896,8 @@ SF-Pattern-PropertyRef-Discard
 →
 $[{#env}IfDef, $[:, "Comparable$", #ref],
     $[Error, "Property reference cannot be compared"],
-  //{#env}SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, $True, #unique, #term, ok.SF-then-Pattern-Ref[ok, $[:,"MetaVar$",#ref], #stage, DISCARD, #sink, #term, o2.#[o2]]],
-  //  {#env}SF-Pattern[#pass, #stage, #Pattern, #sink, #setup, #needed, #unique, #term, ok.#[ok]]]
-    {#env}SF-Pattern[#pass, #stage, #pattern, #sink, #setup, $True, #unique, #term, ok.SF-then-Pattern-Ref[ok, $[:,"MetaVar$", #ref], #stage, DISCARD, #sink, #term, o2.#[o2]]]]
+    {#env}SF-Pattern[#pass, #stage, #pattern, #sink, #setup, $True, #unique, #term, ok¹.
+          SF-then-Pattern-Ref[ok¹, $[:,"MetaVar$", #ref], #stage, DISCARD, #sink, #term, o2¹.#[o2¹]]]]
 ;
 
 SF-Pattern-PropertyRef-Used

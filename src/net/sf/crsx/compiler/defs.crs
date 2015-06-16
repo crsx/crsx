@@ -446,7 +446,7 @@ T-CheckReuse-Variable[BOUNDREUSE]  → T_REUSE;
 T-CheckReuse-Variable[BOUND]       → T_NO_REUSE;
 T-CheckReuse-Variable[FREE]        → T_NO_REUSE;
 T-CheckReuse-Variable[FRESH]       → T_NO_REUSE;
-T-CheckReuse-Variable[BOUND_FUN] → $[Error, "should not reached"];
+T-CheckReuse-Variable[BOUND_FUN]   → $[Error, "should not reached"];
 
 Check-bound-hidden[VARIABLE_ENTRY] :: $Boolean;
 

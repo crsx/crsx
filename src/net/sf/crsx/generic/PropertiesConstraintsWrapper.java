@@ -548,7 +548,11 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
     		propertyNames.add(p);
     	
 		for (String p : propertyNames)
-			namedPropertyConstraints.get(p).analyzeMetaUseContractum(counts, subAnalyzers);  
+		{
+			Term value = namedPropertyConstraints.get(p);
+			if (value != null)
+				value.analyzeMetaUseContractum(counts, subAnalyzers);  
+		}
 		
 		if (propertiesRef != null)
 		{
