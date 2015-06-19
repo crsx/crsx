@@ -741,6 +741,54 @@ public class GenericRule implements Copyable
 		return false;
 	}
 
+	
+	/**
+	 * Whether the sub is a construction that contains unordered variable uses. Ignore properties.
+	 * @param index of the sub
+	 * @throws CRSException 
+	 */	
+	public boolean hasUnorderedShallowBinderUses(Term term, int index) throws CRSException
+	{
+		//if (hasBinders(term, index))
+		if (term.binders(index) != null)
+		{
+			Term sub = term.sub(index);
+			if (sub.kind() == Kind.VARIABLE_USE || sub.arity() == 0)
+				return false;
+
+			// sub is a construction/meta application with binders and optionally with properties.
+			Variable[] binders = term.binders(index);
+			int nextVarPos = 0;
+			
+			for (int i = 0; i < sub.arity(); i++)
+			{
+				Term subsub = sub.sub(i);
+
+				switch (subsub.kind())
+				{
+					case VARIABLE_USE :
+						Variable var = subsub.variable();
+						do 
+						{
+							if (nextVarPos >= binders.length)
+							{
+								// unordered use
+								return true;
+							}
+						} while (!(var.name().equals(binders[nextVarPos++].name())));
+						break;
+					case META_APPLICATION:
+					case CONSTRUCTION :
+					default :
+						break;
+				}
+			}
+		}
+
+		return false;
+	}	
+	
+	
 	/**
 	 * Determine whether the give meta variable, when used in the contractum
 	 * requires meta-substitution when evaluated.
