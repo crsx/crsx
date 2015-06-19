@@ -448,9 +448,9 @@ typedef struct _BitSet* BitSetP;
 // For any term.
 #define ARITY(T) (IS_VARIABLE_USE(T) ? 0 : (T)->descriptor->arity)
 #define IS_VARIABLE_USE(T) ((T)->descriptor == NULL)
-#define IS_FUNCTIONAL_USE(C,T) ((Term)(C)->functionalUse == (T))
 #define IS_CONSTRUCTION(T) ((T)->descriptor != NULL)
 #define IS_FUNCTION(T) (IS_CONSTRUCTION(T) && TAG(T) == 0)
+#define IS_FUNCTIONAL_USE(C,T) ((Term)(C)->functionalUse == (T)) 
 #define IS_DATA(T) (IS_CONSTRUCTION(T) && TAG(T) > 0)
 #define IS_LITERAL(T) (IS_DATA(T) && !SORT(T))
 #define IS_CONTAINER(T) (IS_DATA(T) && SORT(T))
@@ -630,7 +630,7 @@ struct _ConstructionDescriptor
     int size; // sizeof instances of the constructor
     int *binderoffset; // offset in binder list of first binder for each argument; for length = arity+1
     char *(*name)(Term term); // of descriptor
-    int (*step)(Sink sink, Term term); // rewrite the term to get closer to a top level data descriptor and return whether an updated term was sent to sink
+    int (*step)(Sink sink, Term term, ...); // rewrite the term to get closer to a top level data descriptor and return whether an updated term was sent to sink
 };
 
 //#define CRSX_CHECK_SORT(CONTEXT,T,SORT) ASSERT(CONTEXT, IS_VARIABLE_USE(T) || !(T)->descriptor->sort  ||  (T)->descriptor->sort == (SORT))
@@ -957,6 +957,10 @@ extern void freeBuffer(Sink sink);
 extern Term force(Context context, Term term);
 extern void normalize(Context context, Term *termp);
 extern Term normalizep(Context context, Term term);
+
+#ifndef CALL
+# define CALL(SINK,T,...) { Term t = T; t->descriptor->step(SINK, t, __VA_ARGS__); }
+#endif
 
 // Obsolete:
 #ifndef COMPUTE
