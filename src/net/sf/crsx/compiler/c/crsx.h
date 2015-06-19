@@ -630,7 +630,11 @@ struct _ConstructionDescriptor
     int size; // sizeof instances of the constructor
     int *binderoffset; // offset in binder list of first binder for each argument; for length = arity+1
     char *(*name)(Term term); // of descriptor
-    int (*step)(Sink sink, Term term, ...); // rewrite the term to get closer to a top level data descriptor and return whether an updated term was sent to sink
+#ifdef STRICT
+    int (*step)(Sink sink, Term term, ...); // rewrite the term to get closer to a top level data descriptor and return whether the rewrite has fully been complete
+#else
+    int (*step)(Sink sink, Term term); // rewrite the term to get closer to a top level data descriptor and return 1 is term has been sent to sink
+#endif
 };
 
 //#define CRSX_CHECK_SORT(CONTEXT,T,SORT) ASSERT(CONTEXT, IS_VARIABLE_USE(T) || !(T)->descriptor->sort  ||  (T)->descriptor->sort == (SORT))
@@ -659,7 +663,12 @@ extern Variable *noBinders(Term term, int n);
 
 // Generic components of ConstructionDescriptors.
 extern char *dataName(Term term);
+
+#ifdef STRICT
 extern int dataStep(Sink sink, Term term, ...);
+#else
+extern int dataStep(Sink sink, Term term);
+#endif
 
 // Description of sort.
 //
@@ -958,56 +967,19 @@ extern Term force(Context context, Term term);
 extern void normalize(Context context, Term *termp);
 extern Term normalizep(Context context, Term term);
 
-#ifndef CALL
-# define CALL(SINK,T,...) { Term t = T; t->descriptor->step(SINK, t, __VA_ARGS__); }
-#endif
-
 // Obsolete:
 #ifndef COMPUTE
 # define COMPUTE(CONTEXT,T) (T = (IS_NF(T) ? (T) : compute(CONTEXT,T)))
 #endif
 extern Term compute(Context context, Term term);
 
-
-// Send bound term to sink. If binders can be reused, then just copy term,
-// otherwise substitute.
-// Note: testing for the first binder is enough
-extern void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term);
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //// CLOSURE
 ////
-//// A closure is a function term encapsulating binders.
-////
-//
-//// No env
-//#define NO_CENV NULL
-//
-//typedef Term* CEnv;   // Closure environment.
-//typedef int (*FuncP)(Sink, CEnv);
-//
-//struct _ClosureDescriptor
-//{
-//	struct _ConstructionDescriptor construction;
-//	FuncP function;         // the closure function
-//};
-//
-//extern int idclosure(Sink, CEnv, Term);
-////#define ID_CLOSURE { (FuncP) idclosure, NO_CENV }
-//
-//#define CLOSURE_FUN(closure)  (((ClosureDescriptor) ((Term) closure)->descriptor))->function)
-//#define CLOSURE_ENV(closure)  ((closure)->sub)
 
-extern int call1(Sink sink, Term term, Term arg0);
-extern int call(Sink sink, Term term, int nargs, ...);
-
-//#ifndef CALL1
-//# define CALL1(sink, closure, arg0) ((int (*)(Sink, CEnv, Term)) CLOSUREFUN(closure))(sink, CLOSURE_ENV(closure), arg0)
-//#endif
-//
-//#ifndef CALL2
-//# define CALL2(sink,closure, arg0, arg1) ((int (*)(Sink, CEnv, Term, Term)) CLOSUREFUN(closure))(sink, CLOSURE_ENV(closure), arg0, arg1)
-//#endif
+#ifndef CALL
+# define CALL(SINK,T,...) { Term t = T; t->descriptor->step(SINK, t, __VA_ARGS__); }
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // SUBSTITUTE

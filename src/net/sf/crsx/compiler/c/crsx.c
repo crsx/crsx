@@ -35,7 +35,6 @@ void enableProfiling(Context context)
 #ifdef CRSX_ENABLE_PROFILING
     context->profiling = 1;
     context->internal = 1;
-    crsxpInit(context);
 #endif
 }
 
@@ -52,8 +51,8 @@ Variable makeVariableTrusty(Context context, char *name, unsigned int bound, uns
     if (trustname)
     {
       	size_t z = strlen(name)+1;
-	v->name = (char*) ALLOCATE(context, z);
-	memcpy(v->name, name, z);
+        v->name = (char*) ALLOCATE(context, z);
+	    memcpy(v->name, name, z);
     }
     else
     {
@@ -223,10 +222,22 @@ char *dataName(Term term)
     return descriptor->sort->constructorNames[descriptor->sortoffset];
 }
 
+#ifdef STRICT
+
 int dataStep(Sink sink, Term term, ...)
 {
     return 0; // no computation possible
 }
+
+#else
+
+int dataStep(Sink sink, Term term)
+{
+    return 0; // no computation possible
+}
+
+
+#endif
 
 const char *literalName(Term term)
 {
@@ -2594,6 +2605,8 @@ void crsxAddPools(Context context)
         context->segmentPoolSize = 0;
     }
     ++context->poolRefCount;
+
+    crsxpInit(context);
 }
 
 void crsxReleasePools(Context context)
@@ -2639,8 +2652,8 @@ void crsxReleasePools(Context context)
         context->segmentPool = NULL;
         context->segmentPoolSize = 0;
 
-        crsxpDestroy(context);
     }
+    crsxpDestroy(context);
 }
 
 char *makeString(Context context, const char *src)
@@ -3588,132 +3601,6 @@ long elapsed(Context context)
 #else
     return (long)0;
 #endif
-}
-
-void sendBoundTerm(Sink sink, int rank, Variable* binders, Term term)
-{
-	const Context context = sink->context;
-	if (!IS_BOUND(binders[0]))
-	{
-		int i;
-		for (i = 0; i < rank; i ++)
-			REBIND(linkVariable(context, binders[i]));
-
-		BINDS(sink, rank, binders);
-	    COPY(sink, term);
-	}
-	else
-	{
-		// Need to substitute.
-		Variable* newbinders = (Variable *) ALLOCA(context, rank * sizeof(Variable*));
-		VariableUse* newuses = (VariableUse *) ALLOCA(context, rank * sizeof(VariableUse*));
-		int i;
-		for (i = 0; i < rank; i ++)
-		{
-			newbinders[i] = MAKE_BOUND_PROMISCUOUS_VARIABLE(context, binders[i]->name);
-			newuses[i] = makeVariableUse(context, linkVariable(context, newbinders[i]));
-		}
-
-		BINDS(sink, rank, newbinders);
-
-		struct _SubstitutionFrame frame = {NULL, 0, rank, binders, (Term *) newuses};
-	    SUBSTITUTE(sink, term, &frame);
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////
-// Closure.
-//
-
-// Generic closure calls. Not the most efficient.
-
-int call(Sink sink, Term term, int nargs, ...)
-{
-	ASSERT(sink->context, LINK_COUNT(term) == 1);
-
-	// term of the forms x y.x are not allowed in core crsx.
-	ASSERT(sink->context, IS_CONSTRUCTION(term));
-
-	va_list ap;
-	va_start(ap, nargs);
-
-	const VariableUse functional = sink->context->functionalUse;
-
-	const int arity = ARITY(term);
-	int i = 0;
-	for (i = 0; i < arity; i ++)
-	{
-		Term sub = SUB(term, i);
-		if (IS_VARIABLE_USE(sub) && ((VariableUse) sub) == functional)
-		{
-			unlinkTerm(sink->context, (Term) functional);
-			SUB(term, i) = va_arg(ap, Term);
-			if (--nargs == 0)
-				break;
-		}
-	}
-
-	va_end(ap);
-	return term->descriptor->step(sink, term);
-}
-
-int call1(Sink sink, Term term, Term arg0)
-{
-	if (IS_VARIABLE_USE(term))
-	{
-		COPY(sink, arg0);
-		UNLINK(sink->context, term);
-		return 1;
-	}
-
-	// Disallow merging properties.
-	ASSERT(sink->context, asConstruction(term)->namedProperties == NULL);
-	ASSERT(sink->context, asConstruction(term)->variableProperties == NULL);
-
-	if (LINK_COUNT(term) == 1)
-	{
-		// Bind variable in-place.
-
-		const VariableUse functional = sink->context->functionalUse;
-		const int arity = ARITY(term);
-		int i = 0;
-		for (i = 0; i < arity; i ++)
-		{
-			Term sub = SUB(term, i);
-			if (IS_VARIABLE_USE(sub) && ((VariableUse) sub) == functional)
-			{
-				unlinkTerm(sink->context, (Term) functional);
-				SUB(term, i) = arg0; // Transfer ref
-				break;
-			}
-		}
-		return term->descriptor->step(sink, term);
-	}
-	else
-	{
-		// Need to first copy the thunk.
-		Sink buffer = makeBuffer(sink->context);
-
-		buffer->start(sink, term->descriptor);
-
-		int a = ARITY(term);
-		int i;
-		for (i = 0; i < a; i ++)
-		{
-			const int rank = RANK(term, i);
-		    if (rank != 0)
-		    {
-		    	// TODO: rename.
-		    	BINDS(sink, rank, BINDERS(term, i));
-		    }
-		   	COPY(sink, LINK(sink->context, SUB(term, i)));
-		}
-	    sink->end(sink, term->descriptor);
-
-	    Term newthunk = buffer->term(sink);
-	    FREE_BUFFER(buffer);
-		return call1(sink, newthunk, arg0);
-	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////
