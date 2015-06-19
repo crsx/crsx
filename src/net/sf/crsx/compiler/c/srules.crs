@@ -30,7 +30,7 @@ SF-Function[#kind, #function, #Forms, #Sort, #Rules]
 %n⟪«SF-function-extern[#function, #Forms, #Sort]»
 
 /* STEP FUNCTION « COMMENT_TOKEN[#function] ». */
-int «Step[#function]»(Sink «sink», Term «term»)
+int «Step[#function]»(Sink «sink», Term «term», ...)
 {⟦« SF-step-body[#kind, sink, term, #function, #Forms, #Sort, #Rules] »⟧¶}
 
 /* FUNCTION « COMMENT_TOKEN[#function] ». */
@@ -76,7 +76,9 @@ SF-function-desc[#function, SORT-VARIABLE[#SortVariable], #FormArguments]
 SF-step-body[$String, Text, Text, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
 
 SF-step-body[#kind, #sink, #term, #function, #Forms, #Sort, #Rules] →
-    %n⟪¶ssize_t shared = LINK_COUNT(« #term »); 
+    %n⟪¶va_list ap;
+va_start(ap, « #term »);
+ssize_t shared = LINK_COUNT(« #term »);
 NamedPropertyLink namedP = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»)); 
 VariablePropertyLink varP = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));«SF-extract-props[#Forms, $True, #sink, #term, (), ok¹ args¹.SF-StepUnlinkTerm[ok¹, #sink, #term, args¹, #function]]»⟫;
 
@@ -145,7 +147,7 @@ Variable «var» = linkVariable(«#sink»->context, BINDER(«#term»,«INTEGER[#
 SF-ExtractTerm[FORM-ARGUMENT[#Sort], #sink, #term, #args, #subi, #binderi, ok¹ args¹.#[ok¹, args¹]]
 →
 %n⟪
-Term «term» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (term;)]]»⟫
+Term «term» = IS_FUNCTIONAL_USE(«#sink»->context, SUB(«#term», «INTEGER[#subi]»)) ? va_arg(ap, Term) : LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (term;)]]»⟫
 ;
 
 SF-ExtractClosure[Text, Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List[Text].Text] :: Text;
@@ -164,6 +166,7 @@ SF-StepUnlinkTerm[OK, #sink, #term, #args, #function]
 →
 %n⟪
 UNLINK(«#sink»->context, «#term»);
+va_end(ap);
 return «MANGLE[#function]»(«#sink»,shared, namedP, varP«ConcatText[#args,%n⟨,⟩]»);⟫
 ;
 

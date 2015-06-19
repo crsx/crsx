@@ -22,7 +22,7 @@ SH-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[
 SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 →
 %n⟪/* FUNCTION « COMMENT_TOKEN[#name] » HEADER DECLARATIONS. */
-« MapText[f.SH-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term);
+« MapText[f.SH-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term,...);
 extern int « MANGLE[#function] »(Sink, ssize_t,NamedPropertyLink,VariablePropertyLink« SH-Arg[#Forms, $True] »);
 ⟫;
 

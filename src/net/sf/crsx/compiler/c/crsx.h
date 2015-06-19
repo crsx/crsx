@@ -448,6 +448,7 @@ typedef struct _BitSet* BitSetP;
 // For any term.
 #define ARITY(T) (IS_VARIABLE_USE(T) ? 0 : (T)->descriptor->arity)
 #define IS_VARIABLE_USE(T) ((T)->descriptor == NULL)
+#define IS_FUNCTIONAL_USE(C,T) ((Term)(C)->functionalUse == (T))
 #define IS_CONSTRUCTION(T) ((T)->descriptor != NULL)
 #define IS_FUNCTION(T) (IS_CONSTRUCTION(T) && TAG(T) == 0)
 #define IS_DATA(T) (IS_CONSTRUCTION(T) && TAG(T) > 0)
@@ -658,7 +659,7 @@ extern Variable *noBinders(Term term, int n);
 
 // Generic components of ConstructionDescriptors.
 extern char *dataName(Term term);
-extern int dataStep(Sink sink, Term term);
+extern int dataStep(Sink sink, Term term, ...);
 
 // Description of sort.
 //

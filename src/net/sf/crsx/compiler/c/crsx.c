@@ -223,7 +223,7 @@ char *dataName(Term term)
     return descriptor->sort->constructorNames[descriptor->sortoffset];
 }
 
-int dataStep(Sink sink, Term term)
+int dataStep(Sink sink, Term term, ...)
 {
     return 0; // no computation possible
 }
