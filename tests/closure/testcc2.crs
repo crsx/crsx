@@ -1,0 +1,22 @@
+// Closure conversion test.
+// Functional deep binder occurring in both a constructor and an abstraction, twice.
+TestCC2[(
+
+$Lax;
+
+$Use["sfun.crs"];
+
+Test :: $List[$Numeric];
+Test → Test1[(1; 4;), vᵇ.vᵇ];
+
+Test1[$List[$Numeric], vᵇ::$Numeric.$Numeric] :: $List[$Numeric];
+Test1[#list, vᵇ.#[vᵇ]] → Map[vᵇ.Snd[Plus[vᵇ, 1], #[vᵇ], #[vᵇ]], #list];
+
+Snd[$Numeric, $Numeric, $Numeric] :: $Numeric;
+Snd[#1, #2, #3] → #2;
+ 
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+
+)]

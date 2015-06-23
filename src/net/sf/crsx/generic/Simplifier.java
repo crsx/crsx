@@ -5,7 +5,6 @@ package net.sf.crsx.generic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ import net.sf.crsx.util.Util;
  * final generated code.
  * 
  * <p>
- * Bound meta substitution shoud be treated with special care. A bound meta substitution is a contraction on the form: 
+ * Bound meta substitution should be treated with special care. A bound meta substitution is a contraction on the form: 
  * 
  * <pre>  b<sub>1</sub>....b<sub>n</sub>....{#E}#[a<sub>1</sub> ... a<sub>n</sub>]</pre>
  * 
@@ -62,6 +61,13 @@ import net.sf.crsx.util.Util;
  * 
  * <p>
  * The above closure conversion can then be applied.
+ *
+ * <p>
+ * The closure conversion also eliminate weak terms, when one or more of the non-occurring variable is functional. 
+ * At runtime, all functional binders are bound, even the non-occurring ones.
+ * 
+ * <p>
+ * The closure conversion guarantees the functional binders occur in the exact same order they have been declared, to allow, at runtime, faster positional binding.
  * 
  * <p>
  * Meta notes:
@@ -99,28 +105,6 @@ public class Simplifier
 	public void simplify(Map<String, GenericRule> ruleByName) throws CRSException
 	{
 		Env1 state = new Env1();
-
-		// First pass: simplify meta-closures
-		/*
-		for (Entry<String, GenericRule> entry : ruleByName.entrySet())
-		{
-			GenericRule rule = entry.getValue();
-
-			state.changed = false;
-			state.rule = rule;
-			GenericTerm newContractum = eliminateBoundMeta(state, (GenericTerm) rule.getContractum(), SimpleVariableSet.EMPTY, false);
-
-			if (state.changed)
-			{
-				GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newContractum, rule.options);
-				entry.setValue(newRule);
-			}
-
-		}
-
-		// TODO: should avoid this step by maintaining the sort structure is the new rules..
-		crs.sortify();
-		*/
 
 		// Second pass: simplify deep closures
 		Collection<GenericRule> pendingRules = ruleByName.values();
@@ -161,130 +145,6 @@ public class Simplifier
 
 			crs.sortify();
 		}
-
-	}
-
-	/**
-	 * Simplify bound meta application on a term
-	 * 
-	 * @param state
-	 * @param term
-	 * @param bound
-	 * @param functional Whether the term is directly bound by at least one functional binders
-	 * @return
-	 * @throws CRSException 
-	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericTerm term, ExtensibleSet<Variable> bound, boolean functional) throws CRSException
-	{
-		if (term instanceof PropertiesConstraintsWrapper)
-		{
-			// Recursively simplify properties.
-			PropertiesConstraintsWrapper props = (PropertiesConstraintsWrapper) term;
-
-			// TODO: simplify properties
-
-			props.term = eliminateBoundMeta(state, props.term, bound, functional);
-			return props;
-		}
-		else
-		{
-			switch (term.kind())
-			{
-				case CONSTRUCTION :
-					return eliminateBoundMeta(state, (GenericConstruction) term, bound, functional);
-				case META_APPLICATION :
-					return eliminateBoundMeta(state, (GenericMetaApplication) term, bound, functional);
-				case VARIABLE_USE :
-				default :
-					return term;
-			}
-		}
-	}
-
-	/**
-	 * Simplify bound meta application on a construction
-	 * 
-	 * @param state
-	 * @param term
-	 * @param bound
-	 * @param functional  
-	 * @return
-	 * @throws CRSException 
-	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericConstruction term, ExtensibleSet<Variable> bound, boolean functional) throws CRSException
-	{
-		for (int i = term.arity() - 1; i >= 0; i--)
-		{
-			Variable[] binders = term.binders(i);
-			
-			boolean hasFunctionalBinders = false;
-			for (int j = 0; j < binders.length; j++)
-				hasFunctionalBinders |= binders[j].blocking();
-			
-			boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
-
-			ExtensibleSet<Variable> subbound = bound.extend(binders);
-			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound, hasFunctionalBinders & hasDeepBinders);
-			term.replaceSub(i, term.binders(i), newsub);
-		}
-		return term;
-	}
-
-	/**
-	 * Simplify bound meta application on a meta
-	 *
-	 * @param state
-	 * @param term
-	 * @param bound
-	 * @param functional  
-	 * @return
-	 * @throws CRSException 
-	 */
-	private GenericTerm eliminateBoundMeta(Env1 state, GenericMetaApplication term, ExtensibleSet<Variable> bound, boolean functional)
-			throws CRSException
-	{
-		// Apply conversion on the meta arguments first.
-		for (int i = term.arity() - 1; i >= 0; i--)
-		{
-			ExtensibleSet<Variable> subbound = bound.extend(term.binders(i));
-			GenericTerm newsub = eliminateBoundMeta(state, term.sub(i), subbound, false);
-			term.replaceSub(i, term.binders(i), newsub);
-		}
-		
-		if (functional) 
-		{
-			// Replace meta by Delay 
-			Constructor delay = factory.makeConstructor("Delay" + term.arity());
-
-			Variable[][] allbinders = new Variable[term.arity() + 1][];
-			GenericTerm[] subs = new GenericTerm[term.arity() + 1];
-
-			// In order to preserve variable name and binder, gets the metavar on the pattern
-			GenericTerm metaOnPattern = state.rule.getMetaOnPattern(term.metaVariable);
-
-			// Make binders.
-			Variable[] binders = new Variable[term.arity()];
-			GenericTerm[] args = new GenericTerm[term.arity()];
-			for (int i = term.arity() - 1; i >= 0; i--)
-			{
-				Variable original = metaOnPattern.sub(i).variable();
-				binders[i] = factory.makeVariable(original.name(), original.promiscuous(), original.blocking(), original.shallow());
-				args[i] = factory.newVariableUse(binders[i]);
-
-				allbinders[i] = GenericTerm.NO_BIND;
-			}
-			allbinders[term.arity()] = binders;
-
-			// Make subs
-			System.arraycopy(term.allSubs(), 0, subs, 0, term.allSubs().length);
-			subs[term.arity()] = factory.newMetaApplication(term.metaVariable, args);
-
-			// Finally make generic closure using Delay.
-			state.changed = true;
-			return factory.newConstruction(delay, allbinders, subs);
-		}
-
-		return term;
 	}
 
 	/**
@@ -349,7 +209,8 @@ public class Simplifier
 
 			//Pair<Term, Term> sortDeclaration = getSortDeclaration(rulename, term.constructor.symbol());
 			Pair<Term, Term> sortDeclaration = state.rule.getConstructorDeclaration(term);
-			if (sortDeclaration == null) {
+			if (sortDeclaration == null)
+			{
 				sortDeclaration = getSortDeclaration(rulename, term.constructor.symbol());
 			}
 			Term[] binderSorts = getBindersSort(rulename, sortDeclaration.tail(), i);
@@ -358,146 +219,152 @@ public class Simplifier
 			for (int j = 0; j < binders.length; j++)
 				hasFunctionalBinders |= binders[j].blocking();
 
-			final boolean isSingleVariable = sub.variable() != null;
-			final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
-			
-			final boolean requiresRewrite  =
-				hasFunctionalBinders
-				? (isSingleVariable ? true 
-					: hasDeepBinders ? true 
-					: state.rule.hasUnorderedShallowBinderUses(term, i))
-				: false;
-			
-			if (requiresRewrite)
+			// If no functional binders, never rewrite.
+			if (hasFunctionalBinders)
 			{
-				// The sub has deep functional binders.. Perform conversion
-				ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
+				final boolean isSingleVariable = sub.variable() != null; // id function. 
+				final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
+				final boolean hasWeakBinders = state.rule.hasWeakBinders(term, i);
+				final boolean hasUnorderedBinders = state.rule.hasUnorderedShallowBinderUses(term, i);
+				
+				if (isSingleVariable | hasDeepBinders | hasWeakBinders | hasUnorderedBinders)
+				{
+					// Setup
+					ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
+					Env2 env = new Env2(state.rule, subbound, sub.arity());
 
-				Env2 env = new Env2(state.rule, subbound, sub.arity());
+					// Add the direct binders to the new contractum and pattern. This guarantee all binders
+					// are used (eliminate weak binders) and in order.
 
-				GenericTerm contractum = rewrite(env, term, i, sub, binders, subbound);
-
-				for (Variable var : binders) {
-					String meta = env.metavars.get(var);
-					if (meta == null)
+					for (Variable var : binders)
 					{
 						GenericTerm metavar = factory.newMetaApplication(
 								"#" + var.name() + env.patternArgs.size(), GenericTerm.NO_TERMS);
+
+						// Add captured binder to pattern
+						env.patternBinders.add(GenericTerm.NO_BIND);
+						env.patternArgs.add(metavar);
+						env.patternBindersSort.add(GenericTerm.NO_BIND);
+
+						Term varSort = getBoundVariableSort(subbound, var);
+						env.patternArgsSort.add(varSort);
+
+						// And then to the new sub contractum
+						env.argsBinders.add(GenericTerm.NO_BIND);
+						env.args.add(factory.newVariableUse(var));
+
+						// Register new metavariable
 						env.metavars.put(var, metavar.metaVariable());
-						env.patternBinders.add(GenericTerm.NO_BIND);
-						env.patternArgs.add(metavar);
-					} else {
-						GenericTerm metavar = factory.newMetaApplication(meta, GenericTerm.NO_TERMS);
-						env.patternBinders.add(GenericTerm.NO_BIND);
-						env.patternArgs.add(metavar);
 					}
-					env.patternBindersSort.add(GenericTerm.NO_BIND);
-					
-					Term varSort = getSort(subbound, var);
-					env.patternArgsSort.add(varSort);
-					env.argsBinders.add(GenericTerm.NO_BIND);
-					env.args.add(factory.newVariableUse(var));
-				}
 
-				// Replace sub with call to the new function.
-				Constructor name = factory.makeConstructor(state.rule.name() + "$C$" + state.counter++);
-				GenericTerm newsub = factory.newConstruction(
-						name, env.argsBinders.toArray(GenericTerm.NO_BINDS), env.args.toArray(GenericTerm.NO_TERMS));
-				term.replaceSub(i, binders, newsub);
-				env.rule.reconcile();
+					// Parse term and rewrite it. As a side effect, in Env, commute the new pattern arguments and sub-contractum.
+					GenericTerm contractum = rewrite(env, term, i, sub, binders, subbound);
 
-				// Create new rule corresponding to the simplified function
-				GenericTerm pattern = factory.newConstruction(
-						name, env.patternBinders.toArray(GenericTerm.NO_BINDS), env.patternArgs.toArray(GenericTerm.NO_TERMS));
+					// Replace sub with call to the new function.
+					Constructor name = factory.makeConstructor(state.rule.name() + "$C$" + state.counter++);
+					GenericTerm newsub = factory.newConstruction(
+							name, env.argsBinders.toArray(GenericTerm.NO_BINDS), env.args.toArray(GenericTerm.NO_TERMS));
+					term.replaceSub(i, binders, newsub);
+					env.rule.reconcile();
 
-				Pair<Term, Term> subSortDeclaration = sub.constructor() == null ? null :  getSortDeclaration(rulename, sub.constructor().symbol());
-				//if (subSortDeclaration == null)
-				//	fatal("Missing sort declaration for construction " + sub.constructor().symbol() + " in rule " + rulename);
-				
-				// Wrap both pattern and contractum with properties reference (if form has it)
-				// but only if there are of the same sort.
-				
-				final boolean subHasProperties = subSortDeclaration != null && 
-						(Util.hasProperties(subSortDeclaration.head())
-						|| Util.hasProperties(subSortDeclaration.tail()));
-				final boolean subHasRef = Util.hasPropertyRef(sub);
-				if (!subHasRef && subHasProperties)
-				{
-					String metaref = "#E$C";
-					pattern = pattern.wrapWithPropertiesRef(metaref, true);
-					contractum = contractum.wrapWithPropertiesRef(metaref, true);
-				}
+					// Create new rule corresponding to the simplified function
+					GenericTerm pattern = factory.newConstruction(
+							name, env.patternBinders.toArray(GenericTerm.NO_BINDS), env.patternArgs.toArray(GenericTerm.NO_TERMS));
 
-				HashMap<String, List<Term>> options = new HashMap<String, List<Term>>(4);
-				options.put(Builder.LAX_OPTION_SYMBOL, new LinkedList<Term>());
+					Pair<Term, Term> subSortDeclaration = sub.constructor() == null ? null : getSortDeclaration(
+							rulename, sub.constructor().symbol());
+					//if (subSortDeclaration == null)
+					//	fatal("Missing sort declaration for construction " + sub.constructor().symbol() + " in rule " + rulename);
 
-				GenericRule rule = new GenericRule(crs, name, pattern, contractum, options);
+					// Wrap both pattern and contractum with properties reference (if form has it)
+					// but only if there are of the same sort.
 
-				// Set meta sorts to rule so that the sortifier does not have to run after each main iteration (see simplify)!
-				Map<String, Term> metavarSorts = new HashMap<String, Term>(8); // Map meta variable name to sorts
-				for (int j = 0; j < env.patternArgs.size(); j++)
-					metavarSorts.put(env.patternArgs.get(j).metaVariable(), env.patternArgsSort.get(j));
-
-				rule.setMetaVariableSorts(metavarSorts);
-
-				state.newrules.add(rule);				
-				
-				// Add sort for new rule
-				GenericTerm form = factory.newConstruction(
-						name, env.patternBindersSort.toArray(GenericTerm.NO_BINDS),
-						env.patternArgsSort.toArray(GenericTerm.NO_TERMS));
-				
-				if (!subHasRef && subHasProperties)
-				{
-					PropertiesHolder properties = null;
-					if (Util.hasProperties(subSortDeclaration.head()))
-						properties = Util.propertiesHolder(subSortDeclaration.head()); // data
-					if (properties == null && Util.hasProperties(subSortDeclaration.tail()))
-						properties = Util.propertiesHolder(subSortDeclaration.tail()); // function
-
-					if (properties != null)
+					final boolean subHasProperties = subSortDeclaration != null
+							&& (Util.hasProperties(subSortDeclaration.head()) || Util.hasProperties(subSortDeclaration.tail()));
+					final boolean subHasRef = Util.hasPropertyRef(sub);
+					if (!subHasRef && subHasProperties)
 					{
-						for (String prop : properties.propertyNames())
-							form = form.wrapWithProperty(prop, properties.getProperty(prop), true);
-
-						assert !properties.propertyVariables().iterator().hasNext();
+						String metaref = "#E$C";
+						pattern = pattern.wrapWithPropertiesRef(metaref, true);
+						contractum = contractum.wrapWithPropertiesRef(metaref, true);
 					}
+
+					HashMap<String, List<Term>> options = new HashMap<String, List<Term>>(4);
+					options.put(Builder.LAX_OPTION_SYMBOL, new LinkedList<Term>());
+
+					GenericRule rule = new GenericRule(crs, name, pattern, contractum, options);
+
+					// Set meta sorts to rule so that the sortifier does not have to run after each main iteration (see simplify)!
+					Map<String, Term> metavarSorts = new HashMap<String, Term>(8); // Map meta variable name to sorts
+					for (int j = 0; j < env.patternArgs.size(); j++)
+						metavarSorts.put(env.patternArgs.get(j).metaVariable(), env.patternArgsSort.get(j));
+
+					rule.setMetaVariableSorts(metavarSorts);
+
+					state.newrules.add(rule);
+
+					// Add sort for new rule
+					GenericTerm form = factory.newConstruction(
+							name, env.patternBindersSort.toArray(GenericTerm.NO_BINDS),
+							env.patternArgsSort.toArray(GenericTerm.NO_TERMS));
+
+					if (!subHasRef && subHasProperties)
+					{
+						PropertiesHolder properties = null;
+						if (Util.hasProperties(subSortDeclaration.head()))
+							properties = Util.propertiesHolder(subSortDeclaration.head()); // data
+						if (properties == null && Util.hasProperties(subSortDeclaration.tail()))
+							properties = Util.propertiesHolder(subSortDeclaration.tail()); // function
+
+						if (properties != null)
+						{
+							for (String prop : properties.propertyNames())
+								form = form.wrapWithProperty(prop, properties.getProperty(prop), true);
+
+							assert !properties.propertyVariables().iterator().hasNext();
+						}
+					}
+
+					Term sortTerm;
+
+					if (subSortDeclaration != null)
+					{
+						// Simplified rules don't have properties (they are on the form)
+						sortTerm = subSortDeclaration.head();
+					}
+					else if (sub.metaVariable() != null)
+					{
+						// Get the sort of meta-application 
+						sortTerm = rule.getMetaVariableSort(sub.metaVariable());
+					}
+					else
+					{
+						sortTerm = getBoundVariableSort(subbound, sub.variable());
+					}
+
+					if (Util.hasProperties(sortTerm))
+						sortTerm = ((PropertiesConstraintsWrapper) sortTerm).term;
+
+					if (sortTerm.kind() == Kind.CONSTRUCTION && Factory.SORT_VAR.equals(Util.symbol(sortTerm)))
+						sortTerm = sortTerm.sub(0);
+
+					factory.setSortForm(sortTerm, null, form, true, false);
 				}
-				
-				Term sortTerm;
-
-				if (subSortDeclaration != null) {
-					// Simplified rules don't have properties (they are on the form)
-					sortTerm = subSortDeclaration.head();
-				} else if (sub.metaVariable() != null) {
-					// Get the sort of meta-application 
-					sortTerm = rule.getMetaVariableSort(sub.metaVariable());				
-				} else {
-					sortTerm = getSort(subbound, sub.variable());
-				}
-
-				if (Util.hasProperties(sortTerm))
-					sortTerm = ((PropertiesConstraintsWrapper) sortTerm).term;
-
-	        	if (sortTerm.kind() == Kind.CONSTRUCTION && Factory.SORT_VAR.equals(Util.symbol(sortTerm)))
-	        		sortTerm = sortTerm.sub(0);
-				
-				factory.setSortForm(sortTerm, null, form, true, false);
-			}
-			else
-			{
-				if (hasDeepBinders)
+				else
 				{
-					if (factory.defined(Factory.SHOW_POTENTIAL_CLOSURE_OPTION))
-						warning("construction "
-								+ Util.symbol(sub) + " contains deep binder uses. Consider using the blocking marker ᵇ in rule "
-								+ rulename);
+					if (hasDeepBinders)
+					{
+						if (factory.defined(Factory.SHOW_POTENTIAL_CLOSURE_OPTION))
+							warning("construction "
+									+ Util.symbol(sub)
+									+ " contains deep binder uses. Consider using the blocking marker ᵇ in rule " + rulename);
+					}
+
+					ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
+
+					GenericTerm newsub = eliminateDeepBinders(state, term.sub(i), subbound);
+					term.replaceSub(i, binders, newsub);
 				}
-
-				ExtensibleSet<Pair<Variable, Term>> subbound = extend(bound, binders, binderSorts);
-
-				GenericTerm newsub = eliminateDeepBinders(state, term.sub(i), subbound);
-				term.replaceSub(i, binders, newsub);
 			}
 		}
 		return term;
@@ -532,7 +399,7 @@ public class Simplifier
 	 * 
 	 * @param parent term's parent
 	 * @param subindex 
-	 * @param term 
+	 * @param term sub term being rewritten.
 	 * @param binders
 	 * @param subbound 
 	 * @return The term without deep binders, to be used within the closure body. 
@@ -640,14 +507,36 @@ public class Simplifier
 			case VARIABLE_USE : {
 				final Variable var = term.variable();
 
-				if (/* contains(env.freeBinders, var) ||*/ !contains(bound, var))
+				//				if (env.toplevel)
+				//				{
+				//					// just use this variable as it is already shallow.
+				//					GenericTerm metavar = factory.newMetaApplication(
+				//							"#" + var.name() + env.patternArgs.size(), GenericTerm.NO_TERMS);
+				//					env.metavars.put(var, metavar.metaVariable());
+				//
+				//					env.patternBinders.add(GenericTerm.NO_BIND);
+				//					env.patternArgs.add(metavar);
+				//					env.patternBindersSort.add(GenericTerm.NO_BIND);
+				//					env.patternArgsSort.add(getVariableSort(var, bound, env.rule));
+				//
+				//					env.argsBinders.add(GenericTerm.NO_BIND);
+				//					env.args.add(factory.newVariableUse(var));
+				//
+				//					return factory.newMetaApplication(metavar.metaVariable(), GenericTerm.NO_TERMS);
+				//				}
+
+				// Is it a bound variable?
+				final boolean isBound = contains(bound, var);
+
+				if (!isBound || contains(env.preBinders, var))
 				{
-					// This is either a binder occurring before the term being rewritten
-					// or it's a free/fresh variable.
-					// Either case: they need to be captured!
+					// This is either a binder occurring before the term being rewritten (already captured)
+					// or it's a free/fresh variable (that might need to be captured)
 					String meta = env.metavars.get(var);
 					if (meta == null)
 					{
+						// This is a free/fresh variable that hasn't been captured yet. 
+
 						GenericTerm metavar = factory.newMetaApplication(
 								"#" + term.variable().name() + env.patternArgs.size(), GenericTerm.NO_TERMS);
 						env.metavars.put(var, metavar.metaVariable());
@@ -657,35 +546,7 @@ public class Simplifier
 
 						env.patternBindersSort.add(GenericTerm.NO_BIND);
 
-						Term varSort = getSort(bound, var);
-						if (varSort == null)
-						{
-							// This is either a free or fresh variable. Sort is stored in the rule Option
-							if (env.rule.options.containsKey(Builder.FRESH_OPTION_SYMBOL))
-							{
-								for (Term z : env.rule.options.get(Builder.FRESH_OPTION_SYMBOL))
-								{
-									Variable v = Util.variableWithOptionalSortVariable(z);
-									if (v == var)
-									{
-										varSort = Util.variableWithOptionalSortSort(z);
-										break;
-									}
-								}
-							}
-
-							if (varSort == null)
-							{
-
-								// Free variable.
-								varSort = env.rule.getVariableSort(var);
-								if (varSort == null)
-									fatal("Missing sort for free variable " + var.name() + " in rule " + env.rule.name());
-							}
-						}
-						if (varSort.kind() != Kind.VARIABLE_USE && Util.isVariableWithOptionalSort(varSort))
-							varSort = Util.variableWithOptionalSortSort(varSort);
-
+						Term varSort = getVariableSort(var, bound, env.rule);
 						env.patternArgsSort.add(varSort);
 
 						env.argsBinders.add(GenericTerm.NO_BIND);
@@ -695,22 +556,30 @@ public class Simplifier
 					}
 					return factory.newMetaApplication(meta, GenericTerm.NO_TERMS);
 				}
-				else {
-					String meta = env.metavars.get(var);
-					if (meta == null)
-					{
-						GenericTerm metavar = factory.newMetaApplication(
-								"#" + term.variable().name() + env.patternArgs.size(), GenericTerm.NO_TERMS);
-						env.metavars.put(var, metavar.metaVariable());
-						return metavar;
-					}
-					return factory.newMetaApplication(meta, GenericTerm.NO_TERMS);
+				else
+				{
+					// This is a bound variable after the closure. Just use it
+
+					//					
+					//					String meta = env.metavars.get(var);
+					//					if (meta == null)
+					//					{
+					//						GenericTerm metavar = factory.newMetaApplication(
+					//								"#" + term.variable().name() + env.patternArgs.size(), GenericTerm.NO_TERMS);
+					//						env.metavars.put(var, metavar.metaVariable());
+					//						return metavar;
+					//					}
+					//					return factory.newMetaApplication(meta, GenericTerm.NO_TERMS);
+
+					return factory.newVariableUse(var);
 				}
 			}
-			case CONSTRUCTION :
+			case CONSTRUCTION : {
 				if (term.arity() == 0)
 					return term;
 
+				final boolean toplevel = env.toplevel;
+				env.toplevel = false;
 				for (int i = 0; i < term.arity(); i++)
 				{
 					ExtensibleSet<Pair<Variable, Term>> subbound = bound;
@@ -720,9 +589,9 @@ public class Simplifier
 					GenericTerm sub = rewrite(env, term, i, term.sub(i), term.binders(i), subbound);
 					term.replaceSub(i, term.binders(i), sub);
 				}
-
+				env.toplevel = toplevel;
 				return term;
-
+			}
 			case META_APPLICATION :
 			default :
 				// Capture (if not already captured!).
@@ -730,9 +599,6 @@ public class Simplifier
 				if (meta == null)
 				{
 					// Capture metavar (which is potentially an abstraction)
-
-					// A[a0...C[a1... #[...]]]
-					// capture a1.#[a1] as a0 is before the closure
 					GenericTerm metaSort = (GenericTerm) env.rule.getMetaVariableSort(term.metaVariable());
 					if (metaSort == null)
 						fatal("Missing sort for meta variable " + term.metaVariable() + " in rule " + env.rule.name());
@@ -741,59 +607,39 @@ public class Simplifier
 					GenericTerm[] patternSubs;
 					Variable[] patternBindersSort;
 
-					GenericTerm[] contractumSubs;
-
-					final int arity = term.arity();
+					// Only the meta on pattern contains the full list arguments.  
+					GenericTerm original = env.rule.getMetaOnPattern(term.metaVariable());
+					final int arity = original.arity();
 					if (arity > 0)
 					{
-						GenericTerm original = env.rule.getMetaOnPattern(term.metaVariable());
-
-						ArrayList<Variable> patternBindersA = new ArrayList<Variable>();
-						ArrayList<Variable> patternBindersSortA = new ArrayList<Variable>();
-
-						ArrayList<Term> patternSubsA = new ArrayList<Term>(); // Subs of the captured metavariable. All variables
-
+						patternBinders = new Variable[arity];
+						patternSubs = new GenericTerm[arity];
+						patternBindersSort = new Variable[arity];
+						
+						metaSort = factory.newForm(Sorting.SORT_VAR, new GenericTerm[]
+								{metaSort});
+						if (!(metaSort instanceof PropertiesConstraintsWrapper))
+							metaSort = new PropertiesConstraintsWrapper(metaSort, null, null, null, null);
+						
 						for (int i = 0; i < arity; i++)
 						{
-							Term sub = term.sub(i);
+							Variable var = original.sub(i).variable();
+							Variable newvar = factory.makeVariable(var.name(), var.promiscuous(), var.blocking(), var.shallow());
 
-							// If the contractum reuse a binder, preserve its name. Otherwise gets the name from the pattern.
-							Variable var;
-							if (sub.kind() == Kind.VARIABLE_USE)
-								var = sub.variable();
-							else
-								var = original.sub(i).variable();
-
-							// The variable is a binder occurring in the closure. Need to capture the binder
-							Variable capturedvar = factory.makeVariable(
-									var.name(), var.promiscuous(), var.blocking(), var.shallow());
-
-							patternBindersA.add(capturedvar);
-							patternSubsA.add(factory.newVariableUse(capturedvar));
+							patternBinders[i] = newvar;
+							patternSubs[i] = factory.newVariableUse(newvar);
 
 							Term varSort = env.rule.getVariableSort(var);
 							if (varSort == null)
 								fatal("Missing sort for variable " + var + " in rule " + env.rule.name());
 
-							// Update binder sorts
-							// TODO: how to do this on variable use? and Meta?
-
 							Variable binderOnSort = factory.makeVariable(
 									var.name(), var.promiscuous(), var.blocking(), var.shallow());
-							
-							patternBindersSortA.add(binderOnSort);
 
-							metaSort = factory.newForm(Sorting.SORT_VAR, new GenericTerm[] { metaSort });
-							
-							if (!(metaSort instanceof PropertiesConstraintsWrapper))
-								metaSort = new PropertiesConstraintsWrapper(metaSort, null, null, null, null);
+							patternBindersSort[i] = binderOnSort;
 
 							metaSort = metaSort.wrapWithProperty(binderOnSort, varSort, false); // binderOnSort.{binderOnSort:varSort}.MetaSort
 						}
-
-						patternBinders = patternBindersA.toArray(GenericTerm.NO_BIND);
-						patternSubs = patternSubsA.toArray(GenericTerm.NO_TERMS);
-						patternBindersSort = patternBindersSortA.toArray(GenericTerm.NO_BIND);
 					}
 					else
 					{
@@ -823,9 +669,14 @@ public class Simplifier
 					metasubs = GenericTerm.NO_TERMS;
 				else
 				{
+					final boolean toplevel = env.toplevel;
+					env.toplevel = false;
+
 					metasubs = new GenericTerm[term.arity()];
 					for (int i = 0; i < term.arity(); i++)
 						metasubs[i] = rewrite(env, term, i, term.sub(i), GenericTerm.NO_BIND, bound);
+
+					env.toplevel = toplevel;
 				}
 
 				GenericTerm metavar = factory.newMetaApplication(term.metaVariable(), metasubs);
@@ -915,7 +766,7 @@ public class Simplifier
 	{
 		for (Pair<Variable, Term> pair : set)
 		{
-			if (pair.head().name().equals(var.name()))
+			if (pair.head() == var)
 				return true;
 		}
 		return false;
@@ -927,7 +778,7 @@ public class Simplifier
 	 * @param var
 	 * @return A form or null if not found
 	 */
-	private Term getSort(ExtensibleSet<Pair<Variable, Term>> set, Variable var)
+	private Term getBoundVariableSort(ExtensibleSet<Pair<Variable, Term>> set, Variable var)
 	{
 		for (Pair<Variable, Term> pair : set)
 		{
@@ -935,6 +786,44 @@ public class Simplifier
 				return pair.tail();
 		}
 		return null;
+	}
+
+	/**
+	 * Gets variable sort. Variable can either be free, bound or fresh.
+	 * @throws CRSException 
+	 */
+	private Term getVariableSort(Variable var, ExtensibleSet<Pair<Variable, Term>> bound, GenericRule rule) throws CRSException
+	{
+		Term varSort = getBoundVariableSort(bound, var);
+		if (varSort == null)
+		{
+			// This is either a free or fresh variable. Sort is stored in the rule Option
+			if (rule.options.containsKey(Builder.FRESH_OPTION_SYMBOL))
+			{
+				for (Term z : rule.options.get(Builder.FRESH_OPTION_SYMBOL))
+				{
+					Variable v = Util.variableWithOptionalSortVariable(z);
+					if (v == var)
+					{
+						varSort = Util.variableWithOptionalSortSort(z);
+						break;
+					}
+				}
+			}
+
+			if (varSort == null)
+			{
+				// Free variable.
+				varSort = rule.getVariableSort(var);
+				if (varSort == null)
+					fatal("Missing sort for free variable " + var.name() + " in rule " + rule.name());
+			}
+		}
+
+		if (varSort.kind() != Kind.VARIABLE_USE && Util.isVariableWithOptionalSort(varSort))
+			varSort = Util.variableWithOptionalSortSort(varSort);
+
+		return varSort;
 	}
 
 	/**
@@ -1021,7 +910,7 @@ public class Simplifier
 	{
 		final GenericRule rule;
 
-		final Set<Pair<Variable, Term>> freeBinders; // Binders occurring before the rewrite
+		final Set<Pair<Variable, Term>> preBinders; // Binders occurring before the rewrite
 
 		final List<Variable[]> patternBinders; // New closure argument binders.
 		final List<GenericTerm> patternArgs;// New closure pattern arguments. All metas.
@@ -1034,10 +923,12 @@ public class Simplifier
 		final Map<Object, String> metavars; // Map capture variable/metavars to new metavar name in closure
 		final Map<Map<String, Term>, String> propHolder;
 
-		public Env2(GenericRule rule, Set<Pair<Variable, Term>> freeBinders, int arity)
+		boolean toplevel; // The current term is the one being rewritten.
+
+		public Env2(GenericRule rule, Set<Pair<Variable, Term>> preBinders, int arity)
 		{
 			this.rule = rule;
-			this.freeBinders = freeBinders;
+			this.preBinders = preBinders;
 
 			patternBinders = new ArrayList<Variable[]>();
 			patternArgs = new ArrayList<GenericTerm>();
@@ -1049,7 +940,7 @@ public class Simplifier
 
 			metavars = new HashMap<Object, String>();
 			propHolder = new HashMap<Map<String, Term>, String>();
-
+			toplevel = true;
 		}
 	}
 

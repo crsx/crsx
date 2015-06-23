@@ -109,7 +109,7 @@ public class GenericRule implements Copyable
 
 	/** Set of comparable meta application */
 	private Set<String> comparable;
-	
+
 	/** Set of discarded meta application */
 	private Set<String> discarded;
 
@@ -160,12 +160,12 @@ public class GenericRule implements Copyable
 		this.copied = new HashSet<String>(2);
 		this.weak = new HashSet<String>(2);
 		this.shallow = new HashSet<Variable>(2);
-	
+
 		this.forced = new HashSet<String>(4);
 		this.pattern = pattern;
 		this.contractum = contractum;
 		this.explicitCount = new HashMap<String, Integer>();
-		
+
 		reconcile();
 	}
 
@@ -453,7 +453,7 @@ public class GenericRule implements Copyable
 		checkPattern(
 				pattern, free, comparable, weak, patternMetaApplications, patternPropertiesRefs, patternMetaSorts,
 				SimpleVariableSet.EMPTY, patternOccurrences);
-		
+
 		// Check contractum (and extract explicit counts and reusable binders).
 		List<String> contractumMetaVariables = new ArrayList<String>();
 		Map<String, Integer> contractumOccurrences = new HashMap<String, Integer>();
@@ -461,10 +461,9 @@ public class GenericRule implements Copyable
 		Map<Variable, Variable> reusable = new HashMap<Variable, Variable>();
 		Map<Variable, Pair<String, Integer>> reusableOrigin = new HashMap<Variable, Pair<String, Integer>>();
 		checkContractum(
-				contractum, free, !allowMeta, shared, copied, discarded, shallow, patternMetaApplications,
-				patternPropertiesRefs, patternMetaSorts, contractumMetaVariables, contractumOccurrences, nonExplicit, reusable, reusableOrigin);
+				contractum, free, !allowMeta, shared, copied, discarded, shallow, patternMetaApplications, patternPropertiesRefs,
+				patternMetaSorts, contractumMetaVariables, contractumOccurrences, nonExplicit, reusable, reusableOrigin);
 
-		
 		reused = reusable;
 		reusedOrigin = reusableOrigin;
 		for (Variable v : reused.values())
@@ -681,21 +680,6 @@ public class GenericRule implements Copyable
 		else
 			return sortform.head();
 	}
-//
-//	/**
-//	 * Whether the sub is a construction and has binders
-//	 * 
-//	 * <p>The notion of closure only make sense when the term is part of
-//	 * a contraction
-//	 * 
-//	 * @param index of the sub
-//	 * @throws CRSException 
-//	 */
-//	public boolean hasBinders(Term term, int index) throws CRSException
-//	{
-//		//return term.sub(index).kind() != Kind.META_APPLICATION && term.binders(index) != null;
-//		return term.binders(index) != null;
-//	}
 
 	/**
 	 * Whether the sub is a construction with deep use of binders declared on the sub. Ignore properties.
@@ -722,7 +706,7 @@ public class GenericRule implements Copyable
 					case VARIABLE_USE :
 						// Shallow variable use	
 						break;
-					case META_APPLICATION:
+					case META_APPLICATION :
 					case CONSTRUCTION :
 					default :
 						// Check if the subsub contains at least one binder use.
@@ -741,12 +725,11 @@ public class GenericRule implements Copyable
 		return false;
 	}
 
-	
 	/**
 	 * Whether the sub is a construction that contains unordered variable uses. Ignore properties.
 	 * @param index of the sub
 	 * @throws CRSException 
-	 */	
+	 */
 	public boolean hasUnorderedShallowBinderUses(Term term, int index) throws CRSException
 	{
 		//if (hasBinders(term, index))
@@ -759,7 +742,7 @@ public class GenericRule implements Copyable
 			// sub is a construction/meta application with binders and optionally with properties.
 			Variable[] binders = term.binders(index);
 			int nextVarPos = 0;
-			
+
 			for (int i = 0; i < sub.arity(); i++)
 			{
 				Term subsub = sub.sub(i);
@@ -768,16 +751,17 @@ public class GenericRule implements Copyable
 				{
 					case VARIABLE_USE :
 						Variable var = subsub.variable();
-						do 
+						do
 						{
 							if (nextVarPos >= binders.length)
 							{
 								// unordered use
 								return true;
 							}
-						} while (!(var.name().equals(binders[nextVarPos++].name())));
+						}
+						while (!(var.name().equals(binders[nextVarPos++].name())));
 						break;
-					case META_APPLICATION:
+					case META_APPLICATION :
 					case CONSTRUCTION :
 					default :
 						break;
@@ -786,9 +770,56 @@ public class GenericRule implements Copyable
 		}
 
 		return false;
-	}	
-	
-	
+	}
+
+	/**
+	 * Whether the sub does not use all direct binders.
+	 * @param index of the sub
+	 * @throws CRSException 
+	 */
+	public boolean hasWeakBinders(Term term, int index) throws CRSException
+	{
+		Variable[] binders = term.binders(index);
+		if (binders != null)
+		{
+			HashSet<Variable> remainingBinders = new HashSet<Variable>();
+			for (Variable variable : binders)
+				remainingBinders.add(variable);
+
+			removeUsedBinders(remainingBinders, term.sub(index));
+			return !remainingBinders.isEmpty();
+		}
+		return false;
+	}
+
+	/**
+	 * Whether the sub does not use all direct binders.
+	 * @param index of the sub
+	 * @throws CRSException 
+	 */
+	private void removeUsedBinders(HashSet<Variable> binders, Term term) throws CRSException
+	{
+		if (binders.isEmpty())
+			return;
+
+		switch (term.kind())
+		{
+			case VARIABLE_USE :
+				binders.remove(term.variable());
+				break;
+			case CONSTRUCTION :
+			case META_APPLICATION :
+			default :
+				for (int i = 0; i < term.arity(); i++)
+				{
+					removeUsedBinders(binders, term.sub(i));
+					if (binders.isEmpty())
+						break;
+				}
+				break;
+		}
+	}
+
 	/**
 	 * Determine whether the give meta variable, when used in the contractum
 	 * requires meta-substitution when evaluated.
@@ -806,11 +837,11 @@ public class GenericRule implements Copyable
 				if (sub.kind() != Kind.VARIABLE_USE)
 					return true;
 				Variable var = sub.variable();
-				
+
 				// If the variable is fresh, then always assume substitution is needed, even when it can be reused.
 				if (!bound.contains(var))
 					return true;
-				
+
 				if (getReused(var) == null)
 					return true;
 			}
@@ -1278,8 +1309,8 @@ public class GenericRule implements Copyable
 				private int primitiveNesting;
 
 				/** Binders stack. */
-				final Deque<Variable[]> scopedBinders = new ArrayDeque<Variable[]>(); 
-				
+				final Deque<Variable[]> scopedBinders = new ArrayDeque<Variable[]>();
+
 				@Override
 				public void visitPrimitive(Primitive primitive, boolean start) throws CRSException
 				{
@@ -1304,7 +1335,7 @@ public class GenericRule implements Copyable
 					if (start && primitiveNesting == 0)
 						checkConstructionSort(construction, "contractum", boundVariableSorts, patternMetaSorts);
 				}
-				
+
 				@Override
 				public void visitConstructionSub(Term construction, int index, boolean start, Set<Variable> bound)
 						throws CRSException
@@ -1312,19 +1343,19 @@ public class GenericRule implements Copyable
 					if (start)
 					{
 						Variable[] binders = construction.binders(index);
-				
+
 						// Binders on meta cannot be shallow 
-						if 	(construction.sub(index).kind() != Kind.META_APPLICATION)
+						if (construction.sub(index).kind() != Kind.META_APPLICATION)
 						{
-							for (int i = 0; i < binders.length; i ++)
+							for (int i = 0; i < binders.length; i++)
 								maybeShallow.put(binders[i], true);
 						}
-						
+
 						scopedBinders.push(binders);
-					}	
-					
+					}
+
 					super.visitConstructionSub(construction, index, start, bound);
-					
+
 					if (!start)
 						scopedBinders.pop();
 				}
@@ -1527,7 +1558,7 @@ public class GenericRule implements Copyable
 						{
 							linearSubstitutionContexts.add(false);
 						}
-						
+
 						// meta does not define binders
 						scopedBinders.push(GenericTerm.NO_BIND);
 					}
@@ -1535,7 +1566,7 @@ public class GenericRule implements Copyable
 					{
 						// Pop linearity of this meta-application argument.
 						linearSubstitutionContexts.remove(linearSubstitutionContexts.size() - 1);
-						
+
 						scopedBinders.pop();
 					}
 				}
@@ -1567,20 +1598,22 @@ public class GenericRule implements Copyable
 						error("contraction reuses name declared as fresh as bound (" + v + " in " + contractum + ")", true);
 					if (free.containsKey(v.name()))
 						error("contraction reuses name declared as free as bound (" + v + " in " + contractum + ")", true);
-					
+
 					if (!Util.contains(scopedBinders.peek(), v)) // x.x case
 					{
 						if (scopedBinders.size() >= 2)
 						{
 							Variable[] last = scopedBinders.pop();
-							
+
 							if (!Util.contains(scopedBinders.peek(), v)) // x.C[x] case
 							{
 								maybeShallow.remove(v);
 								if (v.shallow())
-									error("contraction uses a deep variable declared as shallow (" + v + " in " + contractum + ")", true);
+									error(
+											"contraction uses a deep variable declared as shallow ("
+													+ v + " in " + contractum + ")", true);
 							}
-							
+
 							scopedBinders.push(last);
 						}
 					}
@@ -1650,7 +1683,7 @@ public class GenericRule implements Copyable
 			for (String varname : declaredFresh)
 				fresh.remove(varname);
 		}
-		
+
 		shallow.clear();
 		for (Variable v : maybeShallow.keySet())
 		{
@@ -1658,8 +1691,8 @@ public class GenericRule implements Copyable
 			{
 				//ruleError("contraction uses a shallow variable but marker is missing (" + v + " in " + contractum + ")", true, true);
 				((GenericVariable) v).setShallow(true);
-			}			
-			
+			}
+
 			shallow.add(v);
 		}
 	}
@@ -1687,7 +1720,7 @@ public class GenericRule implements Copyable
 						{
 							if (Util.contains(construction.binders(i), x))
 							{
-								result[0] = new Pair<Term,Integer>(construction, i);
+								result[0] = new Pair<Term, Integer>(construction, i);
 								break;
 							}
 

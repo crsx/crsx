@@ -1,0 +1,23 @@
+// Closure conversion test.
+// Deep occurrence of a binder in a function taking another function.
+
+TestCC3[(
+
+$Lax;
+
+$Use["sfun.crs"];
+
+Test :: $List[$Numeric];
+Test → Test1[(1; 4;), vᵇ.vᵇ];
+
+Test1[$List[$Numeric], vᵇ::$Numeric.$Numeric] :: $List[$Numeric];
+Test1[#list, vᵇ.#[vᵇ]] → Map[vᵇ.Cont[Plus[vᵇ, 1], vᵇ.#[vᵇ]], #list];
+
+Cont[$Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Cont[#Num, vᵇ.#[vᵇ]] → #[#Num];
+ 
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+
+)]

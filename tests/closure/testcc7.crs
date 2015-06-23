@@ -1,0 +1,17 @@
+// Closure conversion test.
+
+// Unordered shallow weak binder
+TestCC7[(
+
+$Lax;
+
+Test :: $Numeric;
+Test → Test1[1, 2, xᵇ yᵇ. Plus[yᵇ, 1]];
+
+Test1[$Numeric, $Numeric, vᵇ::$Numeric wᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, #2, vᵇ wᵇ.#[vᵇ, wᵇ]] → #[#1, #2];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+)]

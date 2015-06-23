@@ -652,10 +652,7 @@ ST-invoke2[OK_SORT, Text, $List[Text], $String, $Numeric, Text] :: Text;
 {#env; "$tail": #tail}
 ST-invoke2[OK, #closure, #args, #metavar, #arity, #sink]
 →
-//$[If, $[Equal, #arity, 1],
-//  %n⟪«ST-send-tail2[#tail]»¶call1(«#sink», «#closure»«ReverseConcatText[#args,%n⟨,⟩]»);⟫,
-//  %n⟪«ST-send-tail2[#tail]»¶call(«#sink», «#closure», «INTEGER[#arity]»«ReverseConcatText[#args,%n⟨,⟩]»);⟫];
-%n⟪«ST-send-tail2[#tail]»¶CALL(«#sink», «#closure»«ReverseConcatText[#args,%n⟨,⟩]»);⟫;
+%n⟪«ST-send-tail2[#tail]»¶CALL(«#sink», «#closure»«ConcatText[#args,%n⟨,⟩]»);⟫;
 
 ST-may-link[Text, Reified_Use, Text] :: Text;
 

@@ -1,0 +1,14 @@
+// Closure conversion test.
+// Weak id function
+TestCC5[(
+
+$Lax;
+
+Test :: $Numeric;
+Test → Test1[1, 2, vᵇ wᵇ.wᵇ];
+
+Test1[$Numeric, $Numeric, vᵇ::$Numeric wᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, #2, vᵇ wᵇ.#[vᵇ, wᵇ]] → #[#1, #2];
+
+
+)]

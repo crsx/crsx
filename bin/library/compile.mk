@@ -84,7 +84,8 @@ $(symbols): $(symlist)
 
 # Compile C files
 
-CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING -DGENERIC_LOADER $(DEBUG) 
+CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING -DGENERIC_LOADER $(DEBUG)
+ 
 ifdef ICU4CDIR
 LDFLAGS+=-L$(ICU4CDIR)
 CCFLAGS+=-I$(ICU4CDIR)/../include
@@ -97,6 +98,10 @@ endif
 ifdef RTDIR
 LDFLAGS+=-L$(RTDIR)
 CCFLAGS+=-I$(RTDIR)/../include
+endif
+
+ifeq ($(MODE),STRICT)
+CCFLAGS+=-DSTRICT
 endif
 
 objs+=$(OUTPUTDIR)/crsx.o $(OUTPUTDIR)/crsx_scan.o $(OUTPUTDIR)/main.o \

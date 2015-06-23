@@ -966,7 +966,14 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 					{
 						if (Util.getInteger(factory, Factory.VERBOSE_OPTION, 0) > 0)
 							factory.message(directive.toString());
-						new Simplifier(this).simplify(ruleByName);
+						try
+						{
+							new Simplifier(this).simplify(ruleByName);
+						} 
+						catch (CRSException e)
+						{
+							e.printStackTrace();
+						}
 						return sink;
 					}
 				}
