@@ -3555,6 +3555,11 @@ void initCRSXContext(Context context)
     context->keyPool = NULL;
     context->consPool = NULL;
 
+#ifdef CRSX_ENABLE_PROFILING
+    context->profiling = 0;
+    context->internal = 0;
+#endif
+
     crsxAddPools(context);
 
     context->str_filelocation = GLOBAL(context, "$FileLocation");
@@ -3562,12 +3567,6 @@ void initCRSXContext(Context context)
     context->str_columnlocation = GLOBAL(context, "$ColumnLocation");
 
     context->fv_enabled = getenv("crsx-disable-fv") == NULL;
-
-#ifdef CRSX_ENABLE_PROFILING
-    context->profiling = 0;
-    context->internal = 0;
-#endif
-
     context->functional = makeVariable(context, "f", 1, 0);
     context->functionalUse = makeVariableUse(context, context->functional);
 }

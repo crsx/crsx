@@ -546,11 +546,7 @@ public class Completer
 	 */
     private void dispatchifyEntry(final Entry<String, List<StandardizedRule>> e) throws CRSException
     {
-     	if (e.getKey().contains("for-at4"))
-     			System.out.println("here");
-     		   
-    	
-	    final Set<StandardizedRule> relevantRules = new HashSet<StandardizedRule>(8);  
+     	final Set<StandardizedRule> relevantRules = new HashSet<StandardizedRule>(8);  
 	    final Map<Object,Term> sorts = new HashMap<Object,Term>();
 
 	    for (StandardizedRule q : e.getValue())
