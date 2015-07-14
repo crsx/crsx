@@ -108,7 +108,7 @@ Pattern-Stage ::=(
 );
 
 // Sort for tracking meta variable occurrences
-Meta-Occurrence ::=( NOTHING; UNIQUE[$String]; );
+Meta-Occurrence ::=( NOTHING; UNIQUE[$String];  );
 
 // Sort helping in analyzing binder reuse. 
 Binder-State ::= ( OUTER; REUSING; COPYING; NO_REUSE; );

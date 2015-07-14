@@ -834,121 +834,89 @@ ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]],
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-analyze-binders[OK_SORT, Reified_Binder, Text, ok¹::OK_SORT vars::$List[Reified_Variable].Text] :: Text;
  
-{#env}
-ST-analyze-binders[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders[OK, BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, ok¹ vars.#[ok¹, vars]]
 →
 {#env; "$binders":LIST_VARIABLE[()]; "$all_reused": YES}
-ST-analyze-binders1[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, 0, OUTER, ok¹ vars.#[ok¹, vars]]
-;
+ST-analyze-binders1[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, 0, OUTER, ok¹ vars.#[ok¹, vars]];
 
 // - Analyze each binder and either allocate it or reuse the unique variable it replaces.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-analyze-binders1[Reified_Binder, Text, $Numeric, Binder-State, ok¹::OK_SORT vars¹::$List[Reified_Variable].Text] :: Text;
+ST-analyze-binders1[Reified_Binder, Text, $Numeric, Binder-State, ok¹::OK_SORT vars::$List[Reified_Variable].Text] :: Text;
 
-{#env}
-ST-analyze-binders1[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#Binder[b]], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders1[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders2[#occs, NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders2[#occs, NOTHING, #promisc, #kind, #depth, b.#binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]];
 
 // - Once all binders are collected ...
 {#env; "$binders":LIST_VARIABLE[#Args]}
 ST-analyze-binders1[ARGUMENT[#sort, #Term], #sink, #rank, #state, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-#[OK, #Args] 
-;
+{#env}#[OK, #Args];
 
 // -- if binder occurs in exactly one meta-application then record a cookie for that meta-application position and promiscuity -
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-analyze-binders2[$List[Reified_Occurrence], Meta-Occurrence, Reified_Promiscuity, Reified_Kind, 
-    Reified_Depth, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Binder-State, ok¹::OK_SORT vars¹::$List[Reified_Variable].Text] :: Text;
+    Reified_Depth, binder : Reified_Variable . Reified_Binder, Text, $Numeric, Binder-State, ok¹::OK_SORT vars::$List[Reified_Variable].Text] :: Text;
 
-// Record first occurrence. Cannot reuse if meta is copied (TODO: revisit!) or if previous binder coudn't have been reused.
-{#env}
-ST-analyze-binders2[(META-USE[#mv,#k];#occs), NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+// Record first occurrence. Cannot reuse if meta is copied (TODO: revisit reuse binder for at least one of them!) or if previous binder couldn't have been reused.
+{#env}ST-analyze-binders2[(META-USE[#mv,#k]; #occs), NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
-$[{#env}IfDef, $[:,"Copy$",#mv],
+$[{#env}IfDef, $[:,"Copy$", #mv],
   {#env}ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]],
   $[If, $[Equal, #state, NO_REUSE],
     {#env}ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]],
-    {#env}ST-analyze-binders2[#occs, UNIQUE[$[:,"BinderUnique$",#mv,"$",$[FormatNumber, #k],"$",PromiscuityString[#promisc]]], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]]
-]
-;
+    {#env}ST-analyze-binders2[#occs, UNIQUE[$[:, "BinderUnique$", #mv, "$", $[FormatNumber, #k], "$", PromiscuityString[#promisc]]], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]]
+];
 
 // Case where there is more than one occurrence. Can't reuse
-{#env}
-ST-analyze-binders2[(META-USE[#mv,#k];#occs), UNIQUE[#cookie], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders2[(META-USE[#mv,#k]; #occs), UNIQUE[#cookie], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]];
 
 // Fallback case: process next occurrence
-{#env}
-ST-analyze-binders2[(#occ;#occs), #cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders2[(#occ; #occs), #cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders2[#occs, #cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders2[#occs, #cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]];
 
 // done with occurrence. Move to the next phase
-{#env}
-ST-analyze-binders2[(), #cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders2[(), #cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders3[#cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders3[#cookie, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]];
 
 // -- test whether uniquely used local binder was also unique in pattern?
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-analyze-binders3[Meta-Occurrence, Reified_Promiscuity, Reified_Kind, Reified_Depth, binder : Reified_Variable . Reified_Binder, 
     Text, $Numeric, Binder-State, ok¹::OK_SORT vars¹::$List[Reified_Variable].Text] :: Text;
 
-{#env}
-ST-analyze-binders3[UNIQUE[#cookie], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders3[UNIQUE[#cookie], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
 $[{#env}IfDef, #cookie,
   {#env}ST-analyze-binders4[$[{#env}Get[STRING_ENTRY], #cookie], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]],
-  {#env}ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
-];
+  {#env}ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]];
 
 // -- binder that can neither be reused. Generate a fresh binder.
-{#env}
-ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], sink, #index, #state, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders3[NOTHING, #promisc, #kind, #depth, b.#Binder[b], sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders6[#promisc, #kind, #depth, b.#Binder[b], sink, #index, #state, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders6[#promisc, #kind, #depth, b.#Binder[b], sink, #index, #state, ok¹ vars.#[ok¹, vars]];
 
 // -- outermost reused binder.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-analyze-binders4[STRING_ENTRY, Reified_Promiscuity, Reified_Kind, Reified_Depth, binder : Reified_Variable . Reified_Binder,
      Text, $Numeric, Binder-State, ok¹::OK_SORT vars¹::$List[Reified_Variable].Text] :: Text;
 
-{#env}
-ST-analyze-binders4[VARIABLE[#reused], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, OUTER, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders4[VARIABLE[#reused], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, OUTER, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders5[#reused, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, REUSING, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders5[#reused, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, REUSING, ok¹ vars.#[ok¹, vars]];
 
 // -- following reused binder.
-{#env}
-ST-analyze-binders4[VARIABLE[#reused], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, REUSING, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders4[VARIABLE[#reused], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, REUSING, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders5[#reused, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, REUSING, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders5[#reused, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, REUSING, ok¹ vars.#[ok¹, vars]];
 
 // -- binder that should not be reused because we are copying.
-{#env}
-ST-analyze-binders4[VARIABLE[#reused], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, COPYING, ok¹ vars.#[ok¹, vars]]
+{#env}ST-analyze-binders4[VARIABLE[#reused], #promisc, #kind, #depth, b.#Binder[b], #sink, #index, COPYING, ok¹ vars.#[ok¹, vars]]
 →
-{#env}
-ST-analyze-binders6[#promisc, #kind, #depth, b.#Binder[b], #sink, #index, COPYING, ok¹ vars.#[ok¹, vars]]
-;
+{#env}ST-analyze-binders6[#promisc, #kind, #depth, b.#Binder[b], #sink, #index, COPYING, ok¹ vars.#[ok¹, vars]];
 
 // --- Generate binder that can be reused.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -961,8 +929,7 @@ ST-analyze-binders5[Text, Reified_Promiscuity, Reified_Kind, Reified_Depth, bind
 ST-analyze-binders5[reused, #promisc, #kind, #depth, b.#Binder[b], #sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
 {#env; reused : BOUNDREUSE; "$binders":LIST_VARIABLE[Append[#binders, (reused;)]]}
-ST-analyze-binders1[#Binder[reused], #sink, $[Plus, #index, 1], #state, ok¹ vars.#[ok¹, vars]]
-;
+ST-analyze-binders1[#Binder[reused], #sink, $[Plus, #index, 1], #state, ok¹ vars.#[ok¹, vars]];
 
 // --- Generate binder that can't be reused.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -975,8 +942,7 @@ ST-analyze-binders6[Reified_Promiscuity, Reified_Kind, Reified_Depth, binder : R
 ST-analyze-binders6[#promisc, #kind, #depth, b.#Binder[b], sink, #index, #state, ok¹ vars.#[ok¹, vars]]
 →
 {#env; new : BOUND; "$binders":LIST_VARIABLE[Append[#binders, (new;)]]; "$all_reused": NO}
-ST-analyze-binders1[#Binder[new], sink, $[Plus, #index, 1], #state, ok¹ vars.#[ok¹, vars]]
-;
+ST-analyze-binders1[#Binder[new], sink, $[Plus, #index, 1], #state, ok¹ vars.#[ok¹, vars]];
 
 //--- Generate arguments of type Closure. 
 // 

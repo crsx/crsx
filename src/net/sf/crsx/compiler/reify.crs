@@ -146,7 +146,7 @@ Reified_Kind ::=( KDATA; KFUNCTION; ); // Whether binder/construction is data or
 
 Reified_Depth ::=( SHALLOW; DEEP; ); // Whether binder occurrence is shallow or deep
 
-Reified_Occurrence ::=( META-USE[$String<!--MetaVar-->, $Numeric<!--Count-->]; OTHER; );
+Reified_Occurrence ::=( META-USE[$String<!--MetaVar-->, $Numeric<!-- Binder index -->]; OTHER; );
 
 Reified_Use ::=( NA;
    <!-- For Pattern Only -->
