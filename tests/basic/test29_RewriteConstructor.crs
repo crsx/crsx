@@ -1,0 +1,20 @@
+Test29 [(
+
+  $Lax;
+
+  // Test for Patterns: Rewrite Data Constructors
+  
+  Nat ::= (Zero; S[Nat]; );
+ 
+  S[#X] → #X ;
+
+ 
+  Test → S[Zero];
+
+  // m schett: compiler != interpreter
+  //compiler give loads of errors and warnings
+  // which should happen, as it is trying to rewrite a data constructor.
+  //interpreter is happy
+
+
+)]

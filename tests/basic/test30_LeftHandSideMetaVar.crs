@@ -1,0 +1,17 @@
+Test30 [(
+
+  $Lax;
+  
+  // Test for Patterns: No meta variable on lhs
+  Nat ::= (Zero; S[Nat]; );
+  #X → Zero;
+  
+  Test → S[Zero];
+  
+  //m schett: compiler != interpreter
+  // compiler
+  // Completer panic: Missing sort for rule Functionality-#X-1
+  //(Fatal error, processing cannot continue.)
+  //interpreter does not complain
+  // but also ignores the match with the input
+)]

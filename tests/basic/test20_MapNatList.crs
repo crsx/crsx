@@ -1,0 +1,25 @@
+Test20 [(
+
+  $Lax;
+  
+  // Map with NatList, Problem with Compiler
+  Nat ::= (S[Nat]; Zero; );
+  NatList ::= ( Cons[Nat, NatList]; Nil; );
+
+  //PlusOne, function to map
+  PlusOne[Nat] :: Nat;
+  PlusOne[#1]  → S[#1];
+
+  // Map 'typical' definition of map
+  Map[x:Nat.Nat,NatList] :: NatList;
+  Map[x.#[x], Nil]       → Nil ;
+  Map[x.#[x],Cons[#1,#s]] → Cons[#[#1], Map[x.#[x], #s]] ;
+ 
+  // compiler != interpreter
+  // compiler (on command line)
+  // Unrecognized symbol: Map
+  // Conjecture: some problem with shuffling the arguments
+
+  Test → Map[x.PlusOne[x],Cons[Zero,Nil]];
+
+)]

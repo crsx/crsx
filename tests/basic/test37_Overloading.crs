@@ -1,0 +1,25 @@
+Test37 [(
+
+  $Lax;
+  
+  // Overloaded Functions
+
+  Nat ::= (Zero; One;);
+  Bool ::= (True; False;);
+ 
+  Plus[Bool,Bool] :: Bool;
+  Plus[True,#] → #;
+  Plus[False,#] → False;
+
+  Plus[Nat,Nat] :: Nat;
+  Plus[Zero,#] → #;
+  Plus[One,One] → Zero;
+  Plus[One,Zero] → One;
+  
+  Test → Plus[True,Zero];
+
+  //compiler != interpreter  
+  //interpreter output
+  //Zero
+
+)]

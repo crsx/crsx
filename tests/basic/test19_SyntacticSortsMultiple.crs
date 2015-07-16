@@ -1,0 +1,15 @@
+Test19 [(
+
+  $Lax;
+  
+  S ::= ( x; y; z; );
+  F[S] :: S;
+  F[j]  → j;
+  
+  -[Fresh[i::S]]: Test → F[i];
+
+  /*  ** Maybe should produce an Error **
+      Semantically non-sense, thus ignored in .crsD file
+  */
+
+)]

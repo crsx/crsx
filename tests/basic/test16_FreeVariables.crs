@@ -1,0 +1,16 @@
+Test16 [(
+
+  $Lax;
+  
+  S ::= (A; B;);
+  F[S] :: S;
+  F[x]  → x;
+  
+  -[Fresh[i::S]]: Test → F[F[i]];
+ 
+  /* 
+  ** Difference ** 
+  i vs. y__V1 because no actual term comparison but just diff is used.
+  temporarily, in test16_FreeVariables.ref, thus y__V1 is stated as expected.
+  */
+)]

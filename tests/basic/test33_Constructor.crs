@@ -1,0 +1,14 @@
+Test33 [(
+
+  $Lax;
+  
+  // Test for Patterns: constructor symbols at non root position between bound variable
+  
+ Nat ::= (Zero; S[Nat]; );
+ Fun[x :: Nat. Nat, Nat] :: Nat;
+ Fun[x.S[#F[x]],#Y] → #F[#Y] ;
+
+  
+  Test → Fun[x.S[S[x]],Zero];
+
+)]

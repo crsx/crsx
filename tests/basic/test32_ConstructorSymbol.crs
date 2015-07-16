@@ -1,0 +1,15 @@
+Test32 [(
+
+  $Lax;
+  
+  // Test for Patterns: constructor symbols at non root position
+  
+  Nat ::= (Zero; S[Nat]; );
+  MinusOne[Nat] :: Nat;
+  MinusOne[Zero]  → Zero;
+  MinusOne[S[#1]]  → #1;
+
+
+  Test → MinusOne[S[S[Zero]]];
+
+)]

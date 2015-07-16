@@ -1,0 +1,39 @@
+Test9 [(
+
+  $Lax;
+   
+  // Overloading Function Constructors w/ different amount of arguments
+  
+  Nat ::= (S[Nat]; Zero;);
+  Plus[Nat, Nat] :: Nat;
+  Plus[Nat] :: Nat;
+
+  //m schett: Just function declarations are okay - no complaint, 
+  // compiler == interpreter
+  
+  // But if you add the rule
+  Plus[Zero, #2]  → #2;
+  
+  // compiler != interpreter
+  
+  //compiler output
+  /* Completer warning: could not find form for {}
+     Plus1[{}Zero, {}#2]
+     Completer warning: could not find form for {}
+     Plus1[{}Zero, {}#2]
+     Exception in thread "main" java.lang.IndexOutOfBoundsException: Bad binders index 
+  */
+
+   //interpreter output
+  // Zero
+
+  Test → Plus[Zero,Zero];
+  
+  //But if you add the rule
+  //Plus[#1]  → #1
+  //compiler == interpreter
+  /* Error-- Unsupported directive: TypesTest[( Nat ::= (S[Nat]; Zero; ) ;  Bool ::= (True; False; ) ; Plus[Nat, Nat] :: Nat ; Plus[Nat] :: Nat ; Plus[Zero, #2] → #2 ; Plus[#1] → #1 )]
+     Errors prevent $Sortify. 
+  */
+
+)]

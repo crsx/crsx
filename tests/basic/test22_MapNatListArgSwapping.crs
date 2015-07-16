@@ -1,0 +1,24 @@
+Test22 [(
+
+  $Lax;
+  
+  // Map with NatList, Problem with Compiler
+  Nat ::= (S[Nat]; Zero; );
+  NatList ::= ( Cons[Nat, NatList]; Nil; );
+
+  //PlusOne, function to map
+  PlusOne[Nat] :: Nat;
+  PlusOne[#1]  → S[#1];
+
+  // MapR, i.e., MapReverse, arguments in uncommon order, i.e., function last
+  MapR[NatList,x:Nat.Nat] :: NatList;
+  MapR[Nil, x.#[x]]         → Nil ;
+  MapR[Cons[#1,#s], x.#[x]] → Cons[#[#1], MapR[#s, x.#[x]]];
+
+  // MapF swaps arguments for testing purposes.
+  MapF[x:Nat.Nat,NatList] :: NatList;
+  MapF[x.#[x],#2] → MapR[#2,x.#[x]];
+
+  Test → MapF[x.PlusOne[x],Cons[Zero,Nil]];
+
+)]

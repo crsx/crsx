@@ -1,0 +1,24 @@
+Test36 [(
+
+  $Lax;
+  
+  // Behaviour of syntactic variable sort Two Data Sorts
+
+  Nat ::= (Zero; One;);
+  Bool ::= (True; False;);
+
+  ∀ a . Id[a] :: a;
+  Id[True] → False;
+  Id[Zero]  → One; 
+  Id[#X] → #X;
+  
+  // Test → Id[True];  
+  // is okay: False
+  // Test → Id[False];
+  // is okay: False 
+   Test → Id[Zero]; 
+
+  //compiler != interpreter
+  //interpreter returns One
+
+)]

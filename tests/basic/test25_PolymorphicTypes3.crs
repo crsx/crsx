@@ -1,0 +1,23 @@
+Test25[(
+
+  $Lax;
+  
+  Nat ::= (S[Nat]; Zero; );
+  ∀ a . Lst[a] ::= ( Cons[a,Lst[a]]; Nil; );
+ 
+
+  //PlusOne, function to map
+  PlusOne[Nat] :: Nat;
+  PlusOne[#1]  → S[#1];
+  
+  //MapUAB, i.e., Map with Unbound A and B
+  MapUAB[ Lst[a] , x::a.$sort[b] ] :: Lst[b] ;
+  MapUAB[Nil, x.#[x]]         → Nil ;
+  MapUAB[Cons[#1,#s], x.#[x]] → Cons[#[#1], MapUAB[#s, x.#[x]]] ;
+
+  Test → MapUB[Cons[Zero,Nil],x.PlusOne[x]];
+
+  // **∀ a ∀ b** is missing. Why doesn't compiler complain?
+
+
+)]

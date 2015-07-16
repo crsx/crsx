@@ -1,0 +1,27 @@
+Test17 [(
+  
+  S ::= (A; B; x;);
+  F[S] :: S;
+  F[x]  → x;
+  F[y]  → y; 
+  
+  Test → F[F[A]];
+
+  /*
+  ** Unexpected Error Message **  
+ 
+  Error in rule Test17-F-1: pattern contains unauthorized free variable (x in F[x])
+  Error in rule Test17-F-2: pattern contains unauthorized free variable (y in F[y])
+  Errors prevent $Sortify.
+ 
+  should maybe something along the lines: overlaps with as see below
+
+ */
+ 
+  /* 
+  with the  $Lax; option, one gets a 
+ 
+  Completer warning: rule Test17-F-2 overlaps with instance of Test17-F-1.
+ */ 
+
+)]

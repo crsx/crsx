@@ -1,0 +1,11 @@
+Test28 [(
+
+ $Lax;
+  
+  Nat ::= (Zero; One; S[Nat]; );
+  Equal[Nat,Nat] :: Nat;
+  Equal[#X,#X] → #X;
+  
+  Test → Equal[Zero,Zero];
+
+)]

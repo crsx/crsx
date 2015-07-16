@@ -1,0 +1,15 @@
+Test27 [(
+
+  $Lax;
+  
+  Letter ::= (A;);
+
+  Sort ::= () ;
+  Id[Sort] :: Sort;
+  Id[#X]  →  #X;
+  
+  Test → Id[A];
+  
+  // compiler != interpreter
+  // interpreter evaluates to A
+)]

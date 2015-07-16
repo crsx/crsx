@@ -1,0 +1,30 @@
+Test11 [(
+
+  /*  
+    ** Unexpected Failure **
+    Very strange error message. 
+    Should go along the line *It is not allowed to rewrite Data*
+  */
+
+  $Lax;
+  
+  // Check whether data rules are allowed.
+
+  Nat ::= (S[Nat]; Zero;);
+  S[#1] → #1;
+
+  // compiler != interpreter
+  //  compiler shows weird behaviour. In first run it produces large amount of errors.
+  // ... c:7: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘-’ token
+  // ... c:7:22: warning: multi-character character constant
+  // ... c:7:47: warning: multi-character character constant
+  // ... c: In function ‘_M_S’:
+  // [..] and much more
+  //  but on second run it produces a file, which does not reduce the term
+  
+  //interpreter
+  //reduces to Zero
+  
+  Test → S[S[Zero]];
+
+)]

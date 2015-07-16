@@ -1,0 +1,5 @@
+./basic/test10_OverloadingFunctionTypes.crs
+Sort warning: undeclared constructor (Test) in rule Test10-Test-1
+Sort error: could not uniquely determine sort of overloaded symbol in Plus[Zero, #2] in rule Test10-Plus-1
+Errors prevent $Sortify.
+make[2]: *** [results/test10_OverloadingFunctionTypes/test10_OverloadingFunctionTypes.dr] Error 1

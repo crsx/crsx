@@ -1,0 +1,3 @@
+Cons[S[Zero], Nil]
+ 
+ // **∀ b** is missing. Why doesn't compiler complain?

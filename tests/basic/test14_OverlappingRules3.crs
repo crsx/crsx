@@ -1,0 +1,13 @@
+Test14 [(
+
+  // check how overlapping rules are handled
+
+  Nat ::= (S[Nat]; Zero;);
+  Project[Nat, Nat] :: Nat;
+  
+  -[Discard[#2]] : Project[#1,#2]   → #1;
+  -[Discard[#1]] : Project[#1,Zero] → Zero;
+  
+   Test → Project[S[Zero],Zero];
+
+)]

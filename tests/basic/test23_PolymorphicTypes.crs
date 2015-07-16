@@ -1,0 +1,20 @@
+Test23 [(
+
+  $Lax;
+  
+  // Polymorphic Types Size
+  
+  Nat ::= (S[Nat]; Zero; );
+  ∀ a . Lst[a] ::= ( Cons[a,Lst[a]]; Nil; );
+
+  //PlusOne, function to map
+  PlusOne[Nat] :: Nat;
+  PlusOne[#1]  → S[#1];
+
+  ∀ a . Size[Lst[a]] :: Nat;
+  Size[Nil] → Zero;
+  Size[Cons[#H,#T]] → PlusOne[Size[#T]];
+
+  Test → Size[Cons[Zero,Nil]];
+
+)]

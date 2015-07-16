@@ -1,0 +1,45 @@
+Test8[(
+
+  $Lax;
+  
+  /* Rewriting of Typ */
+
+  Nat ::= (S[Nat]; Zero;);
+  Nat  → Flabbergast;
+
+  Test → Nat;
+
+// compiler != interpreter
+
+// compiler output
+/*
+Sort warning: undeclared constructor (Nat) in rule Functionality-Nat-1
+Sort warning: undeclared constructor (Flabbergast) in rule Functionality-Nat-1
+Sort warning: could not resolve a unique monomorphic sort for undeclared constructor Nat, treating as polymorphic.
+Sort warning: could not resolve a unique monomorphic sort for undeclared constructor Flabbergast, treating as polymorphic.
+Sort warning: undeclared constructor Flabbergast does not occur in any pattern; thus, it is neither a function nor a data constructor, and not every term reduces to a normal form.  Treating it as
+ a function constructor for now.
+../functionality-tests_fun.c: In function ‘step_M_Nat’:
+../functionality-tests_fun.c:20: error: ‘descriptor_M_Flabbergast’ undeclared (first use in this function)
+../functionality-tests_fun.c:20: error: (Each undeclared identifier is reported only once
+../functionality-tests_fun.c:20: error: for each function it appears in.)
+make[1]: *** [/home/maschett/git/crsx/samples/MS-functionality-tests//functionality-tests_fun.o] Error 1
+make[1]: Leaving directory `/home/maschett/git/crsx/samples/MS-functionality-tests'
+make: *** [functionality-tests] Error 2
+*/
+
+//interpreter output
+
+/*
+Sort warning: undeclared constructor (Nat) in rule Functionality-Nat-1
+Sort warning: undeclared constructor (Flabbergast) in rule Functionality-Nat-1
+Sort warning: could not resolve a unique monomorphic sort for undeclared constructor Nat, treating as polymorphic.
+Sort warning: could not resolve a unique monomorphic sort for undeclared constructor Flabbergast, treating as polymorphic.
+// Declaring function sort form Nat :: a2
+Sort warning: undeclared constructor Flabbergast does not occur in any pattern; thus, it is neither a function nor a data constructor, and not every term reduces to a normal form.  Treating it as a function constructor for now.
+// Declaring function sort form Flabbergast :: a2
+[..]
+Normal form [..] Flabbergast
+*/
+
+)]

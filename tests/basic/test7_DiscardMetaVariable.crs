@@ -1,0 +1,16 @@
+Test6 [(
+  $Lax;
+  
+ //Discard meta variable
+  Nat ::= (S[Nat]; Zero;);
+  
+  Times[Nat,Nat] :: Nat;
+  Times[Zero, #2] → Zero;
+  
+  Test → Times[Zero,S[Zero]];
+
+  //without $Lax keyword they fail with
+  //Error in rule Functionality-Times-1: contractum discards meta-variable without Discard declaration (#2)
+  //Errors prevent $Sortify.
+
+)]

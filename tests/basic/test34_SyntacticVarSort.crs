@@ -1,0 +1,13 @@
+Test34 [(
+
+  //  Behaviour of syntactic variable sort
+ 
+  Nat ::= (Zero; One;);
+  ∀ a . Id[a] :: a;
+  Id[Zero]  → One; 
+  Id[#X] → #X;
+
+
+  Test → Id[Zero];
+
+)]

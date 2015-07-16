@@ -1,0 +1,15 @@
+Test10 [(
+  /*  
+    ** Expected Failure **
+  */
+  
+  $Lax;
+  
+  // Overloading Function Constructors w/ types
+  Nat ::= (S[Nat]; Zero;);
+  Plus[Nat, Nat] :: Nat;
+  Plus[Nat, Bool] :: Bool;
+  Plus[Zero, #2]  → #2;
+  
+  Test → Plus[Zero,Zero];
+)]

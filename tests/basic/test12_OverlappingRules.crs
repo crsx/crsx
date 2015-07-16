@@ -1,0 +1,16 @@
+Test12 [(
+
+  // check how overlapping rules are handled
+
+  Nat ::= (S[Nat]; Zero;);
+  Project[Nat, Nat] :: Nat;
+
+  -[Discard[#2]] : Project[#1,#2] → #1;
+  -[Discard[#1]] : Project[#1,#2] → #2;
+ 
+   Test → Project[S[Zero],S[S[Zero]]];
+
+  //only compiler produces warning:
+  //Completer warning: rule -Project-2 overlaps with instance of -Project-1.
+
+)]

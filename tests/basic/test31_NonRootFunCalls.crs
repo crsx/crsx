@@ -1,0 +1,22 @@
+Test31 [(
+
+  $Lax;
+  
+  // Test for Patterns: function symbols at non root position
+
+  
+  Bool ::= ( True ; False; );
+  And[Bool,Bool] :: Bool;
+  And[And[#1,#2],#3] → And[#1, And[#2,#3]];
+
+  //m schett: compiler != interpreter
+  //compiler
+  //functionality-tests_fun.c: In function ‘step_M_And’:
+  //functionality-tests_fun.c:23: error: ‘Data_M_And’ undeclared (first use in this function)
+  //interpreter does interpret
+  //term=And[And[True,False],True]
+  //And[True, And[False, True]]
+ 
+  Test → And[And[True,False],True];
+
+)]

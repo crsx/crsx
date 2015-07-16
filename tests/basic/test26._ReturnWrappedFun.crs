@@ -1,0 +1,18 @@
+Test26 [(
+
+  $Lax;
+  
+  Nat ::= (S[Nat]; Zero; Pair[Nat,Nat]; );
+
+  PairUp[Nat, Nat] :: Nat;
+  PairUp[#X,#Y]  → Pair[#X,#Y];
+
+  FixFst[x :: Nat y :: Nat . Nat, Nat, Nat] :: Nat;
+  FixFst[x y . #F[x,y], #X, #Y] → Cont[y . #F[#X,y], #Y];
+
+  Cont[ y :: Nat . Nat, Nat] :: Nat;
+  Cont[y. #F[y], #Y] → #F[#Y];
+
+  
+  Test → FixFst[x y.PairUp[x,y],Zero,Zero];
+)]

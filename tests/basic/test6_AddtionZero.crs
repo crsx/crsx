@@ -1,0 +1,13 @@
+Test6 [(
+  $Lax;
+  
+ //Basic functionality
+ 
+  Nat ::= (S[Nat]; Zero;);
+  
+  Plus[Nat, Nat] :: Nat;
+  Plus[Zero, #2] → #2;
+  
+  Test → Plus[Zero,S[Zero]];
+
+)]

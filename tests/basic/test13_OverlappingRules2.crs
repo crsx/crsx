@@ -1,0 +1,18 @@
+Test13 [(
+
+  // check how overlapping rules are handled
+
+  Nat ::= (S[Nat]; Zero;);
+  Project[Nat, Nat] :: Nat;
+  
+  // rules are reversed wrt test12_OverlappingRules
+  -[Discard[#1]] : Project[#1,#2] → #2;
+  -[Discard[#2]] : Project[#1,#2] → #1;
+  
+   Test → Project[S[Zero],S[S[Zero]]];
+
+  // only compiler produces warning:
+  // Completer warning: rule -Project-2 overlaps with instance of -Project-1.
+  //Conclusion: First come, first serve
+
+)]
