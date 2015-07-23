@@ -1,0 +1,22 @@
+// Closure conversion test.
+
+// Uncurrying
+TestCC7[(
+
+$Lax;
+
+OK_SORT ::= ( OK; );
+
+Test :: $Numeric;
+Test → Test1[1, xᵇ. Plus[xᵇ, 1]];
+
+Test1[$Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, vᵇ.#[vᵇ]] → Test2[#1, oᵇ vᵇ.#[vᵇ]];
+
+Test2[$Numeric, oᵇ::OK_SORT vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test2[#1, oᵇ vᵇ.#[oᵇ, vᵇ]] → #[OK, #1];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+)]

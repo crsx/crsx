@@ -1,0 +1,26 @@
+// Closure conversion test.
+
+// Functional binder to non-functional binder conversion 
+TestCC9[(
+
+$Lax;
+
+OK_SORT ::= ( OK; );
+
+Test :: $Numeric;
+Test → Test1[1, xᵇ. Delay[Plus[Plus[xᵇ, 1], 2]]];
+
+Test1[$Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, vᵇ.#[vᵇ]] → Test2[#1, v.#[v]];
+
+Test2[$Numeric, v::$Numeric.$Numeric] :: $Numeric;
+Test2[#1, v.#[v]] → #[#1];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+Delay[$Numeric] :: $Numeric;
+Delay[#] → #;
+
+
+)]

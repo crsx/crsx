@@ -624,9 +624,6 @@ public class Completer
 	{
 		final Constructor rulename = rule.getName();
 		
-		if (rulename.symbol().contains("for-at4"))
-			System.out.println("here");
-		
 		// check whether sort and form of the pattern are as expected (minimal)
 		final Pair<Term,Term> declaration = rule.getConstructorDeclaration(rule.getPattern());
 		if (declaration == null) fatal("Missing sort for rule " + rule.name());

@@ -87,7 +87,8 @@ size_t pKeyPoolSize;
 typedef char* Charp;
 SETUP_STACK_TYPE(Charp)
 
-CharpStack pStepName; // Current step function
+CharpStack pStepName; // Step function stack
+char* pCurrentStep; // the current step
 Hashset2 pSteps; // Track time/count in step
 
 // Measure memory use after computation.
@@ -144,6 +145,7 @@ void crsxpInit(Context context)
         crsxpMetaCount = makeHS2(context, 8, NULL, equalsChars, hashChars);
         pSteps = makeHS2(context, 16, NULL, equalsChars, hashChars);
         pStepName = makeCharpStack(context);
+        pCurrentStep = NULL;
         pAccuMetaTime = 0l;
         pAccuMergeTime = 0l;
         pAccuPropagateTime = 0l;
@@ -205,6 +207,8 @@ void crsxpBeforeStep(Context context, Term term)
             crsxpPrintStats(context, term);
 
             clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &pStepClock);
+
+            pCurrentStep = SYMBOL(term);
         }
 
         ++pStepCount;
@@ -235,9 +239,19 @@ void crsxpAfterStep(Context context)
 			}
 			entry->count++;
 			entry->time += dl;
+
+			pCurrentStep = *topCharp(pStepName);
 			popCharp(pStepName);
         }
     }
+}
+
+void crsxpNextStep(Context context, char* name)
+{
+    if (context->profiling && context->internal)
+	{
+	    pCurrentStep = name;
+	}
 }
 
 void crsxpBeforeSubstitution(Context context, Term term)
@@ -268,16 +282,18 @@ void crsxpAfterSubstitution(Context context)
         struct timespec d = diff(pNanoTime, nanoTime);
         long dl = d.tv_sec * 1000000000 + d.tv_nsec;
 
-        const char* symbol = (const char*) *topCharp(pStepName);
+        //const char* symbol = (const char*) *topCharp(pStepName);
+        const void* symbol = (const void*) pCurrentStep;
+
         if (symbol)
         {
-        	CountTimeEntry entry = (CountTimeEntry) getValueHS2(crsxpMetaCount,  (const void*) symbol);
+        	CountTimeEntry entry = (CountTimeEntry) getValueHS2(crsxpMetaCount,  symbol);
             if (!entry)
             {
                 entry = (CountTimeEntry) malloc(sizeof(struct _CountTimeEntry));
                 entry->time = dl;
                 entry->count = 1;
-                addValueHS2(context, crsxpMetaCount, (const void*) symbol, (void*) entry);
+                addValueHS2(context, crsxpMetaCount, symbol, (void*) entry);
             }
             else
             {
@@ -1057,6 +1073,8 @@ void crsxpAfterSubstitution(Context context)
 void crsxpBeforeCall(Context context)
 {}
 void crsxpAfterCall(Context context)
+{}
+void crsxpNextStep(Context context, char* name)
 {}
 void crsxpVSCreated(Context context)
 {}

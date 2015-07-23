@@ -604,10 +604,10 @@ ST-call1[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 →
 {#env}ST-call-copy[#metavar, #use, #sink];
 
-// Process substitution argument.
+// Process call argument.
 {#env}ST-call1[#closure, #metavar, (ARGUMENT[#sort, VARIABLE-USE[#y]]; #arguments), #use, #sink] 
-→
-{#env}ST-call1-var[$[{#env}Get, #y], #closure, #metavar, #arguments, #use, #sink];
+→ 
+{#env}ST-call1-var[$[{#env}Get, #y], #closure, #metavar, (ARGUMENT[#sort, VARIABLE-USE[#y]]; #arguments), #use, #sink];
 
 // Not a variable: need to invoke closure
 -[Fallback]:
@@ -628,9 +628,9 @@ $[If, $[Equal, #count, 1],
 ST-call1-var[VARIABLE_ENTRY, Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
 // A functional binder.. continue.
-{#env}ST-call1-var[BOUND_FUN, #closure, #metavar, #arguments, #use, #sink]
+{#env}ST-call1-var[BOUND_FUN, #closure, #metavar, (#argument1; #arguments), #use, #sink]
 →
-{#env}ST-call1[#closure, #metavar,  #arguments, #use, #sink];
+{#env}ST-call1[#closure, #metavar, #arguments, #use, #sink];
 
 // Something else... invoke.
 -[Fallback]:
@@ -822,7 +822,7 @@ ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]],
 {#env; new: BOUND}
 ST-set-term-binder3[BINDER[#promisc, #kind, #depth, #sort, #occs, b.#binder[b]], (new; #binders), (#decl; #decls), #sink, $False] 
 →
-%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context, (char*) "«#decl»");« {#env}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
+%n⟪¶«#decl» = MAKE_BOUND_«TOKEN[PromiscuityString[#promisc]]»_VARIABLE(«#sink»->context, (char*) "«#decl»");« {#env; #decl: BOUND}ST-set-term-binder3[#binder[#decl], #binders, #decls, #sink, $False] »⟫;
 
 //---------
 // Analyze binders and return a list of variables corresponding to the binder.

@@ -716,7 +716,7 @@ F-then-Pattern-Property[OK_SORT, PASS, Text, Text, Reified_Term, Reified_Term, o
 F-then-Pattern-Property[OK, #pass, sink, term, #Key, #Value, ok.#[ok]]
 →
 %n⟪« {#env} F-set-value[#Key, sink, term, value] »if (!«value») {«{#env}F-fail-cleanup[sink]» break;} 
-LINK(«sink»->context, «value»);« {#env} F-Pattern[#pass, SUBMATCH, #Value, sink, %n⟨⟩, $False, $True, value, ok.#[ok]] »⟫
+LINK(«sink»->context, «value»);« {#env} F-Pattern[#pass, MATCH, #Value, sink, %n⟨⟩, $False, $True, value, ok.#[ok]] »⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-set-value[Reified_Term, Text, Text, Text] :: Text;

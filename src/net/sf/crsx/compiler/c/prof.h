@@ -46,6 +46,9 @@ extern void crsxpBeforeStep(Context context, Term term);
 /** Called after executing a step function */
 extern void crsxpAfterStep(Context context);
 
+/** Called before strictly evaluating a step in tail recursive position */
+extern void crsxpNextStep(Context context, char* name);
+
 /** Called before meta substitute */
 extern void crsxpBeforeSubstitution(Context context, Term term);
 

@@ -686,13 +686,18 @@ SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]]
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-UnstepBinders :: Text;
 
-{#env; "$UnstepBinders": LIST_VARIABLE[()]}
-SF-UnstepBinders → %n⟪⟫;
+{#env}SF-UnstepBinders →  {#env}SF-UnstepBinders2[$[{#env}Get[STRING_ENTRY], "$UnstepBinders"], $[{#env}Get[STRING_ENTRY], "$Sink"]];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-UnstepBinders2[STRING_ENTRY, STRING_ENTRY] :: Text;
+
+{#env}
+SF-UnstepBinders2[LIST_VARIABLE[()], #sink] → %n⟪⟫;
 
 -[Fresh[binders::Text]]
 :
-{#env; "$UnstepBinders": LIST_VARIABLE[(#binder; #binders)]; "$Sink": VARIABLE[#sink]}
-SF-UnstepBinders 
+{#env}
+SF-UnstepBinders2[LIST_VARIABLE[(#binder; #binders)], VARIABLE[#sink]]
 → 
 %n⟪«MapText[x.%n⟨¶REBIND(‹x›);⟩, (#binder; #binders)]»
 Variable «binders»[«INTEGER[Length[(#binder;#binders), 0]]»] = {«#binder»«ConcatText[#binders, %n⟨, ⟩]»}; BINDS(«#sink», «INTEGER[Length[(#binder;#binders), 0]]», «binders»);⟫;
@@ -1112,7 +1117,8 @@ SF-then-Pattern-Property[OK, #top, #pass, #sink, #term, #Key, #Value, ok¹.#[ok�
 →
 %n⟪« {#env} SF-set-value[#top, #Key, #sink, #term, value] »
 if (!«value») {«{#env}SF-fail-cleanup[#sink]» break;} 
-LINK(«#sink»->context, «value»);« {#env} SF-Pattern[#pass, SUBMATCH, #Value, #sink, %n⟨⟩, $False, $True, value, ok¹.#[ok¹]] »⟫
+LINK(«#sink»->context, «value»);
+int «value»_count = LINK_COUNT(«value»); permitUnusedInt(«value»_count);« {#env; value: ARG[0, $True]} SF-Pattern[#pass, SUBMATCH, #Value, #sink, %n⟨⟩, $False, $True, value, ok¹.#[ok¹]] »⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -1211,7 +1217,7 @@ SF-PatternBinders[PASS, Pattern-Stage, $List[Reified_Binder], Text, $Boolean, Te
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-PatternBinder[PASS, Pattern-Stage, $Boolean, Reified_Binder, Text, Text, $Boolean, Text, $Numeric<!-- Sub Index -->, $Numeric<!-- Binder index -->, ok¹::OK_SORT.Text] :: Text;
 
-// At least one functional binder: hidden in Closure. Just Skip
+// At least one functional binder: hidden in Closure. Just skip so that they are not marked as reusable.
 -[Fresh[b::Reified_Variable]]
 :
 {#env}SF-PatternBinder[#pass, #stage, $True, BINDER[#promisc, #kind, #depth, #sort, #occs, b . #Binder[b]], #sink, #code, #unique, #term, #i, #j, ok¹.#[ok¹]]
@@ -1233,6 +1239,7 @@ SF-PatternBinder[PASS, Pattern-Stage, $Boolean, Reified_Binder, Text, Text, $Boo
  *
  * If binder occurs in exactly one meta-application then record a BinderUnique$mv$k$promisc cookie for that meta-application position
  * otherwise record BinderUnique$mv$k$promisc only for the first occurrence.
+ *
  */
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -1490,23 +1497,14 @@ SF-PatternSub2[$Boolean<!-- Whether to link sub -->, $Boolean<!-- Processing top
 
 // Get top-level arguments. No need to link as all top-level arguments have a reference. 
 // Might need to unlink if it's a term. 
-{#env; "$Args" : LIST_VARIABLE[(#arg; #args)]} 
-SF-PatternSub2[#link, $True, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
+{#env}SF-PatternSub2[#link, $True, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
 → 
-{#env; "$Args" : LIST_VARIABLE[#args]} // Navigate to the next argument.
-SF-PatternSub3[#arg, $[{#env}Get[VARIABLE_ENTRY], #arg], #link, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
-;
+{#env}SF-PatternSub2a[$[{#env}Get[STRING_ENTRY], "$Args"], #link, $True, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]];
 
 // A sub to link. Record to unlink only when pattern fails
--[Fresh[sub::Text]]
-:
-{#env; "$subterms": LIST_VARIABLE[#subs]}
-SF-PatternSub2[$True, $False, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
+{#env}SF-PatternSub2[$True, $False, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
 → 
-{#env; sub: SUB[#term, #i, $True]; "$subterms":LIST_VARIABLE[(sub; #subs)] }
-SF-Pattern[#pass, SF-move-to-sub-stage[#stage], #pattern, #sink, %n⟪« #code »
-Term «sub» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#i]»)); int «sub»_count = «#term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);«D-check-sort[#sink, sub, #sort]»⟫, $True, #unique, sub, ok¹.#[ok¹]]
-;
+{#env}SF-PatternSub2b[$[{#env}Get[STRING_ENTRY], "$subterms"], $True, $False, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]];
 
 // A temporary sub. Don't link and don't record for unlink
 -[Fresh[sub::Text]]
@@ -1518,6 +1516,26 @@ SF-PatternSub2[$False, $False, #pass, #stage, #sort, #Pattern, #sink, #code, #un
 SF-Pattern[#pass, SF-move-to-sub-stage[#stage], #Pattern, #sink, %n⟪« #code »
 Term «sub» = SUB(«#term», «INTEGER[#i]»); int «sub»_count = «#term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);«D-check-sort[#sink, sub, #sort]»⟫, $False, #unique, sub, ok¹.#[ok¹]];
 
+// Top level argument helper
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternSub2a[STRING_ENTRY, $Boolean<!-- Whether to link sub -->, $Boolean<!-- Processing top terms -->, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+{#env}SF-PatternSub2a[LIST_VARIABLE[(#arg; #args)], #link, $True, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
+→ 
+{#env; "$Args" : LIST_VARIABLE[#args]} // Navigate to the next argument.
+SF-PatternSub3[#arg, $[{#env}Get[VARIABLE_ENTRY], #arg], #link, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] ;
+
+//  Sub argument helper
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-PatternSub2b[STRING_ENTRY, $Boolean<!-- Whether to link sub -->, $Boolean<!-- Processing top terms -->, PASS, Pattern-Stage, Reified_Sort, Reified_Term, Text, Text, $Boolean, Text, $Numeric, ok::OK_SORT.Text] :: Text;
+
+// A sub to link. Record to unlink only when pattern fails
+-[Fresh[sub::Text]]:
+{#env}SF-PatternSub2b[LIST_VARIABLE[#subs], $True, $False, #pass, #stage, #sort, #pattern, #sink, #code, #unique, #term, #i, ok¹.#[ok¹]] 
+→ 
+{#env; sub: SUB[#term, #i, $True]; "$subterms":LIST_VARIABLE[(sub; #subs)]}
+SF-Pattern[#pass, SF-move-to-sub-stage[#stage], #pattern, #sink, %n⟪« #code »
+Term «sub» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#i]»)); int «sub»_count = «#term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);«D-check-sort[#sink, sub, #sort]»⟫, $True, #unique, sub, ok¹.#[ok¹]];
 
 // Processing a top-level argument. 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}

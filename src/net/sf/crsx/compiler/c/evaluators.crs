@@ -2131,16 +2131,16 @@ Poly-Error-None:
 Poly-Error-Kind:
 {#env} E-poly[E_Error, (#Name; #Format; LITERAL[#Msg, #MsgSort]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$tail":NO} T-local-string[#Format, #sink, arg p.
- {#env; "$tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
+{#env; "$tail":NO} T-local-string[#Format, #sink, format p.
+ {#env; "$tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», «format», «TOKEN[#Msg]»⟫, %n⟪);
 «p»« {#env} E-optional[(), (), #sink, ok r.#Tail[ok,r]] »⟫]]
 ;
 
 Poly-Error-Other:
 {#env} E-poly[E_Error, (#Name; #Format; $[NotMatch,LITERAL[#Msg, #MsgSort],#Arg1]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
 →
-{#env; "$tail":NO} T-local-string[#Format, #sink, arg p.
- {#env; "$tail":NO} E-flatten-strings[(), (#Arg1; #Args), #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]»⟫, %n⟪);
+{#env; "$tail":NO} T-local-string[#Format, #sink, format p.
+ {#env; "$tail":NO} E-flatten-strings[(), (#Arg1; #Args), #sink, %n⟪ERRORF(«#sink»->context, «FormatKindOf[#Name]», «format»⟫, %n⟪);
 «p»« {#env} E-optional[(), (), #sink, ok r.#Tail[ok,r]] »⟫]]
 ;
 
