@@ -233,12 +233,15 @@ F-Fresh2[sink, VARIABLE-USE[key], ok.#[ok]]
 %n⟪
 Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, (char *) «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$Vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»⟫;
 
+// Should be of the form $FunctionSort[Term1, Term2]. Ignore Term2.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 F-Fresh3[OK_SORT, Text, $List[Reified_Binder], ok::OK_SORT.Text] :: Text;
 
 {#env}
-F-Fresh3[OK, #sink, (#binder; #binders), ok.#[ok]] → 
-    %n⟪«{#env}F-Fresh4[#sink, #binder, ok.F-Fresh3[ok, #sink, #binders, o2.#[o2]]]»⟫
+F-Fresh3[OK, #sink, (#binder; #binders), ok.#[ok]]
+→ 
+//%n⟪«{#env}F-Fresh4[#sink, #binder, ok.F-Fresh3[ok, #sink, #binders, o2.#[o2]]]»⟫
+{#env}F-Fresh4[#sink, #binder, ok.#[ok]];
 ;
 
 {#env}
