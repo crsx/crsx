@@ -27,8 +27,10 @@ import net.sf.crsx.generic.GenericEvaluator;
 import net.sf.crsx.generic.GenericFactory;
 import net.sf.crsx.generic.GenericRule;
 import net.sf.crsx.generic.GenericTerm;
+import net.sf.crsx.generic.GenericVariableUse;
 import net.sf.crsx.generic.PropertiesConstraintsWrapper;
 import net.sf.crsx.util.ExtensibleMap;
+import net.sf.crsx.util.ExtensibleSet;
 import net.sf.crsx.util.HashMultiMap;
 import net.sf.crsx.util.LinkedExtensibleMap;
 import net.sf.crsx.util.LinkedExtensibleSet;
@@ -617,6 +619,7 @@ public class Sorter
 				if (metaSorts.get(k).length != 0) mSorts.put(k, metaSorts.get(k)[0]);
 			rule.setMetaVariableSorts(mSorts);
 		}
+		
 	}
 
 	/**
@@ -2665,11 +2668,12 @@ public class Sorter
 			{
 				Term sort = Unifier.repeat_apply(constructorSorts.get(t).head(), theta, factory);
 				Term form = constructorSorts.get(t).tail();
+				
 				GenericTerm[] args = new GenericTerm[form.arity()];
 				Variable[][] binds = new Variable[form.arity()][];
 				Term[][] bindersorts = new Term[form.arity()][];
 				for (int i = 0; i < form.arity(); i++)
-				{
+				{	
 					args[i] = Unifier.repeat_apply(subSort(form, i), theta, factory);
 					binds[i] = form.binders(i);
 					bindersorts[i] = new Term[form.binders(i).length];
@@ -2678,8 +2682,15 @@ public class Sorter
 						Term vsort = binderSort(form, i, j);
 						vsort = Unifier.repeat_apply(vsort, theta, factory);
 						bindersorts[i][j] = vsort;
+						
+					//	 Repair linear and functional binders
+					//	 TODO: provide a mode to check
+						Variable termBinder = t.binders(i)[j];
+						//termBinder.setPromiscuous(binds[i][j].promiscuous());
+						termBinder.setBlocking(binds[i][j].blocking()); 
 					}
 				}
+				
 				if (Util.hasProperties(form))
 				{
 					// Form has constructor-local sort set.

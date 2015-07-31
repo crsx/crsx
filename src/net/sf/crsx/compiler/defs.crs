@@ -182,6 +182,10 @@ $[If, $[Equal, #Count, 0],
 : 
 SplitMapText[t.#[t], (), #Count, #PartCount, #PartSize, p.#BeginPartition[p], p.#EndPartition[p]] → #EndPartition[#PartCount] ;
 
+∀ a .Error[$String] :: a;
+
+-[Data[#Msg]]: Error[#Msg] → $[Error, #Msg];
+
 
 UnString[STRING_ENTRY] :: $String;
 UnString[STRING_VALUE[#Str]] → #Str;
@@ -427,7 +431,7 @@ T_REUSE_SORT ::= ( T_REUSE; T_NO_REUSE; );
 {#env}
 T-CheckReuse[VARIABLE-USE[y]]
 →
-T-CheckReuse-Variable[$[{#env}Get[VARIABLE_ENTRY], y, FREE]] // FREE = T_NO_REUSE
+{#env}T-CheckReuse-Variable[$[{#env}Get[VARIABLE_ENTRY], y, FREE]] // FREE = T_NO_REUSE
 ;
 
 -[#Fallback]
@@ -438,15 +442,19 @@ T-CheckReuse[#]
 T_NO_REUSE
 ;
 
-
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 T-CheckReuse-Variable[VARIABLE_ENTRY] :: T_REUSE_SORT;
 
-T-CheckReuse-Variable[FRESHREUSE]  → T_REUSE;
-T-CheckReuse-Variable[BOUNDREUSE]  → T_REUSE;
-T-CheckReuse-Variable[BOUND]       → T_NO_REUSE;
-T-CheckReuse-Variable[FREE]        → T_NO_REUSE;
-T-CheckReuse-Variable[FRESH]       → T_NO_REUSE;
-T-CheckReuse-Variable[BOUND_FUN]   → $[Error, "should not reached"];
+{#env}T-CheckReuse-Variable[FRESHREUSE]  → T_REUSE;
+{#env}T-CheckReuse-Variable[BOUNDREUSE]  → T_REUSE;
+{#env}T-CheckReuse-Variable[BOUND]       → T_NO_REUSE;
+{#env}T-CheckReuse-Variable[FREE]        → T_NO_REUSE;
+{#env}T-CheckReuse-Variable[FRESH]       → T_NO_REUSE;
+{#env}T-CheckReuse-Variable[BOUND_FUN]   → T-CheckReuse-Variable-Error[UnString[$[{#env}Get[STRING_ENTRY], "$Function", STRING_VALUE["unknown function"]]]];
+
+T-CheckReuse-Variable-Error[$String] :: T_REUSE_SORT;
+
+T-CheckReuse-Variable-Error[#function] → Error[$[:, "Error: trying to reuse a functional binder in meta-substitution. (in ", #function, ")"]];
 
 Check-bound-hidden[VARIABLE_ENTRY] :: $Boolean;
 
@@ -456,6 +464,7 @@ Check-bound-hidden[BOUND]       → $False;
 Check-bound-hidden[FREE]        → $False;
 Check-bound-hidden[FRESH]       → $False;
 Check-bound-hidden[BOUND_FUN]   → $True;
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

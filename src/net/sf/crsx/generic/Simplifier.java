@@ -103,24 +103,26 @@ public class Simplifier
 	 * @throws CRSException 
 	 */
 	public void simplify(Map<String, GenericRule> ruleByName) throws CRSException
-	{
+	{	
 		Env1 state = new Env1();
 
-		// Second pass: simplify deep closures
 		Collection<GenericRule> pendingRules = ruleByName.values();
 		List<GenericRule> updatedRules = new LinkedList<GenericRule>();
 		state.counter = 1;
 
 		while (!pendingRules.isEmpty())
 		{
+			if (crs.getVerbosity() > 0)
+				System.out.println("Simplify " + pendingRules.size() + " rules");
+			
 			state.newrules = new LinkedList<GenericRule>();
-			for (GenericRule rule : ruleByName.values())
+			for (GenericRule rule : pendingRules)
 			{
 				// Some $ primitives are currently not properly sorted. Ignore rules containing those.
-				PrimitiveDetector detector = new PrimitiveDetector();
-				rule.getContractum().visit(detector, SimpleVariableSet.EMPTY);
+				//PrimitiveDetector detector = new PrimitiveDetector();
+				//rule.getContractum().visit(detector, SimpleVariableSet.EMPTY);
 
-				if (!detector.hasPrimitive)
+				//if (!detector.hasPrimitive)
 				{
 					state.changed = false;
 					state.rule = rule;
@@ -844,8 +846,12 @@ public class Simplifier
 
 		Map<String, Term> propertiesSort = SortUtil.sortSetOf(factory, rule, properties, evaluator);
 		if (propertiesSort == null || propertiesSort.size() == 0)
-			fatal("Missing properties sort for term " + properties + " in rule " + rule.name());
-
+		{
+			// Crsx is still very lax on property set sort. Just Create a generic one.
+			propertiesSort = new HashMap<>(1);
+			propertiesSort.put("$String", factory.constant(factory.makeConstructor("$String")));
+			//fatal("Missing properties sort for term " + properties + " in rule " + rule.name());
+		}
 		String holderSymbol = env.propHolder.get(propertiesSort);
 		if (holderSymbol == null)
 		{

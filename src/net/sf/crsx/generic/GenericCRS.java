@@ -2288,7 +2288,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		sorter.runSortify(ruleByName);
 
 		if (verbosity > 0)
-			System.out.print("done.");
+			System.out.println("done.");
 	}
 
 	/**

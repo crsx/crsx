@@ -41,4 +41,16 @@ public interface Variable extends Comparable<Variable>
 	 * @param name some string to use for the name - does not need to be unique
 	 */
 	void setName(String name);
+	
+	/**
+	 * Set the promiscuous flag
+	 */
+	public void setPromiscuous(boolean promiscuous);
+	
+	/**
+	 * Set the blocking flag 
+	 */
+	public void setBlocking(boolean blocking);
+
+	 
 }

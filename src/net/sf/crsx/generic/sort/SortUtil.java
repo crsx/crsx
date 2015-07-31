@@ -65,13 +65,13 @@ public class SortUtil
 		String symbol = Util.symbol(properties);
 
 		Map<String, Term> sortSet = null;
-		if (evaluator)
-		{
-			// Try the first arg
-			if (properties.term().arity() >= 1)
-				symbol = Util.symbol(properties.term().sub(0));
-		}
-		else
+//		if (evaluator)
+//		{
+//			// Try the first arg
+//			if (properties.term().arity() >= 1)
+//				symbol = Util.symbol(properties.term().sub(0));
+//		}
+//		else
 		{
 			// For meta-application, the sort set is on the meta variable sort
 			// which can be either data or function.
@@ -96,12 +96,22 @@ public class SortUtil
 			if (formsOf != null && formsOf.size() == 1)
 			{
 				Pair<Term, Term> formOf = formsOf.iterator().next();
+				
+				if (evaluator)
+				{
+					// Try on the first tail argument
+					symbol = Util.symbol(formOf.tail().sub(0));
+					sortSet = factory.sortsetFor(symbol);
+				}
+				else
+				{
 				PropertiesHolder ph = Util.propertiesHolder(formOf.head());
 				if (ph == null || !ph.propertyNames().iterator().hasNext())
 					ph = Util.propertiesHolder(formOf.tail());
 
 				if (ph != null)
 					sortSet = Util.namedProperties(ph, factory);
+				}
 			}
 		}
 
