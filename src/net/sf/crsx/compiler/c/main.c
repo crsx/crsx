@@ -111,6 +111,7 @@ int printUsage(char* errmsg)
     printf ("  include-annotations              print various annotations (linear markers, nostep, etc...)\n");
     printf ("  free-var-annotation              enable free variable annotation\n");
     printf ("  omit-properties[=MAX]            omit properties when printing term, or up to MAX.\n");
+    printf ("  strict                           run in strict mode.\n");
 #endif
     exit(1);
 }
@@ -120,6 +121,10 @@ int run(void)
 {
 	Context context = (Context) calloc(1, sizeof(struct _Context));
 	initCRSXContext(context);
+
+	if (getenv("strict"))
+		context->strict = 1;
+
 	//context->fv_enabled = 0;
 	Term term = NULL;
 	// if input: read term from file

@@ -1,0 +1,29 @@
+// Closure conversion test.
+
+// Recursive simplification
+TestCC11[(
+
+$Lax;
+
+OK_SORT ::= ( OK; );
+
+Test :: $Numeric;
+Test → Test1[1, 2, vᵇ.vᵇ];
+
+Test1[$Numeric, $Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, #2, vᵇ.#[vᵇ]] → Test2[vᵇ.Test3[Plus[#2, #1], v0ᵇ.Test4[vᵇ, v0ᵇ, okᵇ v1ᵇ.v1ᵇ]]];
+
+Test2[vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test2[vᵇ.#1[vᵇ]] → #1[3];
+
+Test3[$Numeric,  vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test3[#1, vᵇ.#2[vᵇ]] → #2[#1];
+
+Test4[$Numeric, $Numeric, okᵇ::OK_SORT vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test4[#1, #2, okᵇ vᵇ.#3[okᵇ, vᵇ]] → #3[OK, Plus[#1, #2]];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+
+)]

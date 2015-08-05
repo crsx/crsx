@@ -128,14 +128,16 @@ ST-Send-MetaApplication
 :
 {   
     #env; 
-    "$tail"         : #tail; 
-    "$pending-props" : #pending
+//    "$tail"          : #tail; 
+   // "$pending-props" : #pending
 }
 ST-send[META-APPLICATION[#metavar, #arguments, #occ], #sink]
 →
-%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«
-    {#env; "$tail": NO; "$pending-props": NO}ST-substitute[#metavar, #arguments, #occ, #sink]»«
-    ST-send-tail[#tail]»⟫;
+{#env}ST-substitute[#metavar, #arguments, #occ, #sink];
+
+//%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«
+//    {#env; "$tail": NO; "$pending-props": NO}ST-substitute[#metavar, #arguments, #occ, #sink]»«
+//    ST-send-tail[#tail]»⟫;
 
 ST-Send-Evaluator // TODO: check $PendingProps is NO
 :
@@ -156,8 +158,6 @@ ST-send-variable[$True, #variable, #sink]
 ST-send-variable[$False, #variable, #sink] 
 →
 %n⟪¶USE(«#sink», linkVariable(«#sink»->context, «#variable»));«ST-send-tail[#tail]»⟫;
-
-
 
 ST-send-tail[STRING_ENTRY] :: Text;
 
@@ -466,43 +466,53 @@ ST-substitute0[STRING_ENTRY, $String, $List[Reified_Binder], Reified_Use, Text] 
 -[Free[var::Reified_Variable]]
 :
 {#env; var: ARG[#Index, $True]}   
-ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink] 
+ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink] 
 →
-{#env}ST-substitute1[#metavar, #Binders, #Use, #sink];
+{#env}ST-substitute1a[#metavar, #arguments, #use, #sink];
 
 // Case 2: top-level closure. Either invoke or copy.
 -[Free[var::Reified_Variable]]
 :
 {#env; var: ARG[#Index, $False]} 
-ST-substitute0[VARIABLE[var], #metavar, #binders, #use, #sink] 
+ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink] 
 →
-{#env}ST-call[var, #metavar, #binders, #use, #sink];
+{#env}ST-call[var, #metavar, #arguments, #use, #sink];
 
 // Case 3: sub meta-variable.. 
 -[Free[var::Reified_Variable]]:
 {#env; var:SUB[#parent, #i, $True]} // Sub data term. Copy or Substitute
-ST-substitute0[VARIABLE[var], #metavar, #binders, #use, #sink] 
+ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink] 
 →
-{#env}ST-substitute1[#metavar, #binders, #use, #sink];
+{#env}ST-substitute1a[#metavar, #arguments, #use, #sink];
 
 // Case 4: sub closure
 -[Free[var::Reified_Variable]]
 :
 {#env; var: SUB[#parent, #i, $True]} // Sub function term. Should not occur
-ST-substitute0[VARIABLE[var], #metavar, #Binders, #Use, #sink]
+ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink]
 →
 $[Error, "Cannot have sub-function with binders"];
+
+// Generate code for substitution. Send properties first  (if any)
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-substitute1a[$String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+{#env; "$pending-props" : #pending}
+ST-substitute1a[#metavar, #arguments, #use, #sink]
+→
+%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«
+    {#env; "$pending-props": NO}ST-substitute1[#metavar, #arguments, #use, #sink]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-substitute1[$String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
 // The meta variable has no argument. Just copy.
-{#env; "$tail": #Tail}
+{#env; "$tail": #tail}
 ST-substitute1[#metavar, (), USE[#Count], #sink] 
 →
 $[If, $[Equal, #Count, 1],
-    %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#Tail] »⟫, // Give up the reference own by the step function 
-    %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »)); « ST-send-tail[#Tail] »⟫];
+    %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#tail] »⟫, // Give up the reference own by the step function 
+    %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »)); « ST-send-tail[#tail] »⟫];
 
 // The meta variable has arguments. Analyze whether substitution is needed.
 {#env}ST-substitute1[#metavar, (#argument1; #arguments), #occ, #sink] 
@@ -591,7 +601,7 @@ ST-call[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 →
 $[Error, "Internal error: closure without arguments"];
 
-// The meta variable has arguments. Analyze whether call is needed.
+// The meta variable has arguments.  Analyze whether call is needed.
 {#env}ST-call[#closure, #metavar, (#argument1; #arguments), #use, #sink] 
 →
 {#env}ST-call1[#closure, #metavar, (#argument1; #arguments), #use, #sink]; 
@@ -602,7 +612,7 @@ ST-call1[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 // Done. Can reuse.
 {#env}ST-call1[#closure, #metavar, (), #use, #sink] 
 →
-{#env}ST-call-copy[#metavar, #use, #sink];
+{#env}ST-call-precopy[#metavar, #use, #sink];
 
 // Process call argument.
 {#env}ST-call1[#closure, #metavar, (ARGUMENT[#sort, VARIABLE-USE[#y]]; #arguments), #use, #sink] 
@@ -613,16 +623,28 @@ ST-call1[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 -[Fallback]:
 {#env}ST-call1[#closure, #metavar, #arguments, #use, #sink] 
 →
-{#env}ST-invoke[#closure, #metavar, #arguments, #use, #sink]; 
+{#env}ST-preinvoke[#closure, #metavar, #arguments, #use, #sink]; 
 
+// Copy closure. Properties haven't been sent yet so deal with them first
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-call-precopy[$String, Reified_Use, Text] :: Text;
+
+{#env; "$pending-props" : #pending}
+ST-call-precopy[#metavar, #use, #sink]
+→
+%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«
+    {#env; "$pending-props": NO}ST-call-copy[#metavar, #use, #sink]»⟫;
+
+// Copy closure. Properties haven't been sent yet so deal with them first
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-call-copy[$String, Reified_Use, Text] :: Text;
 
-{#env; "$tail": #tail}ST-call-copy[#metavar, USE[#count], #sink]
+{#env; "$tail": #tail}
+ST-call-copy[#metavar, USE[#count], #sink]
 →
 $[If, $[Equal, #count, 1],
-  %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#tail] »⟫,
-  %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »));« ST-send-tail[#tail] »⟫];
+  %n⟪¶COPY(«#sink», « {#env}MetaVar[#metavar] »);« ST-send-tail[#tail] »⟫, // TODO: optimize tail call
+  %n⟪¶COPY(«#sink», LINK(«#sink»->context, « {#env}MetaVar[#metavar] »));« ST-send-tail[#tail] »⟫]; // TODO: optimize tail call
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-call1-var[VARIABLE_ENTRY, Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
@@ -636,23 +658,49 @@ ST-call1-var[VARIABLE_ENTRY, Text, $String, $List[Reified_Binder], Reified_Use, 
 -[Fallback]:
 {#env}ST-call1-var[#entry, #closure, #metavar, #arguments, #use, #sink]
 →
-{#env}ST-invoke[#closure, #metavar, #arguments, #use, #sink]; 
+{#env}ST-preinvoke[#closure, #metavar, #arguments, #use, #sink]; 
+
+// Invoke closure. First must take care of properties.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-preinvoke[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+
+{#env}ST-preinvoke[#closure, #metavar, #arguments, #use, #sink] 
+→
+{#env;"$pending-props":NO}ST-invoke[$[{#env}Get, "$pending-props"], #closure, #metavar, #arguments, #use, #sink]; 
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-invoke[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
+ST-invoke[STRING_ENTRY, Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
-{#env}ST-invoke[#closure, #metavar, #binders, #use, #sink]
+{#env}ST-invoke[NO, #closure, #metavar, #binders, #use, #sink]
 → 
-{#env}ST-set-binders[OK, #binders, #sink, ok¹ args¹.
-                         ST-invoke2[ok¹, ST-may-link[#closure, #use, #sink], args¹, #metavar, {#env}MetaVarArityNum[#metavar], #sink]];
+{#env}ST-invoke1[#closure, #metavar, #binders, #use, #sink];
+
+-[Fresh[buf::Text, closure::Text]]:
+{#env}ST-invoke[TERM[#term], #closure, #metavar, #binders, #use, #sink]
+→ 
+%n⟪Term «closure»;
+{⟦
+Sink «buf» = ALLOCA_BUFFER(«#sink»->context);«{#env; "$tail": NO}ST-send-properties[TERM[#term], buf]»
+COPY(«buf», «ST-may-link[#closure, #use, #sink]»);
+«closure» = BUFFER_TERM(«buf»);
+FREE_BUFFER(«buf»);⟧
+}« {#env}ST-invoke1[closure, #metavar, #binders, USE[1], #sink]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-invoke2[OK_SORT, Text, $List[Text], $String, $Numeric, Text] :: Text;
+ST-invoke1[Text, $String, $List[Reified_Binder], Reified_Use, Text] :: Text;
 
 {#env; "$tail": #tail}
-ST-invoke2[OK, #closure, #args, #metavar, #arity, #sink]
+ST-invoke1[#closure, #metavar, #binders, #use, #sink]
+→ 
+{#env; "$tail": NO}ST-set-binders[OK, #binders, #sink, ok¹ args¹.
+      ST-invoke2[ok¹, ST-may-link[#closure, #use, #sink], args¹, #metavar, {#env}MetaVarArityNum[#metavar], #tail, #sink]];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-invoke2[OK_SORT, Text, $List[Text], $String, $Numeric, STRING_ENTRY, Text] :: Text;
+
+{#env}ST-invoke2[OK, #closure, #args, #metavar, #arity, #tail, #sink]
 →
-%n⟪«ST-send-tail2[#tail]»¶CALL(«#sink», «#closure»«ConcatText[#args,%n⟨,⟩]»);⟫;
+%n⟪«ST-send-tail2[#tail]»CALL(«#sink», «#closure»«ConcatText[#args,%n⟨,⟩]»);⟫;
 
 ST-may-link[Text, Reified_Use, Text] :: Text;
 

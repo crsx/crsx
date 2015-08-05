@@ -1,0 +1,39 @@
+// Closure conversion test.
+
+// Currying
+TestCC8a[(
+
+$Use["org/crsx/common.crs"];
+
+$Lax;
+
+OK_SORT ::= ( OK; );
+
+Test :: $Numeric;
+Test → Test1[1, v1ᵇ v2ᵇ. Plus[v1ᵇ, v2ᵇ]];
+
+Test1[$Numeric, vᵇ::$Numeric vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, v1ᵇ v2ᵇ.#[v1ᵇ, v2ᵇ]] → Test2[#1, v1ᵇ.Test3[v1ᵇ, v2ᵇ.#[v2ᵇ, Plus[v1ᵇ, 1]]]];
+
+Test2[$Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test2[#1, vᵇ.#[vᵇ]] → #[#1]; 
+
+Test3[$Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test3[#1, vᵇ.#[vᵇ]] → #[#1];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+//
+//{#E}
+//XD-Then-Return[OK, #ExprSingle,  okᵇ esᵇ.#[okᵇ, esᵇ]]
+//→
+//{#E}XD-Push-Lets[OK,
+//    okᵇ.XD-Push-Hash[okᵇ,
+//    o2ᵇ.XD-ExprSingle[o2ᵇ, #ExprSingle, 
+//    o3ᵇ esᵇ.XD-Pop-Lets-FLWOR[o3ᵇ, esᵇ, 
+//    o4ᵇ eᵇ.XD-Pop-Hash[o4ᵇ, 
+//    o5ᵇ.#[o5ᵇ, eᵇ]]]]]]
+;
+
+
+)]

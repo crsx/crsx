@@ -157,7 +157,7 @@ SF-ExtractClosure[Text, Text, $List[Text], $Numeric, ok¹::OK_SORT args¹::$List
 SF-ExtractClosure[#term, #sink, #args, #subi, ok¹ args¹.#[ok¹, args¹]]
 →
 %n⟪
-Term «closure» = LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (closure;)]]»⟫
+Term «closure» = IS_FUNCTIONAL_USE(«#sink»->context, SUB(«#term», «INTEGER[#subi]»)) ? va_arg(ap, Term) : LINK(«#sink»->context, SUB(«#term», «INTEGER[#subi]»));«#[OK, Append[#args, (closure;)]]»⟫
 ;
 
 SF-StepUnlinkTerm[OK_SORT, Text, Text, $List[Text], $String] :: Text;

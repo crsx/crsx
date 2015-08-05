@@ -3635,7 +3635,7 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
 static void metaSubstituteTermUpdate(Context context, Term *termp, SubstitutionFrame substitution, int substitutionCount,
         BitSetP unexhaustedp, BitSetP unweakened, long *metaSubstituteSizep);
 
-void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
+int metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
 {
     ASSERT(sink->context, term->nr > 0);
     assert(!substitution || (substitution && !substitution->parent));
@@ -3662,6 +3662,8 @@ void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution)
         UNLINK(sink->context, substitution->substitutes[i]);
 
     crsxpAfterSubstitution(sink->context);
+
+    return 1;
 }
 
 /**

@@ -1,0 +1,23 @@
+// Closure conversion test.
+
+// Primitive
+TestCC12[(
+
+$Lax;
+
+Test :: $Numeric;
+Test → Test1[2];
+
+Test1[$Numeric] :: $Numeric;
+Test1[#1] → $[If, $[Equal, #1, 4], Test2[vᵇ.Plus[Plus[vᵇ, 1], 2]],  Test2[vᵇ.Plus[Plus[vᵇ, 5], 6]]];
+
+Test2[vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test2[vᵇ.#1[vᵇ]] → #1[9];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+
+
+
+)]

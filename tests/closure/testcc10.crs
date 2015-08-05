@@ -1,0 +1,26 @@
+// Closure conversion test.
+
+// Deep binders occurring in meta-substitution
+TestCC10[(
+
+$Lax;
+
+OK_SORT ::= ( OK; );
+
+Test :: $Numeric;
+Test → Test1[1, xᵇ x2ᵇ. Delay[Plus[Plus[xᵇ, 1], x2ᵇ]]];
+
+Test1[$Numeric, vᵇ::$Numeric v2ᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, vᵇ v2ᵇ.#[vᵇ, v2ᵇ]] → Test2[1, vᵇ.Test2[4, v1ᵇ.#[4, Plus[Plus[vᵇ, v1ᵇ], 4]]]];
+
+Test2[$Numeric, vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test2[#1, vᵇ.#[vᵇ]] → #[#1];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+Delay[$Numeric] :: $Numeric;
+Delay[#] → #;
+
+
+)]

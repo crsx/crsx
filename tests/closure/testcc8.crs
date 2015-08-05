@@ -1,7 +1,7 @@
 // Closure conversion test.
 
 // Uncurrying
-TestCC7[(
+TestCC8[(
 
 $Lax;
 

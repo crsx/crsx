@@ -1,0 +1,35 @@
+// Closure conversion test.
+
+// Enviroment propagation top-level closure call
+TestCC12[(
+
+$Lax;
+
+OK_SORT ::= ( OK; );
+
+Test :: $Numeric;
+Test → Test1[2, okᵇ vᵇ.Test4[okᵇ, vᵇ]];
+
+Test1[$Numeric, okᵇ::OK_SORT vᵇ::$Numeric.$Numeric] :: $Numeric;
+Test1[#1, okᵇ vᵇ.#[okᵇ, vᵇ]] → {"key":4}Test2[okᵇ vᵇ.Test3[okᵇ, okᵇ v1ᵇ.#[okᵇ, Plus[#1, Plus[v1ᵇ, vᵇ]]]]];
+
+{$String:$Numeric}
+Test2[okᵇ::OK_SORT vᵇ::$Numeric.$Numeric] :: $Numeric;
+{#E}Test2[okᵇ vᵇ.#1[okᵇ, vᵇ]] → {#E}#1[OK, 9];
+
+{$String:$Numeric}
+Test3[OK_SORT, okᵇ::OK_SORT vᵇ::$Numeric.$Numeric] :: $Numeric;
+{#E}Test3[OK, okᵇ vᵇ.#1[okᵇ, vᵇ]] → {#E}#1[OK, 8];
+
+{$String:$Numeric}
+Test4[OK_SORT, $Numeric] :: $Numeric;
+{#E;"key":#1}Test4[OK, #2] → Plus[#1, #2];
+
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]] : Plus[#1, #2] → $[Plus, #1, #2];
+
+
+
+
+)]

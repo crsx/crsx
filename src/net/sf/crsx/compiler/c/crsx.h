@@ -978,7 +978,7 @@ extern Term compute(Context context, Term term);
 ////
 
 #ifndef CALL
-# define CALL(SINK,T,...) { Term t = T; t->descriptor->step(SINK, t, __VA_ARGS__); }
+# define CALL(SINK,T,...) ((T)->descriptor->step(SINK, (T), __VA_ARGS__))
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -999,7 +999,7 @@ struct _SubstitutionFrame
 #ifndef SUBSTITUTE
 # define SUBSTITUTE(sink,term,substitution) metaSubstitute(sink, term, substitution)
 #endif
-extern void metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution);
+extern int metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // PROPERTIES

@@ -713,7 +713,7 @@ public class GenericRule implements Copyable
 						// TODO: addFree is a bit overkill. 
 						Set<Variable> free = new HashSet<Variable>();
 						ExtensibleSet<Variable> bound = SimpleVariableSet.EMPTY;
-						subsub.addFree(free, bound, false, null);
+						subsub.addFree(free, bound, true, null);
 
 						for (int j = 0; j < binders.length; j++)
 							if (free.contains(binders[j]))
