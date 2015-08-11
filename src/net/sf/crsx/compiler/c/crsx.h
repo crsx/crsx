@@ -459,6 +459,7 @@ typedef struct _BitSet* BitSetP;
 #define IS_NF(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nf)
 #define IS_NOSTEP(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nostep)
 #define IS_CLOSED(T) (!IS_VARIABLE_USE(T) && !asConstruction(T)->fvs);
+#define IS_CLOSURE(T) (IS_CONSTRUCTION(T) && asConstruction(T)->closure)
 
 // For variable use terms.
 #define VARIABLE(T) (asVariableUse(T)->variable)
@@ -577,9 +578,10 @@ struct _Construction
 {
     struct _Term term; // extends _Term with term.descriptor!=NULL
 
-    unsigned int nf : 1;     // whether subterm known to be normal form
-    unsigned int nostep : 1; // whether function construction subterm known to not currently be steppable
-    unsigned int varfvs : 1; // whether fvs is a Variable or a Hashset
+    unsigned int nf : 1;      // whether subterm known to be normal form
+    unsigned int nostep : 1;  // whether function construction subterm known to not currently be steppable
+    unsigned int closure : 1; // whether function construction is a closure and can never be be steppable
+    unsigned int varfvs : 1;  // whether fvs is a Variable or a Hashset
 
     NamedPropertyLink namedProperties;       // named properties. (may be null)
     VariablePropertyLink variableProperties; // variable properties. (may be null)

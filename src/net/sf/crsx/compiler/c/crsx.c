@@ -455,6 +455,7 @@ Sink bufferStart(Sink sink, ConstructionDescriptor descriptor)
 
     construction->nf = 0;
     construction->nostep = 0;
+    construction->closure = 0;
 
     // term->sub and term->binders will be populated incrementally.
     bufferPush(buffer, (Term) construction); // suspend current construction in favor of children
@@ -555,6 +556,7 @@ Sink bufferUse(Sink sink, Variable variable)
     	{
     		BufferEntry entry = &buffer->last->entry[buffer->lastTop];
     		asConstruction(entry->term)->nostep = 1;
+    		asConstruction(entry->term)->closure = 1;
     	}
     }
 
@@ -3457,8 +3459,8 @@ void normalize(Context context, Term *termp)
                 ++index;
             if (index < arity)
             {
-                // (6) If term is a non-nf data term or a nostep function application with a non-nf child then clear nostep if it is a function, push term, and switch to that child.
-                if (IS_FUNCTION(term))
+                // (6) If term is a non-nf data term or a nostep function application (but not a closure) with a non-nf child then clear nostep if it is a function, push term, and switch to that child.
+                if (IS_FUNCTION(term) && !IS_CLOSURE(term))
                     asConstruction(term)->nostep = 0;
 
                 ContextEntry entry = {LINK(context, term), index};

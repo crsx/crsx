@@ -751,7 +751,7 @@ public class GenericRule implements Copyable
 				{
 					case VARIABLE_USE :
 						Variable var = subsub.variable();
-						if (nextVarPos < i-1 && !(var.name().equals(binders[nextVarPos++].name()))) 
+						if (nextVarPos < binders.length - 1 && !(var.name().equals(binders[nextVarPos++].name()))) 
 							return true;
 						break;
 					case META_APPLICATION :

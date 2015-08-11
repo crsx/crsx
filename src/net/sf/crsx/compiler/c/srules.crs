@@ -660,7 +660,7 @@ SF-TopTerm[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]], #Index, ok¹ index¹.#
 
 -[Fresh[term::Text]]
 :
-{#env; "$Args":LIST_VARIABLE[#TopArgs];"$unstep": TEXT[#unstep]; "$Sink": VARIABLE[#sink]}
+{#env; "$Args":LIST_VARIABLE[#TopArgs]; "$unstep": TEXT[#unstep]; "$Sink": VARIABLE[#sink]}
 SF-TopTerm[FORM-ARGUMENT[#Sort], #Index, ok¹ index¹.#[ok¹, index¹]]
 →
 %n⟪, Term «term»« 
@@ -672,16 +672,17 @@ SF-TopTerm[FORM-ARGUMENT[#Sort], #Index, ok¹ index¹.#[ok¹, index¹]]
         #[OK, $[Plus, #Index, 1]]»⟫
 ;
 
+// Generate closure type. For now, we use Term. Might change in the future.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-TopClosure[$Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
 
 -[Fresh[closure::Text]]
 :
-{#env; "$Args":LIST_VARIABLE[#TopArgs]}
+{#env; "$Args":LIST_VARIABLE[#TopArgs]; "$unstep": TEXT[#unstep]; "$Sink": VARIABLE[#sink]}
 SF-TopClosure[#Index, ok¹ index¹.#[ok¹, index¹]]
 →
-%n⟪, Term «closure»«{#env; "$Args":LIST_VARIABLE[Append[#TopArgs,(closure;)]];closure:ARG[#Index, $False]}#[OK, $[Plus, #Index, 1]]»⟫
-;
+%n⟪, Term «closure»«{#env; "$Args": LIST_VARIABLE[Append[#TopArgs,(closure;)]]; closure:ARG[#Index, $False]; 
+                           "$unstep" : TEXT[ConcatText[(#unstep; %n⟨¶COPY(‹#sink›, ‹closure›);⟩;), %n⟨⟩]]}#[OK, $[Plus, #Index, 1]]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-UnstepBinders :: Text;
