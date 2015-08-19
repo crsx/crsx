@@ -614,7 +614,7 @@ F-Pattern[#pass, MATCH, CONSTRUCTION[#kind,#Symbol, #Binders], sink, #setup, #ne
 // - SUBMATCH stage: force, check, and process argument Binders.
 Pattern-Construction-SubMatch[Free[sink::Text, term::Text, parent::Text]]
 :
-{#env; term:SUB[parent, #i, #linked]}
+{#env; term:SUB[parent, #i, #linked, #isterm]}
 F-Pattern[#pass, SUBMATCH, CONSTRUCTION[#kind,#Symbol, #Binders], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»;
@@ -636,7 +636,7 @@ F-Pattern[#pass, #stage, LITERAL[#Literal, #Type], sink, #setup, #needed, #uniqu
 // SUBMATCH stage, pattern is free variable (outside meta-application): record the variable.  
 Pattern-Variable-Free[Free[variable::Reified_Variable, sink::Text, term::Text, parent::Text]]
 :
-{#env; variable : FREE; term:SUB[parent, #i, #linked]}
+{#env; variable : FREE; term:SUB[parent, #i, #linked, #isterm]}
 F-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»; Variable «variable» = linkVariable(«sink»->context, VARIABLE(«term»)); 
@@ -646,7 +646,7 @@ F-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #uniqu
 // SUBMATCH stage, Pattern is bound variable (outside meta-application).
 Pattern-Variable-Bound[Free[variable,sink,term,parent],Discard[#pass,#kind,#needed,#unique,#linked]]
 :
-{#env; variable : $[NotMatch, FREE, #kind]; term:SUB[parent, #i, #linked]}
+{#env; variable : $[NotMatch, FREE, #kind]; term:SUB[parent, #i, #linked, #isterm]}
 F-Pattern[#pass, SUBMATCH, VARIABLE-USE[variable], sink, #setup, #needed, #unique, term, ok.#[ok]]
 →
 %n⟪« #setup »FORCE(«sink»->context, «term»); SUB(«parent», «INTEGER[#i]») = «term»; if («variable» != VARIABLE(«term»)) {«{#env}F-fail-cleanup[sink]» break;}
@@ -960,7 +960,7 @@ $False
 
 -[Free[term::Text, parent::Text]]
 :
-{#env; term : SUB[parent, #i, $True]}
+{#env; term : SUB[parent, #i, $True, #isterm]}
 F-Pattern-MetaArgs-Norm[$True, #MetaVar, #MetaArgs, #sink, #setup, term, ok.#[ok]]
 → 
 %n⟪« #setup »UNLINK_SUB(«#sink»->context, «parent»,  «INTEGER[#i]»); NORMALIZE(«#sink»->context, «term»); SUB(«parent»,  «INTEGER[#i]») = LINK(«#sink»->context, «term»);
@@ -1164,7 +1164,7 @@ F-PatternSub2[$Boolean<!-- Whether to link sub -->, PASS, Pattern-Stage, Reified
 {#env; "$Subs": LIST_VARIABLE[#subs]}
 F-PatternSub2[$True, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, term, #i, ok.#[ok]] 
 → 
-{#env; sub: SUB[term, #i, $True]; "$Subs":LIST_VARIABLE[(sub;#subs)]}
+{#env; sub: SUB[term, #i, $True, $True]; "$Subs":LIST_VARIABLE[(sub;#subs)]}
 F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = LINK(«#sink»->context, SUB(«term», «INTEGER[#i]»)); int «sub»_count = «term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);
 «D-check-sort[#sink, sub, #sort]»⟫, $True, #unique, sub, ok.#[ok]]
 ;
@@ -1174,7 +1174,7 @@ F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = LINK(«
 {#env}
 F-PatternSub2[$False, #pass, #stage, #sort, #Pattern, #sink, #code, #unique, term, #i, ok.#[ok]] 
 →
-{#env; sub: SUB[term, #i, $False]}
+{#env; sub: SUB[term, #i, $False, $True]}
 F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«term», «INTEGER[#i]»); int «sub»_count = «term»_count*LINK_COUNT(«sub»); permitUnusedInt(«sub»_count);
 «D-check-sort[#sink, sub, #sort]»⟫, $False, #unique, sub, ok.#[ok]]
 ;

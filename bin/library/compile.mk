@@ -41,7 +41,7 @@ objs+=$(OUTPUTDIR)/$(crsbasename)_fun.o
 symbols=$(OUTPUTDIR)/$(crsbasename)_symbols.c
 objs+=$(OUTPUTDIR)/$(crsbasename)_symbols.o
 
-CCFLAGS+=-I$(COMPILERSRC)/c $(OPTFLAG)
+CCFLAGS+=-I$(COMPILERSRC)/c $(OPTFLAG) -foptimize-sibling-calls  
 
 all: $(crsbinfile)
 clean::
@@ -58,7 +58,7 @@ $(crsdrfile): $(CRSFILE) prereq
 	@$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules="$<" simple-terms sortify dispatchify simplify reify="$@" 
 	
 $(data): $(crsdrfile) prereq
-	@export HEADERS="$(crsbasename).h" && $(CRSXC) compile sorts "$<" > "$@"
+	@$(CRSXC) HEADERS="$(crsbasename).h" $(MODE) wrapper=ComputeSorts input="$<" > "$@"
 
 $(symlist): $(crsdrfile) 
 	@$(CRSXC) wrapper=ComputeSymbols input="$<" > "$@.tmp"
@@ -84,7 +84,7 @@ $(symbols): $(symlist)
 
 # Compile C files
 
-CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING -DGENERIC_LOADER $(DEBUG)
+CCFLAGS+=-I. -DCRSX_ENABLE_PROFILING -DGENERIC_LOADER $(DEBUG)  
  
 ifdef ICU4CDIR
 LDFLAGS+=-L$(ICU4CDIR)
@@ -118,10 +118,10 @@ $(OUTPUTDIR)/invariant.o: $(COMPILERSRC)/c/invariant.c $(COMPILERSRC)/c/invarian
 $(OUTPUTDIR)/prof.o: $(COMPILERSRC)/c/prof.c $(COMPILERSRC)/c/prof.h $(COMPILERSRC)/c/crsx.h
 
 $(OUTPUTDIR)/%.o: $(COMPILERSRC)/c/%.c prereq 
-	@$(CC) $(CCFLAGS) -c "$<" -o "$@"
+	$(CC) $(CCFLAGS) -c "$<" -o "$@" 
 
 $(OUTPUTDIR)/%.o: $(OUTPUTDIR)/%.c $(header) prereq  
-	@$(CC) $(CCFLAGS) -c "$<" -o "$@"
+	$(CC) $(CCFLAGS) -c "$<" -o "$@"
 
 $(OUTPUTDIR)/$(crsbasename): $(objs) 
 	@$(CXX) $(objs) $(ICU4CLIB) $(RTLIB) $(LDFLAGS) -o "$@"

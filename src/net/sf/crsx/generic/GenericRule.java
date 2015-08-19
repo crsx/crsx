@@ -147,6 +147,7 @@ public class GenericRule implements Copyable
 
 		this.crs = crs;
 		this.name = ruleName;
+		
 		this.options = options;
 		this.variableSorts = null;
 		this.metaVariableSorts = null;
@@ -1400,6 +1401,10 @@ public class GenericRule implements Copyable
 										error("rule contractum has inconsistent arity for pattern meta-application ("
 												+ pattern + ")", false);
 									Variable patternVariable = pattern.sub(i).variable();
+									
+									if (patternVariable.blocking())
+										break; // FAIL because functional binders can't be reused.
+									
 									Variable reusedPatternVariable = reusable.get(patternVariable);
 									if (newReusable.containsValue(contractumVariable))
 									{

@@ -39,12 +39,7 @@ ST-then-send[OK_SORT, Reified_Term, Text] :: Text;
 
 {#env}ST-then-send[OK, #term, #sink] 
 → 
-{
-    #env; 
-    "$pending-props" : TERM[#term]
-}
-ST-send[#term, #sink]
-; 
+{#env; "$pending-props" : TERM[#term]}ST-send[#term, #sink]; 
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send[Reified_Term, Text] :: Text;
@@ -70,81 +65,57 @@ ST-send[CONSTRUCTION[KFUNCTION, #Symbol, #Binders], #sink]
 {#env; "$tail" : NO; "$pending-props" : NO}
 ST-set-properties[#Pending, (), #sink, ok¹ props¹.
 ST-set-binders[ok¹, #Binders, #sink, ok¹ vars¹.
-ST-eval-function[ok¹, YES, #Symbol, props¹, vars¹, #sink]]]
-;
+ST-eval-function[ok¹, YES, #Symbol, props¹, vars¹, #sink]]];
 
 ST-Send-Construction-Function-Lazy
 :
-{
-    #env; 
+{#env; 
     "$tail"         : NO; 
-    "$pending-props" : #pending
-}
+    "$pending-props" : #pending}
 ST-send[CONSTRUCTION[KFUNCTION, #symbol, #binders], #sink]  // TODO: add a marker to force strict evaluation.
 →
 %n⟪« 
 {#env; "$tail": NO; "$pending-props" : NO}ST-send-properties[#pending, #sink]  »
 START(«#sink», «EventConstructor[#symbol]»);⟦« 
 {#env; "$tail": NO; "$pending-props" : NO}ST-send-binders[#binders, #sink] »⟧
-END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[NO]»⟫
-;
+END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[NO]»⟫;
 
 ST-Send-Construction-Data
 :
-{
-    #env; 
+{#env; 
     "$tail"         : #tail; 
-    "$pending-props" : #pending
-}
+    "$pending-props" : #pending}
 ST-send[CONSTRUCTION[KDATA, #symbol, #binders], #sink] 
 →
 %n⟪«
 {#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»
 START(«#sink», «EventConstructor[#symbol]»);⟦« 
 {#env; "$tail": NO; "$pending-props": NO}ST-send-binders[#binders, #sink] »⟧
-END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[#tail]»⟫
-;
+END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[#tail]»⟫;
 
 ST-Send-Literal
 :
-{
-    #env;
+{#env;
     "$tail"         : #tail; 
-    "$pending-props" : #pending
-}  
+    "$pending-props" : #pending}  
 ST-send[LITERAL[#literal, #sort], #sink] 
 →
-%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»¶LITERAL(«#sink», (char *)«STRING[#literal]»);«ST-send-tail[#tail]»⟫
-;
+%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»¶LITERAL(«#sink», (char *)«STRING[#literal]»);«ST-send-tail[#tail]»⟫;
 
-ST-Send-Variable
-:
+ST-Send-Variable:
 {#env}ST-send[VARIABLE-USE[#variable], #sink] 
 →
-{#env}ST-send-variable[Check-bound-hidden[$[{#env}Get, #variable, FRESH]], #variable, #sink]
-;
+{#env}ST-send-variable[Check-bound-hidden[$[{#env}Get, #variable, FRESH]], #variable, #sink];
 
-ST-Send-MetaApplication
-:
-{   
-    #env; 
-//    "$tail"          : #tail; 
-   // "$pending-props" : #pending
-}
-ST-send[META-APPLICATION[#metavar, #arguments, #occ], #sink]
+ST-Send-MetaApplication:
+{#env}ST-send[META-APPLICATION[#metavar, #arguments, #occ], #sink]
 →
 {#env}ST-substitute[#metavar, #arguments, #occ, #sink];
 
-//%n⟪«{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«
-//    {#env; "$tail": NO; "$pending-props": NO}ST-substitute[#metavar, #arguments, #occ, #sink]»«
-//    ST-send-tail[#tail]»⟫;
-
-ST-Send-Evaluator // TODO: check $PendingProps is NO
-:
+ST-Send-Evaluator: // TODO: check $PendingProps is NO
 {#env}ST-send[EVALUATOR[#primitive, #terms, #options], #sink] 
 →
-{#env; "$pending-props": NO}E-send[Primitive[#primitive], #terms, #options, #sink]
-;
+{#env; "$pending-props": NO}E-send[Primitive[#primitive], #terms, #options, #sink];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-send-variable[$Boolean, Reified_Variable, Text] :: Text;
@@ -172,22 +143,32 @@ ST-send-tail2[NO]   → %n⟪¶⟫;
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-eval-function[OK_SORT, STRING_ENTRY, $String, $List[Text], $List[Text], Text] :: Text;
 
-{#env}
-ST-eval-function[OK, #tail, #symbol, #props, #vars, #sink] → // vars  are in order 
-    %n⟪«ST-send-tail2[#tail]»«MANGLE[#symbol]»(«#sink», 1«{#env}ST-function-args-props[#props]»«{#env}ST-function-args[#vars]»);⟫;
+{#env}ST-eval-function[OK, #tail, #symbol, #props, #vars, #sink] // vars  are in order 
+→ 
+%n⟪«ST-function-spilled-args[Tail[Tail[#vars]], 2]»«ST-send-tail2[#tail]»«MANGLE[#symbol]»(«#sink», 1«{#env}ST-function-args-props[#props]»«{#env}ST-function-args[#vars, 0, 2]»);⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-function-args[$List[Text]] :: Text;
+ST-function-args[$List[Text], $Numeric, $Numeric] :: Text;
 
-{#env}ST-function-args[()]            → %n⟪⟫ ;
-{#env}ST-function-args[(#Arg; #Args)] → %n⟪, «#Arg»«{#env}ST-function-args[#Args]»⟫;
+{#env}ST-function-args[(), #c, #max]            → %n⟪⟫ ;
+
+-[Data[#c]]:
+{#env}ST-function-args[(#arg; #args), #c, #max] 
+→
+$[If, $[LessThan, #c, #max], 
+    %n⟪, «#arg»«{#env}ST-function-args[#args, Plus[#c, 1], #max]»⟫,
+    %n⟪⟫];
+
+ST-function-spilled-args[$List[Text], $Numeric] :: Text;
+
+ST-function-spilled-args[(), #index]            →  %n⟪⟫;
+ST-function-spilled-args[(#arg; #args), #index] →  %n⟪¶«Spilled[#index]» = (void*) «#arg»;«ST-function-spilled-args[#args, Plus[#index, 1]]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-function-args-props[$List[Text]] :: Text;
 
 {#env}ST-function-args-props[()]            → %n⟪, NULL, NULL⟫;
-{#env}ST-function-args-props[(#Arg;#Args)]  → {#env}ST-function-args[(#Arg;#Args)];
-
+{#env}ST-function-args-props[(#arg; #args)] → {#env}ST-function-args[(#arg; #args), 0, 2];
 
 //------------
 // Send the properties to a sink
@@ -231,8 +212,7 @@ ST-Send-Property-other[Fresh[key::Text, value::Text]]
 %n⟪¶{⟦ 
 Term «key», «value»;« {#env} ST-set-ref[#Key, #sink, key] »« {#env} ST-set[#Value, #sink, value] »
 «value» = NORMALIZEP(«#sink»->context, «value»);
-ADD_PROPERTY(«#sink», «key», «value»);«ST-unlink-ref[#sink, key] »« {#env} ST-send-properties-term[#Term, #sink] »⟧}⟫
-;
+ADD_PROPERTY(«#sink», «key», «value»);«ST-unlink-ref[#sink, key] »« {#env} ST-send-properties-term[#Term, #sink] »⟧}⟫;
 
 // Ignore all other cases.
 {#env}ST-send-properties-term[CONSTRUCTION[#Kind, #Symbol, #Binders], #sink]        → %n⟨⟩;
@@ -345,8 +325,7 @@ $[If, $[Equal, #count, 1], // Last use?
     %n⟪
 NamedPropertyLink ‹namedP›  = LINK_NamedPropertyLink(‹#sink›->context, ‹#namedP›);
 VariablePropertyLink ‹varP› = LINK_VariablePropertyLink(‹#sink›->context, ‹#varP›);«
-{#env}ST-set-properties-term[#term, (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]]»⟫]
-;
+{#env}ST-set-properties-term[#term, (namedP; varP;), #sink, ok¹ props¹.#[ok¹, props¹]]»⟫];
 
 // -----------------------
 // Generate code for sending construction subterms, starting with binders.
@@ -480,7 +459,7 @@ ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink]
 
 // Case 3: sub meta-variable.. 
 -[Free[var::Reified_Variable]]:
-{#env; var:SUB[#parent, #i, $True]} // Sub data term. Copy or Substitute
+{#env; var:SUB[#parent, #i, #linked, $True]} // Sub data term. Copy or Substitute
 ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink] 
 →
 {#env}ST-substitute1a[#metavar, #arguments, #use, #sink];
@@ -488,10 +467,10 @@ ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink]
 // Case 4: sub closure
 -[Free[var::Reified_Variable]]
 :
-{#env; var: SUB[#parent, #i, $True]} // Sub function term. Should not occur
+{#env; var: SUB[#parent, #i, $True, $False]} // Sub function.  
 ST-substitute0[VARIABLE[var], #metavar, #arguments, #use, #sink]
 →
-$[Error, "Cannot have sub-function with binders"];
+{#env}ST-call[var, #metavar, #arguments, #use, #sink];
 
 // Generate code for substitution. Send properties first  (if any)
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -698,9 +677,12 @@ ST-invoke1[#closure, #metavar, #binders, #use, #sink]
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-invoke2[OK_SORT, Text, $List[Text], $String, $Numeric, STRING_ENTRY, Text] :: Text;
 
+-[Data[#arity]]:
 {#env}ST-invoke2[OK, #closure, #args, #metavar, #arity, #tail, #sink]
 →
-%n⟪«ST-send-tail2[#tail]»CALL(«#sink», «#closure»«ConcatText[#args,%n⟨,⟩]»);⟫;
+$[If, $[LessThan, #arity, 5],
+    %n⟪«ST-send-tail2[#tail]»CALL«INTEGER[#arity]»(«#sink», «#closure»«ConcatText[#args,%n⟨,⟩]»);⟫,
+    %n⟪«ST-function-spilled-args[Tail[Tail[Tail[#args]]], 2]»«ST-send-tail2[#tail]»CALL(«#sink», «#closure», «INTEGER[#arity]»«ST-function-args[#args, 0, 3]»);⟫];
 
 ST-may-link[Text, Reified_Use, Text] :: Text;
 
@@ -1147,8 +1129,7 @@ ST-set-capture-variable[VARIABLE_ENTRY, Reified_Variable, $List[Text], Text, ok�
 :
 {#env}ST-set-to[EVALUATOR[#primitive, #args, #options], #sink, var.#[var]]
 →
-%n⟪¶Term «variable»;« {#env}E-set[Primitive[#primitive], #args, #options, #sink, variable] »« {#env}#[variable] »⟫
-;
+%n⟪¶Term «variable»;« {#env}E-set[Primitive[#primitive], #args, #options, #sink, variable] »« {#env}#[variable] »⟫;
 
 // Meta-Application  
 -[Fresh[variable::Text]]

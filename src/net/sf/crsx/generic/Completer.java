@@ -2820,9 +2820,9 @@ public class Completer
 			relevantRules = rs;
 		
 //		String rulename = rs.iterator().next().getName().symbol();
-//		if (rulename.contains("R-R4-R4a-Form-for-at2-1"))
+//		if (rulename.contains("Rule"))
 //			System.out.println("Have rule.");
-//		
+
 		// STEP 1: find a position where we can split, and decide what to split on
 		final Pair<Integer,Object> splitPos = getSplitPosition(relevantRules);
 		if (splitPos == null)
@@ -4011,7 +4011,8 @@ public class Completer
 						args[j] = factory.newVariableUse(dispatcherTopBinders[j]);
 					for (int j = 0; j < dispatcherSubRank; j++)
 					{
-						binders[i][j] = env.makeVariable("y" + j, true);
+						Variable exampleDispatcherBinder = exampleDispatcher.binders(i)[j];
+						binders[i][j] = env.makeVariable("y" + j, exampleDispatcherBinder.promiscuous(), exampleDispatcherBinder.blocking(), exampleDispatcherBinder.shallow());
 						args[dispatcherTopRank + j] = factory.newVariableUse(binders[i][j]);
 					}
 					subterms[i] = standardPatternMetaApplication("#0-" + i, args);

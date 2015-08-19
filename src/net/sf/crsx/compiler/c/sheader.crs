@@ -22,7 +22,7 @@ SH-Function[$String, $String, $String, $List[Reified_Form], Reified_Sort, $List[
 SH-Function[#name, #kind, #function, #Forms, #Sort, #Rules]
 →
 %n⟪/* FUNCTION « COMMENT_TOKEN[#name] » HEADER DECLARATIONS. */
-« MapText[f.SH-Form[f], #Forms] »extern int « Step[#function] »(Sink,Term,...);
+« MapText[f.SH-Form[f], #Forms] »
 extern int « MANGLE[#function] »(Sink, ssize_t,NamedPropertyLink,VariablePropertyLink« SH-Arg[#Forms, $True] »);
 ⟫;
 
@@ -46,39 +46,46 @@ SH-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False]
 
 SH-Arg[(FORM[#Constructor, #Args];), #hasSortSet] 
 → 
-SH-TopArgs[#Args];
+SH-TopArgs[OK, #Args, 0];
 
-SH-TopArgs[$List[Reified_FormArgument]] :: Text;
+// Only generate max 2 arguments: the rest are spilled onto global variables.
 
-SH-TopArgs[()] 
+SH-TopArgs[OK_SORT, $List[Reified_FormArgument], $Numeric] :: Text;
+
+SH-TopArgs[OK, (), #index] → %n⟪⟫;
+
+SH-TopArgs[OK, (#Arg; #Args), #index] 
 →
-%n⟪⟫;
+SH-TopArg[HasFunctionalFormBinders[#Arg], #Arg, #index, ok¹ index¹.SH-TopArgs[ok¹, #Args, index¹]];
 
-SH-TopArgs[(#Arg; #Args)] 
+SH-TopArg[$Boolean, Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
+
+-[Data[#index]]:
+SH-TopArg[$True, #FormArg, #index, ok¹ index¹.#[ok¹, index¹]]
 →
-%n⟪«SH-TopArg[HasFunctionalFormBinders[#Arg], #Arg]»«SH-TopArgs[#Args]»⟫;
-
-SH-TopArg[$Boolean, Reified_FormArgument] :: Text;
-
-SH-TopArg[$True, #FormArg]
-→
-%n⟪,Term⟫; // A closure term
+$[If, $[LessThan, #index, 2], 
+    %n⟪,Term«#[OK, $[Plus, #index, 1]]»⟫, // A closure term
+    %n⟪⟫];
  
-SH-TopArg[$False, #FormArg]
+SH-TopArg[$False, #FormArg, #index, ok¹ index¹.#[ok¹, index¹]]
 →
-SH-TopDataArg[#FormArg];
+SH-TopDataArg[#FormArg, #index, ok¹ index¹.#[ok¹, index¹]];
 
-SH-TopDataArg[Reified_FormArgument] :: Text;
+SH-TopDataArg[Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
 
--[Fresh[v::Reified_Variable]]
-:
-SH-TopDataArg[FORM-BINDER[#Kind, #Sort, v.#FormArgument[v]]] 
+-[Data[#index], Fresh[v::Reified_Variable]]:
+SH-TopDataArg[FORM-BINDER[#Kind, #Sort, v.#FormArgument[v]], #index, ok¹ index¹.#[ok¹, index¹]] 
 →
-%n⟪,Variable«SH-TopDataArg[#FormArgument[v]]»⟫;
+$[If, $[LessThan, #index, 2], 
+    %n⟪,Variable«SH-TopDataArg[#FormArgument[v], $[Plus, #index, 1], ok¹ index¹.#[ok¹, index¹]] »⟫,
+    %n⟪⟫];
 
-SH-TopDataArg[FORM-ARGUMENT[#Sort]] 
+-[Data[#index]]:
+SH-TopDataArg[FORM-ARGUMENT[#Sort], #index, ok¹ index¹.#[ok¹, index¹]] 
 →
-%n⟪,Term⟫;
+$[If, $[LessThan, #index, 2], 
+    %n⟪,Term«#[OK, $[Plus, #index, 1]]»⟫, 
+    %n⟪⟫];
 
 SH-Form[Reified_Form] :: Text;
 

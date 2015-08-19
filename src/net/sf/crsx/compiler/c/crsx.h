@@ -633,7 +633,8 @@ struct _ConstructionDescriptor
     int *binderoffset; // offset in binder list of first binder for each argument; for length = arity+1
     char *(*name)(Term term); // of descriptor
 #ifdef STRICT
-    int (*step)(Sink sink, Term term, ...); // rewrite the term to get closer to a top level data descriptor and return whether the rewrite has fully been complete
+    int argcount; // number of arguments in direct step expression. Does not count the sink, shared and the environment.
+    int (*step)(Sink, ssize_t, Term); // rewrite the term to get closer to a top level data descriptor and return whether the rewrite has fully been complete
 #else
     int (*step)(Sink sink, Term term); // rewrite the term to get closer to a top level data descriptor and return 1 is term has been sent to sink
 #endif
@@ -655,6 +656,7 @@ struct _ConstructionDescriptor
 
 #define c_binders(c,i) (&(((Variable *) &(c->sub[c->term.descriptor->arity]))[c->term.descriptor->binderoffset[i]]))
 #define c_rank(c,i)    (c->term.descriptor->binderoffset[i+1] - c->term.descriptor->binderoffset[i])
+#define c_rankd(d,i)    (d->binderoffset[i+1] - d->binderoffset[i])
 
 // Constant descriptors used for literals.
 
@@ -667,7 +669,7 @@ extern Variable *noBinders(Term term, int n);
 extern char *dataName(Term term);
 
 #ifdef STRICT
-extern int dataStep(Sink sink, Term term, ...);
+extern int dataStep(Sink sink, ssize_t, Term term);
 #else
 extern int dataStep(Sink sink, Term term);
 #endif
@@ -979,8 +981,44 @@ extern Term compute(Context context, Term term);
 //// CLOSURE
 ////
 
+#ifdef STRICT
+
+// Spilled parameters
+extern void* crsxArg[96];
+
+typedef int (*DStepFun)(Sink, ssize_t, Term);
+
+extern int call0(Sink sink, Term term);
+extern int call1(Sink sink, Term term, void* arg1);
+extern int call2(Sink sink, Term term, void* arg1, void* arg2);
+extern int call3(Sink sink, Term term, void* arg1, void* arg2, void* arg3);
+extern int call4(Sink sink, Term term, void* arg1, void* arg2, void* arg3, void* arg4);
+extern int call(Sink sink, Term term, int argcount, void* arg1, void* arg2, void* arg3);
+
+#ifndef CALL0
+#define CALL0(SINK,TERM) call0(SINK, TERM)
+#endif
+
+#ifndef CALL1
+#define CALL1(SINK,TERM,A1) call1(SINK, TERM, A1)
+#endif
+
+#ifndef CALL2
+#define CALL2(SINK,TERM,A1,A2) call2(SINK, TERM, A1, A2)
+#endif
+
+#ifndef CALL3
+#define CALL3(SINK,TERM,A1,A2,A3) call3(SINK, TERM, A1, A2, A3)
+#endif
+
+#ifndef CALL4
+#define CALL4(SINK,TERM,A1,A2,A3,A4) call4(SINK, TERM, A1, A2, A3, A4)
+#endif
+
 #ifndef CALL
-# define CALL(SINK,T,...) ((T)->descriptor->step(SINK, (T), __VA_ARGS__))
+# define CALL(SINK,T,ARGC,A1,A2,A3) call(SINK, (T), ARGC, A1, A2, A3)
+#endif
+
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

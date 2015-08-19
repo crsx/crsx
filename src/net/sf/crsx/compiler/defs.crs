@@ -86,7 +86,7 @@ PASS ::= ( FIRST; SECOND; );
 
 VARIABLE_ENTRY ::= 
 ( 
-	SUB[Text<!-- Parent Variable -->, $Numeric<!-- Index in parent -->, $Boolean<!-- Linked? -->];
+	SUB[Text<!-- Parent Variable -->, $Numeric<!-- Index in parent -->, $Boolean<!-- Linked? -->, $Boolean <!-- term or closure? -->];
     ARG[$Numeric<!-- Index -->,$Boolean<!-- Term? -->];
 
     BOUND_DATA; // TODO: remove      
@@ -116,6 +116,14 @@ Binder-State ::= ( OUTER; REUSING; COPYING; NO_REUSE; );
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generic utilities.
 
+∀ a . Head[$List[a]] :: a ;
+Head[()]     → () ;
+Head[(#;##)] → #;
+
+∀ a . Tail[$List[a]] :: $List[a] ;
+Tail[()]     → () ;
+Tail[(#;##)] → ##;
+
 ∀ a . Length[$List[a], $Numeric] :: $Numeric ;
 -             : Length[()    , #n] → #n ;
 -[Discard[#]] : Length[(#;##), #n] → Length[##, $[Plus,1,#n]] ;
@@ -123,7 +131,6 @@ Binder-State ::= ( OUTER; REUSING; COPYING; NO_REUSE; );
 ∀ a b . Map[x::a . $sort[b], $List[a]] :: $List[b] ;
 Map[x.#[x], ()] → () ;
 Map[x.#[x], (#1;#s)] → (#[#1]; Map[x.#[x], #s]) ;
-
 
 ∀ a . Concat[$List[$List[a]]] :: $List[a] ;
 Concat[()] → () ;
@@ -150,7 +157,6 @@ ConcatText[$List[Text], Text] :: Text ;
 ConcatText[(), #sep] →  %n⟪⟫;
 ConcatText[(#Text;#Texts), #Sep] → %n⟪«#Sep»«#Text»«ConcatText[#Texts, #Sep]»⟫;
 
-
 ReverseConcatText[$List[Text], Text] :: Text ;
 ReverseConcatText[(), #sep] →  %n⟪⟫;
 ReverseConcatText[(#Text;#Texts), #Sep] → %n⟪«ReverseConcatText[#Texts, #Sep]»«#Sep»«#Text»⟫;
@@ -161,6 +167,19 @@ ReverseConcatText[(#Text;#Texts), #Sep] → %n⟪«ReverseConcatText[#Texts, #Se
 ∀ a . If[$Boolean, a, a] :: a ;
 -[Discard[#2]] : If[$True, #1, #2] → #1 ;
 -[Discard[#1]] : If[$False, #1, #2] → #2 ;
+
+Not[$Boolean] :: $Boolean;
+Not[$True]  → $False;
+Not[$False] → $True;
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]]: Plus[#1, #2] → $[Plus, #1, #2];
+
+Minus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]]: Minus[#1, #2] → $[Minus, #1, #2];
+
+LessThan[$Numeric, $Numeric] :: $Boolean;
+-[Data[#1, #2]]: LessThan[#1, #2] → $[LessThan, #1, #2];
 
 // Map splitting input in partition
 // x: current input
@@ -290,6 +309,19 @@ FormArguments-binder-offsets-strict[(), #n]
 () 
 ;
 
+ArgCount[$List[Reified_FormArgument]] :: $Numeric;
+
+ArgCount[()] → 0;
+ArgCount[((#Arg; #Args))] → Plus[ArgCount-Arg[#Arg, 0], ArgCount[#Args]];
+
+ArgCount-Arg[Reified_FormArgument, $Numeric] :: $Numeric;
+
+ArgCount-Arg[FORM-BINDER[KFUNCTION, #Sort, v.#FormArgument[v]], #c] → 1; // ignore functional binders.
+
+-[Fresh[v::Reified_Variable]]:
+ArgCount-Arg[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]], #c]     → ArgCount-Arg[#FormArgument[v], $[Plus, #c, 1]];
+
+ArgCount-Arg[FORM-ARGUMENT[#Sort], #c]                              →  $[Plus, #c, 1];                           
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Identifiers.
@@ -345,6 +377,9 @@ Step[#name] → %n⟪step« MANGLE[#name] »⟫ ;
 Var[$String] :: Text;
 Var[#name] → %n⟪v« MANGLE[#name] »⟫ ;
 
+// Spilled argument
+Spilled[$Numeric /* Original index of argument */] :: Text;
+Spilled[#index] → %n⟪crsxArg[« INTEGER[Minus[#index, 2]] »]⟫ ;
 
 {$String:String}MetaVar[$String] :: Text;
 
@@ -408,15 +443,15 @@ HasFunctionalFormBinders[FORM-ARGUMENT[#Sort]] →
 // Move to the argument term
 MoveToTerm[Reified_Binder] :: Reified_Term;
 
--[Fresh[binder::Reified_Variable]]
-:
-MoveToTerm[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] →
-    MoveToTerm[#Binder[binder]]
-;
+-[Fresh[binder::Reified_Variable]]:
+MoveToTerm[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]]
+ →
+MoveToTerm[#Binder[binder]];
 
-MoveToTerm[ARGUMENT[#Sort, #Term]] →
-    #Term
-;
+MoveToTerm[ARGUMENT[#Sort, #Term]]
+→
+#Term;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Check Reuse Utilities

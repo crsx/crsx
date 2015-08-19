@@ -224,7 +224,7 @@ char *dataName(Term term)
 
 #ifdef STRICT
 
-int dataStep(Sink sink, Term term, ...)
+int dataStep(Sink sink, ssize_t shared, Term term)
 {
     return 0; // no computation possible
 }
@@ -254,6 +254,9 @@ struct _ConstructionDescriptor literalConstructionDescriptor =
     sizeof(struct _Literal),                    //.size
     noBinderOffsets,                            //.binderoffset
     (char *(*)(Term term))&literalName,         //.name
+#ifdef STRICT
+	0,                                          //.argcount
+#endif
     &dataStep                                   //.step
 };
 
@@ -3459,7 +3462,7 @@ void normalize(Context context, Term *termp)
                 ++index;
             if (index < arity)
             {
-                // (6) If term is a non-nf data term or a nostep function application (but not a closure) with a non-nf child then clear nostep if it is a function, push term, and switch to that child.
+                // (6) If term is a non-nf data term or a nostep function application with a non-nf child then clear nostep if it is a function, push term, and switch to that child.
                 if (IS_FUNCTION(term) && !IS_CLOSURE(term))
                     asConstruction(term)->nostep = 0;
 
@@ -3529,7 +3532,11 @@ static int step(Sink sink, Term term)
     DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld)\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGCOND(sink->context->debugviz,   DEBUGT(sink->context, stepNesting+4, term));
 
+#ifdef STRICT
+    int step = CALL0(sink, term);
+#else
     int step = term->descriptor->step(sink, term);
+#endif
 
     DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
     DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld)\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
@@ -5926,19 +5933,153 @@ void printTraceForCps(Context context, Term term)
     }
 }
 
-
-///static void ptSubstitution(Context context, SubstitutionFrame substitution)
-///{
-///    for (; substitution; substitution = substitution->parent)
-///    {
-///        int i;
-///        for (i = 0; i < substitution->count; ++i)
-///        {
-///            PRINTF(context, "  %s => ", substitution->variables[i]->name);
-///            pt(context, substitution->substitutes[i]);
-///        }
-///    }
-///}
-
-
 /////////////////////////////////////////////////////////////////////////////////
+// CLOSURE
+//
+// Not pretty, but get the job done fairly efficiently.
+// Ideally, the code gen should generate these functions...
+
+
+#ifdef STRICT
+
+void* crsxArg[96];
+
+typedef int (*DFunP0)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink);
+typedef int (*DFunP1)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink, void*);
+typedef int (*DFunP2)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink, void*, void*);
+
+typedef int (*FunP0)(Sink, Term);
+typedef int (*FunP1)(Sink, Term, void*);
+
+
+#define ARGS0
+#define ARGS1 arg1
+#define ARGS2 ARGS1, arg2
+#define ARGS3 ARGS2, arg3
+#define ARGS4 ARGS3, arg4
+#define ARGS5 ARGS4, arg5
+
+#define UNTHUNK \
+		const ConstructionDescriptor desc = term->descriptor; \
+		const ssize_t shared = LINK_COUNT(term); \
+		const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term)); \
+		const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term)); \
+		void* p[128]; \
+		int ri = 0; \
+		int pi = 0; \
+		int i; \
+		for (i = 0; i < desc->arity; i ++) \
+		{ \
+			const Term sub = SUB(term, i); \
+			if (IS_FUNCTIONAL_USE(sink->context, sub)) \
+			{ \
+				p[ri++] = args[pi++]; \
+			} \
+			else \
+			{ \
+				int rank = c_rankd(desc, i); \
+				if (rank > 0) \
+				{ \
+					int j; \
+					for (j = 0; j < rank; j ++) \
+						p[ri++] = (void*) linkVariable(sink->context, BINDER(term, i, j)); \
+				} \
+				p[ri++] =  LINK(sink->context, sub);\
+			} \
+		} \
+		UNLINK(sink->context, term); \
+		for (i = 0; i < desc->argcount - 2; i ++) \
+			crsxArg[i] = p[i + 2]; \
+		return ((DFunP2) desc->step)(sink, shared, namedP, varP, p[0], p[1]);
+
+int call0_0(Sink sink, Term term);
+int call0_1(Sink sink, Term term);
+int call0_x(Sink sink, Term term);
+
+const FunP0 dtable0[30] = { &call0_0, &call0_1, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x };
+
+int call0_0(Sink sink, Term term)
+{
+	const ConstructionDescriptor desc = term->descriptor;
+	const ssize_t shared = LINK_COUNT(term);
+	const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
+	const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
+	UNLINK(sink->context, term);
+	return ((DFunP0) desc->step)(sink, shared, namedP, varP);
+}
+
+int call0_1(Sink sink, Term term)
+{
+	const ConstructionDescriptor desc = term->descriptor;
+	const ssize_t shared = LINK_COUNT(term);
+	const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
+	const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
+	const Term sub0 = LINK(sink->context, SUB(term, 0)); // sub0 must be a term without binders.
+	UNLINK(sink->context, term);
+	return ((DFunP1) desc->step)(sink, shared, namedP, varP, sub0);
+}
+
+int call0_x(Sink sink, Term term)
+{
+	void* args[0] = {};
+	UNTHUNK
+}
+
+int call0(Sink sink, Term term) {
+	return dtable0[term->descriptor->argcount](sink, term);
+}
+
+int call1_1(Sink sink, Term term, void* arg1);
+int call1_x(Sink sink, Term term, void* arg1);
+
+const FunP1 dtable1[30] = { NULL, &call1_1, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x };
+
+int call1(Sink sink, Term term, void* arg1) {
+	return dtable1[term->descriptor->argcount](sink, term, arg1);
+}
+
+int call1_1(Sink sink, Term term, void* arg1)
+{
+	const ConstructionDescriptor desc = term->descriptor;
+	const ssize_t shared = LINK_COUNT(term);
+	const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
+	const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
+	UNLINK(sink->context, term);
+	return ((DFunP1) desc->step)(sink, shared, namedP, varP, arg1);
+}
+
+int call1_x(Sink sink, Term term, void* arg1)
+{
+	void* args[1] = { arg1 };
+	UNTHUNK
+}
+
+int call2(Sink sink, Term term, void* arg1, void* arg2)
+{
+	void* args[2] = { arg1, arg2 };
+	UNTHUNK
+}
+
+int call3(Sink sink, Term term, void* arg1, void* arg2, void* arg3)
+{
+	void* args[3] = { arg1, arg2, arg3 };
+	UNTHUNK
+}
+
+int call4(Sink sink, Term term, void* arg1, void* arg2, void* arg3, void* arg4)
+{
+	void* args[4] = { arg1, arg2, arg3, arg4 };
+	UNTHUNK
+}
+
+// Fallback: arguments are spilled onto heap
+int call(Sink sink, Term term, int argcount, void* arg1, void* arg2, void* arg3)
+{
+	void* args[64] = { arg1, arg2, arg3 };
+	int k;
+	for (k = 0; k < argcount; k++)
+		args[k + 3] = crsxArg[k];
+	UNTHUNK
+}
+
+#endif
