@@ -378,8 +378,8 @@ Var[$String] :: Text;
 Var[#name] → %n⟪v« MANGLE[#name] »⟫ ;
 
 // Spilled argument
-Spilled[$Numeric /* Original index of argument */] :: Text;
-Spilled[#index] → %n⟪crsxArg[« INTEGER[Minus[#index, 2]] »]⟫ ;
+Spilled[Text /* sink */, $Numeric /* Original index of argument */] :: Text;
+Spilled[#sink, #index] → %n⟪«#sink»->context->crsxArg[« INTEGER[Minus[#index, 2]] »]⟫ ;
 
 {$String:String}MetaVar[$String] :: Text;
 

@@ -5942,8 +5942,6 @@ void printTraceForCps(Context context, Term term)
 
 #ifdef STRICT
 
-void* crsxArg[96];
-
 typedef int (*DFunP0)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink);
 typedef int (*DFunP1)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink, void*);
 typedef int (*DFunP2)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink, void*, void*);
@@ -5964,7 +5962,7 @@ typedef int (*FunP1)(Sink, Term, void*);
 		const ssize_t shared = LINK_COUNT(term); \
 		const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term)); \
 		const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term)); \
-		void* p[128]; \
+		void* p[96]; \
 		int ri = 0; \
 		int pi = 0; \
 		int i; \
@@ -5989,7 +5987,7 @@ typedef int (*FunP1)(Sink, Term, void*);
 		} \
 		UNLINK(sink->context, term); \
 		for (i = 0; i < desc->argcount - 2; i ++) \
-			crsxArg[i] = p[i + 2]; \
+			sink->context->crsxArg[i] = p[i + 2]; \
 		return ((DFunP2) desc->step)(sink, shared, namedP, varP, p[0], p[1]);
 
 int call0_0(Sink sink, Term term);
@@ -6078,7 +6076,7 @@ int call(Sink sink, Term term, int argcount, void* arg1, void* arg2, void* arg3)
 	void* args[64] = { arg1, arg2, arg3 };
 	int k;
 	for (k = 0; k < argcount; k++)
-		args[k + 3] = crsxArg[k];
+		args[k + 3] = sink->context->crsxArg[k];
 	UNTHUNK
 }
 

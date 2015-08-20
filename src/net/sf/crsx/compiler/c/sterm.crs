@@ -145,7 +145,7 @@ ST-eval-function[OK_SORT, STRING_ENTRY, $String, $List[Text], $List[Text], Text]
 
 {#env}ST-eval-function[OK, #tail, #symbol, #props, #vars, #sink] // vars  are in order 
 → 
-%n⟪«ST-function-spilled-args[Tail[Tail[#vars]], 2]»«ST-send-tail2[#tail]»«MANGLE[#symbol]»(«#sink», 1«{#env}ST-function-args-props[#props]»«{#env}ST-function-args[#vars, 0, 2]»);⟫;
+%n⟪«ST-function-spilled-args[#sink, Tail[Tail[#vars]], 2]»«ST-send-tail2[#tail]»«MANGLE[#symbol]»(«#sink», 1«{#env}ST-function-args-props[#props]»«{#env}ST-function-args[#vars, 0, 2]»);⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-function-args[$List[Text], $Numeric, $Numeric] :: Text;
@@ -159,10 +159,10 @@ $[If, $[LessThan, #c, #max],
     %n⟪, «#arg»«{#env}ST-function-args[#args, Plus[#c, 1], #max]»⟫,
     %n⟪⟫];
 
-ST-function-spilled-args[$List[Text], $Numeric] :: Text;
+ST-function-spilled-args[Text, $List[Text], $Numeric] :: Text;
 
-ST-function-spilled-args[(), #index]            →  %n⟪⟫;
-ST-function-spilled-args[(#arg; #args), #index] →  %n⟪¶«Spilled[#index]» = (void*) «#arg»;«ST-function-spilled-args[#args, Plus[#index, 1]]»⟫;
+ST-function-spilled-args[#sink, (), #index]            →  %n⟪⟫;
+ST-function-spilled-args[#sink, (#arg; #args), #index] →  %n⟪¶«Spilled[#sink, #index]» = (void*) «#arg»;«ST-function-spilled-args[#sink, #args, Plus[#index, 1]]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 ST-function-args-props[$List[Text]] :: Text;
@@ -682,7 +682,7 @@ ST-invoke2[OK_SORT, Text, $List[Text], $String, $Numeric, STRING_ENTRY, Text] ::
 →
 $[If, $[LessThan, #arity, 5],
     %n⟪«ST-send-tail2[#tail]»CALL«INTEGER[#arity]»(«#sink», «#closure»«ConcatText[#args,%n⟨,⟩]»);⟫,
-    %n⟪«ST-function-spilled-args[Tail[Tail[Tail[#args]]], 2]»«ST-send-tail2[#tail]»CALL(«#sink», «#closure», «INTEGER[#arity]»«ST-function-args[#args, 0, 3]»);⟫];
+    %n⟪«ST-function-spilled-args[#sink, Tail[Tail[Tail[#args]]], 2]»«ST-send-tail2[#tail]»CALL(«#sink», «#closure», «INTEGER[#arity]»«ST-function-args[#args, 0, 3]»);⟫];
 
 ST-may-link[Text, Reified_Use, Text] :: Text;
 

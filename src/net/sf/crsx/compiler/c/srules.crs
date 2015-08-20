@@ -633,32 +633,32 @@ SF-TopTerm[#arg, #index, ok¹ index¹.#[ok¹, index¹]];
 SF-TopTerm[Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
 
 -[Data[#index], Fresh[var::Text]]:
-{#env; "$spilled":TEXT[#spilled]}
+{#env; "$spilled":TEXT[#spilled];"$Sink": VARIABLE[#sink]}
 SF-TopTerm[FORM-BINDER[KDATA, #sort, v.#formArgument[v]], #index, ok¹ index¹.#[ok¹, index¹]] // Kind must be KDATA
 →
 $[If, $[LessThan, #index, 2],
     %n⟪, Variable «var»«{#env}SF-TopBinder[var, #formArgument[var], #index, ok¹ index¹.#[ok¹, index¹]]»⟫,
-    {#env; "$spilled": TEXT[%n⟪«#spilled»¶Variable «var» = (Variable) «Spilled[#index]»;⟫]}SF-TopBinder[var, #formArgument[var], #index, ok¹ index¹.#[ok¹, index¹]]];
+    {#env; "$spilled": TEXT[%n⟪«#spilled»¶Variable «var» = (Variable) «Spilled[#sink, #index]»;⟫]}SF-TopBinder[var, #formArgument[var], #index, ok¹ index¹.#[ok¹, index¹]]];
 
 -[Data[#index], Fresh[term::Text]]:
-{#env; "$spilled":TEXT[#spilled]}
+{#env; "$spilled":TEXT[#spilled];"$Sink": VARIABLE[#sink]}
 SF-TopTerm[FORM-ARGUMENT[#sort], #index, ok¹ index¹.#[ok¹, index¹]]
 →
 $[If, $[LessThan, #index, 2],
     %n⟪, Term «term»«{#env}SF-TopTerm2[term, #index, ok¹ index¹.#[ok¹, index¹]]»⟫,
-    {#env; "$spilled": TEXT[%n⟪«#spilled»¶Term «term» = (Term) «Spilled[#index]»;⟫]}SF-TopTerm2[term,  #index, ok¹ index¹.#[ok¹, index¹]]];
+    {#env; "$spilled": TEXT[%n⟪«#spilled»¶Term «term» = (Term) «Spilled[#sink, #index]»;⟫]}SF-TopTerm2[term,  #index, ok¹ index¹.#[ok¹, index¹]]];
 
 // Generate closure type. For now, we use Term. Might change in the future.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-TopClosure[$Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
 
 -[Data[#index], Fresh[closure::Text]]:
-{#env; "$spilled":TEXT[#spilled]}
+{#env; "$spilled":TEXT[#spilled];"$Sink": VARIABLE[#sink]}
 SF-TopClosure[#index, ok¹ index¹.#[ok¹, index¹]]
 →
 $[If, $[LessThan, #index, 2],
     %n⟪, Term «closure»«{#env}SF-TopClosure2[closure, #index, ok¹ index¹.#[ok¹, index¹]]»⟫,
-    {#env; "$spilled": TEXT[%n⟪«#spilled»¶Term «closure» = (Term) «Spilled[#index]»;⟫]}SF-TopClosure2[closure, #index, ok¹ index¹.#[ok¹, index¹]]];
+    {#env; "$spilled": TEXT[%n⟪«#spilled»¶Term «closure» = (Term) «Spilled[#sink, #index]»;⟫]}SF-TopClosure2[closure, #index, ok¹ index¹.#[ok¹, index¹]]];
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-TopBinder[Text, Reified_FormArgument, $Numeric, ok¹::OK_SORT index¹::$Numeric.Text] :: Text;
