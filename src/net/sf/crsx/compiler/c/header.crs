@@ -19,6 +19,7 @@ $Lax;
 //
 // Environment:
 // - HEADERS: ;-separated list of header file base names.
+// - MODULE: name of this module 
 
 ComputeHeader[Reify_CRSX] :: Text;
 

@@ -746,7 +746,7 @@ Sink bufferProperties(Sink sink, NamedPropertyLink namedProperties, VariableProp
     return sink;
 }
 
-Sink bufferPropertyNamed(Sink sink, const char *name, Term term)
+Sink bufferPropertyNamed(Sink sink, PooledString name, Term term)
 {
 #   ifdef DEBUG
     ++eventCount;
@@ -754,6 +754,7 @@ Sink bufferPropertyNamed(Sink sink, const char *name, Term term)
     ASSERT(sink->context, sink->kind == SINK_IS_BUFFER);
     ASSERT(sink->context, name);
     ASSERT(sink->context, term == NULL || term->nr > 0);
+    ASSERT(sink->context, containsHS2(sink->context->keyPool, name) || containsHS2(sink->context->stringPool, name));
 
     const Context context = sink->context;
     const Buffer buffer = (Buffer) sink;
@@ -765,7 +766,7 @@ Sink bufferPropertyNamed(Sink sink, const char *name, Term term)
         nfvs = freeVars(context, term, nfvs);
     }
 
-    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, GLOBAL(context, name), term, buffer->pendingNamedProperties, nfvs, 1); // transfer refs for term and old link
+    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, name, term, buffer->pendingNamedProperties, nfvs, 1); // transfer refs for term and old link
     buffer->pendingNamedProperties = link;
 
     return sink;
@@ -1961,6 +1962,7 @@ Hashset clearHS(Context context, Hashset set)
 ///////////////////////////////////////////////////
 // bucket-based hash set implementation
 
+
 int equalsPtr(const void* left, const void* right)
 {
     return left == right;
@@ -1998,20 +2000,6 @@ static inline LinkedList2 prependLL2(LinkedList2 list, LinkedList2 entry)
     entry->next = list;
     return entry;
 }
-//
-//static LinkedList2 copyLL2(Context context, LinkedList2 head, void (*linkKey)(Context, const void*), void (*linkValue)(Context, void*))
-//{
-//    LinkedList2 newhead = NULL;
-//    while (head)
-//    {
-//        LinkedList2 n = makeLL2(context, linkKey(context, head->key), linkValue(context, head->value));
-//        n->next = newhead;
-//        newhead = n;
-//
-//        head = head->next;
-//    }
-//    return newhead;
-//}
 
 static void freeLL2(Context context, LinkedList2 head, void (*unlink)(Context, const void*, void*))
 {
@@ -2443,12 +2431,12 @@ void freeVariableNameMapLinks(Context context, VariableNameMapLink link)
 
 // Return the named property or NULL if none.
 // The reference is *NOT* transferred
-// The name must have already been interned into the Context's keyPool
-Term c_namedProperty(NamedPropertyLink link, char *name)
+Term c_namedProperty(NamedPropertyLink link, PooledString name)
 {
+
     for (; link; link = link->link)
     {
-        if (! link->name) // hashset
+        if (!link->name) // hashset
         {
             Term term = (Term) getValueHS2(link->u.propset, name);
             if (term)
@@ -2475,8 +2463,10 @@ Term c_variableProperty(VariablePropertyLink link, Variable variable)
 /////////////////////////////////////////////////////////////////////////////////
 // Property construction.
 
-NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, char *key, Term term)
+NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, PooledString key, Term term)
 {
+	ASSERT(context, containsHS2(context->keyPool, key) || containsHS2(context->stringPool, key));
+
     Hashset nfvs = NULL;
     if (context->fv_enabled)
     {
@@ -2484,7 +2474,7 @@ NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, char
         nfvs = freeVars(context, term, nfvs);
     }
 
-    return ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), term, link, nfvs, 1); // transfer refs for term and old link
+    return ALLOCATE_NamedPropertyLink(context, key, term, link, nfvs, 1); // transfer refs for term and old link
 }
 
 VariablePropertyLink addVariableProperty(Context context, VariablePropertyLink link, Variable variable, Term term)
@@ -2587,12 +2577,17 @@ void crsxAddPools(Context context)
     if (!context->poolRefCount)
     {
         context->env = makeHS2(context, 4, freeKeyValue, equalsChars, hashChars);
+
         context->stringPool = makeHS2(context, 16, freeValue, equalsChars, hashChars);
-        context->keyPool = makeHS2(context, 16, freeValue, equalsChars, hashChars);
+        context->keyPool = makeHS2(context, 16, NULL, equalsChars, hashChars);
+
+        int i;
+        for (i = 0; i < literalsCount; i ++)
+        	addValueHS2(context, context->keyPool, literalsTable[i], (void*) literalsTable[i]);
 
         context->consPool = (Construction **) ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(Construction));
         context->consPoolSize = (ssize_t *) ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(ssize_t));
-        int i;
+
         for (i = 0; i < CONS_POOL_MAX_SIZE_SIZE; i ++)
         {
             context->consPool[i] = (Construction *) ALLOCATE(context, CONS_POOL_MAX_SIZE * sizeof(Construction));
@@ -2667,23 +2662,30 @@ char *makeString(Context context, const char *src)
     char *dest = (char *) ALLOCATE(context, length+1);
     memcpy(dest, src, length);
     dest[length] = '\0';
-    ///PRINTF(context, "String<%s>\n", dest);
     return dest;
 }
 
-char *makeKeyString(Context context, const char *src)
+PooledString makeKeyString(Context context, const char *src)
 {
+	// Search first in static pool
     Hashset2 pool = context->keyPool;
-    assert(pool);
-    if (!pool)
-        return NULL;
-    char *interned_string = (char *) getValueHS2(pool, (const void*) src);
-    if (interned_string)
-        return interned_string;
 
-    interned_string = makeString(context, src);
-    addValueHS2(context, pool, (const void*) interned_string, (void*) interned_string);
-    return interned_string;
+    PooledString pstring = (PooledString) getValueHS2(pool, (const void*) src);
+    if (pstring)
+        return pstring;
+
+    // Search in dynamic pool
+    pool = context->stringPool;
+    pstring = (PooledString) getValueHS2(pool, (const void*) src);
+    if (pstring)
+          return pstring;
+
+    // Failed: add to dynamic pool
+    pstring = (PooledString) makeString(context, src);
+
+    // Add value to
+    addValueHS2(context, pool, pstring, (void*) pstring);
+    return pstring;
 }
 
 char *makeSubstring(Context context, const char *src, size_t first, size_t length)
@@ -2694,7 +2696,6 @@ char *makeSubstring(Context context, const char *src, size_t first, size_t lengt
     char *dest = (char *) ALLOCATE(context, length+1);
     memcpy(dest, src+first, length);
     dest[length] = '\0';
-    ///PRINTF(context, "Substring<%s>=<%s>\n", src, dest);
     return dest;
 }
 
@@ -2708,14 +2709,6 @@ void mangle(int length, const char *original, char *mangled)
         mangled[i] = (c == '/' ? '_' : c);
     }
 }
-
-//char* makeMangle(Context context, const char* src)
-//{
-//    size_t l = strlen(src);
-//    char* mangled = (char *) ALLOCATE(context, l + 1);
-//    mangle(l, src, mangled);
-//    return mangled;
-//}
 
 // Interpret one Unicode relaxed UTF-8 character starting at s into codepoint c.
 // NOTE: leaves s on last character in sequence (this leaves s untouched for 7-bit characters)
@@ -3548,6 +3541,8 @@ static int step(Sink sink, Term term)
 
 void initCRSXContext(Context context)
 {
+	initLiterals();
+
     context->stamp = 0;
     context->depth = 0;
 
@@ -3935,7 +3930,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
             ++copyDepth;
 #endif
             // The new link, if any.
-            const char *key = namedLink->name;
+            PooledString key = namedLink->name;
             if (key)
             {
                 // - Regular key-value link is always inserted into prefix after substitution of value.
@@ -3964,7 +3959,7 @@ static void substitutePropertiesPrefix(Sink sink, Construction construction, Sub
                     Term term = BUFFER_TERM(propertysink); // Transfer reference
                     FREE_BUFFER(propertysink);
                     
-                    NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, (const char*)getKeyIHS2(iter), term, NULL, NULL, 0);
+                    NamedPropertyLink newLink = ALLOCATE_NamedPropertyLink(sink->context, (PooledString) getKeyIHS2(iter), term, NULL, NULL, 0);
                     
                     pushNamedPropertyLink(namedStack, newLink);
                     ++(*metaSubstituteSizep);
@@ -4115,7 +4110,7 @@ static void metaSubstituteProperties(Sink sink, Construction construction, Subst
     {
         NamedPropertyLink link = *topNamedPropertyLink(namedStack);
         popNamedPropertyLink(namedStack);
-        const char *key = link->name;
+        PooledString key = link->name;
         if (key)
             ADD_PROPERTY_NAMED(sink, key, LINK(sink->context, link->u.term));
 
@@ -4463,13 +4458,13 @@ void passLocationProperties(Context context, Term locTerm, Term term)
     {
         Construction construction = asConstruction(term);
         Construction locConstruction = asConstruction(locTerm);
-        char *list[] = {context->str_filelocation,
-                        context->str_linelocation,
-                        context->str_columnlocation};
+        PooledString list[] = {context->str_filelocation,
+                               context->str_linelocation,
+                               context->str_columnlocation};
         int i;
         for (i = 0; i < 3; ++i)
         {
-            char *key = list[i];
+            PooledString key = list[i];
             Term value = NAMED_PROPERTY(context, construction, key);
             if (value)
             {
@@ -4477,7 +4472,7 @@ void passLocationProperties(Context context, Term locTerm, Term term)
                 if (locvalue && strcmp(SYMBOL(value), SYMBOL(locvalue)))
                 {
                     // Location has been changed...update.
-                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, GLOBAL(context, key), LINK(context, locvalue),
+                    NamedPropertyLink link = ALLOCATE_NamedPropertyLink(context, key, LINK(context, locvalue),
                             construction->namedProperties, LINK_Hashset(context, construction->namedProperties->fvs), 1);
 
                     construction->namedProperties = link;
@@ -4540,12 +4535,12 @@ static void addAllTerms(Context context, Hashset2 to_set, Hashset2 from_set)
 
 // Index named properties by name
 static
-NamedPropertyLink indexNamedProperties(Context context, const char *name, Term term, NamedPropertyLink nlink, Hashset fvs)
+NamedPropertyLink indexNamedProperties(Context context, PooledString name, Term term, NamedPropertyLink nlink, Hashset fvs)
 {
     ASSERT(context, term);
 
-    // Make a hashset
-    Hashset2 set = makeHS2(context, 8, unlinkValueTerm, equalsChars, hashChars);
+    // Make a hashset for size_t
+    Hashset2 set = makeHS2(context, 8, unlinkValueTerm, equalsPtr, hashPtr);
 
     // 0th = new, 1st = nlink, 2nd..count-1 = older
     addValueHS2(context, set, name, term); // Transfer term ref.
@@ -4556,7 +4551,7 @@ NamedPropertyLink indexNamedProperties(Context context, const char *name, Term t
     {
         if (old_link->name)
         {
-            if (!containsHS2(set, (const void*) old_link->name)) // make sure not to override newer entries
+            if (!containsHS2(set, old_link->name)) // make sure not to override newer entries
             {
                 Term term = LINK(context, old_link->u.term);
                 ASSERT(context, term);
@@ -4595,8 +4590,11 @@ NamedPropertyLink indexNamedProperties(Context context, const char *name, Term t
     return link;
 }
 
-NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink, Hashset fvs, int index)
+NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, PooledString name, Term term, NamedPropertyLink nlink, Hashset fvs, int index)
 {
+	ASSERT(context, containsHS2(context->keyPool, name) || containsHS2(context->stringPool, name));
+
+	// TODO: try to mutate nlink
     if (index)
     {
         int count = nlink ? nlink->count + 1 : 1;
@@ -4637,7 +4635,7 @@ void freeNamedPropertyLink(Context context, NamedPropertyLink link)
 
         link->link = NULL;
         link->fvs = NULL;
-        link->name = NULL; // No need to free name as it is stored in the pool.
+        link->name = NULL;
         FREE(context, link);
         link = NULL;
 
@@ -4712,7 +4710,7 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
         {
             NamedPropertyLink nlink = asConstruction(term)->namedProperties;
             for (; nlink; nlink = nlink->link)
-                if (nlink->name)
+                if (nlink->name != 0)
                     computeFreeVariables2(freevars, nlink->u.term, boundLink);
 		else {
 		  Iterator2 iter = iteratorHS2(freevars->context, nlink->u.propset);
@@ -4841,14 +4839,17 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
             NamedPropertyLink link1, link2;
             for (link1 = construction1->namedProperties; link1; link1 = link1->link)
             {
-                const char *name = link1->name;
-                if (! name) continue; // skip free vars
-                Term value1 = link1->u.term;
+                PooledString name = link1->name;
+                if (name == 0)
+					assert(!"not implemented yet: indexed named property comparison");
+				Term value1 = link1->u.term;
                 Term value2 = NULL;
                 for (link2 = construction2->namedProperties; link2; link2 = link2->link)
                 {
-                    if (! link2->name) continue; // skip free vars
-                    if (!strcmp(name, link2->name))
+                    if (link2->name == 0)
+                      	assert(!"not implemented yet: indexed named property comparison");
+
+                    if (name == link2->name)
                     {
                         value2 = link2->u.term;
                         break;
@@ -4859,13 +4860,15 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
             }
             for (link2 = construction2->namedProperties; link2; link2 = link2->link)
             {
-                const char *name = link2->name;
-                if (! name) continue; // skip free vars
+                PooledString name = link2->name;
+                if (name != 0)
+                	assert(!"not implemented yet: indexed named property comparison");
                 Term value1 = NULL;
                 for (link1 = construction1->namedProperties; link1; link1 = link1->link)
                 {
-                    if (! link1->name) continue; // skip free vars
-                    if (!strcmp(name, link1->name))
+                    if (link1->name == 0)
+                    	assert(!"not implemented yet: indexed named property comparison");
+                    if (name == link1->name)
                     {
                         value1 = link1->u.term;
                         break;
@@ -4941,38 +4944,45 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
 /////////////////////////////////////////////////////////////////////////////////
 // Keys of properties.
 
-void sendPropertiesKeys(Sink sink, NamedPropertyLink named, VariablePropertyLink vard)
-{
-  int depth = 0;
-  for (; named; named = named->link) {
-    if (named->name) {
-      START(sink, _M__sCons); LITERAL(sink, named->name); ++depth;
-    }
-    else {
-      Iterator2 iter = iteratorHS2(sink->context, named->u.propset);
-      if (iter) {
-	do {
-	  START(sink, _M__sCons); LITERAL(sink, (char*)getKeyIHS2(iter)); ++depth;
-	} while (nextIHS2(iter));
-      }
-    }
-  }
-  for (; vard; vard = vard->link) {
-    if (vard->variable) {
-      START(sink, _M__sCons); USE(sink, vard->variable); ++depth;
-    }
-    else {
-      Iterator2 iter = iteratorHS2(sink->context, vard->u.propset);
-      if (iter) {
-	do {
-	  START(sink, _M__sCons); USE(sink, (Variable)getKeyIHS2(iter)); ++depth;
-	} while (nextIHS2(iter));
-      }
-    }
-  }
-  // Terminate and unravel list.
-  START(sink, _M__sNil); END(sink, _M__sNil);
-  while (depth-- > 0) END(sink, _M__sCons);
+void sendPropertiesKeys(Sink sink, NamedPropertyLink named, VariablePropertyLink vard) {
+	int depth = 0;
+	for (; named; named = named->link) {
+		if (named->name) {
+			START(sink, _M__sCons);
+			LITERAL(sink, named->name);
+			++depth;
+		} else {
+			Iterator2 iter = iteratorHS2(sink->context, named->u.propset);
+			if (iter) {
+				do {
+					START(sink, _M__sCons);
+					LITERAL(sink, (char* )getKeyIHS2(iter));
+					++depth;
+				} while (nextIHS2(iter));
+			}
+		}
+	}
+	for (; vard; vard = vard->link) {
+		if (vard->variable) {
+			START(sink, _M__sCons);
+			USE(sink, vard->variable);
+			++depth;
+		} else {
+			Iterator2 iter = iteratorHS2(sink->context, vard->u.propset);
+			if (iter) {
+				do {
+					START(sink, _M__sCons);
+					USE(sink, (Variable )getKeyIHS2(iter));
+					++depth;
+				} while (nextIHS2(iter));
+			}
+		}
+	}
+	// Terminate and unravel list.
+	START(sink, _M__sNil);
+	END(sink, _M__sNil);
+	while (depth-- > 0)
+		END(sink, _M__sCons);
 }
 
 
@@ -5599,7 +5609,7 @@ void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet
                 // a hashtable in the future.  (NamedPropertyLink stores
                 // a set, not a list (ie. unordered), whereas cookie lists
                 // are an ordered list of strings).
-                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, name, NULL, NULL, NULL, 0);
+                NamedPropertyLink newCookie = ALLOCATE_NamedPropertyLink(context, (PooledString) GLOBAL(context, name), NULL, NULL, NULL, 0);
                 newCookie->link = printCookieNameList;
 
                 printCookieNameList = newCookie;
@@ -5948,7 +5958,6 @@ typedef int (*DFunP2)(Sink, ssize_t, NamedPropertyLink, VariablePropertyLink, vo
 
 typedef int (*FunP0)(Sink, Term);
 typedef int (*FunP1)(Sink, Term, void*);
-
 
 #define ARGS0
 #define ARGS1 arg1

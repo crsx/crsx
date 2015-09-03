@@ -1,0 +1,100 @@
+// Copyright © 2012 IBM Corporation
+// $Id: sorts.crs,v 3.3 2013/12/18 20:16:18 villardl Exp $
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// GENERATE C/H LIETRALS FILE TEXT FROM REIFIED CRSX.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+LITERALS[(
+
+$Use["compiler/c/cdefs.crs"];
+
+$Lax;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// C LITERAL FILE TEMPLATE.
+//
+// Create text of crsx_literal.c file.
+//
+// Environment: 
+// - MODULE: name of this module 
+
+ComputeLiterals[$List[$String]] :: Text;
+
+ComputeLiterals[#literals]
+→
+%n⟪#include « STRING[$[:, $[Get[$String], "MODULE"], ".h"]] »
+
+size_t literalsCount = « INTEGER[Length[#literals, 0]] »;
+PooledString literalsTable[] = {⟦ « ThenMapText[ok d.L-String[ok, d], #literals] » ⟧
+};
+
+« ThenMapText[ok d.L-DeclString[ok, d], #literals] »
+
+static int initialized = 0;
+
+void initLiterals() {⟦
+if (!initialized) {⟦« ThenMapIndexText[ok d i.L-InitString[ok, d, i], #literals, 0] »⟧
+initialized = 1;
+}⟧
+};⟫;
+
+L-String[OK_SORT, $String] :: Text;
+L-String[OK, #] 
+→ 
+%n⟪
+« STRING[#] »,⟫;
+
+L-DeclString[OK_SORT, $String] :: Text;
+L-DeclString[OK, #] 
+→ 
+%n⟪
+PooledString « Literal[#] »;⟫;
+
+L-InitString[OK_SORT, $String, $Numeric] :: Text;
+L-InitString[OK, #, #i] 
+→ 
+%n⟪
+« Literal[#] » = literalsTable[« INTEGER[#i] »];⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// H LITERAL FILE TEMPLATE.
+//
+// Create text of crsx_literal.h file.
+//
+// Environment: 
+// - MODULE: name of this module 
+
+ComputeLiteralsHeader[$List[$String]] :: Text;
+ComputeLiteralsHeader[#literals]
+→
+ComputeLiteralsHeader2[("$FileLocation"; "$LineLocation"; "$ColumnLocation"; #literals)];
+
+ComputeLiteralsHeader2[$List[$String]] :: Text;
+ComputeLiteralsHeader2[#literals]
+→
+%n⟪#ifndef CRSX_« MANGLE[$[Get[$String], "MODULE"]] »_LITERALS_H
+#define CRSX_« MANGLE[$[Get[$String], "MODULE"]] »_LITERALS__H
+#ifdef __cplusplus
+extern "C" {
+#endif
+« ThenMapText[ok d.LH-String[ok, d], #literals] »
+#ifdef __cplusplus
+}
+#endif
+#endif⟫;
+
+LH-String[OK_SORT, $String] :: Text;
+
+LH-String[OK, #] 
+→ 
+%n⟪
+ extern PooledString « Literal[#] »;⟫;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+)] 

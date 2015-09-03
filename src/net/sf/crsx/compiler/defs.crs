@@ -145,9 +145,17 @@ Append[(#1;#s), #tail] → (#1 ; Append[#s, #tail]) ;
 -[Share[#x],Copy[#]] : MapText[t.#[t], (#x; #xs)] → %n⟪« #[#x] »« MapText[t.#[t], #xs] »⟫ ;
 -[Discard[#]]        : MapText[t.#[t], ()       ] → %n⟪⟫ ;
 
+∀ a . ThenMapText[ok::OK_SORT x::a.Text, $List[a]] :: Text ;
+-[Share[#x],Copy[#]] : ThenMapText[ok t.#[ok, t], (#x; #xs)] → %n⟪« #[OK, #x] »« ThenMapText[ok t.#[ok, t], #xs] »⟫ ;
+-[Discard[#]]        : ThenMapText[ok t.#[ok, t], ()       ] → %n⟪⟫ ;
+
 ∀ a . MapIndexText[x:a i:$Numeric.Text, $List[a], $Numeric] :: Text ;
 -[Share[#x],Copy[#, #n]] : MapIndexText[t i.#[t, i], (#x; #xs), #n] → %n⟪« #[#x, #n] »« MapIndexText[t i.#[t, i], #xs, $[Plus,1,#n]] »⟫ ;
 -[Discard[#, #n]]        : MapIndexText[t i.#[t, i], ()       , #n] → %n⟪⟫ ;
+
+∀ a . ThenMapIndexText[ok::OK_SORT x::a i::$Numeric.Text, $List[a], $Numeric] :: Text ;
+-[Share[#x],Copy[#, #n]] : ThenMapIndexText[ok t i.#[ok, t, i], (#x; #xs), #n] → %n⟪« #[OK, #x, #n] »« ThenMapIndexText[ok t i.#[ok, t, i], #xs, $[Plus,1,#n]] »⟫ ;
+-[Discard[#, #n]]        : ThenMapIndexText[ok t i.#[ok, t, i], ()       , #n] → %n⟪⟫ ;
 
 ∀ a . MapText1[x:a.Text, x:a.Text, $List[a]] :: Text ;
 -[Share[#x]]      : MapText1[t.#1[t], t.#2[t], (#x; #xs)] → %n⟪« #1[#x] »« MapText[t.#2[t], #xs] »⟫ ;
@@ -376,6 +384,10 @@ Step[#name] → %n⟪step« MANGLE[#name] »⟫ ;
 
 Var[$String] :: Text;
 Var[#name] → %n⟪v« MANGLE[#name] »⟫ ;
+
+Literal[$String] :: Text;
+Literal[#literal] → %n⟪l« MANGLE[#literal] »⟫ ;
+
 
 // Spilled argument
 Spilled[Text /* sink */, $Numeric /* Original index of argument */] :: Text;

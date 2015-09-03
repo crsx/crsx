@@ -61,6 +61,7 @@ import net.sf.crsx.util.FormattingAppendable;
 import net.sf.crsx.util.FunctionFilterSink;
 import net.sf.crsx.util.LinkedExtensibleMap;
 import net.sf.crsx.util.LinkedExtensibleSet;
+import net.sf.crsx.util.ExtractLiteralSink;
 import net.sf.crsx.util.Pair;
 import net.sf.crsx.util.PropertiesConstructor;
 import net.sf.crsx.util.Quad;
@@ -922,16 +923,22 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						final Term t = b.term(true);
 						assert t != null : "Generated dumped rules term is not buffered!";
 						
-						// TODO: Avoid dumping full .crs?
 						if (arity < 2)
 						{
-							Appendable a = output(directive.sub(0));
+							// Dump full dr file.
+							String drname = Util.symbol(directive.sub(0));
+							
+							Appendable a = output(drname);
 							Sink s2 = factory.sink(a);
 							t.copy(s2, arity < 2, LinkedExtensibleMap.EMPTY_RENAMING);
 							if (a instanceof Flushable)
 								((Flushable) a).flush();
 							if (a instanceof Closeable)
 								((Closeable) a).close();
+							
+							// Dump literals
+							System.out.println("dump " + drname.replace(".dr", "_literals.dr"));
+							dumpLiterals(t, drname.replace(".dr", "_literals.dr"));
 						}
 						else
 						{
@@ -1154,8 +1161,44 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 					}
 				}
 			});
+
+		// Generates minimal literal.crs input dr file 
+		pool.execute(new Runnable()
+			{
+				public void run()
+				{
+					dumpLiterals(t, stem.replace(ext, "_literals") + ext);
+				}
+			});
 		
 		pool.shutdown();
+	}
+	
+	/** Dump literals */
+	private void dumpLiterals(final Term t, String output)
+	{
+		try
+		{
+			Appendable a = output(output);
+			Sink nsink = factory.sink(a);
+			
+			nsink = new ExtractLiteralSink(nsink);
+			 
+			t.copy(nsink, false, new LinkedExtensibleMap<Variable, Variable>());
+
+			if (a instanceof Flushable)
+				((Flushable) a).flush();
+			if (a instanceof Closeable)
+				((Closeable) a).close();
+		}
+		catch (CRSException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	/** Helper to evaluate arguments of directive. */

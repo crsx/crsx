@@ -24,6 +24,7 @@ OUTPUTDIR=$(crspath)
 endif
 
 crsdrfile = $(OUTPUTDIR)/$(crsbasename).dr
+crsliteralsdrfile = $(OUTPUTDIR)/$(crsbasename)_literals.dr
 crsbinfile = $(OUTPUTDIR)/$(crsbasename)
 
 objs=
@@ -32,6 +33,11 @@ header=$(OUTPUTDIR)/$(crsbasename).h
 
 data=$(OUTPUTDIR)/$(crsbasename)_data.c
 objs+=$(OUTPUTDIR)/$(crsbasename)_data.o
+
+literals=$(OUTPUTDIR)/$(crsbasename)_literals.c
+objs+=$(OUTPUTDIR)/$(crsbasename)_literals.o
+
+header_literals=$(OUTPUTDIR)/$(crsbasename)_literals.h
 
 symlist=$(OUTPUTDIR)/$(crsbasename)_data.symlist
 
@@ -54,22 +60,30 @@ prereq:
 
 $(OUTPUTDIR)/$(crsbasename) : $(crsdrfile)
 
+$(crsliteralsdrfile) : $(crsdrfile)
+
 $(crsdrfile): $(CRSFILE) prereq
 	@$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules="$<" simple-terms sortify dispatchify simplify reify="$@" 
+
+$(literals): $(crsliteralsdrfile) prereq
+	$(CRSXC) MODULE="$(crsbasename)" wrapper=ComputeLiterals input="$<" > "$@"
+
+$(header_literals): $(crsliteralsdrfile) prereq
+	$(CRSXC) MODULE="$(crsbasename)" wrapper=ComputeLiteralsHeader input="$<" > "$@"
 	
 $(data): $(crsdrfile) prereq
-	@$(CRSXC) HEADERS="$(crsbasename).h" $(MODE) wrapper=ComputeSorts input="$<" > "$@"
+	$(CRSXC) HEADERS="$(crsbasename).h" $(MODE) wrapper=ComputeSorts input="$<" > "$@"
 
 $(symlist): $(crsdrfile) 
-	@$(CRSXC) wrapper=ComputeSymbols input="$<" > "$@.tmp"
+	$(CRSXC) wrapper=ComputeSymbols input="$<" > "$@.tmp"
 	@sed -e 's/ {/\'$$'\n{/g' -e 's/ //g' "$@.tmp" | awk '/^$$/{next}{print}' | LC_ALL=C sort -bu > "$@"
 	@rm "$@.tmp"
 
 $(header): $(crsdrfile) prereq
-	@$(CRSXC) HEADERS=crsx.h $(MODE) wrapper=ComputeHeader input="$<" > "$@"
+	$(CRSXC) HEADERS="crsx.h;$(header_literals)" $(MODE) wrapper=ComputeHeader input="$<" > "$@"
 
 $(function): $(crsdrfile) prereq
-	@$(CRSXC) HEADERS="$(crsbasename).h" $(MODE) CANONICAL_VARIABLES=1 wrapper=ComputeRules input="$<" > "$@"
+	$(CRSXC) HEADERS="$(crsbasename).h" $(MODE) CANONICAL_VARIABLES=1 wrapper=ComputeRules input="$<" > "$@"
 
 # All symbols list.
 $(symbols): $(symlist)
@@ -120,7 +134,7 @@ $(OUTPUTDIR)/prof.o: $(COMPILERSRC)/c/prof.c $(COMPILERSRC)/c/prof.h $(COMPILERS
 $(OUTPUTDIR)/%.o: $(COMPILERSRC)/c/%.c prereq 
 	$(CC) $(CCFLAGS) -c "$<" -o "$@" 
 
-$(OUTPUTDIR)/%.o: $(OUTPUTDIR)/%.c $(header) prereq  
+$(OUTPUTDIR)/%.o: $(OUTPUTDIR)/%.c $(header) $(header_literals)  prereq  
 	$(CC) $(CCFLAGS) -c "$<" -o "$@"
 
 $(OUTPUTDIR)/$(crsbasename): $(objs) 

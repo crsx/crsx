@@ -32,9 +32,7 @@ typedef struct _Term *Term;
 typedef struct _VariableUse *VariableUse;
 typedef struct _Construction *Construction;
 typedef struct _Literal *Literal;
-//typedef struct _Construction *Closure;
 typedef struct _ConstructionDescriptor *ConstructionDescriptor;
-//typedef struct _ClosureDescriptor *ClosureDescriptor;
 typedef struct _SortDescriptor *SortDescriptor;
 typedef struct _Sink *Sink;
 typedef struct _SubstitutionFrame *SubstitutionFrame;
@@ -52,16 +50,13 @@ typedef struct _Hashset2* Hashset2;
 typedef struct _Buffer *Buffer;
 typedef struct _BufferEntry *BufferEntry;
 typedef struct _BufferSegment *BufferSegment;
-
+typedef const char *PooledString;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // IDIOMS
 
 // Context.
-//
-// Defaults to having no content but can be extended as desired because main functions and data
-// structures propagate a pointer to "the context" but never create any or access the content.
-//
+
 #define CONS_POOL_MAX_SIZE_SIZE 32
 #define CONS_POOL_MAX_SIZE 4096
 
@@ -81,8 +76,8 @@ struct _Context
     Hashset2 env;         // General environment.
 
     int poolRefCount;
-    Hashset2 stringPool;  // Set of char*
-    Hashset2 keyPool;     // Set of char* for keys of environments, separate from stringPool for now to leave potential for certain optimizations
+    Hashset2 stringPool;  // Set of dynamic PooledString
+    Hashset2 keyPool;     // Set of static PooledString
 
     Construction** consPool; // Array of Construction
     ssize_t* consPoolSize;
@@ -96,11 +91,9 @@ struct _Context
     Hashset* hashsetPool[HASHSET_MAX_NBITS];
     ssize_t hashsetPoolSize[HASHSET_MAX_NBITS];
 
-    //Properties noProperties;
-
-    char *str_filelocation;
-    char *str_linelocation;
-    char *str_columnlocation;
+    PooledString str_filelocation;
+    PooledString str_linelocation;
+    PooledString str_columnlocation;
 
     Variable functional;       // unique global bound variable representing all functional binders.
     VariableUse functionalUse; // Variable use of the functional variable.
@@ -271,13 +264,10 @@ extern void crsxAddPools(Context context);
 // Release pools
 extern void crsxReleasePools(Context context);
 
-// ALLOCATE copy of existing string on heap.
+// Allocate copy of existing string on heap.
 extern char *makeString(Context context, const char *src);
 
-// ALLOCATE interned copy of existing string on heap.
-extern char *makeKeyString(Context context, const char *src);
-
-// ALLOCATE copy of substring of existing string.
+// Allocate copy of substring of existing string.
 extern char *makeSubstring(Context context, const char *src, size_t first, size_t length);
 
 // ALLOCATE strings corresponding to the $[Escape], $[Rescape], and $[Mangle], primitives. Does not deallocate src/term.
@@ -285,6 +275,18 @@ extern char *makeEscaped(Context context, const char *src);
 extern char *makeRescaped(Context context, const char *src);
 extern char *makeMangled(Context context, const char *src);
 extern char *makeEncodePoint(Context context, unsigned int code);
+
+// Allocate interned copy of existing string on heap.
+extern PooledString makeKeyString(Context context, const char *src);
+
+// Literals value initalization
+extern void initLiterals();
+
+// Static pooled literal table
+extern PooledString literalsTable[];
+
+// Number of static literals
+extern size_t literalsCount;
 
 // Hash code for term.
 #define HASH_CODE(CONTEXT, TERM) termHashCode(CONTEXT, TERM, NULL)
@@ -483,8 +485,8 @@ typedef struct _BitSet* BitSetP;
 
 #define DPROPERTY(C,N,V,P) c_property(C,N,V,P)
 #define PROPERTY(C,T,P) DPROPERTY(C, asConstruction(T)->namedProperties, asConstruction(T)->variableProperties, P)
-#define DNAMED_PROPERTY(C,N,K)  c_namedProperty((N), GLOBAL(C,K))
-#define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->namedProperties, GLOBAL(C,N))
+#define DNAMED_PROPERTY(C,N,K)  c_namedProperty((N), K)
+#define NAMED_PROPERTY(C,T,N)  c_namedProperty(asConstruction(T)->namedProperties, N)
 #define DVARIABLE_PROPERTY(V,K)  c_variableProperty((V), K)
 #define VARIABLE_PROPERTY(T,V)  c_variableProperty(asConstruction(T)->variableProperties, V)
 #define NAMED_PROPERTIES(T) (asConstruction(T)->namedProperties)
@@ -510,7 +512,7 @@ struct _Term
     ConstructionDescriptor descriptor;  // of the term or NULL for variables
     ssize_t nr;                         // number of references to this term (node)
 #ifdef CRSX_ENABLE_PROFILING
-    size_t marker; // counter helper for graph traversal.
+    size_t marker;                      // counter helper for graph traversal.
 #endif
 };
 // Pick Variable set representation
@@ -868,7 +870,7 @@ extern Term makeStringLiteral(Context context, const char *text);
 
 #define ADD_PROPERTIES(sink,namedProperties,variableProperties) ((Sink)(sink))->properties(sink,namedProperties,variableProperties)
 #define ADD_PROPERTY_REF(sink,construction) ((Sink)(sink))->propertyRef(sink, asConstruction(construction))
-#define ADD_PROPERTY(sink,P,value) (IS_VARIABLE_USE(P) ? ADD_PROPERTY_VARIABLE(sink, linkVariable(sink->context, VARIABLE(P)), value) : ADD_PROPERTY_NAMED(sink, SYMBOL(P), value))
+#define ADD_PROPERTY(sink,P,value) (IS_VARIABLE_USE(P) ? ADD_PROPERTY_VARIABLE(sink, linkVariable(sink->context, VARIABLE(P)), value) : ADD_PROPERTY_NAMED(sink, GLOBAL(sink->context, SYMBOL(P)), value))
 #define ADD_PROPERTY_NAMED(sink,name,value) ((Sink)(sink))->propertyNamed(sink, name, value)
 #define ADD_PROPERTY_VARIABLE(sink,variable,value) ((Sink)(sink))->propertyVariable(sink, variable, value)
 #define ADD_PROPERTY_WEAKEN(sink,variable) ((Sink)(sink))->propertyWeaken(sink, variable)
@@ -893,7 +895,7 @@ struct _Sink
     Sink (*propertyRef)(Sink sink, Construction construction); // base properties for next START
     Sink (*properties)(Sink sink, NamedPropertyLink namedProperties, VariablePropertyLink variableProperties); // base properties for next START
 
-    Sink (*propertyNamed)(Sink sink, const char *name, Term term); // add named property to next START
+    Sink (*propertyNamed)(Sink sink, PooledString name, Term term); // add named property to next START
     Sink (*propertyVariable)(Sink sink, Variable variable, Term term); // add variable property to next START. Variable reference is transferred.
     Sink (*propertiesReset)(Sink sink); // reset property state
 };
@@ -1044,7 +1046,7 @@ extern int metaSubstitute(Sink sink, Term term, SubstitutionFrame substitution);
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // PROPERTIES
 
-extern Term c_namedProperty(NamedPropertyLink link, char *name);
+extern Term c_namedProperty(NamedPropertyLink link, PooledString name);
 extern Term c_variableProperty(VariablePropertyLink link, Variable variable);
 static inline Term c_property(Context context, NamedPropertyLink namedProperties, VariablePropertyLink varProperties, Term key)
 {
@@ -1054,7 +1056,7 @@ static inline Term c_property(Context context, NamedPropertyLink namedProperties
 /**
  * Extend named environment with given key/value pair. All refs are transferred.
  */
-extern NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, char *key, Term value);
+extern NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, PooledString key, Term value);
 
 /**
  * Extend variable environment with given key/value pair. All refs are transferred.
@@ -1064,7 +1066,7 @@ extern VariablePropertyLink addVariableProperty(Context context, VariablePropert
 struct _NamedPropertyLink
 {
     NamedPropertyLink link;
-    const char* name;
+    PooledString name;            // pooled name.
     union {
         Term term; // when name != NULL
         Hashset2 propset; // when name == NULL - hash set of many links at once
@@ -1079,7 +1081,7 @@ struct _NamedPropertyLink
 
 // Make a new named property link.
 // All references (term, nlink and fvs) are transferred.
-extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, const char *name, Term term, NamedPropertyLink nlink, Hashset fvs, int index);
+extern NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, PooledString name, Term term, NamedPropertyLink nlink, Hashset fvs, int index);
 
 static inline NamedPropertyLink LINK_NamedPropertyLink(Context context, NamedPropertyLink link)
 {
@@ -1433,7 +1435,7 @@ extern void printCTerm(Context context, Term term);
 // AUXILIARY SORT STRUCTURES
 
 // Last sort descriptor in ->previous chain.
-extern SortDescriptor lastSortDescriptor;
+//extern SortDescriptor lastSortDescriptor;
 
 // Structure for generated lookup function.
 struct _SymbolDescriptor

@@ -734,14 +734,15 @@ F-set-value[META-APPLICATION[#MetaVar, #Args,#count], #sink, #term, #value]
 {#env}
 F-set-value[LITERAL[#Literal, #Sort], #sink, #term, #value] 
 → 
-%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», (char *) «STRING[#Literal]»); permitUnusedTerm(«#value»);
-⟫
-;
+%n⟪
+Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», « Literal[#Literal] »); permitUnusedTerm(«#value»);
+⟫;
 
 {#env}
-F-set-value[CONSTRUCTION[#kind,#Symbol, #Binders], #sink, #term, #value] 
+F-set-value[CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #term, #value] 
 → 
-%n⟪Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Symbol]»); permitUnusedTerm(«#value»);
+%n⟪
+Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», GLOBAL(«#sink»->context, « STRING[#Symbol] »)); permitUnusedTerm(«#value»);
 ⟫
 ;
 

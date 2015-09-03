@@ -269,7 +269,8 @@ struct _StateLink
     enum StateLinkTag tag;
     union {
         ConstructionDescriptor descriptor; /* for LINK_CONSTRUCTION_TAG */
-        char *string;                      /* for LINK_NAMED_PROPERTY_TAG and LINK_STRING_TAG */
+        char *string;                      /* for LINK_STRING_TAG */
+        PooledString pstring;              /* for LINK_NAMED_PROPERTY_TAG */
         Variable variable;                 /* for LINK_VARIABLE_PROPERTY_TAG and LINK_*_BINDER_TAG */
     } stored;
     VariableNameMapLink variableNames; /* variables in scope for this constructor. */
@@ -395,7 +396,7 @@ void pushNamedProperty(StateLink *statep, char *name)
     state->parent = *statep;
     state->sink = MAKE_BUFFER((*statep)->sink->context);
     state->tag = LINK_NAMED_PROPERTY_TAG;
-    state->stored.string = GLOBAL(topSink(state)->context, name);
+    state->stored.pstring = GLOBAL(topSink(state)->context, name);
     state->variableNames = NULL;
     //
     *statep = state; /* push */
@@ -435,7 +436,7 @@ void popProperty(StateLink *statep)
 	    char *name = state->stored.string;
 	    Term term = BUFFER_TERM(topSink(state));
 	    FREE_BUFFER(topSink(state));
-	    ADD_PROPERTY_NAMED((*statep)->sink, name, term);
+	    ADD_PROPERTY_NAMED((*statep)->sink, GLOBAL(context, name), term);
 	    break;
 	}
     case LINK_VARIABLE_PROPERTY_TAG :
@@ -467,7 +468,7 @@ void pushString(StateLink *statep, char *string)
     state->parent = *statep;
     state->sink = (*statep)->sink;
     state->tag = LINK_STRING_TAG;
-    state->stored.string = GLOBAL(topSink(state)->context, string);
+    state->stored.string = makeString(topSink(state)->context, string);
     state->variableNames = NULL;
     //
     *statep = state; /* push */

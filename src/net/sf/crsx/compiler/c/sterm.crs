@@ -201,7 +201,7 @@ ST-Send-Property-Literal-Key[Fresh[value::Text]]
 %n⟪¶{⟦
 Term «value»;« {#env} ST-set[#Value, #sink, value] »
 «value» = NORMALIZEP(«#sink»->context, «value»);
-ADD_PROPERTY_NAMED(«#sink», (char *) « STRING[#Literal] », «value»);⟧
+ADD_PROPERTY_NAMED(«#sink», « Literal[#Literal] », «value»);⟧
 }« {#env} ST-send-properties-term[#Term, #sink] »⟫
 ;
 
@@ -287,10 +287,10 @@ ST-set-property-Literal-Key[Fresh[value::Text]]
 %n⟪
 Term «value»;¶{⟦« {#env} ST-set[#value, #sink, value] »⟧¶}
 «value» = NORMALIZEP(«#sink»->context, «value»);
-«#namedP» = addNamedProperty(«#sink»->context, «#namedP», (char *) « STRING[#literal] », «value»);« 
+«#namedP» = addNamedProperty(«#sink»->context, «#namedP»,  « Literal[#literal] », «value»);« 
 {#env}ST-set-properties-term[#term,  (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
-ST-set-property-other[Fresh[key::Text, value::Text]]
+ST-set-property-other[Fresh[key::Text, value::Text, keyStr::Text]]
 :
 {#env}
 ST-set-properties-term[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#key]], #value, #term], (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]]
@@ -301,7 +301,10 @@ Term «key», «value»;{⟦« {#env} ST-set-ref[#key, #sink, key] »« {#env} S
 if (IS_VARIABLE_USE(«key»))
     «#varP» = addVariableProperty(«#sink»->context, «#varP», linkVariable(«#sink»->context, VARIABLE(«key»)), «value»);
 else
-    «#namedP» = addNamedProperty(«#sink»->context, «#namedP», SYMBOL(« key »), «value»);
+{
+    PooledString «keyStr» = GLOBAL(«#sink»->context, SYMBOL(« key »));
+    «#namedP» = addNamedProperty(«#sink»->context, «#namedP», « keyStr », «value»);
+}
 «ST-unlink-ref[#sink, key] »« {#env} ST-set-properties-term[#term, (#namedP; #varP;), #sink, ok¹ props¹.#[ok¹, props¹]] »⟫;
 
 
@@ -566,8 +569,30 @@ ST-link-prefix[#sink] → %n⟪LINK(«#sink»->context,⟫;
 ST-UnlinkLastMetaUse[#metavar, USE[#Use], #sink]
 →
 $[If, $[Equal, #Use, 1], %n⟪
-UNLINK(«#sink»->context, «{#env}MetaVar[#metavar]»);⟫, %n⟪⟫]
-;
+UNLINK(«#sink»->context, «{#env}MetaVar[#metavar]»);⟫, %n⟪⟫];
+
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-UnlinkLastRefUse[$String, Reified_Use, Text] :: Text;
+
+{#env; "$Strict":NO}ST-UnlinkLastRefUse[#RefCookie, #use, #sink]
+→
+%n⟪⟫;
+
+{#env; "$Strict":YES}
+ST-UnlinkLastRefUse[#Ref, #use, #sink]
+→
+{#env}ST-UnlinkLastRefUse2[$[:,"MetaVar$",#Ref], #use, #sink];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-UnlinkLastRefUse2[$String, Reified_Use, Text] :: Text;
+
+-[Data[#RefCookie]]:
+{#env; #RefCookie: PROPERTY_VARIABLE[#namedP, #varP]}
+ST-UnlinkLastRefUse2[#RefCookie, USE[#use], #sink]
+→
+$[If, $[Equal, #use, 1], %n⟪
+UNLINK_NamedPropertyLink(«#sink»->context, «#namedP»); 
+UNLINK_VariablePropertyLink(«#sink»->context, «#varP»);⟫, %n⟪⟫];
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to call or copy a closure

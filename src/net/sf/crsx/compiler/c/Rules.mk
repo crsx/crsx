@@ -34,13 +34,13 @@ clean::
 TARGETS=CRSXC
 
 # CRSX rule families
-CRSXCFAMILIES=EVAL-E1 EVAL-E2 EVAL-E3 RULE TERM HEADER SORTS SYMBOLS D CD Reified Text SRULE STERM SHEADER
+CRSXCFAMILIES=EVAL-E1 EVAL-E2 EVAL-E3 RULE TERM HEADER SORTS SYMBOLS LITERALS D CD Reified Text SRULE STERM SHEADER
 
 # Same as FAMILIES but as CRSX list format
 CRSXCMODULES=( $(patsubst %,'%';,$(CRSXCFAMILIES)) )
 
 # The crsxc rules files.
-CRSXCRULESFILES =  ../crsxc.crs rules.crs srules.crs sterm.crs evaluators.crs term.crs sterm.crs header.crs sorts.crs symbols.crs ../defs.crs ../reify.crs cdefs.crs 
+CRSXCRULESFILES =  ../crsxc.crs rules.crs srules.crs sterm.crs evaluators.crs term.crs sterm.crs header.crs sorts.crs symbols.crs literals.crs ../defs.crs ../reify.crs cdefs.crs 
 
 # We need a second expansion: the first expansion generates target rules and the second expansion processes automatic variables	    
 .SECONDEXPANSION:
@@ -74,6 +74,20 @@ $(CRSXCBUILD)/$(1)_%_fun.c: $(CRSXCBUILD)/$(1)_%.dr
 	@sed -e 's/ {/\'$$$$'\n{/g' -e 's/ //g' $$@.tmp | awk '/^$$$$/{next}{print}' | LC_ALL=C sort -bu > $$@
 	@rm -f $$@.tmp
 
+ # - literal list 
+ $(CRSXCBUILD)/$(1)_literals.dr: $(CRSXCBUILD)/$(1).dr
+ 
+ $(CRSXCBUILD)/$(1)_literals.c: $(CRSXCBUILD)/$(1)_literals.dr $(CRSXCBUILD)/$(1)_literals.h
+	$(RUNCRSXRC) MODULE="$(1)" "grammar=('net.sf.crsx.text.Text';)" rules=literals.crs wrapper="ComputeLiterals" sink=net.sf.crsx.text.TextSink omit-linear-variables input="$$<" output="$$@.tmp"
+	@mv "$$@.tmp" "$$@" 
+
+ $(CRSXCBUILD)/$(1)_literals.h: $(CRSXCBUILD)/$(1)_literals.dr
+	$(RUNCRSXRC) MODULE="$(1)" "grammar=('net.sf.crsx.text.Text';)" rules=literals.crs wrapper="ComputeLiteralsHeader" sink=net.sf.crsx.text.TextSink omit-linear-variables input="$$<" output="$$@.tmp"
+	@mv "$$@.tmp" "$$@" 
+
+ $(1)C_FILES+=$(CRSXCBUILD)/$(1)_literals.c
+ $(1)H_FILES+=$(CRSXCBUILD)/$(1)_literals.h 
+ 
  # specific targets for data symbols.
  $(CRSXCBUILD)/$(1)_data.dr: $(CRSXCBUILD)/$(1).dr
 
@@ -114,10 +128,6 @@ define FAMILY_DEPENDENCIES
  $(1)SYMLIST_FILES += $(CRSXCBUILD)/$(1)_$(2).symlist
  $(1)C_FILES += $(CRSXCBUILD)/$(1)_$(2)_fun.c
 
-#$(CRSXCBUILD)/$(1)_$(2)_fun.o:	$(CRSXCBUILD)/$(1)_$(2)_fun.c $(H_FILES) $(CRSXCBUILD)/$(1).h
-#$(1)O_FILES += $(CRSXCBUILD)/$(1)_$(2)_fun.o
-
-
 endef
 
 define TARGETED_FAMILY_DEPENDENCIES
@@ -128,6 +138,7 @@ $(CRSXCBUILD)/$(1).h: $$($(1)H_FILES)
 	  echo '#define CRSX__M_$(1)_H'; \
 	  echo '#include "crsx.h"'; \
 	  echo '#include "$(1)_data.h"'; \
+	  echo '#include "$(1)_literals.h"'; \
 	  for line in $($(1)FAMILIES); do \
 	     echo "#include \"$(1)_$$$$line.h\""; \
 	  done; \
@@ -147,7 +158,7 @@ $(CRSXCBUILD)/$(1)symbols.c: $$($(1)SYMLIST_FILES)
 
 $(CRSXCBUILD)/$(1)symbols.o: $(CRSXCBUILD)/$(1)symbols.c crsx.h $(CRSXCBUILD)/$(1)_data.h $(CRSXCBUILD)/$(1).h
 	$(CC) $(CCFLAGS) -I$(CRSXCBUILD) -I. -c $$< -o $$@
-
+ 
 # OBJECT FILES.
 #$(CRSXCBUILD)/$(1)_data.o: $(CRSXCBUILD)/$(1)_data.c $($(1)H_FILES) $(CRSXCBUILD)/$(1).h $(CRSX_FILES) 
 
@@ -159,5 +170,5 @@ endef
 $(foreach tgt, $(TARGETS), $(eval $(call TARGETED_FAMILY_DEPENDENCIES,$(tgt))))
 
 
-rules: $(CRSXCC_FILES) $(CRSXCH_FILES) $(CRSXCBUILD)/CRSXCsymbols.c 
+rules: $(CRSXCC_FILES) $(CRSXCH_FILES) $(CRSXCBUILD)/CRSXCsymbols.c
 	touch rules

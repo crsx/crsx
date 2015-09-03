@@ -113,7 +113,7 @@ T-send[PROPERTY[LITERAL[#Literal, #Sort], #Value, #Term], sink]
 →
 %n⟪{⟦ Term «value»;
 « {#env} T-set[#Value, sink, value] »NORMALIZE(«sink»->context, «value»);
-ADD_PROPERTY_NAMED(«sink», (char *) « STRING[#Literal] », «value»); ⟧}
+ADD_PROPERTY_NAMED(«sink», « Literal[#Literal] », «value»); ⟧}
 « {#env} T-send[#Term, sink] »⟫
 ;
 
@@ -492,13 +492,11 @@ T-link-prefix[#sink]
 %n⟪LINK(«#sink»->context,⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-UnlinkLastMetaUse[$String, Reified_Use, Text] :: Text;
-
-{#env}
-T-UnlinkLastMetaUse[#MetaVar, USE[#Use], #sink]
+{#env}T-UnlinkLastMetaUse[#MetaVar, USE[#Use], #sink]
 →
 $[If, $[Equal, #Use, 1], %n⟪
-UNLINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»);⟫, %n⟪⟫]
-;
+UNLINK(«#sink»->context, «{#env}MetaVar[#MetaVar]»);⟫, %n⟪⟫];
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture reference to term to an existing variable.

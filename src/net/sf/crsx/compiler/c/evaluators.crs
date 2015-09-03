@@ -721,13 +721,22 @@ FREE_BUFFER(«buf»); ⟧
 //
 SET_REF_PRIMITIVE[E_Get];
 
+Set-Get-Literal[Fresh[pp::Text]]:
+{#env}E-set-ref[E_Get, (PROPERTY-REF[#Ref, #Use, #Name]; LITERAL[#String, SORT[#Sort, ()]]; #Defaults), #Options, #sink, #property]
+→
+%n⟪{⟦ Term «pp» = «{#env}E-Get-NamedProperty[$[:,"MetaVar$",#Ref], #Use, #sink, #String]»
+if («pp») «#property» = LINK(«#sink»->context, «pp»);
+else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink, #property]]»⟧}«{#env}ST-UnlinkLastRefUse[#Ref, #Use, #sink]»⟧
+}
+⟫;
+
 Set-Get[Fresh[key::Text,pp::Text]]:
 {#env}E-set-ref[E_Get, (PROPERTY-REF[#Ref, #Use, #Name]; #Key; #Defaults), #Options, #sink, #property]
 →
 %n⟪{⟦ Term «key»;
-«{#env}T-set-ref[#Key, #sink, key]»Term «pp» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #sink, key]»;«T-unlink-ref[#sink, key]»
+«{#env}T-set-ref[#Key, #sink, key]»Term «pp» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #Use, #sink, key]»«T-unlink-ref[#sink, key]»
 if («pp») «#property» = LINK(«#sink»->context, «pp»);
-else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink, #property]]»⟧}⟧
+else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink, #property]]»⟧}«{#env}ST-UnlinkLastRefUse[#Ref, #Use, #sink]»⟧
 }
 ⟫;
 
@@ -743,25 +752,25 @@ else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink,
 
 // $[{#env}GetRef, name[, default]] return immutable property or variable from environment
 //
+// TODO: deprecate: use $[Get
 SET_REF_PRIMITIVE[E_GetRef];
 
 Set-GetRef[Fresh[key::Text, pp::Text]]:
 {#env}E-set-ref[E_GetRef, (PROPERTY-REF[#Ref, #Use, #Name]; #Key; #Defaults), #Options, #sink, #property]
 →
 %n⟪{⟦ Term «key»;
-«{#env}T-set-ref[#Key, #sink, key]»Term «pp» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #sink, key]»;«{#env}T-unlink-ref[#sink, key]»
+«{#env}T-set-ref[#Key, #sink, key]»Term «pp» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #Use, #sink, key]»«{#env}T-unlink-ref[#sink, key]»
 if («pp») «#property» = LINK(«#sink»->context, «pp»);
 else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink, #property]]»⟧}⟧
 }
 ⟫;
 
-{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-Get-Property[$String, Text, Text] :: Text;
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-Get-Property[$String, Reified_Use, Text, Text] :: Text;
 
 {#env; #RefCookie: PROPERTY_VARIABLE[#namedP, #varP]}
-E-Get-Property[#RefCookie, #sink, #key]
+E-Get-Property[#RefCookie, #use, #sink, #key]
 →
-%n⟪DPROPERTY(«#sink»->context, «#namedP», «#varP», «#key»)⟫
-;
+%n⟪DPROPERTY(«#sink»->context, «#namedP», «#varP», «#key»);⟫;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-VariableProperties[$String] :: Text;
 
@@ -769,6 +778,14 @@ E-Get-Property[#RefCookie, #sink, #key]
 E-VariableProperties[#RefCookie]
 →
 %n⟪«#varP»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-Get-NamedProperty[$String, Reified_Use, Text, $String] :: Text;
+
+{#env; #RefCookie: PROPERTY_VARIABLE[#namedP, #varP]}
+E-Get-NamedProperty[#RefCookie, #use, #sink, #name]
+→
+%n⟪DNAMED_PROPERTY(«#sink»->context, «#namedP», «Literal[#name]»);⟫;
+
 
 // $[Pick, #index, #list] with constant #index evaluates as the index'th member of list (starting from 0). 
 //
@@ -1609,7 +1626,7 @@ $Meta[(
 → 
 %n⟪
 {⟦ char *«str»;
-« {#env; "$Tail:NO"}E-set-string[#Primitive, #Args, #Options, #sink, str] »LITERALU(«#sink», «str»); ⟧}«{#env}E-send-tail»⟫;
+« {#env; "$tail":NO}E-set-string[#Primitive, #Args, #Options, #sink, str] »LITERALU(«#sink», «str»); ⟧}«{#env}E-send-tail»⟫;
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-set-string-to-set[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text, Text] :: Text;
 
@@ -2346,13 +2363,23 @@ else {⟦ «p»«{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}
 // If {#environment} is omitted completely, the system environment is searched.
 //
 
+Poly-IfDef-Literal[Fresh[value::Text]]
+:
+{#env}E-poly[E_IfDef, (PROPERTY-REF[#Ref, #Use, #Name];  LITERAL[#String, SORT[#Sort, ()]]; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
+→ 
+%n⟪
+{⟦ Term «value» = «{#env}E-Get-NamedProperty[$[:,"MetaVar$",#Ref], #Use, #sink, #String]»«{#env}ST-UnlinkLastRefUse[#Ref, #Use, #sink]»
+if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
+else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
+}⟫;
+
 Poly-IfDef[Fresh[key::Text, value::Text]]
 :
 {#env}E-poly[E_IfDef, (PROPERTY-REF[#Ref, #Use, #Name]; #Key; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
 → 
 %n⟪
 {⟦ Term «key»;
-«{#env; "$tail":NO}T-set[#Key, #sink, key]»Term «value» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #sink, key]»;
+«{#env; "$tail":NO}T-set[#Key, #sink, key]»Term «value» = «{#env}E-Get-Property[$[:,"MetaVar$",#Ref], #Use, #sink, key]»«{#env}ST-UnlinkLastRefUse[#Ref, #Use, #sink]»
 if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
 else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }⟫;

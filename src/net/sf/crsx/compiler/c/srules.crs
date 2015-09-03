@@ -593,7 +593,7 @@ SF-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False, ok¹.#[ok¹]]
         {
             #env; 
             "$TopRef"       : PROPERTY_VARIABLE[namedP, varP]; 
-            "$unstep-props" : TEXT[%n⟨¶ADD_PROPERTIES(‹#sink›, ‹namedP›, ‹varP›);⟩]
+            "$unstep-props" : TEXT[%n⟨¶ADD_PROPERTIES(‹UnVariable[$[{#env}Get, "$Sink"]]›, ‹namedP›, ‹varP›);⟩]
         }
         SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]»⟫;
 
@@ -729,29 +729,29 @@ SF-Body[OK, #kind, #Rules]
 }⟫
 ;
 
-//
-// Generate C function body. Contraction mode.
-//
-// The generated C code has the following general form:
-//
-//     do
-//     {
-//         { rule1 }
-//         ...
-//         { rulen }    
-//     } while (0);
-//     
-//     fallback
-//      
-// where rule has the following form
-// 
-//     pattern matching
-//     unlink unused meta variable and variable
-//     contraction
-//
-// Since pattern matching can fail, intermediate linked meta variables and variables
-// must first be unlink before fallback.
-//
+/*
+ * Generate C function body. Contraction mode.
+ *
+ * The generated C code has the following general form:
+ *
+ *     do
+ *     {
+ *         { rule1 }
+ *         ...
+ *         { rulen }    
+ *     } while (0);
+ *     
+ *     fallback
+ *      
+ * where rule has the following form
+ * 
+ *     pattern matching
+ *     unlink unused meta variable and variable
+ *     contraction
+ *
+ * Since pattern matching can fail, intermediate linked meta variables and variables
+ * must first be unlink before fallback.
+ */
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Contract[$List[Reified_Rule]] :: Text;
@@ -1113,8 +1113,8 @@ VariablePropertyLink «varP» = VARIABLE_PROPERTIES(«#term»); permitUnusedVLin
 SF-pattern-ref[$False, #refcookie, #stage, USE[#count], #sink, #term, ok¹.#[ok¹]]  
 →
 %n⟪
-NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»));
-VariablePropertyLink «varP» = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»));
+NamedPropertyLink «namedP» = LINK_NamedPropertyLink(«#sink»->context, NAMED_PROPERTIES(«#term»));  
+VariablePropertyLink «varP» = LINK_VariablePropertyLink(«#sink»->context, VARIABLE_PROPERTIES(«#term»)); 
 « {#env;  #refcookie : PROPERTY_VARIABLE[namedP, varP]; "$subrefs": LIST_STRING[(#refcookie; #subrefs)]} #[OK] »⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -1147,28 +1147,34 @@ SF-set-value[$False, META-APPLICATION[#MetaVar, #Args,#count], #sink, #term, #va
 Term «#value» = PROPERTY(«#sink»->context, «#term», « {#env}MetaVar[#MetaVar] »); permitUnusedTerm(«#value»);⟫;
 
 {#env; "$TopRef":PROPERTY_VARIABLE[#namedP, #varP]}
-SF-set-value[$True, LITERAL[#Literal, #Sort], #sink, #term, #value] 
+SF-set-value[$True, LITERAL[#literal, #Sort], #sink, #term, #value] 
 → 
 %n⟪
-Term «#value» = DNAMED_PROPERTY(«#sink»->context, «#namedP», (char *) «STRING[#Literal]»); permitUnusedTerm(«#value»);⟫;
+Term «#value» = DNAMED_PROPERTY(«#sink»->context, «#namedP»,  « Literal[#literal] »); permitUnusedTerm(«#value»);⟫;
 
 {#env}
-SF-set-value[$False, LITERAL[#Literal, #Sort], #sink, #term, #value] 
+SF-set-value[$False, LITERAL[#literal, #Sort], #sink, #term, #value] 
 → 
 %n⟪
-Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», (char *) «STRING[#Literal]»); permitUnusedTerm(«#value»);⟫;
+Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», « Literal[#literal] »); permitUnusedTerm(«#value»);⟫;
 
+-[Fresh[key::Text]]
+:
 {#env; "$TopRef":PROPERTY_VARIABLE[#namedP, #varP]}
-SF-set-value[$True, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #term, #value] 
+SF-set-value[$True, CONSTRUCTION[#kind, #symbol, #Binders], #sink, #term, #value] 
 → 
 %n⟪
-Term «#value» = DNAMED_PROPERTY(«#sink»->context, «#namedP», «STRING[#Symbol]»); permitUnusedTerm(«#value»);⟫;
+const PooledString «key» = GLOBAL(«#sink»->context, « STRING[#symbol] »);
+Term «#value» = DNAMED_PROPERTY(«#sink»->context, «#namedP», «key»); permitUnusedTerm(«#value»);⟫;
 
+-[Fresh[key::Text]]
+:
 {#env}
-SF-set-value[$False, CONSTRUCTION[#kind, #Symbol, #Binders], #sink, #term, #value] 
+SF-set-value[$False, CONSTRUCTION[#kind, #symbol, #Binders], #sink, #term, #value] 
 → 
 %n⟪
-Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «STRING[#Symbol]»); permitUnusedTerm(«#value»);⟫;
+PooledString «key» = GLOBAL(«#sink»->context, « STRING[#symbol] »);
+Term «#value» = NAMED_PROPERTY(«#sink»->context, «#term», «key»); permitUnusedTerm(«#value»);⟫;
 
 {#env; "$TopRef":PROPERTY_VARIABLE[#namedP, #varP]}
 SF-set-value[$True, VARIABLE-USE[#variable], #sink, #term, #value] 
@@ -1629,7 +1635,6 @@ SF-unlink-refs2[Text, STRING_ENTRY] :: Text;
 %n⟪
 UNLINK_NamedPropertyLink(«#sink»->context, «#namedP»); 
 UNLINK_VariablePropertyLink(«#sink»->context, «#varP»);⟫;
-
 
 //
 // Unlink terms.
