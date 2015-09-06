@@ -349,10 +349,10 @@ public final class Util
 		return CONSTRUCTOR_PATTERN.matcher(symbol).matches() ? symbol : Util.singleQuoteJava(symbol); // fall back to quoting as Java string
 	}
 
-	/** Utility to export literal &lang;CONSTRUCTOR&rang; token in reparseable form. */
+	/** Utility to export literal in reparseable form. */
 	public static String externalizeLiteral(String symbol)
 	{
-		return CONSTRUCTOR_PATTERN.matcher(symbol).matches() ? symbol : Util.quoteJava(symbol); // fall back to quoting as Java string
+		return Util.quoteJava(symbol); // fall back to quoting as Java string
 	}
 
 	/** Utility to export &lang;VARIABLE&rang; token in reparseable form. */
