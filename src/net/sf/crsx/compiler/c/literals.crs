@@ -2,7 +2,7 @@
 // $Id: sorts.crs,v 3.3 2013/12/18 20:16:18 villardl Exp $
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// GENERATE C/H LIETRALS FILE TEXT FROM REIFIED CRSX.
+// GENERATE C/H LITERALS FILE TEXT FROM REIFIED CRSX.
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 LITERALS[(
@@ -76,8 +76,8 @@ ComputeLiteralsHeader2[("$FileLocation"; "$LineLocation"; "$ColumnLocation"; #li
 ComputeLiteralsHeader2[$List[$String]] :: Text;
 ComputeLiteralsHeader2[#literals]
 →
-%n⟪#ifndef CRSX_« MANGLE[$[Get[$String], "MODULE"]] »_LITERALS_H
-#define CRSX_« MANGLE[$[Get[$String], "MODULE"]] »_LITERALS__H
+%n⟪#ifndef CRSX_« MANGLE[$[Get[$String], "MODULE", ""]] »_LITERALS_H
+#define CRSX_« MANGLE[$[Get[$String], "MODULE", ""]] »_LITERALS__H
 #ifdef __cplusplus
 extern "C" {
 #endif
