@@ -4675,12 +4675,13 @@ void freeVariablePropertyLink(Context context, VariablePropertyLink link)
 
 
 //
-static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLink boundLink)
+//
+static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLink boundLink, int constrained, VariablePropertyLink props)
 {
     if (IS_VARIABLE_USE(term))
     {
         Variable v = VARIABLE(term);
-        if (!variableSetLinkFor(boundLink, v) && !containsVariable(freevars, v))
+        if (!variableSetLinkFor(boundLink, v) && !containsVariable(freevars, v) && (!constrained || c_variableProperty(props, VARIABLE(term)) != NULL))
             addVariable(freevars, linkVariable(freevars->context, v));
     }
     else
@@ -4699,7 +4700,7 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
                 newLink->link = subBoundLink;
                 subBoundLink = newLink;
             }
-            computeFreeVariables2(freevars, SUB(term, i), subBoundLink);
+            computeFreeVariables2(freevars, SUB(term, i), subBoundLink, constrained, props);
             for (j = 0; j < rank; ++j)
             {
                 VariableSetLink oldLink = subBoundLink;
@@ -4707,40 +4708,54 @@ static void computeFreeVariables2(VariableSet freevars, Term term, VariableSetLi
                 FREE(freevars->context, oldLink);
             }
         }
+
         {
             NamedPropertyLink nlink = asConstruction(term)->namedProperties;
             for (; nlink; nlink = nlink->link)
                 if (nlink->name != 0)
-                    computeFreeVariables2(freevars, nlink->u.term, boundLink);
-		else {
-		  Iterator2 iter = iteratorHS2(freevars->context, nlink->u.propset);
-		  if (iter)
-		    do {
-		      computeFreeVariables2(freevars, (Term)getValueIHS2(iter), boundLink);
-		    } while (nextIHS2(iter));
-		}
-	}
+                    computeFreeVariables2(freevars, nlink->u.term, boundLink, constrained, props);
+                else
+                {
+                    Iterator2 iter = iteratorHS2(freevars->context,
+                            nlink->u.propset);
+                    if (iter)
+                        do
+                        {
+                            computeFreeVariables2(freevars, (Term) getValueIHS2(iter), boundLink, constrained, props);
+                        } while (nextIHS2(iter));
+                }
+        }
+
         {
             VariablePropertyLink vlink = asConstruction(term)->variableProperties;
             for (; vlink; vlink = vlink->link)
-                if (vlink->variable)
-                    computeFreeVariables2(freevars, vlink->u.term, boundLink);
-		else {
-		  Iterator2 iter = iteratorHS2(freevars->context, vlink->u.propset);
-		  if (iter)
-		    do {
-		      computeFreeVariables2(freevars, (Term)getValueIHS2(iter), boundLink);
-		    } while (nextIHS2(iter));
-		}
+            {
+                Variable v = vlink->variable;
+                if (v)
+                {
+                    if (!variableSetLinkFor(boundLink, v) && !containsVariable(freevars, v) && (!constrained || c_variableProperty(props, VARIABLE(term)) != NULL))
+                        addVariable(freevars, linkVariable(freevars->context, v));
+                    computeFreeVariables2(freevars, vlink->u.term, boundLink, constrained, props);
+                }
+                else
+                {
+                    Iterator2 iter = iteratorHS2(freevars->context, vlink->u.propset);
+                    if (iter)
+                        do
+                        {
+                            computeFreeVariables2(freevars, (Term) getValueIHS2(iter), boundLink, constrained, props);
+                        } while (nextIHS2(iter));
+                }
+            }
         }
     }
 }
 
 //
-static VariableSet computeFreeVariables(Context context, Term term)
+static VariableSet computeFreeVariables(Context context, Term term, int constrained, VariablePropertyLink props)
 {
     VariableSet free = makeVariableSet(context);
-    computeFreeVariables2(free, term, (VariableSetLink) NULL);
+    computeFreeVariables2(free, term, (VariableSetLink) NULL, constrained, props);
     UNLINK(free->context, term);
     return free;
 }
@@ -4755,8 +4770,7 @@ void checkFreeVariables(Context context, Term term)
         set = VARIABLESET_MERGEALL(context, set, LINK_VARIABLESET(context, c->vfvs));
     }
 
-
-    VariableSet set2 = computeFreeVariables(context, term);
+    VariableSet set2 = computeFreeVariables(context, term, 0, NULL);
 
     VariableSetLink link = set2->u.link;
     int count = 0;
@@ -4783,8 +4797,11 @@ VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort,
 
     if (IS_VARIABLE_USE(term))
     {
-        free = makeVariableSet(context);
-        free->addVariable(free, linkVariable(context, VARIABLE(term)));
+        if (!constrained || c_variableProperty(props, VARIABLE(term)) != NULL)
+        {
+            free = makeVariableSet(context);
+            free->addVariable(free, linkVariable(context, VARIABLE(term)));
+        }
     }
     else
     {
@@ -4798,7 +4815,9 @@ VariableSet makeFreeVariableSet(Context context, Term term, SortDescriptor sort,
             VARIABLESET_ADDVARIABLESOF(context, free, c->vfvs, constrained, props);
         }
         else
-            return computeFreeVariables(context, term); // Transfer ref
+        {
+            return computeFreeVariables(context, term, constrained, props); // Transfer term ref.
+        }
     }
 
     UNLINK(context, term);
