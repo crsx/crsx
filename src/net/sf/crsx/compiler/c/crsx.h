@@ -1422,6 +1422,7 @@ extern void printTermFullWithIndent(Context context, Term term);
 extern void fprintTermFullWithIndent(Context context, FILE*, Term term);
 extern void ppt(Context context, int nesting, Term term);
 extern void pt(Context context, Term term);
+extern void pnp(Context context,  NamedPropertyLink namedProperties);
 
 extern void fprintTermTop(Context context, FILE* out, Term term, int depth, VariableSet encountered, Hashset2 used, int indent, int *positionp, int includeprops, int debug);
 extern void fprintFreeVars(Context context, FILE* out, VARIABLESET freeVars);

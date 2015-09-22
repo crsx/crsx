@@ -4594,6 +4594,8 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, PooledString name,
 {
 	ASSERT(context, containsHS2(context->keyPool, name) || containsHS2(context->stringPool, name));
 
+	crsxpAllocateNamedProperty(context, nlink);
+
 	// TODO: try to mutate nlink
     if (index)
     {
@@ -5148,6 +5150,14 @@ void pwt(Context context, Term term)
     PRINTF(context, "\n");
     freeVariableSet(set);
     fprintCookies(context);
+}
+
+extern void pnp(Context context,  NamedPropertyLink namedProperties)
+{
+	VariableSet encountered = makeVariableSet(context);
+	int pos = 0;
+	fprintNamedProperties(context, STDOUT, namedProperties, "", INT32_MAX, encountered, NULL, 0, &pos, getenv("include-annotations") ? 1 : 0, getenv("omit-properties") ? 0 : 10);
+	freeVariableSet(encountered);
 }
 
 char *SPACES = (char *) "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ";

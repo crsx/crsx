@@ -83,6 +83,8 @@ struct timespec pMergeClock;
 struct timespec pPropagateClock;
 struct timespec pStepClock;
 size_t pKeyPoolSize;
+size_t pMaxLinkedNamedProps; // Maximum number of linked named properties
+size_t pMaxNamedProps; // Maximum number of named properties
 
 typedef char* Charp;
 SETUP_STACK_TYPE(Charp)
@@ -151,6 +153,8 @@ void crsxpInit(Context context)
         pAccuPropagateTime = 0l;
         pMergeCount = 0;
         pAccuStepTime = 0;
+        pMaxLinkedNamedProps = 0;
+        pMaxNamedProps = 0;
 
         pDumpFile = NULL;
         pVariableIds = makeHS2(context, 8, unlinkVarValue, equalsPtr, hashPtr);
@@ -366,7 +370,33 @@ void crsxpVSContains(Hashset set)
         pFVUsedCount++;
         set->marker = 1;
     }
+}
 
+static size_t crsxpCountNamedProperties(NamedPropertyLink link, int linksOnly)
+{
+	size_t s = 0;
+	while (link)
+	{
+		s ++;
+		if (!linksOnly && !link->name)
+		{
+			s += link->u.propset->size;
+		}
+		link = link->link;
+	}
+	return s;
+}
+
+void crsxpAllocateNamedProperty(Context context, NamedPropertyLink next)
+{
+	if (context->profiling && context->internal)
+	{
+		size_t propsCount = crsxpCountNamedProperties(next, 0);
+		pMaxNamedProps = pMaxNamedProps > propsCount ? pMaxNamedProps : propsCount;
+
+		size_t linksCount = crsxpCountNamedProperties(next, 1);
+		pMaxLinkedNamedProps = pMaxLinkedNamedProps > linksCount ? pMaxLinkedNamedProps : linksCount;
+	}
 }
 
 void crsxpVSRehashed(Context context)
@@ -890,6 +920,8 @@ void printProfiling(Context context)
         PRINTF(context, "\n%-50s : %ld", "Total construction count",
                 pTotalConsCount);
         PRINTF(context, "\n%-50s : %ld", "String key pool size", pKeyPoolSize);
+        PRINTF(context, "\n%-50s : %ld", "Maximum number of named properties", pMaxNamedProps);
+        PRINTF(context, "\n%-50s : %ld", "Maximum number of named property links", pMaxLinkedNamedProps);
         PRINTF(context, "\n%-50s : %ldms", "Total time", nano2ms(dl));
 
     }
@@ -1116,5 +1148,6 @@ void crsxpInstrumentEnter(Context context, Variable id, char* name)
 {}
 void crsxpInstrumentExit(Context context, Variable id)
 {}
-
+void crsxpAllocateNamedProperty(Context context, NamedPropertyLink next)
+{}
 #endif

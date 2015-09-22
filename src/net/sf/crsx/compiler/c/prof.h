@@ -76,6 +76,8 @@ extern void crsxpVSAdded(Context context, Hashset set);
 
 extern void crsxpVSContains(Hashset set);
 
+/** Called before allocating a new named properties */
+extern void crsxpAllocateNamedProperty(Context context, NamedPropertyLink next);
 
 /** Called before releasing pools */
 extern void crsxpReleasePools(Context context);
