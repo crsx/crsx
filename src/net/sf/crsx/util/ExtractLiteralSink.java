@@ -13,14 +13,14 @@ import net.sf.crsx.Sink;
 import net.sf.crsx.Variable;
 
 /**
- * Extract LITERAL within PROPERTY or GET or IFDEF
+ * Extract LITERAL/CONSTRUCTION[KDATA, SYMBOL, BINDERS] within PROPERTY or GET or IFDEF
  * 
  * @author villardl
  */
 public class ExtractLiteralSink extends ManagedSink
 {
 	enum State {
-		FILTER, ACCEPT, IN_LITERAL, IN_EVALUATOR, IN_PROPERTY
+		FILTER, ACCEPT, IN_LITERAL, IN_EVALUATOR, IN_PROPERTY, IN_CONSTRUCTION
 	};
 
 	// State
@@ -64,7 +64,7 @@ public class ExtractLiteralSink extends ManagedSink
 		{
 			state.push(State.IN_EVALUATOR);
 		}
-		else if ("LITERAL".equals(constructor.symbol()))
+		else if ("LITERAL".equals(constructor.symbol()) && state.peek() != State.IN_LITERAL)
 		{
 			switch (state.peek())
 			{
@@ -80,51 +80,74 @@ public class ExtractLiteralSink extends ManagedSink
 				case FILTER :
 					state.push(State.FILTER);
 					break;
-				case IN_LITERAL :
+				case IN_LITERAL : // Could be "LITERAL", thus the guard above
+				case IN_CONSTRUCTION :
 					// hmm shouldn't happen
 					throw new RuntimeException();
 				default :
 					break;
 			}
 		}
-		else if (state.peek() == State.IN_PROPERTY)
+		else if ("CONSTRUCTION".equals(constructor.symbol()))
 		{
-			state.pop();
-			state.push(State.FILTER);
-			state.push(State.FILTER);
-		}
-		else if (state.peek() == State.IN_EVALUATOR)
-		{
-			// This is the evaluator name.
-			
-			state.pop();
-			String eval = constructor.symbol();
-			if (eval.equals("Get") || eval.equals("IfDef"))
-				state.push(State.ACCEPT);
-			else
-				state.push(State.FILTER);
-			state.push(State.FILTER); // does not matter: will be popped right away.
-		}
-		else if (state.peek() == State.IN_LITERAL)
-		{
-			if (!constructor.symbol().equals("$Cons") && !literals.contains(constructor.symbol()))
-			{
-				literals.add(constructor.symbol());
-
-				super.start(sink.makeConstructor(CRS.CONS_SYMBOL));
-				super.start(constructor);
-				super.end();
-
-				literalCount++;
-			}
-			state.pop();
-			state.push(State.FILTER); // Skip literal sort.
-			state.push(State.FILTER); 
+			state.push(State.IN_CONSTRUCTION);
 		}
 		else
 		{
-			// Inherit state
-			state.push(state.peek());
+			switch (state.peek())
+			{
+				case IN_PROPERTY :
+					state.pop();
+					state.push(State.FILTER);
+					state.push(State.FILTER);
+					break;
+				case IN_EVALUATOR :
+					// This is the evaluator name.
+
+					state.pop();
+					String eval = constructor.symbol();
+					if (eval.equals("Get") || eval.equals("IfDef"))
+						state.push(State.ACCEPT);
+					else
+						state.push(State.FILTER);
+					state.push(State.FILTER); // does not matter: will be popped right away.
+
+					break;
+				case IN_LITERAL :
+					if (!constructor.symbol().equals("$Cons") && !literals.contains(constructor.symbol()))
+					{
+						literals.add(constructor.symbol());
+
+						super.start(sink.makeConstructor(CRS.CONS_SYMBOL));
+						super.start(constructor);
+						super.end();
+
+						literalCount++;
+					}
+					state.pop();
+					state.push(State.FILTER); // Skip literal sort.
+					state.push(State.FILTER);
+
+					break;
+				case IN_CONSTRUCTION :
+					if (constructor.symbol().equals("KDATA"))
+					{
+						// parent construction is data. The next start event is the data constructor symbol: add it 
+						state.pop();
+						state.push(State.IN_LITERAL);
+					}
+					else
+					{
+						state.pop();
+						state.push(State.FILTER);
+					}
+					state.push(State.IN_LITERAL); // does not matter: will be popped right away.
+					break;
+				default :
+					// Inherit state
+					state.push(state.peek());
+
+			}
 		}
 		return this;
 	}

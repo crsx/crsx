@@ -730,6 +730,15 @@ else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink,
 }
 ⟫;
 
+Set-Get-ConsData[Fresh[pp::Text]]:
+{#env}E-set-ref[E_Get, (PROPERTY-REF[#Ref, #Use, #Name]; CONSTRUCTION[KDATA, #Symbol, ()]; #Defaults), #Options, #sink, #property]
+→
+%n⟪{⟦ Term «pp» = «{#env}E-Get-NamedProperty[$[:,"MetaVar$",#Ref], #Use, #sink, #Symbol]»
+if («pp») «#property» = LINK(«#sink»->context, «pp»);
+else {⟦«{#env}E-optional-nil[#Defaults, ok arg.T-then-set-ref[ok, arg, #sink, #property]]»⟧}«{#env}ST-UnlinkLastRefUse[#Ref, #Use, #sink]»⟧
+}
+⟫;
+
 Set-Get[Fresh[key::Text,pp::Text]]:
 {#env}E-set-ref[E_Get, (PROPERTY-REF[#Ref, #Use, #Name]; #Key; #Defaults), #Options, #sink, #property]
 →
@@ -2372,6 +2381,18 @@ Poly-IfDef-Literal[Fresh[value::Text]]
 if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
 else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }⟫;
+
+
+Poly-IfDef-ConsData[Fresh[value::Text]]
+:
+{#env}E-poly[E_IfDef, (PROPERTY-REF[#Ref, #Use, #Name];  CONSTRUCTION[KDATA, #Symbol, ()]; #Yes; #Nos), (#O1; #O2; #O3; #O4), #sink, ok result.#Tail[ok,result]] 
+→ 
+%n⟪
+{⟦ Term «value» = «{#env}E-Get-NamedProperty[$[:,"MetaVar$",#Ref], #Use, #sink, #Symbol]»«{#env}ST-UnlinkLastRefUse[#Ref, #Use, #sink]»
+if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
+else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
+}⟫;
+
 
 Poly-IfDef[Fresh[key::Text, value::Text]]
 :
