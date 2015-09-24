@@ -689,13 +689,15 @@ public class GenericRule implements Copyable
 	 */
 	public boolean hasDeepBinderUses(Term term, int index) throws CRSException
 	{
-		//if (hasBinders(term, index))
 		if (term.binders(index) != null)
 		{
 			Term sub = term.sub(index);
 			if (sub.kind() == Kind.VARIABLE_USE || sub.arity() == 0)
+			{
+				 // either identity function or constant. Either way no deep binder uses
 				return false;
-
+			}
+			
 			// sub is a construction/meta application with binders and optionally with properties.
 			Variable[] binders = term.binders(index);
 			for (int i = 0; i < sub.arity(); i++)
@@ -705,8 +707,15 @@ public class GenericRule implements Copyable
 				switch (subsub.kind())
 				{
 					case VARIABLE_USE :
-						// Shallow variable use	
-						break;
+						if (sub.binders(i) == null)
+						{
+							// Only a shallow variable...
+							return false;
+						}
+						
+						// This is either the identity function or constant.
+						// That's considered deep
+						return true; 
 					case META_APPLICATION :
 					case CONSTRUCTION :
 					default :

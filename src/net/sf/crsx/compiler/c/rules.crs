@@ -155,7 +155,7 @@ F-Contract[#sink, #term, #function, (RULE[#name, #Options, #Pattern, #Contractum
 →
 %n⟪do {⟦
 /* Contraction rule « COMMENT_TOKEN[#name] ». */
-« {"$Binders":LIST_VARIABLE[()];"$Subs": LIST_VARIABLE[()]; "$Refs": LIST_STRING[()]; "$Vars": LIST_VARIABLE[()]; "$Strict":NO} F-Options[#Options, o3.F-then-Fresh[o3, #sink, #Options, ok.F-then-Pattern[ok, FIRST, MATCH, #Pattern, #sink, %n⟨⟩, $False, $False, #term, o2.F-then-Send[o2, #term, #Contractum, #sink]]]] »return 1;⟧
+« {"$Binders":LIST_VARIABLE[()];"$Subs": LIST_VARIABLE[()]; "$Refs": LIST_STRING[()]; "$vars": LIST_VARIABLE[()]; "$Strict":NO} F-Options[#Options, o3.F-then-Fresh[o3, #sink, #Options, ok.F-then-Pattern[ok, FIRST, MATCH, #Pattern, #sink, %n⟨⟩, $False, $False, #term, o2.F-then-Send[o2, #term, #Contractum, #sink]]]] »return 1;⟧
 } while (0);
 « F-Contract[#sink, #term, #function, #Rules] »⟫
 ;
@@ -227,11 +227,11 @@ F-Fresh3[OK, sink, #binders, ok.#[ok]]
 
 -[Free[sink::Text, key::Text]]
 :
-{#env; "$Vars": LIST_VARIABLE[#Vars]}
+{#env; "$vars": LIST_VARIABLE[#Vars]}
 F-Fresh2[sink, VARIABLE-USE[key], ok.#[ok]]	 
 → 
 %n⟪
-Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, (char *) «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$Vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»⟫;
+Variable «key» = MAKE_FRESH_PROMISCUOUS_VARIABLE(«sink»->context, (char *) «STRING[$[BeforeFirst,$[Show,key],"_"]]»);«{#env; "$vars":LIST_VARIABLE[(key;#Vars)]}#[OK]»⟫;
 
 // Should be of the form $FunctionSort[Term1, Term2]. Ignore Term2.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
@@ -317,7 +317,7 @@ F-Dispatch-cases[PASS, $String, $List[Reified_Rule], Text, Text, $String] :: Tex
 // Generate switch body for each dispatch rule: case+options+matching, then contraction, finally report success.
 F-Dispatch-cases[#pass, #function, (RULE[#name, #Options, #Pattern, #Contractum];#Rules), #sink, term, #SortName]
 →
-%n⟪« {"$Binders":LIST_VARIABLE[()]; "$Subs":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()];"$Vars": LIST_VARIABLE[()]; "$Strict":NO}
+%n⟪« {"$Binders":LIST_VARIABLE[()]; "$Subs":LIST_VARIABLE[()]; "$Refs": LIST_STRING[()];"$vars": LIST_VARIABLE[()]; "$Strict":NO}
      F-Pattern[#pass, DISPATCH[#name,#Options,#SortName], #Pattern, #sink, %n⟨⟩, $False, $False, term, ok.
      F-then-Send[ok, term, #Contractum, #sink]] »« F-Dispatch-cases[SECOND, #function, #Rules, #sink, term, #SortName] »⟫
 ;
@@ -500,10 +500,10 @@ F-metaOption2[#key, ok.#[ok]]
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY} F-recordFreeOption[VARIABLE_ENTRY, Reified_Variable, ok::OK_SORT.Text] :: Text;
 
-{#env; "$Vars": LIST_VARIABLE[#Vars]}
+{#env; "$vars": LIST_VARIABLE[#Vars]}
 F-recordFreeOption[FREE, #key, ok.#[ok]]
 → 
-{#env; "$Vars": LIST_VARIABLE[(#key; #Vars)]}
+{#env; "$vars": LIST_VARIABLE[(#key; #Vars)]}
 #[OK]
 ;
 
@@ -875,20 +875,20 @@ F-PatternBinder2[Meta-Occurrence, PASS, Pattern-Stage, binder : Reified_Variable
 // - then generate and record cookie, binder name, and promiscuity (and recurse).
 -[Free[term::Text], Fresh[v::Text]]
 :
-{#env; "$Vars":LIST_VARIABLE[#Vars]}
+{#env; "$vars":LIST_VARIABLE[#Vars]}
 F-PatternBinder2[UNIQUE[#cookie], #pass, #stage, b . #Binder[b], #sink, #code, #unique, term, #i, #j, ok.#[ok]]
 →
-{#env; v : BOUND; #cookie : VARIABLE[v]; "$Vars":LIST_VARIABLE[(v; #Vars)]}
+{#env; v : BOUND; #cookie : VARIABLE[v]; "$vars":LIST_VARIABLE[(v; #Vars)]}
 F-PatternBinder[#pass, #stage, #Binder[v], #sink, %n⟪« #code »Variable «v» = linkVariable(«#sink»->context, BINDER(«term»,«INTEGER[#i]»,«INTEGER[#j]»)); if (« term »_count <= 1) UNBIND(«v»);
 ⟫, #unique, term, #i, $[Plus,#j,1], ok.#[ok]]
 ;
 
 -[Free[term::Text], Fresh[v::Text]]
 :
-{#env; "$Vars":LIST_VARIABLE[#Vars]}
+{#env; "$vars":LIST_VARIABLE[#Vars]}
 F-PatternBinder2[NOTHING, #pass, #stage, b . #Binder[b], #sink, #code, #unique, term, #i, #j, ok.#[ok]]
 →
-{#env; v : BOUND; "$Vars":LIST_VARIABLE[(v; #Vars)]}
+{#env; v : BOUND; "$vars":LIST_VARIABLE[(v; #Vars)]}
 F-PatternBinder[#pass, #stage, #Binder[v], #sink, %n⟪« #code »Variable «v» = linkVariable(«#sink»->context, BINDER(«term»,«INTEGER[#i]»,«INTEGER[#j]»)); if (« term »_count <= 1) UNBIND(«v»);
 ⟫, #unique, term, #i, $[Plus,#j,1], ok.#[ok]]
 ;
@@ -1190,7 +1190,7 @@ F-Pattern[#pass, #stage, #Pattern, #sink, %n⟪« #code »Term «sub» = SUB(«t
 F-then-Send[OK, #term, #Contractum, #sink]
 →
 %n⟪UNLINK(«#sink»->context, «#term»);
-« {#env} T-send[#Contractum, #sink] »«{#env}F-unlink-refs[#sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]»«{#env}F-unlink-var[#sink, $[{#env}Get[STRING_ENTRY], "$Vars"]]»
+« {#env} T-send[#Contractum, #sink] »«{#env}F-unlink-refs[#sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]»«{#env}F-unlink-var[#sink, $[{#env}Get[STRING_ENTRY], "$vars"]]»
 ⟫
 ;
 
@@ -1203,7 +1203,7 @@ F-then-Send[OK, #term, #Contractum, #sink]
 
 {#env}
 F-fail-cleanup[#sink] →
-    %n⟪«F-unlink[#sink, $[{#env}Get[STRING_ENTRY], "$Subs"]]»«{#env}F-unlink-refs[#sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]»«F-unlink-var[#sink, $[{#env}Get[STRING_ENTRY], "$Vars"]]»⟫
+    %n⟪«F-unlink[#sink, $[{#env}Get[STRING_ENTRY], "$Subs"]]»«{#env}F-unlink-refs[#sink, $[{#env}Get[STRING_ENTRY], "$Refs"]]»«F-unlink-var[#sink, $[{#env}Get[STRING_ENTRY], "$vars"]]»⟫
 ;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}F-unlink-refs[Text, STRING_ENTRY] :: Text;
