@@ -1024,10 +1024,10 @@ ST-set-closure-binder[OK_SORT, Reified_Binder, Text, ok¹::OK_SORT vars¹ /* The
 ST-set-closure[Reified_Term, Text, ok¹::OK_SORT vars¹::$List[Text].Text] :: Text;
 
 // x...y.T[ ... ]. A new closure. Compute captured arg
-{#env; "$Function":STRING_VALUE[#Function]; "$ClosureCount":NUM_VALUE[#CCount]}
+{#env; "$function":STRING_VALUE[#Function]; "$closure-count":NUM_VALUE[#CCount]}
 ST-set-closure[CONSTRUCTION[#Kind, #Symbol, #Binders], #sink, ok¹ vars¹.#[ok¹, vars¹]] 
 →
-{#env;"$ClosureCount":NUM_VALUE[$[Plus, #CCount, 1]]}
+{#env;"$closure-count":NUM_VALUE[$[Plus, #CCount, 1]]}
 ST-set-capture[OK, #Binders, (), #sink, ok¹ captureds¹.
 ST-set-closure2[ok¹, captureds¹, $[:, #Function, "$CC$", $[FormatNumber, #CCount]], #sink, ok¹ vars¹.#[ok¹, vars¹]]]
 ;
@@ -1040,7 +1040,7 @@ ST-set-closure2[ok¹, captureds¹, $[:, #Function, "$CC$", $[FormatNumber, #CCou
 
 // x...y.#[ ... ]: Reuse closure. No need to capture anything. 
 -[Fresh[c::Text]]:
-{#env;"$Function":STRING_VALUE[#Function]; "$ClosureCount":NUM_VALUE[#CCount]}
+{#env;"$function":STRING_VALUE[#Function]; "$closure-count":NUM_VALUE[#CCount]}
 ST-set-closure[META-APPLICATION[#Meta, #Binders, #Use], #sink, ok¹ vars¹.#[ok¹, vars¹]] 
 →
 %n⟪¶Closure «c» = linkClosure(«{#env}MetaVar[#Meta]»);«{#env}#[OK, (c;)]»⟫;
