@@ -736,6 +736,28 @@ public class GenericRule implements Copyable
 	}
 
 	/**
+	 * Whether the sub is a construction that contains other constructions..
+	 * @param index of the sub
+	 * @throws CRSException 
+	 */
+	public boolean hasConstruction(Term term, int index) throws CRSException
+	{
+		if (term.binders(index) != null)
+		{
+			Term sub = term.sub(index);
+			if (sub.kind() == Kind.VARIABLE_USE || sub.arity() == 0)
+				return false;
+
+			for (int i = 0; i < sub.arity(); i++)
+			{
+				Term subsub = sub.sub(i);
+				if (subsub.kind() == Kind.CONSTRUCTION)
+					return true;
+			}
+		}
+		return false;
+	}
+	/**
 	 * Whether the sub is a construction that contains unordered variable uses. Ignore properties.
 	 * @param index of the sub
 	 * @throws CRSException 

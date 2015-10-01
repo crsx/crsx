@@ -24,6 +24,7 @@ extern "C" {
 #include <alloca.h>
 #include <ctype.h>
 #include <math.h>
+#include <limits.h>
 
 // All the pointer types declared forward.
 typedef struct _Context *Context;
@@ -70,14 +71,14 @@ struct _Context
 {
     unsigned int stamp;   // satisfy old C compilers and provide variable identity
 #ifndef OMIT_TIMESPEC
-    struct timespec time; // time when compute started.
+    struct timespec time;  // time when compute started.
 #endif
     unsigned int depth;   // monitor recursion depth
-    Hashset2 env;         // General environment.
+    Hashset2 env;           // General environment.
 
     int poolRefCount;
-    Hashset2 stringPool;  // Set of dynamic PooledString
-    Hashset2 keyPool;     // Set of static PooledString
+    Hashset2 stringPool;    // Set of dynamic PooledString
+    Hashset2 keyPool;       // Set of static PooledString
 
     Construction** consPool; // Array of Construction
     ssize_t* consPoolSize;
@@ -100,6 +101,9 @@ struct _Context
 
     // Spilled parameters
     void* crsxArg[96];
+
+    // Named properties indexing threshold
+    unsigned int indexThreshold;
 
     unsigned int fv_enabled    : 1; // Whether the free variable optimization is on.
     unsigned int debugsteps    : 1;
@@ -279,7 +283,7 @@ extern char *makeEncodePoint(Context context, unsigned int code);
 // Allocate interned copy of existing string on heap.
 extern PooledString makeKeyString(Context context, const char *src);
 
-// Literals value initalization
+// Literals value initialization
 extern void initLiterals();
 
 // Static pooled literal table
@@ -287,6 +291,12 @@ extern PooledString literalsTable[];
 
 // Number of static literals
 extern size_t literalsCount;
+
+// Constant term initialization
+extern void initConstants();
+
+// Allocate new global construction
+extern Construction makeGlobalConstruction(ConstructionDescriptor desc);
 
 // Hash code for term.
 #define HASH_CODE(CONTEXT, TERM) termHashCode(CONTEXT, TERM, NULL)
@@ -554,6 +564,9 @@ extern void freeTerm(Context context, Term term);
 
 static inline Term linkTerm(Context context, Term t)
 {
+    if (t->nr == SSIZE_MAX)
+    	return t;
+
     assert(t->nr > 0);
     t->nr ++;
     return t;
@@ -561,8 +574,10 @@ static inline Term linkTerm(Context context, Term t)
 
 static inline Term unlinkTerm(Context context, Term t)
 {
-    assert(t->nr > 0);
+	if (t->nr == SSIZE_MAX)
+		return t;
 
+    assert(t->nr > 0);
     if (--t->nr == 0)
     {
         freeTerm(context,t);

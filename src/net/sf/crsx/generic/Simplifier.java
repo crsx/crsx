@@ -258,8 +258,9 @@ public class Simplifier
 					final boolean hasDeepBinders = state.rule.hasDeepBinderUses(term, i);
 					final boolean hasWeakBinders = state.rule.hasWeakBinders(term, i);
 					final boolean hasUnorderedBinders = state.rule.hasUnorderedShallowBinderUses(term, i);
+					final boolean hasConstruction = state.rule.hasConstruction(term, i);
 
-					if (isSingleVariable | hasDeepBinders | hasWeakBinders | hasUnorderedBinders)
+					if (isSingleVariable | hasDeepBinders | hasWeakBinders | hasUnorderedBinders | hasConstruction)
 					{
 						recurse = false; // No need to recurse as the sub is being rewritten.
 

@@ -129,7 +129,15 @@ ADD_PROPERTY(«sink», «key», «value»);«T-unlink-ref[sink, key] »
 ⟫
 ;
 
-Send-Construction[Free[sink::Text]]
+Send-Constant-Construction[Free[sink::Text]]
+:
+{#env}
+T-send[CONSTRUCTION[KDATA, #Symbol, ()], sink]
+→
+%n⟪COPY(«sink», LINK(«sink»->context, (Term) «Const[#Symbol]»));
+⟫;
+
+Send-Construction[Fallback, Free[sink::Text]]
 :
 {#env}
 T-send[CONSTRUCTION[#kind, #Symbol, #Binders], sink]

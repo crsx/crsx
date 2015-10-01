@@ -117,6 +117,7 @@ H-Form[FORM[#name, ()]]
 →
 %n⟪#define STRUCT« Struct[#name] » struct _ConstantConstruction
 extern struct _ConstructionDescriptor « Descriptor[#name] »;
+extern Construction « Const[#name] »;
 ⟫
 ;
 

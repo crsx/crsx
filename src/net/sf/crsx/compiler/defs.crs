@@ -352,6 +352,9 @@ Enum[#name] → %n⟪EnumOf« MANGLE[#name] »⟫ ;
 Sort[$String] :: Text;
 Sort[#name] → %n⟪sort« MANGLE[#name] »⟫ ;
 
+Const[$String] :: Text;
+Const[#name] → %n⟪const« MANGLE[#name] »⟫ ;
+
 Descriptor[$String] :: Text;
 Descriptor[#name] → %n⟪descriptor« MANGLE[#name] »⟫ ;
 
@@ -457,13 +460,20 @@ MoveToTerm[Reified_Binder] :: Reified_Term;
 
 -[Fresh[binder::Reified_Variable]]:
 MoveToTerm[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]]
- →
-MoveToTerm[#Binder[binder]];
+→ MoveToTerm[#Binder[binder]];
 
 MoveToTerm[ARGUMENT[#Sort, #Term]]
-→
-#Term;
+→ #Term;
 
+// Whether term has properties
+HasProperties[Reified_Term] :: $Boolean;
+
+HasProperties[PROPERTY-REF[#ref, #use, #term]] → $True;
+HasProperties[PROPERTY[#key, #value, #term]]   → $True;
+HasProperties[PROPERTY-NOT[#key, #term]]       → $True;
+
+-[Fallback]:
+HasProperties[#term]                           → $False;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Check Reuse Utilities

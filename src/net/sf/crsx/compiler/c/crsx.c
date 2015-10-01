@@ -135,8 +135,7 @@ VariableUse makeVariableUse(Context context, Variable variable)
 /////////////////////////////////////////////////////////////////////////////////
 // Construction allocation.
 
-static
-Construction makeConstruction(Context context, ConstructionDescriptor descriptor)
+static Construction makeConstruction(Context context, ConstructionDescriptor descriptor)
 {
     Construction construction;
     int poolIndex = (descriptor->size - sizeof(struct _Construction)) / sizeof(Construction);
@@ -162,6 +161,26 @@ Construction makeConstruction(Context context, ConstructionDescriptor descriptor
 
     return construction;
 }
+
+
+Construction makeGlobalConstruction(ConstructionDescriptor desc)
+{
+	Construction construction = (Construction) malloc(desc->size);
+	construction->term.descriptor = desc;
+	construction->term.nr = SSIZE_MAX; // Immortal
+
+	#ifdef CRSX_ENABLE_PROFILING
+	    construction->term.marker = 0;
+	#endif
+
+	construction->namedProperties = NULL;
+	construction->variableProperties = NULL;
+	construction->fvs = NULL;
+	construction->nfvs = NULL;
+	construction->vfvs = NULL;
+	return construction;
+}
+
 
 static
 void freeConstruction(Context context, Construction construction)
@@ -607,16 +626,16 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
     Buffer buffer = (Buffer) sink;
     const Context context = sink->context;
 
-    // If no properties and blocking condition matches, then just share!
+
+    // If no properties or are the same, then just share!
     if (IS_VARIABLE_USE(term)
-            || (buffer->pendingNamedProperties == asConstruction(term)->namedProperties
-                    && buffer->pendingVariableProperties == asConstruction(term)->variableProperties
-               ))
+    		|| (buffer->pendingNamedProperties == NULL && buffer->pendingVariableProperties == NULL)
+			|| (buffer->pendingNamedProperties == asConstruction(term)->namedProperties && buffer->pendingVariableProperties == asConstruction(term)->variableProperties))
     {
-        UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
-        buffer->pendingNamedProperties = NULL;
+    	UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
+    	buffer->pendingNamedProperties = NULL;
         UNLINK_VariablePropertyLink(context, buffer->pendingVariableProperties);
-        buffer->pendingVariableProperties = NULL;
+    	buffer->pendingVariableProperties = NULL;
 
         bufferInsert(buffer, term);
         return sink;
@@ -3542,8 +3561,9 @@ static int step(Sink sink, Term term)
 void initCRSXContext(Context context)
 {
 	initLiterals();
+	initConstants();
 
-    context->stamp = 0;
+	context->stamp = 0;
     context->depth = 0;
 
     context->debugsteps = getenv("crsx-debug-steps") != NULL;
@@ -3573,6 +3593,9 @@ void initCRSXContext(Context context)
     context->fv_enabled = getenv("crsx-disable-fv") == NULL;
     context->functional = makeVariable(context, "f", 1, 0);
     context->functionalUse = makeVariableUse(context, context->functional);
+
+    context->indexThreshold = 100;
+
 }
 
 Term compute(Context context, Term term)
@@ -4596,11 +4619,16 @@ NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, PooledString name,
 
 	crsxpAllocateNamedProperty(context, nlink);
 
-	// TODO: try to mutate nlink
     if (index)
     {
-        int count = nlink ? nlink->count + 1 : 1;
-        if (count > 100)
+    	if (nlink && !nlink->name && nlink->nr == 1 && nlink->u.propset->nr == 1)
+		{
+			nlink->u.propset = addValueHS2(context, nlink->u.propset, name, term);
+			return nlink;
+		}
+
+    	int count = nlink ? nlink->count + 1 : 1;
+        if (count > context->indexThreshold)
             return indexNamedProperties(context, name, term, nlink, fvs);
     }
     
@@ -6057,7 +6085,7 @@ int call0_1(Sink sink, Term term)
 
 int call0_x(Sink sink, Term term)
 {
-	void* args[0] = {};
+	void** args = NULL;
 	UNTHUNK
 }
 
