@@ -707,15 +707,22 @@ public class GenericRule implements Copyable
 				switch (subsub.kind())
 				{
 					case VARIABLE_USE :
-						if (sub.binders(i) == null)
+						if (sub.binders(i) == null || sub.binders(i).length == 0)
 						{
-							// Only a shallow variable...
-							return false;
+							// Term of the form T[ ... x..y.S[...v..] ..]
+							// This is not a deep variable. 
+							// Continue on the next sub...
+							
 						}
-						
-						// This is either the identity function or constant.
-						// That's considered deep
-						return true; 
+						else
+						{
+							// Term of the form T[ ... x..y.S[...z.v..] ..]
+							
+							// This is either the identity function or constant.
+							// That's considered deep
+							return true;
+						}
+						break;
 					case META_APPLICATION :
 					case CONSTRUCTION :
 					default :
