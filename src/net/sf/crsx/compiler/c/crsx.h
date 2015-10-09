@@ -25,6 +25,9 @@ extern "C" {
 #include <ctype.h>
 #include <math.h>
 #include <limits.h>
+#ifndef SSIZE_MAX
+# include <bits/local_lim.h>
+#endif
 
 // All the pointer types declared forward.
 typedef struct _Context *Context;
