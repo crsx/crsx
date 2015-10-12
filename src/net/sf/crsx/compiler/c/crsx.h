@@ -604,7 +604,6 @@ struct _Construction
     unsigned int nf : 1;      // whether subterm known to be normal form
     unsigned int nostep : 1;  // whether function construction subterm known to not currently be steppable
     unsigned int closure : 1; // whether function construction is a closure and can never be be steppable
-    unsigned int varfvs : 1;  // whether fvs is a Variable or a Hashset
 
     NamedPropertyLink namedProperties;       // named properties. (may be null)
     VariablePropertyLink variableProperties; // variable properties. (may be null)

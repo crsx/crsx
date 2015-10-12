@@ -171,13 +171,17 @@ Construction makeGlobalConstruction(ConstructionDescriptor desc)
 
 	#ifdef CRSX_ENABLE_PROFILING
 	    construction->term.marker = 0;
-	#endif
+    #endif
+	construction->nf = 1;
+	construction->nostep = 1;
+	construction->closure = 0;
 
 	construction->namedProperties = NULL;
 	construction->variableProperties = NULL;
 	construction->fvs = NULL;
 	construction->nfvs = NULL;
 	construction->vfvs = NULL;
+
 	return construction;
 }
 
