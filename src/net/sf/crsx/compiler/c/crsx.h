@@ -25,7 +25,10 @@ extern "C" {
 #include <ctype.h>
 #include <math.h>
 #include <limits.h>
-
+#ifndef SSIZE_MAX
+#  define SSIZE_MAX LONG_MAX
+#endif
+  
 // All the pointer types declared forward.
 typedef struct _Context *Context;
 typedef struct _Variable *Variable;
