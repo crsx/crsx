@@ -1,0 +1,15 @@
+Test[(
+
+$Lax;
+
+$Use["bool.crs"];
+$Use["org/crsx/common.crs"];
+
+Test :: Boolean;
+
+Test → $[Let, Tuple2[#1, #2], GetBools, And[#1, #2]];
+
+GetBools :: Tuple2[Boolean, Boolean];
+GetBools → Tuple2[True, False];
+
+)]

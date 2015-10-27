@@ -91,6 +91,11 @@ public abstract class AbstractLiteralConstructor implements Constructor
 	{
 		return this;
 	}
+	
+	final public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		return this;
+	}
 
 	final public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException

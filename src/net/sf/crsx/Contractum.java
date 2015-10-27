@@ -37,4 +37,14 @@ public interface Contractum extends Term
      * @return the sink after reception of the contracted subterm
      */
     Sink contract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings);
+    
+    /**
+     * Statically contract this fragment of contractum (rule right hand side) to sink.
+     * 
+     * @param sink to send the fragment to
+     * @param valuation from successful matching of left-hand side (contains the full contractum of which this is a fragment)
+     * @param renamings already decided mappings of variables for the contraction (maps variables in contractum to variables to use in result of contraction)
+     * @return the sink after reception of the contracted subterm or null if contraction failed.
+     */
+    Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings);
 }

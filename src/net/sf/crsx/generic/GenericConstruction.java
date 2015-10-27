@@ -959,6 +959,43 @@ public abstract class GenericConstruction extends GenericTerm
 		return sink.end();
 	}
 
+	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
+	{
+		sink = sink.start(constructor().staticContract(valuation, renamings));
+		
+		final int arity = arity();
+		for (int i = 0; i < arity; ++i)
+		{
+			// Bindings for i'th subterm are those from the redex.
+			ExtensibleMap<Variable,Variable> innerRenamings = renamings;
+			Variable[] currentBinds = binders(i);
+			if (currentBinds.length > 0)
+			{
+				// Construct renamings for subterm construction.
+				Variable[] mappedBinds = new Variable[currentBinds.length];
+				for (int b = 0; b < currentBinds.length; ++b)
+				{
+					Variable currentVariable = currentBinds[b];
+					Variable renamedVariable = valuation.getVariable(currentVariable); // already allocated?
+					if (renamedVariable == null)
+					{
+					    // This is the normal case where fresh bound variables are needed - the above is merely to allow preallocation of all bound variables by Valuation. 
+					    renamedVariable = factory.makeVariable(currentVariable.name(), currentVariable.promiscuous(), currentVariable.blocking(), currentVariable.shallow());
+					}
+                    innerRenamings = innerRenamings.extend(currentVariable, renamedVariable);
+					mappedBinds[b] = renamedVariable;
+				}
+				sink = sink.binds(mappedBinds);
+			}
+			
+			// Copy subterm using the new bindings.
+			sink = ((Contractum) sub(i)).staticContract(sink, valuation, innerRenamings);
+		}
+		
+		return sink.end();
+		
+	}
+	
 	@Override
 	protected boolean occurs(String mvar, Unification unification) {
 		for (int i = 0; i < arity(); i++){

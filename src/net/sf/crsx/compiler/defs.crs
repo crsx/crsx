@@ -70,6 +70,7 @@ STRING_ENTRY ::=
 
 	NUM_VALUE[$Numeric];
     TEXT[Text];
+    TEXTS[$List[Text]];
 
     TERM[Reified_Term];
 	VARIABLE[Reified_Variable];
@@ -391,6 +392,8 @@ Var[#name] → %n⟪v« MANGLE[#name] »⟫ ;
 Literal[$String] :: Text;
 Literal[#literal] → %n⟪l« MANGLE[#literal] »⟫ ;
 
+Memo[$String] :: Text;
+Memo[#function] → %n⟪memo« MANGLE[#function] »⟫ ;
 
 // Spilled argument
 Spilled[Text /* sink */, $Numeric /* Original index of argument */] :: Text;
@@ -413,26 +416,21 @@ MetaVar2[STRING_VALUE[#Str]] → TOKEN[#Str];
 {#E}MetaVarArityNum[#name] → UnNumeric[$[{#E}Get[STRING_ENTRY], $[:,#name, "$arity"], NUM_VALUE[0]]];
 
 {$String:String}MetaVarArity[$String] :: Text;
-
 {#E}MetaVarArity[#name] → INTEGER[MetaVarArityNum[#name]];
 
 
 {$String:String}EventConstructor[$String] :: Text;
-
 EventConstructor[#name] → MANGLE[#name] ;
 
 // Test whether one of the binders is functional
 HasFunctionalBinders[Reified_Binder] :: $Boolean;
 
-HasFunctionalBinders[BINDER[#Promiscuity, KFUNCTION, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] →
-    $True
-;
+HasFunctionalBinders[BINDER[#Promiscuity, KFUNCTION, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] 
+→ $True;
 
--[Fresh[binder::Reified_Variable]]
-:
-HasFunctionalBinders[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] →
-    HasFunctionalBinders[#Binder[binder]]
-;
+-[Fresh[binder::Reified_Variable]]:
+HasFunctionalBinders[BINDER[#Promiscuity, KDATA, #Depth, #Sort, #Occurrences, binder.#Binder[binder]]] 
+→ HasFunctionalBinders[#Binder[binder]];
 
 HasFunctionalBinders[ARGUMENT[#Sort, #Term]] →
     $False
@@ -441,19 +439,15 @@ HasFunctionalBinders[ARGUMENT[#Sort, #Term]] →
 // Test whether one of the form argument binders  is functional
 HasFunctionalFormBinders[Reified_FormArgument] :: $Boolean;
 
-HasFunctionalFormBinders[FORM-BINDER[KFUNCTION, #Sort, v.#FormArgument[v]]] →
-    $True
-;
+HasFunctionalFormBinders[FORM-BINDER[KFUNCTION, #Sort, v.#FormArgument[v]]] 
+→ $True;
 
--[Fresh[v::Reified_Variable]]
-:
-HasFunctionalFormBinders[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]]] →
-    HasFunctionalFormBinders[#FormArgument[v]]
-;
+-[Fresh[v::Reified_Variable]]:
+HasFunctionalFormBinders[FORM-BINDER[KDATA, #Sort, v.#FormArgument[v]]]
+→ HasFunctionalFormBinders[#FormArgument[v]];
 
-HasFunctionalFormBinders[FORM-ARGUMENT[#Sort]] →
-    $False
-;
+HasFunctionalFormBinders[FORM-ARGUMENT[#Sort]]
+→ $False;
 
 // Move to the argument term
 MoveToTerm[Reified_Binder] :: Reified_Term;
@@ -474,6 +468,20 @@ HasProperties[PROPERTY-NOT[#key, #term]]       → $True;
 
 -[Fallback]:
 HasProperties[#term]                           → $False;
+
+// Add MetaVar cookie in environment
+∀ a .{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+AddMetaCookie[$String, STRING_ENTRY, ok :: OK_SORT.$sort[a]] :: a;
+
+{#env}AddMetaCookie[#metavar, #value, ok.#[ok]]
+→ {#env}AddMetaCookie2[$[:, "MetaVar$", #metavar], #value, ok.#[ok]];
+
+∀ a .{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+AddMetaCookie2[$String, STRING_ENTRY, ok :: OK_SORT.$sort[a]] :: a;
+
+-[Data[#cookie]]:
+{#env}AddMetaCookie2[#cookie, #value, ok.#[ok]]
+→ {#env; #cookie:#value}#[OK];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Check Reuse Utilities
@@ -522,8 +530,6 @@ Check-bound-hidden[FREE]        → $False;
 Check-bound-hidden[FRESH]       → $False;
 Check-bound-hidden[BOUND_FUN]   → $True;
 
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Primitives
 
@@ -535,7 +541,7 @@ SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; 
 				 E_IfDef; E_Show; E_Symbol; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
 				 E_Match; E_Call; E_TryCall; E_Cast; E_Pick; E_ReversePick; E_ListLength; E_Null; E_Nil; E_ForgivableError; E_StringEqual; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
                  E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_ParseText; E_Echo; E_DeepEqual; E_HashCode; E_ElapsedTime;
-                 E_ProfileEnter; E_ProfileExit;
+                 E_ProfileEnter; E_ProfileExit; E_Let; E_For;
 				);
 
 Primitive[$String] :: SPrimitive;
@@ -645,10 +651,12 @@ Primitive[#Primitive] →
     $[If, $[Equal, #Primitive, "ElapsedTime"],          E_ElapsedTime,
     $[If, $[Equal, #Primitive, "ProfileEnter"],         E_ProfileEnter,
     $[If, $[Equal, #Primitive, "ProfileExit"],          E_ProfileExit,
-	
+    $[If, $[Equal, #Primitive, "Let"],                  E_Let,
+    $[If, $[Equal, #Primitive, "For"],                  E_For,
+    
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 

@@ -234,6 +234,17 @@ void freeConstruction(Context context, Construction construction)
     crsxpFreeConstruction(context);
 }
 
+void addMemo(Context context, ConstructionDescriptor desc, Term term)
+{
+	addValueHS2(context, context->cterms, (const void*) desc, (void*) term);
+}
+
+Term memo(Context context, ConstructionDescriptor desc)
+{
+	Term t = (Term) getValueHS2(context->cterms, (const void*) desc);
+	return t ?  LINK(context, t) : t;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////
 // Predefined components for ConstructorDescriptors.
@@ -3597,6 +3608,8 @@ void initCRSXContext(Context context)
     context->fv_enabled = getenv("crsx-disable-fv") == NULL;
     context->functional = makeVariable(context, "f", 1, 0);
     context->functionalUse = makeVariableUse(context, context->functional);
+
+    context->cterms = makeHS2(context, 4, NULL, equalsPtr, hashPtr);
 
     context->indexThreshold = 100;
 

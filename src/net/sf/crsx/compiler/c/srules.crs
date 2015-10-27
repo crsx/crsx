@@ -31,6 +31,10 @@ int «MANGLE[#function]»(Sink «sink», ssize_t «count», NamedPropertyLink «
                                         "$Strict"      : YES;
                                         "$unstep"      : TEXT[%n⟨⟩];                                            // The unstep code. Built by SF-Arg.
                                         "$unstep-props": TEXT[%n⟨¶ADD_PROPERTIES(‹sink›, ‹namedP›, ‹varP›);⟩];  // The properties unstep code.
+                                        "$constant"    : YES;                                                    // Whether this function is constant. SF-Arg might invalidate the default assumption 
+                                        "$fallback"    : YES;                                                    // Whether to generate fallback
+                                        "$tail"        : YES; 
+                                        "$eval"        : YES;                             
                                         "$spilled"     : TEXT[%n⟨⟩];                                            // Spilled arguments (to allow TCO) 
                                      }
                                     SF-Arg[#Forms, $True, ok¹.SF-Body[ok¹, #kind, #Rules]] »⟫;
@@ -42,7 +46,7 @@ SF-function-extern[#function, (SORT-ALLOWS-VARIABLES; #Forms), #Sort]           
 SF-function-extern[#function, (SORT-SET[#Key, #Value, #Form]; #Forms), #Sort]   → SF-function-extern[#function, (#Form; #Forms), #Sort];
 
 SF-function-extern[#function, (FORM[#Constructor, #FormArguments]; #Forms), #Sort]
-→ %n⟪¶¶int « BinderOffsets[#function] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets-strict[#FormArguments, 0]] »};
+→ %n⟪¶int « BinderOffsets[#function] »[] = {0« DelayMapText[k o.%n⟨ , ‹ DINTEGER[k, o] ›⟩, FormArguments-binder-offsets-strict[#FormArguments, 0]] »};
 char *« NameFun[#function] »(Term term) { return (char *) « STRING[#function] »; }«SF-function-desc[#function, #Sort, #FormArguments]»⟫;
 
 SF-function-desc[$String, Reified_Sort, $List[Reified_FormArgument]] :: Text;
@@ -52,6 +56,20 @@ SF-function-desc[#function, SORT[#SortName,#SortArgs], #FormArguments]
 SF-function-desc[#function, SORT-VARIABLE[#SortVariable], #FormArguments] 
 → %n⟪¶struct _ConstructionDescriptor « Descriptor[#function] » = {NULL, 0, « INTEGER[Length[#FormArguments,0]] », sizeof(STRUCT« Struct[#function] »), « BinderOffsets[#function] », &« NameFun[#function] », « INTEGER[ArgCount[#FormArguments]] », (DStepFun) &«MANGLE[#function]»};⟫;
 
+SF-function-memo[$String, $Boolean] :: Text;
+
+SF-function-memo[#function, $True]  → %n⟪¶static int « Memo[#function] » = -1;⟫;
+SF-function-memo[#function, $False] → %n⟪⟫;
+
+
+SF-is-constant[$List[Reified_Form]] :: $Boolean;
+
+SF-is-constant[()]                                        → $True;
+SF-is-constant[(SORT-ALLOWS-VARIABLES; #Forms)]           → SF-is-constant[#Forms];
+SF-is-constant[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms)] → $False; 
+SF-is-constant[(FORM[#Constructor, ()];)]                 → $True;
+SF-is-constant[(FORM[#Constructor, (#a;#as)];)]           → $False;
+              
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GENERATE FUNCTION. STRICT MODE.
 //
@@ -67,7 +85,7 @@ SF-Arg[$List[Reified_Form], $Boolean<!-- Environment generated? -->, ok¹::OK_SO
 → {#env}SF-Arg[#Forms, #hasSortSet, ok¹.#[ok¹]];
 
 {#env}SF-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $True, ok¹.#[ok¹]] 
-→ {#env}SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]];
+→ {#env; "$constant": NO}SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]];
 
 -[Fresh[namedP::Text, varP::Text]]:
 {#env; "$unstep": TEXT[#unstep]; "$sink": VARIABLE[#sink];}
@@ -76,7 +94,8 @@ SF-Arg[(SORT-SET[#Sort1, #Sort2, #Form]; #Forms), $False, ok¹.#[ok¹]]
         {
             #env; 
             "$TopRef"       : PROPERTY_VARIABLE[namedP, varP]; 
-            "$unstep-props" : TEXT[%n⟨¶ADD_PROPERTIES(‹UnVariable[$[{#env}Get, "$sink"]]›, ‹namedP›, ‹varP›);⟩]
+            "$unstep-props" : TEXT[%n⟨¶ADD_PROPERTIES(‹UnVariable[$[{#env}Get, "$sink"]]›, ‹namedP›, ‹varP›);⟩];
+            "$constant"     : NO
         }
         SF-Arg[(#Form; #Forms), $True, ok¹.#[ok¹]]»⟫;
 
@@ -92,7 +111,7 @@ SF-TopArgs[OK_SORT, $List[Reified_FormArgument], $Numeric, ok¹::OK_SORT.Text] :
 → {#env}#[OK];
 
 {#env}SF-TopArgs[OK, (#arg; #args), #index, ok¹.#[ok¹]] 
-→ {#env}SF-TopArg[HasFunctionalFormBinders[#arg], #arg, #index, ok¹ index¹.SF-TopArgs[ok¹, #args, index¹, ok¹.#[ok¹]]];
+→ {#env; "$constant": NO}SF-TopArg[HasFunctionalFormBinders[#arg], #arg, #index, ok¹ index¹.SF-TopArgs[ok¹, #args, index¹, ok¹.#[ok¹]]];
 
 // if FormArgument contains at least one functional binder, generate a closure term. Otherwise, generate variable + term
 
@@ -187,19 +206,41 @@ Variable «binders»[«INTEGER[Length[(#binder;#binders), 0]]»] = {«#binder»�
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Body[OK_SORT, $String, $List[Reified_Rule]] :: Text;
 
-{#env; "$spilled":TEXT[#spilled]}
-SF-Body[OK, #kind, #Rules] 
+{#env; "$constant":#constant}
+SF-Body[OK, #kind, #rules] 
 →
 %n⟪)
-{⟦«#spilled»«
-    $[If, $[Equal, #kind, "Contract"],       {#env}SF-Contract[#Rules],
-    $[If, $[Equal, #kind, "BinderDispatch"], {#env}SF-Contract[#Rules], 
-    $[If, $[Equal, #kind, "Dispatch"],       {#env}SF-Dispatch[#Rules],  
-    $[If, $[Equal, #kind, "Shuffle" ],       {#env}SF-Contract[#Rules],
+{⟦«{#env}SF-Body1[#constant, #kind, #rules]»⟧
+}⟫;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-Body1[STRING_ENTRY, $String, $List[Reified_Rule]] :: Text;
+
+-[Fresh[isink::Text, m::Text]]:
+{#env; "$sink": VARIABLE[#sink]; "$function": STRING_VALUE[#function]}
+SF-Body1[YES, #kind, #rules]
+→
+%n⟪
+Term « m » =  memo(« #sink »->context, &« Descriptor[#function] »);
+if (!« m ») {⟦
+Sink « isink » = ALLOCA_BUFFER(« #sink »->context);« {#env; "$sink": VARIABLE[isink];"$fallback":NO; "$tail" : NO; "$eval":NO}SF-Body1[NO, #kind, #rules] »
+addMemo(« #sink »->context, &« Descriptor[#function] », BUFFER_TERM(« isink » ));
+FREE_BUFFER(« isink »);
+⟧
+}
+COPY(« #sink », memo(« #sink »->context, &« Descriptor[#function] »));
+return 1;
+⟫;
+
+{#env; "$spilled":TEXT[#spilled]}
+SF-Body1[NO, #kind, #rules] 
+→ %n⟪«#spilled»«
+    $[If, $[Equal, #kind, "Contract"],       {#env}SF-Contract[#rules],
+    $[If, $[Equal, #kind, "BinderDispatch"], {#env}SF-Contract[#rules], 
+    $[If, $[Equal, #kind, "Dispatch"],       {#env}SF-Dispatch[#rules],  
+    $[If, $[Equal, #kind, "Shuffle" ],       {#env}SF-Contract[#rules],
                                              %n⟨⟩]]]]
-»⟧
-}⟫
-;
+»⟫;
 
 /*
   Generate C function body. Contraction mode.
@@ -246,14 +287,17 @@ SF-Contract[(RULE[#name, #Options, #Pattern, #Contractum]; #Rules)]
   "$unstep"       : TEXT[#unstep];
   "$unstep-props" : TEXT[#unstep-props]; 
   "$function"     : STRING_VALUE[#function]; 
-  "$sink"         : VARIABLE[#sink]
+  "$sink"         : VARIABLE[#sink];
+  "$fallback"     : #fallback
 }SF-Contract[()]
-→ %n⟪
+→ $[If, $[Equal, #fallback, NO], 
+     %n⟪⟫, 
+     %n⟪
 
 /* Fallback */«#unstep-props»
 START(«#sink», «EventConstructor[#function]»);«#unstep»
 END(«#sink», «EventConstructor[#function]»); 
-return 0;⟫;
+return 0;⟫];
 
 /*
   Generate C function body. Dispatch mode.
@@ -1101,7 +1145,7 @@ SF-then-eval[OK, #term, #contractum, #sink]
 →
 %n⟪«SF-unlink-comment[#refs, #terms]»«{#env}SF-unlink-refs[#sink, #refs]»«{#env}SF-unlink-terms[#sink, #terms]»
 
-/* -- Contraction -- */«{#env; "$tail": YES}ST-then-send[OK, #contractum, #sink]»⟫;
+/* -- Contraction -- */«{#env}ST-then-send[OK, #contractum, #sink]»⟫;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

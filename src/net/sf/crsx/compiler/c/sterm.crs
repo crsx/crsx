@@ -51,32 +51,8 @@ ST-send[Reified_Term, Text] :: Text;
 {#env}ST-send[PROPERTY[LITERAL[#literal, #sort], #value, #term], #sink]                                     → {#env}ST-send[#term, #sink];
 {#env}ST-send[PROPERTY[$[NotMatch,VARIABLE-USE[#1],$[NotMatch,LITERAL[#2,#3],#Key]], #value, #term], #sink] → {#env}ST-send[#term, #sink];
 
-// TODO: the choice between or lazy should be done by placing a marker.
-// Currently only use strict evaluation for the top-level construction.
-
-ST-Send-Construction-Function-Strict:
-{
-    #env; 
-    "$tail"         : YES; 
-    "$pending-props" : #Pending
-}
-ST-send[CONSTRUCTION[KFUNCTION, #Symbol, #Binders], #sink] 
-→ 
-{#env; "$tail" : NO; "$pending-props" : NO}
-ST-set-properties[#Pending, (), #sink, ok¹ props¹.
-ST-set-binders[ok¹, #Binders, #sink, ok¹ vars¹.
-ST-eval-function[ok¹, YES, #Symbol, props¹, vars¹, #sink]]];
-
-// Lazy function 
-{#env; 
-  "$tail"          : NO; 
-  "$pending-props" : #pending}
-ST-send[CONSTRUCTION[KFUNCTION, #symbol, #binders], #sink]  // TODO: add a marker to force strict evaluation.
-→ %n⟪« 
-{#env; "$tail": NO; "$pending-props" : NO}ST-send-properties[#pending, #sink]  »
-START(«#sink», «EventConstructor[#symbol]»);⟦« 
-{#env; "$tail": NO; "$pending-props" : NO}ST-send-binders[#binders, #sink] »⟧
-END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[NO]»⟫;
+{#env}ST-send[CONSTRUCTION[KFUNCTION, #symbol, #binders], #sink] 
+→  {#env}ST-send-function[#symbol, #binders, #sink]; 
 
 ST-Send-Construction-Data:
 {#env; 
@@ -84,7 +60,7 @@ ST-Send-Construction-Data:
   "$pending-props" : #pending}
 ST-send[CONSTRUCTION[KDATA, #symbol, #binders], #sink] 
 → %n⟪«
-{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«{#env; "$tail": NO; "$pending-props": NO}ST-send-data[#symbol, #binders, #sink]»«ST-send-tail[#tail]»⟫;
+{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«{#env; "$tail": NO; "$pending-props": NO; "$eval":NO}ST-send-data[#pending, #symbol, #binders, #sink]»«ST-send-tail[#tail]»⟫;
 
 ST-Send-Literal:
 {#env;
@@ -96,7 +72,7 @@ ST-send[LITERAL[#literal, #sort], #sink]
 ST-Send-Variable:
 {#env}ST-send[VARIABLE-USE[#variable], #sink] 
 →
-{#env}ST-send-variable[Check-bound-hidden[$[{#env}Get, #variable, FRESH]], #variable, #sink];
+{#env}ST-send-variable[$[{#env}Get, #variable, FRESH], #variable, #sink];
 
 ST-Send-MetaApplication:
 {#env}ST-send[META-APPLICATION[#metavar, #arguments, #occ], #sink]
@@ -108,34 +84,63 @@ ST-Send-Evaluator: // TODO: check $PendingProps is NO
 →
 {#env; "$pending-props": NO}E-send[Primitive[#primitive], #terms, #options, #sink];
 
+
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-send-variable[$Boolean, Reified_Variable, Text] :: Text;
+ST-send-function[$String, $List[Reified_Binder], Text] :: Text;
+
+ST-Send-Construction-Function-Strict:
+{
+    #env; 
+    "$tail"          : YES;  // TODO: should rely on eval.
+    "$pending-props" : #Pending
+}
+ST-send-function[#Symbol, #Binders, #sink] 
+→ 
+{#env; "$tail" : NO; "$pending-props" : NO; "$eval": NO}
+ST-set-properties[#Pending, (), #sink, ok¹ props¹.
+ST-set-binders[ok¹, #Binders, #sink, ok¹ vars¹.
+ST-eval-function[ok¹, YES, #Symbol, props¹, vars¹, #sink]]];
+
+// Lazy function 
+{#env; 
+  "$tail"          : NO; 
+  "$pending-props" : #pending}
+ST-send-function[#symbol, #binders, #sink]  
+→ %n⟪« 
+{#env; "$tail": NO; "$pending-props" : NO}ST-send-properties[#pending, #sink]  »
+START(«#sink», «EventConstructor[#symbol]»);⟦« 
+{#env; "$tail": NO; "$pending-props" : NO}ST-send-binders[#binders, #sink] »⟧
+END(«#sink», «EventConstructor[#symbol]»);«ST-send-tail[NO]»⟫;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-send-variable[VARIABLE_ENTRY, Reified_Variable, Text] :: Text;
 
 {#env; "$tail": #tail} 
-ST-send-variable[$True, #variable, #sink] 
+ST-send-variable[BOUND_FUN, #variable, #sink] 
 →
 %n⟪¶USEF(«#sink»);«ST-send-tail[#tail]»⟫;
 
+-[Fallback]:
 {#env; "$tail": #tail} 
-ST-send-variable[$False, #variable, #sink] 
+ST-send-variable[#entry, #variable, #sink] 
 →
 %n⟪¶USE(«#sink», linkVariable(«#sink»->context, «#variable»));«ST-send-tail[#tail]»⟫;
 
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-send-data[$String, $List[Reified_Binder], Text] :: Text;
+ST-send-data[STRING_ENTRY, $String, $List[Reified_Binder], Text] :: Text;
 
-{#env}ST-send-data[#symbol, (), #sink]
+{#env}ST-send-data[NO, #symbol, (), #sink]
 → %n⟪
 COPY(«#sink», LINK(«#sink»->context, (Term) «Const[#symbol]»));⟫;
 
-{#env}ST-send-data[#symbol, (#binder; #binders), #sink]
+-[Fallback]:
+{#env}ST-send-data[#pending, #symbol, #binders, #sink]
 → %n⟪
 START(«#sink», «EventConstructor[#symbol]»);⟦« 
-{#env}ST-send-binders[(#binder; #binders), #sink] »⟧
+{#env}ST-send-binders[#binders, #sink] »⟧
 END(«#sink», «EventConstructor[#symbol]»);
 ⟫;
-
 
 ST-send-tail[STRING_ENTRY] :: Text;
 
@@ -594,7 +599,107 @@ $[If, $[Equal, #use, 1], %n⟪
 UNLINK_NamedPropertyLink(«#sink»->context, «#namedP»); 
 UNLINK_VariablePropertyLink(«#sink»->context, «#varP»);⟫, %n⟪⟫];
 
+// Determine whether meta is copied.
 
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied[$String, $List[Reified_Binder]] :: $Boolean;
+
+{#env}ST-is-copied[#metavar, #binders] 
+→ {#env}ST-is-copied0[$[{#env}Get[STRING_ENTRY], $[:, "MetaVar$", #metavar]], #metavar, #binders];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied0[STRING_ENTRY, $String, $List[Reified_Binder]] :: $Boolean;
+
+// Case 1: top-level meta-variable. Copy or Substitute
+-[Free[var::Reified_Variable]] :
+{#env; var: ARG[#Index, $True]}   
+ST-is-copied0[VARIABLE[var], #metavar, #arguments] 
+→ {#env}ST-is-copied-sub[#metavar, #arguments];
+
+// Case 2: top-level closure. Either invoke or copy.
+-[Free[var::Reified_Variable]] :
+{#env; var: ARG[#Index, $False]} 
+ST-is-copied0[VARIABLE[var], #metavar, #arguments] 
+→ {#env}ST-is-copied-call[var, #metavar, #arguments];
+
+// Case 3: sub meta-variable.. 
+-[Free[var::Reified_Variable]]:
+{#env; var:SUB[#parent, #i, #linked, $True]} // Sub data term. Copy or Substitute
+ST-is-copied0[VARIABLE[var], #metavar, #arguments] 
+→ {#env}ST-is-copied-sub[#metavar, #arguments];
+
+// Case 4: sub closure
+-[Free[var::Reified_Variable]]:
+{#env; var: SUB[#parent, #i, $True, $False]} // Sub function.  
+ST-is-copied0[VARIABLE[var], #metavar, #arguments]
+→ {#env}ST-is-copied-call[var, #metavar, #arguments];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied-sub[$String, $List[Reified_Binder]] :: $Boolean;
+
+{#env}ST-is-copied-sub[#metavar, ()] → $True;
+
+// The meta variable has arguments. Analyze whether substitution is needed.
+{#env}ST-is-copied-sub[#metavar, (#argument1; #arguments)] 
+→ {#env}ST-is-copied-sub2[#metavar, (#argument1; #arguments)];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied-sub2[$String, $List[Reified_Binder]] :: $Boolean;
+
+// Process substitution argument.
+{#env}ST-is-copied-sub2[#metavar, (ARGUMENT[#sort, #term]; #arguments)] 
+→ {#env}ST-is-copied-sub3[{#env} T-CheckReuse[#term], #metavar, #arguments];
+
+// Generate COPY instruction for explicit substitution.
+{#env}ST-is-copied-sub2[#metavar, ()]  → $True; 
+
+// Skip reusable substitution component.
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied-sub3[T_REUSE_SORT, $String, $List[Reified_Binder] ] :: $Boolean;
+
+{#env}ST-is-copied-sub3[T_REUSE, #metavar,#arguments]
+→ {#env}ST-is-copied-sub2[#metavar, #arguments];
+
+// Generate non-explicit substitution setup for argument.
+{#env}ST-is-copied-sub3[T_NO_REUSE, #metavar, #arguments] → $False;
+
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied-call[Text, $String, $List[Reified_Binder]] :: $Boolean;
+
+// Closure without arguments. Not possible.
+{#env}ST-is-copied-call[#closure, #metavar, ()] 
+→ $[Error, "Internal error: closure without arguments"];
+
+// The meta variable has arguments.  Analyze whether call is needed.
+{#env}ST-is-copied-call[#closure, #metavar, (#argument1; #arguments)] 
+→ {#env}ST-is-copied-call1[#closure, #metavar, (#argument1; #arguments)]; 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied-call1[Text, $String, $List[Reified_Binder]] :: $Boolean;
+
+// Done. Can copy
+{#env}ST-is-copied-call1[#closure, #metavar, ()] → $True;
+
+// Process call argument.
+{#env}ST-is-copied-call1[#closure, #metavar, (ARGUMENT[#sort, VARIABLE-USE[#y]]; #arguments)] 
+→ {#env}ST-is-copied-call1-var[$[{#env}Get, #y], #closure, #metavar, (ARGUMENT[#sort, VARIABLE-USE[#y]]; #arguments)];
+
+// Not a variable: need to invoke closure
+-[Fallback]:
+{#env}ST-is-copied-call1[#closure, #metavar, #arguments] → $False; 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-is-copied-call1-var[VARIABLE_ENTRY, Text, $String, $List[Reified_Binder]] :: $Boolean;
+
+// A functional binder.. continue.
+{#env}ST-is-copied-call1-var[BOUND_FUN, #closure, #metavar, (#argument1; #arguments)]
+→ {#env}ST-is-copied-call1[#closure, #metavar, #arguments];
+
+// Something else... invoke.
+-[Fallback]:
+{#env}ST-is-copied-call1-var[#entry, #closure, #metavar, #arguments] → $False;
+ 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to call or copy a closure
 
@@ -1000,7 +1105,8 @@ ST-analyze-binders1[#Binder[new], sink, $[Plus, #index, 1], #state, ok¹ vars.#[
 // Generate code to capture copy of term to new variable.
 //
 
-{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-to[Reified_Term, Text, var::Text.Text] :: Text;
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-to[Reified_Term, Text, var::Text.Text] :: Text;
 
 // Literals can be created directly.
 -[Fresh[literal::Text]] :
@@ -1020,20 +1126,23 @@ ST-analyze-binders1[#Binder[new], sink, $[Plus, #index, 1], #state, ok¹ vars.#[
     %n⟨¶Term «variable» = LINK(«#sink»->context, «{#env}MetaVar[#metavar]»);« {#env}#[variable] »⟩];
 
 {#env}ST-set-to[META-APPLICATION[#metavar, (#binder; #binders), #use], #sink, var.#[var]] 
-→ {#env}ST-set-buffer-to[META-APPLICATION[#metavar, (#binder; #binders), #use], #sink, var.#[var]];
-
+→ {#env}ST-set-to-meta[{#env}ST-is-copied[#metavar, (#binder; #binders)], #metavar, (#binder; #binders), #use, #sink, var.#[var]];
+ 
 // Constant data construction with no properties: just assign
 -[Fresh[variable::Text]]:
 {#env}ST-set-to[CONSTRUCTION[KDATA, #symbol, ()], #sink, var.#[var]] 
 → %n⟪
 Term «variable» = LINK(«#sink»->context, (Term) «Const[#symbol]»);« {#env}#[variable] »⟫;
 
+{#env}ST-set-to[VARIABLE-USE[#Variable],  #sink, var.#[var]] 
+→ {#env}ST-set-to-use[$[{#env}Get[VARIABLE_ENTRY], #Variable, FRESH], #Variable, #sink, var.#[var]];
+
 // Proper term cases require buffering.
 {#env}ST-set-to[PROPERTY-REF[#Ref, #Use, #Term],       #sink, var.#[var]] → {#env}ST-set-buffer-to[PROPERTY-REF[#Ref, #Use, #Term],       #sink, var.#[var]];
 {#env}ST-set-to[PROPERTY[#Key, #Value, #Term],         #sink, var.#[var]] → {#env}ST-set-buffer-to[PROPERTY[#Key, #Value, #Term],         #sink, var.#[var]];
 {#env}ST-set-to[PROPERTY-NOT[#Key, #Term],             #sink, var.#[var]] → {#env}ST-set-buffer-to[PROPERTY-NOT[#Key, #Term],             #sink, var.#[var]];
-{#env}ST-set-to[VARIABLE-USE[#Variable],               #sink, var.#[var]] → {#env}ST-set-buffer-to[VARIABLE-USE[#Variable],               #sink, var.#[var]];
 {#env}ST-set-to[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, var.#[var]] → {#env}ST-set-buffer-to[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, var.#[var]];
+
 
 // Helper to set term variable using temporary buffer.   
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}ST-set-buffer-to[Reified_Term, Text, var::Text.Text] :: Text;
@@ -1051,6 +1160,27 @@ Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env}ST-then-send[OK, #term
 FREE_BUFFER(«buf»);⟧
 }«{#env}#[variable]»⟫
 ;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-to-meta[$Boolean, $String, $List[Reified_Binder], Reified_Use, Text, var::Text.Text] :: Text;
+
+{#env}ST-set-to-meta[$True, #metavar, #binders, #use, #sink, var.#[var]]
+→ {#env}ST-set-to[META-APPLICATION[#metavar, (), #use], #sink, var.#[var]];
+
+{#env}ST-set-to-meta[$False, #metavar, #binders, #use, #sink, var.#[var]]
+→ {#env}ST-set-buffer-to[META-APPLICATION[#metavar, #binders, #use], #sink, var.#[var]];
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-to-use[VARIABLE_ENTRY, Reified_Variable, Text , var::Text.Text] :: Text;
+
+-[Fresh[use::Text]]:
+{#env}ST-set-to-use[BOUND_FUN, #variable, #sink, var.#[var]] 
+→ %n⟪¶Term «use» = LINK(«#sink»->context, (Term) «#sink»->context->functionalUse);«{#env}#[use]»⟫;
+
+-[Fallback, Fresh[use::Text]]:
+{#env}ST-set-to-use[#entry, #variable, #sink, var.#[var]] 
+→ %n⟪¶Term «use» = (Term) makeVariableUse(«#sink»->context, linkVariable(«#sink»->context, «#variable»));«{#env}#[use]»⟫;
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture copy of term (actual copy or by reference) to an existing variable.
@@ -1078,15 +1208,10 @@ ST-set[META-APPLICATION[#metavar, (), USE[#count]], #sink, #variable]
 $[If, $[Equal, #count, 1], 
     %n⟪¶«#variable» = «{#env}MetaVar[#metavar]»;⟫,
     %n⟪¶«#variable» = LINK(«#sink»->context, «{#env}MetaVar[#metavar]»);⟫
-] 
-;
+] ;
 
--[Fallback]
-:
-{#env}ST-set[META-APPLICATION[#metavar, #binders, #use], #sink, #variable] 
-→ 
-{#env}ST-set-buffer[META-APPLICATION[#metavar, #binders, #use], #sink, #variable]
-;
+{#env}ST-set[META-APPLICATION[#metavar, (#binder;#binders), #use], #sink, #variable] 
+→  {#env}ST-set-meta[{#env}ST-is-copied[#metavar, (#binder; #binders)], #metavar, (#binder; #binders), #use, #sink, #variable]; 
 
 // Proper term cases require buffering.
 {#env}ST-set[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] → {#env}ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] ;
@@ -1108,8 +1233,16 @@ ST-set-buffer[#Term, #sink, #variable]
 Sink «buf» = ALLOCA_BUFFER(«#sink»->context);« {#env; "$tail":NO}ST-then-send[OK, #Term, buf] »
 «#variable» = BUFFER_TERM(«buf»);
 FREE_BUFFER(«buf»);⟧
-}⟫
-;
+}⟫;
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-meta[$Boolean, $String, $List[Reified_Binder], Reified_Use, Text, Text] :: Text;
+
+{#env}ST-set-meta[$True, #metavar, #binders, #use, #sink, #variable]
+→ {#env}ST-set[META-APPLICATION[#metavar, (), #use], #sink, #variable];
+
+{#env}ST-set-meta[$False, #metavar, #binders, #use, #sink, #variable]
+→ {#env}ST-set-buffer[META-APPLICATION[#metavar, #binders, #use], #sink, #variable];
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

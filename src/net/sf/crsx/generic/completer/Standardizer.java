@@ -196,8 +196,10 @@ final public class Standardizer
 					        term.sub(i), metaVariablePositions, variablePositions, setMetaVariableArgs, varSubstitution, contextPos
 					                + subPosition(i, args.length), explicitMeta, bound, rule, sorts, keysorts, left, belowSemantic);
 				if (!metaVariablePositions.containsKey(term.metaVariable()))
-					//factory.env.error("Unbound meta-application "+term+" used in rule "+rule.name());
-					metaVariablePositions.put(term.metaVariable(), "un" + metaVariablePositions.size());
+				{
+					// This can only be a meta declaration in the contraction.
+					metaVariablePositions.put(term.metaVariable(), "C" + metaVariablePositions.size());
+				}
 				ret = factory.newMetaApplication("#" + metaVariablePositions.get(term.metaVariable()), args);
 				break;
 			}

@@ -251,7 +251,7 @@ public class Simplifier
 
 				boolean hasFunctionalBinders = hasFunctionalBinders(binders);
 
-				// If no functional binders, never rewrite.
+				// If no functional binders, never rewrite. 
 				if (hasFunctionalBinders)
 				{
 					final boolean isSingleVariable = sub.variable() != null; // id function. 
@@ -644,8 +644,8 @@ public class Simplifier
 					Variable[] patternBindersSort;
 
 					// Only the meta on pattern contains the full list arguments.  
-					GenericTerm original = env.rule.getMetaOnPattern(term.metaVariable());
-					final int arity = original.arity();
+					GenericTerm original = env.rule.getMetaOnPattern(term.metaVariable()); // can be null if meta is defined in primitive. Does not support high-order (yet)
+					final int arity = original == null ? 0 : original.arity(); 
 					if (arity > 0)
 					{
 						patternBinders = new Variable[arity];

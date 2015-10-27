@@ -1,0 +1,15 @@
+Test[(
+
+$Lax;
+
+// Non tuple list item, param and item used.
+
+Test :: $Numeric;
+Test → $[For, #num, (1; 4; 5;), #sum, 0, Plus[#sum, #num], #sum];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]]: Plus[#1, #2] → $[Plus, #1, #2];
+
+
+
+)]

@@ -1,0 +1,14 @@
+Test[(
+
+$Lax;
+
+$Use["org/crsx/common.crs"];
+
+// List of tuples. param and item used.
+
+Test :: $List[$Numeric];
+
+Test → $[For, Tuple2[#num1, #num2], (Tuple2[1, 2]; Tuple2[3, 4];), #unzip, (), (#num1; #num2; #unzip), #unzip];
+
+
+)]

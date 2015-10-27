@@ -2172,6 +2172,12 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 		////System.out.println("DONE");
 		return sink;
 	}
+	
+	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
+	{
+		return null;
+	}
+
 
 	@Override
 	public void appendTermTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean outer, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException

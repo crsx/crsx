@@ -1,0 +1,15 @@
+Test[(
+
+$Lax;
+
+$Use["org/crsx/common.crs"];
+
+Test :: $List[$Numeric];
+
+// List of tuples. Discard one parameter in #return
+
+Test → $[For, Tuple2[#num1, #num2], (Tuple2[2, 4]; Tuple2[6, 7];),
+               Tuple2[#unzip, #unsused], Tuple2[(), ()], 
+          Tuple2[(#num1; #num2; #unzip), #unsused], #unzip];
+
+)]

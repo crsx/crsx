@@ -1,0 +1,20 @@
+Test[(
+
+$Lax;
+
+// Outer meta used in loop.
+
+Test :: $Numeric;
+Test → Test2[5, 10];
+
+Test2[$Numeric, $Numeric] :: $Numeric;
+
+Test2[#init, #constant] 
+→ $[For, #value, (3; 5; 8;), #acc, #init, 
+    Plus[#value, Plus[#acc, #constant]],
+    #acc];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]]: Plus[#1, #2] → $[Plus, #1, #2];
+
+)]

@@ -159,8 +159,8 @@ E-OptionDiscard2[Text, STRING_ENTRY] :: Text;
 
 E-OptionDiscard2[#sink, VARIABLE[#term]]             
 → 
-%n⟪ UNLINK(«#sink»->context, «#term»); ⟫
-;
+%n⟪
+UNLINK(«#sink»->context, «#term»); ⟫;
 
 E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#namedP, #varP]] 
 → 
@@ -2080,6 +2080,8 @@ POLY_PRIMITIVE[E_VariableNameIs];
 POLY_PRIMITIVE[E_Echo];
 POLY_PRIMITIVE[E_ProfileEnter];
 POLY_PRIMITIVE[E_ProfileExit];
+POLY_PRIMITIVE[E_Let];
+POLY_PRIMITIVE[E_For];
 
 )];
 
@@ -2244,6 +2246,18 @@ Poly-Trace-None:
 →
 {#env}#Tail[OK,#Result]
 ;
+
+// $[Let, #metavar, #value, #return]
+Poly-Let[Fresh[value::Text]]:
+{#env} E-poly[E_Let, (#name; #vars; #value; #result;), #options, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+Term «value»;« {#env; "$tail": NO} T-set[#value, #sink, value] »
+«value» = NORMALIZEP(«#sink»->context, «value»);« {#env}E-poly-let[#vars, value, #result, #sink, ok result.#tail[ok,result]] »⟫;
+
+// $[For, #metavar, #list, #params, #initvalues, #body, #return]
+Poly-For:
+{#env} E-poly[E_For, (#name; #vars; #list; #params; #init; #body; #result;), #options, #sink, ok result.#tail[ok,result]]
+→ {#env}E-poly-for[#vars, #list, #params, #init, #body, #result, #options, #sink, ok result.#tail[ok,result]];
 
 )];
 
@@ -2413,7 +2427,6 @@ Poly-IfDef-Global[Fresh[value::Text]]
 «p»if («value») {⟦ «{#env}E-OptionsUnlink[#sink, #O3] »«{#env}#Tail[OK,#Yes] » ⟧}
 else {⟦ «{#env}E-optional[#Nos, #O4, #sink, ok no.#Tail[ok,no]]» ⟧}⟧
 }⟫];
-
 // $[VariableNameIs, #var, #name, #result] updates the variable name of #var to #name, then returns #result.
 //
 
@@ -2690,12 +2703,289 @@ Poly-Echo:
 
 E3[(
 
+
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-eval[SPrimitive, $List[Reified_Term], $List[$List[Reified_Option]], Text] :: Text;
 
 Null-eval:             {#env}E-eval[E_Null, (#Name;), #Options, #sink] → %n⟪⟫ ;
 
-)];
+// Let
 
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-let[Reified_Term, Text, Reified_Term, Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-let[META-APPLICATION[#metavar, (), #use], #value, #result, #sink, ok result.#tail[ok,result]]
+→ {#env; #value : ARG[0, $True]}AddMetaCookie[#metavar, VARIABLE[#value], ok.#tail[ok, #result]];
+
+{#env}E-poly-let[CONSTRUCTION[KDATA, #symbol, #binders], #value, #result, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+if («INTEGER[Length[#binders, 0]]» != ARITY(«#value»))⟦
+   ERRORF(«#sink»->context, Crsx, "Invalid value encountered while deconstructing let\n");⟧«
+{#env}E-poly-let-deconstruct[OK, #binders, #value, 0, #result, #sink, ok result.#tail[ok,result]]»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-let-deconstruct[OK_SORT, $List[Reified_Binder], Text, $Numeric, Reified_Term, Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-let-deconstruct[OK, (), #value, #index, #result, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+UNLINK(«#sink»->context, «#value»);«{#env}#tail[OK, #result]»⟫;
+
+-[Fresh[sub::Text]]:
+{#env}E-poly-let-deconstruct[OK, (ARGUMENT[#sort, META-APPLICATION[#metavar, (), #use]]; #binders), #value, #index, #result, #sink, ok result.#tail[ok,result]]
+→ $[If, $[Equal, #use, DISCARD],  
+     {#env}E-poly-let-deconstruct[OK, #binders, #value, $[Plus, #index, 1], #result, #sink, ok result.#tail[ok,result]],
+     %n⟪
+Term «sub» = LINK(«#sink»->context, SUB(«#value», «INTEGER[#index]»));«
+{#env; sub : ARG[#index, $True]}AddMetaCookie[#metavar, VARIABLE[sub], ok.E-poly-let-deconstruct[ok, #binders, #value, $[Plus, #index, 1], #result, #sink, ok result.#tail[ok,result]]]»⟫];
+
+// --- For
+
+// TODO: generate lazy evaluation.  
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for[Reified_Term, Reified_Term, Reified_Term, Reified_Term, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+-[Fresh[list::Text]]:
+{#env}E-poly-for[#vars, #list, #params, #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+Term «list»;« {#env; "$tail": NO} T-set[#list, #sink, list] »
+«list» = NORMALIZEP(«#sink»->context, «list»);«{#env; "$params": TEXTS[()]}E-poly-for-init[#vars, list, #params, #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init[Reified_Term, Text, Reified_Term, Reified_Term, Reified_Term, Reified_Term,  $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-init[#vars, #list, #params, CONSTRUCTION[#kind2, #symbol2, #args2], #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[StartsWith, #symbol2, "Tuple"],
+     {#env}E-poly-for-init-static1[#vars, #list, #params, #args2, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+     {#env}E-poly-for-init1[#vars, #list, #params, CONSTRUCTION[#kind2, #symbol2, #args2], #body, #result, #options,#sink, ok result.#tail[ok,result]]];
+
+-[Fallback]:
+{#env}E-poly-for-init[#vars, #list, #params, #init, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env}E-poly-for-init1[#vars, #list, #params, #init, #body, #result, #options,#sink, ok result.#tail[ok,result]];
+
+// Static Tuple. Optimize out
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init-static1[Reified_Term, Text, Reified_Term, $List[Reified_Binder], Reified_Term, Reified_Term,  $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-init-static1[#vars, #list, CONSTRUCTION[#kind, #symbol, #args], #args2, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[StartsWith, #symbol, "Tuple"], 
+        {#env; "$tplparams": YES}E-poly-for-init-static2[OK, #vars, #list, #args, #args2, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+        $[Error, "Invalid $[For parameter: must be of the form TupleN[...] or #"]];
+
+-[Fallback]:
+{#env}E-poly-for-init-static1[#vars, #list, #init, #args2, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[Error, "Invalid $[For parameter: must be of the form TupleN[...] or #"];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init-static2[OK_SORT, Reified_Term, Text, $List[Reified_Binder], $List[Reified_Binder], Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-init-static2[OK, #vars, #list, (), (), #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env}E-poly-for-binder[OK, #vars, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]];
+
+-[Fresh[term::Text]]:
+{#env}E-poly-for-init-static2[OK, #vars, #list, (ARGUMENT[#sort, META-APPLICATION[#metavar, (), #use]]; #binders), (ARGUMENT[#sort2, #term]; #binders2), #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[Equal, #use, DISCARD], // The param is just an unused meta variable. Don't bother computing the initial value.
+    {#env}E-poly-for-init-static3[#metavar, term, $False, #vars, #list, #binders, #binders2, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+    %n⟪
+Term «term»;« {#env; "$tail": NO} T-set[#term, #sink, term] »«
+{#env}E-poly-for-init-static3[#metavar, term, $True, #vars, #list, #binders, #binders2, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫];
+
+-[Fallback]:
+{#env}E-poly-for-init-static2[OK, #vars, #list, #binder, #binders2, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[Error, "Initialization parameters in $[For primitive have does not match the number of initialization values"];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init-static3[$String, Text, $Boolean, Reified_Term, Text, $List[Reified_Binder], $List[Reified_Binder], Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env; "$params":TEXTS[#params]}E-poly-for-init-static3[#metavar, #term, #linked, #vars, #list, #binders, #binders2, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env; #term : SUB[#term, 0, #linked, $True]; "$params":TEXTS[Append[#params, (#term;)]]
+  }AddMetaCookie[#metavar, VARIABLE[#term], ok.
+   E-poly-for-init-static2[ok, #vars, #list, #binders, #binders2, #body, #result, #options, #sink, ok result.#tail[ok,result]]];
+
+// Non static value/tuple. Evaluate and extract (if used)
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init1[Reified_Term, Text, Reified_Term, Reified_Term, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+// Case where parameter is just a metavar. If not used (most unlikely), then don't compute initial value.
+-[Fresh[init::Text]]:
+{#env}E-poly-for-init1[#vars, #list, META-APPLICATION[#metavar, (), #use], #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[Equal, #use, DISCARD], // The param is just an unused meta variable. Don't bother computing the initial value.
+     {#env}E-poly-for-init2[#vars, #list, META-APPLICATION[#metavar, (), #use], init, $False, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+     {#env}E-poly-for-init1a[#vars, #list, META-APPLICATION[#metavar, (), #use], #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]]];
+
+-[Fallback]:
+{#env}E-poly-for-init1[#vars, #list, #args, #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env}E-poly-for-init1a[#vars, #list, #args, #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init1a[Reified_Term, Text, Reified_Term, Reified_Term, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+-[Fresh[init::Text]]:
+{#env}E-poly-for-init1a[#vars, #list, #args, #inits, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+Term «init»;« {#env; "$tail": NO} T-set[#inits, #sink, init] »
+«init» = NORMALIZEP(«#sink»->context, «init»);«{#env}E-poly-for-init2[#vars, #list, #args, init, $True, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init2[Reified_Term, Text, Reified_Term, Text, $Boolean, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+// Case where parameter is just a metavar  
+{#env}E-poly-for-init2[#vars, #list, META-APPLICATION[#metavar, (), #use], #init, #linked, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env; #init : SUB[#init, 0, #linked, $True]; "$tplparams": NO; "$params":TEXTS[(#init;)]}AddMetaCookie[#metavar, VARIABLE[#init], ok.E-poly-for-binder[OK, #vars, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]];
+
+// Case where parameter is dynamic Tuple... extract.
+{#env}E-poly-for-init2[#vars, #list, CONSTRUCTION[#kind, #symbol, #args], #init, #linked, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ %n⟪ if («INTEGER[Length[#args, 0]]» != ARITY(«#init»))⟦
+   ERRORF(«#sink»->context, Crsx, "Invalid value encountered while initializing for parameters\n");⟧«
+{#env; "$tplparams": YES}E-poly-for-init3[OK, #vars, #list, #args, #init, 0, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init3[OK_SORT, Reified_Term, Text, $List[Reified_Binder], Text, $Numeric, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-init3[OK, #vars, #list, (), #init, #index, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+UNLINK(«#sink»->context, «#init»);«{#env}E-poly-for-binder[OK, #vars, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫;
+
+-[Fresh[sub::Text]]:
+{#env}E-poly-for-init3[OK, #vars, #list, (ARGUMENT[#sort, META-APPLICATION[#metavar, (), #use]]; #args), #init, #index, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[Equal, #use, DISCARD], // Not used.
+    {#env}E-poly-for-init4[#metavar, sub, $False, #vars, #list, #args, #init, $[Plus, #index, 1], #body, #result, #options, #sink, ok result.#tail[ok, result]],
+    %n⟪
+Term «sub» = LINK(«#sink»->context, SUB(«#init», «INTEGER[#index]»));«
+{#env}E-poly-for-init4[#metavar, sub, $True, #vars, #list, #args, #init, $[Plus, #index, 1], #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-init4[$String, Text, $Boolean, Reified_Term, Text, $List[Reified_Binder], Text, $Numeric, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env; "$params":TEXTS[#params]}E-poly-for-init4[#metavar, #sub, #linked, #vars, #list, #args, #init, #index, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env; #sub : SUB[#sub, #index, #linked, $True]; "$params":TEXTS[Append[#params, (#sub;)]]
+  }AddMetaCookie[#metavar, VARIABLE[#sub], ok.
+   E-poly-for-init3[ok, #vars, #list, #args, #init, $[Plus, #index, 1], #body, #result, #options, #sink, ok result.#tail[ok,result]]];
+
+// Generate binder declarations
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-binder[OK_SORT, Reified_Term, Text, Reified_Term, Reified_Term,  $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-binder[OK, CONSTRUCTION[#kind, #symbol, #args], #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[StartsWith, #symbol, "Tuple"], 
+        {#env}E-poly-for-binder-static[OK, (), #args, 0, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+        $[Error, "Invalid $[For binder: must be of the form TupleN[...] or #"]];
+
+-[Fresh[item::Text]]:
+{#env}E-poly-for-binder[OK, META-APPLICATION[#metavar, (), #use], #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[Equal, #use, DISCARD], // case where binder is not used in body and return. Optimize out.
+    {#env}E-poly-for-binder1[#metavar, item, $False, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+    %n⟪
+Term «item» = (Term) «Const["$True"]»; /* dummy */«{#env}E-poly-for-binder1[#metavar, item, $True, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-binder1[$String, Text, $Boolean, Text, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-binder1[#metavar, #item, #linked, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env; #item : SUB[#item, 0, #linked, $True]
+  }AddMetaCookie[#metavar, VARIABLE[#item], ok.
+   E-poly-for-loop[ok, $False, (#item;), #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]];
+
+// Deconstruct tuple.
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-binder-static[OK_SORT, $List[Text], $List[Reified_Binder], $Numeric, Text, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-binder-static[OK, #vars, (), #index, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env}E-poly-for-loop[OK, $True, #vars, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]];
+
+-[Fresh[subitem::Text]]:
+{#env}E-poly-for-binder-static[OK, #vars, (ARGUMENT[#sort, META-APPLICATION[#metavar, (), #use]]; #args), #index, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ $[If, $[Equal, #use, DISCARD],
+    {#env}E-poly-for-binder-static1[#metavar, subitem, $False, #vars, #args, #index, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]],
+    %n⟪
+Term «subitem» = (Term) «Const["$True"]»; /* dummy */«
+{#env}E-poly-for-binder-static1[#metavar, subitem, $True, #vars, #args, #index, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]»⟫];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-binder-static1[$String, Text, $Boolean, $List[Text], $List[Reified_Binder], $Numeric, Text, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-for-binder-static1[#metavar, #subitem, #linked, #vars, #args, #index, #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]
+→ {#env; #subitem : SUB[#subitem, #index, #linked, $True]
+  }AddMetaCookie[#metavar, VARIABLE[#subitem], ok.
+   E-poly-for-binder-static[ok, Append[#vars, (#subitem;)], #args, $[Plus, #index, 1], #list, #body, #result, #options, #sink, ok result.#tail[ok,result]]];
+
+// Generate loop
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-loop[OK_SORT, $Boolean, $List[Text], Text, Reified_Term, Reified_Term, $List[$List[Reified_Option]], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+-[Fresh[item::Text, next::Text]]:
+{#env}E-poly-for-loop[OK, #istuple, #vars, #list, #body, #result, (#o0; #o1; #o2; #o3; #o4; #ob; #or;), #sink, ok result.#tail[ok,result]]
+→ %n⟪
+while (&«Descriptor["$Cons"]» == DESCRIPTOR(«#list»)) {⟦
+/* Extract item from list */
+Term «item» = LINK(«#sink»->context, SUB(«#list», 0)); 
+Term «next» = LINK(«#sink»->context, SUB(«#list», 1));
+UNLINK(«#sink»->context, «#list»);
+«#list» = «next»;
+/* bind new list item */«{#env}E-poly-for-update[#istuple, $True, #vars, item, (#o0; #o1; #o2; #o3; #o4; #ob; #or;), #sink]»«{#env}E-poly-for-body[#body, (#o0; #o1; #o2; #o3; #o4; #ob; #or;), #sink]»⟧
+}
+UNLINK(«#sink»->context, «#list»);«{#env}E-OptionsUnlink[#sink, #or]»«{#env}#tail[OK, #result]»⟫;
+
+// Update variables or parameter values.
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-update[$Boolean /* is tuple? */, $Boolean /* is variable? */, $List[Text], Text, $List[$List[Reified_Option]], Text] :: Text;
+
+// Don't deconstruct tuple. variable is not used.
+{#env; #item: SUB[#parent, #index, $False, #isterm]}E-poly-for-update[$False, #isvar, (#item;), #newitem, #options, #sink]
+→ $[If, #isvar, 
+    %n⟪⟫, // has been discarded earlier
+    %n⟪
+UNLINK(«#sink»->context, «#newitem»);⟫]; 
+
+// Don't deconstruct tuple. value is  used.
+{#env; #item: SUB[#parent, #index, $True, #isterm]}E-poly-for-update[$False, #isvar, (#item;), #newitem, #options, #sink]
+→ %n⟪
+«#item» = «#newitem»;⟫;
+
+// deconstruct tuple
+{#env}E-poly-for-update[$True, #isvar, (#item; #items), #newtuple, #options, #sink]
+→ %n⟪«{#env}E-poly-for-unlink-vars[(#item; #items), #isvar, #sink]»«{#env}E-poly-for-update-tuple[0, (#item; #items), #newtuple, #sink]»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-update-tuple[$Numeric, $List[Text], Text, Text] :: Text;
+
+{#env}E-poly-for-update-tuple[#index, (), #newtuple, #sink]
+→ %n⟪
+UNLINK(«#sink»->context, «#newtuple»);⟫;
+
+{#env; #item: SUB[#parent, #index, $False, #isterm]}E-poly-for-update-tuple[#index, (#item; #items), #newtuple, #sink]
+→ {#env}E-poly-for-update-tuple[$[Plus, #index, 1], #items, #newtuple, #sink];
+
+{#env; #item: SUB[#parent, #index, $True, #isterm]}E-poly-for-update-tuple[#index, (#item; #items), #newtuple, #sink]
+→ %n⟪
+«#item» = LINK(«#sink»->context, SUB(«#newtuple», «INTEGER[#index]»));«{#env}E-poly-for-update-tuple[$[Plus, #index, 1], #items, #newtuple, #sink]»⟫;
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-unlink-vars[$List[Text], $Boolean, Text] :: Text;
+
+{#env}E-poly-for-unlink-vars[(), #isvar, #sink]        
+→ %n⟪⟫;
+
+{#env; #b: SUB[#parent, #index, $False, #isterm]}E-poly-for-unlink-vars[(#b; #bs), #isvar, #sink] 
+→ $[If, #isvar, 
+    %n⟪
+UNLINK(«#sink»->context, «#b»);«{#env}E-poly-for-unlink-vars[#bs, #isvar, #sink]»⟫,
+    {#env}E-poly-for-unlink-vars[#bs, #isvar, #sink]];
+
+{#env; #b: SUB[#parent, #index, $True, #isterm]}E-poly-for-unlink-vars[(#b; #bs), #isvar, #sink] 
+→ {#env}E-poly-for-unlink-vars[#bs, #isvar, #sink];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-for-body[Reified_Term, $List[$List[Reified_Option]], Text] :: Text;
+
+// TODO: optimize parameters only updated in body and used in return.
+
+-[Fresh[newvalues::Text]]:
+{#env; "$params": TEXTS[#params]; "$tplparams": #istuple}E-poly-for-body[#body, #options, #sink] 
+→ %n⟪
+Term «newvalues»;«{#env}T-set[#body, #sink, newvalues]»
+«newvalues» = NORMALIZEP(«#sink»->context, «newvalues»);«{#env}E-poly-for-update[$[Equal, #istuple, YES], $False, #params, newvalues, #options, #sink]»⟫;
+
+)]; // E3
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 )] //E

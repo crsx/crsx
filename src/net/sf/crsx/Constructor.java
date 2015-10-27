@@ -124,6 +124,15 @@ public interface Constructor extends PropertiesHolder
 	Constructor contract(Valuation valuation, ExtensibleMap<Variable,Variable> renamings);
 
 	/**
+	 * Result of statically contracting this constructor (used in a {@link Contractum}).
+	 * (For usual simple constructors this can return itself.)
+	 *  
+	 * @param valuation with substitutes (from pattern to term)
+	 * @param renamings with renamings mandated by context (from contractum to matched term)
+	 */
+	Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings);
+
+	/**
 	 * Normalize the constructor (destructively).
 	 * @param crs rewrite system that is requesting the normalization
 	 * @throws CRSException if use of crs throws it

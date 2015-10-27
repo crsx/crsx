@@ -1983,7 +1983,7 @@ public final class Util
 		catch (CRSException e)
 		{}
 	}
-
+	
 	/**
 	 * Generate special occurrence term in reified BINDER structure...
 	 * @param sink to send to

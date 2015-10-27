@@ -68,4 +68,11 @@ public class DummyValuation implements Valuation
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public Sink staticContract(Sink sink)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

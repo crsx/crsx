@@ -3,6 +3,7 @@
 package net.sf.crsx.generic;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.Flushable;
 import java.io.IOException;
@@ -57,11 +58,11 @@ import net.sf.crsx.util.ContextStack;
 import net.sf.crsx.util.EmptyIterable;
 import net.sf.crsx.util.ExtensibleMap;
 import net.sf.crsx.util.ExtensibleSet;
+import net.sf.crsx.util.ExtractLiteralSink;
 import net.sf.crsx.util.FormattingAppendable;
 import net.sf.crsx.util.FunctionFilterSink;
 import net.sf.crsx.util.LinkedExtensibleMap;
 import net.sf.crsx.util.LinkedExtensibleSet;
-import net.sf.crsx.util.ExtractLiteralSink;
 import net.sf.crsx.util.Pair;
 import net.sf.crsx.util.PropertiesConstructor;
 import net.sf.crsx.util.Quad;
@@ -145,7 +146,9 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 
 	/** Last result of any $Dispatchify, in {@link Completer} "standard form". */
 	List<Quad<GenericTerm, GenericTerm, Constructor, Map<String, List<Term>>>> lastDispatchify;
-
+	
+	/** Whether to inline rules after $Dispatchify */
+	private boolean inline;
 	// Constructor.
 
 	/**
@@ -937,7 +940,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 								((Closeable) a).close();
 							
 							// Dump literals
-							System.out.println("dump " + drname.replace(".dr", "_literals.dr"));
 							dumpLiterals(t, drname.replace(".dr", "_literals.dr"));
 						}
 						else
@@ -983,6 +985,11 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						}
 						return sink;
 					}
+				}
+				else if (symbol.equals(Builder.INLINE_SYMBOL))
+				{
+					inline = true;
+					return sink;
 				}
 				else if (Util.isSequence(directive))
 				{
@@ -1233,7 +1240,12 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 	{
 		try
 		{
-			return "".equals(name) ? makeAppendable() : new FileWriter(name);
+			if ("".equals(name))
+				return makeAppendable();
+			
+			File file = new File(name);
+			file.getParentFile().mkdirs();
+			return new FileWriter(file);
 		}
 		catch (IOException e)
 		{
@@ -1843,6 +1855,12 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		return this;
 	}
 
+	@Override
+	public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		return this;
+	}
+
 	public void normalize(CRS crs) throws CRSException
 	{
 		// Should this do anything?
@@ -2311,6 +2329,22 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 				}
 				catch (CRSException e1)
 				{}
+		}
+		
+		if (inline)
+		{
+			if (verbosity > 0)
+				System.out.println("inline.... disabled");
+			
+			// Not yet quite working...
+//			try
+//			{
+//				new Inliner(this).inline(constructors, dataForms, functionForms, fullSort, rulesByFunction, shuffleRulesByFunction);
+//			}
+//			catch (CRSException e1)
+//			{
+//				e1.printStackTrace();
+//			}
 		}
 	}
 

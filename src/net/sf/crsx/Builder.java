@@ -199,6 +199,8 @@ public interface Builder
     public final static String ASSERT_SYMBOL = "$Assert";
     /** Internal constructor name for $Simplify directive as passed to {@link #load(Sink, Term)}. */
     public final static String SIMPLIFY_SYMBOL = "$Simplify";
+    /** Internal constructor name for $Inline directive as passed to {@link #load(Sink, Term)}. */
+    public final static String INLINE_SYMBOL = "$Inline";
     
     
     /** Constructor for "Free" option used by $Rule in {@link #load(Sink, Term)}. */
@@ -233,6 +235,8 @@ public interface Builder
     public final static String MIXED_OPTION_SYMBOL = "Mixed";
     /** Constructor for "Watch" option used by $Rule in {@link #load(Sink, Term)}. */
     public final static String WATCH_OPTION_SYMBOL = "Watch";
+    /** Constructor for "Inline" option used by $Rule in {@link #load(Sink, Term)}. */
+    public final static String INLINE_OPTION_SYMBOL = "Inline";
     
     /** Constructor for EXPERIMENTAL "FreshReuse" option used by $Rule in {@link #load(Sink, Term)}. */
     public final static String FRESH_REUSE_OPTION_SYMBOL = "FreshReuse";

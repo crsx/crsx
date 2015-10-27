@@ -105,6 +105,10 @@ struct _Context
     // Spilled parameters
     void* crsxArg[96];
 
+    // Memoized constant term
+    Hashset2 cterms;
+
+
     // Named properties indexing threshold
     unsigned int indexThreshold;
 
@@ -301,6 +305,13 @@ extern void initConstants();
 // Allocate new global construction
 extern Construction makeGlobalConstruction(ConstructionDescriptor desc);
 
+// memoize term
+extern void addMemo(Context context, ConstructionDescriptor desc, Term term);
+
+// get a new ref to memoized term
+extern Term memo(Context context, ConstructionDescriptor desc);
+
+
 // Hash code for term.
 #define HASH_CODE(CONTEXT, TERM) termHashCode(CONTEXT, TERM, NULL)
 typedef struct _VariableLink *VariableLink;
@@ -472,6 +483,7 @@ typedef struct _BitSet* BitSetP;
 #define IS_DATA(T) (IS_CONSTRUCTION(T) && TAG(T) > 0)
 #define IS_LITERAL(T) (IS_DATA(T) && !SORT(T))
 #define IS_CONTAINER(T) (IS_DATA(T) && SORT(T))
+#define DESCRIPTOR(T) ((T)->descriptor)
 
 // Tests: normal form and function that cannot currently step.
 #define IS_NF(T) (IS_VARIABLE_USE(T) || asConstruction(T)->nf)

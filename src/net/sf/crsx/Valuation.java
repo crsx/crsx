@@ -27,4 +27,11 @@ public interface Valuation
 
 	/** Hint to the rewrite engine that the contraction should not be searched for redexes right away. */
 	boolean leave();
+	
+	/**
+	 * Static contract.  
+	 * @param sink to send static contraction to.
+	 */
+	Sink staticContract(Sink sink);
+	
 }

@@ -1,0 +1,20 @@
+Test[(
+
+$Lax;
+
+$Use["org/crsx/common.crs"];
+
+Test :: $Numeric;
+
+// List of tuples. One parameter is not read in #body but updated and used in #return
+
+Test → $[For, Tuple2[#num1, #num2], (Tuple2[5, 2]; Tuple2[2, 7];),
+               Tuple2[#sum, #last], Tuple2[0, 0], 
+          Tuple2[Plus[#num2, #num1], #sum], #last];
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]]: Plus[#1, #2] → $[Plus, #1, #2];
+
+
+
+)]

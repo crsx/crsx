@@ -60,4 +60,9 @@ CI-Exit[#id, #] → $[ProfileExit, #id, #];
 ∀ a. CI-ThenExit[OK_SORT, $Numeric, ok¹::OK_SORT.$sort[a]] :: a;
 CI-ThenExit[OK, #id, ok¹.#[ok¹]] → $[ProfileExit, #id, #[OK]]; 
 
+
+∀ a.Tuple1[a] ::= ( Tuple1[a]; );
+∀ a b.Tuple2[a,b] ::= ( Tuple2[a, b]; );
+∀ a b c.Tuple3[a,b,c] ::= ( Tuple3[a, b, c]; );
+
 )]

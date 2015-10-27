@@ -943,6 +943,11 @@ public class GenericMetaApplication extends GenericTerm
 		}
 	}
 
+	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
+	{
+		return null;
+	}
+
 	@Override
 	protected boolean occurs(String mvar, Unification unification)
 	{

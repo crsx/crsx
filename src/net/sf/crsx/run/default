@@ -21,7 +21,8 @@
 	$[IfDef, "simplify", $Simplify, ()] ;
 	$[IfDef, "locify", $Locify, ()] ;
 	$[IfDef, "dispatchify", $Dispatchify, ()] ;
-	$[IfDef, "dump-rules", $DumpRules[$[Get, "dump-rules", 1], $[Get, "dump-part", ""]], ()] ;
+    $[IfDef, "inline", $Inline, ()] ;
+    $[IfDef, "dump-rules", $DumpRules[$[Get, "dump-rules", 1], $[Get, "dump-part", ""]], ()] ;
 	$[IfDef, "reify", $[IfDef, "modules", $Reify[$[Get, "reify", 1], $[ParseText, "", $[Get, "modules"]]], $Reify[$[Get, "reify", 1]]], ()] ;
 	
 	// Normalize (using internal interpreter).

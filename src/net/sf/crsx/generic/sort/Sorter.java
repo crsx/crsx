@@ -1329,6 +1329,31 @@ public class Sorter
 				sort = factory.newVariableUse(alpha);
 				break;
 			}
+			case LET: {
+				Variable alpha = freshSortVariable();
+				argumentsorts[0] = factory.newVariableUse(alpha);
+				argumentsorts[1] = factory.newVariableUse(alpha);
+				alpha = freshSortVariable();
+				argumentsorts[2] = factory.newVariableUse(alpha);
+				sort = factory.newVariableUse(alpha);
+				break;
+			}
+			case FOR: {
+				Variable alpha = freshSortVariable();
+				argumentsorts[0] = factory.newVariableUse(alpha);
+				argumentsorts[1] = freshForm(CRS.LIST_SORT, 1);
+				setSubSort(argumentsorts[1], 0, factory.newVariableUse(alpha));
+				
+				alpha = freshSortVariable();
+				argumentsorts[2] = factory.newVariableUse(alpha);
+				argumentsorts[3] = factory.newVariableUse(alpha);
+				argumentsorts[4] = factory.newVariableUse(alpha);
+				
+				alpha = freshSortVariable();
+				argumentsorts[5] = factory.newVariableUse(alpha);
+				sort = factory.newVariableUse(alpha);
+				break;
+			}
 			case GET : 
 			case GET_REF : {
 				PropertiesHolder B = Util.propertiesHolder(term.sub(0));

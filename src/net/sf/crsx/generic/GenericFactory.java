@@ -34,6 +34,7 @@ import net.sf.crsx.PropertiesHolder;
 import net.sf.crsx.Sink;
 import net.sf.crsx.Stub;
 import net.sf.crsx.Term;
+import net.sf.crsx.Valuation;
 import net.sf.crsx.Variable;
 import net.sf.crsx.Visitor;
 import net.sf.crsx.analysis.Unifier;
@@ -312,6 +313,7 @@ public class GenericFactory implements Factory<GenericTerm>
 		{
 			return CRS.BOOLEAN_SORT;
 		}
+
 	}
 
 	// Methods.

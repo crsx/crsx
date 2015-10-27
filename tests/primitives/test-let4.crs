@@ -1,0 +1,17 @@
+Test[(
+
+$Lax;
+
+$Use["bool.crs"];
+
+Test :: Boolean;
+
+Test → Test2[True];
+
+Test2[Boolean] :: Boolean;
+
+Test2[#1] 
+→ $[Let, #2, $True, 
+     $[If, #2, #1, False]];
+
+)]

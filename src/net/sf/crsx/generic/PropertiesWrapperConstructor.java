@@ -239,6 +239,12 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
 	}
 
+	public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
+	}
+
+
 	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{

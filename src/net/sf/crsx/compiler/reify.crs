@@ -152,6 +152,6 @@ Reified_Use ::=( NA;
    <!-- For Pattern Only -->
    DISCARD;
    <!-- For Contractum and Pattern --> 
-   USE[$Numeric<!-- counter -->]; ); 
+   USE[$Numeric<!-- counter -->]; /* 1 = last use, > 1 not last use */  ); 
 
 )]

@@ -83,6 +83,21 @@ class GenericValuation implements Valuation
 		return rule.contract(sink, this, mapped);
 	}
     
+    public Sink staticContract(Sink sink)
+	{
+    	// Allocate fresh variables.
+    	ExtensibleMap<Variable, Variable> mapped = LinkedExtensibleMap.EMPTY_RENAMING;
+    	for (Term vd : rule.fresh.values())
+    	{
+    		Variable v = Util.variableWithOptionalSortVariable(vd);
+    		Variable freshV = sink.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow());
+    		mapped = mapped.extend(v, freshV);
+    	}
+        // ENTRY POINT to Contractum.contract().
+		return rule.staticContract(sink, this, mapped);
+	}
+    
+    
 	public boolean leave()
     {
         return rule.leaf;

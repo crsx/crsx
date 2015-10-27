@@ -295,6 +295,11 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		return this;
 	}
+	
+	public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		return this;
+	}
 
 	public void normalize(CRS crs) throws CRSException
 	{}

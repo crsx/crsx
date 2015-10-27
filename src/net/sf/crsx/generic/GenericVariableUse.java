@@ -474,6 +474,12 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		return sink.use(v);
 	}
 
+	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
+	{
+		return null;
+	}
+
+
 	@Override
 	protected boolean occurs(String mvar, Unification unification)
 	{

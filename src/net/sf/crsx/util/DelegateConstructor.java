@@ -115,6 +115,12 @@ public abstract class DelegateConstructor implements Constructor
 		return constructor.contract(valuation, renamings);
 	}
 
+	@Override
+	public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		return constructor.staticContract(valuation, renamings);
+	}
+
 	// @see net.sf.crsx.Constructor#appendTo(java.lang.Appendable)
 	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
 	{

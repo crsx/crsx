@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.crsx.Builder;
+import net.sf.crsx.CRS;
 import net.sf.crsx.CRSException;
 import net.sf.crsx.Constructor;
 import net.sf.crsx.Contractum;
@@ -147,7 +148,7 @@ public class GenericRule implements Copyable
 
 		this.crs = crs;
 		this.name = ruleName;
-		
+
 		this.options = options;
 		this.variableSorts = null;
 		this.metaVariableSorts = null;
@@ -694,10 +695,10 @@ public class GenericRule implements Copyable
 			Term sub = term.sub(index);
 			if (sub.kind() == Kind.VARIABLE_USE || sub.arity() == 0)
 			{
-				 // either identity function or constant. Either way no deep binder uses
+				// either identity function or constant. Either way no deep binder uses
 				return false;
 			}
-			
+
 			// sub is a construction/meta application with binders and optionally with properties.
 			Variable[] binders = term.binders(index);
 			for (int i = 0; i < sub.arity(); i++)
@@ -712,12 +713,12 @@ public class GenericRule implements Copyable
 							// Term of the form T[ ... x..y.S[...v..] ..]
 							// This is not a deep variable. 
 							// Continue on the next sub...
-							
+
 						}
 						else
 						{
 							// Term of the form T[ ... x..y.S[...z.v..] ..]
-							
+
 							// This is either the identity function or constant.
 							// That's considered deep
 							return true;
@@ -764,6 +765,7 @@ public class GenericRule implements Copyable
 		}
 		return false;
 	}
+
 	/**
 	 * Whether the sub is a construction that contains unordered variable uses. Ignore properties.
 	 * @param index of the sub
@@ -790,7 +792,7 @@ public class GenericRule implements Copyable
 				{
 					case VARIABLE_USE :
 						Variable var = subsub.variable();
-						if (nextVarPos < binders.length - 1 && !(var.name().equals(binders[nextVarPos++].name()))) 
+						if (nextVarPos < binders.length - 1 && !(var.name().equals(binders[nextVarPos++].name())))
 							return true;
 						break;
 					case META_APPLICATION :
@@ -904,6 +906,14 @@ public class GenericRule implements Copyable
 	}
 
 	/**
+	 * Whether the term is marked as "inline"
+	 */
+	public boolean inline()
+	{
+		return options != null && options.containsKey(Builder.INLINE_OPTION_SYMBOL);
+	}
+
+	/**
 	 * Attempt to apply the rule.
 	 * @param term to match rule against
 	 * @return valuation with successful unification result, or null if there is no match
@@ -978,6 +988,24 @@ public class GenericRule implements Copyable
 		}
 		// ENTRY POINT to Contractum.contract().
 		return contractum.contract(sink, valuation, renamings);
+	}
+
+	/**
+	 * Statically contract this fragment of contractum (rule right hand side) to sink.
+	 * Reduces Data-declared fragments followed by contraction.
+	 * @param sink to send the fragment to
+	 * @param valuation from successful matching of left-hand side (contains the full contractum of which this is a fragment)
+	 * @param renamings already decided mappings of variables for the contraction (maps variables in contractum to variables to use in result of contraction)
+	 * @return the sink after reception of the contracted subterm or null if contraction failed.
+	 */
+	Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		if (!forced.isEmpty())
+		{
+			// no way to forced inlined term.
+			return null;
+		}
+		return contractum.staticContract(sink, valuation, renamings);
 	}
 
 	/**
@@ -1092,8 +1120,10 @@ public class GenericRule implements Copyable
 							// Already seen - check that is permitted!
 							if (!comparable.contains(metaVariable))
 							{
-								error("pattern meta-application "
-										+ term + " cannot be used more than once without a Comparable declaration", true);
+								error(
+										"pattern meta-application "
+												+ term + " cannot be used more than once without a Comparable declaration",
+										true);
 								comparable.add(metaVariable);
 							}
 							// Check it is the same and does not include non-promiscuous variables!
@@ -1110,12 +1140,16 @@ public class GenericRule implements Copyable
 									{
 										Variable v = t.variable();
 										if (!previousV.equals(v))
-											error("repeated pattern meta-application "
-													+ term + " contains different variable (" + t + ") from previous instances ("
-													+ previous + ")", false);
+											error(
+													"repeated pattern meta-application "
+															+ term + " contains different variable (" + t
+															+ ") from previous instances (" + previous + ")",
+													false);
 										else if (!v.promiscuous())
-											error("repeated pattern meta-application "
-													+ term + " contains non-promiscuous variable (" + t + ")", false);
+											error(
+													"repeated pattern meta-application "
+															+ term + " contains non-promiscuous variable (" + t + ")",
+													false);
 									}
 								}
 							occurrences.put(metaVariable, occurrences.get(metaVariable) + 1);
@@ -1169,7 +1203,8 @@ public class GenericRule implements Copyable
 					{
 						error(
 								"pattern contains free variable that is declared fresh in contractum ("
-										+ v + " in " + pattern + ")", true);
+										+ v + " in " + pattern + ")",
+								true);
 						free.put(v.name(), fresh.remove(v.name()));
 					}
 					else
@@ -1327,6 +1362,7 @@ public class GenericRule implements Copyable
 
 				/** Keep track of linearity of each meta-application argument - initially true. */
 				final List<Boolean> linearSubstitutionContexts = new ArrayList<Boolean>();
+
 				{
 					linearSubstitutionContexts.add(true);
 				}
@@ -1340,8 +1376,17 @@ public class GenericRule implements Copyable
 				/** Nesting of primitive wrappers... */
 				private int primitiveNesting;
 
+				/** Expect inlined pattern argument  */
+				private boolean declmeta;
+
 				/** Binders stack. */
 				final Deque<Variable[]> scopedBinders = new ArrayDeque<Variable[]>();
+
+				/** Pending Metavariable stack. */
+				final Deque<List<String>> pendingScopedMeta = new ArrayDeque<List<String>>();
+
+				/** Metavariable stack. */
+				final Deque<List<String>> scopedMeta = new ArrayDeque<List<String>>();
 
 				@Override
 				public void visitPrimitive(Primitive primitive, boolean start) throws CRSException
@@ -1364,8 +1409,18 @@ public class GenericRule implements Copyable
 				@Override
 				public void visitConstruction(Term construction, boolean start, Set<Variable> bound) throws CRSException
 				{
+					if (start && declmeta)
+					{
+						if (!Util.symbol(construction).matches("Tuple[0-9]*"))
+							error(
+									"pattern argument contractum must either be a meta variable or a TupleN construction ("
+											+ construction + ")",
+									false);
+					}
+
 					if (start && primitiveNesting == 0)
 						checkConstructionSort(construction, "contractum", boundVariableSorts, patternMetaSorts);
+
 				}
 
 				@Override
@@ -1383,13 +1438,83 @@ public class GenericRule implements Copyable
 								maybeShallow.put(binders[i], true);
 						}
 
+						// Disallow binders in pattern argument
+						if (declmeta && binders.length > 0)
+							error("pattern argument in contractum cannot contain binders (" + construction + ")", false);
+
 						scopedBinders.push(binders);
+
+						if (construction instanceof GenericEvaluator && index > 0)
+						{
+							switch (((GenericEvaluator) construction).primitive())
+							{
+								case LET :
+									if (index == 1)
+									{
+										declmeta = true;
+										pendingScopedMeta.push(new ArrayList<String>());
+									}
+									else if (index == 3)// Body: pending scoped metas are now in scope
+										scopedMeta.push(pendingScopedMeta.pop());
+									break;
+								case FOR :
+									if (index == 1) // variables
+									{
+										declmeta = true;
+										pendingScopedMeta.push(new ArrayList<String>());
+									}
+									else if (index == 3) // params
+									{
+										declmeta = true;
+										pendingScopedMeta.push(new ArrayList<String>());
+									}
+									else if (index == 5) // body
+									{
+										// both, variable and params are inscope 
+										scopedMeta.push(pendingScopedMeta.pop()); // params
+										scopedMeta.push(pendingScopedMeta.pop()); // variables
+									}
+									break;
+								default :
+									break;
+							}
+						}
 					}
 
 					super.visitConstructionSub(construction, index, start, bound);
 
 					if (!start)
+					{
 						scopedBinders.pop();
+
+						if (construction instanceof GenericEvaluator && index > 0)
+						{
+							switch (((GenericEvaluator) construction).primitive())
+							{
+								case LET :
+									if (index == 1)
+										declmeta = false;
+									else if (index == 3)
+										scopedMeta.pop();
+									break;
+								case FOR :
+									if (index == 1 || index == 3)
+										declmeta = false;
+									else if (index == 5)
+									{
+										// Only variables goes out of scope.
+										scopedMeta.pop(); // variables
+									}
+									else if (index == 6)
+									{
+										scopedMeta.pop(); // params
+									}
+									break;
+								default :
+									break;
+							}
+						}
+					}
 				}
 
 				@Override
@@ -1397,127 +1522,148 @@ public class GenericRule implements Copyable
 				{
 					if (start)
 					{
-						// Check the meta-application.
-						final String metaVariable = term.metaVariable();
-						if (patternPropertiesRefs.contains(metaVariable))
-							error(
-									"contractum uses property reference meta-variable in regular meta-application (" + term + ")",
-									false);
-						contractumMetaVariables.add(metaVariable);
-						if (discarded.contains(metaVariable))
+						if (declmeta)
 						{
-							error("contractum uses discarded meta-variable (" + term + ")", true);
-							discarded.remove(metaVariable);
+							final String metaVariable = term.metaVariable();
+							Term pattern = patternMetaApplications.get(metaVariable);
+							if (pattern != null)
+								error("contractum cannot redeclare meta-variable (" + term + ")", false);
+							pendingScopedMeta.peek().add(metaVariable);
 						}
-						Term pattern = patternMetaApplications.get(metaVariable);
-						if (pattern == null && noMeta)
-							error("contractum uses undefined meta-variable (" + term + ")", false);
-						final int arity = term.arity();
-						if (pattern != null && arity != pattern.arity())
-							error("contractum uses meta-variable with wrong arity (" + term + ")", false);
-
-						// Check if this meta-variable occurs in non-explicit configuration (Bloo & Rose, RTA '96).
-						// Explicit means that the arguments are the same variables as in the pattern...which means they can be reused!
-						// If ALL variables are reused then the contractum is 'explicit'.
-						if (pattern != null && !nonExplicit.contains(metaVariable))
+						else
 						{
-							// Candidate for being explicit...
-							Map<Variable, Variable> newReusable = new HashMap<Variable, Variable>();
-							boolean explicit = true; // so far
-							CheckExplicit : for (int i = 0; i < arity; ++i)
+							// Check the meta-application.
+							final String metaVariable = term.metaVariable();
+							if (patternPropertiesRefs.contains(metaVariable))
+								error(
+										"contractum uses property reference meta-variable in regular meta-application ("
+												+ term + ")",
+										false);
+							contractumMetaVariables.add(metaVariable);
+							if (discarded.contains(metaVariable))
 							{
-								Term sub = term.sub(i);
-								if (sub.kind() == Kind.VARIABLE_USE)
+								error("contractum uses discarded meta-variable (" + term + ")", true);
+								discarded.remove(metaVariable);
+							}
+							Term pattern = patternMetaApplications.get(metaVariable);
+							if (pattern == null && noMeta)
+							{
+								if (!hasMeta(metaVariable, scopedMeta))
+									error("contractum uses undefined meta-variable (" + term + ")", false);
+							}
+							final int arity = term.arity();
+							if (pattern != null && arity != pattern.arity())
+								error("contractum uses meta-variable with wrong arity (" + term + ")", false);
+
+							// Check if this meta-variable occurs in non-explicit configuration (Bloo & Rose, RTA '96).
+							// Explicit means that the arguments are the same variables as in the pattern...which means they can be reused!
+							// If ALL variables are reused then the contractum is 'explicit'.
+							if (pattern != null && !nonExplicit.contains(metaVariable))
+							{
+								// Candidate for being explicit...
+								Map<Variable, Variable> newReusable = new HashMap<Variable, Variable>();
+								boolean explicit = true; // so far
+								CheckExplicit : for (int i = 0; i < arity; ++i)
 								{
-									Variable contractumVariable = sub.variable();
-									if (free.containsKey(contractumVariable.name()))
+									Term sub = term.sub(i);
+									if (sub.kind() == Kind.VARIABLE_USE)
 									{
-										explicit = false;
-										break; // FAIL because we're substituting an existing free variable!
-									}
-									if (pattern.arity() <= i)
-										error("rule contractum has inconsistent arity for pattern meta-application ("
-												+ pattern + ")", false);
-									Variable patternVariable = pattern.sub(i).variable();
-									
-									if (patternVariable.blocking())
-										break; // FAIL because functional binders can't be reused.
-									
-									Variable reusedPatternVariable = reusable.get(patternVariable);
-									if (newReusable.containsValue(contractumVariable))
-									{
-										explicit = false;
-										break; // FAIL because we're copying a free variable to two bound positions
-									}
-									if (reusedPatternVariable == null)
-									{
-										reusedPatternVariable = newReusable.get(patternVariable);
+										Variable contractumVariable = sub.variable();
+										if (free.containsKey(contractumVariable.name()))
+										{
+											explicit = false;
+											break; // FAIL because we're substituting an existing free variable!
+										}
+										if (pattern.arity() <= i)
+											error(
+													"rule contractum has inconsistent arity for pattern meta-application ("
+															+ pattern + ")",
+													false);
+										Variable patternVariable = pattern.sub(i).variable();
+
+										if (patternVariable.blocking())
+											break; // FAIL because functional binders can't be reused.
+
+										Variable reusedPatternVariable = reusable.get(patternVariable);
+										if (newReusable.containsValue(contractumVariable))
+										{
+											explicit = false;
+											break; // FAIL because we're copying a free variable to two bound positions
+										}
 										if (reusedPatternVariable == null)
 										{
-											for (Map.Entry<String, Term> e : free.entrySet())
-												if (Util.variableWithOptionalSortVariable(e.getValue()) == contractumVariable)
-												{
-													explicit = false;
-													break CheckExplicit; // FAIL because we must properly substitute existing free variables
-												}
-											reusedPatternVariable = contractumVariable;
-											newReusable.put(patternVariable, reusedPatternVariable);
-											reusableOrigin.put(patternVariable, new Pair<String, Integer>(metaVariable, i));
+											reusedPatternVariable = newReusable.get(patternVariable);
+											if (reusedPatternVariable == null)
+											{
+												for (Map.Entry<String, Term> e : free.entrySet())
+													if (Util.variableWithOptionalSortVariable(e.getValue()) == contractumVariable)
+													{
+														explicit = false;
+														break CheckExplicit; // FAIL because we must properly substitute existing free variables
+													}
+												reusedPatternVariable = contractumVariable;
+												newReusable.put(patternVariable, reusedPatternVariable);
+												reusableOrigin.put(patternVariable, new Pair<String, Integer>(metaVariable, i));
+											}
+										}
+										if (!reusedPatternVariable.equals(contractumVariable))
+										{
+											explicit = false;
+											break; // FAIL because the variable could not be reused without conflict
 										}
 									}
-									if (!reusedPatternVariable.equals(contractumVariable))
+									else
 									{
+										// Non-variable.
 										explicit = false;
-										break; // FAIL because the variable could not be reused without conflict
+										break;
 									}
 								}
+								if (explicit)
+									reusable.putAll(newReusable); // commit the variable reuses
 								else
+									nonExplicit.add(metaVariable);
+							}
+
+							// Register the meta-variable contraction count, if it can be known...
+							if (linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
+							{
+								// Context is linear so try to include in count (unless already non-linear, i.e., Integer.MAX_VALUE).
+								Integer count = contractionCounts.get(metaVariable);
+								if (count == null)
+									// First occurrence...sofar linear!
+									contractionCounts.put(metaVariable, 1);
+								else if (count > 0)
 								{
-									// Non-variable.
-									explicit = false;
-									break;
+									// Following occurrence. 
+									if (!shared.contains(metaVariable)
+											&& !copied.contains(metaVariable)
+											&& (noMeta || patternMetaApplications.containsKey(metaVariable)))
+									{
+										error(
+												"contractum uses non-shared/copyable meta-variable twice (" + metaVariable + ")",
+												true);
+									}
+									contractionCounts.put(metaVariable, count + 1);
 								}
 							}
-							if (explicit)
-								reusable.putAll(newReusable); // commit the variable reuses
 							else
-								nonExplicit.add(metaVariable);
-						}
-
-						// Register the meta-variable contraction count, if it can be known...
-						if (linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
-						{
-							// Context is linear so try to include in count (unless already non-linear, i.e., Integer.MAX_VALUE).
-							Integer count = contractionCounts.get(metaVariable);
-							if (count == null)
-								// First occurrence...sofar linear!
-								contractionCounts.put(metaVariable, 1);
-							else if (count > 0)
 							{
-								// Following occurrence. 
+								// Used to require explicit Copy[]...
 								if (!shared.contains(metaVariable)
 										&& !copied.contains(metaVariable)
 										&& (noMeta || patternMetaApplications.containsKey(metaVariable)))
 								{
-									error("contractum uses non-shared/copyable meta-variable twice (" + metaVariable + ")", true);
+									error(
+											"contractum uses non-shared/copyable meta-variable in place that may be copied ("
+													+ metaVariable + ")",
+											true);
+									copied.add(metaVariable);
 								}
-								contractionCounts.put(metaVariable, count + 1);
+								// Not linear (nested in substitution) so insist the meta-variable cannot be counted.
+								contractionCounts.put(metaVariable, -1);
+								// TODO: count should be incremented normally for substitution for non-promiscuous variable...later.
 							}
-						}
-						else
-						{
-							// Used to require explicit Copy[]...
-							if (!shared.contains(metaVariable)
-									&& !copied.contains(metaVariable)
-									&& (noMeta || patternMetaApplications.containsKey(metaVariable)))
-							{
-								error("contractum uses non-shared/copyable meta-variable in place that may be copied ("
-										+ metaVariable + ")", true);
-								copied.add(metaVariable);
-							}
-							// Not linear (nested in substitution) so insist the meta-variable cannot be counted.
-							contractionCounts.put(metaVariable, -1);
-							// TODO: count should be incremented normally for substitution for non-promiscuous variable...later.
 						}
 					}
 				}
@@ -1525,6 +1671,12 @@ public class GenericRule implements Copyable
 				@Override
 				public void visitMetaProperty(String metaVariable, boolean start, boolean hasMapping) throws CRSException
 				{
+					if (declmeta)
+						error(
+								"pattern argument in contraction cannot contain meta property ("
+										+ metaVariable + " in " + contractum + ")",
+								false);
+
 					// When meta-variable is used to construct property key (name or variable)...pieces from visitMetaApplication above.
 					if (start)
 					{
@@ -1564,8 +1716,10 @@ public class GenericRule implements Copyable
 							// Used to require explicit Copy[]...
 							if (!shared.contains(metaVariable) && !copied.contains(metaVariable) && noMeta)
 							{
-								error("contractum uses non-shared/copyable meta-variable in place that may be copied ("
-										+ metaVariable + ")", true);
+								error(
+										"contractum uses non-shared/copyable meta-variable in place that may be copied ("
+												+ metaVariable + ")",
+										true);
 								copied.add(metaVariable);
 							}
 							// Not linear (nested in substitution) so insist the meta-variable cannot be counted.
@@ -1611,6 +1765,12 @@ public class GenericRule implements Copyable
 				@Override
 				public void visitPropertiesRef(String metaVariable, boolean start) throws CRSException
 				{
+					if (declmeta)
+						error(
+								"pattern argument in contraction cannot property reference ("
+										+ metaVariable + " in " + contractum + ")",
+								false);
+
 					if (start)
 					{
 						if (!patternPropertiesRefs.contains(metaVariable) && noMeta)
@@ -1621,6 +1781,11 @@ public class GenericRule implements Copyable
 				@Override
 				public void visitBound(Variable v, VariableUpdater updater) throws CRSException
 				{
+					if (declmeta)
+						error(
+								"pattern argument in contraction cannot contain bound variable (" + v + " in " + contractum + ")",
+								false);
+
 					if (!v.promiscuous())
 					{
 						if (linearVariables.contains(v))
@@ -1647,7 +1812,8 @@ public class GenericRule implements Copyable
 								if (v.shallow())
 									error(
 											"contraction uses a deep variable declared as shallow ("
-													+ v + " in " + contractum + ")", true);
+													+ v + " in " + contractum + ")",
+											true);
 							}
 
 							scopedBinders.push(last);
@@ -1658,6 +1824,9 @@ public class GenericRule implements Copyable
 				@Override
 				public void visitFree(Variable v, VariableUpdater updater) throws CRSException
 				{
+					if (declmeta)
+						error("pattern argument in contraction cannot free variable (" + v + " in " + contractum + ")", false);
+
 					// Maybe global?
 					for (Term g : global.values())
 					{
@@ -1686,7 +1855,7 @@ public class GenericRule implements Copyable
 					if (!realV.promiscuous())
 					{
 						if (linearVariables.contains(realV))
-						{}//error("contractum uses linear free variable twice (" + contractum + ")", false);
+						{} //error("contractum uses linear free variable twice (" + contractum + ")", false);
 							//if (!linearSubstitutionContexts.get(linearSubstitutionContexts.size() - 1))
 							//	error("contractum uses non-promiscuous free variable in promiscuous context (" + realV + " in " + contractum + ")", false);
 						linearVariables.add(realV);
@@ -1705,6 +1874,7 @@ public class GenericRule implements Copyable
 		unused.removeAll(contractumMetaVariables);
 		for (String u : unused)
 			if (!discarded.contains(u))
+
 			{
 				ruleError("contractum discards meta-variable without Discard declaration (" + u + ")", true, false);
 				discarded.add(u);
@@ -1714,6 +1884,7 @@ public class GenericRule implements Copyable
 		Set<String> declaredFresh = new HashSet<String>(fresh.keySet());
 		declaredFresh.removeAll(usedFresh);
 		if (!declaredFresh.isEmpty())
+
 		{
 			ruleError("rule declares fresh variables not used in contractum (" + declaredFresh + ")", true, false);
 			for (String varname : declaredFresh)
@@ -1722,6 +1893,7 @@ public class GenericRule implements Copyable
 
 		shallow.clear();
 		for (Variable v : maybeShallow.keySet())
+
 		{
 			if (!v.shallow())
 			{
@@ -1731,6 +1903,23 @@ public class GenericRule implements Copyable
 
 			shallow.add(v);
 		}
+
+	}
+
+	/**
+	 * Test meta is inscoped
+	 * @param meta to look for
+	 * @return
+	 * @throws CRSException 
+	 */
+	private boolean hasMeta(final String meta, final Deque<List<String>> inscope)
+	{
+		for (List<String> metas : inscope)
+		{
+			if (metas.contains(meta))
+				return true;
+		}
+		return false;
 	}
 
 	/**
@@ -1800,8 +1989,7 @@ public class GenericRule implements Copyable
 	 * @param variableProps TODO
 	 * @throws IOException in case of write failure
 	 */
-	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean namedProps, boolean variableProps)
-			throws IOException
+	void appendTo(Appendable w, Map<Variable, String> used, int depth, boolean namedProps, boolean variableProps) throws IOException
 	{
 		// Name with options.
 		if (w instanceof FormattingAppendable)
@@ -1829,8 +2017,10 @@ public class GenericRule implements Copyable
 				String innerSep = "";
 				for (Map.Entry<String, Term> e : fresh.entrySet())
 				{
-					w.append(innerSep
-							+ Util.safeVariableName(Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
+					w.append(
+							innerSep
+									+ Util.safeVariableName(
+											Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
 					Term sort = e.getValue();
 					if (sort != null)
 					{
@@ -1848,8 +2038,10 @@ public class GenericRule implements Copyable
 				String innerSep = "";
 				for (Map.Entry<String, Term> e : global.entrySet())
 				{
-					w.append(innerSep
-							+ Util.safeVariableName(Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
+					w.append(
+							innerSep
+									+ Util.safeVariableName(
+											Util.variableWithOptionalSortVariable(e.getValue()), used, false, false));
 					Term sort = e.getValue();
 					if (sort != null)
 					{
@@ -1888,9 +2080,10 @@ public class GenericRule implements Copyable
 		{
 			w.append(" // Reuse:");
 			for (Map.Entry<Variable, Variable> e : reused.entrySet())
-				w.append(" "
-						+ Util.safeVariableName(e.getKey(), used, false, false) + ":"
-						+ Util.safeVariableName(e.getValue(), used, false, false));
+				w.append(
+						" "
+								+ Util.safeVariableName(e.getKey(), used, false, false) + ":"
+								+ Util.safeVariableName(e.getValue(), used, false, false));
 		}
 		w.append("\n");
 

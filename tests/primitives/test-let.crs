@@ -1,0 +1,11 @@
+Test[(
+
+$Lax;
+
+$Use["bool.crs"];
+
+Test :: Boolean;
+
+Test → $[Let, #, True, #];
+
+)]

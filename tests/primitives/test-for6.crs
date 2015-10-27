@@ -1,0 +1,25 @@
+Test[(
+
+$Lax;
+
+// Nested loop and let 
+
+Test :: $Numeric;
+Test → Test2[5, 10, 3];
+
+Test2[$Numeric, $Numeric, $Numeric] :: $Numeric;
+
+Test2[#init, #constant, #outer] 
+→ $[For, #value, (3; 5; 8;), #acc, #init, 
+    $[Let, #ip, Plus[#acc, #constant],
+      Plus[#value, Plus[#outer, #ip]]],
+      $[For, #value_, (2; 4; 6;), #acc_, #acc,
+        Plus[#value_, #acc_],
+        #acc_]];
+
+
+Plus[$Numeric, $Numeric] :: $Numeric;
+-[Data[#1, #2]]: Plus[#1, #2] → $[Plus, #1, #2];
+
+
+)]
