@@ -60,7 +60,7 @@ ST-Send-Construction-Data:
   "$pending-props" : #pending}
 ST-send[CONSTRUCTION[KDATA, #symbol, #binders], #sink] 
 → %n⟪«
-{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«{#env; "$tail": NO; "$pending-props": NO; "$eval":NO}ST-send-data[#pending, #symbol, #binders, #sink]»«ST-send-tail[#tail]»⟫;
+{#env; "$tail": NO; "$pending-props": NO}ST-send-properties[#pending, #sink]»«{#env; "$tail": NO; "$pending-props": NO; "$eval":NO}ST-send-data[#symbol, #binders, #sink]»«ST-send-tail[#tail]»⟫;
 
 ST-Send-Literal:
 {#env;
@@ -128,17 +128,16 @@ ST-send-variable[#entry, #variable, #sink]
 
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
-ST-send-data[STRING_ENTRY, $String, $List[Reified_Binder], Text] :: Text;
+ST-send-data[$String, $List[Reified_Binder], Text] :: Text;
 
-{#env}ST-send-data[NO, #symbol, (), #sink]
+{#env}ST-send-data[#symbol, (), #sink]
 → %n⟪
 COPY(«#sink», LINK(«#sink»->context, (Term) «Const[#symbol]»));⟫;
 
--[Fallback]:
-{#env}ST-send-data[#pending, #symbol, #binders, #sink]
+{#env}ST-send-data[#symbol, (#binder; #binders), #sink]
 → %n⟪
 START(«#sink», «EventConstructor[#symbol]»);⟦« 
-{#env}ST-send-binders[#binders, #sink] »⟧
+{#env}ST-send-binders[(#binder; #binders), #sink] »⟧
 END(«#sink», «EventConstructor[#symbol]»);
 ⟫;
 
