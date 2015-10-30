@@ -334,6 +334,10 @@ extern void *errorf(Context context, char *format, ...) __attribute__((format(pr
 # define FORGIVABLEERRORF(CONTEXT,KIND,...) errorf(CONTEXT, __VA_ARGS__)
 #endif
 
+#ifndef EVENTUALERRORF
+# define EVENTUALERRORF(CONTEXT,KIND,...) errorf(CONTEXT, __VA_ARGS__)
+#endif
+
 //
 #ifndef CHECKF
 # define CHECKF(CONTEXT,TEST,OK,KIND,...) (({ if (!(TEST)) ERRORF(CONTEXT,KIND,__VA_ARGS__); }), OK)

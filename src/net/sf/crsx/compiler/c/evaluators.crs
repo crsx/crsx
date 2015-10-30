@@ -2071,6 +2071,7 @@ POLY_PRIMITIVE[E_SaveTerm];
 POLY_PRIMITIVE[E_Dump];
 POLY_PRIMITIVE[E_Error];
 POLY_PRIMITIVE[E_ForgivableError];
+POLY_PRIMITIVE[E_EventualError];
 POLY_PRIMITIVE[E_Trace];
 POLY_PRIMITIVE[E_If];
 POLY_PRIMITIVE[E_IfZero];
@@ -2209,8 +2210,29 @@ E-ForgivableError[#Name, #Format, #Msg, (#Result; #Args), #sink, ok result.#Tail
 {#env; "$tail":NO}
 T-local-string[#Format, #sink, arg p.
  {#env; "$tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪FORGIVABLEERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);
-«p»«{#env}#Tail[OK, #Result] »⟫]]
-;
+«p»«{#env}#Tail[OK, #Result] »⟫]];
+
+// $[EventualError[#kind], #format[, #arg,..., #result]] accumulates errors and eventually emits an exception. 
+//
+
+{#env}E-poly[E_EventualError, (#Name; #Format; LITERAL[#Msg, #MsgSort]; #Args), #Options, #sink, ok result.#Tail[ok,result]]
+→ {#env}E-EventualError[#Name, #Format, #Msg, E-SplitLast[#Args], #sink, ok result.#Tail[ok,result]];
+
+-[Fallback]:
+{#env}E-poly[E_EventualError, (#Name; #String; #Result; ), #Options, #sink, ok result.#Tail[ok,result]]
+→ {#env; "$tail":NO}T-local-string[#String, #sink, arg p. 
+                    %n⟪
+EVENTUALERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg»);«p»«{#env}#Tail[OK,#Result] »⟫];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}E-EventualError[Reified_Term, Reified_Term, $String, $List[Reified_Term], Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}
+E-EventualError[#Name, #Format, #Msg, (#Result; #Args), #sink, ok result.#Tail[ok,result]]
+→
+{#env; "$tail":NO}
+T-local-string[#Format, #sink, arg p.
+ {#env; "$tail":NO} E-flatten-strings[(), #Args, #sink, %n⟪
+EVENTUALERRORF(«#sink»->context, «FormatKindOf[#Name]», «arg», «TOKEN[#Msg]»⟫, %n⟪);«p»«{#env}#Tail[OK, #Result] »⟫]];
 
 // Helper moving the last element in the list to the first position
 E-SplitLast[$List[Reified_Term]] :: $List[Reified_Term];
