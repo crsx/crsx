@@ -1449,7 +1449,8 @@ public class Sorter
 				sort = freshSortVariableUse();
 				break;
 			}
-			case FORGIVABLEERROR : {
+			case FORGIVABLEERROR : 
+			case EVENTUALERROR : {
 				// term and all string
 				Variable alpha = freshSortVariable();
 				sort = factory.newVariableUse(alpha);

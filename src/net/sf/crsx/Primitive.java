@@ -327,8 +327,10 @@ public enum Primitive
     ERROR("Error", 1, Integer.MAX_VALUE),
     /** $[ForgivableError, #value, #format [, #argument, ...]] emits an exception or a warning with text built from the #format string formatted with #argument... strings (as needed). */
     FORGIVABLEERROR("ForgivableError", 2, Integer.MAX_VALUE),
-	/** $[Trace, #message, #value]: first argument is echoed (unevaluated, to stderr!) second argument is then matched/contracted... */
-	TRACE("Trace", 1, 2),
+   	/** $[EventualError,  #value, #format [, #argument, ...]]: */
+    EVENTUALERROR("EventualError", 2, Integer.MAX_VALUE),
+   	/** $[Trace, #message, #value]: first argument is echoed (unevaluated, to stderr!) second argument is then matched/contracted... */
+   	TRACE("Trace", 1, 2),
 	
 	/** Sort cast. */
 	CAST("Cast", 1, 1),

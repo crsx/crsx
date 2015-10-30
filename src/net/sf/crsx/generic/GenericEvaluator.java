@@ -2009,6 +2009,7 @@ public class GenericEvaluator extends FixedGenericConstruction
 
 			case ERROR :
 			case FORGIVABLEERROR :
+			case EVENTUALERROR :
 				// $[Error, ...]
 				normalizeArguments();
 				error();
