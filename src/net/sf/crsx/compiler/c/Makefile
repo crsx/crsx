@@ -63,6 +63,8 @@ $(CRSXCBUILD)/%.o: $(CRSXCBUILD)/%.c rules
 	@mkdir -p $(CRSXCBUILD)
 	$(CC) $(CCFLAGS) -c $< -o $@
 #
+.SUFFIXES: .l
+
 $(CRSXCBUILD)/crsx_scan.o: $(CRSXCBUILD)/crsx_scan.c crsx.h 
 $(CRSXCBUILD)/crsx_scan.c: crsx_scan.l
 	@mkdir -p $(CRSXCBUILD)
