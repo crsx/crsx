@@ -600,13 +600,13 @@ public abstract class GenericConstruction extends GenericTerm
 	/**
 	 * Write construction in traditional way.
 	 * @param writer to write to
-	 * @param noLinear TODO
+	 * @param noLinear whether to omit linear markers
 	 * @param depth remaining depth
-	 * @param full TODO
+	 * @param full whether to include terms in full form
 	 * @param namedProps whether to include named properties in the output
 	 * @param variableProps whether to include variable properties in the output
 	 * @param omitProps specific variable properties to exclude
-	 * @param sortProps TODO
+	 * @param sortProps whether to sort the propserties by name
 	 * @throws IOException if the writing fails
 	 */
 	private void appendSimpleTo(FormattingAppendable writer, Map<Variable, String> used, boolean noLinear, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps) throws IOException
