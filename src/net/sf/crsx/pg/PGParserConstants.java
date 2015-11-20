@@ -11,44 +11,46 @@ public interface PGParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int LANGLE = 53;
+  int LANGLE = 56;
   /** RegularExpression Id. */
-  int RANGLE = 54;
+  int RANGLE = 57;
   /** RegularExpression Id. */
-  int DASH = 55;
+  int DASH = 58;
   /** RegularExpression Id. */
-  int NOT = 56;
+  int NOT = 59;
   /** RegularExpression Id. */
-  int COMMENT = 57;
+  int COMMENT = 60;
   /** RegularExpression Id. */
-  int STRING = 58;
+  int STRING = 61;
   /** RegularExpression Id. */
-  int EMBEDDED = 59;
+  int EMBEDDED = 62;
   /** RegularExpression Id. */
-  int VAR = 60;
+  int VAR = 63;
   /** RegularExpression Id. */
-  int CONST = 61;
+  int CONST = 64;
   /** RegularExpression Id. */
-  int NUMBER = 62;
+  int NUMBER = 65;
   /** RegularExpression Id. */
-  int METAVAR = 63;
+  int METAVAR = 66;
   /** RegularExpression Id. */
-  int DIGIT = 64;
+  int DIGIT = 67;
   /** RegularExpression Id. */
-  int LOWER = 65;
+  int LOWER = 68;
   /** RegularExpression Id. */
-  int UPPER = 66;
+  int UPPER = 69;
   /** RegularExpression Id. */
-  int LETTER = 67;
+  int LETTER = 70;
   /** RegularExpression Id. */
-  int TAIL = 68;
+  int TAIL = 71;
   /** RegularExpression Id. */
-  int CHAR = 69;
+  int CHAR = 72;
 
   /** Lexical state. */
   int DEFAULT = 0;
   /** Lexical state. */
   int IN_LINE_COMMENT = 1;
+  /** Lexical state. */
+  int IN_PLUGIN_NOTATION = 2;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -102,9 +104,12 @@ public interface PGParserConstants {
     "\"\\n\"",
     "\"\\r\"",
     "\"//\"",
+    "\"/@\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<token of kind 52>",
+    "<token of kind 53>",
+    "\"@/\"",
+    "<token of kind 55>",
     "<LANGLE>",
     "<RANGLE>",
     "<DASH>",

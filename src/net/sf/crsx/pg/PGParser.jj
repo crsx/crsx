@@ -2334,9 +2334,10 @@ String Comment() throws IOException :
 	t=<COMMENT> {return t.toString();}
 }
 
-/** Spaces and line comments are just skipped. */
-SKIP : { " " | "\t" | "\n" | "\r" | "//" : IN_LINE_COMMENT }
+/** Spaces,line comments and plugin notations are just skipped. */
+SKIP : { " " | "\t" | "\n" | "\r" | "//" : IN_LINE_COMMENT | "/@" : IN_PLUGIN_NOTATION}
 <IN_LINE_COMMENT> SKIP : { "\n" : DEFAULT | "\r" : DEFAULT | <~[] > }
+<IN_PLUGIN_NOTATION> SKIP : { "@/" : DEFAULT | <~[]>}
 
 /** Complex tokens. */
 Token Name() :
