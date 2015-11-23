@@ -93,8 +93,7 @@ class GenericValuation implements Valuation
     		Variable freshV = sink.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow());
     		mapped = mapped.extend(v, freshV);
     	}
-        // ENTRY POINT to Contractum.contract().
-		return rule.staticContract(sink, this, mapped);
+       return rule.staticContract(sink, this, mapped);
 	}
     
     

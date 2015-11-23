@@ -1,0 +1,30 @@
+Test[(
+
+$Lax;
+
+{$String:$String}R ::= ( R1[$String]; );
+
+Test :: R;
+Test 
+→ Test2["v"];
+
+Test2[$String] :: R;
+Test2[#v]
+→ {}Test3[#v]; 
+
+{$String:$String}
+Test3[$String] :: R;
+{#E}Test3[#v]
+→ {#E; "f":#v} Test4[R1["w"]];
+
+{$String:$String}
+Test4[R] :: R;
+{#E; "f":#1}Test4[R1[#2]]
+→ {#E}Test5["f", R1[#1]];
+
+{$String:$String}
+Test5[$String, R] :: R;
+-[Data[#k]]:
+{#E}Test5[#k, R1[#2]]
+→ R1[$[{#E}Get, #k, #2]];
+)]

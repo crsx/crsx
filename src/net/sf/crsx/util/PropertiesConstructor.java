@@ -660,6 +660,52 @@ public class PropertiesConstructor extends DelegateConstructor
 		}
 	}
 
+	@Override
+	public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+	{
+		Constructor c = super.staticContract(valuation, renamings);
+		if (namedProperties.isEmpty() && variableProperties.isEmpty())
+		{
+			// When no properties just eliminate the property wrapper!
+			return c;
+		}
+		else
+		{
+			// Contract the properties!
+			Map<String, Term> np = new HashMap<String, Term>();
+			for (Map.Entry<String, Term> e : getLocalProperties().entrySet())
+			{
+				String key = e.getKey();
+				Term value = e.getValue();
+				Term contraction = Buffer.staticContraction((Contractum) value, valuation, renamings);
+				np.put(key, contraction);
+			}
+			Map<Variable, Term> vp = new HashMap<Variable, Term>();
+			for (Map.Entry<Variable, Term> e : getLocalVariableProperties().entrySet())
+			{
+				Variable patternKey = e.getKey();
+				Variable contractedKey = renamings.get(patternKey);
+				if (contractedKey == null)
+				{
+					contractedKey = valuation.getVariable(patternKey);
+					if (contractedKey == null)
+						contractedKey = patternKey; // unmatched variable not changed
+				}
+				Term value = e.getValue();
+				Term contraction = Buffer.staticContraction((Contractum) value, valuation, renamings);
+				vp.put(contractedKey, contraction);
+			}
+			try
+			{
+				return Util.wrapWithProperties(maker, c, np, vp);
+			}
+			catch (CRSException e)
+			{
+				throw new RuntimeException("Setting property failed during contraction", e);
+			}
+		}
+	}
+
 	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)
 			throws IOException
 	{

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,6 @@ public final class Util
 	/** Regular expression that conservatively approximates constructors that can be parsed without being quoted. */
 	public static final java.util.regex.Pattern CONSTRUCTOR_PATTERN = java.util.regex.Pattern.compile("(?:\\w*[$A-Z]+\\w*|[\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]|\\d+(?:[.]\\d+)?(?:[Ee]\\d+)?|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+|<(i|b|u|tt|q)>(?:[^<>&\n\r]|&(?:#[0-9]+|[-$A-Za-z0-9_]+);)+</\\1>)"
 			+ "(?:[-](?:[$A-Za-z]+\\w*|\\d+|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+))*");
-	// TODO: handle more...
 	
 	/** Conservative approximation of string that it is safe to print as an unquoted variable name */
 	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile("[a-z][A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
@@ -342,11 +342,19 @@ public final class Util
 		}
 		return fallback;
 	}
+	
+	static IdentityHashMap<String, String> externSymbols = new IdentityHashMap<String, String>();
 
 	/** Utility to export &lang;CONSTRUCTOR&rang; token in reparseable form. */
 	public static String externalizeConstructor(String symbol)
 	{
-		return CONSTRUCTOR_PATTERN.matcher(symbol).matches() ? symbol : Util.singleQuoteJava(symbol); // fall back to quoting as Java string
+		String extern = externSymbols.get(symbol);
+		if (extern == null)
+		{
+			extern = CONSTRUCTOR_PATTERN.matcher(symbol).matches() ? symbol : Util.singleQuoteJava(symbol); // fall back to quoting as Java string
+			externSymbols.put(symbol, extern);
+		}
+		return extern;
 	}
 
 	/** Utility to export literal in reparseable form. */
@@ -355,10 +363,18 @@ public final class Util
 		return Util.quoteJava(symbol); // fall back to quoting as Java string
 	}
 
+	static IdentityHashMap<String, String> externVars = new IdentityHashMap<String, String>();
+
 	/** Utility to export &lang;VARIABLE&rang; token in reparseable form. */
 	public static String externalizeVariable(String name)
 	{
-		return name == null ? "vNULL" : VARIABLE_PATTERN.matcher(name).matches() ? name : "v" + Util.quoteJava(name); // fall back to quoting as Java string
+		String extern = externVars.get(name);
+		if (extern == null)
+		{
+			extern = name == null ? "vNULL" : VARIABLE_PATTERN.matcher(name).matches() ? name : "v" + Util.quoteJava(name); // fall back to quoting as Java string
+			externVars.put(name, extern);
+		}
+		return extern;
 	}
 
 	/** Utility to export &lang;METAVARIABLE&rang; token in reparseable form. */

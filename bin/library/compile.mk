@@ -63,7 +63,7 @@ $(OUTPUTDIR)/$(crsbasename) : $(crsdrfile)
 $(crsliteralsdrfile) : $(crsdrfile)
 
 $(crsdrfile): $(CRSFILE) prereq
-	@$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules="$<" simple-terms sortify dispatchify simplify reify="$@" 
+	@$(RUNCRSXRC) "grammar=('net.sf.crsx.text.Text';)" rules="$<" simple-terms sortify dispatchify simplify inline reify="$@" 
 
 $(literals): $(crsliteralsdrfile) prereq
 	$(CRSXC) MODULE="$(crsbasename)" wrapper=ComputeLiterals input="$<" > "$@"

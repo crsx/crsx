@@ -1,0 +1,17 @@
+// Closure conversion test.
+
+// Functional binder within a data sort
+TestCC9[(
+
+$Lax;
+
+Cont ::= ( CONT[vᵇ::$Numeric.$Numeric]; );
+
+Test :: $Numeric;
+Test → Test1[CONT[vᵇ.vᵇ]];
+
+Test1[Cont] :: $Numeric;
+Test1[CONT[vᵇ.#[vᵇ]]] → #[3];
+
+
+)]

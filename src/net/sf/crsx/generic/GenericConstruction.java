@@ -775,6 +775,9 @@ public abstract class GenericConstruction extends GenericTerm
 			     Variable b = termBinders[j];
 			     if (!pb.promiscuous() && b.promiscuous())
 			         return false; // linear pattern binder does not match unrestricted real binder
+			     //if (pb.blocking() != b.blocking())
+			     //    return false; 
+			     
 			     match.putVariable(pb, b);
 			 }
 // TODO: linearity.
@@ -990,10 +993,12 @@ public abstract class GenericConstruction extends GenericTerm
 			
 			// Copy subterm using the new bindings.
 			sink = ((Contractum) sub(i)).staticContract(sink, valuation, innerRenamings);
+			
+			if (sink == null)
+				return null;
 		}
 		
 		return sink.end();
-		
 	}
 	
 	@Override

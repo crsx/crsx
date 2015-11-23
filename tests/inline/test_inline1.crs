@@ -1,0 +1,15 @@
+Test[(
+
+$Lax;
+
+$Use["bool.crs"];
+
+W ::= ( W[Boolean]; );
+
+Test :: Boolean;
+Test → F[W[False]];
+
+F[W] :: Boolean;
+F[W[#]] → #;
+
+)]

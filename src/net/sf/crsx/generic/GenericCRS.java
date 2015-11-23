@@ -889,7 +889,9 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 						Term t = b.term(false);
 						assert t != null : "Generated dumped rules term is not buffered!";
 						Appendable a = output(directive.sub(0));
-						t.appendTo(a, new HashMap<Variable, String>(), Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
+						Map<Variable,String> used = new IdentityHashMap<Variable, String>();
+						//used.put(null, "1");
+						t.appendTo(a, used, Integer.MAX_VALUE, factory.defined(Factory.SIMPLE_TERMS), true, true, null, factory.defined(Factory.SORT_PROPERTIES));
 						if (a instanceof Flushable)
 							((Flushable) a).flush();
 						if (a instanceof Closeable)
@@ -2067,6 +2069,8 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		final SortedMultiMap<String, GenericRule> rulesByFunction = new SortedHashMultiMap<String, GenericRule>();
 		classifySymbols(constructors, dataForms, functionForms, fullSort, rulesByFunction, rulesByFunction);
 
+		
+		System.out.println("dump sort aliases");
 		// Sort aliases.
 		for (Map.Entry<String, String> e : factory.sortAliases.entrySet())
 		{
@@ -2078,7 +2082,11 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			sink = sink.end(); // ] of $SortAlias
 		}
 
+		System.out.println("dump data sorts");
+		
 		// Data sort declarations.
+		int current = 1;
+		int count = dataForms.size();
 		for (Map.Entry<String, Set<Term>> e : dataForms.entrySet())
 		{
 			sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL)); // $Cons[
@@ -2126,8 +2134,15 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()
 			while (innerEnds-- > 0)
 				sink = sink.end(); // ]]]] of inner $Cons/$Sort/∀
+			
+			System.out.print(current + "/" + count + "\r");
+			current ++;
 		}
-
+		
+		System.out.println("\ndump functions");
+		current = 1;
+		count = functionForms.size();
+		
 		// Print function declarations (sort (if any) + rules).
 		for (Map.Entry<String, Set<GenericRule>> e : rulesByFunction.entrySet())
 		{
@@ -2135,6 +2150,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 
 			// Find sort for function, if any.
 			if (functionForms.multiContainsKey(function))
+			{
 				for (Pair<Term, Term> p : functionForms.get(function))
 				{
 					Term sort = p.head();
@@ -2166,7 +2182,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 							sink = sink.end(); // ]] of inner $FunctionSort/∀s
 					}
 				}
-
+			}
 			TreeMap<String, GenericRule> functionRulesByName = new TreeMap<String, GenericRule>();
 			for (GenericRule rule : e.getValue())
 				functionRulesByName.put(rule.name(), rule);
@@ -2240,8 +2256,12 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 				sink = contractum.copy(sink, false, LinkedExtensibleMap.EMPTY_RENAMING); // contractum
 				sink = sink.end(); // ] of $Rule
 			}
+			
+			System.out.print(current + "/" + count + "\r");
+			current ++;
 		}
-
+		System.out.println("");
+		
 		// End.
 		sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()
 		while (declarationEnds-- > 0)
@@ -2260,6 +2280,9 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 	 */
 	private void classifySymbols(Set<String> constructors, SortedMultiMap<String, Term> dataForms, SortedMultiMap<String, Pair<Term, Term>> functionForms, Map<String, Term> fullSort, SortedMultiMap<String, GenericRule> rulesByFunction, SortedMultiMap<String, GenericRule> shuffleRulesByFunction)
 	{
+		System.out.print("Classify symbols...");
+		
+		
 		// Updated with all data forms from {@link Factory#formsOf(String)} for all sorted symbols.
 		final Set<Pair<Term, Term>> allDataForms = new HashSet<Pair<Term, Term>>();
 
@@ -2311,8 +2334,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 					String function = Util.symbol(pattern);
 					GenericTerm contractum = q.two();
 					Constructor rulename = q.three(); //function + (pattern.arity() > 0 && pattern.sub(0).kind() == Kind.CONSTRUCTION ? "-" + Util.symbol(pattern.sub(0)) : "");
-//					if (rulename.symbol().contains("EB-Code-ForDo-Emit-Tuple-2"))
-//						factory.warning("karma");
 
 					Map<String, List<Term>> options = q.four();
 					if (contractum != null) // defensive to avoid follow-on errors from dispatchifier failure
@@ -2333,19 +2354,20 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		
 		if (inline)
 		{
-			if (verbosity > 0)
-				System.out.println("inline.... disabled");
+			//if (verbosity > 0)
+				System.out.print("inline....");
 			
-			// Not yet quite working...
-//			try
-//			{
-//				new Inliner(this).inline(constructors, dataForms, functionForms, fullSort, rulesByFunction, shuffleRulesByFunction);
-//			}
-//			catch (CRSException e1)
-//			{
-//				e1.printStackTrace();
-//			}
+			try
+			{
+				new Inliner(this).inline(constructors, dataForms, functionForms, fullSort, rulesByFunction, shuffleRulesByFunction);
+			}
+			catch (CRSException e)
+			{
+				e.printStackTrace();
+			}
 		}
+
+		System.out.println("...done");
 	}
 
 	/**

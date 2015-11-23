@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.crsx.Builder;
-import net.sf.crsx.CRS;
 import net.sf.crsx.CRSException;
 import net.sf.crsx.Constructor;
 import net.sf.crsx.Contractum;
@@ -710,17 +709,19 @@ public class GenericRule implements Copyable
 					case VARIABLE_USE :
 						if (sub.binders(i) == null || sub.binders(i).length == 0)
 						{
-							// Term of the form T[ ... x..y.S[...v..] ..]
-							// This is not a deep variable. 
+							// Term of the form T[ ... x..y.S[...v ...] ...]
+							// v is not a deep variable. 
 							// Continue on the next sub...
-
 						}
 						else
 						{
-							// Term of the form T[ ... x..y.S[...z.v..] ..]
-
-							// This is either the identity function or constant.
-							// That's considered deep
+							// Term of the form T[ ... x y.S[... z.v ...] ...]
+							// or               T[ ... x y.S[... v.v ...] ...]
+         					// This is either the identity function (v.v) or constant (z.v).
+							
+							// In both cases we need to perform closure conversion
+							// so consider this variable as deep.
+							
 							return true;
 						}
 						break;
@@ -906,14 +907,6 @@ public class GenericRule implements Copyable
 	}
 
 	/**
-	 * Whether the term is marked as "inline"
-	 */
-	public boolean inline()
-	{
-		return options != null && options.containsKey(Builder.INLINE_OPTION_SYMBOL);
-	}
-
-	/**
 	 * Attempt to apply the rule.
 	 * @param term to match rule against
 	 * @return valuation with successful unification result, or null if there is no match
@@ -991,6 +984,40 @@ public class GenericRule implements Copyable
 	}
 
 	/**
+	 * Whether this rule should be inlined
+	 */
+	public boolean inline()
+	{
+		if(options != null && options.containsKey(Builder.INLINE_OPTION_SYMBOL))
+			return true;
+		
+		if (!forced.isEmpty())
+		{
+			// Currently there is no way to forced inlined term, so fail...
+			return false;
+		}
+		
+		if (!fresh.isEmpty())
+		{
+			// Could be done but for now disable. 
+			return false;
+		}
+		
+		if (!copied.isEmpty())
+		{
+			// In general not a good idea, except if meta is data, which is not known here.
+			return false;
+		}
+		
+		// If contractum is a meta application, don't inline as the argument is normalized.
+		if (contractum.kind() == Kind.META_APPLICATION)
+			return false;
+		
+		return true;
+	}
+
+	
+	/**
 	 * Statically contract this fragment of contractum (rule right hand side) to sink.
 	 * Reduces Data-declared fragments followed by contraction.
 	 * @param sink to send the fragment to
@@ -1000,11 +1027,9 @@ public class GenericRule implements Copyable
 	 */
 	Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
 	{
-		if (!forced.isEmpty())
-		{
-			// no way to forced inlined term.
+		if (!inline())
 			return null;
-		}
+		
 		return contractum.staticContract(sink, valuation, renamings);
 	}
 

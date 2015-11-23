@@ -103,6 +103,22 @@ public class Buffer extends DelegateMaker implements Copyable
         contractum.contract(b.sink(), valuation, renamings);
         return b.term(true);
     }
+    
+    /**
+     * Return materialized static contraction.
+     * @param contractum to contract [sic]
+     * @param valuation with match to contract with
+     * @param renamings to 
+     * @return contracted term
+     */
+    public static Term staticContraction(Contractum contractum, Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
+    {
+        Buffer b = new Buffer(contractum.maker());
+        contractum.staticContract(b.sink(), valuation, renamings);
+        return b.term(true);
+    }
+    
+    
 
 	/**
 	 * Load substituted term...

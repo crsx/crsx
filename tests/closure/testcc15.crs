@@ -1,0 +1,17 @@
+// Closure conversion test.
+
+// NeFunctional binder within a data sort
+TestCC15[(
+
+$Lax;
+
+Test :: $Numeric;
+Test → Test1[5];
+
+Test1[$Numeric] :: $Numeric;
+Test1[#v] → Twice[xᵇ. Twice[yᵇ. x, 1], #v];
+
+∀ a . Twice[xᵇ::a. $sort[a], a] :: a ;
+Twice[xᵇ. #[x], #v] → #[#[#v]];
+
+)]

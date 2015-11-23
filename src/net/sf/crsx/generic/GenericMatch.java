@@ -76,10 +76,10 @@ class GenericMatch implements Match, Cloneable
 
 	public void putSubstitute(String name, Variable[] binders, Term term)
 	{
-		if (copyCount.containsKey(name))
+		//if (copyCount.containsKey(name))
 		    // Use substitution that merely reuses bound variables and copies...
-		    lastSubstitute = new SubstituteCreatedCopyLink(lastSubstitute, name, binders, term, copyCount.get(name));
-		else
+		//    lastSubstitute = new SubstituteCreatedCopyLink(lastSubstitute, name, binders, term, copyCount.get(name));
+		//else
 		    // Unoptimized generic substitution.
 		    lastSubstitute = new SubstituteCreatedSubstituteLink(lastSubstitute, name, binders, term);
 	}

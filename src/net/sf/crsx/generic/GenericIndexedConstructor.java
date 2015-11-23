@@ -127,7 +127,7 @@ final public class GenericIndexedConstructor implements Constructor
 	
 	public Constructor staticContract(Valuation valuation, ExtensibleMap<Variable, Variable> renamings)
 	{
-		return this;
+		throw new RuntimeException();
 	}
 
 	public void appendTo(Appendable writer, Map<Variable, String> used, int depth, boolean full, boolean namedProps, boolean variableProps, Set<Variable> omitProps, boolean sortProps)

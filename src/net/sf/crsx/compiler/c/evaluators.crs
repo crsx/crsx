@@ -2126,6 +2126,14 @@ ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «str»);
 
 // $[ProfileEnter, #id, #name, #cont]  
 
+{#env}E-poly[E_ProfileEnter, (#Name; VARIABLE-USE[#var]; #name; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
+→
+{#env; "$tail":NO}T-local-string[#name, #sink, s p.%n⟪
+PROFILE_ENTER(«#sink»->context, VARIABLE(«#var»), «s»);«p»
+«{#env}#Tail[OK, #cont]»
+⟫]
+;
+
 Poly-ProfileEnter
 :
 {#env}E-poly[E_ProfileEnter, (#Name; META-APPLICATION[#MetaVar, #Args, #Use]; #name; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
@@ -2136,7 +2144,15 @@ PROFILE_ENTER(«#sink»->context, VARIABLE(«{#env}MetaVar[#MetaVar]»), «s»);
 ⟫]
 ;
 
+
 // $[ProfileExit, #id, #cont]  
+
+{#env}E-poly[E_ProfileExit, (#Name; VARIABLE-USE[#var]; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
+→
+%n⟪PROFILE_EXIT(«#sink»->context, VARIABLE(«#var»));
+«{#env}#Tail[OK, #cont]»
+⟫
+;
 
 Poly-ProfileExit 
 :
@@ -2146,6 +2162,7 @@ Poly-ProfileExit
 «{#env}#Tail[OK, #cont]»
 ⟫
 ;
+
 
 // $[Error[#kind], #format[, #arg,...]] emits an exception.
 //

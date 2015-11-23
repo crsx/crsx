@@ -1,0 +1,17 @@
+Test[(
+
+$Lax;
+
+$Use["bool.crs"];
+$Use["org/crsx/common.crs"];
+
+W ::= ( W[Boolean]; );
+
+Test :: Boolean;
+
+-[Fresh[i::$Numeric]]: Test → CI-Enter[i, "blash", F[W[False]]];
+
+F[W] :: Boolean;
+F[W[#]] → #;
+
+)]

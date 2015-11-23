@@ -945,6 +945,19 @@ public class GenericMetaApplication extends GenericTerm
 
 	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
 	{
+		Substitute s = valuation.getSubstitute(metaVariable);
+		if (s != null)
+		{
+			if (data)
+			{
+				// TODO: should be forced but can't for now.
+				return null;
+			}
+			
+			
+			return s.substitute(valuation, sub).copy(sink, true, renamings); // normal case...
+		}
+		
 		return null;
 	}
 

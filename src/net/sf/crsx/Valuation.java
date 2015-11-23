@@ -30,7 +30,9 @@ public interface Valuation
 	
 	/**
 	 * Static contract.  
+	 * 
 	 * @param sink to send static contraction to.
+	 * @return continuing sink or null if static contraction failed. 
 	 */
 	Sink staticContract(Sink sink);
 	

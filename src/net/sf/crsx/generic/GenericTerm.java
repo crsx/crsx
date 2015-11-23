@@ -836,7 +836,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 		}
 	}
 
-	// Detect whether term contains a $ primitive  
+	// Detect whether term contains a Meta Property key  
 	private static class HasMetaPropertyKey extends Visitor
 	{
 		// Whether the term has meta
@@ -858,10 +858,7 @@ abstract public class GenericTerm implements Pattern, Contractum
 				public void visitMetaApplication(Term metaApplication, boolean start, Set<Variable> bound) throws CRSException
 				{
 					if (start)
-					{
-						String mv = metaApplication.metaVariable();
-						metas.add((GenericMetaApplication) metaApplication);
-					}
+						metas.add((GenericMetaApplication) metaApplication);			
 				}
 			};
 		try
