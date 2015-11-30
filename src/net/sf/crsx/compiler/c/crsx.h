@@ -1074,6 +1074,10 @@ struct _SubstitutionFrame
     Term *substitutes;         // count redex subterms to substitute for variables, in order
 };
 
+SubstitutionFrame makeSubstitution(Context context, SubstitutionFrame parent, int parentCount, int count, Variable* variables, Term* substitutes);
+
+void freeSubstitution(Context context, SubstitutionFrame frame);
+
 #ifndef SUBSTITUTE
 # define SUBSTITUTE(sink,term,substitution) metaSubstitute(sink, term, substitution)
 #endif

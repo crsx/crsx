@@ -249,6 +249,23 @@ public class GenericMetaApplication extends GenericTerm
 		return sink.endMetaApplication();
 	}
 
+
+	public Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		if (possible.isEmpty())
+			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
+
+		sink = sink.startMetaApplication(metaVariable);
+		for (int i = 0; i < sub.length; ++i)
+		{
+			sink = sub[i].staticSubsubstitute(sink, valuation, renamings, substitution, bound, possible);
+			if (sink == null) 
+				return null; // static substitution failed.
+		}
+		return sink.endMetaApplication();
+	}
+
+	
 	public boolean equalsModulo(Term that, ExtensibleMap<Variable, Variable> renamings)
 	{
 		if (that.kind() != Kind.META_APPLICATION)
@@ -955,7 +972,7 @@ public class GenericMetaApplication extends GenericTerm
 			}
 			
 			
-			return s.substitute(valuation, sub).copy(sink, true, renamings); // normal case...
+			return s.staticSubstitute(valuation, sub).copy(sink, true, renamings); // normal case...
 		}
 		
 		return null;

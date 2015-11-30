@@ -1,30 +1,23 @@
 Test[(
 
+// Test inlining nesting environment
+
 $Lax;
 
-{$String:$String}R ::= ( R1[$String]; );
+{$String: RN}R ::= ( R0; R1[R]; );
+{$String: $String}RN ::= ( RN0; );
 
 Test :: R;
-Test 
-→ Test2["v"];
+Test → T1[{}R0, x.R1[x], {"THERE":RN0}R0];
 
-Test2[$String] :: R;
-Test2[#v]
-→ {}Test3[#v]; 
+T1[R, x::R.R, R] :: R;
+T1[{#E}R0, x.#[x], #1]
+→
+T2[x.#[x], #1, {#E; "K1" : RN0}R0];
 
-{$String:$String}
-Test3[$String] :: R;
-{#E}Test3[#v]
-→ {#E; "f":#v} Test4[R1["w"]];
+T2[x::R.R, R, R] :: R;
+T2[x.#[x], {#E1}R0, {#E2}R0]
+→
+#[{#E2; "K2" : {#E1}RN0}R0];
 
-{$String:$String}
-Test4[R] :: R;
-{#E; "f":#1}Test4[R1[#2]]
-→ {#E}Test5["f", R1[#1]];
-
-{$String:$String}
-Test5[$String, R] :: R;
--[Data[#k]]:
-{#E}Test5[#k, R1[#2]]
-→ R1[$[{#E}Get, #k, #2]];
 )]

@@ -79,6 +79,11 @@ final public class JokerConstructor implements Constructor
 	{
 		return this;
 	}
+	
+	public Constructor staticSubsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		return this;
+	}
 
 	public boolean checkFree(Collection<Variable> forbidden, Collection<Variable> once, Collection<Variable> onceSeen, boolean promiscuous, ExtensibleSet<Variable> bound)
 	{

@@ -1842,6 +1842,11 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		throw new UnsupportedOperationException();
 	}
 
+	public Constructor staticSubsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		throw new UnsupportedOperationException();
+	}
+
 	public Constructor unify(Unification unification, Constructor that, StackedMap<Variable> rho, StackedMap<Variable> rhoprime)
 	{
 		throw new UnsupportedOperationException();
@@ -2004,6 +2009,11 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		throw new UnsupportedOperationException(); // you gotta be kidding
 	}
 
+	public Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		throw new UnsupportedOperationException(); // you gotta be kidding
+	}
+
 	public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException
 	{
 		throw new UnsupportedOperationException(); // you gotta be kidding
@@ -2070,7 +2080,6 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 		classifySymbols(constructors, dataForms, functionForms, fullSort, rulesByFunction, rulesByFunction);
 
 		
-		System.out.println("dump sort aliases");
 		// Sort aliases.
 		for (Map.Entry<String, String> e : factory.sortAliases.entrySet())
 		{
@@ -2082,11 +2091,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			sink = sink.end(); // ] of $SortAlias
 		}
 
-		System.out.println("dump data sorts");
-		
 		// Data sort declarations.
-		int current = 1;
-		int count = dataForms.size();
 		for (Map.Entry<String, Set<Term>> e : dataForms.entrySet())
 		{
 			sink = sink.start(sink.makeConstructor(CRS.CONS_SYMBOL)); // $Cons[
@@ -2135,13 +2140,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			while (innerEnds-- > 0)
 				sink = sink.end(); // ]]]] of inner $Cons/$Sort/∀
 			
-			System.out.print(current + "/" + count + "\r");
-			current ++;
 		}
-		
-		System.out.println("\ndump functions");
-		current = 1;
-		count = functionForms.size();
 		
 		// Print function declarations (sort (if any) + rules).
 		for (Map.Entry<String, Set<GenericRule>> e : rulesByFunction.entrySet())
@@ -2207,8 +2206,13 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 				{
 					Map<Variable,Term> fresh = new HashMap<Variable, Term>();  // fresh variables (so we can remove the reused ones).
 					for (Term t : rule.getOptions().get(Builder.FRESH_OPTION_SYMBOL))
-						if (t != null && t.kind() == Kind.VARIABLE_USE)
-							fresh.put(t.variable(), factory.newVariableUse(t.variable()));
+					{
+						if (t != null)
+						{
+							Variable v = Util.variableWithOptionalSortVariable(t);
+							fresh.put(v, factory.newVariableUse(v));
+						}
+					}
 					if (rule.reused != null && !rule.reused.isEmpty())
 						for (Variable v : rule.reused.values())
 							if (fresh.containsKey(v))
@@ -2257,10 +2261,7 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 				sink = sink.end(); // ] of $Rule
 			}
 			
-			System.out.print(current + "/" + count + "\r");
-			current ++;
 		}
-		System.out.println("");
 		
 		// End.
 		sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end(); // ()

@@ -118,6 +118,20 @@ public interface Term extends Stub
 	 */
 	Sink subsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable,Variable> bound, Set<Variable> possible);
 
+	/**
+	 * Statically copy this term as part of subterms inserted by substitution.
+	 * (Invoked from {@link Contractum#contract(Sink, Valuation, ExtensibleMap)} when inserting a fragment of the matched redex,
+	 * as well as recursively, thus this term is part of the redex.)
+	 * @param sink to copy to
+	 * @param valuation of original match (passed to nested contractions resulting from substituted variables)
+	 * @param renamings in effect for contraction (passed to nested contractions resulting from substituted variables)
+	 * @param substitution maps the variables in the pattern to the corresponding fragments of the contractum (passed to nested contractions)
+	 * @param bound variables locally in the matched term (renames in the redex)
+	 * @param possible variables that can still occur in redex needing substitution
+	 */
+	Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable,Variable> bound, Set<Variable> possible);
+
+	
     /**
      * Visit all subterms of term.
      * @param visitor to use

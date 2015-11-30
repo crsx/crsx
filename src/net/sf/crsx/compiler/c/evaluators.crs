@@ -167,8 +167,9 @@ E-OptionDiscard2[#sink, PROPERTY_VARIABLE[#namedP, #varP]]
 %n⟪ ⟫
 ; // property refs are unlink at the end of the step function
 
-// Strict evaluation helpers
 
+
+// Strict evaluation helpers
 
 {$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
 E-send-tail :: Text;
@@ -2083,6 +2084,7 @@ POLY_PRIMITIVE[E_ProfileEnter];
 POLY_PRIMITIVE[E_ProfileExit];
 POLY_PRIMITIVE[E_Let];
 POLY_PRIMITIVE[E_For];
+POLY_PRIMITIVE[E_Data];
 
 )];
 
@@ -2297,6 +2299,14 @@ Term «value»;« {#env; "$tail": NO} T-set[#value, #sink, value] »
 Poly-For:
 {#env} E-poly[E_For, (#name; #vars; #list; #params; #init; #body; #result;), #options, #sink, ok result.#tail[ok,result]]
 → {#env}E-poly-for[#vars, #list, #params, #init, #body, #result, #options, #sink, ok result.#tail[ok,result]];
+
+
+// $[Data, #term]
+-[Fresh[term::Text]]:
+{#env}E-poly[E_Data, (#name; #term;), #options, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+Term «term»;« {#env; "$tail": NO} T-set[#term, #sink, term]»
+«term» = NORMALIZEP(«#sink»->context, «term»);«{#env}E-poly-term-result[term, ok result.#tail[ok,result]]»⟫;
 
 )];
 
@@ -3023,6 +3033,21 @@ E-poly-for-body[Reified_Term, $List[$List[Reified_Option]], Text] :: Text;
 → %n⟪
 Term «newvalues»;«{#env}T-set[#body, #sink, newvalues]»
 «newvalues» = NORMALIZEP(«#sink»->context, «newvalues»);«{#env}E-poly-for-update[$[Equal, #istuple, YES], $False, #params, newvalues, #options, #sink]»⟫;
+
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-term-result[Text/* resulting term */, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+{#env}E-poly-term-result[#term, ok result.#tail[ok,result]]
+→ {#env}E-poly-term-result2[$[:,"MetaVar$", $[Show, #term]], #term, $[Show, #term], ok result.#tail[ok,result]];
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-term-result2[$String, Text, $String, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+-[Data[#metavarKey, #term, #metavar]]:
+{#env}E-poly-term-result2[#metavarKey, #term, #metavar, ok result.#tail[ok,result]]
+→ {#env; #metavarKey: VARIABLE[#term]}#tail[OK, META-APPLICATION[#metavar, (), USE[1]]];
+
 
 )]; // E3
 

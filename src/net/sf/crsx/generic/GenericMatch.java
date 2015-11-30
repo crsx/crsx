@@ -222,6 +222,14 @@ class GenericMatch implements Match, Cloneable
 				}
 			};
         }
+		
+
+		@Override
+		public Copyable staticSubstitute(Valuation valuation, Term[] replacement)
+		{
+			return substitute(valuation, replacement);
+		}
+		
         public Variable[] getBindings()
         {
             return bindings;
@@ -288,6 +296,7 @@ class GenericMatch implements Match, Cloneable
 		{
 			return this;
 		}
+		
 		// Substitute...
 		public boolean rematch(Match match, Variable[] bs, Term term)
 		{
@@ -297,6 +306,7 @@ class GenericMatch implements Match, Cloneable
 				return false;
 			return getBody().equalsModulo(term, LinkedExtensibleMap.EMPTY_RENAMING);
 		}
+		
 		public Copyable substitute(final Valuation valuation, final Term[] sub)
 		{
 			return new Copyable()
@@ -322,6 +332,34 @@ class GenericMatch implements Match, Cloneable
 				}
 			};
 		}
+		
+		public Copyable staticSubstitute(final Valuation valuation, final Term[] sub)
+		{
+			return new Copyable()
+			{
+				public Sink copy(Sink sink, boolean discard, ExtensibleMap<Variable, Variable> renamings)
+				{
+					if (crs instanceof GenericCRS) ++((GenericCRS) crs).substituteProper;
+		            final int arity = sub.length;
+		            if (arity != bindings.length)
+		            	assert false : "rhs meta-application arity does not match pattern for "+valuation.name();
+		            // There is actual substitution work to do so we must...
+		            ExtensibleMap<Variable, Contractum> substitution = LinkedExtensibleMap.EMPTY_SUBSTITUTION;
+		            for (int i = 0; i < arity; ++i)
+		            {
+		            	if (i  >= bindings.length || i >= sub.length)
+		            		System.err.println("Error in copy of subterm ");
+		            	else
+		            		substitution = substitution.extend(bindings[i], (Contractum) sub[i]);
+		            }
+		            // NOTE: THIS IS THE ONLY ENTRY POINT TO CALLING Term.subsubstitute() FOR MATCHING (except for the properties one...)!
+		            // (Unification also uses it in class UnificationSubstitute.)
+		            return getBody().staticSubsubstitute(sink, valuation, renamings, substitution, LinkedExtensibleMap.EMPTY_RENAMING, new HashSet<Variable>(substitution.keySet()));
+				}
+			};
+		}
+		
+		
 		public Variable[] getBindings()
         {
             return bindings;

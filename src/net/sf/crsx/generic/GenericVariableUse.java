@@ -220,6 +220,30 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 		return subContractum.contract(sink, valuation, renamings);
 	}
 
+	public Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		Variable v = bound.get(variable);
+		if (v != null)
+		{
+			if (factory.verbosity() >= 6)
+				factory.message("VARIABLE " + variable + " RENAMED TO " + v);
+			return sink.use(v); // locally bound variable mapped to new definition
+		}
+
+		Contractum subContractum = substitution.get(variable);
+		if (subContractum == null)
+		{
+			if (factory.verbosity() >= 6)
+				factory.message("VARIABLE " + variable + " UNCHANGED");
+			return sink.use(variable); // free variable just copied
+		}
+
+		if (!variable.promiscuous())
+			possible.remove(variable); // used to switch to copying
+
+		return subContractum.staticContract(sink, valuation, renamings);
+	}
+
 	public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException
 	{
 		visitor.visitUse(this, true, bound);
@@ -477,6 +501,7 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
 	{
 		return null;
+		//return contract(sink, valuation, renamings);
 	}
 
 

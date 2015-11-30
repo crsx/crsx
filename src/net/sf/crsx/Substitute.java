@@ -29,6 +29,15 @@ public interface Substitute
 	 */
 	Copyable substitute(Valuation valuation, Term[] replacement);
 	
+	/**
+	 * Statically apply the substitute to a list of contractum replacement fragments!
+	 * @param valuation with result of match
+	 * @param replacement terms for the substitute's binders (where further substitutions will happen)
+	 * @return the result of the substitution
+	 */
+	Copyable staticSubstitute(Valuation valuation, Term[] replacement);
+	
+	
 	/** The bindings of this substitute. */
 	Variable[] getBindings();
 	

@@ -136,6 +136,21 @@ public class Buffer extends DelegateMaker implements Copyable
     }
 
     /**
+	 * Statically load substituted term...
+	 * @param valuation of original match (for nested contractions)
+	 * @param renamings in effect
+	 * @param substitution maps the variables in the pattern to the corresponding fragments of the contractum
+	 * @param bound variables locally in this term
+	 * @param possible variables that can still occur in redex needing substitution
+	 */
+    public static Term staticSubsubstitute(Term term, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+    {
+        Buffer b = new Buffer(term.maker());
+        term.staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
+        return b.term(true);
+    }
+    
+    /**
      * Materialize constant term with wrapper construction.
      * @param maker to use for materialization
      * @param tag of wrapper construction

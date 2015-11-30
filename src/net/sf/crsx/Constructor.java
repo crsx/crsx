@@ -88,6 +88,18 @@ public interface Constructor extends PropertiesHolder
 	 * @param possible variables that can still occur in redex needing substitution
 	 */
 	Constructor subsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable,Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable,Variable> bound, Set<Variable> possible);
+	 
+	/**
+	 * Statically copy this constructor as part of a subterm subject to substitution.
+	 * (Invoked by {@link Term#subsubstitute(Sink, Valuation, ExtensibleMap, ExtensibleMap, ExtensibleMap, Set)}.)
+	 * @param maker for term construction
+	 * @param valuation of original match (for nested contractions)
+	 * @param renamings in effect in contractum (for nested contractions)
+	 * @param substitution maps the variables in the pattern to the corresponding fragments of the contractum
+	 * @param bound variables locally in this term
+	 * @param possible variables that can still occur in redex needing substitution
+	 */
+	Constructor staticSubsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable,Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable,Variable> bound, Set<Variable> possible);
 
     /**
      * Visit all subterms that are contained <em>within</em> the constructor itself.

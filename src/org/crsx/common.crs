@@ -60,6 +60,14 @@ CI-Exit[#id, #] → $[ProfileExit, #id, #];
 ∀ a. CI-ThenExit[OK_SORT, $Numeric, ok¹::OK_SORT.$sort[a]] :: a;
 CI-ThenExit[OK, #id, ok¹.#[ok¹]] → $[ProfileExit, #id, #[OK]]; 
 
+// Functional Delay variant.
+∀ a. CI-ThenEnterF[OK_SORT, $Numeric, $String, okᵇ::OK_SORT.$sort[a]] :: a;
+CI-ThenEnterF[OK, #id, #name, okᵇ.#[okᵇ]] → $[ProfileEnter, #id, #name, #[OK]]; 
+
+// Delay variant 
+∀ a. CI-ThenExitF[OK_SORT, $Numeric, okᵇ::OK_SORT.$sort[a]] :: a;
+CI-ThenExitF[OK, #id, okᵇ.#[okᵇ]] → $[ProfileExit, #id, #[OK]]; 
+
 
 ∀ a.Tuple1[a] ::= ( Tuple1[a]; );
 ∀ a b.Tuple2[a,b] ::= ( Tuple2[a, b]; );

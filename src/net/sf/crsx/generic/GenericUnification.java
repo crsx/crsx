@@ -76,6 +76,23 @@ public class GenericUnification implements Unification
 				}
 			};
 		}
+
+		@Override
+		public Copyable staticSubstitute(final Valuation valuation, final Term[] replacement)
+		{
+			return new Copyable()
+			{
+				public Sink copy(Sink sink, boolean discard, ExtensibleMap<Variable, Variable> renamings)
+				{
+		            final int arity = replacement.length;
+		            assert arity == binders.length: "Substitute applied to wrong number of arguments during unification";
+		            ExtensibleMap<Variable, Contractum> substitution = LinkedExtensibleMap.EMPTY_SUBSTITUTION;
+		            for (int i = 0; i < arity; ++i)
+		                substitution = substitution.extend(binders[i], (Contractum) replacement[i]);
+		            return body.staticSubsubstitute(sink, valuation, renamings, substitution, LinkedExtensibleMap.EMPTY_RENAMING, new HashSet<Variable>());
+				}
+			};
+		}
 	}
 
 	//Maps from metavariables (names) to substitutes.

@@ -169,6 +169,11 @@ public class PropertiesWrapperConstructor extends GenericProperties implements C
 	{
 		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
 	}
+	
+	public Constructor staticSubsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		throw new UnsupportedOperationException("Misuse of PropertiesWrapperConstructor?");
+	}
 
 	public boolean checkFree(Collection<Variable> forbidden, Collection<Variable> once, Collection<Variable> onceSeen, boolean promiscuous, ExtensibleSet<Variable> bound)
 	{

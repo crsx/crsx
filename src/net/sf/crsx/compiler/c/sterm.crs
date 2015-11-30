@@ -531,8 +531,9 @@ ST-substitute2[#metavar, (), USE[#Count], #sink, #arity, #prefix, #vars, #args, 
 %n⟪« #prefix »
 Variable «vars»[«INTEGER[#used]»] = {«#vars»};
 Term «args»[«INTEGER[#used]»] = {«#args»};
-struct _SubstitutionFrame «substitution» = {NULL, 0, «INTEGER[#used]», «vars», «args»};
-SUBSTITUTE(«#sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, ST-link-prefix[#sink]]»«{#env}MetaVar[#metavar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», &«substitution»);« ST-send-tail[#Tail] »⟫;
+SubstitutionFrame «substitution» = makeSubstitution(«#sink»->context, NULL, 0, «INTEGER[#used]», «vars», «args»);
+SUBSTITUTE(«#sink», «$[If, $[Equal, #Count, 1], %n⟨⟩, ST-link-prefix[#sink]]»«{#env}MetaVar[#metavar]»«$[If, $[Equal, #Count, 1],%n⟨⟩, %n⟨)⟩]», «substitution»);
+freeSubstitution(«#sink»->context, «substitution»); « ST-send-tail[#Tail] »⟫;
 
 // Skip reusable substitution component.
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}

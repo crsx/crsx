@@ -1329,6 +1329,12 @@ public class Sorter
 				sort = factory.newVariableUse(alpha);
 				break;
 			}
+			case DATA : {
+				Variable alpha = freshSortVariable();
+				argumentsorts[0] = factory.newVariableUse(alpha);
+				sort = factory.newVariableUse(alpha);
+				break;
+			}
 			case LET: {
 				Variable alpha = freshSortVariable();
 				argumentsorts[0] = factory.newVariableUse(alpha);

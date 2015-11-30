@@ -447,6 +447,42 @@ public class PropertiesConstructor extends DelegateConstructor
 		return new PropertiesConstructor(maker, nc, np, vp);
 	}
 
+	public Constructor staticSubsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		Constructor nc = constructor.staticSubsubstitute(maker, valuation, renamings, substitution, bound, possible);
+		if (nc == null)
+			return null;
+		Map<String, Term> np = new HashMap<String, Term>();
+		for (Map.Entry<String, Term> e : getLocalProperties().entrySet())
+		{
+			String key = e.getKey();
+			Term value = Buffer.staticSubsubstitute(e.getValue(), valuation, renamings, substitution, bound, possible);
+			if (value == null)
+				return null;
+			np.put(key, value);
+		}
+		Map<Variable, Term> vp = new HashMap<Variable, Term>();
+		for (Map.Entry<Variable, Term> e : getLocalVariableProperties().entrySet())
+		{
+			Variable v = e.getKey();
+			{
+				Variable v2 = bound.get(v);
+				if (v2 != null)
+					v = v2;
+			}
+			if (!substitution.containsKey(v))
+			{
+				// Only include non-substituted variables.
+				Term value = Buffer.staticSubsubstitute(e.getValue(), valuation, renamings, substitution, bound, possible);
+				if (value == null)
+					return null;
+				vp.put(v, value);
+			}
+		}
+		return new PropertiesConstructor(maker, nc, np, vp);
+	}
+
+	
 	public boolean checkFree(Collection<Variable> forbidden, Collection<Variable> once, Collection<Variable> onceSeen, boolean promiscuous, ExtensibleSet<Variable> bound)
 	{
 		if (!constructor.checkFree(forbidden, once, onceSeen, promiscuous, bound))
@@ -678,6 +714,9 @@ public class PropertiesConstructor extends DelegateConstructor
 				String key = e.getKey();
 				Term value = e.getValue();
 				Term contraction = Buffer.staticContraction((Contractum) value, valuation, renamings);
+				if (contraction == null)
+					return null;
+				
 				np.put(key, contraction);
 			}
 			Map<Variable, Term> vp = new HashMap<Variable, Term>();
@@ -693,6 +732,9 @@ public class PropertiesConstructor extends DelegateConstructor
 				}
 				Term value = e.getValue();
 				Term contraction = Buffer.staticContraction((Contractum) value, valuation, renamings);
+				if (contraction == null)
+					return null;
+				
 				vp.put(contractedKey, contraction);
 			}
 			try

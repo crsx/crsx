@@ -335,6 +335,42 @@ public abstract class GenericConstruction extends GenericTerm
 		return sink.end();
 	}
 
+	final public Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable,Variable> bound, Set<Variable> possible)
+	{
+		if (possible.isEmpty())
+			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
+		
+		Constructor c = constructor().staticSubsubstitute(sink, valuation, renamings, substitution, bound, possible);
+		if (c == null)
+			return null;
+		sink = sink.start(c);
+		
+		final int arity = arity();
+		for (int i = 0; i < arity; ++i)
+		{
+			ExtensibleMap<Variable,Variable> innerBound = bound;
+			final Variable[] b = binders(i);
+			if (b.length > 0)
+			{
+				Variable[] newb = new Variable[b.length];
+				for (int j = 0; j < b.length; ++j)
+				{
+				    Variable v = b[j];
+					newb[j] = factory.makeVariable(v.name(), v.promiscuous(), v.blocking(), v.shallow());
+				}
+				innerBound = bound.extend(b, newb);
+				sink = sink.binds(newb);
+			}
+			sink = sub(i).staticSubsubstitute(sink, valuation, renamings, substitution, innerBound, possible);
+			if (sink == null)
+				return null;
+		}
+		
+		return sink.end();
+	}
+
+		
+	
     public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException
     {
         visitor.visitConstruction(this, true, bound);
@@ -964,7 +1000,11 @@ public abstract class GenericConstruction extends GenericTerm
 
 	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
 	{
-		sink = sink.start(constructor().staticContract(valuation, renamings));
+		Constructor c = constructor().staticContract(valuation, renamings);
+		if (c == null)
+			return null;
+		
+		sink = sink.start(c);
 		
 		final int arity = arity();
 		for (int i = 0; i < arity; ++i)
@@ -993,7 +1033,6 @@ public abstract class GenericConstruction extends GenericTerm
 			
 			// Copy subterm using the new bindings.
 			sink = ((Contractum) sub(i)).staticContract(sink, valuation, innerRenamings);
-			
 			if (sink == null)
 				return null;
 		}

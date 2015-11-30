@@ -993,9 +993,12 @@ public class GenericRule implements Copyable
 		
 		if (!forced.isEmpty())
 		{
-			// Currently there is no way to forced inlined term, so fail...
+			// Currently there is no way to force inlined term, so fail...
 			return false;
 		}
+		
+		if (!free.isEmpty())
+			return false;
 		
 		if (!fresh.isEmpty())
 		{
@@ -1008,10 +1011,6 @@ public class GenericRule implements Copyable
 			// In general not a good idea, except if meta is data, which is not known here.
 			return false;
 		}
-		
-		// If contractum is a meta application, don't inline as the argument is normalized.
-		if (contractum.kind() == Kind.META_APPLICATION)
-			return false;
 		
 		return true;
 	}

@@ -1716,7 +1716,10 @@ public class GenericEvaluator extends FixedGenericConstruction
 				}
 				break;
 			}
-
+			case DATA : {
+				computeArgument(1);
+				break;
+			}
 			case GET :
 			case GET_REF : {
 				// $[{...}Get, key]
@@ -2755,7 +2758,11 @@ public class GenericEvaluator extends FixedGenericConstruction
 						{
 							return argSubstitute.substitute(valuation, replacement);
 						}
-
+						@Override
+						public Copyable staticSubstitute(Valuation valuation, Term[] replacement)
+						{
+							return argSubstitute.staticSubstitute(valuation, replacement);
+						}
 						public Variable[] getBindings()
 						{
 							return argSubstitute.getBindings();
@@ -2771,6 +2778,8 @@ public class GenericEvaluator extends FixedGenericConstruction
 						{
 							throw new RuntimeException("PANIC: bad replacement of $[Plus...].");
 						}
+
+						
 					};
 				match.putSubstitute(arg, minusSubstitute);
 				return true;

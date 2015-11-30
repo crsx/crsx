@@ -268,6 +268,8 @@ public enum Primitive
 	IF_LINEAR("IfLinear", 2, 3),
 	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, otherwise #false or (). */
 	IF_DATA("IfData", 2, 3),
+	/** $[Data, #t] forces evaluation of #t (normalization). */
+	DATA("Data", 2, 3),
 	/** $[Let, #binder, #term, #return]] binds #expr to #meta and return #return. #binder can be a tuple. */
 	LET("Let", 3, 3),
 	/** $[For, #vars, #list, #param, #init, #body, #return]] iterate over #list, binds list item to #vars, evaluate #body and binds #body result to #param then return #return */

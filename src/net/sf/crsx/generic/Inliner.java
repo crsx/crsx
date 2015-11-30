@@ -73,8 +73,11 @@ public class Inliner
 		while (true);
 	}
 
-	/** Performs inlining on given rule */
-	private void inline(GenericRule rule)
+	/**
+	 * Performs inlining on given rule 
+	 * @throws CRSException
+	 */
+	private void inline(GenericRule rule) throws CRSException
 	{
 		// Get the rule.
 		String function = rule.contractum.constructor().symbol();
@@ -98,13 +101,20 @@ public class Inliner
 				
 				if (newcontractum != null)
 				{
-					if (crs.getVerbosity() >= 4)
-						System.out.println("\ninline\nbefore:\n" + rule);
+//					boolean print = inlinedRule.contractum.kind() == Kind.META_APPLICATION && inlinedRule.contractum.arity() > 1;
+//					if (print)
+//					{
+//						System.out.println("\n\n=============================== START INLINE:\n" + rule);
+//						System.out.println("\n----- inlined rule:\n" + inlinedRule);
+//					}
+						
+					GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newcontractum, rule.options);
 					
-					rule.contractum = newcontractum;
-				
-					if (crs.getVerbosity() >= 4)
-						System.out.println("====\nafter:\n" + rule);
+					rulesByFunction.multiRemove(rule.pattern.constructor().symbol(), rule);
+					rulesByFunction.multiAdd(rule.pattern.constructor().symbol(), newRule);
+					
+					//if (print)
+					//	System.out.println("------ \nafter:\n" + newRule);
 					
 				} else
 				

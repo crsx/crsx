@@ -263,6 +263,11 @@ public class CommonTokenConstructor extends CommonToken implements Token, Constr
 	{
 		return this;
 	}
+	
+	public Constructor staticSubsubstitute(Maker maker, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
+	{
+		return this;
+	}
 
 	public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException
 	{

@@ -3669,6 +3669,24 @@ long metaSubstituteWork;
 #endif
 
 
+// Substitution frame lifetime management
+
+SubstitutionFrame makeSubstitution(Context context, SubstitutionFrame parent, int parentCount, int count, Variable* variables, Term* substitutes)
+{
+    SubstitutionFrame frame = ALLOCATE(context, sizeof(struct _SubstitutionFrame));
+    frame->parent = parent;
+    frame->parentCount = parentCount;
+    frame->count = count;
+    frame->variables = variables;
+    frame->substitutes = substitutes;
+    return frame;
+}
+
+void freeSubstitution(Context context, SubstitutionFrame frame)
+{
+    FREE(context, frame);
+}
+
 // Forward declarations
 static void metaSubstituteTerm(Sink sink, Term term, SubstitutionFrame substitution, int substitutionCount,
         BitSetP unexhausted, BitSetP unweakened, long *metaSubstituteSizep);
