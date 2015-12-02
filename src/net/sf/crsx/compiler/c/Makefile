@@ -45,7 +45,7 @@ CRSX_O_FILES=$(CRSXCBUILD)/crsx.o $(CRSXCBUILD)/crsx_scan.o $(CRSXCBUILD)/main.o
 
 #
 $(CRSXCBUILD)/crsx.o: crsx.c crsx.h
-$(CRSXCBUILD)/crsx_scan.o: crsx_scan.c crsx.h
+$(CRSXCBUILD)/crsx_scan.o: $(CRSXCBUILD)/crsx_scan.c crsx.h
 $(CRSXCBUILD)/linter.o: linter.c linter.h crsx.h 
 $(CRSXCBUILD)/main.o: main.c linter.h crsx.h
 $(CRSXCBUILD)/invariant.o: invariant.c invariant.h crsx.h
@@ -62,8 +62,9 @@ $(CRSXCBUILD)/%.o: %.c
 $(CRSXCBUILD)/%.o: $(CRSXCBUILD)/%.c rules  
 	@mkdir -p $(CRSXCBUILD)
 	$(CC) $(CCFLAGS) -c $< -o $@
-#
-.SUFFIXES: .l
+
+# Disable default lex rule. 
+%.c : %.l
 
 $(CRSXCBUILD)/crsx_scan.o: $(CRSXCBUILD)/crsx_scan.c crsx.h 
 $(CRSXCBUILD)/crsx_scan.c: crsx_scan.l
