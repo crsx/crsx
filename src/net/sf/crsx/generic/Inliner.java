@@ -10,6 +10,7 @@ import java.util.Set;
 
 import net.sf.crsx.CRSException;
 import net.sf.crsx.Contractum;
+import net.sf.crsx.Factory;
 import net.sf.crsx.Kind;
 import net.sf.crsx.Sink;
 import net.sf.crsx.Term;
@@ -50,6 +51,12 @@ public class Inliner
 	/**
 	 * Implements $Inline
 	 * 
+	 * @param constructors must be set to all constructor symbols before call (not updated)
+	 * @param dataForms updated with all data forms indexed by symbol
+	 * @param functionForms updated with all function forms from {@link Factory#formsOf(String)} for all sorted symbols, indexed by symbol
+	 * @param fullSort updated with the full form of every sort, by sort name
+	 * @param rulesByFunction updated with all non-shuffle rules (overridden by {@link #lastDispatchify}) indexed by function symbol
+	 * @param shuffleRulesByFunction updated with shuffle rules
 	 * @throws CRSException 
 	 */
 	public void inline(Set<String> constructors, SortedMultiMap<String, Term> dataForms, SortedMultiMap<String, Pair<Term, Term>> functionForms, Map<String, Term> fullSort, SortedMultiMap<String, GenericRule> rulesByFunction, SortedMultiMap<String, GenericRule> shuffleRulesByFunction)
@@ -101,7 +108,7 @@ public class Inliner
 				
 				if (newcontractum != null)
 				{
-//					boolean print = inlinedRule.contractum.kind() == Kind.META_APPLICATION && inlinedRule.contractum.arity() > 1;
+//					boolean print = !inlinedRule.reused.isEmpty();
 //					if (print)
 //					{
 //						System.out.println("\n\n=============================== START INLINE:\n" + rule);
@@ -168,14 +175,14 @@ public class Inliner
 	/** whether the given rules should be inlined */
 	private boolean inline(GenericRule rule, Set<GenericRule> rules)
 	{
+		if (excludes.contains(rule))
+			return false;
+
 		// For now only single rule can be inlined.
 		if (rules.size() != 1)
 			return false;
 
 		GenericRule r = rules.iterator().next();
-		
-		if (excludes.contains(rule))
-			return false;
 			
 		final String function = Util.symbol(rule.getContractum());
 		
@@ -186,11 +193,10 @@ public class Inliner
 		if (r.inline())
 			return true;
 		
-		// Inline shuffle rules
-		if (shuffleRulesByFunction.get(function) != null)
-			return true;
-			
 		// By default: don't inline
 		return false;
 	}
+	
+	
+	
 }

@@ -500,10 +500,8 @@ public class GenericVariableUse extends GenericTerm implements Visitor.VariableU
 
 	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
 	{
-		return null;
-		//return contract(sink, valuation, renamings);
+		return contract(sink, valuation, renamings);
 	}
-
 
 	@Override
 	protected boolean occurs(String mvar, Unification unification)

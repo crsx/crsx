@@ -823,6 +823,20 @@ abstract public class GenericTerm implements Pattern, Contractum
 		return v.hasMeta;
 	}
 
+	/** Whether term contains a property reference */
+	public boolean hasPropertyRef()
+	{
+		HasPropertyRef v = new HasPropertyRef();
+		try
+		{
+			visit(v, LinkedExtensibleSet.EMPTY_VARIABLE_SET);
+		}
+		catch (CRSException e)
+		{}
+		return v.hasRef;
+	}
+
+	
 	// Detect whether term contains a $ primitive  
 	private static class HasPrimitive extends Visitor
 	{
@@ -847,6 +861,21 @@ abstract public class GenericTerm implements Pattern, Contractum
 		{
 			hasMeta = true;
 		}
+	}
+	
+
+	// Detect whether term contains at least one property reference  
+	private static class HasPropertyRef extends Visitor
+	{
+		// Whether the term has a property reference
+		boolean hasRef;
+
+		@Override
+		public void visitPropertiesRef(String name, boolean start) throws CRSException
+		{
+			hasRef = true;
+		}
+
 	}
 
 	/** Returns all metas occurring in this term */

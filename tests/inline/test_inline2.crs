@@ -2,16 +2,11 @@ Test[(
 
 $Lax;
 
-$Use["bool.crs"];
-$Use["org/crsx/common.crs"];
+Test :: $Boolean;
+-[Fresh[i::$Numeric]]: 
+Test → Trace[i];
 
-W ::= ( W[Boolean]; );
-
-Test :: Boolean;
-
--[Fresh[i::$Numeric]]: Test → CI-Enter[i, "blash", F[W[False]]];
-
-F[W] :: Boolean;
-F[W[#]] → #;
+Trace[$Numeric] :: $Numeric;
+Trace[#] → $[Trace, #];
 
 )]

@@ -1,15 +1,15 @@
 Test[(
 
+// Basic meta-variable inlining.
+
 $Lax;
 
-$Use["bool.crs"];
+W ::= ( W[$Boolean]; );
 
-W ::= ( W[Boolean]; );
+Test :: $Boolean;
+Test → F[W[$False]];
 
-Test :: Boolean;
-Test → F[W[False]];
-
-F[W] :: Boolean;
+F[W] :: $Boolean;
 F[W[#]] → #;
 
 )]

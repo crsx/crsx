@@ -28,9 +28,6 @@ extern "C" {
 #ifndef SSIZE_MAX
 #  define SSIZE_MAX LONG_MAX
 #endif
-#ifndef setenv
-  extern int setenv(const char *name, const char *value, int overwrite);
-#endif
   
 // All the pointer types declared forward.
 typedef struct _Context *Context;

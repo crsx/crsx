@@ -498,7 +498,7 @@ SF-Pattern-Variable-Free-Top
 SF-Pattern[#pass, SUBMATCH, VARIABLE-USE[#variable], #sink, #setup, #needed, #unique, #term, ok¹.#[ok¹]]
 →
 %n⟪« #setup »
-Variable «#variable» = VARIABLE(«#term»);« {#env} #[OK] »⟫;
+Variable «#variable» = VARIABLE(«#term»); permitUnusedVariable(«#variable»);« {#env} #[OK] »⟫;
 
 // SUBMATCH stage, Pattern is bound variable (outside meta-application).
 SF-Pattern-Variable-Bound

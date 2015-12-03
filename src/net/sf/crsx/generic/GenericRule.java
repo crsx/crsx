@@ -74,6 +74,9 @@ public class GenericRule implements Copyable
 	/** The fresh variables in contractum that should be created, with their declarations. */
 	final Map<String, Term> fresh;
 
+	/** List for fresh variable that can be reused */
+	List<Variable> freshReused;
+	
 	/** The global variables in contractum where the rule system copy should be used. */
 	final Map<String, Term> global;
 
@@ -154,6 +157,7 @@ public class GenericRule implements Copyable
 
 		this.free = new HashMap<String, Term>(4);
 		this.fresh = new HashMap<String, Term>(4);
+		this.freshReused = null;
 		this.global = new HashMap<String, Term>(2);
 		this.comparable = new HashSet<String>(2);
 		this.discarded = new HashSet<String>(8);
@@ -469,7 +473,13 @@ public class GenericRule implements Copyable
 		reusedOrigin = reusableOrigin;
 		for (Variable v : reused.values())
 		{
-			fresh.remove(v.name());
+			if (fresh.containsKey(v.name()))
+			{
+				fresh.remove(v.name());
+				if (freshReused == null)
+					freshReused = new ArrayList<Variable>(reused.size());
+				freshReused.add(v);
+			}
 		}
 
 		explicitCount.clear();
@@ -1001,6 +1011,12 @@ public class GenericRule implements Copyable
 			return false;
 		
 		if (!fresh.isEmpty())
+		{
+			// Could be done but for now disable. 
+			return false;
+		}
+		
+		if (freshReused != null && !freshReused.isEmpty())
 		{
 			// Could be done but for now disable. 
 			return false;

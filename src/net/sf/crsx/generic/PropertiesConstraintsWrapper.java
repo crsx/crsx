@@ -2269,34 +2269,38 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	
 	public Sink staticContract(Sink sink, Valuation valuation, ExtensibleMap<Variable,Variable> renamings)
 	{
-//		if (!namedPropertyConstraints.isEmpty() || !variablePropertyConstraints.isEmpty() || !metaPropertyConstraints.isEmpty())
-//			return null;
-//		
-//		if (propertiesRef != null)
-//		{
-//			Substitute substitute = valuation.getSubstitute(propertiesRef);
-//			if (substitute == null)
-//				return null;
-//			
-//			if (substitute instanceof MatchedPropertiesDummySubstitute)
-//			{
-//				final MatchedPropertiesDummySubstitute ps = (MatchedPropertiesDummySubstitute) substitute;
-//				if (ps.propertiesRef == null)
-//					return term.staticContract(sink, valuation, renamings);
-//			
-//				sink = PropertiesWrapperConstructor.start(sink, ps.propertiesRef, null, null, null);
-//				if (sink == null)
-//					return null;
-//				sink = term.staticContract(sink, valuation, renamings);
-//				if (sink == null)
-//					return null;
-//				return sink.end();
-//				
-//			}
-//			
-//			return null;
-//		}
-//		
+		if (!namedPropertyConstraints.isEmpty() || !variablePropertyConstraints.isEmpty() || !metaPropertyConstraints.isEmpty())
+			return null;
+		
+		if (propertiesRef != null)
+		{
+			Substitute substitute = valuation.getSubstitute(propertiesRef);
+			if (substitute == null)
+				return null;
+			
+			if (substitute instanceof MatchedPropertiesDummySubstitute)
+			{
+				final MatchedPropertiesDummySubstitute ps = (MatchedPropertiesDummySubstitute) substitute;
+				if (ps.propertiesRef == null)
+				{
+					// Coulnd't find a property ref on the original pattern. It could be declared on the inlined pattern 
+					// but this information is currently lost.
+					return null;
+					//return term.staticContract(sink, valuation, renamings);
+				}
+				
+				sink = PropertiesWrapperConstructor.start(sink, ps.propertiesRef, null, null, null);
+				if (sink == null)
+					return null;
+				sink = term.staticContract(sink, valuation, renamings);
+				if (sink == null)
+					return null;
+				return sink.end();
+			}
+			
+			return null;
+		}
+		
 		
 		return null;
 	}

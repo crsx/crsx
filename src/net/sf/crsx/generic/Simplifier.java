@@ -5,6 +5,8 @@ package net.sf.crsx.generic;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -119,23 +121,16 @@ public class Simplifier
 			state.newrules = new LinkedList<GenericRule>();
 			for (GenericRule rule : pendingRules)
 			{
-				// Some $ primitives are currently not properly sorted. Ignore rules containing those.
-				//PrimitiveDetector detector = new PrimitiveDetector();
-				//rule.getContractum().visit(detector, SimpleVariableSet.EMPTY);
+				state.changed = false;
+				state.rule = rule;
+				
+				GenericTerm newContractum = eliminateDeepBinders(
+						state, (GenericTerm) rule.getContractum(), new LinkedExtensibleSet<Pair<Variable, Term>>());
 
-				//if (!detector.hasPrimitive)
+				if (state.changed)
 				{
-					state.changed = false;
-					state.rule = rule;
-
-					GenericTerm newContractum = eliminateDeepBinders(
-							state, (GenericTerm) rule.getContractum(), new LinkedExtensibleSet<Pair<Variable, Term>>());
-
-					if (state.changed)
-					{
-						GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newContractum, rule.options);
-						updatedRules.add(newRule);
-					}
+					GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newContractum, rule.options);
+					updatedRules.add(newRule);
 				}
 			}
 
@@ -166,9 +161,7 @@ public class Simplifier
 
 		}
 
-		// TODO: should avoid this step by maintaining the sort structure is the new rules..
 		crs.sortify();
-
 	}
 
 	//---------------- Eliminate deep functional binders
@@ -351,6 +344,9 @@ public class Simplifier
 
 						rule.setMetaVariableSorts(metavarSorts);
 
+						if (env.varSorts != null)
+							rule.setVariableSorts(env.varSorts);
+						
 						state.newrules.add(rule);
 
 						// Add sort for new rule
@@ -595,6 +591,7 @@ public class Simplifier
 
 						Term varSort = getVariableSort(var, bound, env.rule);
 						env.patternArgsSort.add(varSort);
+						env.addVarSort(var, varSort);
 
 						env.argsBinders.add(GenericTerm.NO_BIND);
 						env.args.add(factory.newVariableUse(var));
@@ -606,7 +603,6 @@ public class Simplifier
 				else
 				{
 					// This is a bound variable after the closure. Just use it
-
 					return factory.newVariableUse(var);
 				}
 			}
@@ -620,8 +616,16 @@ public class Simplifier
 				{
 					ExtensibleSet<Pair<Variable, Term>> subbound = bound;
 					if (term.binders(i).length > 0)
-						subbound = extend(bound, term.binders(i), getBindersSort(env.rule.name(), term.constructor().symbol(), i));
-
+					{
+						Term[] bindersSort = getBindersSort(env.rule.name(), term.constructor().symbol(), i);
+						if (bindersSort != null)
+						{
+							for (int j = 0; j < bindersSort.length; j++)
+								env.addVarSort(term.binders(i)[j], bindersSort[j]);
+						}
+						subbound = extend(bound, term.binders(i), bindersSort);
+					}
+				
 					GenericTerm sub = rewrite(env, term, i, term.sub(i), term.binders(i), subbound);
 					term.replaceSub(i, term.binders(i), sub);
 				}
@@ -1097,6 +1101,8 @@ public class Simplifier
 		final Map<Object, String> metavars; // Map capture variable/metavars to new metavar name in closure
 		final Map<Map<String, Term>, String> propHolder;
 
+		Map<Variable, Term> varSorts; // All variables sorts.
+		
 		boolean toplevel; // The current term is the one being rewritten.
 
 		public Env2(GenericRule rule, Set<Pair<Variable, Term>> preBinders, int arity)
@@ -1116,29 +1122,15 @@ public class Simplifier
 			propHolder = new HashMap<Map<String, Term>, String>();
 			toplevel = true;
 		}
-	}
-
-	// Detect whether term contains a $ primitive requiring sorting
-	private static class PrimitiveDetector extends Visitor
-	{
-		// Whether the term has a primitive.
-		boolean hasPrimitive;
-
-		@Override
-		public void visitPrimitive(Primitive primitive, boolean start) throws CRSException
+		
+		public void addVarSort(Variable var, Term sort)
 		{
-			switch (primitive)
-			{
-				case GET :
-				case GET_REF :
-					hasPrimitive = true;
-					break;
-				default :
-					break;
-
-			}
-			super.visitPrimitive(primitive, start);
+			if (varSorts == null)
+				varSorts = new IdentityHashMap<Variable, Term>();
+			
+			varSorts.put(var, sort);
 		}
 	}
+	
 
 }
