@@ -62,16 +62,16 @@ Variable makeVariableTrusty(Context context, char *name, unsigned int bound, uns
     	char *nameu = name;
     	while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
     	if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
-	{
-	    if (nameu < name+len)
-	      v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
-	    else
-	      v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
-	}
+    	{
+    	    if (nameu < name+len)
+    	        v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
+    	    else
+    	        v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
+    	}
     	else
-	{
-	    v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
-	}
+    	{
+    	    v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
+    	}
     }
 
     v->bound = bound;
@@ -3053,11 +3053,13 @@ char *stringnf(Context context, size_t size, const char *format, ...)
     }
     else
     {
-        // Overflow...repair as best possible.
-        char *string = (char *) ALLOCATE(context, size+4);
-        memcpy(string, buffer, size);
-        memcpy(string+size, "...", 3);
-        string[size+3] = '\0';
+        // Overflow. Try again
+        char *string = (char *) ALLOCATE(context, bytes); // bytes includes '\0'
+        va_list ap;
+        va_start(ap,format);
+        size_t bytes2 = vsnprintf(string, bytes, format, ap);
+        va_end(ap);
+        ASSERT(context, bytes == bytes2);
         return string;
     }
 }
