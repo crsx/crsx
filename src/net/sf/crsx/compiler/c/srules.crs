@@ -838,7 +838,7 @@ if («#variable» != VARIABLE(«#term»)) { «{#env}SF-fail-cleanup[#sink]» bre
 // - free variable case is always last
 {#env}SF-then-Pattern-Variable-Use2[FREE, #name, #sink, #variable, #term, ok¹.#[ok¹]] 
 → %n⟪/* Function «COMMENT_TOKEN[#name]» fall-back case for free variable */
-Variable «#variable» = linkVariable(«#sink»->context, VARIABLE(«#term»));«{#env}#[OK]»⟫;
+Variable «#variable» = linkVariable(«#sink»->context, VARIABLE(«#term»)); permitUnusedVariable(«#variable»);«{#env}#[OK]»⟫;
 
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
 SF-Pattern-MetaArgs-Norm[$Boolean <!-- Need normalization? -->, Pattern-Stage, $String, $List[Reified_Binder], Text, Text, Text, ok::OK_SORT.Text] :: Text;
