@@ -704,94 +704,95 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	// @see net.sf.crsx.Term#subsubstitute(net.sf.crsx.Valuation, net.sf.crsx.util.ExtensibleMap, net.sf.crsx.util.ExtensibleMap, net.sf.crsx.util.ExtensibleMap)
 	public Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
 	{
-		if (possible.isEmpty())
-			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
-		
-		// New wrapper properties...
-		String r = propertiesRef; // pass catch-all.
-		Map<String, Term> np = new HashMap<String, Term>(); // new named properties
-		Map<Variable, Term> vp =new HashMap<Variable, Term>(); // new variable properties
-		Map<String, Term> mp = new HashMap<String, Term>(); // new meta properties
-		for (Map.Entry<String, Term> e : namedPropertyConstraints.entrySet())
-		{
-			String name = e.getKey();
-			Buffer b = new Buffer(sink);
-			Sink result = e.getValue().staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
-			assert result == null;
-			Term value = (GenericTerm) b.term(true);
-			if (value == null)
-				return null;
-			
-			np.put(name, value);
-		}
-		for (Map.Entry<Variable, Term> e : variablePropertyConstraints.entrySet())
-		{
-			Variable variable = e.getKey();
-			// First build copy of value.
-			Buffer b = new Buffer(sink);
-			Sink result = e.getValue().staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
-			assert result == null;
-			Term value = (GenericTerm) b.term(true);
-			if (value == null)
-				return null;
-			// Now see whether the variable is morphed into something else...
-			Variable v = bound.get(variable);
-			if (v != null)
-			{
-				variable = v; // property variable renamed in copy
-				vp.put(variable, value);
-			}
-			else
-			{
-				Contractum subContractum = substitution.get(variable);
-				if (subContractum ==  null)
-				{
-					vp.put(variable, value); // property variable external to copy thus not touched
-				}
-				else
-				{
-					// Variable is substituted...better be to something that can still be used as a property key!
-					b = new Buffer(sink);
-					result = subContractum.staticContract(b.sink(), valuation, renamings);
-					assert result == null;
-					Term key = b.term(true);
-					if (key == null)
-						return null;
-					switch (key.kind())
-					{
-						case CONSTRUCTION :
-							if (!Util.isConstant(key))
-								throw new RuntimeException("Property rewrite error: substituted " + variable + " with " + key + " not usable as a property key!");
-							np.put(Util.symbol(key), value); // variable substituted with constant
-							break;
-						case VARIABLE_USE :
-							vp.put(key.variable(), value); // variable substituted by another
-							break;
-						case META_APPLICATION :
-							mp.put(key.metaVariable(), value);
-							break;
-					}
-				}
-			}
-		}
-		for (Map.Entry<String, Term> e : metaPropertyConstraints.entrySet())
-		{
-			String metaKey = e.getKey();
-			Buffer b = new Buffer(sink);
-			Sink result = e.getValue().staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
-			assert result == null;
-			Term value = (GenericTerm) b.term(true);
-			if (value == null)
-				return null;
-			mp.put(metaKey, value);
-		}
-
-		PropertiesWrapperConstructor c = new PropertiesWrapperConstructor(r, np, vp, mp);
-		sink = sink.start(c);
-		sink = term.staticSubsubstitute(sink, valuation, renamings, substitution, bound, possible);
-		if (sink == null)
-			return null;
-		return sink.end();
+		return null;
+//		if (possible.isEmpty())
+//			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
+//		
+//		// New wrapper properties...
+//		String r = propertiesRef; // pass catch-all.
+//		Map<String, Term> np = new HashMap<String, Term>(); // new named properties
+//		Map<Variable, Term> vp =new HashMap<Variable, Term>(); // new variable properties
+//		Map<String, Term> mp = new HashMap<String, Term>(); // new meta properties
+//		for (Map.Entry<String, Term> e : namedPropertyConstraints.entrySet())
+//		{
+//			String name = e.getKey();
+//			Buffer b = new Buffer(sink);
+//			Sink result = e.getValue().staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
+//			assert result == null;
+//			Term value = (GenericTerm) b.term(true);
+//			if (value == null)
+//				return null;
+//			
+//			np.put(name, value);
+//		}
+//		for (Map.Entry<Variable, Term> e : variablePropertyConstraints.entrySet())
+//		{
+//			Variable variable = e.getKey();
+//			// First build copy of value.
+//			Buffer b = new Buffer(sink);
+//			Sink result = e.getValue().staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
+//			assert result == null;
+//			Term value = (GenericTerm) b.term(true);
+//			if (value == null)
+//				return null;
+//			// Now see whether the variable is morphed into something else...
+//			Variable v = bound.get(variable);
+//			if (v != null)
+//			{
+//				variable = v; // property variable renamed in copy
+//				vp.put(variable, value);
+//			}
+//			else
+//			{
+//				Contractum subContractum = substitution.get(variable);
+//				if (subContractum ==  null)
+//				{
+//					vp.put(variable, value); // property variable external to copy thus not touched
+//				}
+//				else
+//				{
+//					// Variable is substituted...better be to something that can still be used as a property key!
+//					b = new Buffer(sink);
+//					result = subContractum.staticContract(b.sink(), valuation, renamings);
+//					assert result == null;
+//					Term key = b.term(true);
+//					if (key == null)
+//						return null;
+//					switch (key.kind())
+//					{
+//						case CONSTRUCTION :
+//							if (!Util.isConstant(key))
+//								throw new RuntimeException("Property rewrite error: substituted " + variable + " with " + key + " not usable as a property key!");
+//							np.put(Util.symbol(key), value); // variable substituted with constant
+//							break;
+//						case VARIABLE_USE :
+//							vp.put(key.variable(), value); // variable substituted by another
+//							break;
+//						case META_APPLICATION :
+//							mp.put(key.metaVariable(), value);
+//							break;
+//					}
+//				}
+//			}
+//		}
+//		for (Map.Entry<String, Term> e : metaPropertyConstraints.entrySet())
+//		{
+//			String metaKey = e.getKey();
+//			Buffer b = new Buffer(sink);
+//			Sink result = e.getValue().staticSubsubstitute(b.sink(), valuation, renamings, substitution, bound, possible);
+//			assert result == null;
+//			Term value = (GenericTerm) b.term(true);
+//			if (value == null)
+//				return null;
+//			mp.put(metaKey, value);
+//		}
+//
+//		PropertiesWrapperConstructor c = new PropertiesWrapperConstructor(r, np, vp, mp);
+//		sink = sink.start(c);
+//		sink = term.staticSubsubstitute(sink, valuation, renamings, substitution, bound, possible);
+//		if (sink == null)
+//			return null;
+//		return sink.end();
 	}
 	
 	public void visit(Visitor visitor, ExtensibleSet<Variable> bound) throws CRSException

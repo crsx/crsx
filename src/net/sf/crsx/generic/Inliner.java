@@ -12,7 +12,6 @@ import net.sf.crsx.CRSException;
 import net.sf.crsx.Contractum;
 import net.sf.crsx.Factory;
 import net.sf.crsx.Kind;
-import net.sf.crsx.Sink;
 import net.sf.crsx.Term;
 import net.sf.crsx.Valuation;
 import net.sf.crsx.util.Buffer;
@@ -34,9 +33,6 @@ public class Inliner
 	
 	/** All rules */
 	private SortedMultiMap<String, GenericRule> rulesByFunction;
-
-	/** All shuffle rules */
-	private SortedMultiMap<String, GenericRule> shuffleRulesByFunction;
 
 	/** Rules not to inline */
 	private HashSet<GenericRule> excludes;
@@ -62,8 +58,7 @@ public class Inliner
 	public void inline(Set<String> constructors, SortedMultiMap<String, Term> dataForms, SortedMultiMap<String, Pair<Term, Term>> functionForms, Map<String, Term> fullSort, SortedMultiMap<String, GenericRule> rulesByFunction, SortedMultiMap<String, GenericRule> shuffleRulesByFunction)
 			throws CRSException
 	{
-		this.rulesByFunction = rulesByFunction;
-		this.shuffleRulesByFunction = shuffleRulesByFunction;
+		this.rulesByFunction = rulesByFunction; 
 		this.excludes = new HashSet<GenericRule>();
 
 		// Iterate until nothing to do.
@@ -108,20 +103,20 @@ public class Inliner
 				
 				if (newcontractum != null)
 				{
-//					boolean print = !inlinedRule.reused.isEmpty();
-//					if (print)
-//					{
-//						System.out.println("\n\n=============================== START INLINE:\n" + rule);
-//						System.out.println("\n----- inlined rule:\n" + inlinedRule);
-//					}
+					boolean print = false;
+					if (print)
+					{
+						System.out.println("\n\n=============================== START INLINE:\n" + rule);
+						System.out.println("\n----- inlined rule:\n" + inlinedRule);
+					}
 						
 					GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newcontractum, rule.options);
 					
 					rulesByFunction.multiRemove(rule.pattern.constructor().symbol(), rule);
 					rulesByFunction.multiAdd(rule.pattern.constructor().symbol(), newRule);
 					
-					//if (print)
-					//	System.out.println("------ \nafter:\n" + newRule);
+					if (print)
+						System.out.println("------ \nafter:\n" + newRule);
 					
 				} else
 				
