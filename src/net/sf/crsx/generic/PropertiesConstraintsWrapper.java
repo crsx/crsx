@@ -20,7 +20,6 @@ import net.sf.crsx.CRSException;
 import net.sf.crsx.Constructor;
 import net.sf.crsx.Contractum;
 import net.sf.crsx.Copyable;
-import net.sf.crsx.Factory;
 import net.sf.crsx.Kind;
 import net.sf.crsx.Match;
 import net.sf.crsx.MetaAnalyzer;

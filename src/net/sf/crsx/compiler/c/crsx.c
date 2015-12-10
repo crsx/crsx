@@ -3102,9 +3102,8 @@ char *stringnf(Context context, size_t size, const char *format, ...)
         char *string = (char *) ALLOCATE(context, bytes); // bytes includes '\0'
         va_list ap;
         va_start(ap,format);
-        size_t bytes2 = vsnprintf(string, bytes, format, ap);
+        vsnprintf(string, bytes, format, ap);
         va_end(ap);
-        ASSERT(context, bytes == bytes2);
         return string;
     }
 }
