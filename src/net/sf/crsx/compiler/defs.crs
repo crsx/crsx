@@ -541,7 +541,7 @@ SPrimitive ::= ( E_Concat; E_C; E_Equal; E_NotEqual; E_LessThan; E_GreaterThan; 
 				 E_IfDef; E_Show; E_Symbol; E_Format; E_FreeVariables; E_IntersectVariables; E_UnionVariables; E_ExceptVariables;
 				 E_Match; E_Call; E_TryCall; E_Cast; E_Pick; E_ReversePick; E_ListLength; E_Null; E_Nil; E_ForgivableError; E_StringEqual; E_StringLessThan; E_FromFirst; E_ToFirst; E_VariableNameIs; E_Split;
                  E_Rescape; E_UpCase; E_DownCase; E_Replace; E_Trim; E_Keys; E_ParseURL; E_ParseText; E_Echo; E_DeepEqual; E_HashCode; E_ElapsedTime;
-                 E_ProfileEnter; E_ProfileExit; E_Let; E_For; E_EventualError; E_Data;
+                 E_ProfileEnter; E_ProfileExit; E_Let; E_For; E_EventualError; E_Data; E_FormatInteger; E_FormatDecimal;
 				);
 
 Primitive[$String] :: SPrimitive;
@@ -554,8 +554,8 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "StringEqual"], 		E_StringEqual,
 	$[If, $[Equal, #Primitive, "StringLessThan"], 		E_StringLessThan,
 	$[If, $[Equal, #Primitive, "LessThan"], 			E_LessThan,
-	$[If, $[Equal, #Primitive, "GreaterThan"], 			E_GreaterThan,  
-	$[If, $[Equal, #Primitive, "LessThanOrEqual"], 		E_LessThanOrEqual,
+	$[If, $[Equal, #Primitive, "GreaterThan"], 		E_GreaterThan,  
+	$[If, $[Equal, #Primitive, "LessThanOrEqual"], 	E_LessThanOrEqual,
 	$[If, $[Equal, #Primitive, "GreaterThanOrEqual"], 	E_GreaterThanOrEqual,  
 	$[If, $[Equal, #Primitive, "NotEqual"], 			E_NotEqual,  
 	$[If, $[Equal, #Primitive, ":"], 					E_Concat,	
@@ -573,11 +573,13 @@ Primitive[#Primitive] →
 	$[If, $[Equal, #Primitive, "Substring"], 			E_Substring,  
 	$[If, $[Equal, #Primitive, "Escape"], 				E_Escape, 
 	$[If, $[Equal, #Primitive, "Mangle"], 				E_Mangle, 
-	$[If, $[Equal, #Primitive, "BeforeFirst"], 			E_BeforeFirst, 
+	$[If, $[Equal, #Primitive, "BeforeFirst"], 		E_BeforeFirst, 
 	$[If, $[Equal, #Primitive, "AfterFirst"], 			E_AfterFirst,  
 	$[If, $[Equal, #Primitive, "FromFirst"], 			E_FromFirst,  
 	$[If, $[Equal, #Primitive, "ToFirst"], 				E_ToFirst,  
-	$[If, $[Equal, #Primitive, "FormatNumber"],			E_FormatNumber,
+    $[If, $[Equal, #Primitive, "FormatNumber"],        E_FormatNumber,
+    $[If, $[Equal, #Primitive, "FormatInteger"],       E_FormatInteger,
+    $[If, $[Equal, #Primitive, "FormatDecimal"],       E_FormatDecimal,
 	$[If, $[Equal, #Primitive, "Format"],				E_Format,
 	$[If, $[Equal, #Primitive, "Show"],					E_Show,
 	$[If, $[Equal, #Primitive, "Symbol"],					E_Symbol,
@@ -658,7 +660,7 @@ Primitive[#Primitive] →
     
 	MissingPrimitive[#Primitive] 
 	
-]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]] ;
 
 MissingPrimitive[$String] :: SPrimitive;
 

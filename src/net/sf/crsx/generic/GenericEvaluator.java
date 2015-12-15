@@ -1836,7 +1836,9 @@ public class GenericEvaluator extends FixedGenericConstruction
 				{}
 				break;
 
-			case FORMAT_NUMBER : {
+			case FORMAT_NUMBER : 
+			case FORMAT_INTEGER :
+			case FORMAT_DECIMAL : {
 				// $[FormatNumber, number]
 				// $[FormatNumber, number, format]
 				computeArguments();

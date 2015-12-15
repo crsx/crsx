@@ -305,8 +305,12 @@ public enum Primitive
 	SHOW("Show", 1, 1),
 	/** $[Symbol, #term] is a constant with the textual representation of the root of #term as a string value. */
 	SYMBOL("Symbol", 1, 1),
-	/** $[FormatNumber, #number [,#format]] is a string representing the number. */
+	/** $[FormatNumber, #number [,#format]] is a string representing the double number. */
 	FORMAT_NUMBER("FormatNumber", 1, 2),
+	/** $[FormatInteger, #number] is a string representing the integer. */
+	FORMAT_INTEGER("FormatInteger", 1, 1),
+	/** $[FormatDecimal, #number] is a string representing the decimal number. */
+	FORMAT_DECIMAL("FormatDecimal", 1, 1),
 	/** $[Format, #format [,#argument...]] generates a string from the #format string and the #arguments... strings. */
 	FORMAT("Format", 1, Integer.MAX_VALUE),
 	

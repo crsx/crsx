@@ -1393,6 +1393,8 @@ public class Sorter
 				break;
 			}
 			case FORMAT_NUMBER :
+			case FORMAT_INTEGER :
+			case FORMAT_DECIMAL :
 			case ENCODE_POINT : {
 				// generate string from numeric
 				argumentsorts[0] = freshForm(CRS.NUMERIC_SORT, 0);

@@ -1904,7 +1904,6 @@ Set-String-EncodePoint[Fresh[code::Text, str::Text]]
 
 // $[FormatNumber, #number ,#format] is a string representing the number (TODO: use #format).
 //
-// TODO: it's quite a hack for now...deprecate and use $[Format].
 STRING_LOCAL_PRIMITIVE[E_FormatNumber];
 
 Set-String-FormatNumber[Fresh[num::Text, str::Text]]
@@ -1915,6 +1914,36 @@ Set-String-FormatNumber[Fresh[num::Text, str::Text]]
 {⟦
 double «num»; char *«str»;« {#env}T-set-num[#Number, #sink, num] »
 snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+« #[str,%n⟨⟩] »⟧
+}⟫;
+
+// $[FormatInteger, #number] is a string representing the integer
+//
+STRING_LOCAL_PRIMITIVE[E_FormatInteger];
+
+Set-String-FormatInteger[Fresh[num::Text, str::Text]]
+:
+{#env}E-local-string[E_FormatInteger, (#Name; #Number;), #Options, #sink, s p.#[s, p]] 
+→
+%n⟪
+{⟦
+long long «num»; char *«str»;« {#env}T-set-int[#Number, #sink, num] »
+snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%lld", «num»);
+« #[str,%n⟨⟩] »⟧
+}⟫;
+
+// $[FormatDecimal, #number] is a string representing the decimal.
+//
+STRING_LOCAL_PRIMITIVE[E_FormatDecimal];
+
+Set-String-FormatDecimal[Fresh[num::Text, str::Text]]
+:
+{#env}E-local-string[E_FormatDecimal, (#Name; #Number;), #Options, #sink, s p.#[s, p]] 
+→
+%n⟪
+{⟦
+double «num»; char *«str»;« {#env}T-set-num[#Number, #sink, num] »
+snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%f", «num»);
 « #[str,%n⟨⟩] »⟧
 }⟫;
 
