@@ -5,3 +5,4 @@ build
 crsx-javadoc
 out
 outj
+*.log
