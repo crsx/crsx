@@ -185,9 +185,10 @@ Construction makeGlobalConstruction(ConstructionDescriptor desc)
 	return construction;
 }
 
+SETUP_STACK_TYPE(Term)
 
 static
-void freeConstruction(Context context, Construction construction)
+void freeConstruction(Context context, Construction construction, TermStack stack)
 {
     ASSERT(context, construction->term.nr == 0);
 
@@ -213,7 +214,11 @@ void freeConstruction(Context context, Construction construction)
     int i;
     for (i = 0; i < arity; ++i)
     {
-        UNLINK(context, SUB(term, i));
+        Term sub =  SUB(term, i);
+
+        if (sub->nr != SSIZE_MAX && (--sub->nr) == 0)
+            pushTerm(stack, sub);
+
         const int rank = RANK(term,i);
         int j;
         for (j = 0; j < rank; ++j)
@@ -4554,18 +4559,31 @@ void passLocationProperties(Context context, Term locTerm, Term term)
 
 void freeTerm(Context context, Term term)
 {
-    if (IS_VARIABLE_USE(term))
+    TermStack stack = makeTermStack(context);
+    pushTerm(stack, term);
+
+    while (!emptyTermStack(stack))
     {
-        Variable var = VARIABLE(term);
-        unuseVariable(context, var);
-        unlinkVariable(context, var);
-        FREE(context, term);
+        term = *topTerm(stack);
+        popTerm(stack);
+
+        ASSERT(context, term->nr == 0);
+
+        if (IS_VARIABLE_USE(term))
+        {
+            Variable var = VARIABLE(term);
+            unuseVariable(context, var);
+            unlinkVariable(context, var);
+            FREE(context, term);
+        }
+        else
+        {
+            Construction construction = asConstruction(term);
+            freeConstruction(context, construction, stack);
+        }
     }
-    else
-    {
-        Construction construction = asConstruction(term);
-        freeConstruction(context, construction);
-    }
+
+    freeTermStack(stack);
 }
 
 void unlinkValueTerm(Context context, const void* key, void* value)
