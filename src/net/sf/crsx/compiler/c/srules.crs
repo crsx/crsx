@@ -15,7 +15,7 @@ $Lax;
 /* Generate top-level functions */
 SF-Function[$String, $String, $List[Reified_Form], Reified_Sort, $List[Reified_Rule]] :: Text;
 
--[Fresh[sink::Text, count::Text, namedP::Text, varP::Text]]:
+-[Fresh[sink::Text, count::Text, namedP::Text, varP::Text, result::Text]]:
 SF-Function[#kind, #function, #Forms, #Sort, #Rules]
 → %n⟪«SF-function-extern[#function, #Forms, #Sort]»
 
@@ -33,6 +33,7 @@ int «MANGLE[#function]»(Sink «sink», ssize_t «count», NamedPropertyLink «
                                         "$unstep-props": TEXT[%n⟨¶ADD_PROPERTIES(‹sink›, ‹namedP›, ‹varP›);⟩];  // The properties unstep code.
                                         "$constant"    : YES;                                                    // Whether this function is constant. SF-Arg might invalidate the default assumption 
                                         "$fallback"    : YES;                                                    // Whether to generate fallback
+                                        "$step-result" : VARIABLE[result];                                               
                                         "$tail"        : YES; 
                                         "$eval"        : YES;                             
                                         "$spilled"     : TEXT[%n⟨⟩];                                            // Spilled arguments (to allow TCO) 
@@ -161,7 +162,7 @@ SF-TopBinder[#var, #formArgument, #index, ok¹ index¹.#[ok¹, index¹]]
 → {#env; 
      "$args"          : LIST_VARIABLE[Append[#topArgs,(#var;)]]; 
      #var             : ARG[#index, $True]; 
-     "$unstep-binders" : LIST_VARIABLE[(#var; #binders)]
+     "$unstep-binders" : LIST_VARIABLE[Append[#binders, (#var;)]]
   }SF-TopTerm[#formArgument, $[Plus, #index, 1], ok¹ index¹.#[ok¹, index¹]];
 
 
@@ -232,15 +233,28 @@ COPY(« #sink », memo(« #sink »->context, &« Descriptor[#function] »));
 return 1;
 ⟫;
 
-{#env; "$spilled":TEXT[#spilled]}
+{#env; "$spilled":TEXT[#spilled]; "$sink": VARIABLE[#sink]}
 SF-Body1[NO, #kind, #rules] 
-→ %n⟪«#spilled»«
+→ %n⟪«#spilled»«{#env}SF-CheckStack»«
     $[If, $[Equal, #kind, "Contract"],       {#env}SF-Contract[#rules],
     $[If, $[Equal, #kind, "BinderDispatch"], {#env}SF-Contract[#rules], 
     $[If, $[Equal, #kind, "Dispatch"],       {#env}SF-Dispatch[#rules],  
     $[If, $[Equal, #kind, "Shuffle" ],       {#env}SF-Contract[#rules],
                                              %n⟨⟩]]]]
 »⟫;
+
+// Insert code to check for stack depth
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+SF-CheckStack :: Text;
+
+{#env; "$fallback":NO}SF-CheckStack 
+→ %n⟪⟫;
+
+{#env;  "$sink": VARIABLE[#sink]; "$fallback":YES; "$step-result" : VARIABLE[#result]}SF-CheckStack 
+→ %n⟪
+int «#result» = (++«#sink»->context->depth > «#sink»->context->maxdepth) ? 2 : 0;
+if («#result» == 2) goto fallback;⟫;
+
 
 /*
   Generate C function body. Contraction mode.
@@ -273,9 +287,7 @@ SF-Contract[$List[Reified_Rule]] :: Text;
 SF-Contract[(RULE[#name, #Options, #Pattern, #Contractum]; #Rules)]
 → %n⟪¶do {⟦
 /* Contraction rule « COMMENT_TOKEN[#name] ». */« 
-    {#env;
-      "$vars" : LIST_VARIABLE[()];    // Keep list of linked variable that needs to be unlinked before contraction.
-    }
+    {#env; "$vars" : LIST_VARIABLE[()]}    // Keep list of linked variable that needs to be unlinked before contraction.
     F-Options[#Options, o3.
     F-then-Fresh[o3, #sink, #Options, ok.
     SF-pattern-init[ok, FIRST, MATCH, #Pattern, #sink, %n⟨⟩, $False, $False, %n⟨⟩, o2.
@@ -288,16 +300,17 @@ SF-Contract[(RULE[#name, #Options, #Pattern, #Contractum]; #Rules)]
   "$unstep-props" : TEXT[#unstep-props]; 
   "$function"     : STRING_VALUE[#function]; 
   "$sink"         : VARIABLE[#sink];
-  "$fallback"     : #fallback
+  "$fallback"     : #fallback;
+  "$step-result"  : VARIABLE[#result];
 }SF-Contract[()]
 → $[If, $[Equal, #fallback, NO], 
      %n⟪⟫, 
      %n⟪
 
-/* Fallback */«#unstep-props»
+fallback:«#unstep-props»
 START(«#sink», «EventConstructor[#function]»);«#unstep»
 END(«#sink», «EventConstructor[#function]»); 
-return 0;⟫];
+return «#result»;⟫];
 
 /*
   Generate C function body. Dispatch mode.
@@ -331,7 +344,8 @@ SF-Dispatch-choice[Reified_FormArgument, $List[Text] <!-- top-level arguments --
   "$sink"         : VARIABLE[#sink];
   "$unstep"       : TEXT[#unstep];
   "$unstep-props" : TEXT[#unstep-props]; 
-  "$function"     : STRING_VALUE[#function]
+  "$function"     : STRING_VALUE[#function];
+  "$step-result" : VARIABLE[#result]
 }SF-Dispatch-choice[FORM-ARGUMENT[SORT[#sort-name, #sort-params]], (#arg; #args), #rules]
 → %n⟪
 FORCE(«#sink»->context, «#arg»);
@@ -342,10 +356,10 @@ default:
 break;⟧
 }
 
-/* Fallback. */«#unstep-props»
+fallback:«#unstep-props»
 START(«#sink», «EventConstructor[#function]»);«#unstep»
 END(«#sink», «EventConstructor[#function]»); 
-return 0;⟫;
+return «#result»;⟫;
 
 // dispatch on single polymorphic variable - just contract.
 -[Free[alpha::Reified_Variable]] :

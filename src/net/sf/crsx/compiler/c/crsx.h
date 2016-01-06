@@ -76,8 +76,9 @@ struct _Context
 #ifndef OMIT_TIMESPEC
     struct timespec time;  // time when compute started.
 #endif
-    unsigned int depth;   // monitor recursion depth
-    Hashset2 env;           // General environment.
+    unsigned int depth;     // monitor strict evaluation depth
+    unsigned int maxdepth;  // maximum strict evaluation depth
+    Hashset2 env;            // General environment.
 
     int poolRefCount;
     Hashset2 stringPool;    // Set of dynamic PooledString

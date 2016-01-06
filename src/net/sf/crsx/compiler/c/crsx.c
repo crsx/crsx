@@ -3373,7 +3373,6 @@ struct _ContextEntry
 typedef struct _ContextEntry ContextEntry;
 SETUP_STACK_TYPE(ContextEntry)
 
-// Note that step is special:
 static int step(Sink sink, Term term); // helper
 
 // Standard normalization function.
@@ -3462,7 +3461,7 @@ void normalize(Context context, Term *termp)
         else if (IS_FUNCTION(term) && ! IS_NOSTEP(term))
         {
             Sink sink = ALLOCA_BUFFER(context);
-            if (step(sink, term)) // Reference is transferred and consumed only when step succeeds
+            if (step(sink, term))  // Reference is transferred and consumed only when step succeeds (non-strict mode)
             {
                 // (4) If term is a function invocation that is not marked as nostep and that we can in fact step then do so and update term to the result.
                 term = BUFFER_TERM(sink); // Reference is transferred
@@ -3526,7 +3525,7 @@ Term force(Context context, Term term)
         {
             //CRSX_CHECK(context, term);
             Sink sink = ALLOCA_BUFFER(context);
-            if (!step(sink, term)) // Reference is transferred and consume only when succeed
+            if (!step(sink, term)) // Reference is transferred and consume only when succeed (non-strict mode)
             {
                 if (context->strict)
                 {
@@ -3551,7 +3550,12 @@ Term force(Context context, Term term)
     return term;
 }
 
-// Helper to focus steps in a single place.
+/*
+ * Helper to focus steps in a single place.
+ * Returns: 0 when step failed
+ *          1 when step succeeded
+ *          2 when step failed due to stack overflow.
+ */
 static int step(Sink sink, Term term)
 {
 #   ifdef DEBUG
@@ -3565,14 +3569,16 @@ static int step(Sink sink, Term term)
     DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP(%ld): %s[%d] (%ld,%ld)\n", ++stepNesting, "", count, SYMBOL(term), CRSX_CHECK(sink->context, term), allocateCount, freeCount));
     DEBUGCOND(sink->context->debugviz,   DEBUGT(sink->context, stepNesting+4, term));
 
+    sink->context->depth = 0; // reset number of allowed consecutive strict calls.
+
 #ifdef STRICT
     int step = CALL0(sink, term);
 #else
     int step = term->descriptor->step(sink, term);
 #endif
 
-    DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
-    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld)\n", stepNesting--, "", (step ? "OK" : "FAIL"), count, allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugsteps, DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld) ==============\n", stepNesting--, "", (step == 1 ? "OK" : "FAIL"), count, allocateCount, freeCount));
+    DEBUGCOND(sink->context->debugviz,   DEBUGF(sink->context, "//%*sSTEP-%s(%ld): (%ld,%ld)\n", stepNesting--, "", (step == 1 ? "OK" : "FAIL"), count, allocateCount, freeCount));
 
     crsxpAfterStep(sink->context);
 
@@ -3586,6 +3592,7 @@ void initCRSXContext(Context context)
 
 	context->stamp = 0;
     context->depth = 0;
+    context->maxdepth = 10;
 
     context->debugsteps = getenv("crsx-debug-steps") != NULL;
     context->debugtrace = getenv("crsx-trace") != NULL;
@@ -6114,8 +6121,6 @@ int call0_0(Sink sink, Term term);
 int call0_1(Sink sink, Term term);
 int call0_x(Sink sink, Term term);
 
-const FunP0 dtable0[30] = { &call0_0, &call0_1, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x };
-
 int call0_0(Sink sink, Term term)
 {
 	const ConstructionDescriptor desc = term->descriptor;
@@ -6143,17 +6148,39 @@ int call0_x(Sink sink, Term term)
 	UNTHUNK
 }
 
+const FunP0 dtable0[100] = { &call0_0, &call0_1, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
+                             &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x};
+
 int call0(Sink sink, Term term) {
-	return dtable0[term->descriptor->argcount](sink, term);
+    ASSERT(sink->context, term->descriptor->argcount < 100);
+    return dtable0[term->descriptor->argcount](sink, term);
 }
 
 int call1_1(Sink sink, Term term, void* arg1);
 int call1_x(Sink sink, Term term, void* arg1);
 
-const FunP1 dtable1[30] = { NULL, &call1_1, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x };
+const FunP1 dtable1[100] = { NULL, &call1_1, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x,
+                         &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x, &call1_x  };
 
 int call1(Sink sink, Term term, void* arg1) {
-	return dtable1[term->descriptor->argcount](sink, term, arg1);
+    ASSERT(sink->context, term->descriptor->argcount < 100);
+    return dtable1[term->descriptor->argcount](sink, term, arg1);
 }
 
 int call1_1(Sink sink, Term term, void* arg1)
