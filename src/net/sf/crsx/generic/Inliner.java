@@ -51,11 +51,10 @@ public class Inliner
 	 * @param dataForms updated with all data forms indexed by symbol
 	 * @param functionForms updated with all function forms from {@link Factory#formsOf(String)} for all sorted symbols, indexed by symbol
 	 * @param fullSort updated with the full form of every sort, by sort name
-	 * @param rulesByFunction updated with all non-shuffle rules (overridden by {@link #lastDispatchify}) indexed by function symbol
-	 * @param shuffleRulesByFunction updated with shuffle rules
+	 * @param rulesByFunction updated with all rules (overridden by {@link #lastDispatchify}) indexed by function symbol
 	 * @throws CRSException 
 	 */
-	public void inline(Set<String> constructors, SortedMultiMap<String, Term> dataForms, SortedMultiMap<String, Pair<Term, Term>> functionForms, Map<String, Term> fullSort, SortedMultiMap<String, GenericRule> rulesByFunction, SortedMultiMap<String, GenericRule> shuffleRulesByFunction)
+	public void inline(Set<String> constructors, SortedMultiMap<String, Term> dataForms, SortedMultiMap<String, Pair<Term, Term>> functionForms, Map<String, Term> fullSort, SortedMultiMap<String, GenericRule> rulesByFunction)
 			throws CRSException
 	{
 		this.rulesByFunction = rulesByFunction; 
@@ -76,24 +75,27 @@ public class Inliner
 	}
 
 	/**
-	 * Performs inlining on given rule 
+	 * Partially evaluate the contraction of the given rule.
+	 * 
 	 * @throws CRSException
 	 */
 	private void inline(GenericRule rule) throws CRSException
 	{
-		// Get the rule.
-		String function = rule.contractum.constructor().symbol();
+		String function = Util.symbol(rule.contractum); // Name of the function to partially evaluate
+		
+		// Get all possible candidate rules
 		Set<GenericRule> rules = rulesByFunction.multiGet(function);
-
 		assert rules != null;
-
+		
 		if (rules.size() == 1)
 		{
-			GenericRule inlinedRule = rules.iterator().next();
+			// Get rule to evaluate.
+			GenericRule inlinedRule = rules.iterator().next(); 
 			
 			// Use dynamic match for computing valuation (conservative)
 			// Does not work well on redex with properties and meta-variables.
 			// For instance Redex=F[#1], Pattern=F[W[#2]] produces no valuation (which is normal).
+			// TODO: staticMatch.
 			Valuation valuation = inlinedRule.match(rule.contractum);
 			if (valuation != null)
 			{
@@ -110,33 +112,34 @@ public class Inliner
 						System.out.println("\n----- inlined rule:\n" + inlinedRule);
 					}
 						
+					// Override existing rule with new contractum.
+					
 					GenericRule newRule = new GenericRule(crs, rule.name, rule.pattern, newcontractum, rule.options);
 					
-					rulesByFunction.multiRemove(rule.pattern.constructor().symbol(), rule);
-					rulesByFunction.multiAdd(rule.pattern.constructor().symbol(), newRule);
+					String ruleSymbol = Util.symbol(rule.pattern);
+					rulesByFunction.multiRemove(ruleSymbol, rule);
+					rulesByFunction.multiAdd(ruleSymbol, newRule);
 					
 					if (print)
 						System.out.println("------ \nafter:\n" + newRule);
 					
 				} else
-				
 					excludes.add(rule);
 			}
 			else
-			{
-				// Couldn't statically contract rules. Record.
 				excludes.add(rule);
-			}
 		}
 		else
 		{
-			// Can't inline function with multiple rules as it requiress something like $[Dispatch
+			// Can't inline function with multiple rules as it requires something like $[Dispatch
+			// TODO: could do it if only one rule statically match.
 			excludes.add(rule);
 		}
 	}
 
 	/**
-	 * Get the list of rules to perform inlining on.
+	 * Compute the list of rules that should be considered for inlining their contractum 
+	 * @return A list of rules
 	 */
 	private List<GenericRule> toInline()
 	{
@@ -167,19 +170,23 @@ public class Inliner
 		return rules;
 	}
 
-	/** whether the given rules should be inlined */
-	private boolean inline(GenericRule rule, Set<GenericRule> rules)
+	/** 
+	 * Determines whether the given rules should be inlined 
+	 * @param rule the rule's contractum to considered
+	 * @param candidates the rules matching the rule's top-level contractum symbol */
+	private boolean inline(GenericRule rule, Set<GenericRule> candidates)
 	{
 		if (excludes.contains(rule))
 			return false;
 
 		// For now only single rule can be inlined.
-		if (rules.size() != 1)
+		if (candidates.size() != 1)
 			return false;
 
-		GenericRule r = rules.iterator().next();
+		GenericRule r = candidates.iterator().next();
 			
 		final String function = Util.symbol(rule.getContractum());
+		 
 		
 		// Not inlinable if recursive
 		if (r.contractum.kind() == Kind.CONSTRUCTION && Util.symbol(r.contractum).equals(function))

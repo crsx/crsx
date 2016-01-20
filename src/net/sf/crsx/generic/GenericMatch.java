@@ -385,7 +385,7 @@ class GenericMatch implements Match, Cloneable
                 w.append(v.name());
                 used.put(v, v.name());
             }			
-			w.append(") => ");
+			w.append(")").append(from).append(" => ");
 			try
 			{
 				getBody().appendTo(w, used, Integer.MAX_VALUE, false, true, true, null, false);

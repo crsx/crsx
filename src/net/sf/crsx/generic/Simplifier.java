@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,12 +17,10 @@ import net.sf.crsx.CRSException;
 import net.sf.crsx.Constructor;
 import net.sf.crsx.Factory;
 import net.sf.crsx.Kind;
-import net.sf.crsx.Primitive;
 import net.sf.crsx.PropertiesHolder;
 import net.sf.crsx.Sorting;
 import net.sf.crsx.Term;
 import net.sf.crsx.Variable;
-import net.sf.crsx.Visitor;
 import net.sf.crsx.generic.sort.SortUtil;
 import net.sf.crsx.util.ExtensibleSet;
 import net.sf.crsx.util.LinkedExtensibleSet;
@@ -69,7 +66,8 @@ import net.sf.crsx.util.Util;
  * At runtime, all functional binders are bound, even the non-occurring ones.
  * 
  * <p>
- * The closure conversion guarantees the functional binders occur in the exact same order they have been declared, to allow, at runtime, faster positional binding.
+ * The closure conversion guarantees the functional binders occur in the exact same order they have been declared, 
+ * to allow, at runtime, faster positional binding.
  * 
  * <p>
  * Meta notes:
@@ -141,6 +139,7 @@ public class Simplifier
 			// Continue with added rules
 			pendingRules = state.newrules;
 
+			// TODO: there are still some rules that are not sorted properly. When fixed, remove this statement.
 			crs.sortify();
 		}
 
@@ -161,6 +160,7 @@ public class Simplifier
 
 		}
 
+		// TODO: shouldn't be needed
 		crs.sortify();
 	}
 

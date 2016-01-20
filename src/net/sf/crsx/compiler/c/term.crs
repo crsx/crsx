@@ -598,8 +598,18 @@ $[IfDef, "STRICT",
 {#env} T-set[PROPERTY[#Key, #Value, #Term],         #sink, #variable] → {#env} T-set-buffer[PROPERTY[#Key, #Value, #Term],     #sink, #variable] ;
 {#env} T-set[PROPERTY-NOT[#Key, #Term],             #sink, #variable] → {#env} T-set-buffer[PROPERTY-NOT[#Key, #Term],         #sink, #variable] ;
 {#env} T-set[CONSTRUCTION[#kind, #Symbol, #Binders],#sink, #variable] → {#env} T-set-buffer[CONSTRUCTION[#kind, #Symbol, #Binders],   #sink, #variable] ;
-{#env} T-set[VARIABLE-USE[#Variable],               #sink, #variable] → {#env} T-set-buffer[VARIABLE-USE[#Variable],           #sink, #variable] ;
-{#env} T-set[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] → {#env} T-set-buffer[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] ;
+
+{#env} T-set[VARIABLE-USE[#Variable],               #sink, #variable] 
+→ 
+$[IfDef, "STRICT",
+    {#env} ST-set[VARIABLE-USE[#Variable],               #sink, #variable],
+    {#env} T-set-buffer[VARIABLE-USE[#Variable],           #sink, #variable]] ;
+
+{#env} T-set[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable] 
+→ 
+$[IfDef, "STRICT",
+    {#env}ST-set[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable],
+    {#env}T-set-buffer[META-APPLICATION[#MetaVar, #Args, #C], #sink, #variable]] ;
 
 // Helper to set term variable using temporary buffer.  TODO: alloca-buffer?
 {$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}T-set-buffer[Reified_Term, Text, Text] :: Text;

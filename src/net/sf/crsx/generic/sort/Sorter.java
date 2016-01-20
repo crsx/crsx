@@ -1344,6 +1344,14 @@ public class Sorter
 				sort = factory.newVariableUse(alpha);
 				break;
 			}
+			case SUBTERM: {
+				Variable alpha = freshSortVariable();
+				argumentsorts[0] = factory.newVariableUse(alpha);
+				argumentsorts[1] = freshForm(CRS.NUMERIC_SORT, 0);
+				alpha = freshSortVariable();
+				sort = factory.newVariableUse(alpha);
+				break;
+			}
 			case FOR: {
 				Variable alpha = freshSortVariable();
 				argumentsorts[0] = factory.newVariableUse(alpha);

@@ -796,6 +796,7 @@ public abstract class GenericConstruction extends GenericTerm
 		final int arity = arity();
 		if (redex.kind() != Kind.CONSTRUCTION || arity != redex.arity())
 			return false; // we shouldn't be here...
+
 		for (int i = 0; i < arity; ++i)
 		{
 			final Variable[] patternBinders = binders(i);
@@ -811,32 +812,10 @@ public abstract class GenericConstruction extends GenericTerm
 			     Variable b = termBinders[j];
 			     if (!pb.promiscuous() && b.promiscuous())
 			         return false; // linear pattern binder does not match unrestricted real binder
-			     //if (pb.blocking() != b.blocking())
-			     //    return false; 
 			     
 			     match.putVariable(pb, b);
 			 }
-// TODO: linearity.
-//            ExtensibleSet<Variable> nestedOnce = SimpleVariableSet.make(once);
-//            for (int j = 0; j < binderLength; ++j)
-//            {
-//                Variable v = patternBinders[j];
-//                Variable b = termBinders[j];
-//                
-//                // We are matching v -> b.
-//                if (v.promiscuous())
-//                    if (b.promiscuous())
-//                        ; // v -> b : safe
-//                    else
-//                        return false; // v -> ¹b : fail
-//                else
-//                    if (b.promiscuous())
-//                        nestedOnce = nestedOnce.extend(b); // ¹v -> b : we must check that b occurs linearly
-//                    else
-//                        ; // ¹v -> ¹b : safe
-//            }
-//			Collection<Variable> nestedOnceSeen = (onceSeen == null ? new HashSet<Variable>() : onceSeen);
-//			 
+
 			 if (!((Pattern) sub(i)).match(match, redex.sub(i), bound.extend(termBinders), contractionCount, promiscuous, once, onceSeen))
 			     return false;
 		}

@@ -59,14 +59,17 @@ public final class Util
 	{}
 
 	/** Regular expression that conservatively approximates constructors that can be parsed without being quoted. */
-	public static final java.util.regex.Pattern CONSTRUCTOR_PATTERN = java.util.regex.Pattern.compile("(?:\\w*[$A-Z]+\\w*|[\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]|\\d+(?:[.]\\d+)?(?:[Ee]\\d+)?|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+|<(i|b|u|tt|q)>(?:[^<>&\n\r]|&(?:#[0-9]+|[-$A-Za-z0-9_]+);)+</\\1>)"
-			+ "(?:[-](?:[$A-Za-z]+\\w*|\\d+|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+))*");
-	
+	public static final java.util.regex.Pattern CONSTRUCTOR_PATTERN = java.util.regex.Pattern.compile(
+			"(?:\\w*[$A-Z]+\\w*|[\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]|\\d+(?:[.]\\d+)?(?:[Ee]\\d+)?|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+|<(i|b|u|tt|q)>(?:[^<>&\n\r]|&(?:#[0-9]+|[-$A-Za-z0-9_]+);)+</\\1>)"
+					+ "(?:[-](?:[$A-Za-z]+\\w*|\\d+|[-@^*+`|\\\\!?$%=]+|(?:&(?:#\\d+|\\w+);)+))*");
+
 	/** Conservative approximation of string that it is safe to print as an unquoted variable name */
-	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile("[a-z][A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
+	public static final java.util.regex.Pattern VARIABLE_PATTERN = java.util.regex.Pattern.compile(
+			"[a-z][A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*(?:[-_]+[A-Za-z0-9\u02E2\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]+)*|v['][^']*[']|v[\"][^\"]*[\"]");
 
 	/** Conservative approximation of string that it is safe to print as an unquoted meta-variable name. */
-	public static final java.util.regex.Pattern META_VARIABLE_PATTERN = java.util.regex.Pattern.compile("(?:[<]em[>].*[<][/]em[>]|[A-Za-z0-9_$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[#]+[A-Za-z0-9_$#\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)(?:-[A-Za-z0-9$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)*|[#]['][^']*[']|[#][\"][^\"]*[\"]");
+	public static final java.util.regex.Pattern META_VARIABLE_PATTERN = java.util.regex.Pattern.compile(
+			"(?:[<]em[>].*[<][/]em[>]|[A-Za-z0-9_$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[#]+[A-Za-z0-9_$#\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)(?:-[A-Za-z0-9$\u0391-\u218F\u2200-\u2307\u230C-\u2767\u276A-\u27E5\u27EC-\u2982\u2985-\uF000]*[*+?]?)*|[#]['][^']*[']|[#][\"][^\"]*[\"]");
 
 	/** Whether this is a constant. */
 	final public static boolean isConstant(Stub term)
@@ -342,7 +345,7 @@ public final class Util
 		}
 		return fallback;
 	}
-	
+
 	static IdentityHashMap<String, String> externSymbols = new IdentityHashMap<String, String>();
 
 	/** Utility to export &lang;CONSTRUCTOR&rang; token in reparseable form. */
@@ -799,7 +802,7 @@ public final class Util
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Defensive extraction of numeric value.
 	 * @param stub term with property
@@ -1036,15 +1039,15 @@ public final class Util
 	/** Whether term has any properties at all. The standard property does not count. */
 	public static boolean hasNoStandardProperties(Term term)
 	{
-		return hasProperties(term, false);	
+		return hasProperties(term, false);
 	}
-	
+
 	/** Whether term has any properties at all.  A properties reference does not count */
 	public static boolean hasProperties(Term term)
 	{
 		return hasProperties(term, true);
 	}
-	
+
 	/** Whether term has any properties at all.  A properties reference does not count, as well as standard properties is includeStandard is false */
 	private static boolean hasProperties(Term term, boolean includeStandard)
 	{
@@ -1397,7 +1400,7 @@ public final class Util
 		{}
 		return c;
 	}
-	
+
 	/**
 	 * Make a copy of a map of named properties.
 	 * @param named properties (may map some values to null)
@@ -1776,7 +1779,9 @@ public final class Util
 						{
 							Variable[] newBinders = new Variable[first.binders(i).length];
 							for (int j = 0; j < newBinders.length; ++j)
-								newBinders[j] = sink.makeVariable(first.binders(i)[j].name(), first.binders(i)[j].promiscuous(), first.binders(i)[j].blocking(), first.binders(i)[j].shallow());
+								newBinders[j] = sink.makeVariable(
+										first.binders(i)[j].name(), first.binders(i)[j].promiscuous(),
+										first.binders(i)[j].blocking(), first.binders(i)[j].shallow());
 							for (Term t : terms)
 								renames = renames.extend(t.binders(i), newBinders);
 							sink = sink.binds(newBinders);
@@ -1914,8 +1919,7 @@ public final class Util
 		}
 
 		@Override
-		public void visitMetaApplicationSub(Term metaApplication, int index, boolean start, Set<Variable> bound)
-				throws CRSException
+		public void visitMetaApplicationSub(Term metaApplication, int index, boolean start, Set<Variable> bound) throws CRSException
 		{
 			if (!start
 					&& metaApplication.sub(index).kind() == Kind.VARIABLE_USE && metaApplication.sub(index).variable() == variable)
@@ -1999,7 +2003,7 @@ public final class Util
 		catch (CRSException e)
 		{}
 	}
-	
+
 	/**
 	 * Generate special occurrence term in reified BINDER structure...
 	 * @param sink to send to
@@ -2018,8 +2022,8 @@ public final class Util
 			{
 				final String mv = pair.head();
 				final Integer index = pair.tail();
-				sink = sink.start(sink.makeConstructor(CRS.REIFY_META_USE)).start(sink.makeLiteral(mv, CRS.STRING_SORT)).end().start(
-						sink.makeLiteral(index, CRS.NUMERIC_SORT)).end().end();
+				sink = sink.start(sink.makeConstructor(CRS.REIFY_META_USE)).start(
+						sink.makeLiteral(mv, CRS.STRING_SORT)).end().start(sink.makeLiteral(index, CRS.NUMERIC_SORT)).end().end();
 			}
 		}
 		sink = sink.start(sink.makeConstructor(CRS.NIL_SYMBOL)).end();

@@ -703,10 +703,11 @@ public class PropertiesConstraintsWrapper extends DelegateGenericTerm implements
 	// @see net.sf.crsx.Term#subsubstitute(net.sf.crsx.Valuation, net.sf.crsx.util.ExtensibleMap, net.sf.crsx.util.ExtensibleMap, net.sf.crsx.util.ExtensibleMap)
 	public Sink staticSubsubstitute(Sink sink, Valuation valuation, ExtensibleMap<Variable, Variable> renamings, ExtensibleMap<Variable, Contractum> substitution, ExtensibleMap<Variable, Variable> bound, Set<Variable> possible)
 	{
+		if (possible.isEmpty())
+			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
+
 		return null;
-//		if (possible.isEmpty())
-//			return copy(sink, false, bound); // Copying means there will be no substitutions so only pass redex bound variable renamings
-//		
+		//		
 //		// New wrapper properties...
 //		String r = propertiesRef; // pass catch-all.
 //		Map<String, Term> np = new HashMap<String, Term>(); // new named properties

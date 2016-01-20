@@ -237,6 +237,8 @@ public interface Builder
     public final static String WATCH_OPTION_SYMBOL = "Watch";
     /** Constructor for "Inline" option used by $Rule in {@link #load(Sink, Term)}. */
     public final static String INLINE_OPTION_SYMBOL = "Inline";
+    /** Constructor for "Main" option used by $Rule in {@link #load(Sink, Term)}. */
+    public final static String MAIN_OPTION_SYMBOL = "Main";
     
     /** Constructor for EXPERIMENTAL "FreshReuse" option used by $Rule in {@link #load(Sink, Term)}. */
     public final static String FRESH_REUSE_OPTION_SYMBOL = "FreshReuse";

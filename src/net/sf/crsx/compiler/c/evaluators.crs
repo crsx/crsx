@@ -2114,6 +2114,7 @@ POLY_PRIMITIVE[E_ProfileExit];
 POLY_PRIMITIVE[E_Let];
 POLY_PRIMITIVE[E_For];
 POLY_PRIMITIVE[E_Data];
+POLY_PRIMITIVE[E_SubTerm];
 
 )];
 
@@ -2160,7 +2161,7 @@ ERRORF(«#sink»->context, «FormatKindOf[#Name]», "%s\n", «str»);
 {#env}E-poly[E_ProfileEnter, (#Name; VARIABLE-USE[#var]; #name; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
 →
 {#env; "$tail":NO}T-local-string[#name, #sink, s p.%n⟪
-PROFILE_ENTER(«#sink»->context, VARIABLE(«#var»), «s»);«p»
+PROFILE_ENTER(«#sink»->context, «#var», «s»);«p»
 «{#env}#Tail[OK, #cont]»
 ⟫]
 ;
@@ -2180,7 +2181,7 @@ PROFILE_ENTER(«#sink»->context, VARIABLE(«{#env}MetaVar[#MetaVar]»), «s»);
 
 {#env}E-poly[E_ProfileExit, (#Name; VARIABLE-USE[#var]; #cont;), #Options, #sink, ok result.#Tail[ok,result]]
 →
-%n⟪PROFILE_EXIT(«#sink»->context, VARIABLE(«#var»));
+%n⟪PROFILE_EXIT(«#sink»->context, «#var»);
 «{#env}#Tail[OK, #cont]»
 ⟫
 ;
@@ -2336,6 +2337,10 @@ Poly-For:
 → %n⟪
 Term «term»;« {#env; "$tail": NO} T-set[#term, #sink, term]»
 «term» = NORMALIZEP(«#sink»->context, «term»);«{#env}E-poly-term-result[term, ok result.#tail[ok,result]]»⟫;
+
+// $[SubTerm, #term, #index]
+{#env}E-poly[E_SubTerm, (#name; #term; #index;), #options, #sink, ok result.#tail[ok,result]]
+→ {#env}E-poly-subterm[#term, #index, #sink, ok result.#tail[ok,result]];
 
 )];
 
@@ -3075,8 +3080,27 @@ E-poly-term-result2[$String, Text, $String, ok::OK_SORT result::Reified_Term.Tex
 
 -[Data[#metavarKey, #term, #metavar]]:
 {#env}E-poly-term-result2[#metavarKey, #term, #metavar, ok result.#tail[ok,result]]
-→ {#env; #metavarKey: VARIABLE[#term]}#tail[OK, META-APPLICATION[#metavar, (), USE[1]]];
+→ {#env; #metavarKey: VARIABLE[#term];  #term: SUB[#term, 0, $True, $True]}#tail[OK, META-APPLICATION[#metavar, (), USE[1]]];
 
+// --- Subterm
+
+{$String:STRING_ENTRY;Reified_Variable:VARIABLE_ENTRY}
+E-poly-subterm[Reified_Term, Reified_Term, Text, ok::OK_SORT result::Reified_Term.Text] :: Text;
+
+-[Fresh[term::Text, subterm::Text]]:
+{#env}E-poly-subterm[#term, LITERAL[#index, #sort], #sink, ok result.#tail[ok,result]]
+→ %n⟪
+Term «term»;«{#env}T-set[#term, #sink, term]»
+Term «subterm» = LINK(«#sink»->context, SUB(«term», «TOKEN[#index]»)); 
+UNLINK(«#sink»->context, «term»);«{#env}E-poly-term-result[subterm, ok result.#tail[ok,result]]»⟫;
+
+-[Fresh[term::Text, index::Text, subterm::Text], Fallback]:
+{#env}E-poly-subterm[#term, #index, #sink, ok result.#tail[ok,result]]
+→ %n⟪
+Term «term»;«{#env}T-set[#term, #sink, term]»
+long long «index»; «{#env}T-set-int[#index, #sink, index]»
+Term «subterm» = LINK(«#sink»->context, SUB(«term», «index»)); 
+UNLINK(«#sink»->context, «term»);«{#env}E-poly-term-result[subterm, ok result.#tail[ok,result]]»⟫;
 
 )]; // E3
 

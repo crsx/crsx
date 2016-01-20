@@ -2360,7 +2360,8 @@ public class GenericCRS implements CRS, Builder, Constructor, Term, Observable
 			
 			try
 			{
-				new Inliner(this).inline(constructors, dataForms, functionForms, fullSort, rulesByFunction, shuffleRulesByFunction);
+				new Inliner(this).inline(constructors, dataForms, functionForms, fullSort, rulesByFunction);
+				new DeadRulesRemover(this).removeDeadRules(constructors, dataForms, functionForms, fullSort, rulesByFunction, shuffleRulesByFunction);
 			}
 			catch (CRSException e)
 			{

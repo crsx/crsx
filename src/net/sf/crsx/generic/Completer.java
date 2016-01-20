@@ -3002,7 +3002,10 @@ public class Completer
 		discardedMetas.removeAll(usedMetas);
 		List<Term> discards = new ArrayList<Term>();
 		for (String mv : discardedMetas)
-			discards.add(factory.newMetaApplication(mv, GenericTerm.NO_TERMS));
+		{
+			if (!discards.contains(mv))
+				discards.add(factory.newMetaApplication(mv, GenericTerm.NO_TERMS));
+		}
 		if (discards.isEmpty())
 			options.remove(Builder.DISCARD_OPTION_SYMBOL);
 		else

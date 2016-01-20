@@ -1213,11 +1213,16 @@ $[If, $[Equal, #count, 1],
 {#env}ST-set[META-APPLICATION[#metavar, (#binder;#binders), #use], #sink, #variable] 
 →  {#env}ST-set-meta[{#env}ST-is-copied[#metavar, (#binder; #binders)], #metavar, (#binder; #binders), #use, #sink, #variable]; 
 
+
+{#env}ST-set[VARIABLE-USE[#variable], #sink, #resvar]
+→ 
+{#env}ST-set-variable[$[{#env}Get, #variable, FRESH], #variable, #sink, #resvar];
+
+
 // Proper term cases require buffering.
 {#env}ST-set[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] → {#env}ST-set-buffer[PROPERTY-REF[#Ref, #Use, #Term],       #sink, #variable] ;
 {#env}ST-set[PROPERTY[#Key, #Value, #Term],         #sink, #variable] → {#env}ST-set-buffer[PROPERTY[#Key, #Value, #Term],         #sink, #variable] ;
 {#env}ST-set[PROPERTY-NOT[#Key, #Term],             #sink, #variable] → {#env}ST-set-buffer[PROPERTY-NOT[#Key, #Term],             #sink, #variable] ;
-{#env}ST-set[VARIABLE-USE[#Variable],               #sink, #variable] → {#env}ST-set-buffer[VARIABLE-USE[#Variable],               #sink, #variable] ;
 {#env}ST-set[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, #variable] → {#env}ST-set-buffer[CONSTRUCTION[#Kind, #Symbol, #Binders],#sink, #variable] ;
 
 // Helper to set term variable using temporary buffer.   
@@ -1244,6 +1249,22 @@ ST-set-meta[$Boolean, $String, $List[Reified_Binder], Reified_Use, Text, Text] :
 {#env}ST-set-meta[$False, #metavar, #binders, #use, #sink, #variable]
 → {#env}ST-set-buffer[META-APPLICATION[#metavar, #binders, #use], #sink, #variable];
 
+
+{$String:STRING_ENTRY; Reified_Variable:VARIABLE_ENTRY}
+ST-set-variable[VARIABLE_ENTRY, Reified_Variable, Text, Text] :: Text;
+
+{#env} 
+ST-set-variable[BOUND_FUN, #variable, #sink, #resvar] 
+→
+%n⟪
+«#resvar» = LINK(«#sink»->context, (Term) «#sink»->context->functionalUse);⟫;
+
+-[Fallback]:
+{#env} 
+ST-set-variable[#entry, #variable, #sink, #resvar] 
+→
+%n⟪
+«#resvar» = (Term) makeVariableUse(«#sink»->context, linkVariable(«#sink»->context, «#variable»));⟫;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Generate code to capture reference to term to an existing variable.

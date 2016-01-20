@@ -310,7 +310,6 @@ final public class Environment
 	{
 		List<Term> discards = new ArrayList<Term>(2);
 		List<Term> copies = new ArrayList<Term>(2);
-		// List<Term> weak = new ArrayList<Term>(2);
 
 		Map<String, Integer> patternMetavars = Util.metaVars(rule.getPattern());
 		if (patternMetavars != null)

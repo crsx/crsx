@@ -76,7 +76,7 @@ public class GenericRule implements Copyable
 
 	/** List for fresh variable that can be reused */
 	List<Variable> freshReused;
-	
+
 	/** The global variables in contractum where the rule system copy should be used. */
 	final Map<String, Term> global;
 
@@ -198,6 +198,13 @@ public class GenericRule implements Copyable
 	public Map<String, List<Term>> getOptions()
 	{
 		return options;
+	}
+
+	/** Whether this is a shuffle rule */
+	public boolean isShuffle()
+	{
+		return options.containsKey(Builder.COMPILE_TYPE_OPTION_SYMBOL)
+				&& "Shuffle".equals(Util.symbol(options.get(Builder.COMPILE_TYPE_OPTION_SYMBOL).get(0)));
 	}
 
 	/** 
@@ -727,11 +734,11 @@ public class GenericRule implements Copyable
 						{
 							// Term of the form T[ ... x y.S[... z.v ...] ...]
 							// or               T[ ... x y.S[... v.v ...] ...]
-         					// This is either the identity function (v.v) or constant (z.v).
-							
+							// This is either the identity function (v.v) or constant (z.v).
+
 							// In both cases we need to perform closure conversion
 							// so consider this variable as deep.
-							
+
 							return true;
 						}
 						break;
@@ -998,40 +1005,39 @@ public class GenericRule implements Copyable
 	 */
 	public boolean inline()
 	{
-		if(options != null && options.containsKey(Builder.INLINE_OPTION_SYMBOL))
+		if (options != null && options.containsKey(Builder.INLINE_OPTION_SYMBOL))
 			return true;
-		
+
 		if (!forced.isEmpty())
 		{
 			// Currently there is no way to force inlined term, so fail...
 			return false;
 		}
-		
+
 		if (!free.isEmpty())
 			return false;
-		
+
 		if (!fresh.isEmpty())
 		{
 			// Could be done but for now disable. 
 			return false;
 		}
-		
+
 		if (freshReused != null && !freshReused.isEmpty())
 		{
 			// Could be done but for now disable. 
 			return false;
 		}
-		
+
 		if (!copied.isEmpty())
 		{
 			// In general not a good idea, except if meta is data, which is not known here.
 			return false;
 		}
-		
+
 		return true;
 	}
 
-	
 	/**
 	 * Statically contract this fragment of contractum (rule right hand side) to sink.
 	 * Reduces Data-declared fragments followed by contraction.
@@ -1044,7 +1050,7 @@ public class GenericRule implements Copyable
 	{
 		if (!inline())
 			return null;
-		
+
 		return contractum.staticContract(sink, valuation, renamings);
 	}
 

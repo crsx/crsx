@@ -1647,7 +1647,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
 // void freeTStack(TStack)    - free the entire stack
 
 #ifndef STACK_SEGMENT_SIZE
-# define STACK_SEGMENT_SIZE 63
+# define STACK_SEGMENT_SIZE 1023
 #endif
 #define SETUP_STACK_TYPE(TYPE)                                                                          \
                                                                                                         \

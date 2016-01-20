@@ -249,6 +249,8 @@ public enum Primitive
 	SCRIPT("Script", 1, 1),
 	/** $[Normalize, term[, crs]] normalizes the term using the indicated crs (or in-scope crs if not specified) and returns the result.  */
 	NORMALIZE("Normalize", 1, 2),
+	/** $[SubTerm, #term, #index] evaluates to the subterm at #index.  */
+	SUBTERM("SubTerm", 2, 2),
 	
 	/** $[If, #test, #true[, #false]] with constant #test evaluates as either #true or #false depending on whether test is true or false (empty sequence/string, zero, $False). */
 	IF("If", 2, 3),
@@ -269,7 +271,7 @@ public enum Primitive
 	/** $[IfData, #t, #true[, #false]] is #true if #t is a data construction, otherwise #false or (). */
 	IF_DATA("IfData", 2, 3),
 	/** $[Data, #t] forces evaluation of #t (normalization). */
-	DATA("Data", 2, 3),
+	DATA("Data", 1, 1),
 	/** $[Let, #binder, #term, #return]] binds #expr to #meta and return #return. #binder can be a tuple. */
 	LET("Let", 3, 3),
 	/** $[For, #vars, #list, #param, #init, #body, #return]] iterate over #list, binds list item to #vars, evaluate #body and binds #body result to #param then return #return */
