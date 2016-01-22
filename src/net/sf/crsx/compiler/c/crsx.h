@@ -54,6 +54,9 @@ typedef struct _Hashset2* Hashset2;
 typedef struct _Buffer *Buffer;
 typedef struct _BufferEntry *BufferEntry;
 typedef struct _BufferSegment *BufferSegment;
+typedef struct _TermStack *TermStack;
+typedef struct _TermStackSegment *TermStackSegment;
+
 typedef const char *PooledString;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +95,8 @@ struct _Context
 
     BufferSegment segmentPool;
     ssize_t segmentPoolSize;
+    TermStackSegment termSegmentPool;
+    ssize_t termSegmentPoolSize;
 
     Hashset* hashsetPool[HASHSET_MAX_NBITS];
     ssize_t hashsetPoolSize[HASHSET_MAX_NBITS];
@@ -1647,7 +1652,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
 // void freeTStack(TStack)    - free the entire stack
 
 #ifndef STACK_SEGMENT_SIZE
-# define STACK_SEGMENT_SIZE 1023
+# define STACK_SEGMENT_SIZE 32
 #endif
 #define SETUP_STACK_TYPE(TYPE)                                                                          \
                                                                                                         \
@@ -1659,7 +1664,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
                                                                                                         \
   static TYPE##Stack make##TYPE##Stack(Context context)                                                 \
   {                                                                                                     \
-      TYPE##Stack stack = (TYPE##Stack) ALLOCATE(context, sizeof(struct _##TYPE##Stack)); \
+      TYPE##Stack stack = (TYPE##Stack) malloc(sizeof(struct _##TYPE##Stack)); \
       stack->context = context;                                                                         \
       stack->last = NULL;                                                                               \
       stack->top = -1;                                                                                  \
@@ -1676,7 +1681,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       ++stack->top;                                                                                     \
       if (!stack->last || stack->top >= STACK_SEGMENT_SIZE)                                             \
       {                                                                                                 \
-          TYPE##StackSegment segment = (TYPE##StackSegment) ALLOCATE(stack->context, sizeof(struct _##TYPE##StackSegment)); \
+          TYPE##StackSegment segment = (TYPE##StackSegment) malloc(sizeof(struct _##TYPE##StackSegment)); \
           segment->previous = stack->last;                                                              \
           stack->last = segment;                                                                        \
           stack->top = 0;                                                                               \
@@ -1691,7 +1696,7 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       {                                                                                                 \
           TYPE##StackSegment segment = stack->last;                                                     \
           stack->last = segment->previous;                                                              \
-          FREE(stack->context, segment);                                                                \
+          free(segment);                                                                \
           if (stack->last)                                                                              \
               stack->top = STACK_SEGMENT_SIZE-1;                                                        \
       }                                                                                                 \
@@ -1708,11 +1713,22 @@ extern void mergeAllB(BitSetP first, BitSetP second);
       while (last)                                                                                      \
       {                                                                                                 \
           TYPE##StackSegment previous = last->previous;                                                 \
-          FREE(stack->context, last);                                                                   \
+          free(last);                                                                   \
           last = previous;                                                                              \
       }                                                                                                 \
-      FREE(stack->context, stack);                                                                      \
+      free(stack);                                                                      \
   }
+
+// Pooled term stack
+
+struct _TermStack { Context context; TermStackSegment last; int top; };
+struct _TermStackSegment { TermStackSegment previous; Term entry[STACK_SEGMENT_SIZE]; };
+
+extern int emptyTermStack(TermStack stack);
+extern void pushTerm(TermStack stack, Term value);
+extern void popTerm(TermStack stack);
+extern Term *topTerm(TermStack stack);
+extern void freeTermStack(TermStack stack);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // QUEUES OF MEMORY-MANAGED SEGMENTS

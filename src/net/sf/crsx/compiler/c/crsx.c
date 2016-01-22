@@ -185,7 +185,7 @@ Construction makeGlobalConstruction(ConstructionDescriptor desc)
 	return construction;
 }
 
-SETUP_STACK_TYPE(Term)
+//SETUP_STACK_TYPE(Term)
 
 static
 void freeConstruction(Context context, Construction construction, TermStack stack)
@@ -2642,6 +2642,8 @@ void crsxAddPools(Context context)
 
         context->segmentPool = NULL;
         context->segmentPoolSize = 0;
+        context->termSegmentPool = NULL;
+        context->termSegmentPoolSize = 0;
     }
     ++context->poolRefCount;
 
@@ -4564,15 +4566,104 @@ void passLocationProperties(Context context, Term locTerm, Term term)
 /////////////////////////////////////////////////////////////////////////////////
 // Memory management.
 
+static TermStackSegment newTermSegment(TermStack stack)
+{
+    TermStackSegment segment;
+    if (stack->context->termSegmentPool)
+    {
+        ASSERT(stack->context, stack->context->termSegmentPoolSize > 0);
+        segment = stack->context->termSegmentPool;
+
+        stack->context->termSegmentPool = segment->previous;
+        stack->context->termSegmentPoolSize --;
+    }
+    else
+    {
+        segment = (TermStackSegment) malloc(sizeof(struct _TermStackSegment));
+    }
+    return segment;
+}
+
+static void freeTermSegment(TermStack stack, TermStackSegment segment)
+{
+    // Put segment back in the pool, if not too big.
+    if (stack->context->termSegmentPoolSize < MAX_SEGMENT_POOL_SIZE)
+    {
+        if (stack->context->termSegmentPool)
+        {
+            stack->context->termSegmentPool->previous = segment;
+            stack->context->termSegmentPool = segment;
+        }
+        else
+        {
+            stack->context->termSegmentPool = segment;
+        }
+        segment->previous = NULL;
+        stack->context->termSegmentPoolSize ++;
+    }
+    else
+        free(segment);
+}
+
+int emptyTermStack(TermStack stack)
+{
+    return !stack->last;
+}
+
+void pushTerm(TermStack stack, Term value)
+{
+    ++stack->top;
+    if (!stack->last || stack->top >= STACK_SEGMENT_SIZE)
+    {
+        TermStackSegment segment = newTermSegment(stack);
+
+        segment->previous = stack->last;
+        stack->last = segment;
+        stack->top = 0;
+    }
+    stack->last->entry[stack->top] = value;
+}
+
+void popTerm(TermStack stack)
+{
+    --stack->top;
+    if (stack->top < 0 && stack->last)
+    {
+        TermStackSegment segment = stack->last;
+        stack->last = segment->previous;
+
+        freeTermSegment(stack, segment);
+
+        if (stack->last)
+            stack->top = STACK_SEGMENT_SIZE-1;
+    }
+}
+
+Term *topTerm(TermStack stack)
+{
+    return &stack->last->entry[stack->top];
+}
+
+void freeTermStack(TermStack stack)
+{
+    TermStackSegment last = stack->last;
+    while (last)
+    {
+        TermStackSegment previous = last->previous;
+        freeTermSegment(stack, last);
+        last = previous;
+    }
+}
+
 void freeTerm(Context context, Term term)
 {
-    TermStack stack = makeTermStack(context);
-    pushTerm(stack, term);
+    struct _TermStack stack = { context, NULL, -1 };
+    pushTerm(&stack, term);
 
-    while (!emptyTermStack(stack))
+    while (!emptyTermStack(&stack))
     {
-        term = *topTerm(stack);
-        popTerm(stack);
+        term = *topTerm(&stack);
+        popTerm(&stack);
 
         ASSERT(context, term->nr == 0);
 
@@ -4586,11 +4677,11 @@ void freeTerm(Context context, Term term)
         else
         {
             Construction construction = asConstruction(term);
-            freeConstruction(context, construction, stack);
+            freeConstruction(context, construction, &stack);
         }
     }
 
-    freeTermStack(stack);
+    freeTermStack(&stack);
 }
 
 void unlinkValueTerm(Context context, const void* key, void* value)
