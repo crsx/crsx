@@ -2650,6 +2650,8 @@ void crsxAddPools(Context context)
     crsxpInit(context);
 }
 
+static void destroyTermSegments(TermStackSegment segment);
+
 void crsxReleasePools(Context context)
 {
     crsxpReleasePools(context);
@@ -2692,6 +2694,8 @@ void crsxReleasePools(Context context)
         destroySegments(context, context->segmentPool);
         context->segmentPool = NULL;
         context->segmentPoolSize = 0;
+
+        destroyTermSegments(context->termSegmentPool);
 
     }
     crsxpDestroy(context);
@@ -4603,6 +4607,17 @@ static void freeTermSegment(TermStack stack, TermStackSegment segment)
     }
     else
         free(segment);
+}
+
+
+static void destroyTermSegments(TermStackSegment segment)
+{
+    while (segment)
+    {
+        TermStackSegment prev = segment->previous;
+        free(segment);
+        segment = prev;
+    }
 }
 
 int emptyTermStack(TermStack stack)
