@@ -50,27 +50,27 @@ Variable makeVariableTrusty(Context context, char *name, unsigned int bound, uns
 
     if (trustname)
     {
-      	size_t z = strlen(name)+1;
+        size_t z = strlen(name)+1;
         v->name = (char*) ALLOCATE(context, z);
-	    memcpy(v->name, name, z);
+        memcpy(v->name, name, z);
     }
     else
     {
-    	// TODO: too expensive.
-    	int len = strlen(name);
-    	char *nameu = name;
-    	while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
-    	if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
-    	{
-    	    if (nameu < name+len)
-    	        v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
-    	    else
-    	        v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
-    	}
-    	else
-    	{
-    	    v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
-    	}
+        // TODO: too expensive.
+        int len = strlen(name);
+        char *nameu = name;
+        while (nameu < name+len && (*nameu != '_' || *(nameu+1) < '0' ||  *(nameu+1) > '9')) ++nameu;
+        if (name[0] == 'v' && name[1] == '"' && name[len-1] == '"')
+        {
+            if (nameu < name+len)
+                v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(nameu-name), name, ++context->stamp, "\"");
+            else
+                v->name = ALLOCATENF(context, 100, "%.*s_%u%s", (int)(strlen(name)-1), name, ++context->stamp, "\"");
+        }
+        else
+        {
+            v->name = ALLOCATENF(context, 100, "%.*s_%u", (int)(nameu < name+len ? nameu-name : len), name, ++context->stamp);
+        }
     }
 
     v->bound = bound;
@@ -83,7 +83,7 @@ Variable makeVariableTrusty(Context context, char *name, unsigned int bound, uns
 
 Variable makeVariable(Context context, char *name, unsigned int bound, unsigned int linear)
 {
-	return makeVariableTrusty(context, name, bound, linear, 0);
+    return makeVariableTrusty(context, name, bound, linear, 0);
 }
 
 void freeVariable(Context context, Variable variable)
@@ -165,24 +165,24 @@ static Construction makeConstruction(Context context, ConstructionDescriptor des
 
 Construction makeGlobalConstruction(ConstructionDescriptor desc)
 {
-	Construction construction = (Construction) malloc(desc->size);
-	construction->term.descriptor = desc;
-	construction->term.nr = SSIZE_MAX; // Immortal
+    Construction construction = (Construction) malloc(desc->size);
+    construction->term.descriptor = desc;
+    construction->term.nr = SSIZE_MAX; // Immortal
 
-	#ifdef CRSX_ENABLE_PROFILING
-	    construction->term.marker = 0;
+    #ifdef CRSX_ENABLE_PROFILING
+        construction->term.marker = 0;
     #endif
-	construction->nf = 1;
-	construction->nostep = 1;
-	construction->closure = 0;
+    construction->nf = 1;
+    construction->nostep = 1;
+    construction->closure = 0;
 
-	construction->namedProperties = NULL;
-	construction->variableProperties = NULL;
-	construction->fvs = NULL;
-	construction->nfvs = NULL;
-	construction->vfvs = NULL;
+    construction->namedProperties = NULL;
+    construction->variableProperties = NULL;
+    construction->fvs = NULL;
+    construction->nfvs = NULL;
+    construction->vfvs = NULL;
 
-	return construction;
+    return construction;
 }
 
 //SETUP_STACK_TYPE(Term)
@@ -241,13 +241,13 @@ void freeConstruction(Context context, Construction construction, TermStack stac
 
 void addMemo(Context context, ConstructionDescriptor desc, Term term)
 {
-	addValueHS2(context, context->cterms, (const void*) desc, (void*) term);
+    addValueHS2(context, context->cterms, (const void*) desc, (void*) term);
 }
 
 Term memo(Context context, ConstructionDescriptor desc)
 {
-	Term t = (Term) getValueHS2(context->cterms, (const void*) desc);
-	return t ?  LINK(context, t) : t;
+    Term t = (Term) getValueHS2(context->cterms, (const void*) desc);
+    return t ?  LINK(context, t) : t;
 }
 
 
@@ -294,7 +294,7 @@ struct _ConstructionDescriptor literalConstructionDescriptor =
     noBinderOffsets,                            //.binderoffset
     (char *(*)(Term term))&literalName,         //.name
 #ifdef STRICT
-	0,                                          //.argcount
+    0,                                          //.argcount
 #endif
     &dataStep                                   //.step
 };
@@ -584,22 +584,22 @@ Sink bufferUse(Sink sink, Variable variable)
 
     VariableUse use;
     if (variable == sink->context->functional)
-    	use = (VariableUse) LINK(sink->context, (Term) sink->context->functionalUse);
+        use = (VariableUse) LINK(sink->context, (Term) sink->context->functionalUse);
     else
-    	use = makeVariableUse(sink->context, variable); // No need to link variable
+        use = makeVariableUse(sink->context, variable); // No need to link variable
 
     bufferInsert(buffer, (Term) use);
 
     if (variable == sink->context->functional)
     {
-    	// A construction with functional binders cannot be normalized. Mark as nostep
-    	// TODO: should really be on the construction descriptor.
-    	if (buffer->lastTop >= 0)
-    	{
-    		BufferEntry entry = &buffer->last->entry[buffer->lastTop];
-    		asConstruction(entry->term)->nostep = 1;
-    		asConstruction(entry->term)->closure = 1;
-    	}
+        // A construction with functional binders cannot be normalized. Mark as nostep
+        // TODO: should really be on the construction descriptor.
+        if (buffer->lastTop >= 0)
+        {
+            BufferEntry entry = &buffer->last->entry[buffer->lastTop];
+            asConstruction(entry->term)->nostep = 1;
+            asConstruction(entry->term)->closure = 1;
+        }
     }
 
     // Fresh context for next child.
@@ -649,13 +649,13 @@ Sink bufferCopy(Sink sink, Term term) // Transfer ref
 
     // If no properties or are the same, then just share!
     if (IS_VARIABLE_USE(term)
-    		|| (buffer->pendingNamedProperties == NULL && buffer->pendingVariableProperties == NULL)
-			|| (buffer->pendingNamedProperties == asConstruction(term)->namedProperties && buffer->pendingVariableProperties == asConstruction(term)->variableProperties))
+            || (buffer->pendingNamedProperties == NULL && buffer->pendingVariableProperties == NULL)
+            || (buffer->pendingNamedProperties == asConstruction(term)->namedProperties && buffer->pendingVariableProperties == asConstruction(term)->variableProperties))
     {
-    	UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
-    	buffer->pendingNamedProperties = NULL;
+        UNLINK_NamedPropertyLink(context, buffer->pendingNamedProperties);
+        buffer->pendingNamedProperties = NULL;
         UNLINK_VariablePropertyLink(context, buffer->pendingVariableProperties);
-    	buffer->pendingVariableProperties = NULL;
+        buffer->pendingVariableProperties = NULL;
 
         bufferInsert(buffer, term);
         return sink;
@@ -2504,7 +2504,7 @@ Term c_variableProperty(VariablePropertyLink link, Variable variable)
 
 NamedPropertyLink addNamedProperty(Context context, NamedPropertyLink link, PooledString key, Term term)
 {
-	ASSERT(context, containsHS2(context->keyPool, key) || containsHS2(context->stringPool, key));
+    ASSERT(context, containsHS2(context->keyPool, key) || containsHS2(context->stringPool, key));
 
     Hashset nfvs = NULL;
     if (context->fv_enabled)
@@ -2622,7 +2622,7 @@ void crsxAddPools(Context context)
 
         int i;
         for (i = 0; i < literalsCount; i ++)
-        	addValueHS2(context, context->keyPool, literalsTable[i], (void*) literalsTable[i]);
+            addValueHS2(context, context->keyPool, literalsTable[i], (void*) literalsTable[i]);
 
         context->consPool = (Construction **) ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(Construction));
         context->consPoolSize = (ssize_t *) ALLOCATE(context, CONS_POOL_MAX_SIZE_SIZE * sizeof(ssize_t));
@@ -2650,7 +2650,7 @@ void crsxAddPools(Context context)
     crsxpInit(context);
 }
 
-static void destroyTermSegments(TermStackSegment segment);
+static void destroyTermSegments(Context context, TermStackSegment segment);
 
 void crsxReleasePools(Context context)
 {
@@ -2695,7 +2695,9 @@ void crsxReleasePools(Context context)
         context->segmentPool = NULL;
         context->segmentPoolSize = 0;
 
-        destroyTermSegments(context->termSegmentPool);
+        destroyTermSegments(context, context->termSegmentPool);
+        context->termSegmentPool = NULL;
+        context->termSegmentPool = 0;
 
     }
     crsxpDestroy(context);
@@ -2712,7 +2714,7 @@ char *makeString(Context context, const char *src)
 
 PooledString makeKeyString(Context context, const char *src)
 {
-	// Search first in static pool
+    // Search first in static pool
     Hashset2 pool = context->keyPool;
 
     PooledString pstring = (PooledString) getValueHS2(pool, (const void*) src);
@@ -3482,13 +3484,13 @@ void normalize(Context context, Term *termp)
                 // (5) If term is a function invocation that is not marked as nostep and that we can in fact not step then mark it as nostep.
                 // (Note: failed step has not output anything to buffer, except in strict mode)
 
-            	if (context->strict)
-				{
-					// When strict mode is set, the step function always consumes the term and output a new term in the sink
-					term = BUFFER_TERM(sink);
-				}
+                if (context->strict)
+                {
+                    // When strict mode is set, the step function always consumes the term and output a new term in the sink
+                    term = BUFFER_TERM(sink);
+                }
 
-            	asConstruction(term)->nostep = 1;
+                asConstruction(term)->nostep = 1;
             }
             FREE_BUFFER(sink); // always free buffer, even when not actually used!
         }
@@ -3535,8 +3537,8 @@ Term force(Context context, Term term)
             {
                 if (context->strict)
                 {
-                	// When strict mode is set, the step function always consumes the term and output a new term in the sink
-                	term = BUFFER_TERM(sink);
+                    // When strict mode is set, the step function always consumes the term and output a new term in the sink
+                    term = BUFFER_TERM(sink);
                 }
 
                 //DEBUGF(context, "//NF DATA %s\n", SYMBOL(term));
@@ -3593,10 +3595,10 @@ static int step(Sink sink, Term term)
 
 void initCRSXContext(Context context)
 {
-	initLiterals();
-	initConstants();
+    initLiterals();
+    initConstants();
 
-	context->stamp = 0;
+    context->stamp = 0;
     context->depth = 0;
     context->maxdepth = 10;
 
@@ -4395,10 +4397,10 @@ Hashset freeVars(Context context, Term term, Hashset set)
 {
     if (IS_VARIABLE_USE(term))
     {
-    	// No need to keep track of functional variables as they
+        // No need to keep track of functional variables as they
         // are substituted in a special way.
-    	if ((VariableUse) term == context->functionalUse)
-    		return NULL;
+        if ((VariableUse) term == context->functionalUse)
+            return NULL;
 
         return addVariableHS(context, set, linkVariable(context, VARIABLE(term)));
     }
@@ -4583,7 +4585,7 @@ static TermStackSegment newTermSegment(TermStack stack)
     }
     else
     {
-        segment = (TermStackSegment) malloc(sizeof(struct _TermStackSegment));
+        segment = (TermStackSegment) ALLOCATE(stack->context, sizeof(struct _TermStackSegment));
     }
     return segment;
 }
@@ -4606,16 +4608,16 @@ static void freeTermSegment(TermStack stack, TermStackSegment segment)
         stack->context->termSegmentPoolSize ++;
     }
     else
-        free(segment);
+        FREE(stack->context, segment);
 }
 
 
-static void destroyTermSegments(TermStackSegment segment)
+static void destroyTermSegments(Context context, TermStackSegment segment)
 {
     while (segment)
     {
         TermStackSegment prev = segment->previous;
-        free(segment);
+        FREE(context, segment);
         segment = prev;
     }
 }
@@ -4782,19 +4784,19 @@ NamedPropertyLink indexNamedProperties(Context context, PooledString name, Term 
 
 NamedPropertyLink ALLOCATE_NamedPropertyLink(Context context, PooledString name, Term term, NamedPropertyLink nlink, Hashset fvs, int index)
 {
-	ASSERT(context, containsHS2(context->keyPool, name) || containsHS2(context->stringPool, name));
+    ASSERT(context, containsHS2(context->keyPool, name) || containsHS2(context->stringPool, name));
 
-	crsxpAllocateNamedProperty(context, nlink);
+    crsxpAllocateNamedProperty(context, nlink);
 
     if (index)
     {
-    	if (nlink && !nlink->name && nlink->nr == 1 && nlink->u.propset->nr == 1)
-		{
-			nlink->u.propset = addValueHS2(context, nlink->u.propset, name, term);
-			return nlink;
-		}
+        if (nlink && !nlink->name && nlink->nr == 1 && nlink->u.propset->nr == 1)
+        {
+            nlink->u.propset = addValueHS2(context, nlink->u.propset, name, term);
+            return nlink;
+        }
 
-    	int count = nlink ? nlink->count + 1 : 1;
+        int count = nlink ? nlink->count + 1 : 1;
         if (count > context->indexThreshold)
             return indexNamedProperties(context, name, term, nlink, fvs);
     }
@@ -5057,13 +5059,13 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
             {
                 PooledString name = link1->name;
                 if (name == 0)
-					assert(!"not implemented yet: indexed named property comparison");
-				Term value1 = link1->u.term;
+                    assert(!"not implemented yet: indexed named property comparison");
+                Term value1 = link1->u.term;
                 Term value2 = NULL;
                 for (link2 = construction2->namedProperties; link2; link2 = link2->link)
                 {
                     if (link2->name == 0)
-                      	assert(!"not implemented yet: indexed named property comparison");
+                        assert(!"not implemented yet: indexed named property comparison");
 
                     if (name == link2->name)
                     {
@@ -5078,12 +5080,12 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
             {
                 PooledString name = link2->name;
                 if (name != 0)
-                	assert(!"not implemented yet: indexed named property comparison");
+                    assert(!"not implemented yet: indexed named property comparison");
                 Term value1 = NULL;
                 for (link1 = construction1->namedProperties; link1; link1 = link1->link)
                 {
                     if (link1->name == 0)
-                    	assert(!"not implemented yet: indexed named property comparison");
+                        assert(!"not implemented yet: indexed named property comparison");
                     if (name == link1->name)
                     {
                         value1 = link1->u.term;
@@ -5161,44 +5163,44 @@ static int deepEqual2(Context context, Term term1, Term term2, int compenv, Vari
 // Keys of properties.
 
 void sendPropertiesKeys(Sink sink, NamedPropertyLink named, VariablePropertyLink vard) {
-	int depth = 0;
-	for (; named; named = named->link) {
-		if (named->name) {
-			START(sink, _M__sCons);
-			LITERAL(sink, named->name);
-			++depth;
-		} else {
-			Iterator2 iter = iteratorHS2(sink->context, named->u.propset);
-			if (iter) {
-				do {
-					START(sink, _M__sCons);
-					LITERAL(sink, (char* )getKeyIHS2(iter));
-					++depth;
-				} while (nextIHS2(iter));
-			}
-		}
-	}
-	for (; vard; vard = vard->link) {
-		if (vard->variable) {
-			START(sink, _M__sCons);
-			USE(sink, vard->variable);
-			++depth;
-		} else {
-			Iterator2 iter = iteratorHS2(sink->context, vard->u.propset);
-			if (iter) {
-				do {
-					START(sink, _M__sCons);
-					USE(sink, (Variable )getKeyIHS2(iter));
-					++depth;
-				} while (nextIHS2(iter));
-			}
-		}
-	}
-	// Terminate and unravel list.
-	START(sink, _M__sNil);
-	END(sink, _M__sNil);
-	while (depth-- > 0)
-		END(sink, _M__sCons);
+    int depth = 0;
+    for (; named; named = named->link) {
+        if (named->name) {
+            START(sink, _M__sCons);
+            LITERAL(sink, named->name);
+            ++depth;
+        } else {
+            Iterator2 iter = iteratorHS2(sink->context, named->u.propset);
+            if (iter) {
+                do {
+                    START(sink, _M__sCons);
+                    LITERAL(sink, (char* )getKeyIHS2(iter));
+                    ++depth;
+                } while (nextIHS2(iter));
+            }
+        }
+    }
+    for (; vard; vard = vard->link) {
+        if (vard->variable) {
+            START(sink, _M__sCons);
+            USE(sink, vard->variable);
+            ++depth;
+        } else {
+            Iterator2 iter = iteratorHS2(sink->context, vard->u.propset);
+            if (iter) {
+                do {
+                    START(sink, _M__sCons);
+                    USE(sink, (Variable )getKeyIHS2(iter));
+                    ++depth;
+                } while (nextIHS2(iter));
+            }
+        }
+    }
+    // Terminate and unravel list.
+    START(sink, _M__sNil);
+    END(sink, _M__sNil);
+    while (depth-- > 0)
+        END(sink, _M__sCons);
 }
 
 
@@ -5212,19 +5214,19 @@ ConstructionDescriptor lookupSymbolTableDescriptor(Context context, SymbolDescri
     while (hi >= lo)
     {
         x = (lo+hi)/2;
-	if (! (lo <= x && x <= hi && strcmp(table[lo].symbol, symbol) <= 0 && strcmp(symbol, table[hi].symbol) <= 0) )
-	{
-	    ERRORF(context, Crsx, "Unrecognized symbol: %s\n", symbol);
-	    break;
-	}
-	SymbolDescriptor candidate = &table[x];
-	int compare = strcmp(symbol, candidate->symbol);
-	if (compare == 0)
-	    return candidate->descriptor;
-	if (compare < 0) // what we are searching for is in lower half
-	    hi = x-1;
-	else //if (compare > 0) // what we are searching for is in upper half
-	    lo = x+1;
+    if (! (lo <= x && x <= hi && strcmp(table[lo].symbol, symbol) <= 0 && strcmp(symbol, table[hi].symbol) <= 0) )
+    {
+        ERRORF(context, Crsx, "Unrecognized symbol: %s\n", symbol);
+        break;
+    }
+    SymbolDescriptor candidate = &table[x];
+    int compare = strcmp(symbol, candidate->symbol);
+    if (compare == 0)
+        return candidate->descriptor;
+    if (compare < 0) // what we are searching for is in lower half
+        hi = x-1;
+    else //if (compare > 0) // what we are searching for is in upper half
+        lo = x+1;
     }
     return NULL;
 }
@@ -5349,10 +5351,10 @@ void pwt(Context context, Term term)
 
 extern void pnp(Context context,  NamedPropertyLink namedProperties)
 {
-	VariableSet encountered = makeVariableSet(context);
-	int pos = 0;
-	fprintNamedProperties(context, STDOUT, namedProperties, "", INT32_MAX, encountered, NULL, 0, &pos, getenv("include-annotations") ? 1 : 0, getenv("omit-properties") ? 0 : 10);
-	freeVariableSet(encountered);
+    VariableSet encountered = makeVariableSet(context);
+    int pos = 0;
+    fprintNamedProperties(context, STDOUT, namedProperties, "", INT32_MAX, encountered, NULL, 0, &pos, getenv("include-annotations") ? 1 : 0, getenv("omit-properties") ? 0 : 10);
+    freeVariableSet(encountered);
 }
 
 char *SPACES = (char *) "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ";
@@ -5930,20 +5932,20 @@ static char* fprintProperty(Context context, FILE* out, int isNamed, size_t nr, 
 
 static char *fprintPropsHS2(Context context, FILE* out, int isNamed, Hashset2 set, char* sep, int depth, VariableSet encountered, Hashset2 used, int indent, int *posp, int debug, int max)
 {
-	if (set)
-	{
-		size_t i;
-		for (i = 0 ; i < set->nslots ; i++)
-		{
-			LinkedList2 slot = set->entries[i];
-			while (slot)
-			{
-				Term term = (Term) slot->value;
-				sep = fprintProperty(context, out, isNamed, set->nr, slot->key, term, sep, depth, encountered, used, indent, posp, debug, max);
-				slot = slot->next;
-			}
-		}
-	}
+    if (set)
+    {
+        size_t i;
+        for (i = 0 ; i < set->nslots ; i++)
+        {
+            LinkedList2 slot = set->entries[i];
+            while (slot)
+            {
+                Term term = (Term) slot->value;
+                sep = fprintProperty(context, out, isNamed, set->nr, slot->key, term, sep, depth, encountered, used, indent, posp, debug, max);
+                slot = slot->next;
+            }
+        }
+    }
     return sep;
 }
 
@@ -6132,38 +6134,38 @@ void printCTerm2(Context context, Term term, VariableSet allocated, char *sink, 
 
 void printTraceForCps(Context context, Term term)
 {
-	PRINTF(context, "==>\n");
-	while (1) {
-		if (IS_LITERAL(term))
-    	{
-        	PRINTF(context, "   %s\n", term->descriptor->name(term));
-        	break;
-    	}
-    	else if (IS_CONSTRUCTION(term))
-    	{
-    		char* nm=term->descriptor->name(term);
-        	PRINTF(context, "   %s\n", nm);
-        	int arity=ARITY(term);
-        	if (arity==0) break;
-        	
-        	int k;
-        	for (k=0; k<arity; k++) {
-        		Term sub = SUB(term, k);
-        		if (sub && IS_CONSTRUCTION(sub) && !strncmp(sub->descriptor->name(sub), "CONT", 4)) {
-        			term = SUB(sub, 0);
-        			goto cont;
-        		}
-        	}
-        	
-        	if (RANK(term, arity-1)>0)
-        	{
-				term= SUB(term,arity-1);	
-        	}
-        	else break;
+    PRINTF(context, "==>\n");
+    while (1) {
+        if (IS_LITERAL(term))
+        {
+            PRINTF(context, "   %s\n", term->descriptor->name(term));
+            break;
+        }
+        else if (IS_CONSTRUCTION(term))
+        {
+            char* nm=term->descriptor->name(term);
+            PRINTF(context, "   %s\n", nm);
+            int arity=ARITY(term);
+            if (arity==0) break;
+
+            int k;
+            for (k=0; k<arity; k++) {
+                Term sub = SUB(term, k);
+                if (sub && IS_CONSTRUCTION(sub) && !strncmp(sub->descriptor->name(sub), "CONT", 4)) {
+                    term = SUB(sub, 0);
+                    goto cont;
+                }
+            }
+
+            if (RANK(term, arity-1)>0)
+            {
+                term= SUB(term,arity-1);
+            }
+            else break;
         }
         else break;
     cont:
-    	continue;
+        continue;
     }
 }
 
@@ -6191,37 +6193,37 @@ typedef int (*FunP1)(Sink, Term, void*);
 #define ARGS5 ARGS4, arg5
 
 #define UNTHUNK \
-		const ConstructionDescriptor desc = term->descriptor; \
-		const ssize_t shared = LINK_COUNT(term); \
-		const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term)); \
-		const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term)); \
-		void* p[96]; \
-		int ri = 0; \
-		int pi = 0; \
-		int i; \
-		for (i = 0; i < desc->arity; i ++) \
-		{ \
-			const Term sub = SUB(term, i); \
-			if (IS_FUNCTIONAL_USE(sink->context, sub)) \
-			{ \
-				p[ri++] = args[pi++]; \
-			} \
-			else \
-			{ \
-				int rank = c_rankd(desc, i); \
-				if (rank > 0) \
-				{ \
-					int j; \
-					for (j = 0; j < rank; j ++) \
-						p[ri++] = (void*) linkVariable(sink->context, BINDER(term, i, j)); \
-				} \
-				p[ri++] =  LINK(sink->context, sub);\
-			} \
-		} \
-		UNLINK(sink->context, term); \
-		for (i = 0; i < desc->argcount - 2; i ++) \
-			sink->context->crsxArg[i] = p[i + 2]; \
-		return ((DFunP2) desc->step)(sink, shared, namedP, varP, p[0], p[1]);
+        const ConstructionDescriptor desc = term->descriptor; \
+        const ssize_t shared = LINK_COUNT(term); \
+        const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term)); \
+        const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term)); \
+        void* p[96]; \
+        int ri = 0; \
+        int pi = 0; \
+        int i; \
+        for (i = 0; i < desc->arity; i ++) \
+        { \
+            const Term sub = SUB(term, i); \
+            if (IS_FUNCTIONAL_USE(sink->context, sub)) \
+            { \
+                p[ri++] = args[pi++]; \
+            } \
+            else \
+            { \
+                int rank = c_rankd(desc, i); \
+                if (rank > 0) \
+                { \
+                    int j; \
+                    for (j = 0; j < rank; j ++) \
+                        p[ri++] = (void*) linkVariable(sink->context, BINDER(term, i, j)); \
+                } \
+                p[ri++] =  LINK(sink->context, sub);\
+            } \
+        } \
+        UNLINK(sink->context, term); \
+        for (i = 0; i < desc->argcount - 2; i ++) \
+            sink->context->crsxArg[i] = p[i + 2]; \
+        return ((DFunP2) desc->step)(sink, shared, namedP, varP, p[0], p[1]);
 
 int call0_0(Sink sink, Term term);
 int call0_1(Sink sink, Term term);
@@ -6229,29 +6231,29 @@ int call0_x(Sink sink, Term term);
 
 int call0_0(Sink sink, Term term)
 {
-	const ConstructionDescriptor desc = term->descriptor;
-	const ssize_t shared = LINK_COUNT(term);
-	const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
-	const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
-	UNLINK(sink->context, term);
-	return ((DFunP0) desc->step)(sink, shared, namedP, varP);
+    const ConstructionDescriptor desc = term->descriptor;
+    const ssize_t shared = LINK_COUNT(term);
+    const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
+    const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
+    UNLINK(sink->context, term);
+    return ((DFunP0) desc->step)(sink, shared, namedP, varP);
 }
 
 int call0_1(Sink sink, Term term)
 {
-	const ConstructionDescriptor desc = term->descriptor;
-	const ssize_t shared = LINK_COUNT(term);
-	const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
-	const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
-	const Term sub0 = LINK(sink->context, SUB(term, 0)); // sub0 must be a term without binders.
-	UNLINK(sink->context, term);
-	return ((DFunP1) desc->step)(sink, shared, namedP, varP, sub0);
+    const ConstructionDescriptor desc = term->descriptor;
+    const ssize_t shared = LINK_COUNT(term);
+    const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
+    const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
+    const Term sub0 = LINK(sink->context, SUB(term, 0)); // sub0 must be a term without binders.
+    UNLINK(sink->context, term);
+    return ((DFunP1) desc->step)(sink, shared, namedP, varP, sub0);
 }
 
 int call0_x(Sink sink, Term term)
 {
-	void** args = NULL;
-	UNTHUNK
+    void** args = NULL;
+    UNTHUNK
 }
 
 const FunP0 dtable0[100] = { &call0_0, &call0_1, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x, &call0_x,
@@ -6291,46 +6293,46 @@ int call1(Sink sink, Term term, void* arg1) {
 
 int call1_1(Sink sink, Term term, void* arg1)
 {
-	const ConstructionDescriptor desc = term->descriptor;
-	const ssize_t shared = LINK_COUNT(term);
-	const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
-	const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
-	UNLINK(sink->context, term);
-	return ((DFunP1) desc->step)(sink, shared, namedP, varP, arg1);
+    const ConstructionDescriptor desc = term->descriptor;
+    const ssize_t shared = LINK_COUNT(term);
+    const NamedPropertyLink namedP = LINK_NamedPropertyLink(sink->context, NAMED_PROPERTIES(term));
+    const VariablePropertyLink varP = LINK_VariablePropertyLink(sink->context, VARIABLE_PROPERTIES(term));
+    UNLINK(sink->context, term);
+    return ((DFunP1) desc->step)(sink, shared, namedP, varP, arg1);
 }
 
 int call1_x(Sink sink, Term term, void* arg1)
 {
-	void* args[1] = { arg1 };
-	UNTHUNK
+    void* args[1] = { arg1 };
+    UNTHUNK
 }
 
 int call2(Sink sink, Term term, void* arg1, void* arg2)
 {
-	void* args[2] = { arg1, arg2 };
-	UNTHUNK
+    void* args[2] = { arg1, arg2 };
+    UNTHUNK
 }
 
 int call3(Sink sink, Term term, void* arg1, void* arg2, void* arg3)
 {
-	void* args[3] = { arg1, arg2, arg3 };
-	UNTHUNK
+    void* args[3] = { arg1, arg2, arg3 };
+    UNTHUNK
 }
 
 int call4(Sink sink, Term term, void* arg1, void* arg2, void* arg3, void* arg4)
 {
-	void* args[4] = { arg1, arg2, arg3, arg4 };
-	UNTHUNK
+    void* args[4] = { arg1, arg2, arg3, arg4 };
+    UNTHUNK
 }
 
 // Fallback: arguments are spilled onto heap
 int call(Sink sink, Term term, int argcount, void* arg1, void* arg2, void* arg3)
 {
-	void* args[64] = { arg1, arg2, arg3 };
-	int k;
-	for (k = 0; k < argcount; k++)
-		args[k + 3] = sink->context->crsxArg[k];
-	UNTHUNK
+    void* args[64] = { arg1, arg2, arg3 };
+    int k;
+    for (k = 0; k < argcount; k++)
+        args[k + 3] = sink->context->crsxArg[k];
+    UNTHUNK
 }
 
 #endif
