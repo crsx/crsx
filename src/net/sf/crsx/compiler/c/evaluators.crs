@@ -609,7 +609,7 @@ $[If, $[Equal, #Name, "$Numeric"],$False,
 →
 $[If, $[Equal, "$String", #ReturnSortName], %n⟪LITERAL(«#sink», «#value»);⟫,
 $[If, $[Equal, "$Boolean", #ReturnSortName], %n⟪if («#value») { START(«#sink», «MANGLE["$True"]»); END(«#sink», «MANGLE["$True"]»); } else  { START(«#sink», «MANGLE["$False"]»); END(«#sink», «MANGLE["$False"]»); }⟫,
-$[If, $[Equal, "$Numeric", #ReturnSortName], %n⟪LITERALNF(«#sink», (size_t) 31, "%G", «#value»);⟫
+$[If, $[Equal, "$Numeric", #ReturnSortName], %n⟪LITERALNF(«#sink», (size_t) 31, "%.15G", «#value»);⟫
 ]]]
 ;
 
@@ -1437,7 +1437,7 @@ E-send-num[#Primitive, #Args, #Options, #sink]
 %n⟪
 {⟦
 double «num»;«{#env; "$tail":NO}E-set-num[#Primitive, #Args, #Options, #sink, num]»
-LITERALNF(«#sink», (size_t) 31, "%G", «num»);«{#env}E-send-tail»⟧
+LITERALNF(«#sink», (size_t) 31, "%.15G", «num»);«{#env}E-send-tail»⟧
 }⟫
 ;
 
@@ -1477,7 +1477,7 @@ double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
 %n⟪
 {⟦
 double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
-«#variable» = ALLOCATENF(«#sink»->context, (size_t) 31, "%G", «num»);⟧
+«#variable» = ALLOCATENF(«#sink»->context, (size_t) 31, "%.15G", «num»);⟧
 }⟫
 ;
 
@@ -1489,7 +1489,7 @@ double «num»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»
 → 
 %n⟪
 {⟦
-double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+double «num»; char *«str»;«{#env}E-set-num[#Primitive, #Args, #Options, #sink, num]»snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%.15G", «num»);
 « #[str, %n⟨⟩] »⟧
 }⟫
 ;
@@ -1913,7 +1913,7 @@ Set-String-FormatNumber[Fresh[num::Text, str::Text]]
 %n⟪
 {⟦
 double «num»; char *«str»;« {#env}T-set-num[#Number, #sink, num] »
-snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%G", «num»);
+snprintf(«str» = (char *) ALLOCA(«#sink»->context, (size_t) 32), (size_t) 31, "%.15G", «num»);
 « #[str,%n⟨⟩] »⟧
 }⟫;
 
